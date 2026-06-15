@@ -10,9 +10,11 @@
 
   <ItemGroup>
     <ProjectReference Include="../Agent.Core/Agent.Core.csproj" />
+    <ProjectReference Include="../Agent.Memory/Agent.Memory.csproj" />
     <ProjectReference Include="../Agent.Tools/Agent.Tools.csproj" />
+    <ProjectReference Include="../Agent.World.Minecraft/Agent.World.Minecraft.csproj" />
   </ItemGroup>
 
-  <!-- TODO: add SignalR for real-time UI updates (BotStatusUpdated, InventoryChanged, etc.) -->
+  <!-- TODO Phase 1: add SignalR for real-time BotStatusUpdated events -->
 
 </Project>
