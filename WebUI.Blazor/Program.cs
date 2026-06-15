@@ -1,10 +1,11 @@
 // MemorySmith.Agent — Web UI & Agent Host
-// Exposes REST endpoints for agent control and hosts the agent background service.
-// SignalR (Phase 1): will push BotStatusUpdated, InventoryChanged, NewBlueprintPage.
-// LLM integration (Phase 2): Microsoft.Extensions.AI with Ollama/OpenAI.
+// Phase 1: REST API endpoints, WebSocket bridge to Minecraft.
+// Phase 2: RestMemoryGateway (IMemoryGateway via MemorySmith REST).
+// Phase 3: HTN/GOAP planner, goal factory, POST /api/agent/plan endpoint.
 
 using Agent.Core;
 using Agent.Memory;
+using Agent.Planning;
 using Agent.Tools;
 using Agent.World.Minecraft;
 using Microsoft.Extensions.Options;
@@ -12,7 +13,7 @@ using WebUI.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── Agent options ────────────────────────────────────────────────────────────
+// ── Options ──────────────────────────────────────────────────────────────────
 builder.Services.Configure<MinecraftAdapterConfig>(
     builder.Configuration.GetSection("Agent:Minecraft"));
 builder.Services.Configure<RestMemoryGatewayOptions>(
@@ -23,14 +24,14 @@ var agentEnabled = builder.Configuration.GetValue<bool>("Agent:Enabled");
 
 if (agentEnabled)
 {
-    // IWorldAdapter → MinecraftAdapter (auto-starts Node.js when AutoStartNode = true)
+    // IWorldAdapter → MinecraftAdapter
     builder.Services.AddSingleton<IWorldAdapter>(sp =>
     {
         var cfg = sp.GetRequiredService<IOptions<MinecraftAdapterConfig>>().Value;
         return new MinecraftAdapter(cfg);
     });
 
-    // IMemoryGateway → RestMemoryGateway via IHttpClientFactory (pooled, resilient)
+    // IMemoryGateway → RestMemoryGateway (IHttpClientFactory for pooling)
     builder.Services.AddHttpClient("memorysmith", (sp, http) =>
     {
         var opts = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
@@ -39,7 +40,6 @@ if (agentEnabled)
         if (!string.IsNullOrEmpty(opts.ApiKey))
             http.DefaultRequestHeaders.Add("X-Api-Key", opts.ApiKey);
     });
-
     builder.Services.AddSingleton<IMemoryGateway>(sp =>
     {
         var factory = sp.GetRequiredService<IHttpClientFactory>();
@@ -47,13 +47,13 @@ if (agentEnabled)
         return new RestMemoryGateway(factory.CreateClient("memorysmith"), opts);
     });
 
-    // IToolCaller → ToolEngine with all registered tools
+    // IToolCaller → ToolEngine with all tools
     builder.Services.AddSingleton<ToolRegistry>();
     builder.Services.AddSingleton<IToolCaller>(sp =>
     {
         var registry = sp.GetRequiredService<ToolRegistry>();
-        var world   = sp.GetRequiredService<IWorldAdapter>();
-        var memory  = sp.GetRequiredService<IMemoryGateway>();
+        var world    = sp.GetRequiredService<IWorldAdapter>();
+        var memory   = sp.GetRequiredService<IMemoryGateway>();
 
         registry.Register(new MoveToTool(world));
         registry.Register(new StatusTool(world));
@@ -64,8 +64,18 @@ if (agentEnabled)
         return new ToolEngine(registry);
     });
 
-    // Hosted agent loop
-    builder.Services.AddHostedService<AgentBackgroundService>();
+    // IPlanner → HtnPlanner with default task library
+    builder.Services.AddSingleton<HtnTaskLibrary>();
+    builder.Services.AddSingleton<IPlanner, HtnPlanner>();
+
+    // IGoalFactory → GoalFactory
+    builder.Services.AddSingleton<IGoalFactory, GoalFactory>();
+
+    // Hosted agent loop — registered as concrete type AND as IHostedService
+    // so both /api/agent/plan (typed resolution) and DI work.
+    builder.Services.AddSingleton<AgentBackgroundService>();
+    builder.Services.AddHostedService(sp =>
+        sp.GetRequiredService<AgentBackgroundService>());
 }
 
 // ── Build ────────────────────────────────────────────────────────────────────
@@ -73,16 +83,53 @@ var app = builder.Build();
 
 app.MapGet("/", () => "MemorySmith.Agent is running.");
 
-// Agent control endpoints
+// Agent control
 app.MapPost("/api/agent/connect",  () => Results.Ok(new { Status = "connected" }));
 app.MapPost("/api/agent/stop",     () => Results.Ok(new { Status = "stopped" }));
-app.MapGet ("/api/agent/status",   () => Results.Ok(new { Status = agentEnabled ? "idle" : "disabled", Goal = (string?)null }));
+app.MapGet ("/api/agent/status", (AgentBackgroundService? agent) =>
+    Results.Ok(new
+    {
+        Status = agentEnabled ? "idle" : "disabled",
+        Goal   = agent?.CurrentGoal?.Name,
+        Health = agent?.WorldState.Health,
+    }));
 
-app.MapPost("/api/agent/command", (CommandRequest req) =>
+// Queue a raw tool call
+app.MapPost("/api/agent/command", (CommandRequest req, AgentBackgroundService? agent) =>
 {
-    // TODO Phase 1: route to AgentBackgroundService.Enqueue when agent is enabled
-    return Results.Ok(new { Received = req.Command, Status = agentEnabled ? "queued" : "agent disabled" });
+    if (agent is null)
+        return Results.BadRequest("Agent is not enabled.");
+    agent.Enqueue(new ActionData { Tool = req.Command });
+    return Results.Ok(new { Received = req.Command, Status = "queued" });
 });
+
+// Create a plan for a named goal and enqueue it
+app.MapPost("/api/agent/plan", async (PlanRequest req, AgentBackgroundService? agent,
+    IPlanner? planner, IGoalFactory? factory) =>
+{
+    if (agent is null || planner is null || factory is null)
+        return Results.Problem("Agent services are not enabled. Set Agent:Enabled=true.");
+
+    var goal = factory.Create(req.GoalName, req.Parameters);
+    if (goal is null)
+        return Results.BadRequest(
+            new { Error = $"Unknown goal '{req.GoalName}'.",
+                  Available = factory.RegisteredGoals });
+
+    var plan = await planner.PlanAsync(goal, agent.WorldState);
+    agent.SetGoal(goal); // also clears queue and resets failures
+    return Results.Ok(new
+    {
+        Goal        = goal.Name,
+        Description = goal.Description,
+        ActionCount = plan.Actions.Count,
+        Phases      = plan.Phases,
+    });
+});
+
+// List available goals
+app.MapGet("/api/goals", (IGoalFactory? factory) =>
+    Results.Ok(factory?.RegisteredGoals ?? []));
 
 // Blueprint catalog
 app.MapGet("/api/blueprints", () => Results.Ok(Array.Empty<object>()));
@@ -90,3 +137,4 @@ app.MapGet("/api/blueprints", () => Results.Ok(Array.Empty<object>()));
 app.Run();
 
 record CommandRequest(string Command);
+record PlanRequest(string GoalName, IReadOnlyDictionary<string, object?>? Parameters = null);
