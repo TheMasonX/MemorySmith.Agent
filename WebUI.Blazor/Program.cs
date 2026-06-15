@@ -81,7 +81,28 @@ if (agentEnabled)
 // ── Build ────────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
+// Static files (wwwroot/about.html → /about)
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.MapGet("/", () => "MemorySmith.Agent is running.");
+
+// About endpoint
+app.MapGet("/api/about", () => Results.Ok(new
+{
+    Name        = "MemorySmith.Agent",
+    Description = "A modular autonomous agent framework backed by the MemorySmith knowledge system.",
+    Version     = "0.3.0",
+    Phase       = "Phase 3 — HTN/GOAP Planner (complete)",
+    License     = "MIT",
+    Repository  = "https://github.com/TheMasonX/MemorySmith.Agent",
+    ProjectSource = "https://github.com/TheMasonX/MemorySmith",
+    Dashboard   = "/about",
+    WikiHome    = "/Data/Pages/home.md",
+    RegisteredGoals = agentEnabled
+        ? new[] { "GatherWood", "SurviveNight" }
+        : Array.Empty<string>(),
+}));
 
 // Agent control
 app.MapPost("/api/agent/connect",  () => Results.Ok(new { Status = "connected" }));
