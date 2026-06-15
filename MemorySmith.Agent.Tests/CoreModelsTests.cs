@@ -1,5 +1,6 @@
 using Agent.Core;
 using Agent.Tools;
+using NUnit.Framework;
 using System.Text.Json;
 
 namespace MemorySmith.Agent.Tests;
