@@ -10,7 +10,7 @@ using System.Text.Json.Serialization;
 /// IMemoryGateway implementation that calls MemorySmith's REST API.
 ///
 /// API contract (TheMasonX/MemorySmith):
-///   GET  /api/search?query={q}&limit={n}  — unified search (memories + pages)
+///   GET  /api/search?query={q}&amp;limit={n}  — unified search (memories + pages)
 ///   GET  /api/pages/{slug}                — get a page by slug
 ///   POST /api/pages                       — create page { slug, title, body, minimumRole }
 ///   PUT  /api/pages/{slug}                — update page { slug, title, body, minimumRole }
@@ -33,8 +33,11 @@ public sealed class RestMemoryGateway(HttpClient http, RestMemoryGatewayOptions 
         var url = $"api/search?query={Uri.EscapeDataString(query)}&limit=20";
         var hits = await http.GetFromJsonAsync<SearchHit[]>(url, JsonOpts, cancellationToken)
                    ?? [];
+        // Preserve MemorySmith's server-side ordering (score desc, then date desc).
+        // Kind="page" → PageId is a slug usable in GetPageAsync.
+        // Kind="memory" → PageId is a UUID, NOT a valid page slug.
         return hits
-            .Select(h => new SearchResult(h.Id, h.Score ?? 0.0, h.Snippet))
+            .Select(h => new SearchResult(h.Id, h.Score ?? 0.0, h.Snippet, h.Kind))
             .ToArray();
     }
 
@@ -68,10 +71,17 @@ public sealed class RestMemoryGateway(HttpClient http, RestMemoryGatewayOptions 
     {
         var url = $"api/pages/{Uri.EscapeDataString(pageId)}";
 
-        // Fetch existing title so we can preserve it on update
-        var existing = await http.GetFromJsonAsync<PageResponse>(url, JsonOpts, cancellationToken);
-        var title = existing?.Title ?? pageId;
+        // Fetch existing page to preserve its title on update.
+        // If the page doesn't exist we fall back to pageId as a reasonable title
+        // (the PUT will create it as an upsert on MemorySmith's side).
+        PageResponse? existing = null;
+        try
+        {
+            existing = await http.GetFromJsonAsync<PageResponse>(url, JsonOpts, cancellationToken);
+        }
+        catch { /* 404 or parse error — proceed with fallback title */ }
 
+        var title = existing?.Title ?? pageId.Replace("-", " ");
         var req = new PageSaveRequest(pageId, title, content, options.DefaultPageRole);
         var resp = await http.PutAsJsonAsync(url, req, JsonOpts, cancellationToken);
         resp.EnsureSuccessStatusCode();
