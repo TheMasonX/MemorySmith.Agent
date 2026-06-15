@@ -30,6 +30,7 @@
     <ProjectReference Include="../Agent.Core/Agent.Core.csproj" />
     <ProjectReference Include="../Agent.Planning/Agent.Planning.csproj" />
     <ProjectReference Include="../Agent.Tools/Agent.Tools.csproj" />
+    <ProjectReference Include="../WebUI.Blazor/WebUI.Blazor.csproj" />
   </ItemGroup>
 
 </Project>
