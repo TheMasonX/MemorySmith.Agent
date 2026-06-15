@@ -1,13 +1,74 @@
-// MemorySmith.Agent — Web UI Host
-// Exposes REST endpoints for agent control and will host the Blazor dashboard (Phase 1).
-// SignalR will push real-time events (BotStatusUpdated, InventoryChanged, NewBlueprintPage)
-// to connected browsers.
+// MemorySmith.Agent — Web UI & Agent Host
+// Exposes REST endpoints for agent control and hosts the agent background service.
+// SignalR (Phase 1): will push BotStatusUpdated, InventoryChanged, NewBlueprintPage.
+// LLM integration (Phase 2): Microsoft.Extensions.AI with Ollama/OpenAI.
+
+using Agent.Core;
+using Agent.Memory;
+using Agent.Tools;
+using Agent.World.Minecraft;
+using Microsoft.Extensions.Options;
+using WebUI.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// TODO Phase 1: builder.Services.AddSignalR();
-// TODO Phase 2: register IMemoryGateway, IToolRegistry, IPlanner, IWorldAdapter
+// ── Agent options ────────────────────────────────────────────────────────────
+builder.Services.Configure<MinecraftAdapterConfig>(
+    builder.Configuration.GetSection("Agent:Minecraft"));
+builder.Services.Configure<RestMemoryGatewayOptions>(
+    builder.Configuration.GetSection("Agent:Memory"));
 
+// ── Agent services (registered when Agent:Enabled = true) ───────────────────
+var agentEnabled = builder.Configuration.GetValue<bool>("Agent:Enabled");
+
+if (agentEnabled)
+{
+    // IWorldAdapter → MinecraftAdapter (auto-starts Node.js when AutoStartNode = true)
+    builder.Services.AddSingleton<IWorldAdapter>(sp =>
+    {
+        var cfg = sp.GetRequiredService<IOptions<MinecraftAdapterConfig>>().Value;
+        return new MinecraftAdapter(cfg);
+    });
+
+    // IMemoryGateway → RestMemoryGateway (calls live MemorySmith instance)
+    builder.Services.AddSingleton<RestMemoryGatewayOptions>(sp =>
+        sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value);
+
+    builder.Services.AddSingleton<IMemoryGateway>(sp =>
+    {
+        var opts = sp.GetRequiredService<RestMemoryGatewayOptions>();
+        var http = new HttpClient
+        {
+            BaseAddress = new Uri(opts.BaseUrl),
+            Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds),
+        };
+        if (!string.IsNullOrEmpty(opts.ApiKey))
+            http.DefaultRequestHeaders.Add("X-Api-Key", opts.ApiKey);
+        return new RestMemoryGateway(http, opts);
+    });
+
+    // IToolCaller → ToolEngine with all registered tools
+    builder.Services.AddSingleton<ToolRegistry>();
+    builder.Services.AddSingleton<IToolCaller>(sp =>
+    {
+        var registry = sp.GetRequiredService<ToolRegistry>();
+        var world   = sp.GetRequiredService<IWorldAdapter>();
+        var memory  = sp.GetRequiredService<IMemoryGateway>();
+
+        registry.Register(new MoveToTool(world));
+        registry.Register(new StatusTool(world));
+        registry.Register(new SearchMemoryTool(memory));
+        registry.Register(new GetPageTool(memory));
+        registry.Register(new CreatePageTool(memory));
+
+        return new ToolEngine(registry);
+    });
+
+    // Hosted agent loop
+    builder.Services.AddHostedService<AgentBackgroundService>();
+}
+
+// ── Build ────────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
 app.MapGet("/", () => "MemorySmith.Agent is running.");
@@ -15,10 +76,13 @@ app.MapGet("/", () => "MemorySmith.Agent is running.");
 // Agent control endpoints
 app.MapPost("/api/agent/connect",  () => Results.Ok(new { Status = "connected" }));
 app.MapPost("/api/agent/stop",     () => Results.Ok(new { Status = "stopped" }));
-app.MapGet ("/api/agent/status",   () => Results.Ok(new { Status = "idle", Goal = (string?)null }));
+app.MapGet ("/api/agent/status",   () => Results.Ok(new { Status = agentEnabled ? "idle" : "disabled", Goal = (string?)null }));
 
 app.MapPost("/api/agent/command", (CommandRequest req) =>
-    Results.Ok(new { Received = req.Command, Status = "queued" }));
+{
+    // TODO Phase 1: route to AgentBackgroundService.Enqueue when agent is enabled
+    return Results.Ok(new { Received = req.Command, Status = agentEnabled ? "queued" : "agent disabled" });
+});
 
 // Blueprint catalog
 app.MapGet("/api/blueprints", () => Results.Ok(Array.Empty<object>()));
