@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>WebUI.Blazor</RootNamespace>
+    <AssemblyName>WebUI.Blazor</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Agent.Core/Agent.Core.csproj" />
+    <ProjectReference Include="../Agent.Tools/Agent.Tools.csproj" />
+  </ItemGroup>
+
+  <!-- TODO: add SignalR for real-time UI updates (BotStatusUpdated, InventoryChanged, etc.) -->
+
+</Project>
