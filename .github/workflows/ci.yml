@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "master", "feature/**" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore MemorySmith.Agent.slnx
+
+      - name: Build
+        run: dotnet build MemorySmith.Agent.slnx --no-restore --configuration Release
+
+      - name: Test
+        run: >
+          dotnet test MemorySmith.Agent.slnx
+          --no-build --configuration Release --verbosity normal
+          --collect:"XPlat Code Coverage" --results-directory artifacts/TestResults
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
