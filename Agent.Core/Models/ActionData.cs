@@ -3,11 +3,22 @@ namespace Agent.Core;
 /// <summary>
 /// A single tool invocation dispatched by the planner.
 /// Tool names correspond to registered ITool instances (e.g. "MoveTo", "MineBlock").
+///
+/// Context carry (Phase 4): tools can write results into Context so subsequent
+/// actions in the same plan can read them. For example, SearchMemoryTool writes
+/// the first result's coordinates to Context["nearestWoodX/Y/Z"], and MoveToTool
+/// reads them if its own Arguments don't specify coordinates.
 /// </summary>
 public record ActionData
 {
     public string Tool { get; init; } = string.Empty;
     public Dictionary<string, object?> Arguments { get; init; } = [];
+
+    /// <summary>
+    /// Mutable inter-action context bag. Shared across all actions in a single plan
+    /// dispatch sequence. Tools write here; subsequent tools read here.
+    /// </summary>
+    public Dictionary<string, object?> Context { get; init; } = [];
 }
 
 /// <summary>Result returned by a tool after execution.</summary>
