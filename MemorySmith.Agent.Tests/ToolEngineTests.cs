@@ -21,7 +21,7 @@ public class ToolEngineTests
     public async Task CallAsync_KnownTool_ReturnsSuccess()
     {
         _registry.Register(new EchoTool());
-        var result = await _engine.CallAsync("Echo", JsonDocument.Parse("""{{"message":"hello"}}""").RootElement);
+        var result = await _engine.CallAsync("Echo", JsonDocument.Parse("{\"message\":\"hello\"}").RootElement);
 
         Assert.That(result.Success, Is.True);
         Assert.That(result.Message, Does.Contain("hello"));
@@ -40,7 +40,7 @@ public class ToolEngineTests
     public async Task CallAsync_CaseInsensitiveToolName_ReturnsSuccess()
     {
         _registry.Register(new EchoTool());
-        var result = await _engine.CallAsync("echo", JsonDocument.Parse("""{{"message":"ci"}}""").RootElement);
+        var result = await _engine.CallAsync("echo", JsonDocument.Parse("{\"message\":\"ci\"}").RootElement);
 
         Assert.That(result.Success, Is.True);
     }
@@ -49,7 +49,7 @@ public class ToolEngineTests
     public void All_RegisteredTools_AreVisible()
     {
         _registry.Register(new EchoTool());
-        _registry.Register(new EchoTool()); // same name — overwrites
+        _registry.Register(new EchoTool()); // same name overwrites
         Assert.That(_registry.All, Has.Count.EqualTo(1));
     }
 }
@@ -59,7 +59,7 @@ file sealed class EchoTool : ITool
 {
     public string Name => "Echo";
     public string Description => "Returns the input message.";
-    public JsonElement InputSchema => JsonDocument.Parse("""{{"type":"object","properties":{{"message":{{"type":"string"}}}}}}""").RootElement;
+    public JsonElement InputSchema => JsonDocument.Parse("{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"}}}" ).RootElement;
     public Task<ToolResult> ExecuteAsync(JsonElement arguments, CancellationToken ct = default)
     {
         var msg = arguments.TryGetProperty("message", out var v) ? v.GetString() ?? "" : "";
