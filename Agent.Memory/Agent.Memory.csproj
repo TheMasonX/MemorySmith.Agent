@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Agent.Memory</RootNamespace>
+    <AssemblyName>Agent.Memory</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Agent.Core/Agent.Core.csproj" />
+  </ItemGroup>
+
+  <!-- HttpClient and System.Text.Json are part of the .NET SDK — no NuGet needed -->
+  <!-- TODO Phase 2: add Microsoft.Extensions.AI for IChatClient abstraction -->
+
+</Project>
