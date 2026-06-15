@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MemorySmith.Agent — About</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --yellow: #d29922;
+      --orange: #f0883e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+    .container { max-width: 860px; margin: 0 auto; }
+    header { border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; margin-bottom: 2rem; }
+    .logo {
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+      white-space: pre;
+      line-height: 1.3;
+    }
+    h1 { font-size: 1.8rem; margin-top: 0.75rem; }
+    h2 { font-size: 1.15rem; color: var(--accent); margin: 2rem 0 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+    h3 { font-size: 1rem; margin: 1.25rem 0 0.5rem; }
+    p { margin-bottom: 0.75rem; color: var(--muted); }
+    p strong { color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 2rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 0.4rem;
+    }
+    .badge-green  { background: rgba(63,185,80,0.15);  color: var(--green);  border: 1px solid rgba(63,185,80,0.3); }
+    .badge-yellow { background: rgba(210,153,34,0.15); color: var(--yellow); border: 1px solid rgba(210,153,34,0.3); }
+    .badge-orange { background: rgba(240,136,62,0.15); color: var(--orange); border: 1px solid rgba(240,136,62,0.3); }
+    .badge-muted  { background: rgba(139,148,158,0.1); color: var(--muted);  border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 0.9rem; }
+    th, td { padding: 0.5rem 0.75rem; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--surface); color: var(--text); font-weight: 600; }
+    td { color: var(--muted); }
+    td:first-child { color: var(--text); font-family: "SF Mono","Fira Code",monospace; font-size: 0.85rem; }
+    code {
+      font-family: "SF Mono","Fira Code",monospace;
+      font-size: 0.85rem;
+      background: var(--surface);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+    pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-family: "SF Mono","Fira Code",monospace;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+    .phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+    .phase-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+    }
+    .phase-card .phase-title { font-size: 0.82rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .phase-card .phase-desc  { font-size: 0.78rem; color: var(--muted); }
+    .license-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem;
+      font-family: "SF Mono","Fira Code",monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--muted); }
+    .links { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+    .links a { font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="logo">
+  __  __                          ___ _   _   _ _   _
+ |  \/  | ___ _ __ ___   ___  __|  _| |_|_|_| | |_| |_
+ | |\/| |/ _ \ '_ ` _ \ / _ \| '__| | | | | | | | | '_ \
+ | |  | |  __/ | | | | | (_) | |  | |_| | | | | |_| | | |
+ |_|  |_|\___|_| |_| |_|\___/|_|   \__| |_|_|_|\__|_| |_|
+    </div>
+    <h1>MemorySmith.Agent</h1>
+    <p style="margin-top:0.5rem">
+      <span class="badge badge-green">v0.3.0</span>
+      <span class="badge badge-green">Phase 3 Complete</span>
+      <span class="badge badge-muted">MIT License</span>
+      <span class="badge badge-muted">.NET 10</span>
+    </p>
+  </header>
+
+  <h2>About</h2>
+  <p>
+    <strong>MemorySmith.Agent</strong> is a modular autonomous agent framework that treats Minecraft (and other
+    game worlds) as a <em>world adapter</em> while using the
+    <a href="https://github.com/TheMasonX/MemorySmith" target="_blank" rel="noopener">MemorySmith</a>
+    wiki as long-term memory. The design follows Domain-Driven, deep-module principles — each bounded
+    context exposes a small stable interface and hides its complexity.
+  </p>
+  <p>
+    Agents build, explore, and survive in Minecraft using an <strong>HTN/GOAP hybrid planner</strong>
+    backed by a searchable knowledge base of facts, blueprints, and observations.
+  </p>
+
+  <h2>Phase Status</h2>
+  <div class="phases">
+    <div class="phase-card">
+      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 0 — Skeleton</div>
+      <div class="phase-desc">Interfaces, wiki, CI baseline</div>
+    </div>
+    <div class="phase-card">
+      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 1 — Core MVP</div>
+      <div class="phase-desc">WebSocket bridge, MoveToTool, agent loop</div>
+    </div>
+    <div class="phase-card">
+      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 2 — Memory</div>
+      <div class="phase-desc">RestMemoryGateway, memory tools, DI wiring</div>
+    </div>
+    <div class="phase-card">
+      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 3 — Planner</div>
+      <div class="phase-desc">HTN/GOAP, GatherWoodGoal, GoalFactory</div>
+    </div>
+    <div class="phase-card">
+      <div class="phase-title"><span class="badge badge-yellow">⟳</span> Phase 4 — Vision</div>
+      <div class="phase-desc">Spatial analysis, adaptive execution, GOAP</div>
+    </div>
+    <div class="phase-card">
+      <div class="phase-title"><span class="badge badge-muted">○</span> Phase 5 — Advanced</div>
+      <div class="phase-desc">Multi-agent, embeddings, CI/CD pipelines</div>
+    </div>
+  </div>
+
+  <h2>Architecture</h2>
+  <pre>┬────────────────────────────────────────────────────────┬
+│                   WebUI.Blazor (Host)                  │
+│  REST API + AgentBackgroundService + SignalR (Phase 4) │
+└────┬───────────────┬───────────────────────────────────└
+     │               │
+     ▼               ▼
+┬──────────┬  ┬──────────────────────────────────────────┬
+│ IPlanner │  │           IToolCaller (ToolEngine)       │
+│ HtnPlan- │  │  MoveToTool  StatusTool  SearchMemory    │
+│ ner      │  │  GetPage     CreatePage  (+ future tools) │
+└────┬─────└  └──────┬─────────────────┬────────────────-└
+     │               │                 │
+     ▼               ▼                 ▼
+┬─────────────┬ ┬──────────────┬ ┬────────────────────┬
+│  IGoalFact- │ │ IWorldAdapter│ │  IMemoryGateway    │
+│  ory + Goals│ │ MinecraftAda-│ │  RestMemoryGateway │
+│  GatherWood │ │ pter + Node.j│ │  → MemorySmith API │
+│  SurviveNi- │ │ s (Mineflayer│ └────────────────────└
+│  ght + more │ └──────────────└
+└─────────────└       │
+                       │ WebSocket
+                       ▼
+              ┬─────────────────┬
+              │  Minecraft Bot  │
+              │  (Mineflayer)   │
+              └─────────────────└</pre>
+
+  <h2>Quick Start</h2>
+  <pre>git clone https://github.com/TheMasonX/MemorySmith.Agent
+cd MemorySmith.Agent
+dotnet restore MemorySmith.Agent.slnx
+dotnet run --project WebUI.Blazor</pre>
+  <p>Then visit <a href="http://localhost:5000/api/agent/status" target="_blank"><code>/api/agent/status</code></a> or send a goal:</p>
+  <pre>curl -X POST http://localhost:5000/api/agent/plan \
+  -H "Content-Type: application/json" \
+  -d '{"goalName":"GatherWood","parameters":{"count":10}}'</pre>
+
+  <h2>API Endpoints</h2>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>GET</td><td>/</td><td>Health check</td></tr>
+    <tr><td>GET</td><td>/api/agent/status</td><td>Current agent state + goal + health</td></tr>
+    <tr><td>POST</td><td>/api/agent/plan</td><td>Set a goal and enqueue its plan</td></tr>
+    <tr><td>POST</td><td>/api/agent/command</td><td>Enqueue a single raw tool call</td></tr>
+    <tr><td>GET</td><td>/api/goals</td><td>List registered goal names</td></tr>
+    <tr><td>GET</td><td>/api/blueprints</td><td>Blueprint catalog (Phase 3+)</td></tr>
+    <tr><td>GET</td><td>/api/about</td><td>Project metadata (JSON)</td></tr>
+    <tr><td>GET</td><td>/about</td><td>This page</td></tr>
+  </table>
+  <p>See the <a href="/api/about">API about endpoint</a> or the <a href="https://github.com/TheMasonX/MemorySmith.Agent/blob/main/Data/Pages/guides/api-reference.md" target="_blank" rel="noopener">full API reference</a> in the wiki.</p>
+
+  <h2>Third-party Acknowledgments</h2>
+  <table>
+    <tr><th>Dependency</th><th>License</th><th>Use</th></tr>
+    <tr><td>MemorySmith</td><td>MIT</td><td>Long-term memory and wiki backend</td></tr>
+    <tr><td>Mineflayer (Node.js)</td><td>MIT</td><td>Minecraft bot automation</td></tr>
+    <tr><td>ws (Node.js)</td><td>MIT</td><td>WebSocket server in the adapter</td></tr>
+    <tr><td>Microsoft.Extensions.*</td><td>MIT</td><td>DI, logging, hosted services</td></tr>
+    <tr><td>NUnit</td><td>MIT</td><td>Test framework</td></tr>
+    <tr><td>coverlet</td><td>MIT</td><td>Code coverage collection</td></tr>
+    <tr><td>GitHubActionsTestLogger</td><td>MIT</td><td>CI test annotations</td></tr>
+  </table>
+
+  <h2>License</h2>
+  <div class="license-box">MIT License
+
+Copyright (c) 2026 Lucas Norr
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", "WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</div>
+
+  <footer>
+    <div>MemorySmith.Agent — An AI agent framework backed by MemorySmith knowledge.</div>
+    <div class="links">
+      <a href="https://github.com/TheMasonX/MemorySmith.Agent" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/TheMasonX/MemorySmith" target="_blank" rel="noopener">MemorySmith</a>
+      <a href="/api/about">API About</a>
+      <a href="/api/agent/status">Agent Status</a>
+      <a href="https://github.com/TheMasonX/MemorySmith.Agent/blob/main/Data/Pages/home.md" target="_blank" rel="noopener">Wiki Home</a>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
