@@ -1,8 +1,8 @@
-namespace MemorySmith.Agent.Tests;
-
 using Agent.Core;
 using Agent.Tools;
 using System.Text.Json;
+
+namespace MemorySmith.Agent.Tests;
 
 [TestFixture]
 public class CoreModelsTests
