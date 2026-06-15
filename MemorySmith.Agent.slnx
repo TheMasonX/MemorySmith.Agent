@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="Agent.Core/Agent.Core.csproj" />
+  <Project Path="Agent.Planning/Agent.Planning.csproj" />
+  <Project Path="Agent.Personality/Agent.Personality.csproj" />
+  <Project Path="Agent.Tools/Agent.Tools.csproj" />
+  <Project Path="Agent.Vision/Agent.Vision.csproj" />
+  <Project Path="Agent.Construction/Agent.Construction.csproj" />
+  <Project Path="Agent.World.Minecraft/Agent.World.Minecraft.csproj" />
+  <Project Path="WebUI.Blazor/WebUI.Blazor.csproj" />
+  <Project Path="MemorySmith.Agent.Tests/MemorySmith.Agent.Tests.csproj" />
+</Solution>
