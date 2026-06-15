@@ -28,7 +28,25 @@ public sealed class SearchMemoryTool(IMemoryGateway memory) : ITool
             ? "No results found."
             : string.Join(", ", results.Take(5).Select(r => $"{r.PageId}({r.Score:F2})"));
 
-        return new ToolResult(true, $"Found {results.Count} result(s): {summary}",
-            new Dictionary<string, object?> { ["results"] = results });
+        // Phase 4: write best page result into Data so AgentBackgroundService
+        // can carry it forward as plan context for subsequent actions.
+        var data = new Dictionary<string, object?>
+        {
+            ["results"] = results,
+        };
+        if (results.Count > 0)
+        {
+            // The best page result (kind=page) is the primary result for GetPageAsync calls.
+            var bestPage = results.FirstOrDefault(r =>
+                r.Kind.Equals("page", StringComparison.OrdinalIgnoreCase));
+            if (bestPage is not null)
+            {
+                data["bestPageId"]  = bestPage.PageId;
+                data["bestScore"]   = bestPage.Score;
+                data["bestSnippet"] = bestPage.Snippet;
+            }
+        }
+
+        return new ToolResult(true, $"Found {results.Count} result(s): {summary}", data);
     }
 }
