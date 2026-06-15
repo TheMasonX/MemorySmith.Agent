@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../Agent.Core/Agent.Core.csproj" />
+    <ProjectReference Include="../Agent.Planning/Agent.Planning.csproj" />
     <ProjectReference Include="../Agent.Tools/Agent.Tools.csproj" />
   </ItemGroup>
 
