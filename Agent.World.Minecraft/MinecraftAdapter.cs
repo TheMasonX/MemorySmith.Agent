@@ -1,33 +1,34 @@
 namespace Agent.World.Minecraft;
 
 using Agent.Core;
+using System.Diagnostics;
+using System.Net.Sockets;
 
 /// <summary>
 /// IWorldAdapter implementation for Minecraft via Node.js/Mineflayer.
 ///
-/// The C# host spawns a Node process (Process.Start) running MineflayerAdapter/index.js.
-/// Communication uses WebSocket over localhost: C# sends JSON commands, Node sends JSON events.
+/// Connection flow:
+///   1. If AutoStartNode is true, spawn MineflayerAdapter/index.js as a subprocess.
+///   2. Poll until the WebSocket server port is open (Node.js startup).
+///   3. Connect WebSocketBridge to the WS server.
+///   4. On bot.once('spawn'), Node sends {"event":"spawn",...} — agent is live.
 ///
-/// Protocol (C# → Node):
-///   {"action":"mine","block":"minecraft:iron_ore","quantity":5}
-///
-/// Protocol (Node → C#):
-///   {"event":"blockMined","block":"iron_ore","count":3,"position":{"x":10,"y":64,"z":20}}
-///
-/// The adapter encapsulates all Minecraft-specific logic. Higher-level agent code
-/// uses only IWorldAdapter — it does not know about Mineflayer or Node.
+/// C# → Node command:  {"action":"move","x":10,"y":64,"z":20}
+/// Node → C# event:    {"event":"blockMined","block":"stone","count":3}
 /// </summary>
-public sealed class MinecraftAdapter : IWorldAdapter, IDisposable
+public sealed class MinecraftAdapter(MinecraftAdapterConfig config) : IWorldAdapter, IDisposable
 {
     private WebSocketBridge? _bridge;
-    private System.Diagnostics.Process? _nodeProcess;
+    private Process? _nodeProcess;
 
     public bool IsConnected => _bridge?.IsOpen ?? false;
 
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
     {
-        // TODO: start Node subprocess
-        _bridge = new WebSocketBridge("ws://localhost:3000");
+        if (config.AutoStartNode && !string.IsNullOrWhiteSpace(config.NodeScriptPath))
+            await StartNodeProcessAsync(cancellationToken);
+
+        _bridge = new WebSocketBridge(config.WebSocketUrl);
         await _bridge.ConnectAsync(cancellationToken);
     }
 
@@ -36,8 +37,11 @@ public sealed class MinecraftAdapter : IWorldAdapter, IDisposable
         if (_bridge is not null)
             await _bridge.CloseAsync(cancellationToken);
 
-        if (_nodeProcess is not null && !_nodeProcess.HasExited)
-            _nodeProcess.Kill();
+        if (_nodeProcess is { HasExited: false })
+        {
+            _nodeProcess.Kill(entireProcessTree: true);
+            await _nodeProcess.WaitForExitAsync(cancellationToken);
+        }
     }
 
     public Task SendActionAsync(ActionData action, CancellationToken cancellationToken = default)
@@ -54,6 +58,46 @@ public sealed class MinecraftAdapter : IWorldAdapter, IDisposable
             throw new InvalidOperationException("Minecraft adapter is not connected.");
 
         return _bridge.ReceiveAsync(cancellationToken);
+    }
+
+    // ── Private helpers ──────────────────────────────
+
+    private async Task StartNodeProcessAsync(CancellationToken cancellationToken)
+    {
+        var psi = new ProcessStartInfo("node", config.NodeScriptPath)
+        {
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
+        psi.EnvironmentVariables["WS_PORT"]      = config.WebSocketPort.ToString();
+        psi.EnvironmentVariables["MC_HOST"]       = config.ServerHost;
+        psi.EnvironmentVariables["MC_PORT"]       = config.ServerPort.ToString();
+        psi.EnvironmentVariables["MC_USERNAME"]   = config.BotUsername;
+
+        _nodeProcess = Process.Start(psi)
+            ?? throw new InvalidOperationException($"Failed to start Node process: {config.NodeScriptPath}");
+
+        await WaitForPortAsync(config.WebSocketPort, config.NodeStartTimeoutMs, cancellationToken);
+    }
+
+    private static async Task WaitForPortAsync(int port, int timeoutMs, CancellationToken ct)
+    {
+        var deadline = Stopwatch.GetTimestamp() + (long)(timeoutMs / 1000.0 * Stopwatch.Frequency);
+        while (Stopwatch.GetTimestamp() < deadline && !ct.IsCancellationRequested)
+        {
+            try
+            {
+                using var tcp = new TcpClient();
+                await tcp.ConnectAsync("127.0.0.1", port, ct);
+                return; // port is open
+            }
+            catch
+            {
+                await Task.Delay(200, ct);
+            }
+        }
+        throw new TimeoutException($"Node.js WS server did not open port {port} within {timeoutMs}ms.");
     }
 
     public void Dispose()
