@@ -103,6 +103,11 @@ public sealed class AgentBackgroundService(
     {
         const int MaxConsecutiveFailures = 3;
 
+        // Phase 4: shared context bag carried across all actions in the current plan.
+        // Tools write here (e.g. SearchMemory writes result coordinates);
+        // subsequent tools read here (e.g. MoveToTool reads nearestWoodX/Y/Z).
+        var planContext = new Dictionary<string, object?>();
+
         while (!ct.IsCancellationRequested)
         {
             // When queue is empty and a goal is active — ask the planner
@@ -113,6 +118,7 @@ public sealed class AgentBackgroundService(
                     logger.LogInformation("Goal '{Goal}' completed.", _currentGoal.Name);
                     _currentGoal = null;
                     _consecutiveFailures = 0;
+                    planContext.Clear();
                     continue;
                 }
 
@@ -123,12 +129,21 @@ public sealed class AgentBackgroundService(
                         _currentGoal.Name, _consecutiveFailures);
                     _currentGoal = null;
                     _consecutiveFailures = 0;
+                    planContext.Clear();
                     continue;
                 }
 
                 try
                 {
                     var plan = await planner.PlanAsync(_currentGoal, _worldState, ct);
+
+                    // Inject the shared context into each action before enqueuing
+                    foreach (var planAction in plan.Actions)
+                    {
+                        foreach (var kv in planContext)
+                            planAction.Context.TryAdd(kv.Key, kv.Value);
+                    }
+
                     _queue.EnqueueAll(plan.Actions);
                     logger.LogInformation(
                         "New plan for '{Goal}': {Count} actions.",
@@ -155,6 +170,13 @@ public sealed class AgentBackgroundService(
                     {
                         logger.LogInformation("Tool {Tool}: {Message}", action.Tool, result.Message);
                         _consecutiveFailures = 0;
+
+                        // Carry tool result data into the shared plan context
+                        if (result.Data is not null)
+                        {
+                            foreach (var kv in result.Data)
+                                planContext[kv.Key] = kv.Value;
+                        }
                     }
                     else
                     {
