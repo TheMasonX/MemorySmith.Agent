@@ -5,14 +5,10 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
 // TODO Phase 1: builder.Services.AddSignalR();
 // TODO Phase 2: register IMemoryGateway, IToolRegistry, IPlanner, IWorldAdapter
 
 var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-    app.MapOpenApi();
 
 app.MapGet("/", () => "MemorySmith.Agent is running.");
 
