@@ -30,21 +30,21 @@ if (agentEnabled)
         return new MinecraftAdapter(cfg);
     });
 
-    // IMemoryGateway → RestMemoryGateway (calls live MemorySmith instance)
-    builder.Services.AddSingleton<RestMemoryGatewayOptions>(sp =>
-        sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value);
+    // IMemoryGateway → RestMemoryGateway via IHttpClientFactory (pooled, resilient)
+    builder.Services.AddHttpClient("memorysmith", (sp, http) =>
+    {
+        var opts = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
+        http.BaseAddress = new Uri(opts.BaseUrl);
+        http.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds);
+        if (!string.IsNullOrEmpty(opts.ApiKey))
+            http.DefaultRequestHeaders.Add("X-Api-Key", opts.ApiKey);
+    });
 
     builder.Services.AddSingleton<IMemoryGateway>(sp =>
     {
-        var opts = sp.GetRequiredService<RestMemoryGatewayOptions>();
-        var http = new HttpClient
-        {
-            BaseAddress = new Uri(opts.BaseUrl),
-            Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds),
-        };
-        if (!string.IsNullOrEmpty(opts.ApiKey))
-            http.DefaultRequestHeaders.Add("X-Api-Key", opts.ApiKey);
-        return new RestMemoryGateway(http, opts);
+        var factory = sp.GetRequiredService<IHttpClientFactory>();
+        var opts = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
+        return new RestMemoryGateway(factory.CreateClient("memorysmith"), opts);
     });
 
     // IToolCaller → ToolEngine with all registered tools
