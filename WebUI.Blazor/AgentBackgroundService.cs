@@ -1,32 +1,50 @@
 namespace WebUI.Blazor;
 
 using Agent.Core;
+using Agent.Planning;
 using Agent.Tools;
 using System.Text.Json;
 
 /// <summary>
 /// Hosted service that owns the agent loop.
-/// On start: connects the world adapter, then runs two concurrent tasks:
-///   1. ProcessEventsAsync — reads WorldEvents from the adapter, updates state.
-///   2. DispatchActionsAsync — drains the ActionQueue and dispatches via ToolEngine.
 ///
-/// Phase 1: basic loop, no planner, no memory. Actions are enqueued externally
-///          via the /api/agent/command endpoint.
-/// Phase 2: wire IMemoryGateway for context injection.
-/// Phase 3: wire IPlanner to generate actions from goals.
+/// Phase 1: basic loop — external Enqueue() feeds actions, dispatched via ToolEngine.
+/// Phase 3: IPlanner integration — when the queue is empty and a goal is set,
+///          the planner generates the next action sequence automatically.
+///
+/// Lifecycle:
+///   1. ConnectAsync to the world adapter.
+///   2. ProcessEventsAsync — read WorldEvents, update WorldState.
+///   3. DispatchActionsAsync — drain ActionQueue, call planner when idle.
 /// </summary>
 public sealed class AgentBackgroundService(
     IWorldAdapter worldAdapter,
     IToolCaller toolCaller,
-    ILogger<AgentBackgroundService> logger) : BackgroundService
+    ILogger<AgentBackgroundService> logger,
+    IPlanner planner) : BackgroundService
 {
     private readonly ActionQueue _queue = new();
     private WorldState _worldState = new();
+    private IGoal? _currentGoal;
+    private int _consecutiveFailures;
 
     public WorldState WorldState => _worldState;
+    public IGoal? CurrentGoal => _currentGoal;
 
-    /// <summary>Externally enqueue an action (called from REST endpoint).</summary>
+    /// <summary>Externally enqueue a single action (REST API path).</summary>
     public void Enqueue(ActionData action) => _queue.Enqueue(action);
+
+    /// <summary>
+    /// Set a new goal. Clears the current action queue and triggers replanning
+    /// on the next dispatch cycle.
+    /// </summary>
+    public void SetGoal(IGoal goal)
+    {
+        _currentGoal = goal;
+        _queue.Clear();
+        _consecutiveFailures = 0;
+        logger.LogInformation("Goal set: {Goal}", goal.Name);
+    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -56,27 +74,74 @@ public sealed class AgentBackgroundService(
         }
     }
 
+    // ── Event processing ─────────────────────────────────────────────────────
+
     private async Task ProcessEventsAsync(CancellationToken ct)
     {
         await foreach (var worldEvent in worldAdapter.ReceiveEventsAsync(ct))
         {
             logger.LogDebug("World event: {Type}", worldEvent.EventType);
 
-            // Phase 1: update basic world state facts from events
             _worldState = _worldState.With(b =>
             {
                 foreach (var kv in worldEvent.Payload)
                     b.SetFact($"event:{worldEvent.EventType}:{kv.Key}", kv.Value);
             });
 
-            // TODO Phase 3: trigger planner if goal is incomplete
+            // Update health from health events
+            if (worldEvent.EventType == "health" &&
+                worldEvent.Payload.TryGetValue("hp", out var hp) && hp is int healthVal)
+            {
+                _worldState = _worldState with { Health = healthVal };
+            }
         }
     }
 
+    // ── Action dispatch loop ─────────────────────────────────────────────────
+
     private async Task DispatchActionsAsync(CancellationToken ct)
     {
+        const int MaxConsecutiveFailures = 3;
+
         while (!ct.IsCancellationRequested)
         {
+            // When queue is empty and a goal is active — ask the planner
+            if (_queue.IsEmpty && _currentGoal is not null)
+            {
+                if (_currentGoal.IsComplete(_worldState))
+                {
+                    logger.LogInformation("Goal '{Goal}' completed.", _currentGoal.Name);
+                    _currentGoal = null;
+                    _consecutiveFailures = 0;
+                    continue;
+                }
+
+                if (_currentGoal.HasFailed(_worldState) ||
+                    _consecutiveFailures >= MaxConsecutiveFailures)
+                {
+                    logger.LogWarning("Goal '{Goal}' failed (failures={N}).",
+                        _currentGoal.Name, _consecutiveFailures);
+                    _currentGoal = null;
+                    _consecutiveFailures = 0;
+                    continue;
+                }
+
+                try
+                {
+                    var plan = await planner.PlanAsync(_currentGoal, _worldState, ct);
+                    _queue.EnqueueAll(plan.Actions);
+                    logger.LogInformation(
+                        "New plan for '{Goal}': {Count} actions.",
+                        _currentGoal.Name, plan.Actions.Count);
+                    _consecutiveFailures = 0;
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex, "Planning failed for goal '{Goal}'.", _currentGoal?.Name);
+                    _currentGoal = null;
+                }
+            }
+
             var action = _queue.Dequeue();
             if (action is not null)
             {
@@ -87,18 +152,25 @@ public sealed class AgentBackgroundService(
                     var result = await toolCaller.CallAsync(action.Tool, doc.RootElement, ct);
 
                     if (result.Success)
+                    {
                         logger.LogInformation("Tool {Tool}: {Message}", action.Tool, result.Message);
+                        _consecutiveFailures = 0;
+                    }
                     else
+                    {
                         logger.LogWarning("Tool {Tool} failed: {Message}", action.Tool, result.Message);
+                        _consecutiveFailures++;
+                    }
                 }
                 catch (Exception ex)
                 {
                     logger.LogError(ex, "Exception dispatching tool {Tool}", action.Tool);
+                    _consecutiveFailures++;
                 }
             }
             else
             {
-                await Task.Delay(50, ct); // idle poll
+                await Task.Delay(50, ct);
             }
         }
     }
