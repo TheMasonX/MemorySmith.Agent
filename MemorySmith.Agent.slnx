@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="Agent.Core/Agent.Core.csproj" />
+  <Project Path="Agent.Memory/Agent.Memory.csproj" />
   <Project Path="Agent.Planning/Agent.Planning.csproj" />
   <Project Path="Agent.Personality/Agent.Personality.csproj" />
   <Project Path="Agent.Tools/Agent.Tools.csproj" />
