@@ -50,13 +50,13 @@ public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
         return Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases, actions));
     }
 
-    public Task<IPlan?> ReplanAsync(
+    public async Task<IPlan?> ReplanAsync(
         IPlan currentPlan, WorldState state, string failureReason,
         CancellationToken cancellationToken = default)
     {
-        // Phase 3: simple full-restart replan.
-        // Phase 4: GOAP will kick in for specific failed phases
-        //   e.g. "no coal" → GOAP finds alternative path to coal.
+        // Phase 3: simple full-restart replan from the original goal phases.
+        // Phase 4: GOAP will substitute alternative actions for the failed phase
+        //   e.g. "path blocked on MoveToTree" → GOAP finds another route.
         var goal = new SimpleGoal(
             currentPlan.GoalName, "",
             [.. currentPlan.Phases],
@@ -64,14 +64,12 @@ public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
 
         try
         {
-            return PlanAsync(goal, state, cancellationToken)
-                .ContinueWith(t => (IPlan?)t.Result, cancellationToken,
-                    System.Threading.Tasks.TaskContinuationOptions.OnlyOnRanToCompletion,
-                    System.Threading.Tasks.TaskScheduler.Default);
+            return await PlanAsync(goal, state, cancellationToken);
         }
         catch
         {
-            return System.Threading.Tasks.Task.FromResult<IPlan?>(null);
+            // No decomposition available — caller falls back to idle or LLM (Phase 4)
+            return null;
         }
     }
 }
