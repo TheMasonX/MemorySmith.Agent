@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="../Agent.Core/Agent.Core.csproj" />
     <ProjectReference Include="../Agent.Memory/Agent.Memory.csproj" />
+    <ProjectReference Include="../Agent.Planning/Agent.Planning.csproj" />
     <ProjectReference Include="../Agent.Tools/Agent.Tools.csproj" />
     <ProjectReference Include="../Agent.World.Minecraft/Agent.World.Minecraft.csproj" />
   </ItemGroup>
