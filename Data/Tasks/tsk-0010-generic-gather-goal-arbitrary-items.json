@@ -1,0 +1,42 @@
+{
+  "Id": "tsk-0010-generic-gather-goal-arbitrary-items",
+  "Key": "TSK-0010",
+  "Title": "Design and implement GenericGatherGoal \u2014 arbitrary item gathering including mods",
+  "Description": "Replace hardcoded GatherWoodGoal with a generalised gathering system that works for any Minecraft item, including modded items.\n\nThe user's intent: 'more agent defined than GatherWood, as it would be nice if it could work with arbitrary items (including mods). I don't know if the llm would have to help architect what that gather task means, but this is something to consider and work towards'\n\nDesign questions (run council review before implementing):\n1. Item specification schema \u2014 what does the agent need to know about an item? { id: 'minecraft:iron_ore', displayName: 'Iron Ore' } minimum. For smelting chains: { id: 'minecraft:iron_ingot', raw: 'minecraft:iron_ore', requiresSmelting: true }\n2. GenericGatherGoal(itemSpec, count) vs separate goal classes\n3. ItemRegistry \u2014 MemorySmith wiki pages at 'item-registry/{itemId}' with block ID, mining tool, crafting chain\n4. LLM role \u2014 'gather iron' \u2192 LLM resolves to iron_ore, creates GatherItemGoal\n5. Mod support \u2014 agent cannot know mod item IDs without being told; architecture: MemorySmith pages teach the agent\n\nSuggested implementation path:\n1. Rename GatherWoodGoal -> GatherItemGoal(itemId, count) \u2014 configurable item ID\n2. Keep GoalFactory['GatherWood'] as convenience (creates GatherItemGoal('minecraft:oak_log', 10))\n3. Add ItemRegistry backed by MemorySmith SearchMemory('item-registry/{id}')\n4. LLM fallback for unknown items (Phase 4+)\n\nSee handoff doc for full design analysis: Data/Pages/Tasks/agent-handoff-20260616.md",
+  "Type": "Feature",
+  "Status": "Backlog",
+  "Priority": "Medium",
+  "AssigneeMode": "Custom",
+  "AssigneeDirectoryId": null,
+  "AssigneeCustomText": "AI Agent",
+  "Reporter": "user-2026-06-16",
+  "Labels": [
+    "phase-4",
+    "gather",
+    "generic",
+    "mods",
+    "llm",
+    "item-registry"
+  ],
+  "Attachments": [],
+  "ExternalLinks": [],
+  "LinkedPages": [
+    "Tasks/agent-handoff-20260616"
+  ],
+  "Comments": [
+    {
+      "Id": "c-tsk0010-001",
+      "Author": "AI Agent",
+      "Body": "User note: 'I don't know if the llm would have to help architect what that gather task means, but this is something to consider and work towards'. The architecture council should review the ItemRegistry design before implementation. Key risk: mod item IDs are unknown at compile time \u2014 the agent must learn them from MemorySmith pages or from the LLM.",
+      "CreatedAtUtc": "2026-06-16T02:28:00Z"
+    }
+  ],
+  "EpicId": null,
+  "ParentId": null,
+  "DueDateUtc": null,
+  "CreatedAtUtc": "2026-06-16T02:28:00Z",
+  "UpdatedAtUtc": "2026-06-16T02:28:00Z",
+  "CompletedAtUtc": null,
+  "Revision": 1,
+  "IsArchived": false
+}
