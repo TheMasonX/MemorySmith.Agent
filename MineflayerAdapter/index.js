@@ -5,15 +5,13 @@
  * Architecture:
  *   1. Starts a WebSocket server on WS_PORT (default: 3000).
  *   2. Creates a Mineflayer bot connecting to MC_HOST:MC_PORT.
- *   3. Forwards bot events (spawn, health, move, blockMined…) to C# as JSON.
+ *   3. Forwards bot events (spawn, health, move, blockMined, chat…) to C# as JSON.
  *   4. Accepts JSON action commands from C# and executes them via Mineflayer.
  *
- * Bug fixes (2026-06-16):
- *   - Sequential command queue: commands are processed one at a time so overlapping
- *     bot.dig() calls no longer abort each other ("Digging aborted").
- *   - Mine auto-navigation: the mine case now pathfinds to the nearest matching
- *     block (up to 64 blocks) before digging, so the bot moves to trees rather
- *     than trying to mine from spawn.
+ * Phase 5 additions:
+ *   - chat event: includes onlinePlayers count for directed-at-bot heuristics
+ *   - craft action: uses bot.craft() to craft items from inventory
+ *   - smelt action: uses bot.openFurnace() to smelt items in a nearby furnace
  *
  * Environment variables:
  *   WS_PORT      WebSocket server port for C# connection (default: 3000)
@@ -51,7 +49,7 @@ function sendEvent(event, data = {}) {
   }
 }
 
-// ── Sequential command queue (Fix 2) ────────────────────────────────────────
+// ── Sequential command queue ─────────────────────────────────────────────────
 // C# sends actions as fast as WebSocket allows. Without a queue, overlapping
 // bot.dig() calls cause mineflayer to throw "Digging aborted" on every but
 // the last command. This queue ensures actions run strictly one at a time.
@@ -153,9 +151,12 @@ bot.on('death',  () => { console.warn('[mc] bot died'); sendEvent('death', botPo
 bot.on('kicked', (reason) => { console.warn('[mc] kicked:', reason); sendEvent('kicked', { reason }); });
 bot.on('error',  (e)      => { console.error('[mc] error:', e.message); sendEvent('error', { message: e.message }); });
 
+// Phase 5: emit chat events with onlinePlayers count so the C# ChatInterpreter
+// can apply the directed-at-bot heuristic (onlinePlayers == 1 → always addressed).
 bot.on('chat', (username, message) => {
   if (username === bot.username) return;
-  sendEvent('chat', { username, message });
+  const onlinePlayers = Object.keys(bot.players).filter(p => p !== bot.username).length;
+  sendEvent('chat', { username, message, onlinePlayers });
 });
 
 // ── Action dispatcher ─────────────────────────────────────────────────────────
@@ -201,24 +202,22 @@ async function dispatch({ action, arguments: args = {} }) {
         if (!target) {
           console.log(`[mine] no ${shortName} found within 128 blocks after ${mined} mined`);
           sendEvent('blockNotFound', { block: blockName, mined });
-          // Throw only when we got nothing at all — lets C# track this as a real failure
           if (mined === 0) throw new Error(`No ${shortName} found within 128 blocks`);
           break;
         }
 
-        // Navigate to the block — catch timeout so a single bad block doesn't abort everything
         try {
           await bot.pathfinder.goto(
             new pfGoals.GoalNear(target.position.x, target.position.y, target.position.z, 2)
           );
-          pathFailures = 0; // successful navigation — reset streak
+          pathFailures = 0;
         } catch (e) {
           pathFailures++;
           console.warn(`[mine] nav to ${shortName} failed (${pathFailures}/${MAX_PATH_FAILURES}): ${e.message}`);
           if (pathFailures >= MAX_PATH_FAILURES)
             throw new Error(`Pathfinding to ${shortName} failed ${MAX_PATH_FAILURES} times: ${e.message}`);
           await new Promise(r => setTimeout(r, 500));
-          continue; // try a different block next iteration
+          continue;
         }
 
         // Re-fetch — another player may have mined it during navigation
@@ -242,7 +241,6 @@ async function dispatch({ action, arguments: args = {} }) {
     }
 
     case 'place': {
-      // Navigate to within reach, then try all six adjacent reference blocks.
       const { x, y, z, material } = args;
       if (x == null || !material) throw new Error('place requires x, y, z, material');
 
@@ -255,14 +253,13 @@ async function dispatch({ action, arguments: args = {} }) {
       if (!item) throw new Error(`${material} not in inventory`);
       await bot.equip(item, 'hand');
 
-      // Try all six faces to find a solid reference block
       const offsets = [
-        { dx: 0, dy: -1, dz: 0,  fx: 0,  fy: 1,  fz: 0  },  // below → place on top
-        { dx: 0, dy: 1,  dz: 0,  fx: 0,  fy: -1, fz: 0  },  // above → place underneath
-        { dx: -1, dy: 0, dz: 0,  fx: 1,  fy: 0,  fz: 0  },  // west face
-        { dx: 1,  dy: 0, dz: 0,  fx: -1, fy: 0,  fz: 0  },  // east face
-        { dx: 0,  dy: 0, dz: -1, fx: 0,  fy: 0,  fz: 1  },  // north face
-        { dx: 0,  dy: 0, dz: 1,  fx: 0,  fy: 0,  fz: -1 },  // south face
+        { dx: 0, dy: -1, dz: 0,  fx: 0,  fy: 1,  fz: 0  },
+        { dx: 0, dy: 1,  dz: 0,  fx: 0,  fy: -1, fz: 0  },
+        { dx: -1, dy: 0, dz: 0,  fx: 1,  fy: 0,  fz: 0  },
+        { dx: 1,  dy: 0, dz: 0,  fx: -1, fy: 0,  fz: 0  },
+        { dx: 0,  dy: 0, dz: -1, fx: 0,  fy: 0,  fz: 1  },
+        { dx: 0,  dy: 0, dz: 1,  fx: 0,  fy: 0,  fz: -1 },
       ];
 
       let placed = false;
@@ -270,7 +267,7 @@ async function dispatch({ action, arguments: args = {} }) {
         const ref = bot.blockAt(bot.entity.position.offset(dx + (x - Math.round(bot.entity.position.x)),
                                                            dy + (y - Math.round(bot.entity.position.y)),
                                                            dz + (z - Math.round(bot.entity.position.z))));
-        if (!ref || ref.type === 0) continue;  // air
+        if (!ref || ref.type === 0) continue;
         try {
           await bot.placeBlock(ref, { x: fx, y: fy, z: fz });
           placed = true;
@@ -284,17 +281,15 @@ async function dispatch({ action, arguments: args = {} }) {
     }
 
     case 'wander': {
-      // Walk in a random direction, clamped to maxDistanceFromSpawn from spawn.
       const { radius = 20, maxDistanceFromSpawn = 100 } = args;
       const angle = Math.random() * 2 * Math.PI;
-      const dist  = 5 + Math.random() * (radius - 5);  // at least 5 blocks
+      const dist  = 5 + Math.random() * (radius - 5);
 
       const curX = bot.entity.position.x;
       const curZ = bot.entity.position.z;
       let tX = curX + Math.cos(angle) * dist;
       let tZ = curZ + Math.sin(angle) * dist;
 
-      // Clamp to spawn boundary if we have a recorded spawn and a limit
       if (spawnPos && maxDistanceFromSpawn > 0) {
         const dxS = tX - spawnPos.x;
         const dzS = tZ - spawnPos.z;
@@ -314,7 +309,6 @@ async function dispatch({ action, arguments: args = {} }) {
         );
         sendEvent('wanderComplete', { ...botPos(), targetX: Math.round(tX), targetZ: Math.round(tZ) });
       } catch (e) {
-        // Destination may be unreachable (cliff, ocean) — not fatal
         console.warn(`[wander] pathfinding failed: ${e.message}`);
         sendEvent('wanderFailed', { message: e.message, ...botPos() });
       }
@@ -328,6 +322,107 @@ async function dispatch({ action, arguments: args = {} }) {
     case 'chat':
       bot.chat(args.message ?? '');
       break;
+
+    // ── Phase 5: Craft ────────────────────────────────────────────────────────
+    // Craft an item from materials already in inventory.
+    // Finds the first available recipe; for 3×3 recipes requires a crafting_table
+    // within 4 blocks.
+    case 'craft': {
+      const { item: itemName, count = 1 } = args;
+      if (!itemName) throw new Error('craft requires item');
+
+      const itemEntry = bot.registry.itemsByName[itemName];
+      if (!itemEntry) throw new Error(`Unknown item: ${itemName}`);
+
+      const recipes = bot.recipesFor(itemEntry.id, null, null, null);
+      if (!recipes || recipes.length === 0)
+        throw new Error(`No recipe found for: ${itemName}`);
+
+      const recipe = recipes[0];
+      let craftingTable = null;
+
+      if (recipe.requiresTable) {
+        const tableId = bot.registry.blocksByName['crafting_table']?.id;
+        if (tableId == null) throw new Error('crafting_table not found in registry');
+        craftingTable = bot.findBlock({ matching: tableId, maxDistance: 4 });
+        if (!craftingTable) throw new Error('No crafting_table within 4 blocks');
+      }
+
+      await bot.craft(recipe, count, craftingTable);
+      sendEvent('craftComplete', { item: itemName, count });
+      console.log(`[craft] crafted ${count}x ${itemName}`);
+      break;
+    }
+
+    // ── Phase 5: Smelt ────────────────────────────────────────────────────────
+    // Smelt an item in the nearest furnace (within 16 blocks).
+    // Adds fuel if the furnace slot is empty, places input, waits for output.
+    case 'smelt': {
+      const { item: inputName, count = 1, fuel = 'coal' } = args;
+      if (!inputName) throw new Error('smelt requires item');
+
+      const furnaceId = bot.registry.blocksByName['furnace']?.id;
+      if (furnaceId == null) throw new Error('furnace not found in registry');
+
+      let furnaceBlock = bot.findBlock({ matching: furnaceId, maxDistance: 16 });
+      if (!furnaceBlock) throw new Error('No furnace found within 16 blocks');
+
+      // Navigate to furnace
+      const movements = new Movements(bot);
+      bot.pathfinder.setMovements(movements);
+      await bot.pathfinder.goto(new pfGoals.GoalNear(
+        furnaceBlock.position.x, furnaceBlock.position.y, furnaceBlock.position.z, 2
+      ));
+
+      // Re-fetch after navigation
+      furnaceBlock = bot.blockAt(furnaceBlock.position);
+      if (!furnaceBlock || furnaceBlock.type !== furnaceId)
+        throw new Error('Furnace not found at expected position after navigation');
+
+      const furnace = await bot.openFurnace(furnaceBlock);
+
+      try {
+        // Add fuel if empty
+        if (!furnace.fuelItem()) {
+          const fuelItem = bot.inventory.items().find(i => i.name === fuel);
+          if (fuelItem) {
+            await furnace.putFuel(fuelItem.type, null, Math.min(fuelItem.count, 8));
+          } else {
+            console.warn(`[smelt] no ${fuel} for fuel — furnace may already have fuel`);
+          }
+        }
+
+        // Check input item
+        const inputItem = bot.inventory.items().find(i => i.name === inputName);
+        if (!inputItem) throw new Error(`${inputName} not found in inventory`);
+
+        const toSmelt = Math.min(inputItem.count, count);
+        await furnace.putInput(inputItem.type, null, toSmelt);
+
+        // Wait for output (up to 40 seconds — one smelt cycle is ~10s)
+        const outputName = await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => reject(new Error('Smelting timed out after 40s')), 40_000);
+          const check = () => {
+            const out = furnace.outputItem();
+            if (out) { clearTimeout(timeout); resolve(out.name); }
+          };
+          furnace.on('update', check);
+          check(); // check immediately in case it's already done
+        });
+
+        if (furnace.outputItem()) await furnace.takeOutput();
+
+        sendEvent('smeltComplete', {
+          item:   inputName,
+          result: outputName,
+          count:  toSmelt,
+        });
+        console.log(`[smelt] smelted ${toSmelt}x ${inputName} → ${outputName}`);
+      } finally {
+        furnace.close();
+      }
+      break;
+    }
 
     default:
       throw new Error(`Unknown action: ${action}`);
