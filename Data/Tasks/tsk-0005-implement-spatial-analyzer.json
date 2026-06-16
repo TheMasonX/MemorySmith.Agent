@@ -1,0 +1,33 @@
+{
+  "Id": "tsk-0005-implement-spatial-analyzer",
+  "Key": "TSK-0005",
+  "Title": "Implement SpatialAnalyzer.cs in Agent.Vision",
+  "Description": "ISpatialAnalyzer is defined but WorldVision is just a stub. Implement SpatialAnalyzer that computes:\n- FlatnessRatio: sample terrain in a radius, compute variance of Y values\n- TreeCoverage: count leaf/log blocks in radius / total blocks\n- WaterProximity: nearest water block distance\n\nInputs: WorldState.Facts (populated from Mineflayer blockAt/radar events)\nOutputs: SpatialAnalysis record with metrics and Tags (e.g. 'flat', 'forest', 'near-water')\n\nFeed into GatherWoodGoal: before planning, run SpatialAnalyzer and pick the direction with highest tree coverage for the MoveTo action.",
+  "Type": "Feature",
+  "Status": "Backlog",
+  "Priority": "Medium",
+  "AssigneeMode": "Custom",
+  "AssigneeDirectoryId": null,
+  "AssigneeCustomText": "AI Agent",
+  "Reporter": "agent-session-20260615",
+  "Labels": [
+    "phase-4",
+    "vision",
+    "spatial-analysis"
+  ],
+  "Attachments": [],
+  "ExternalLinks": [],
+  "LinkedPages": [
+    "vision",
+    "Tasks/phase4-tasks"
+  ],
+  "Comments": [],
+  "EpicId": null,
+  "ParentId": null,
+  "DueDateUtc": null,
+  "CreatedAtUtc": "2026-06-15T23:30:00Z",
+  "UpdatedAtUtc": "2026-06-15T23:30:00Z",
+  "CompletedAtUtc": null,
+  "Revision": 1,
+  "IsArchived": false
+}
