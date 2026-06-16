@@ -2,27 +2,11 @@
  * MineflayerAdapter — Node.js bridge between the MemorySmith.Agent C# host
  * and a Minecraft server.
  *
- * Architecture:
- *   1. Starts a WebSocket server on WS_PORT (default: 3000).
- *   2. Creates a Mineflayer bot connecting to MC_HOST:MC_PORT.
- *   3. Forwards bot events (spawn, health, move, blockMined, chat…) to C# as JSON.
- *   4. Accepts JSON action commands from C# and executes them via Mineflayer.
+ * Phase 5b additions:
+ *   - chat event: includes playerX/Y/Z (bot.players[username].entity.position)
+ *     so C# can compute bot-to-player distance for the "closest agent" heuristic.
  *
- * Phase 5 additions:
- *   - chat event: includes onlinePlayers count for directed-at-bot heuristics
- *   - craft action: uses bot.craft() to craft items from inventory
- *   - smelt action: uses bot.openFurnace() to smelt items in a nearby furnace
- *
- * Environment variables:
- *   WS_PORT      WebSocket server port for C# connection (default: 3000)
- *   MC_HOST      Minecraft server host (default: localhost)
- *   MC_PORT      Minecraft server port (default: 25565)
- *   MC_USERNAME  Bot username (default: AgentBot)
- *   MC_VERSION   Minecraft version e.g. "1.21.4" (optional; auto-detect if omitted)
- *   WS_TOKEN     Simple shared secret for auth (optional)
- *
- * Dependencies: mineflayer, mineflayer-pathfinder, ws
- * Run: node index.js
+ * Full changelog at top of Phase 5 version.
  */
 
 import mineflayer from 'mineflayer';
@@ -41,7 +25,7 @@ const WS_TOKEN = process.env.WS_TOKEN ?? null;
 
 const wss = new WebSocketServer({ port: WS_PORT });
 let agentSocket = null;
-let spawnPos = null;       // recorded on first spawn for boundary checks
+let spawnPos = null;
 
 function sendEvent(event, data = {}) {
   if (agentSocket?.readyState === 1 /* OPEN */) {
@@ -50,9 +34,6 @@ function sendEvent(event, data = {}) {
 }
 
 // ── Sequential command queue ─────────────────────────────────────────────────
-// C# sends actions as fast as WebSocket allows. Without a queue, overlapping
-// bot.dig() calls cause mineflayer to throw "Digging aborted" on every but
-// the last command. This queue ensures actions run strictly one at a time.
 
 const cmdQueue = [];
 let dispatching = false;
@@ -92,7 +73,7 @@ wss.on('connection', (ws) => {
       return;
     }
 
-    enqueueCommand(msg);          // enqueue — do NOT await here
+    enqueueCommand(msg);
   });
 
   ws.on('close', () => {
@@ -151,12 +132,22 @@ bot.on('death',  () => { console.warn('[mc] bot died'); sendEvent('death', botPo
 bot.on('kicked', (reason) => { console.warn('[mc] kicked:', reason); sendEvent('kicked', { reason }); });
 bot.on('error',  (e)      => { console.error('[mc] error:', e.message); sendEvent('error', { message: e.message }); });
 
-// Phase 5: emit chat events with onlinePlayers count so the C# ChatInterpreter
-// can apply the directed-at-bot heuristic (onlinePlayers == 1 → always addressed).
+// Phase 5b: include the speaker's world position so C# can compute distance.
+// playerX/Y/Z are null if the player's entity is not loaded (e.g. they spoke
+// before the bot could see them — happens at long distances).
 bot.on('chat', (username, message) => {
   if (username === bot.username) return;
   const onlinePlayers = Object.keys(bot.players).filter(p => p !== bot.username).length;
-  sendEvent('chat', { username, message, onlinePlayers });
+  const playerEntity  = bot.players[username]?.entity;
+  const playerPos     = playerEntity?.position ?? null;
+  sendEvent('chat', {
+    username,
+    message,
+    onlinePlayers,
+    playerX: playerPos ? Math.round(playerPos.x) : null,
+    playerY: playerPos ? Math.round(playerPos.y) : null,
+    playerZ: playerPos ? Math.round(playerPos.z) : null,
+  });
 });
 
 // ── Action dispatcher ─────────────────────────────────────────────────────────
@@ -176,13 +167,10 @@ async function dispatch({ action, arguments: args = {} }) {
     }
 
     case 'mine': {
-      // Navigate to each target block before digging.
-      // Catches pathfinder timeouts per-block so one unreachable log
-      // doesn't kill the entire mine operation.
       const { block: blockName, count = 1 } = args;
       if (!blockName) throw new Error('mine requires block name');
 
-      const shortName = blockName.replace('minecraft:', '');
+      const shortName  = blockName.replace('minecraft:', '');
       const blockEntry = bot.registry.blocksByName[shortName];
       if (!blockEntry) throw new Error(`Unknown block: ${blockName}`);
       const blockId = blockEntry.id;
@@ -195,7 +183,6 @@ async function dispatch({ action, arguments: args = {} }) {
       const MAX_PATH_FAILURES = 3;
 
       while (mined < count) {
-        // Search up to 64 blocks first, widen to 128 if empty
         let target = bot.findBlock({ matching: blockId, maxDistance: 64 });
         if (!target) target = bot.findBlock({ matching: blockId, maxDistance: 128 });
 
@@ -220,7 +207,6 @@ async function dispatch({ action, arguments: args = {} }) {
           continue;
         }
 
-        // Re-fetch — another player may have mined it during navigation
         const fresh = bot.blockAt(target.position);
         if (!fresh || fresh.type !== blockId) {
           await new Promise(r => setTimeout(r, 100));
@@ -264,9 +250,10 @@ async function dispatch({ action, arguments: args = {} }) {
 
       let placed = false;
       for (const { dx, dy, dz, fx, fy, fz } of offsets) {
-        const ref = bot.blockAt(bot.entity.position.offset(dx + (x - Math.round(bot.entity.position.x)),
-                                                           dy + (y - Math.round(bot.entity.position.y)),
-                                                           dz + (z - Math.round(bot.entity.position.z))));
+        const ref = bot.blockAt(bot.entity.position.offset(
+          dx + (x - Math.round(bot.entity.position.x)),
+          dy + (y - Math.round(bot.entity.position.y)),
+          dz + (z - Math.round(bot.entity.position.z))));
         if (!ref || ref.type === 0) continue;
         try {
           await bot.placeBlock(ref, { x: fx, y: fy, z: fz });
@@ -275,7 +262,7 @@ async function dispatch({ action, arguments: args = {} }) {
         } catch { /* try next face */ }
       }
 
-      if (!placed) throw new Error(`Cannot place ${material} at (${x},${y},${z}) — no solid reference block found`);
+      if (!placed) throw new Error(`Cannot place ${material} at (${x},${y},${z}) — no solid reference block`);
       sendEvent('blockPlaced', { x, y, z, block: shortMat });
       break;
     }
@@ -323,10 +310,6 @@ async function dispatch({ action, arguments: args = {} }) {
       bot.chat(args.message ?? '');
       break;
 
-    // ── Phase 5: Craft ────────────────────────────────────────────────────────
-    // Craft an item from materials already in inventory.
-    // Finds the first available recipe; for 3×3 recipes requires a crafting_table
-    // within 4 blocks.
     case 'craft': {
       const { item: itemName, count = 1 } = args;
       if (!itemName) throw new Error('craft requires item');
@@ -354,9 +337,6 @@ async function dispatch({ action, arguments: args = {} }) {
       break;
     }
 
-    // ── Phase 5: Smelt ────────────────────────────────────────────────────────
-    // Smelt an item in the nearest furnace (within 16 blocks).
-    // Adds fuel if the furnace slot is empty, places input, waits for output.
     case 'smelt': {
       const { item: inputName, count = 1, fuel = 'coal' } = args;
       if (!inputName) throw new Error('smelt requires item');
@@ -367,39 +347,30 @@ async function dispatch({ action, arguments: args = {} }) {
       let furnaceBlock = bot.findBlock({ matching: furnaceId, maxDistance: 16 });
       if (!furnaceBlock) throw new Error('No furnace found within 16 blocks');
 
-      // Navigate to furnace
       const movements = new Movements(bot);
       bot.pathfinder.setMovements(movements);
       await bot.pathfinder.goto(new pfGoals.GoalNear(
         furnaceBlock.position.x, furnaceBlock.position.y, furnaceBlock.position.z, 2
       ));
 
-      // Re-fetch after navigation
       furnaceBlock = bot.blockAt(furnaceBlock.position);
       if (!furnaceBlock || furnaceBlock.type !== furnaceId)
-        throw new Error('Furnace not found at expected position after navigation');
+        throw new Error('Furnace not found after navigation');
 
       const furnace = await bot.openFurnace(furnaceBlock);
 
       try {
-        // Add fuel if empty
         if (!furnace.fuelItem()) {
           const fuelItem = bot.inventory.items().find(i => i.name === fuel);
-          if (fuelItem) {
-            await furnace.putFuel(fuelItem.type, null, Math.min(fuelItem.count, 8));
-          } else {
-            console.warn(`[smelt] no ${fuel} for fuel — furnace may already have fuel`);
-          }
+          if (fuelItem) await furnace.putFuel(fuelItem.type, null, Math.min(fuelItem.count, 8));
         }
 
-        // Check input item
         const inputItem = bot.inventory.items().find(i => i.name === inputName);
         if (!inputItem) throw new Error(`${inputName} not found in inventory`);
 
         const toSmelt = Math.min(inputItem.count, count);
         await furnace.putInput(inputItem.type, null, toSmelt);
 
-        // Wait for output (up to 40 seconds — one smelt cycle is ~10s)
         const outputName = await new Promise((resolve, reject) => {
           const timeout = setTimeout(() => reject(new Error('Smelting timed out after 40s')), 40_000);
           const check = () => {
@@ -407,16 +378,11 @@ async function dispatch({ action, arguments: args = {} }) {
             if (out) { clearTimeout(timeout); resolve(out.name); }
           };
           furnace.on('update', check);
-          check(); // check immediately in case it's already done
+          check();
         });
 
         if (furnace.outputItem()) await furnace.takeOutput();
-
-        sendEvent('smeltComplete', {
-          item:   inputName,
-          result: outputName,
-          count:  toSmelt,
-        });
+        sendEvent('smeltComplete', { item: inputName, result: outputName, count: toSmelt });
         console.log(`[smelt] smelted ${toSmelt}x ${inputName} → ${outputName}`);
       } finally {
         furnace.close();
