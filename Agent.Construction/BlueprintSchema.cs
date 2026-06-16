@@ -31,3 +31,14 @@ public record Blueprint
 
 public record MaterialEntry(string Block, int Quantity);
 public record Dimensions(int X = 0, int Y = 0, int Z = 0);
+
+/// <summary>
+/// A single block placement relative to the blueprint's build origin.
+///
+/// X = east, Y = up, Z = south (Minecraft right-hand coordinate convention).
+/// The build origin is (0,0,0); all offsets are non-negative in a standard blueprint.
+///
+/// Produced by <see cref="BlueprintParser"/> and consumed by
+/// <see cref="BlueprintExecutor"/> to emit PlaceBlock <see cref="Agent.Core.ActionData"/>.
+/// </summary>
+public record PlacementBlock(int X, int Y, int Z, string BlockId);
