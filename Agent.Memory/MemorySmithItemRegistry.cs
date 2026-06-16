@@ -1,1 +1,145 @@
-bmFtZXNwYWNlIEFnZW50Lk1lbW9yeTsKCnVzaW5nIEFnZW50LkNvcmU7CgovLy8gPHN1bW1hcnk+Ci8vLyA8c2VlIGNyZWY9IklJdGVtUmVnaXN0cnkiLz4gaW1wbGVtZW50YXRpb24gYmFja2VkIGJ5IE1lbW9yeVNtaXRoIHdpa2kgcGFnZXMuCi8vLwovLy8gV2lraSBwYWdlcyBtdXN0IGxpdmUgYXQgc2x1ZyAiaXRlbS1yZWdpc3RyeS97aXRlbUlkfSIgKHVuZGVyc2NvcmVzIGNvbnZlcnRlZCB0byBoeXBoZW5zKQovLy8gYW5kIHVzZSB0aGUgZm9sbG93aW5nIGZyb250LW1hdHRlciBmb3JtYXQgKFlBTUwtbGlrZSwgb25lIGZpZWxkIHBlciBsaW5lKToKLy8vCi8vLyA8Y29kZT4KLy8vICMgb2FrLWxvZwovLy8KLy8vIGl0ZW1faWQ6IG9ha19sb2cKLy8vIGRpc3BsYXlfbmFtZTogT2FrIExvZwovLy8gc291cmNlX2Jsb2Nrczogb2FrX2xvZywgYmlyY2hfbG9nLCBzcHJ1Y2VfbG9nCi8vLyByZXF1aXJlc19zbWVsdGluZzogZmFsc2UKLy8vIG1pbl9oYXJ2ZXN0X2xldmVsOiAwCi8vLyA8L2NvZGU+Ci8vLwovLy8gRmllbGRzIGFyZSBjYXNlLWluc2Vuc2l0aXZlLiBFeHRyYSB3aGl0ZXNwYWNlIGlzIHRvbGVyYXRlZC4gTGluZXMgdGhhdCBhcmUgbm90Ci8vLyB2YWxpZCBrZXk6IHZhbHVlIHBhaXJzIChoZWFkaW5ncywgY29tbWVudHMsIGJsYW5rIGxpbmVzKSBhcmUgc2lsZW50bHkgc2tpcHBlZC4KLy8vCi8vLyBSZXR1cm5zIG51bGwgZm9yIHVua25vd24gb3IgbWFsZm9ybWVkIHBhZ2VzLiBOZXZlciBjYWxscyB0aGUgTExNIChELTAwMykuCi8vLyA8L3N1bW1hcnk+CnB1YmxpYyBzZWFsZWQgY2xhc3MgTWVtb3J5U21pdGhJdGVtUmVnaXN0cnkoSU1lbW9yeUdhdGV3YXkgbWVtb3J5KSA6IElJdGVtUmVnaXN0cnkKewogICAgcHJpdmF0ZSBjb25zdCBzdHJpbmcgUGFnZVByZWZpeCA9ICJpdGVtLXJlZ2lzdHJ5LyI7CgogICAgLy8vIDxpbmhlcml0ZG9jLz4KICAgIHB1YmxpYyBhc3luYyBUYXNrPEl0ZW1TcGVjPz4gR2V0QXN5bmMoc3RyaW5nIGl0ZW1JZCwgQ2FuY2VsbGF0aW9uVG9rZW4gY3QgPSBkZWZhdWx0KQogICAgewogICAgICAgIC8vIE5vcm1hbGl6ZSBpdGVtSWQgdG8gc2x1ZyBmb3JtOiB1bmRlcnNjb3JlcyDihpIgaHlwaGVucywgbG93ZXJjYXNlLgogICAgICAgIC8vIFdpa2kgcGFnZXMgYXJlIHN0b3JlZCBhdCAiaXRlbS1yZWdpc3RyeS9vYWstbG9nIiwgbm90ICJpdGVtLXJlZ2lzdHJ5L29ha19sb2ciLgogICAgICAgIHZhciBzbHVnID0gaXRlbUlkLlJlcGxhY2UoJ18nLCAnLScpLlRvTG93ZXJJbnZhcmlhbnQoKTsKICAgICAgICB2YXIgcGFnZUlkID0gJCJ7UGFnZVByZWZpeH17c2x1Z30iOwoKICAgICAgICAvLyAxLiBEaXJlY3QgcGFnZSBsb29rdXAgKGRldGVybWluaXN0aWMsIGZhc3Qg4oCUIHByZWZlcnJlZCBwYXRoIHBlciBELTAwMykuCiAgICAgICAgdmFyIGNvbnRlbnQgPSBhd2FpdCBtZW1vcnkuR2V0UGFnZUFzeW5jKHBhZ2VJZCwgY3QpOwoKICAgICAgICAvLyAyLiBGYWxsIGJhY2sgdG8gc2VhcmNoIGlmIGRpcmVjdCBsb29rdXAgbWlzc2VzIChlLmcuIG1vZGRlZCBpdGVtcyB3aG9zZQogICAgICAgIC8vICAgIHNsdWcgZG9lc24ndCBtYXRjaCB0aGUgbm9ybWFsaXNhdGlvbiBjb252ZW50aW9uKS4KICAgICAgICBpZiAoY29udGVudCBpcyBudWxsKQogICAgICAgIHsKICAgICAgICAgICAgdmFyIHJlc3VsdHMgPSBhd2FpdCBtZW1vcnkuU2VhcmNoQXN5bmMoJCJ7UGFnZVByZWZpeH17aXRlbUlkfSIsIGN0KTsKICAgICAgICAgICAgdmFyIGhpdCA9IHJlc3VsdHMuRmlyc3RPckRlZmF1bHQociA9PgogICAgICAgICAgICAgICAgc3RyaW5nLkVxdWFscyhyLktpbmQsICJwYWdlIiwgU3RyaW5nQ29tcGFyaXNvbi5PcmRpbmFsSWdub3JlQ2FzZSkgJiYKICAgICAgICAgICAgICAgIHIuSWQuQ29udGFpbnMoIml0ZW0tcmVnaXN0cnkiLCBTdHJpbmdDb21wYXJpc29uLk9yZGluYWxJZ25vcmVDYXNlKSk7CiAgICAgICAgICAgIGlmIChoaXQgaXMgbm90IG51bGwpCiAgICAgICAgICAgICAgICBjb250ZW50ID0gYXdhaXQgbWVtb3J5LkdldFBhZ2VBc3luYyhoaXQuSWQsIGN0KTsKICAgICAgICB9CgogICAgICAgIHJldHVybiBjb250ZW50IGlzIG51bGwgPyBudWxsIDogUGFyc2VJdGVtU3BlYyhjb250ZW50KTsKICAgIH0KCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gUGFyc2VzIHRoZSBmcm9udC1tYXR0ZXIgZmllbGRzIGZyb20gYSB3aWtpIHBhZ2UgYm9keSBzdHJpbmcuCiAgICAvLy8gUmV0dXJucyBudWxsIGlmIHJlcXVpcmVkIGZpZWxkcyAoPGM+aXRlbV9pZDwvYz4sIDxjPmRpc3BsYXlfbmFtZTwvYz4pCiAgICAvLy8gYXJlIG1pc3Npbmcgb3IgdGhlIGNvbnRlbnQgaXMgZW1wdHkuCiAgICAvLy8KICAgIC8vLyBFeHBvc2VkIGFzIDxjPmludGVybmFsPC9jPiBmb3IgdW5pdCB0ZXN0aW5nIHZpYSBJdGVtU3BlY1BhcnNlclRlc3RzLgogICAgLy8vIDwvc3VtbWFyeT4KICAgIGludGVybmFsIHN0YXRpYyBJdGVtU3BlYz8gUGFyc2VJdGVtU3BlYyhzdHJpbmcgcGFnZUNvbnRlbnQpCiAgICB7CiAgICAgICAgaWYgKHN0cmluZy5Jc051bGxPcldoaXRlU3BhY2UocGFnZUNvbnRlbnQpKSByZXR1cm4gbnVsbDsKCiAgICAgICAgdmFyIGZpZWxkcyA9IG5ldyBEaWN0aW9uYXJ5PHN0cmluZywgc3RyaW5nPihTdHJpbmdDb21wYXJlci5PcmRpbmFsSWdub3JlQ2FzZSk7CiAgICAgICAgc3RyaW5nPyBoZWFkaW5nSXRlbUlkID0gbnVsbDsKCiAgICAgICAgZm9yZWFjaCAodmFyIHJhd0xpbmUgaW4gcGFnZUNvbnRlbnQuU3BsaXQoJ1xuJykpCiAgICAgICAgewogICAgICAgICAgICB2YXIgbGluZSA9IHJhd0xpbmUuVHJpbSgpOwogICAgICAgICAgICBpZiAobGluZS5MZW5ndGggPT0gMCkgY29udGludWU7CgogICAgICAgICAgICAvLyBFeHRyYWN0IGl0ZW0gSUQgZnJvbSB0aGUgZmlyc3QgTWFya2Rvd24gaGVhZGluZyAoIyBvYWstbG9nIOKGkiAib2FrX2xvZyIpLgogICAgICAgICAgICBpZiAoaGVhZGluZ0l0ZW1JZCBpcyBudWxsICYmIGxpbmUuU3RhcnRzV2l0aCgnIycpKQogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICBoZWFkaW5nSXRlbUlkID0gbGluZS5UcmltU3RhcnQoJyMnLCAnICcpLlRyaW0oKQogICAgICAgICAgICAgICAgICAgIC5Ub0xvd2VySW52YXJpYW50KCkKICAgICAgICAgICAgICAgICAgICAuUmVwbGFjZSgnLScsICdfJyk7CiAgICAgICAgICAgICAgICBjb250aW51ZTsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgLy8gUGFyc2UgImtleTogdmFsdWUiIHBhaXJzLgogICAgICAgICAgICB2YXIgY29sb25JZHggPSBsaW5lLkluZGV4T2YoJzonKTsKICAgICAgICAgICAgaWYgKGNvbG9uSWR4IDw9IDApIGNvbnRpbnVlOwoKICAgICAgICAgICAgdmFyIGtleSAgID0gbGluZVsuLmNvbG9uSWR4XS5UcmltKCk7CiAgICAgICAgICAgIHZhciB2YWx1ZSA9IGxpbmVbKGNvbG9uSWR4ICsgMSkuLl0uVHJpbSgpOwoKICAgICAgICAgICAgLy8gT25seSBhY2NlcHQgd29yZC1jaGFyYWN0ZXIga2V5cyAobGV0dGVycywgZGlnaXRzLCB1bmRlcnNjb3JlcykuCiAgICAgICAgICAgIC8vIFRoaXMgcmVqZWN0cyBIVE1MIGNvbW1lbnRzICg8IS0tIC4uLiAtLT4pLCBVUkxzLCBldGMuCiAgICAgICAgICAgIGlmIChrZXkuTGVuZ3RoID09IDAgfHwgIUlzVmFsaWRGaWVsZEtleShrZXkpIHx8IHZhbHVlLkxlbmd0aCA9PSAwKSBjb250aW51ZTsKCiAgICAgICAgICAgIGZpZWxkc1trZXldID0gdmFsdWU7CiAgICAgICAgfQoKICAgICAgICAvLyBSZXF1aXJlZDogaXRlbV9pZCDigJQgcHJlZmVyIGV4cGxpY2l0IGZpZWxkLCBmYWxsIGJhY2sgdG8gaGVhZGluZy4KICAgICAgICBpZiAoIWZpZWxkcy5UcnlHZXRWYWx1ZSgiaXRlbV9pZCIsIG91dCB2YXIgaXRlbUlkKSB8fCBzdHJpbmcuSXNOdWxsT3JXaGl0ZVNwYWNlKGl0ZW1JZCkpCiAgICAgICAgICAgIGl0ZW1JZCA9IGhlYWRpbmdJdGVtSWQ7CiAgICAgICAgaWYgKHN0cmluZy5Jc051bGxPcldoaXRlU3BhY2UoaXRlbUlkKSkgcmV0dXJuIG51bGw7CgogICAgICAgIC8vIFJlcXVpcmVkOiBkaXNwbGF5X25hbWUuCiAgICAgICAgaWYgKCFmaWVsZHMuVHJ5R2V0VmFsdWUoImRpc3BsYXlfbmFtZSIsIG91dCB2YXIgZGlzcGxheU5hbWUpCiAgICAgICAgICAgIHx8IHN0cmluZy5Jc051bGxPcldoaXRlU3BhY2UoZGlzcGxheU5hbWUpKQogICAgICAgICAgICByZXR1cm4gbnVsbDsKCiAgICAgICAgLy8gT3B0aW9uYWw6IHNvdXJjZV9ibG9ja3Mg4oCUIGNvbW1hLXNlcGFyYXRlZCBsaXN0IG9mIGJsb2NrIElEcy4KICAgICAgICBJUmVhZE9ubHlMaXN0PHN0cmluZz4gc291cmNlQmxvY2tzID0gW107CiAgICAgICAgaWYgKGZpZWxkcy5UcnlHZXRWYWx1ZSgic291cmNlX2Jsb2NrcyIsIG91dCB2YXIgc2JSYXcpICYmIHNiUmF3Lkxlbmd0aCA+IDApCiAgICAgICAgewogICAgICAgICAgICBzb3VyY2VCbG9ja3MgPSBzYlJhdwogICAgICAgICAgICAgICAgLlNwbGl0KCcsJywgU3RyaW5nU3BsaXRPcHRpb25zLlJlbW92ZUVtcHR5RW50cmllcyB8IFN0cmluZ1NwbGl0T3B0aW9ucy5UcmltRW50cmllcykKICAgICAgICAgICAgICAgIC5XaGVyZShzID0+IHMuTGVuZ3RoID4gMCkKICAgICAgICAgICAgICAgIC5Ub0FycmF5KCk7CiAgICAgICAgfQoKICAgICAgICAvLyBPcHRpb25hbDogcmVxdWlyZXNfc21lbHRpbmcgKGRlZmF1bHQ6IGZhbHNlKS4KICAgICAgICB2YXIgcmVxdWlyZXNTbWVsdGluZyA9IGZhbHNlOwogICAgICAgIGlmIChmaWVsZHMuVHJ5R2V0VmFsdWUoInJlcXVpcmVzX3NtZWx0aW5nIiwgb3V0IHZhciByc1JhdykpCiAgICAgICAgICAgIGJvb2wuVHJ5UGFyc2UocnNSYXcsIG91dCByZXF1aXJlc1NtZWx0aW5nKTsKCiAgICAgICAgLy8gT3B0aW9uYWw6IG1pbl9oYXJ2ZXN0X2xldmVsIChkZWZhdWx0OiAwKS4KICAgICAgICB2YXIgbWluSGFydmVzdExldmVsID0gMDsKICAgICAgICBpZiAoZmllbGRzLlRyeUdldFZhbHVlKCJtaW5faGFydmVzdF9sZXZlbCIsIG91dCB2YXIgbWhsUmF3KSkKICAgICAgICAgICAgaW50LlRyeVBhcnNlKG1obFJhdywgb3V0IG1pbkhhcnZlc3RMZXZlbCk7CgogICAgICAgIHJldHVybiBuZXcgSXRlbVNwZWMKICAgICAgICB7CiAgICAgICAgICAgIEl0ZW1JZCAgICAgICAgICAgPSBpdGVtSWQsCiAgICAgICAgICAgIERpc3BsYXlOYW1lICAgICAgPSBkaXNwbGF5TmFtZSwKICAgICAgICAgICAgU291cmNlQmxvY2tzICAgICA9IHNvdXJjZUJsb2NrcywKICAgICAgICAgICAgUmVxdWlyZXNTbWVsdGluZyA9IHJlcXVpcmVzU21lbHRpbmcsCiAgICAgICAgICAgIE1pbkhhcnZlc3RMZXZlbCAgPSBtaW5IYXJ2ZXN0TGV2ZWwsCiAgICAgICAgfTsKICAgIH0KCiAgICAvLyBBIHZhbGlkIGZyb250LW1hdHRlciBrZXkgY29uc2lzdHMgb25seSBvZiBsZXR0ZXJzLCBkaWdpdHMsIGFuZCB1bmRlcnNjb3Jlcy4KICAgIHByaXZhdGUgc3RhdGljIGJvb2wgSXNWYWxpZEZpZWxkS2V5KHN0cmluZyBrZXkpCiAgICB7CiAgICAgICAgZm9yZWFjaCAodmFyIGMgaW4ga2V5KQogICAgICAgICAgICBpZiAoIWNoYXIuSXNMZXR0ZXJPckRpZ2l0KGMpICYmIGMgIT0gJ18nKSByZXR1cm4gZmFsc2U7CiAgICAgICAgcmV0dXJuIHRydWU7CiAgICB9Cn0K
+namespace Agent.Memory;
+
+using Agent.Core;
+
+/// <summary>
+/// <see cref="IItemRegistry"/> implementation backed by MemorySmith wiki pages.
+///
+/// Wiki pages must live at slug "item-registry/{itemId}" (underscores converted to hyphens)
+/// and use the following front-matter format (YAML-like, one field per line):
+///
+/// <code>
+/// # oak-log
+///
+/// item_id: oak_log
+/// display_name: Oak Log
+/// source_blocks: oak_log, birch_log, spruce_log
+/// requires_smelting: false
+/// min_harvest_level: 0
+/// </code>
+///
+/// Fields are case-insensitive. Extra whitespace is tolerated. Lines that are not
+/// valid key: value pairs (headings, comments, blank lines) are silently skipped.
+///
+/// Returns null for unknown or malformed pages. Never calls the LLM (D-003).
+/// </summary>
+public sealed class MemorySmithItemRegistry(IMemoryGateway memory) : IItemRegistry
+{
+    private const string PagePrefix = "item-registry/";
+
+    /// <inheritdoc/>
+    public async Task<ItemSpec?> GetAsync(string itemId, CancellationToken ct = default)
+    {
+        // Normalize itemId to slug form: underscores → hyphens, lowercase.
+        // Wiki pages are stored at "item-registry/oak-log", not "item-registry/oak_log".
+        var slug = itemId.Replace('_', '-').ToLowerInvariant();
+        var pageId = $"{PagePrefix}{slug}";
+
+        // 1. Direct page lookup (deterministic, fast — preferred path per D-003).
+        var content = await memory.GetPageAsync(pageId, ct);
+
+        // 2. Fall back to search if direct lookup misses (e.g. modded items whose
+        //    slug doesn't match the normalisation convention).
+        if (content is null)
+        {
+            var results = await memory.SearchAsync($"{PagePrefix}{itemId}", ct);
+            var hit = results.FirstOrDefault(r =>
+                string.Equals(r.Kind, "page", StringComparison.OrdinalIgnoreCase) &&
+                r.Id.Contains("item-registry", StringComparison.OrdinalIgnoreCase));
+            if (hit is not null)
+                content = await memory.GetPageAsync(hit.Id, ct);
+        }
+
+        return content is null ? null : ParseItemSpec(content);
+    }
+
+    /// <summary>
+    /// Parses the front-matter fields from a wiki page body string.
+    /// Returns null if required fields (<c>item_id</c>, <c>display_name</c>)
+    /// are missing or the content is empty.
+    ///
+    /// Exposed as <c>internal</c> for unit testing via ItemSpecParserTests.
+    /// </summary>
+    internal static ItemSpec? ParseItemSpec(string pageContent)
+    {
+        if (string.IsNullOrWhiteSpace(pageContent)) return null;
+
+        var fields = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        string? headingItemId = null;
+
+        foreach (var rawLine in pageContent.Split('\n'))
+        {
+            var line = rawLine.Trim();
+            if (line.Length == 0) continue;
+
+            // Extract item ID from the first Markdown heading (# oak-log → "oak_log").
+            if (headingItemId is null && line.StartsWith('#'))
+            {
+                headingItemId = line.TrimStart('#', ' ').Trim()
+                    .ToLowerInvariant()
+                    .Replace('-', '_');
+                continue;
+            }
+
+            // Parse "key: value" pairs.
+            var colonIdx = line.IndexOf(':');
+            if (colonIdx <= 0) continue;
+
+            var key   = line[..colonIdx].Trim();
+            var value = line[(colonIdx + 1)..].Trim();
+
+            // Only accept word-character keys (letters, digits, underscores).
+            // This rejects HTML comments (<!-- ... -->), URLs, etc.
+            if (key.Length == 0 || !IsValidFieldKey(key) || value.Length == 0) continue;
+
+            fields[key] = value;
+        }
+
+        // Required: item_id — prefer explicit field, fall back to heading.
+        if (!fields.TryGetValue("item_id", out var itemId) || string.IsNullOrWhiteSpace(itemId))
+            itemId = headingItemId;
+        if (string.IsNullOrWhiteSpace(itemId)) return null;
+
+        // Required: display_name.
+        if (!fields.TryGetValue("display_name", out var displayName)
+            || string.IsNullOrWhiteSpace(displayName))
+            return null;
+
+        // Optional: source_blocks — comma-separated list of block IDs.
+        IReadOnlyList<string> sourceBlocks = [];
+        if (fields.TryGetValue("source_blocks", out var sbRaw) && sbRaw.Length > 0)
+        {
+            sourceBlocks = sbRaw
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(s => s.Length > 0)
+                .ToArray();
+        }
+
+        // Optional: requires_smelting (default: false).
+        var requiresSmelting = false;
+        if (fields.TryGetValue("requires_smelting", out var rsRaw))
+            bool.TryParse(rsRaw, out requiresSmelting);
+
+        // Optional: min_harvest_level (default: 0).
+        var minHarvestLevel = 0;
+        if (fields.TryGetValue("min_harvest_level", out var mhlRaw))
+            int.TryParse(mhlRaw, out minHarvestLevel);
+
+        return new ItemSpec
+        {
+            ItemId           = itemId,
+            DisplayName      = displayName,
+            SourceBlocks     = sourceBlocks,
+            RequiresSmelting = requiresSmelting,
+            MinHarvestLevel  = minHarvestLevel,
+        };
+    }
+
+    // A valid front-matter key consists only of letters, digits, and underscores.
+    private static bool IsValidFieldKey(string key)
+    {
+        foreach (var c in key)
+            if (!char.IsLetterOrDigit(c) && c != '_') return false;
+        return true;
+    }
+}
