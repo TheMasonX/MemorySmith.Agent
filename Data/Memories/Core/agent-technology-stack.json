@@ -1,0 +1,13 @@
+{
+  "Id": "agent-technology-stack",
+  "Title": "MemorySmith.Agent — Technology Stack",
+  "Content": "C# side: .NET 10, C# 14 (latest), net10.0 target framework, .slnx solution format, nullable enabled, implicit usings enabled. DI via Microsoft.Extensions.DependencyInjection (included in Web SDK). Logging via Microsoft.Extensions.Logging. Hosted services via Microsoft.Extensions.Hosting.BackgroundService. HTTP client via IHttpClientFactory. WebSocket via System.Net.WebSockets.ClientWebSocket.\n\nNode.js side: Node.js 22+, ESM modules (type:module in package.json). Dependencies: mineflayer ^4.23.0 (Minecraft bot), mineflayer-pathfinder ^2.4.5 (A* navigation), ws ^8.18.0 (WebSocket server).\n\nTest stack: NUnit 4.6.1, NUnit3TestAdapter 6.2.0, Microsoft.NET.Test.Sdk 18.6.0, coverlet.collector 10.0.1, GitHubActionsTestLogger 2.4.1.\n\nWiki/memory backend: MemorySmith (https://github.com/TheMasonX/MemorySmith) — ASP.NET Core app with BM25 + embedding search, REST API at /api/search and /api/pages.",
+  "Status": 2,
+  "Confidence": 0.99,
+  "Tags": ["agent", "technology", "dotnet", "nodejs", "mineflayer", "kind:reference", "audience:agent", "scope:tech"],
+  "References": ["agent-architecture-bounded-contexts"],
+  "Conflicts": [],
+  "SourceLinks": [],
+  "UsageCount": 0,
+  "LastUpdated": "2026-06-15T23:30:00Z"
+}
