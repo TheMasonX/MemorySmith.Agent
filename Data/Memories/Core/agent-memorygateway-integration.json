@@ -1,0 +1,16 @@
+{
+  "Id": "agent-memorygateway-integration",
+  "Title": "MemorySmith.Agent — IMemoryGateway and MemorySmith REST API",
+  "Content": "IMemoryGateway (Agent.Core) has 4 methods: SearchAsync, GetPageAsync, CreatePageAsync, UpdatePageAsync.\n\nRestMemoryGateway (Agent.Memory) implements this via MemorySmith REST endpoints:\n  GET /api/search?query={q}&limit=20   -> unified search (pages + memories)\n  GET /api/pages/{slug}               -> page content (body field)\n  POST /api/pages                     -> create page {slug, title, body, minimumRole}\n  PUT /api/pages/{slug}               -> update page\n\nSearchResult.Kind field distinguishes 'page' (slug usable in GetPageAsync) from 'memory' (UUID, NOT a valid page slug).\n\nConfig: Agent:Memory:BaseUrl, ApiKey, TimeoutSeconds, DefaultPageRole in appsettings.json.\nAuth: X-Api-Key header if ApiKey is configured in MemorySmith.\n\nPhase 2 bug fixed: UpdatePageAsync preserves existing title via GET-then-PUT; falls back gracefully if page doesn't exist.\nIHttpClientFactory used for connection pooling (not new HttpClient()).\n\nFor Phase 2 tests, use MockMemoryGateway (in MemorySmith.Agent.Tests). No real MemorySmith instance needed for unit tests.",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": ["agent", "memory", "rest-api", "memorysmith", "kind:integration", "audience:agent", "scope:memory"],
+  "References": ["agent-architecture-bounded-contexts", "agent-technology-stack"],
+  "Conflicts": [],
+  "SourceLinks": [
+    { "Label": "RestMemoryGateway.cs", "Uri": "%RepoRoot%Agent.Memory/RestMemoryGateway.cs", "StartLine": null, "EndLine": null },
+    { "Label": "Memory wiki page",    "Uri": "%RepoRoot%Data/Pages/memory.md",               "StartLine": null, "EndLine": null }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-06-15T23:30:00Z"
+}
