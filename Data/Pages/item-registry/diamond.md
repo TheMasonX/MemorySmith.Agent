@@ -1,1 +1,12 @@
-IyBkaWFtb25kCgppdGVtX2lkOiBkaWFtb25kCmRpc3BsYXlfbmFtZTogRGlhbW9uZApzb3VyY2VfYmxvY2tzOiBkaWFtb25kX29yZSwgZGVlcHNsYXRlX2RpYW1vbmRfb3JlCnJlcXVpcmVzX3NtZWx0aW5nOiBmYWxzZQptaW5faGFydmVzdF9sZXZlbDogMwoKRGlhbW9uZHMgYXJlIGZvdW5kIGJldHdlZW4gbGF5ZXJzIC02NCBhbmQgMTYsIHdpdGggdGhlIGhpZ2hlc3QgY29uY2VudHJhdGlvbiBhdCBsYXllciAtNTguClRoZXkgcmVxdWlyZSBhbiBpcm9uIHBpY2theGUgb3IgYmV0dGVyIHRvIG1pbmUgKG1pbl9oYXJ2ZXN0X2xldmVsOiAzKS4KRWFjaCBvcmUgYmxvY2sgZHJvcHMgb25lIGRpYW1vbmQgKG9yIG1vcmUgd2l0aCBGb3J0dW5lIGVuY2hhbnRtZW50KS4KRGlhbW9uZHMgYXJlIHVzZWQgZm9yIGNyYWZ0aW5nIHRoZSBzdHJvbmdlc3QgdmFuaWxsYSB0b29scyBhbmQgYXJtb3VyLgo=
+# diamond
+
+item_id: diamond
+display_name: Diamond
+source_blocks: diamond_ore, deepslate_diamond_ore
+requires_smelting: false
+min_harvest_level: 3
+
+Diamonds are found between layers -64 and 16, with the highest concentration at layer -58.
+They require an iron pickaxe or better to mine (min_harvest_level: 3).
+Each ore block drops one diamond (or more with Fortune enchantment).
+Diamonds are used for crafting the strongest vanilla tools and armour.
