@@ -33,7 +33,7 @@ public sealed class WanderTool(IWorldAdapter worldAdapter) : ITool
 
         var action = new ActionData
         {
-            Tool = "wander",
+            Tool = ActionProtocol.Wander,
             Arguments = { ["radius"] = (object?)radius, ["maxDistanceFromSpawn"] = (object?)maxDist }
         };
 
