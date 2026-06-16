@@ -1,0 +1,16 @@
+{
+  "Id": "agent-ci-baseline-status",
+  "Title": "MemorySmith.Agent — CI Baseline and Test Setup",
+  "Content": "CI uses GitHub Actions with a single build-and-test job on ubuntu-latest. Test framework: NUnit 4.6.1, NUnit3TestAdapter 6.2.0, Microsoft.NET.Test.Sdk 18.6.0, coverlet.collector 10.0.1, GitHubActionsTestLogger 2.4.1. ci.runsettings activates the GitHub Actions logger.\n\nBaseline: 48+ tests passing, 0 failures. Test categories: domain models (7), memory gateway (7), tool engine (4), world adapter (6), planner + goals (15+), integration (6).\n\nSandbox NuGet issue: dotnet restore fails with proxy 407 for new packages. Fix: (1) start authproxy.py on port 9081; (2) override BOTH HTTPS_PROXY and https_proxy (lowercase) to http://127.0.0.1:9081; (3) if packages still missing, use Python to download .nupkg files and create .sha512 files manually in ~/.nuget/packages.\n\nCoverlet workaround: locally, XPlat Code Coverage shows 'Unable to find datacollector' but tests still pass (exit 0). On CI, coverlet.collector 10.0.1 resolves this. Do NOT use coverlet.collector 6.0.4 (doesn't exist on NuGet).",
+  "Status": 2,
+  "Confidence": 0.97,
+  "Tags": ["agent", "ci", "tests", "nunit", "kind:operational", "audience:agent", "scope:testing"],
+  "References": [],
+  "Conflicts": [],
+  "SourceLinks": [
+    { "Label": "CI workflow", "Uri": "%RepoRoot%.github/workflows/ci.yml", "StartLine": null, "EndLine": null },
+    { "Label": "Test csproj",  "Uri": "%RepoRoot%MemorySmith.Agent.Tests/MemorySmith.Agent.Tests.csproj", "StartLine": null, "EndLine": null }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-06-15T23:30:00Z"
+}
