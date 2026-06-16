@@ -63,3 +63,23 @@ Key decisions recorded here so agents and developers understand the "why" behind
 **Rationale**: Mineflayer is the most mature Minecraft bot library and is JavaScript-native. Running it in a subprocess over WebSocket keeps the C# host clean and allows independent restart/upgrade of the bot layer.
 
 **Confidence**: High (0.95).
+
+## D-009: HtnTask Record Deleted; TaskDecomposer Moved to HtnTaskLibrary
+
+**Decision**: `HtnTask(Name, Description, SubTasks[])` record removed from `Agent.Planning/HtnTask.cs`. `TaskDecomposer` delegate moved into `HtnTaskLibrary.cs` (its only consumer). `Phases` property retained on goal classes.
+
+**Rationale**: `HtnTask` was never instantiated — a placeholder from early Phase 2 design that was superseded by the `TaskDecomposer` + `HtnTaskLibrary` approach. Deleting it passes the deletion test: removing it changes nothing about runtime behaviour. `TaskDecomposer` is co-located with the only class that uses it. `Phases` is retained on `IGoal` implementations (including direct-decomposition goals like `GatherWoodGoal`) because: (a) `HtnPlanner` reads `goal.Phases` on the phase-by-phase decomposition path (non-direct goals); (b) the phases serve as readable documentation of a goal's logical stages and are a stable part of the `IGoal` contract.
+
+**Reviewed**: phase3-refactor-candidates-council-20260616.md
+
+**Confidence**: High (0.93).
+
+## D-010: ActionProtocol Constants; WebSocketBridge No Longer Lowercases Tool Name
+
+**Decision**: `Agent.Tools/ActionProtocol.cs` defines string constants for all Node.js wire-action names (`move`, `mine`, `place`, `status`, `wander`, `chat`). Each tool sets `ActionData.Tool` to the appropriate constant in `ExecuteAsync`. `WebSocketBridge.SendAsync` forwards `ActionData.Tool` as-is — the `ToLowerInvariant()` call is removed.
+
+**Rationale**: The old design had a hidden coupling: `MineBlockTool` set `Tool = "mine"` to compensate for the bridge's implicit lowercasing; `MoveTo` set `Tool = "move"` for the same reason. The mapping from logical tool name (`MineBlock`) to wire name (`mine`) was buried inside each tool's body, not visible to any reader of `WebSocketBridge`. The new design makes the tool the single source of truth for its wire name. `ActionProtocol` is the canonical registry of valid wire names, discoverable from one file.
+
+**Reviewed**: phase3-refactor-candidates-council-20260616.md
+
+**Confidence**: High (0.95).
