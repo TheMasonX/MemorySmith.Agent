@@ -45,9 +45,9 @@ public sealed class MemorySmithItemRegistry(IMemoryGateway memory) : IItemRegist
             var results = await memory.SearchAsync($"{PagePrefix}{itemId}", ct);
             var hit = results.FirstOrDefault(r =>
                 string.Equals(r.Kind, "page", StringComparison.OrdinalIgnoreCase) &&
-                r.Id.Contains("item-registry", StringComparison.OrdinalIgnoreCase));
+                r.PageId.Contains("item-registry", StringComparison.OrdinalIgnoreCase));
             if (hit is not null)
-                content = await memory.GetPageAsync(hit.Id, ct);
+                content = await memory.GetPageAsync(hit.PageId, ct);
         }
 
         return content is null ? null : ParseItemSpec(content);
@@ -58,9 +58,9 @@ public sealed class MemorySmithItemRegistry(IMemoryGateway memory) : IItemRegist
     /// Returns null if required fields (<c>item_id</c>, <c>display_name</c>)
     /// are missing or the content is empty.
     ///
-    /// Exposed as <c>internal</c> for unit testing via ItemSpecParserTests.
+    /// Exposed as <c>public</c> for direct unit testing via ItemSpecParserTests.
     /// </summary>
-    internal static ItemSpec? ParseItemSpec(string pageContent)
+    public static ItemSpec? ParseItemSpec(string pageContent)
     {
         if (string.IsNullOrWhiteSpace(pageContent)) return null;
 
