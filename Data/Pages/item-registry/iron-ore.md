@@ -1,1 +1,15 @@
-IyBpcm9uLW9yZQoKaXRlbV9pZDogaXJvbl9vcmUKZGlzcGxheV9uYW1lOiBJcm9uIE9yZQpzb3VyY2VfYmxvY2tzOiBpcm9uX29yZSwgZGVlcHNsYXRlX2lyb25fb3JlCnJlcXVpcmVzX3NtZWx0aW5nOiBmYWxzZQptaW5faGFydmVzdF9sZXZlbDogMgoKSXJvbiBvcmUgY2FuIGJlIGZvdW5kIGJldHdlZW4gbGF5ZXJzIC02NCBhbmQgMzIwLCBtb3N0IGNvbW1vbmx5IGFyb3VuZCBsYXllciAxNi4KQnJlYWtpbmcgaXQgd2l0aCBhIHN0b25lIHBpY2theGUgb3IgYmV0dGVyIGRyb3BzIHJhdyBpcm9uIChzaW5jZSBKYXZhIDEuMTcpLgpVc2UgdGhpcyBlbnRyeSB3aGVuIGdhdGhlcmluZyByYXcgaXJvbiDigJQgZm9yIGlyb24gaW5nb3RzIHNlZSBpdGVtLXJlZ2lzdHJ5L2lyb24taW5nb3QuCgpOb3RlOiByZXF1aXJlc19zbWVsdGluZyBpcyBmYWxzZSBoZXJlIGJlY2F1c2UgdGhlIGludmVudG9yeSBrZXkgYWZ0ZXIgbWluaW5nIGlzCiJyYXdfaXJvbiIgKHNpbmNlIEphdmEgMS4xNykgb3IgImlyb25fb3JlIiAocHJlLTEuMTcpLiBGb3IgaW5nb3RzLCBjcmVhdGUgYQpzZXBhcmF0ZSBpdGVtLXJlZ2lzdHJ5L2lyb24taW5nb3QgcGFnZSB3aXRoIHJlcXVpcmVzX3NtZWx0aW5nOiB0cnVlLgo=
+# iron-ore
+
+item_id: iron_ore
+display_name: Iron Ore
+source_blocks: iron_ore, deepslate_iron_ore
+requires_smelting: false
+min_harvest_level: 2
+
+Iron ore can be found between layers -64 and 320, most commonly around layer 16.
+Breaking it with a stone pickaxe or better drops raw iron (since Java 1.17).
+Use this entry when gathering raw iron — for iron ingots see item-registry/iron-ingot.
+
+Note: requires_smelting is false here because the inventory key after mining is
+"raw_iron" (since Java 1.17) or "iron_ore" (pre-1.17). For ingots, create a
+separate item-registry/iron-ingot page with requires_smelting: true.
