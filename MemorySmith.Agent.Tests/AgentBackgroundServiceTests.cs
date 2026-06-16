@@ -40,7 +40,7 @@ public class AgentBackgroundServiceTests
     /// </summary>
     private WebUI.Blazor.AgentBackgroundService CreateService(int maxConsecutiveFailures) =>
         new(_adapter, _toolCaller, NullLogger<WebUI.Blazor.AgentBackgroundService>.Instance,
-            _planner, maxConsecutiveFailures);
+            _planner, maxConsecutiveFailures: maxConsecutiveFailures);
 
     // -- PlanAsync call verification ---------------------------------------------------
 
