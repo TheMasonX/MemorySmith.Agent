@@ -156,8 +156,15 @@ public sealed class AgentBackgroundService(
 
         while (!ct.IsCancellationRequested)
         {
-            // When queue is empty and a goal is active — ask the planner
-            if (_queue.IsEmpty && _currentGoal is not null)
+            // When queue is empty, a goal is active, and a plan cycle has NOT just completed —
+            // ask the planner for the next action sequence.
+            // The !_actionDispatchedThisCycle guard is critical: when a plan cycle just
+            // completed (_actionDispatchedThisCycle = true), we must fall through to the
+            // else branch below so the settle delay fires and the error channel is read
+            // BEFORE starting the next plan. Without this guard, re-planning happens
+            // in the same iteration as the settle window is entered, and the channel
+            // read never runs.
+            if (_queue.IsEmpty && _currentGoal is not null && !_actionDispatchedThisCycle)
             {
                 if (_currentGoal.IsComplete(_worldState))
                 {
