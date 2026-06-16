@@ -19,12 +19,16 @@ using System.Threading.Channels;
 ///      route error events to the typed <see cref="_gameErrors"/> channel.
 ///   3. DispatchActionsAsync — drain ActionQueue, call planner when idle,
 ///      consume error channel after each plan-cycle settle.
+///
+/// <paramref name="maxConsecutiveFailures"/> defaults to 3. Override in tests to observe
+/// failure behaviour after fewer errors without waiting for multiple plan cycles.
 /// </summary>
 public sealed class AgentBackgroundService(
     IWorldAdapter worldAdapter,
     IToolCaller toolCaller,
     ILogger<AgentBackgroundService> logger,
-    IPlanner planner) : BackgroundService
+    IPlanner planner,
+    int maxConsecutiveFailures = 3) : BackgroundService
 {
     private readonly ActionQueue _queue = new();
 
@@ -142,7 +146,8 @@ public sealed class AgentBackgroundService(
 
     private async Task DispatchActionsAsync(CancellationToken ct)
     {
-        const int MaxConsecutiveFailures = 3;
+        // Captured from the constructor parameter so it can be overridden in tests.
+        var maxFailures = maxConsecutiveFailures;
 
         // Phase 4: shared context bag carried across all actions in the current plan.
         // Tools write here (e.g. SearchMemory writes result coordinates);
@@ -164,7 +169,7 @@ public sealed class AgentBackgroundService(
                 }
 
                 if (_currentGoal.HasFailed(_worldState) ||
-                    _consecutiveFailures >= MaxConsecutiveFailures)
+                    _consecutiveFailures >= maxFailures)
                 {
                     logger.LogWarning("Goal '{Goal}' failed (failures={N}).",
                         _currentGoal.Name, _consecutiveFailures);
@@ -252,7 +257,7 @@ public sealed class AgentBackgroundService(
                         _consecutiveFailures++;
                         logger.LogWarning(
                             "Game error after cycle (failures={N}/{Max}): {Error}",
-                            _consecutiveFailures, MaxConsecutiveFailures, errMsg);
+                            _consecutiveFailures, maxFailures, errMsg);
                     }
                 }
                 else
