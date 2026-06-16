@@ -82,19 +82,96 @@ public sealed class AgentBackgroundService(
         {
             logger.LogDebug("World event: {Type}", worldEvent.EventType);
 
+            // Store all payload fields as raw facts for inspection / debugging
             _worldState = _worldState.With(b =>
             {
                 foreach (var kv in worldEvent.Payload)
                     b.SetFact($"event:{worldEvent.EventType}:{kv.Key}", kv.Value);
             });
 
-            // Update health from health events
-            if (worldEvent.EventType == "health" &&
-                worldEvent.Payload.TryGetValue("hp", out var hp) && hp is int healthVal)
+            // Structured updates — each event type updates the canonical WorldState fields
+            switch (worldEvent.EventType)
             {
-                _worldState = _worldState with { Health = healthVal };
+                case "health":
+                    ApplyHealthAndFood(worldEvent.Payload);
+                    break;
+
+                case "spawn":
+                    ApplyPosition(worldEvent.Payload);
+                    ApplyHealthAndFood(worldEvent.Payload);
+                    logger.LogInformation("Bot spawned at {Pos}", _worldState.Position);
+                    break;
+
+                case "move":
+                case "moveComplete":
+                    ApplyPosition(worldEvent.Payload);
+                    break;
+
+                case "status":
+                    ApplyPosition(worldEvent.Payload);
+                    ApplyHealthAndFood(worldEvent.Payload);
+                    ApplyInventorySnapshot(worldEvent.Payload);
+                    break;
+
+                case "blockMined":
+                    // Each blockMined event = one block collected
+                    if (worldEvent.Payload.TryGetValue("block", out var rawBlock) &&
+                        rawBlock is string blockName)
+                    {
+                        // Normalize "minecraft:oak_log" → "oak_log"
+                        var itemKey = blockName.Contains(':')
+                            ? blockName.Split(':')[1]
+                            : blockName;
+                        _worldState = _worldState.With(b => b.AddInventoryItem(itemKey, 1));
+                        logger.LogInformation(
+                            "Inventory +1 {Block} → total {Total}",
+                            itemKey,
+                            _worldState.Inventory.GetValueOrDefault(itemKey));
+                    }
+                    break;
             }
         }
+    }
+
+    // ── WorldState update helpers ─────────────────────────────────────────────
+
+    private void ApplyPosition(IReadOnlyDictionary<string, object?> payload)
+    {
+        if (payload.TryGetValue("x", out var ox) && ox is int px &&
+            payload.TryGetValue("y", out var oy) && oy is int py &&
+            payload.TryGetValue("z", out var oz) && oz is int pz)
+        {
+            _worldState = _worldState with { Position = new Position(px, py, pz) };
+        }
+    }
+
+    private void ApplyHealthAndFood(IReadOnlyDictionary<string, object?> payload)
+    {
+        if (payload.TryGetValue("hp", out var ohp) && ohp is int hp)
+            _worldState = _worldState with { Health = hp };
+        if (payload.TryGetValue("food", out var of) && of is int food)
+            _worldState = _worldState with { Food = food };
+    }
+
+    /// <summary>
+    /// Parses the "inventory" field from a status event (a raw JSON object string
+    /// from WebSocketBridge) and replaces WorldState.Inventory with a full snapshot.
+    /// </summary>
+    private void ApplyInventorySnapshot(IReadOnlyDictionary<string, object?> payload)
+    {
+        if (!payload.TryGetValue("inventory", out var invRaw) || invRaw is not string invJson)
+            return;
+        try
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(invJson);
+            var snap = new Dictionary<string, int>();
+            foreach (var prop in doc.RootElement.EnumerateObject())
+                if (prop.Value.TryGetInt32(out var qty) && qty > 0)
+                    snap[prop.Name] = qty;
+            _worldState = _worldState.With(b => b.SetInventory(snap));
+            logger.LogDebug("Inventory snapshot: {Count} item types", snap.Count);
+        }
+        catch { /* ignore malformed inventory JSON */ }
     }
 
     // ── Action dispatch loop ─────────────────────────────────────────────────
