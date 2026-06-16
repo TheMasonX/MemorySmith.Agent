@@ -10,6 +10,10 @@ namespace MemorySmith.Agent.Tests;
 /// when the action queue is empty and a goal is active (council Phase 3 acceptance criterion),
 /// and that game error events (blockNotFound, error) are routed through the typed
 /// Channel&lt;string&gt; and correctly increment _consecutiveFailures (council Phase 3 deferred).
+///
+/// Sprint 1 additions:
+///   1a — SlowChatInterpreter_DoesNotBlock_BlockMinedEvent
+///   1b — Reconnect_AfterTwoFailures_ResumesCurrentGoal
 /// </summary>
 [TestFixture]
 public class AgentBackgroundServiceTests
@@ -173,22 +177,9 @@ public class AgentBackgroundServiceTests
 
     // -- Error-channel path (deferred from Phase 3 council) ----------------------------
 
-    /// <summary>
-    /// Verifies that a blockNotFound event with mined=0 is written to the typed
-    /// Channel&lt;string&gt; error channel, which DispatchActionsAsync reads after
-    /// the settle delay, incrementing _consecutiveFailures.
-    ///
-    /// Observable via: with maxConsecutiveFailures=1, a single error abandons the goal
-    /// (CurrentGoal → null). This tests the complete signal path:
-    ///   PushEvent("blockNotFound") → ProcessEventsAsync writes to _gameErrors
-    ///   → settle delay → DispatchActionsAsync TryRead → _consecutiveFailures++
-    ///   → goal abandoned.
-    /// </summary>
     [Test]
     public async Task BlockNotFoundEvent_MinedZero_WritesToErrorChannel_CausesGoalAbandonment()
     {
-        // maxConsecutiveFailures=1 so a single error abandons the goal immediately,
-        // making the channel-write observable without _consecutiveFailures being public.
         _planner.PlanToReturn = new ActionPlan("Mine", [],
             [new ActionData { Tool = "NoOp" }]);
         _registry.Register(new NoOpTool("NoOp"));
@@ -199,23 +190,18 @@ public class AgentBackgroundServiceTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
         var serviceTask = service.StartAsync(cts.Token);
 
-        // Wait for the first plan cycle to begin (planner called)
         var planDeadline = DateTime.UtcNow.AddSeconds(2);
         while (_planner.PlanCalls.Count == 0 && DateTime.UtcNow < planDeadline)
             await Task.Delay(10);
         Assert.That(_planner.PlanCalls, Has.Count.GreaterThan(0),
             "Planner must be called before injecting the error event.");
 
-        // Inject the blockNotFound event with mined=0 (total failure — no blocks found at all).
-        // ProcessEventsAsync picks it up and writes "$"blockNotFound:oak_log"" to _gameErrors.
         _adapter.PushEvent("blockNotFound", new()
         {
             ["block"] = "minecraft:oak_log",
             ["mined"] = 0
         });
 
-        // Wait for the settle delay to fire (300ms) and for the dispatch loop to
-        // read the error, increment failures, and abandon the goal.
         var abandonDeadline = DateTime.UtcNow.AddSeconds(3);
         while (service.CurrentGoal is not null && DateTime.UtcNow < abandonDeadline)
             await Task.Delay(20);
@@ -228,10 +214,6 @@ public class AgentBackgroundServiceTests
             "when maxConsecutiveFailures=1 (error channel path verified).");
     }
 
-    /// <summary>
-    /// Verifies the error event path: an "error" event (e.g. pathfinder timeout) is
-    /// written to the Channel&lt;string&gt; and causes the same failure increment.
-    /// </summary>
     [Test]
     public async Task ErrorEvent_WritesToErrorChannel_CausesGoalAbandonment()
     {
@@ -245,21 +227,18 @@ public class AgentBackgroundServiceTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
         var serviceTask = service.StartAsync(cts.Token);
 
-        // Wait for the first plan cycle to begin
         var planDeadline = DateTime.UtcNow.AddSeconds(2);
         while (_planner.PlanCalls.Count == 0 && DateTime.UtcNow < planDeadline)
             await Task.Delay(10);
         Assert.That(_planner.PlanCalls, Has.Count.GreaterThan(0),
             "Planner must be called before injecting the error event.");
 
-        // Inject a game "error" event (e.g. pathfinder blocked, cannot reach target).
         _adapter.PushEvent("error", new()
         {
             ["action"]  = "mine",
             ["message"] = "path blocked"
         });
 
-        // Wait for the error to be consumed and the goal to be abandoned
         var abandonDeadline = DateTime.UtcNow.AddSeconds(3);
         while (service.CurrentGoal is not null && DateTime.UtcNow < abandonDeadline)
             await Task.Delay(20);
@@ -272,11 +251,6 @@ public class AgentBackgroundServiceTests
             "when maxConsecutiveFailures=1 (error channel path verified).");
     }
 
-    /// <summary>
-    /// Verifies that a blockNotFound event with mined &gt; 0 does NOT signal an error.
-    /// When some blocks were mined but the patch depleted, it is a partial success —
-    /// the bot collected what it could. The error channel must NOT receive an entry.
-    /// </summary>
     [Test]
     public async Task BlockNotFoundEvent_MinedGreaterThanZero_DoesNotSignalError()
     {
@@ -284,29 +258,23 @@ public class AgentBackgroundServiceTests
             [new ActionData { Tool = "NoOp" }]);
         _registry.Register(new NoOpTool("NoOp"));
 
-        // maxConsecutiveFailures=1: if an error IS incorrectly written, the goal
-        // will be abandoned within ~1s. We assert the goal is still alive after 800ms.
         var service = CreateService(maxConsecutiveFailures: 1);
         service.SetGoal(new SimpleGoal("Mine", "", [], _ => false));
 
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         var serviceTask = service.StartAsync(cts.Token);
 
-        // Wait for the first plan cycle to begin
         var planDeadline = DateTime.UtcNow.AddSeconds(2);
         while (_planner.PlanCalls.Count == 0 && DateTime.UtcNow < planDeadline)
             await Task.Delay(10);
         Assert.That(_planner.PlanCalls, Has.Count.GreaterThan(0));
 
-        // Inject blockNotFound with mined=3 — partial success; should NOT cause a failure.
         _adapter.PushEvent("blockNotFound", new()
         {
             ["block"] = "minecraft:oak_log",
-            ["mined"] = 3   // 3 blocks were collected before the patch depleted
+            ["mined"] = 3
         });
 
-        // Wait one full settle window + safety margin (300ms settle + 500ms buffer = 800ms).
-        // If an error was written incorrectly, the goal would be gone by now.
         await Task.Delay(800);
 
         var goalBeforeCancel = service.CurrentGoal;
@@ -318,7 +286,103 @@ public class AgentBackgroundServiceTests
             "Goal should NOT be abandoned when blockNotFound has mined>0 " +
             "(partial success must not signal a game error).");
     }
+
+    // -- Sprint 1a: non-blocking LLM ---------------------------------------------------
+
+    /// <summary>
+    /// Sprint 1a acceptance criterion: a slow LLM (6s mock) does NOT delay processing
+    /// of subsequent blockMined events. Without the Channel fix, blockMined would be
+    /// queued behind the 6s LLM await; with it, the event loop returns immediately after
+    /// writing the chat event to the channel.
+    /// </summary>
+    [Test]
+    public async Task SlowChatInterpreter_DoesNotBlock_BlockMinedEventProcessing()
+    {
+        var slowInterp = new SlowChatInterpreter(TimeSpan.FromSeconds(6));
+
+        var service = new WebUI.Blazor.AgentBackgroundService(
+            _adapter, _toolCaller,
+            NullLogger<WebUI.Blazor.AgentBackgroundService>.Instance,
+            _planner,
+            chatInterpreter: slowInterp,
+            reconnectDelays: []); // no reconnect retries needed for this test
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var serviceTask = service.StartAsync(cts.Token);
+
+        // Push a chat event first — goes to _chatChannel; ChatConsumerAsync will await 6s
+        _adapter.PushEvent("chat", new Dictionary<string, object?>
+        {
+            ["username"]      = "Player1",
+            ["message"]       = "hello",
+            ["onlinePlayers"] = 1
+        });
+
+        // Immediately push a blockMined event — should be processed within ~1s
+        _adapter.PushEvent("blockMined", new Dictionary<string, object?>
+        {
+            ["block"] = "oak_log",
+            ["count"] = 1
+        });
+
+        // Assert: blockMined updates inventory within 2s (well within the 6s LLM window)
+        var deadline = DateTime.UtcNow.AddSeconds(2);
+        while (service.WorldState.Inventory.GetValueOrDefault("oak_log") == 0
+               && DateTime.UtcNow < deadline)
+            await Task.Delay(20);
+
+        cts.Cancel();
+        try { await serviceTask; } catch (OperationCanceledException) { }
+
+        Assert.That(service.WorldState.Inventory.GetValueOrDefault("oak_log"), Is.GreaterThan(0),
+            "blockMined inventory update should complete within 2s even when LLM takes 6s " +
+            "(Sprint 1a: non-blocking chat channel verified).");
+    }
+
+    // -- Sprint 1b: reconnect with exponential backoff ---------------------------------
+
+    /// <summary>
+    /// Sprint 1b acceptance criterion: AgentBackgroundService retries after two
+    /// ConnectAsync failures and successfully connects on the third attempt.
+    /// The current goal survives the reconnect loop unchanged.
+    /// </summary>
+    [Test]
+    public async Task Reconnect_AfterTwoFailures_ResumesCurrentGoal()
+    {
+        // Adapter that fails the first two ConnectAsync calls, succeeds on the third
+        var failingAdapter = new FailingWorldAdapter(failCount: 2);
+
+        _planner.PlanToReturn = new ActionPlan("Mine", [],
+            [new ActionData { Tool = "NoOp" }]);
+        _registry.Register(new NoOpTool("NoOp"));
+
+        var service = new WebUI.Blazor.AgentBackgroundService(
+            failingAdapter, _toolCaller,
+            NullLogger<WebUI.Blazor.AgentBackgroundService>.Instance,
+            _planner,
+            reconnectDelays: [TimeSpan.Zero, TimeSpan.Zero, TimeSpan.Zero]); // instant retries
+
+        service.SetGoal(new SimpleGoal("Mine", "", [], _ => false));
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var serviceTask = service.StartAsync(cts.Token);
+
+        // Wait until the adapter successfully connects (3rd attempt)
+        var deadline = DateTime.UtcNow.AddSeconds(4);
+        while (!failingAdapter.IsConnected && DateTime.UtcNow < deadline)
+            await Task.Delay(20);
+
+        cts.Cancel();
+        try { await serviceTask; } catch (OperationCanceledException) { }
+
+        Assert.That(failingAdapter.ConnectAttempts, Is.EqualTo(3),
+            "Should have attempted 3 connections (2 failures + 1 success).");
+        Assert.That(service.CurrentGoal?.Name, Is.EqualTo("Mine"),
+            "Goal should persist unchanged through reconnect attempts (Sprint 1b verified).");
+    }
 }
+
+// ── Test helpers ─────────────────────────────────────────────────────────────────────────────
 
 /// <summary>Tool that does nothing -- used for integration test dispatch without real adapters.</summary>
 file sealed class NoOpTool(string name) : ITool
@@ -330,4 +394,54 @@ file sealed class NoOpTool(string name) : ITool
     public Task<ToolResult> ExecuteAsync(
         System.Text.Json.JsonElement arguments, CancellationToken ct = default)
         => Task.FromResult(new ToolResult(true, "no-op"));
+}
+
+/// <summary>
+/// Sprint 1a: IChatInterpreter that sleeps for a configurable duration before returning
+/// NotAddressed. Simulates a slow LLM to verify the chat channel doesn't block the event loop.
+/// </summary>
+file sealed class SlowChatInterpreter(TimeSpan delay) : Agent.Planning.IChatInterpreter
+{
+    public async Task<Agent.Planning.ChatInterpretation> InterpretAsync(
+        string username, string message, string botName,
+        int onlinePlayers, Agent.Core.Position botPosition, Agent.Core.Position? playerPosition,
+        Agent.Core.WorldState state, CancellationToken ct = default)
+    {
+        await Task.Delay(delay, ct);
+        return new Agent.Planning.ChatInterpretation(Agent.Planning.ChatIntentType.NotAddressed);
+    }
+
+    public void RecordBotSpoke() { }
+}
+
+/// <summary>
+/// Sprint 1b: IWorldAdapter that throws on the first N ConnectAsync calls, then delegates
+/// to an inner MockWorldAdapter. Verifies the reconnect retry loop.
+/// </summary>
+file sealed class FailingWorldAdapter : IWorldAdapter
+{
+    private int _connectAttempts;
+    private readonly int _failCount;
+    private readonly MockWorldAdapter _inner = new();
+
+    public FailingWorldAdapter(int failCount) => _failCount = failCount;
+
+    public bool IsConnected => _connectAttempts > _failCount && _inner.IsConnected;
+    public int ConnectAttempts => _connectAttempts;
+
+    public Task ConnectAsync(CancellationToken cancellationToken = default)
+    {
+        if (++_connectAttempts <= _failCount)
+            throw new System.IO.IOException($"Simulated connection failure {_connectAttempts}");
+        return _inner.ConnectAsync(cancellationToken);
+    }
+
+    public Task DisconnectAsync(CancellationToken cancellationToken = default)
+        => _inner.DisconnectAsync(cancellationToken);
+
+    public Task SendActionAsync(ActionData action, CancellationToken cancellationToken = default)
+        => _inner.SendActionAsync(action, cancellationToken);
+
+    public IAsyncEnumerable<WorldEvent> ReceiveEventsAsync(CancellationToken cancellationToken = default)
+        => _inner.ReceiveEventsAsync(cancellationToken);
 }
