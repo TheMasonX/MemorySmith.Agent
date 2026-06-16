@@ -1,8 +1,8 @@
-namespace MemorySmith.Agent.Tests;
-
 using Agent.Construction;
 using Agent.Core;
 using Agent.Planning.Goals;
+
+namespace MemorySmith.Agent.Tests;
 
 /// <summary>
 /// Unit tests for <see cref="BuildGoal"/>: name format, phases, IsComplete, HasFailed,
