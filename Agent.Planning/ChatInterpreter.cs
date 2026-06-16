@@ -67,12 +67,23 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
 
     // ── Regexes ────────────────────────────────────────────────────────────────
 
+    // Allow zero or more filler words (me, some, more, a, an, the, us) before count
+    // and before the item name. Using * instead of ? handles "get me some wood" and
+    // "get me 32 cobble" correctly — "me" is skipped as a filler.
     private static readonly Regex GatherRegex = new(
-        @"\b(get|gather|collect|mine|find|bring|fetch)\b\s+(?:(?<count>\d+)\s+)?(?:(?:some|more|a|an|the)\s+)?(?<item>[a-z_][a-z_ ]{1,24})",
+        @"\b(get|gather|collect|mine|find|bring|fetch)\b\s+" +
+        @"(?:(?:me|us|some|more|a|an|the)\s+)*" +
+        @"(?:(?<count>\d+)\s+)?" +
+        @"(?:(?:me|us|some|more|a|an|the)\s+)*" +
+        @"(?<item>[a-z_][a-z_ ]{1,24})",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+    // Allow zero or more filler words before the blueprint name. Using * instead of ?
+    // handles "build me a shelter" → fillers consumed = ["me", "a"], blueprint = "shelter".
     private static readonly Regex BuildRegex = new(
-        @"\b(build|construct|make)\b\s+(?:a |the |me )?(?<blueprint>[a-z_][a-z_\- ]{1,30})",
+        @"\b(build|construct|make)\b\s+" +
+        @"(?:(?:me|us|a|the|an)\s+)*" +
+        @"(?<blueprint>[a-z_][a-z_\- ]{1,30})",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     private static readonly Regex GoToRegex = new(
