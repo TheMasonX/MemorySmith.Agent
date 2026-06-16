@@ -1,5 +1,6 @@
 namespace Agent.Planning;
 
+using Agent.Construction;
 using Agent.Core;
 
 /// <summary>
@@ -21,7 +22,8 @@ public delegate IReadOnlyList<ActionData> TaskDecomposer(
 ///
 /// Phase 3 tasks: GatherWood, FindTree, MineWood, Collect, SurviveNight,
 ///               FindShelter, LightArea, WaitForSunrise.
-/// Phase 4 additions: GatherItemDecompose (generic item gathering via ItemSpec).
+/// Phase 4a additions: GatherItemDecompose (generic item gathering via ItemSpec).
+/// Phase 4b additions: DecomposeBuild (blueprint construction via PlacementBlock list).
 /// </summary>
 public sealed class HtnTaskLibrary
 {
@@ -36,6 +38,22 @@ public sealed class HtnTaskLibrary
                            "dark_oak_log", "jungle_log", "acacia_log", "cherry_log"],
         RequiresSmelting = false,
         MinHarvestLevel  = 0,
+    };
+
+    // Blocks that can be directly mined by the bot (no crafting required).
+    // Used by DecomposeBuild to determine which blueprint materials need gather actions.
+    private static readonly HashSet<string> DirectMineBlocks = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "cobblestone", "stone", "dirt", "gravel", "sand",
+        "oak_log", "birch_log", "spruce_log", "dark_oak_log",
+        "jungle_log", "acacia_log", "cherry_log", "mangrove_log",
+        "iron_ore", "deepslate_iron_ore",
+        "gold_ore", "deepslate_gold_ore",
+        "coal_ore", "deepslate_coal_ore",
+        "diamond_ore", "deepslate_diamond_ore",
+        "redstone_ore", "deepslate_redstone_ore",
+        "lapis_ore", "deepslate_lapis_ore",
+        "gravel",
     };
 
     private readonly Dictionary<string, TaskDecomposer> _methods;
@@ -78,14 +96,76 @@ public sealed class HtnTaskLibrary
 
     /// <summary>
     /// Decomposes a generic item-gather goal into concrete actions using the
-    /// provided <paramref name="spec"/>.  Called directly by
-    /// <see cref="Agent.Planning.HtnPlanner"/> when it encounters a
-    /// <see cref="Goals.GenericGatherGoal"/>, bypassing the string-keyed
-    /// dispatch table so that the full <see cref="ItemSpec"/> is available.
+    /// provided <paramref name="spec"/>. Called directly by
+    /// <see cref="HtnPlanner"/> when it encounters an <see cref="IItemSpecGoal"/>,
+    /// bypassing the string-keyed dispatch table so that the full
+    /// <see cref="ItemSpec"/> is available.
     /// </summary>
     public IReadOnlyList<ActionData> DecomposeGatherItem(
         ItemSpec spec, string[] parameters, WorldState state) =>
         GatherItemDecompose(spec, parameters, state);
+
+    /// <summary>
+    /// Decomposes a <see cref="BuildGoal"/> into material-gather actions followed
+    /// by PlaceBlock actions for every block in the blueprint.
+    ///
+    /// Material gathering: for each required material in <paramref name="blueprint"/>.Materials
+    /// that can be directly mined (wood, stone, ore) and is not already in inventory,
+    /// emit SearchMemory + Wander + MineBlock actions.
+    ///
+    /// Build phase: emit one PlaceBlock action per block in <paramref name="blocks"/>,
+    /// ordered floor-first (Y ascending) by <see cref="BlueprintExecutor"/>.
+    ///
+    /// Crafted items (planks, slabs, torches, doors, chests, beds, glass) are not
+    /// auto-gathered here — they must be pre-crafted or obtained via separate
+    /// GatherItem goals. CraftItem automation is deferred to Phase 5.
+    /// </summary>
+    public IReadOnlyList<ActionData> DecomposeBuild(
+        Blueprint blueprint,
+        IReadOnlyList<PlacementBlock> blocks,
+        int originX, int originY, int originZ,
+        WorldState state)
+    {
+        var actions = new List<ActionData>();
+
+        // ── Phase: GatherMaterials ────────────────────────────────────────────
+        foreach (var material in blueprint.Materials)
+        {
+            // Only emit gather actions for directly-mineable raw blocks.
+            // Crafted items (planks, slabs, torches, etc.) must be pre-prepared.
+            if (!DirectMineBlocks.Contains(material.Block)) continue;
+
+            var have   = state.Inventory.GetValueOrDefault(material.Block);
+            var needed = material.Quantity - have;
+            if (needed <= 0) continue;
+
+            var searchQuery = $"{material.Block} nearby source location";
+            actions.Add(MakeAction("SearchMemory", ("query", searchQuery)));
+            actions.Add(MakeAction("Wander",
+                ("radius", (object?)30),
+                ("maxDistanceFromSpawn", (object?)150)));
+            actions.Add(MakeAction("MineBlock",
+                ("block",  material.Block),
+                ("count",  (object?)needed)));
+        }
+
+        // ── Phase: Navigate to build site ─────────────────────────────────────
+        actions.Add(MakeAction("SearchMemory",
+            ("query", $"flat area build location {blueprint.Name}")));
+        actions.Add(MakeAction("MoveTo",
+            ("x", (object?)originX),
+            ("y", (object?)originY),
+            ("z", (object?)originZ)));
+
+        // ── Phase: Build — emit PlaceBlock for every block in order ───────────
+        var executor = new BlueprintExecutor();
+        actions.AddRange(executor.Execute(blocks, originX, originY, originZ));
+
+        // ── Phase: Verify ─────────────────────────────────────────────────────
+        actions.Add(MakeAction("GetStatus"));
+
+        return actions;
+    }
 
     // ── Decomposers ───────────────────────────────────────────────────────────
 
