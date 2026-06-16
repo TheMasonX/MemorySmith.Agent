@@ -24,9 +24,18 @@ public delegate IReadOnlyList<ActionData> TaskDecomposer(
 ///               FindShelter, LightArea, WaitForSunrise.
 /// Phase 4a additions: GatherItemDecompose (generic item gathering via ItemSpec).
 /// Phase 4b additions: DecomposeBuild (blueprint construction via PlacementBlock list).
+/// Sprint 2b: DecomposeBuild now emits a CraftingChain after raw material gathering.
 /// </summary>
 public sealed class HtnTaskLibrary
 {
+    // ── Crafting constants ────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Vanilla Minecraft: 1 stick + 1 coal → 4 torches.
+    /// Used to compute the number of sticks and coal needed when torch is in the blueprint.
+    /// </summary>
+    private const int TorchesPerCraft = 4;
+
     // Built-in ItemSpec for oak logs — used as the GatherWood fallback so that
     // GatherWoodDecompose can delegate to GatherItemDecompose without needing
     // an IItemRegistry at construction time.
@@ -54,6 +63,29 @@ public sealed class HtnTaskLibrary
         "redstone_ore", "deepslate_redstone_ore",
         "lapis_ore", "deepslate_lapis_ore",
         "gravel",
+    };
+
+    // Items that can be crafted by DecomposeBuild via the CraftingChain phase.
+    // Key = craftable item; Value = the raw log/ore source that must already be in
+    // inventory (gathered in the earlier phase or found via DirectMineBlocks).
+    // Ordered: planks first (no table), then table (no table), then table-dependent items.
+    private static readonly IReadOnlyList<string> CraftingChainOrder =
+    [
+        "oak_planks",
+        "birch_planks",
+        "spruce_planks",
+        "crafting_table",
+        "oak_slab",
+        "oak_door",
+        "chest",
+        // torch handled separately (requires intermediate stick step)
+    ];
+
+    // Items in the crafting chain that require a crafting table placed in the world.
+    // The bot must have crafted and placed a crafting_table before reaching these.
+    private static readonly HashSet<string> RequiresCraftingTable = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "oak_slab", "oak_door", "chest",
     };
 
     private readonly Dictionary<string, TaskDecomposer> _methods;
@@ -106,19 +138,17 @@ public sealed class HtnTaskLibrary
         GatherItemDecompose(spec, parameters, state);
 
     /// <summary>
-    /// Decomposes a <see cref="BuildGoal"/> into material-gather actions followed
-    /// by PlaceBlock actions for every block in the blueprint.
+    /// Decomposes a <see cref="BuildGoal"/> into:
+    ///   1. GatherMaterials — mine directly-mineable raw blocks (cobblestone, oak_log, coal_ore…).
+    ///   2. CraftingChain — emit CraftItem actions for crafted blueprint materials
+    ///      (planks → crafting_table → slabs, doors, chests; sticks+coal → torches).
+    ///   3. Navigate to build site.
+    ///   4. Build — one PlaceBlock per block in blueprint order.
+    ///   5. Verify — GetStatus.
     ///
-    /// Material gathering: for each required material in <paramref name="blueprint"/>.Materials
-    /// that can be directly mined (wood, stone, ore) and is not already in inventory,
-    /// emit SearchMemory + Wander + MineBlock actions.
-    ///
-    /// Build phase: emit one PlaceBlock action per block in <paramref name="blocks"/>,
-    /// ordered floor-first (Y ascending) by <see cref="BlueprintExecutor"/>.
-    ///
-    /// Crafted items (planks, slabs, torches, doors, chests, beds, glass) are not
-    /// auto-gathered here — they must be pre-crafted or obtained via separate
-    /// GatherItem goals. CraftItem automation is deferred to Phase 5.
+    /// Sprint 2b: Phase 2 (CraftingChain) is new. Items already in inventory are skipped.
+    /// Coal for torches is gathered implicitly — coal_ore is in <see cref="DirectMineBlocks"/>
+    /// and is added as an explicit gather step when torch is in the blueprint.
     /// </summary>
     public IReadOnlyList<ActionData> DecomposeBuild(
         Blueprint blueprint,
@@ -128,11 +158,10 @@ public sealed class HtnTaskLibrary
     {
         var actions = new List<ActionData>();
 
-        // ── Phase: GatherMaterials ────────────────────────────────────────────
+        // ── Phase 1: GatherMaterials ──────────────────────────────────────────
+        // Mine directly-mineable raw blocks (cobblestone, oak_log, coal_ore, etc.)
         foreach (var material in blueprint.Materials)
         {
-            // Only emit gather actions for directly-mineable raw blocks.
-            // Crafted items (planks, slabs, torches, etc.) must be pre-prepared.
             if (!DirectMineBlocks.Contains(material.Block)) continue;
 
             var have   = state.Inventory.GetValueOrDefault(material.Block);
@@ -149,7 +178,33 @@ public sealed class HtnTaskLibrary
                 ("count",  (object?)needed)));
         }
 
-        // ── Phase: Navigate to build site ─────────────────────────────────────
+        // Sprint 2b: Gather coal if torch is in blueprint (coal_ore not in blueprint Materials,
+        // but is needed as an ingredient for crafting torches).
+        var torchEntry = blueprint.Materials
+            .FirstOrDefault(m => string.Equals(m.Block, "torch", StringComparison.OrdinalIgnoreCase));
+        if (torchEntry is not null)
+        {
+            var torchNeeded = torchEntry.Quantity - state.Inventory.GetValueOrDefault("torch");
+            if (torchNeeded > 0)
+            {
+                // 1 coal → TorchesPerCraft torches; mine coal_ore to get coal
+                var coalNeeded = Math.Max(1, (torchNeeded + TorchesPerCraft - 1) / TorchesPerCraft);
+                var haveCoal   = state.Inventory.GetValueOrDefault("coal");
+                if (haveCoal < coalNeeded)
+                {
+                    actions.Add(MakeAction("SearchMemory", ("query", "coal ore location nearby")));
+                    actions.Add(MakeAction("MineBlock",
+                        ("block", "coal_ore"),
+                        ("count", (object?)(coalNeeded - haveCoal))));
+                }
+            }
+        }
+
+        // ── Phase 2: CraftingChain ────────────────────────────────────────────
+        // Emit CraftItem actions for crafted blueprint materials, in dependency order.
+        actions.AddRange(BuildCraftingChain(blueprint, state, torchEntry));
+
+        // ── Phase 3: Navigate to build site ──────────────────────────────────
         actions.Add(MakeAction("SearchMemory",
             ("query", $"flat area build location {blueprint.Name}")));
         actions.Add(MakeAction("MoveTo",
@@ -157,28 +212,83 @@ public sealed class HtnTaskLibrary
             ("y", (object?)originY),
             ("z", (object?)originZ)));
 
-        // ── Phase: Build — emit PlaceBlock for every block in order ───────────
+        // ── Phase 4: Build — emit PlaceBlock for every block in order ─────────
         var executor = new BlueprintExecutor();
         actions.AddRange(executor.Execute(blocks, originX, originY, originZ));
 
-        // ── Phase: Verify ─────────────────────────────────────────────────────
+        // ── Phase 5: Verify ───────────────────────────────────────────────────
         actions.Add(MakeAction("GetStatus"));
 
         return actions;
+    }
+
+    // ── Crafting chain helper ─────────────────────────────────────────────────
+
+    /// <summary>
+    /// Builds the CraftItem action sequence for crafted blueprint materials.
+    /// Steps are emitted in dependency order only when the item appears in
+    /// the blueprint and inventory is insufficient.
+    /// </summary>
+    private static IReadOnlyList<ActionData> BuildCraftingChain(
+        Blueprint blueprint,
+        WorldState state,
+        MaterialEntry? torchEntry)
+    {
+        var actions    = new List<ActionData>();
+        var materials  = blueprint.Materials
+            .ToDictionary(m => m.Block, m => m.Quantity, StringComparer.OrdinalIgnoreCase);
+
+        // Emit each step in CraftingChainOrder if the item is in the blueprint
+        // and the bot doesn't already have enough.
+        foreach (var item in CraftingChainOrder)
+            EmitCraftIfNeeded(item, materials, state, actions);
+
+        // Torch requires an intermediate stick step (sticks are not in blueprints directly).
+        if (torchEntry is not null)
+        {
+            var torchNeeded = torchEntry.Quantity - state.Inventory.GetValueOrDefault("torch");
+            if (torchNeeded > 0)
+            {
+                // Each crafting batch: 1 stick + 1 coal → TorchesPerCraft torches.
+                var sticksNeeded = Math.Max(1, (torchNeeded + TorchesPerCraft - 1) / TorchesPerCraft);
+                var haveSticks   = state.Inventory.GetValueOrDefault("stick");
+                if (haveSticks < sticksNeeded)
+                    actions.Add(MakeAction("CraftItem",
+                        ("item",  "stick"),
+                        ("count", (object?)(sticksNeeded - haveSticks))));
+
+                actions.Add(MakeAction("CraftItem",
+                    ("item",  "torch"),
+                    ("count", (object?)torchNeeded)));
+            }
+        }
+
+        return actions;
+    }
+
+    /// <summary>
+    /// Adds a CraftItem action for <paramref name="item"/> if it is listed in
+    /// <paramref name="materials"/> and the current inventory is insufficient.
+    /// </summary>
+    private static void EmitCraftIfNeeded(
+        string item,
+        IReadOnlyDictionary<string, int> materials,
+        WorldState state,
+        List<ActionData> actions)
+    {
+        if (!materials.TryGetValue(item, out var needed)) return;
+        var have    = state.Inventory.GetValueOrDefault(item);
+        var toCraft = needed - have;
+        if (toCraft <= 0) return;
+        actions.Add(MakeAction("CraftItem", ("item", item), ("count", (object?)toCraft)));
     }
 
     // ── Decomposers ───────────────────────────────────────────────────────────
 
     private static IReadOnlyList<ActionData> GatherWoodDecompose(
         string[] parameters, WorldState state) =>
-        // Delegate to the generic implementation using the built-in oak-log spec.
-        // This keeps GatherWood backward-compatible while sharing the same logic.
         GatherItemDecompose(OakLogSpec, parameters, state);
 
-    /// <summary>
-    /// Generic item-gather decomposition. Generates SearchMemory + Wander +
-    /// up to two MineBlock actions (one per source-block variant) + GetStatus.
-    /// </summary>
     private static IReadOnlyList<ActionData> GatherItemDecompose(
         ItemSpec spec, string[] parameters, WorldState state)
     {
@@ -191,8 +301,6 @@ public sealed class HtnTaskLibrary
             MakeAction("Wander", ("radius", (object?)40), ("maxDistanceFromSpawn", (object?)200)),
         };
 
-        // Mine up to 2 source-block variants per planning cycle.
-        // Additional variants are tried in subsequent replanning cycles.
         foreach (var block in spec.SourceBlocks.Take(2))
             actions.Add(MakeAction("MineBlock", ("block", block), ("count", (object?)count)));
 
@@ -250,10 +358,6 @@ public sealed class HtnTaskLibrary
         MakeAction("GetStatus"),
     ];
 
-    /// <summary>
-    /// Single random wander step. Optional parameters: radius (default 20),
-    /// maxDistanceFromSpawn (default 100).
-    /// </summary>
     private static IReadOnlyList<ActionData> WanderDecompose(
         string[] parameters, WorldState state)
     {
@@ -266,10 +370,6 @@ public sealed class HtnTaskLibrary
         ];
     }
 
-    /// <summary>
-    /// Three-step exploration: wander, observe surroundings, wander again.
-    /// Keeps the bot within 100 blocks of spawn by default.
-    /// </summary>
     private static IReadOnlyList<ActionData> ExploreDecompose(
         string[] parameters, WorldState state)
     {
