@@ -9,22 +9,11 @@ using System.Threading.Channels;
 /// <summary>
 /// Hosted service that owns the agent loop.
 ///
-/// Phase 1: basic loop — external Enqueue() feeds actions, dispatched via ToolEngine.
-/// Phase 3: IPlanner integration — when the queue is empty and a goal is set,
-///          the planner generates the next action sequence automatically.
-/// Phase 5: chat event routing — chat WorldEvents are forwarded to ChatInterpreter;
-///          valid intents become new goals or enqueue immediate actions.
-///          New public API: CancelGoal, SetBuildOrigin, GetPendingActions.
-///
-/// Lifecycle:
-///   1. ConnectAsync to the world adapter.
-///   2. ProcessEventsAsync — read WorldEvents, apply WorldStateProjector,
-///      route chat events to ChatInterpreter, route error events to the
-///      typed _gameErrors channel.
-///   3. DispatchActionsAsync — drain ActionQueue, call planner when idle,
-///      consume error channel after each plan-cycle settle.
-///
-/// maxConsecutiveFailures defaults to 3.
+/// Phase 1: basic loop.
+/// Phase 3: IPlanner integration.
+/// Phase 5: chat event routing via <see cref="IChatInterpreter"/> (includes LLM path).
+/// Phase 5b: LlmChatInterpreter; player-position-aware chat routing; CancelGoal,
+///           SetBuildOrigin, GetPendingActions public API.
 /// </summary>
 public sealed class AgentBackgroundService(
     IWorldAdapter worldAdapter,
@@ -32,7 +21,7 @@ public sealed class AgentBackgroundService(
     ILogger<AgentBackgroundService> logger,
     IPlanner planner,
     GoalFactory? goalFactory = null,
-    ChatInterpreter? chatInterpreter = null,
+    IChatInterpreter? chatInterpreter = null,
     string botName = "AgentBot",
     int maxConsecutiveFailures = 3) : BackgroundService
 {
@@ -41,7 +30,6 @@ public sealed class AgentBackgroundService(
     private readonly Channel<string> _gameErrors =
         Channel.CreateUnbounded<string>(new UnboundedChannelOptions { SingleWriter = true });
 
-    // Snapshot of the current plan's actions for UI inspection
     private readonly List<ActionData> _pendingActions = [];
     private readonly object _pendingLock = new();
 
@@ -50,9 +38,9 @@ public sealed class AgentBackgroundService(
     private int _consecutiveFailures;
     private bool _actionDispatchedThisCycle;
 
-    public WorldState WorldState       => _worldState;
-    public IGoal?     CurrentGoal      => _currentGoal;
-    public int        ConsecutiveFailures => _consecutiveFailures;
+    public WorldState WorldState           => _worldState;
+    public IGoal?     CurrentGoal          => _currentGoal;
+    public int        ConsecutiveFailures  => _consecutiveFailures;
 
     // ── Public control API ────────────────────────────────────────────────────
 
@@ -67,7 +55,6 @@ public sealed class AgentBackgroundService(
         logger.LogInformation("Goal set: {Goal}", goal.Name);
     }
 
-    /// <summary>Cancel the current goal and clear the action queue.</summary>
     public void CancelGoal()
     {
         if (_currentGoal is not null)
@@ -78,10 +65,6 @@ public sealed class AgentBackgroundService(
         lock (_pendingLock) _pendingActions.Clear();
     }
 
-    /// <summary>
-    /// Set the build origin for the specified blueprint in world-state facts.
-    /// The planner reads these facts to compute absolute block coordinates.
-    /// </summary>
     public void SetBuildOrigin(string blueprintId, int x, int y, int z)
     {
         _worldState = _worldState.With(b =>
@@ -93,7 +76,6 @@ public sealed class AgentBackgroundService(
         logger.LogInformation("Build origin set for '{Blueprint}': ({X},{Y},{Z})", blueprintId, x, y, z);
     }
 
-    /// <summary>Returns a snapshot of pending actions for UI display.</summary>
     public IReadOnlyList<ActionData> GetPendingActions()
     {
         lock (_pendingLock)
@@ -118,7 +100,7 @@ public sealed class AgentBackgroundService(
         finally
         {
             try { await worldAdapter.DisconnectAsync(stoppingToken); }
-            catch { /* best-effort disconnect */ }
+            catch { /* best-effort */ }
         }
     }
 
@@ -147,16 +129,16 @@ public sealed class AgentBackgroundService(
                     break;
 
                 case "craftComplete":
-                    if (worldEvent.Payload.TryGetValue("item",  out var craftItem)  && craftItem  is string ci &&
-                        worldEvent.Payload.TryGetValue("count", out var craftCount) && craftCount is int    cc)
-                        logger.LogInformation("Crafted {Count}x {Item}", cc, ci);
+                    if (worldEvent.Payload.TryGetValue("item",  out var ci) && ci  is string ciStr &&
+                        worldEvent.Payload.TryGetValue("count", out var cc) && cc is int    ccInt)
+                        logger.LogInformation("Crafted {Count}x {Item}", ccInt, ciStr);
                     break;
 
                 case "smeltComplete":
-                    if (worldEvent.Payload.TryGetValue("item",   out var smeltItem)   && smeltItem   is string si &&
-                        worldEvent.Payload.TryGetValue("result", out var smeltResult) && smeltResult is string sr &&
-                        worldEvent.Payload.TryGetValue("count",  out var smeltCount)  && smeltCount  is int    sc)
-                        logger.LogInformation("Smelted {Count}x {Input} → {Output}", sc, si, sr);
+                    if (worldEvent.Payload.TryGetValue("item",   out var si) && si is string siStr &&
+                        worldEvent.Payload.TryGetValue("result", out var sr) && sr is string srStr &&
+                        worldEvent.Payload.TryGetValue("count",  out var sc) && sc is int    scInt)
+                        logger.LogInformation("Smelted {Count}x {Input} → {Output}", scInt, siStr, srStr);
                     break;
 
                 case "chat":
@@ -174,28 +156,30 @@ public sealed class AgentBackgroundService(
     {
         if (chatInterpreter is null) return;
 
-        if (!worldEvent.Payload.TryGetValue("username", out var usernameObj) || usernameObj is not string username)
-            return;
-        if (!worldEvent.Payload.TryGetValue("message",  out var messageObj)  || messageObj  is not string message)
-            return;
+        if (!worldEvent.Payload.TryGetValue("username", out var uObj) || uObj is not string username) return;
+        if (!worldEvent.Payload.TryGetValue("message",  out var mObj) || mObj is not string message)  return;
 
         var onlinePlayers = worldEvent.Payload.TryGetValue("onlinePlayers", out var opObj) && opObj is int op
             ? op : 1;
 
         logger.LogInformation("[chat] <{Username}> {Message}", username, message);
 
-        var interpretation = chatInterpreter.Interpret(
-            username, message, botName, onlinePlayers, _worldState);
+        // Extract player position from chat event payload (Phase 5b: sent by Mineflayer)
+        var playerPos = ExtractPlayerPosition(worldEvent);
+
+        var interpretation = await chatInterpreter.InterpretAsync(
+            username, message, botName, onlinePlayers,
+            _worldState.Position, playerPos, _worldState, ct);
 
         if (interpretation.IntentType == ChatIntentType.NotAddressed)
             return;
 
-        // Respond in chat if there's a response message
+        // Queue a chat response if one was generated
         if (!string.IsNullOrEmpty(interpretation.Response))
         {
             _queue.Enqueue(new ActionData
             {
-                Tool = "Chat",
+                Tool      = "Chat",
                 Arguments = { ["message"] = interpretation.Response }
             });
             chatInterpreter.RecordBotSpoke();
@@ -209,7 +193,6 @@ public sealed class AgentBackgroundService(
                 break;
 
             case ChatIntentType.QueryStatus:
-                // Response already queued above; update world state fact
                 _worldState = _worldState.With(b =>
                     b.SetFact("currentGoal", _currentGoal?.Name ?? "idle"));
                 break;
@@ -230,19 +213,18 @@ public sealed class AgentBackgroundService(
                     });
                 }
                 break;
+
+            // ChatIntentType.Unknown → response already queued ("say 'help' for commands")
         }
     }
 
     private async Task TryCreateGoalFromChatAsync(ChatInterpretation interpretation, CancellationToken ct)
     {
-        if (goalFactory is null || interpretation.GoalName is null)
-            return;
+        if (goalFactory is null || interpretation.GoalName is null) return;
 
         try
         {
-            var goal = await goalFactory.CreateAsync(
-                interpretation.GoalName, interpretation.GoalParameters, ct);
-
+            var goal = await goalFactory.CreateAsync(interpretation.GoalName, interpretation.GoalParameters, ct);
             if (goal is not null)
             {
                 SetGoal(goal);
@@ -254,7 +236,7 @@ public sealed class AgentBackgroundService(
                 _queue.Enqueue(new ActionData
                 {
                     Tool = "Chat",
-                    Arguments = { ["message"] = $"Sorry, I don't know how to do that yet." }
+                    Arguments = { ["message"] = "Sorry, I don't know how to do that yet." }
                 });
                 chatInterpreter?.RecordBotSpoke();
             }
@@ -268,15 +250,12 @@ public sealed class AgentBackgroundService(
     private void TryRouteAsError(WorldEvent worldEvent)
     {
         string? errMsg = null;
-
         if (worldEvent.EventType == "blockNotFound" &&
-            worldEvent.Payload.TryGetValue("mined", out var minedObj) &&
-            minedObj is int minedCount && minedCount == 0 &&
-            worldEvent.Payload.TryGetValue("block", out var bObj) &&
-            bObj is string bNotFound)
+            worldEvent.Payload.TryGetValue("mined", out var mined) && mined is int mc && mc == 0 &&
+            worldEvent.Payload.TryGetValue("block", out var bn) && bn is string bStr)
         {
-            errMsg = $"blockNotFound:{bNotFound}";
-            logger.LogWarning("No {Block} found in range — will count as failure.", bNotFound);
+            errMsg = $"blockNotFound:{bStr}";
+            logger.LogWarning("No {Block} found in range — will count as failure.", bStr);
         }
         else if (worldEvent.EventType == "error")
         {
@@ -285,9 +264,16 @@ public sealed class AgentBackgroundService(
             errMsg = $"{act}:{msg}";
             logger.LogWarning("Game error [{Action}]: {Message}", act, msg);
         }
+        if (errMsg is not null) _gameErrors.Writer.TryWrite(errMsg);
+    }
 
-        if (errMsg is not null)
-            _gameErrors.Writer.TryWrite(errMsg);
+    private static Position? ExtractPlayerPosition(WorldEvent worldEvent)
+    {
+        if (worldEvent.Payload.TryGetValue("playerX", out var px) && px is int x &&
+            worldEvent.Payload.TryGetValue("playerY", out var py) && py is int y &&
+            worldEvent.Payload.TryGetValue("playerZ", out var pz) && pz is int z)
+            return new Position(x, y, z);
+        return null;
     }
 
     // ── Action dispatch ────────────────────────────────────────────────────────
