@@ -42,7 +42,7 @@ public sealed class PlaceBlockTool(IWorldAdapter worldAdapter) : ITool
 
         var action = new ActionData
         {
-            Tool = "place",
+            Tool = ActionProtocol.Place,
             Arguments = { ["x"] = (object?)x, ["y"] = (object?)y, ["z"] = (object?)z, ["material"] = material }
         };
 
