@@ -87,7 +87,7 @@ public sealed class HtnTaskLibraryCraftingTests
     public void DecomposeBuild_BlueprintHasOakSlab_EmitsCraftTableAndSlab()
     {
         // oak_slab requires a crafting table (3x1 recipe); the chain must emit
-        // crafting_table before oak_slab.
+        // crafting_table before oak_slab even when crafting_table is not in blueprint Materials.
         var bp      = MakeBlueprint(new MaterialEntry("oak_slab", 12));
         var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, new WorldState());
 
@@ -95,11 +95,49 @@ public sealed class HtnTaskLibraryCraftingTests
                                 .Select(a => a.Arguments["item"]?.ToString())
                                 .ToList();
 
+        // B1: crafting_table must be auto-emitted even though it's not in blueprint Materials
+        Assert.That(craftItems, Contains.Item("crafting_table"),
+            "CraftItem(crafting_table) must be auto-emitted when oak_slab is needed (B1 fix).");
         Assert.That(craftItems, Contains.Item("oak_slab"),
             "CraftItem(oak_slab) should be emitted.");
         Assert.That(craftItems.IndexOf("crafting_table"),
             Is.LessThan(craftItems.IndexOf("oak_slab")),
             "crafting_table must be crafted before oak_slab (dependency order).");
+    }
+
+    /// <summary>
+    /// B1 regression test: blueprint with chest but no explicit crafting_table Material
+    /// must still auto-emit CraftItem(crafting_table) because chest is a 3x3 recipe.
+    /// </summary>
+    [Test]
+    public void DecomposeBuild_BlueprintHasChest_NoExplicitTable_AutoEmitsCraftTable()
+    {
+        var bp      = MakeBlueprint(new MaterialEntry("chest", 2));
+        var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, new WorldState());
+
+        var craftItems = actions.Where(a => ToolIs(a, "CraftItem"))
+                                .Select(a => a.Arguments["item"]?.ToString())
+                                .ToList();
+
+        Assert.That(craftItems, Contains.Item("crafting_table"),
+            "CraftItem(crafting_table) must be auto-emitted when chest is needed (B1 fix).");
+        Assert.That(craftItems.IndexOf("crafting_table"),
+            Is.LessThan(craftItems.IndexOf("chest")),
+            "crafting_table must appear before chest in the crafting chain.");
+    }
+
+    [Test]
+    public void DecomposeBuild_BlueprintHasChest_TableAlreadyInInventory_SkipsTableCraft()
+    {
+        var bp    = MakeBlueprint(new MaterialEntry("chest", 2));
+        var state = new WorldState().With(b => b.AddInventoryItem("crafting_table", 1));
+
+        var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, state);
+
+        Assert.That(
+            actions.Where(a => ToolIs(a, "CraftItem") && ArgIs(a, "item", "crafting_table")),
+            Is.Empty,
+            "CraftItem(crafting_table) should be skipped when one is already in inventory.");
     }
 
     // ── torch chain (sticks + coal) ───────────────────────────────────────────
