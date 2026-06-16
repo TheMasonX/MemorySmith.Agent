@@ -228,6 +228,10 @@ public sealed class HtnTaskLibrary
     /// Builds the CraftItem action sequence for crafted blueprint materials.
     /// Steps are emitted in dependency order only when the item appears in
     /// the blueprint and inventory is insufficient.
+    ///
+    /// B1 fix: if any item in <see cref="RequiresCraftingTable"/> is needed and
+    /// <c>crafting_table</c> is not already listed in the blueprint Materials,
+    /// a preparatory <c>CraftItem(crafting_table, 1)</c> step is auto-emitted.
     /// </summary>
     private static IReadOnlyList<ActionData> BuildCraftingChain(
         Blueprint blueprint,
@@ -237,6 +241,16 @@ public sealed class HtnTaskLibrary
         var actions    = new List<ActionData>();
         var materials  = blueprint.Materials
             .ToDictionary(m => m.Block, m => m.Quantity, StringComparer.OrdinalIgnoreCase);
+
+        // B1: if any table-requiring item (slab, door, chest) is needed and crafting_table is
+        // not explicitly in the blueprint Materials, auto-craft one as a preparatory step.
+        bool anyTableRequired = materials.Keys.Any(RequiresCraftingTable.Contains);
+        if (anyTableRequired
+            && !materials.ContainsKey("crafting_table")
+            && state.Inventory.GetValueOrDefault("crafting_table") == 0)
+        {
+            actions.Add(MakeAction("CraftItem", ("item", "crafting_table"), ("count", (object?)1)));
+        }
 
         // Emit each step in CraftingChainOrder if the item is in the blueprint
         // and the bot doesn't already have enough.
