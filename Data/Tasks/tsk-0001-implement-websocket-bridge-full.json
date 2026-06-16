@@ -1,0 +1,33 @@
+{
+  "Id": "tsk-0001-implement-websocket-bridge-full",
+  "Key": "TSK-0001",
+  "Title": "DONE: WebSocketBridge fully implemented with background receive loop",
+  "Description": "WebSocketBridge.cs now has a real System.Net.WebSockets.ClientWebSocket implementation with:\n- Background receive loop using Channel<WorldEvent> so sends and receives don't block each other\n- Proper JSON serialization: C# sends {action, arguments} (lowercase); Node.js sends {event, ...payload}\n- Multi-frame message reassembly (handles large Minecraft world data)\n- ParseEvent correctly extracts all JSON fields into the WorldEvent.Payload dictionary\n\nCompleted 2026-06-15.",
+  "Type": "Task",
+  "Status": "Done",
+  "Priority": "Critical",
+  "AssigneeMode": "Custom",
+  "AssigneeDirectoryId": null,
+  "AssigneeCustomText": "AI Agent",
+  "Reporter": "agent-session-20260615",
+  "Labels": [
+    "game-testing",
+    "blocker",
+    "websocket",
+    "phase-1"
+  ],
+  "Attachments": [],
+  "ExternalLinks": [],
+  "LinkedPages": [
+    "guides/development"
+  ],
+  "Comments": [],
+  "EpicId": null,
+  "ParentId": null,
+  "DueDateUtc": null,
+  "CreatedAtUtc": "2026-06-15T23:30:00Z",
+  "UpdatedAtUtc": "2026-06-15T23:30:00Z",
+  "CompletedAtUtc": "2026-06-15T23:30:00Z",
+  "Revision": 1,
+  "IsArchived": false
+}
