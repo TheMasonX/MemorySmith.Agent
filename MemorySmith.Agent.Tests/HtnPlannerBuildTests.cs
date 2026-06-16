@@ -1,0 +1,190 @@
+namespace MemorySmith.Agent.Tests;
+
+using Agent.Construction;
+using Agent.Core;
+using Agent.Planning;
+using Agent.Planning.Goals;
+
+/// <summary>
+/// Tests for <see cref="HtnPlanner"/> Phase 4b: BuildGoal decomposition produces
+/// the correct mix of MineBlock (material gathering) and PlaceBlock (construction)
+/// actions, and applies the build origin from world-state facts.
+/// </summary>
+[TestFixture]
+[Description("HtnPlanner BuildGoal: PlaceBlock actions, material gathering, origin offset")]
+public sealed class HtnPlannerBuildTests
+{
+    // ── Fixtures ──────────────────────────────────────────────────────────────
+
+    private static readonly IReadOnlyList<PlacementBlock> SmallFloor =
+    [
+        new(0, 0, 0, "cobblestone"),
+        new(1, 0, 0, "cobblestone"),
+        new(2, 0, 0, "cobblestone"),
+        new(0, 0, 1, "cobblestone"),
+        new(1, 0, 1, "cobblestone"),
+        new(2, 0, 1, "cobblestone"),
+    ];
+
+    private static Blueprint MakeBlueprintWithMaterials(
+        string id = "test-house",
+        string name = "Test House",
+        MaterialEntry[]? materials = null) => new()
+    {
+        Id        = id,
+        Name      = name,
+        Materials = materials ?? [new MaterialEntry("cobblestone", 6)],
+    };
+
+    // ── PlaceBlock actions ────────────────────────────────────────────────────
+
+    [Test]
+    public async Task PlanAsync_BuildGoal_ProducesSixPlaceBlockActions()
+    {
+        var plan = await MakePlan(SmallFloor, new WorldState());
+        Assert.That(CountTool(plan, "PlaceBlock"), Is.EqualTo(6));
+    }
+
+    [Test]
+    public async Task PlanAsync_BuildGoal_PlaceBlocks_HaveCorrectMaterial()
+    {
+        var plan  = await MakePlan(SmallFloor, new WorldState());
+        var place = plan.Actions.Where(a => a.Tool == "PlaceBlock").ToList();
+        Assert.That(place, Has.All.Matches<ActionData>(a =>
+            a.Arguments.TryGetValue("material", out var m) &&
+            m?.ToString() == "cobblestone"));
+    }
+
+    [Test]
+    public async Task PlanAsync_BuildGoal_PlaceBlocks_HaveXYZArguments()
+    {
+        var plan  = await MakePlan(SmallFloor, new WorldState());
+        var place = plan.Actions.Where(a => a.Tool == "PlaceBlock").ToList();
+        Assert.That(place, Has.All.Matches<ActionData>(a =>
+            a.Arguments.ContainsKey("x") &&
+            a.Arguments.ContainsKey("y") &&
+            a.Arguments.ContainsKey("z")));
+    }
+
+    // ── Build origin applied ──────────────────────────────────────────────────
+
+    [Test]
+    public async Task PlanAsync_BuildGoal_OriginX_AddedToBlockX()
+    {
+        var state = new WorldState().With(b =>
+        {
+            b.SetFact("build:offset-test:origin:x", 100);
+            b.SetFact("build:offset-test:origin:y", 64);
+            b.SetFact("build:offset-test:origin:z", 200);
+        });
+
+        var plan   = await MakePlan(SmallFloor, state, "offset-test");
+        var place  = plan.Actions.Where(a => a.Tool == "PlaceBlock").ToList();
+
+        // All X coords should be 100 or 101 or 102 (100 + blueprint X 0-2)
+        Assert.That(place, Has.All.Matches<ActionData>(a =>
+        {
+            var xVal = a.Arguments["x"];
+            var x    = xVal is int xi ? xi : xVal is long xl ? (int)xl : 0;
+            return x >= 100 && x <= 102;
+        }));
+    }
+
+    [Test]
+    public async Task PlanAsync_BuildGoal_OriginY_AddedToBlockY()
+    {
+        var state = new WorldState().With(b =>
+        {
+            b.SetFact("build:y-test:origin:x", 0);
+            b.SetFact("build:y-test:origin:y", 64);
+            b.SetFact("build:y-test:origin:z", 0);
+        });
+
+        var plan  = await MakePlan(SmallFloor, state, "y-test");
+        var place = plan.Actions.Where(a => a.Tool == "PlaceBlock").ToList();
+
+        Assert.That(place, Has.All.Matches<ActionData>(a =>
+        {
+            var yVal = a.Arguments["y"];
+            var y    = yVal is int yi ? yi : yVal is long yl ? (int)yl : 0;
+            return y == 64; // all floor blocks at origin Y = 64
+        }));
+    }
+
+    // ── Material gathering ────────────────────────────────────────────────────
+
+    [Test]
+    public async Task PlanAsync_BuildGoal_EmitsMineBlock_WhenCobblestoneNotInInventory()
+    {
+        // Inventory empty — cobblestone must be mined
+        var plan = await MakePlan(SmallFloor, new WorldState());
+        Assert.That(CountTool(plan, "MineBlock"), Is.GreaterThan(0));
+    }
+
+    [Test]
+    public async Task PlanAsync_BuildGoal_SkipsMining_WhenInventorySufficient()
+    {
+        // Inventory already has 10 cobblestone — blueprint only needs 6
+        var state = new WorldState().With(b => b.AddInventoryItem("cobblestone", 10));
+        var plan  = await MakePlan(SmallFloor, state);
+        Assert.That(CountTool(plan, "MineBlock"), Is.EqualTo(0));
+    }
+
+    [Test]
+    public async Task PlanAsync_BuildGoal_DoesNotMine_NonMineableBlocks()
+    {
+        // oak_planks is crafted — should never emit a MineBlock("oak_planks") action
+        var blueprint = MakeBlueprintWithMaterials(
+            materials: [new MaterialEntry("oak_planks", 64)]);
+        var blocks = new[] { new PlacementBlock(0, 1, 0, "oak_planks") };
+        var goal   = new BuildGoal(blueprint, blocks);
+        var state  = new WorldState();
+
+        var plan    = await new HtnPlanner(new HtnTaskLibrary()).PlanAsync(goal, state);
+        var mining  = plan.Actions.Where(a => a.Tool == "MineBlock").ToList();
+
+        Assert.That(mining, Is.Empty,
+            "oak_planks is crafted — DecomposeBuild must not emit MineBlock for it");
+    }
+
+    // ── Plan metadata ─────────────────────────────────────────────────────────
+
+    [Test]
+    public async Task PlanAsync_BuildGoal_GoalNameIsPreserved()
+    {
+        var plan = await MakePlan(SmallFloor, new WorldState(), "named-house");
+        Assert.That(plan.GoalName, Is.EqualTo("Build:named-house"));
+    }
+
+    [Test]
+    public async Task PlanAsync_BuildGoal_PlanIsNotEmpty()
+    {
+        var plan = await MakePlan(SmallFloor, new WorldState());
+        Assert.That(plan.Actions, Is.Not.Empty);
+    }
+
+    [Test]
+    public async Task PlanAsync_BuildGoal_PlanEndsWithGetStatus()
+    {
+        var plan = await MakePlan(SmallFloor, new WorldState());
+        Assert.That(plan.Actions.Last().Tool, Is.EqualTo("GetStatus"));
+    }
+
+    // ── Helper methods ────────────────────────────────────────────────────────
+
+    private static async Task<IPlan> MakePlan(
+        IReadOnlyList<PlacementBlock> blocks,
+        WorldState state,
+        string blueprintId = "test-house")
+    {
+        var library = new HtnTaskLibrary();
+        var planner = new HtnPlanner(library);
+        var bp      = MakeBlueprintWithMaterials(id: blueprintId);
+        var goal    = new BuildGoal(bp, blocks);
+        return await planner.PlanAsync(goal, state);
+    }
+
+    private static int CountTool(IPlan plan, string toolName) =>
+        plan.Actions.Count(a =>
+            string.Equals(a.Tool, toolName, StringComparison.OrdinalIgnoreCase));
+}
