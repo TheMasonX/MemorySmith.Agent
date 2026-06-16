@@ -2,7 +2,10 @@
 // Phase 1: REST API endpoints, WebSocket bridge to Minecraft.
 // Phase 2: RestMemoryGateway (IMemoryGateway via MemorySmith REST).
 // Phase 3: HTN/GOAP planner, goal factory, POST /api/agent/plan endpoint.
+// Phase 4: IItemRegistry, IBlueprintRepository, GenericGatherGoal, BuildGoal.
+// Phase 5: ChatInterpreter, CraftItemTool, FurnaceTool, async goal creation.
 
+using Agent.Construction;
 using Agent.Core;
 using Agent.Memory;
 using Agent.Planning;
@@ -43,11 +46,28 @@ if (agentEnabled)
     builder.Services.AddSingleton<IMemoryGateway>(sp =>
     {
         var factory = sp.GetRequiredService<IHttpClientFactory>();
-        var opts = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
+        var opts    = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
         return new RestMemoryGateway(factory.CreateClient("memorysmith"), opts);
     });
 
-    // IToolCaller → ToolDispatcher (merged registry + executor — Candidate 2 deepening)
+    // IItemRegistry → MemorySmithItemRegistry (Phase 4a)
+    builder.Services.AddSingleton<IItemRegistry>(sp =>
+        new MemorySmithItemRegistry(sp.GetRequiredService<IMemoryGateway>()));
+
+    // IBlueprintRepository → MemorySmithBlueprintRepository (Phase 4b)
+    builder.Services.AddSingleton<IBlueprintRepository>(sp =>
+        new MemorySmithBlueprintRepository(sp.GetRequiredService<IMemoryGateway>()));
+
+    // GoalFactory — concrete type, wired with both registries (Phase 4b+5)
+    builder.Services.AddSingleton<GoalFactory>(sp => new GoalFactory(
+        sp.GetRequiredService<IItemRegistry>(),
+        sp.GetRequiredService<IBlueprintRepository>()));
+    builder.Services.AddSingleton<IGoalFactory>(sp => sp.GetRequiredService<GoalFactory>());
+
+    // ChatInterpreter — stateful singleton (tracks conversation window)
+    builder.Services.AddSingleton<ChatInterpreter>();
+
+    // IToolCaller → ToolDispatcher (all tools registered here)
     builder.Services.AddSingleton<IToolCaller>(sp =>
     {
         var world      = sp.GetRequiredService<IWorldAdapter>();
@@ -62,6 +82,10 @@ if (agentEnabled)
         dispatcher.Register(new SearchMemoryTool(memory));
         dispatcher.Register(new GetPageTool(memory));
         dispatcher.Register(new CreatePageTool(memory));
+        // Phase 5: chat + crafting tools
+        dispatcher.Register(new ChatTool(world));
+        dispatcher.Register(new CraftItemTool(world));
+        dispatcher.Register(new FurnaceTool(world));
 
         return dispatcher;
     });
@@ -70,12 +94,20 @@ if (agentEnabled)
     builder.Services.AddSingleton<HtnTaskLibrary>();
     builder.Services.AddSingleton<IPlanner, HtnPlanner>();
 
-    // IGoalFactory → GoalFactory
-    builder.Services.AddSingleton<IGoalFactory, GoalFactory>();
-
-    // Hosted agent loop — registered as concrete type AND as IHostedService
-    // so both /api/agent/plan (typed resolution) and DI work.
-    builder.Services.AddSingleton<AgentBackgroundService>();
+    // AgentBackgroundService — inject all optional services explicitly
+    builder.Services.AddSingleton<AgentBackgroundService>(sp =>
+    {
+        var cfg = sp.GetRequiredService<IOptions<MinecraftAdapterConfig>>().Value;
+        return new AgentBackgroundService(
+            sp.GetRequiredService<IWorldAdapter>(),
+            sp.GetRequiredService<IToolCaller>(),
+            sp.GetRequiredService<ILogger<AgentBackgroundService>>(),
+            sp.GetRequiredService<IPlanner>(),
+            goalFactory:      sp.GetService<GoalFactory>(),
+            chatInterpreter:  sp.GetService<ChatInterpreter>(),
+            botName:          cfg.BotUsername,
+            maxConsecutiveFailures: 3);
+    });
     builder.Services.AddHostedService(sp =>
         sp.GetRequiredService<AgentBackgroundService>());
 }
@@ -83,81 +115,148 @@ if (agentEnabled)
 // ── Build ────────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
-// Static files (wwwroot/about.html → /about)
-app.UseDefaultFiles();
+app.UseDefaultFiles();   // serves index.html as default
 app.UseStaticFiles();
 
 app.MapGet("/", () => "MemorySmith.Agent is running.");
 
-// About endpoint
-app.MapGet("/api/about", () => Results.Ok(new
+// ── Info ─────────────────────────────────────────────────────────────────────
+
+app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
 {
     Name        = "MemorySmith.Agent",
     Description = "A modular autonomous agent framework backed by the MemorySmith knowledge system.",
-    Version     = "0.3.0",
-    Phase       = "Phase 3 — HTN/GOAP Planner (complete)",
+    Version     = "0.5.0",
+    Phase       = "Phase 5 — Crafting, Chat Interpretation, Interactive Dashboard (complete)",
     License     = "MIT",
     Repository  = "https://github.com/TheMasonX/MemorySmith.Agent",
     ProjectSource = "https://github.com/TheMasonX/MemorySmith",
-    Dashboard   = "/about",
+    Dashboard   = "/",
+    AboutPage   = "/about.html",
     WikiHome    = "/Data/Pages/home.md",
-    RegisteredGoals = agentEnabled
-        ? new[] { "GatherWood", "SurviveNight" }
-        : Array.Empty<string>(),
+    RegisteredGoals = factory?.RegisteredGoals ?? [],
 }));
 
-// Agent control
-app.MapPost("/api/agent/connect",  () => Results.Ok(new { Status = "connected" }));
-app.MapPost("/api/agent/stop",     () => Results.Ok(new { Status = "stopped" }));
-app.MapGet ("/api/agent/status", (AgentBackgroundService? agent) =>
+// ── Agent status ──────────────────────────────────────────────────────────────
+
+app.MapGet("/api/agent/status", (AgentBackgroundService? agent) =>
     Results.Ok(new
     {
-        Status = agentEnabled ? "idle" : "disabled",
-        Goal   = agent?.CurrentGoal?.Name,
-        Health = agent?.WorldState.Health,
+        Status              = agentEnabled ? (agent?.CurrentGoal != null ? "active" : "idle") : "disabled",
+        Goal                = agent?.CurrentGoal?.Name,
+        GoalDescription     = agent?.CurrentGoal?.Description,
+        GoalPhases          = agent?.CurrentGoal?.Phases,
+        Health              = agent?.WorldState.Health ?? 0,
+        Food                = agent?.WorldState.Food ?? 0,
+        Position            = agent?.WorldState.Position,
+        Inventory           = agent?.WorldState.Inventory,
+        QueuedActions       = agent?.GetPendingActions().Count ?? 0,
+        ConsecutiveFailures = agent?.ConsecutiveFailures ?? 0,
     }));
 
-// Queue a raw tool call
-app.MapPost("/api/agent/command", (CommandRequest req, AgentBackgroundService? agent) =>
-{
-    if (agent is null)
-        return Results.BadRequest("Agent is not enabled.");
-    agent.Enqueue(new ActionData { Tool = req.Command });
-    return Results.Ok(new { Received = req.Command, Status = "queued" });
-});
+// ── Goal management ───────────────────────────────────────────────────────────
 
-// Create a plan for a named goal and enqueue it
+app.MapGet("/api/goals", (IGoalFactory? factory) =>
+    Results.Ok(factory?.RegisteredGoals ?? []));
+
+/// <summary>Create and start pursuing a goal. Supports GatherItem: and Build: async prefixes.</summary>
 app.MapPost("/api/agent/plan", async (PlanRequest req, AgentBackgroundService? agent,
-    IPlanner? planner, IGoalFactory? factory) =>
+    IGoalFactory? factory, IPlanner? planner) =>
 {
     if (agent is null || planner is null || factory is null)
-        return Results.Problem("Agent services are not enabled. Set Agent:Enabled=true.");
+        return Results.Problem("Agent services are not enabled. Set Agent:Enabled=true in configuration.");
 
-    var goal = factory.Create(req.GoalName, req.Parameters);
+    // Use CreateAsync so GatherItem: and Build: goals resolve via registries
+    var goal = await factory.CreateAsync(req.GoalName, req.Parameters);
     if (goal is null)
-        return Results.BadRequest(
-            new { Error = $"Unknown goal '{req.GoalName}'.",
-                  Available = factory.RegisteredGoals });
+        return Results.BadRequest(new
+        {
+            Error     = $"Unknown goal '{req.GoalName}' or missing registry dependency.",
+            Available = factory.RegisteredGoals,
+        });
 
     var plan = await planner.PlanAsync(goal, agent.WorldState);
-    agent.SetGoal(goal); // also clears queue and resets failures
+    agent.SetGoal(goal);
     return Results.Ok(new
     {
         Goal        = goal.Name,
         Description = goal.Description,
-        ActionCount = plan.Actions.Count,
         Phases      = plan.Phases,
+        ActionCount = plan.Actions.Count,
+        Actions     = plan.Actions.Take(5).Select(a => new { a.Tool, a.Arguments }),
     });
 });
 
-// List available goals
-app.MapGet("/api/goals", (IGoalFactory? factory) =>
-    Results.Ok(factory?.RegisteredGoals ?? []));
+/// <summary>Cancel the current goal immediately.</summary>
+app.MapDelete("/api/agent/goal", (AgentBackgroundService? agent) =>
+{
+    if (agent is null) return Results.BadRequest("Agent not enabled.");
+    agent.CancelGoal();
+    return Results.Ok(new { Status = "cancelled" });
+});
 
-// Blueprint catalog
-app.MapGet("/api/blueprints", () => Results.Ok(Array.Empty<object>()));
+// ── Queue inspection ──────────────────────────────────────────────────────────
+
+app.MapGet("/api/agent/queue", (AgentBackgroundService? agent) =>
+{
+    var actions = agent?.GetPendingActions() ?? [];
+    return Results.Ok(new
+    {
+        Count   = actions.Count,
+        Actions = actions.Select(a => new { a.Tool, Args = a.Arguments }),
+    });
+});
+
+// ── Build origin ──────────────────────────────────────────────────────────────
+
+app.MapPost("/api/agent/origin", (OriginRequest req, AgentBackgroundService? agent) =>
+{
+    if (agent is null) return Results.BadRequest("Agent not enabled.");
+    agent.SetBuildOrigin(req.BlueprintId, req.X, req.Y, req.Z);
+    return Results.Ok(new
+    {
+        Status      = "origin set",
+        BlueprintId = req.BlueprintId,
+        X = req.X, Y = req.Y, Z = req.Z,
+    });
+});
+
+// ── Chat ──────────────────────────────────────────────────────────────────────
+
+app.MapPost("/api/agent/chat", (ChatRequest req, AgentBackgroundService? agent) =>
+{
+    if (agent is null) return Results.BadRequest("Agent not enabled.");
+    agent.Enqueue(new ActionData
+    {
+        Tool      = "Chat",
+        Arguments = { ["message"] = req.Message ?? string.Empty }
+    });
+    return Results.Ok(new { Status = "queued", Message = req.Message });
+});
+
+// ── Blueprints ────────────────────────────────────────────────────────────────
+
+app.MapGet("/api/blueprints", () => Results.Ok(new[]
+{
+    new { Id = "small-house", Name = "Small Survival House", Tags = new[] { "house", "starter", "survival" } }
+}));
+
+// ── Legacy ────────────────────────────────────────────────────────────────────
+
+app.MapPost("/api/agent/connect", () => Results.Ok(new { Status = "connected" }));
+app.MapPost("/api/agent/stop",    () => Results.Ok(new { Status = "stopped" }));
+app.MapPost("/api/agent/command", (CommandRequest req, AgentBackgroundService? agent) =>
+{
+    if (agent is null) return Results.BadRequest("Agent not enabled.");
+    agent.Enqueue(new ActionData { Tool = req.Command });
+    return Results.Ok(new { Received = req.Command, Status = "queued" });
+});
 
 app.Run();
 
+// ── Request records ───────────────────────────────────────────────────────────
+
 record CommandRequest(string Command);
 record PlanRequest(string GoalName, IReadOnlyDictionary<string, object?>? Parameters = null);
+record OriginRequest(string BlueprintId, int X, int Y, int Z);
+record ChatRequest(string? Message);
