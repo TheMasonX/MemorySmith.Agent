@@ -27,7 +27,7 @@ namespace Agent.Planning.Llm;
 ///   2. Pull a model: ollama pull llama3.2
 ///   3. Set LlmEnabled: true
 /// </summary>
-public sealed class ChatOptions
+public sealed record ChatOptions
 {
     // ── LLM provider ──────────────────────────────────────────────────────────
 
