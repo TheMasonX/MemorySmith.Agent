@@ -1,11 +1,11 @@
-/**
- * MineflayerAdapter — Node.js bridge between the MemorySmith.Agent C# host
+﻿/**
+ * MineflayerAdapter â€” Node.js bridge between the MemorySmith.Agent C# host
  * and a Minecraft server.
  *
  * Architecture:
  *   1. Starts a WebSocket server on WS_PORT (default: 3000).
  *   2. Creates a Mineflayer bot connecting to MC_HOST:MC_PORT.
- *   3. Forwards bot events (spawn, health, move, blockMined…) to C# as JSON.
+ *   3. Forwards bot events (spawn, health, move, blockMinedâ€¦) to C# as JSON.
  *   4. Accepts JSON action commands from C# and executes them via Mineflayer.
  *
  * Environment variables:
@@ -21,7 +21,8 @@
  */
 
 import mineflayer from 'mineflayer';
-import { pathfinder, Movements, goals as pfGoals } from 'mineflayer-pathfinder';
+import mflPathfinder from 'mineflayer-pathfinder';
+const { pathfinder, Movements, goals: pfGoals } = mflPathfinder;
 import { WebSocketServer } from 'ws';
 
 const WS_PORT  = parseInt(process.env.WS_PORT   ?? '3000',    10);
@@ -31,7 +32,7 @@ const MC_USER  = process.env.MC_USERNAME ?? 'AgentBot';
 const MC_VER   = process.env.MC_VERSION;       // omit for auto-detect
 const WS_TOKEN = process.env.WS_TOKEN ?? null; // optional auth
 
-// ── WebSocket server (C# connects here) ──────────────────────────────────────
+// â”€â”€ WebSocket server (C# connects here) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const wss = new WebSocketServer({ port: WS_PORT });
 let agentSocket = null;
@@ -75,7 +76,7 @@ wss.on('connection', (ws) => {
   if (bot?.entity) sendBotStatus();
 });
 
-// ── Mineflayer bot ────────────────────────────────────────────────────────────
+// â”€â”€ Mineflayer bot â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const botOpts = {
   host: MC_HOST,
@@ -124,7 +125,7 @@ bot.on('chat', (username, message) => {
   sendEvent('chat', { username, message });
 });
 
-// ── Action dispatcher ──────────────────────────────────────────────────────────
+// â”€â”€ Action dispatcher â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function dispatch({ action, arguments: args = {} }) {
   switch (action) {
@@ -181,7 +182,7 @@ async function dispatch({ action, arguments: args = {} }) {
   }
 }
 
-// ── Graceful shutdown ─────────────────────────────────────────────────────────
+// â”€â”€ Graceful shutdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function shutdown() {
   console.log('[adapter] shutting down');
@@ -191,3 +192,4 @@ function shutdown() {
 }
 process.on('SIGINT',  shutdown);
 process.on('SIGTERM', shutdown);
+
