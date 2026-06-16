@@ -175,8 +175,9 @@ async function dispatch({ action, arguments: args = {} }) {
     }
 
     case 'mine': {
-      // Fix 1b: auto-navigate to the target block before digging so the bot
-      // moves to trees rather than timing out at spawn.
+      // Navigate to each target block before digging.
+      // Catches pathfinder timeouts per-block so one unreachable log
+      // doesn't kill the entire mine operation.
       const { block: blockName, count = 1 } = args;
       if (!blockName) throw new Error('mine requires block name');
 
@@ -189,27 +190,53 @@ async function dispatch({ action, arguments: args = {} }) {
       bot.pathfinder.setMovements(movements);
 
       let mined = 0;
+      let pathFailures = 0;
+      const MAX_PATH_FAILURES = 3;
+
       while (mined < count) {
-        // Search up to 64 blocks away (increased from 32)
-        const target = bot.findBlock({ matching: blockId, maxDistance: 64 });
+        // Search up to 64 blocks first, widen to 128 if empty
+        let target = bot.findBlock({ matching: blockId, maxDistance: 64 });
+        if (!target) target = bot.findBlock({ matching: blockId, maxDistance: 128 });
+
         if (!target) {
-          console.log(`[mine] no ${shortName} found within 64 blocks after ${mined} mined`);
+          console.log(`[mine] no ${shortName} found within 128 blocks after ${mined} mined`);
           sendEvent('blockNotFound', { block: blockName, mined });
+          // Throw only when we got nothing at all — lets C# track this as a real failure
+          if (mined === 0) throw new Error(`No ${shortName} found within 128 blocks`);
           break;
         }
 
-        // Navigate to within 2 blocks of the target before digging
-        await bot.pathfinder.goto(
-          new pfGoals.GoalNear(target.position.x, target.position.y, target.position.z, 2)
-        );
+        // Navigate to the block — catch timeout so a single bad block doesn't abort everything
+        try {
+          await bot.pathfinder.goto(
+            new pfGoals.GoalNear(target.position.x, target.position.y, target.position.z, 2)
+          );
+          pathFailures = 0; // successful navigation — reset streak
+        } catch (e) {
+          pathFailures++;
+          console.warn(`[mine] nav to ${shortName} failed (${pathFailures}/${MAX_PATH_FAILURES}): ${e.message}`);
+          if (pathFailures >= MAX_PATH_FAILURES)
+            throw new Error(`Pathfinding to ${shortName} failed ${MAX_PATH_FAILURES} times: ${e.message}`);
+          await new Promise(r => setTimeout(r, 500));
+          continue; // try a different block next iteration
+        }
 
-        // Re-fetch the block — it may have moved if the world changed during pathing
+        // Re-fetch — another player may have mined it during navigation
         const fresh = bot.blockAt(target.position);
-        if (!fresh || fresh.type !== blockId) continue;  // gone, find another
+        if (!fresh || fresh.type !== blockId) {
+          await new Promise(r => setTimeout(r, 100));
+          continue;
+        }
 
-        await bot.dig(fresh);
-        mined++;
-        sendEvent('blockMined', { block: shortName, count: mined, ...botPos() });
+        try {
+          await bot.dig(fresh);
+          mined++;
+          pathFailures = 0;
+          sendEvent('blockMined', { block: shortName, count: mined, ...botPos() });
+        } catch (e) {
+          console.warn(`[mine] dig failed: ${e.message}`);
+          await new Promise(r => setTimeout(r, 500));
+        }
       }
       break;
     }
