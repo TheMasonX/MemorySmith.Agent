@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../Agent.Core/Agent.Core.csproj" />
+    <ProjectReference Include="../Agent.Construction/Agent.Construction.csproj" />
   </ItemGroup>
 
   <!-- TODO: <PackageReference Include="Microsoft.Extensions.AI" Version="9.*" /> -->
