@@ -4,6 +4,7 @@ using Agent.Core;
 using Agent.Planning;
 using Agent.Tools;
 using System.Text.Json;
+using System.Threading.Channels;
 
 /// <summary>
 /// Hosted service that owns the agent loop.
@@ -14,8 +15,10 @@ using System.Text.Json;
 ///
 /// Lifecycle:
 ///   1. ConnectAsync to the world adapter.
-///   2. ProcessEventsAsync — read WorldEvents, update WorldState.
-///   3. DispatchActionsAsync — drain ActionQueue, call planner when idle.
+///   2. ProcessEventsAsync — read WorldEvents, apply <see cref="WorldStateProjector"/>,
+///      route error events to the typed <see cref="_gameErrors"/> channel.
+///   3. DispatchActionsAsync — drain ActionQueue, call planner when idle,
+///      consume error channel after each plan-cycle settle.
 /// </summary>
 public sealed class AgentBackgroundService(
     IWorldAdapter worldAdapter,
@@ -24,6 +27,15 @@ public sealed class AgentBackgroundService(
     IPlanner planner) : BackgroundService
 {
     private readonly ActionQueue _queue = new();
+
+    // Pure projector: maps (WorldState, WorldEvent) → WorldState.
+    private readonly WorldStateProjector _projector = new();
+
+    // Typed error channel replaces the stringly-typed game.lastError WorldState fact.
+    // ProcessEventsAsync writes; DispatchActionsAsync reads after the settle delay.
+    private readonly Channel<string> _gameErrors =
+        Channel.CreateUnbounded<string>(new UnboundedChannelOptions { SingleWriter = true });
+
     private WorldState _worldState = new();
     private IGoal? _currentGoal;
     private int _consecutiveFailures;
@@ -83,120 +95,47 @@ public sealed class AgentBackgroundService(
         {
             logger.LogDebug("World event: {Type}", worldEvent.EventType);
 
-            // Store all payload fields as raw facts for inspection / debugging
-            _worldState = _worldState.With(b =>
+            // Delegate all state projection to the pure WorldStateProjector.
+            _worldState = _projector.Apply(_worldState, worldEvent);
+
+            // Supplemental logging for notable state transitions
+            if (worldEvent.EventType == "spawn")
+                logger.LogInformation("Bot spawned at {Pos}", _worldState.Position);
+
+            if (worldEvent.EventType == "blockMined" &&
+                worldEvent.Payload.TryGetValue("block", out var rawBlock) &&
+                rawBlock is string blockName)
             {
-                foreach (var kv in worldEvent.Payload)
-                    b.SetFact($"event:{worldEvent.EventType}:{kv.Key}", kv.Value);
-            });
-
-            // Structured updates — each event type updates the canonical WorldState fields
-            switch (worldEvent.EventType)
-            {
-                case "health":
-                    ApplyHealthAndFood(worldEvent.Payload);
-                    break;
-
-                case "spawn":
-                    ApplyPosition(worldEvent.Payload);
-                    ApplyHealthAndFood(worldEvent.Payload);
-                    logger.LogInformation("Bot spawned at {Pos}", _worldState.Position);
-                    break;
-
-                case "move":
-                case "moveComplete":
-                    ApplyPosition(worldEvent.Payload);
-                    break;
-
-                case "status":
-                    ApplyPosition(worldEvent.Payload);
-                    ApplyHealthAndFood(worldEvent.Payload);
-                    ApplyInventorySnapshot(worldEvent.Payload);
-                    break;
-
-                case "blockMined":
-                    // Each blockMined event = one block collected
-                    if (worldEvent.Payload.TryGetValue("block", out var rawBlock) &&
-                        rawBlock is string blockName)
-                    {
-                        var itemKey = blockName.Contains(':') ? blockName.Split(':')[1] : blockName;
-                        _worldState = _worldState.With(b => b.AddInventoryItem(itemKey, 1));
-                        logger.LogInformation(
-                            "Inventory +1 {Block} → total {Total}",
-                            itemKey, _worldState.Inventory.GetValueOrDefault(itemKey));
-                    }
-                    break;
-
-                case "blockNotFound":
-                    // Node.js could not find the block type within its search radius.
-                    // Only marks a game error when nothing was mined (mined=0 means
-                    // total failure; mined>0 means some blocks collected then ran out).
-                    if (worldEvent.Payload.TryGetValue("mined", out var minedObj) &&
-                        minedObj is int minedCount && minedCount == 0 &&
-                        worldEvent.Payload.TryGetValue("block", out var bObj) &&
-                        bObj is string bNotFound)
-                    {
-                        _worldState = _worldState.With(b =>
-                            b.SetFact("game.lastError", $"blockNotFound:{bNotFound}"));
-                        logger.LogWarning("No {Block} found in range — will count as failure.", bNotFound);
-                    }
-                    break;
-
-                case "error":
-                    // Game-side action failed (e.g. pathfinder timeout, block unreachable).
-                    // Set a fact that DispatchActionsAsync will consume after the settle delay
-                    // to increment _consecutiveFailures.
-                    {
-                        var act = worldEvent.Payload.TryGetValue("action",  out var a) && a is string sa ? sa : "?";
-                        var msg = worldEvent.Payload.TryGetValue("message", out var m) && m is string sm ? sm : "unknown";
-                        _worldState = _worldState.With(b =>
-                            b.SetFact("game.lastError", $"{act}:{msg}"));
-                        logger.LogWarning("Game error [{Action}]: {Message}", act, msg);
-                    }
-                    break;
+                var itemKey = blockName.Contains(':') ? blockName.Split(':')[1] : blockName;
+                logger.LogInformation(
+                    "Inventory +1 {Block} → total {Total}",
+                    itemKey, _worldState.Inventory.GetValueOrDefault(itemKey));
             }
+
+            // Route game errors to the typed error channel.
+            // DispatchActionsAsync reads from this channel after the settle delay,
+            // replacing the old stringly-typed game.lastError WorldState fact.
+            string? errMsg = null;
+            if (worldEvent.EventType == "blockNotFound" &&
+                worldEvent.Payload.TryGetValue("mined", out var minedObj) &&
+                minedObj is int minedCount && minedCount == 0 &&
+                worldEvent.Payload.TryGetValue("block", out var bObj) &&
+                bObj is string bNotFound)
+            {
+                errMsg = $"blockNotFound:{bNotFound}";
+                logger.LogWarning("No {Block} found in range — will count as failure.", bNotFound);
+            }
+            else if (worldEvent.EventType == "error")
+            {
+                var act = worldEvent.Payload.TryGetValue("action",  out var a) && a is string sa ? sa : "?";
+                var msg = worldEvent.Payload.TryGetValue("message", out var m) && m is string sm ? sm : "unknown";
+                errMsg = $"{act}:{msg}";
+                logger.LogWarning("Game error [{Action}]: {Message}", act, msg);
+            }
+
+            if (errMsg is not null)
+                _gameErrors.Writer.TryWrite(errMsg);
         }
-    }
-
-    // ── WorldState update helpers ─────────────────────────────────────────────
-
-    private void ApplyPosition(IReadOnlyDictionary<string, object?> payload)
-    {
-        if (payload.TryGetValue("x", out var ox) && ox is int px &&
-            payload.TryGetValue("y", out var oy) && oy is int py &&
-            payload.TryGetValue("z", out var oz) && oz is int pz)
-        {
-            _worldState = _worldState with { Position = new Position(px, py, pz) };
-        }
-    }
-
-    private void ApplyHealthAndFood(IReadOnlyDictionary<string, object?> payload)
-    {
-        if (payload.TryGetValue("hp", out var ohp) && ohp is int hp)
-            _worldState = _worldState with { Health = hp };
-        if (payload.TryGetValue("food", out var of) && of is int food)
-            _worldState = _worldState with { Food = food };
-    }
-
-    /// <summary>
-    /// Parses the "inventory" field from a status event (a raw JSON object string
-    /// from WebSocketBridge) and replaces WorldState.Inventory with a full snapshot.
-    /// </summary>
-    private void ApplyInventorySnapshot(IReadOnlyDictionary<string, object?> payload)
-    {
-        if (!payload.TryGetValue("inventory", out var invRaw) || invRaw is not string invJson)
-            return;
-        try
-        {
-            using var doc = System.Text.Json.JsonDocument.Parse(invJson);
-            var snap = new Dictionary<string, int>();
-            foreach (var prop in doc.RootElement.EnumerateObject())
-                if (prop.Value.TryGetInt32(out var qty) && qty > 0)
-                    snap[prop.Name] = qty;
-            _worldState = _worldState.With(b => b.SetInventory(snap));
-            logger.LogDebug("Inventory snapshot: {Count} item types", snap.Count);
-        }
-        catch { /* ignore malformed inventory JSON */ }
     }
 
     // ── Action dispatch loop ─────────────────────────────────────────────────
@@ -305,12 +244,11 @@ public sealed class AgentBackgroundService(
                     await Task.Delay(300, ct);
                     _actionDispatchedThisCycle = false;
 
-                    // Consume any game-error fact set by ProcessEventsAsync during the plan cycle.
+                    // Consume any game errors signalled by ProcessEventsAsync during the plan cycle.
+                    // The typed Channel replaces the old stringly-typed game.lastError WorldState fact.
                     // Doing this AFTER the settle ensures late-arriving error events are captured.
-                    if (_worldState.Facts.TryGetValue("game.lastError", out var gameErr) &&
-                        gameErr is string errMsg && !string.IsNullOrEmpty(errMsg))
+                    if (_gameErrors.Reader.TryRead(out var errMsg))
                     {
-                        _worldState = _worldState.With(b => b.SetFact("game.lastError", null));
                         _consecutiveFailures++;
                         logger.LogWarning(
                             "Game error after cycle (failures={N}/{Max}): {Error}",
