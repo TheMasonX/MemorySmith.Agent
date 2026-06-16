@@ -1,7 +1,8 @@
 namespace Agent.Memory;
 
 /// <summary>
-/// Configuration for RestMemoryGateway. Bind from appsettings.json section "Agent:Memory".
+/// Configuration for RestMemoryGateway and MemorySmithItemRegistry.
+/// Bind from appsettings.json section "Agent:Memory".
 /// </summary>
 public sealed record RestMemoryGatewayOptions
 {
@@ -19,4 +20,12 @@ public sealed record RestMemoryGatewayOptions
 
     /// <summary>Default minimum role for pages created by the agent.</summary>
     public string DefaultPageRole { get; init; } = "Anonymous";
+
+    /// <summary>
+    /// Time-to-live for the <see cref="MemorySmithItemRegistry"/> in-memory cache, in seconds.
+    /// Each unique item ID is cached for this duration after its first successful lookup.
+    /// Set to 0 to disable caching (every call issues a fresh HTTP request).
+    /// Default: 60 seconds.
+    /// </summary>
+    public int ItemCacheTtlSeconds { get; init; } = 60;
 }
