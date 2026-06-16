@@ -1,7 +1,7 @@
-namespace MemorySmith.Agent.Tests;
-
 using Agent.Core;
 using Agent.Planning;
+
+namespace MemorySmith.Agent.Tests;
 
 /// <summary>
 /// Unit tests for <see cref="ChatInterpreter"/>: directed-at-bot heuristics,
