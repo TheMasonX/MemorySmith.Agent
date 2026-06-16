@@ -48,8 +48,11 @@ if (agentEnabled)
     });
 
     // ── Registries ────────────────────────────────────────────────────────────────────────────
+    // Sprint 2c: MemorySmithItemRegistry now receives RestMemoryGatewayOptions for TTL cache config.
     builder.Services.AddSingleton<IItemRegistry>(sp =>
-        new MemorySmithItemRegistry(sp.GetRequiredService<IMemoryGateway>()));
+        new MemorySmithItemRegistry(
+            sp.GetRequiredService<IMemoryGateway>(),
+            sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value));
     builder.Services.AddSingleton<IBlueprintRepository>(sp =>
         new MemorySmithBlueprintRepository(sp.GetRequiredService<IMemoryGateway>()));
 
