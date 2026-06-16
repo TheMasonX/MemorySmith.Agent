@@ -12,22 +12,25 @@
 
 | Task | Status | Notes |
 |------|--------|-------|
-| 1a: Non-blocking LLM (Channel<WorldEvent>) | ✅ Done | `AgentBackgroundService.cs` — chat events offloaded to `ChatConsumerAsync` |
-| 1b: Reconnect with exponential backoff | ✅ Done | `AgentBackgroundService.cs` — 5-delay retry loop, per-connection CTS |
+| 1a: Non-blocking LLM (Channel<WorldEvent>) | ✅ Done | `AgentBackgroundService.cs` |
+| 1b: Reconnect with exponential backoff | ✅ Done | `AgentBackgroundService.cs` |
 | Tests: SlowChatInterpreter (1a) + FailingWorldAdapter (1b) | ✅ Done | Both pass |
-| CI hotfixes: 5 pre-existing TSK-0014 bugs | ✅ Done | Raw string, Position?, ChatOptions record, named arg, filler regex |
+| CI hotfixes: 5 pre-existing TSK-0014 bugs | ✅ Done | |
 
 ---
 
-## Sprint 2 — End-to-End Build (TODO)
+## Sprint 2 — End-to-End Build (COMPLETE ✅)
 
-**Backlog priority order:**
+**Council review:** `Data/Pages/council/sprint2-impl-council-20260616.md`
+**CI commit:** `cdc0d18` (B1 fix + tests, conclusion: pending)
 
-| # | Task | File | Notes |
-|---|------|------|-------|
-| 2a | CraftItemTool: pathfind to crafting table | `MineflayerAdapter/index.js` | Add pathfinder.goto() before bot.craft(); expand search radius 4→8 |
-| 2b | HtnTaskLibrary.DecomposeBuild: crafting chain | `Agent.Planning/HtnTaskLibrary.cs` | oak_log → planks → table, slabs, door, chest, torches |
-| 2c | IItemRegistry TTL cache (60s) | `Agent.Memory/MemorySmithItemRegistry.cs` | ConcurrentDictionary with DateTimeOffset expiry |
+| Task | Status | Notes |
+|------|--------|-------|
+| 2a: CraftItemTool pathfind to crafting table | ✅ Done | `index.js` — CRAFT_TABLE_SEARCH_RADIUS=8, pathfinder.goto() |
+| 2b: DecomposeBuild crafting chain | ✅ Done | `HtnTaskLibrary.cs` — planks→table→slabs/door/chest/torches |
+| 2b B1 fix: auto-emit crafting_table for slab/door/chest blueprints | ✅ Done | `HtnTaskLibrary.cs` — B1 fix |
+| 2c: IItemRegistry TTL cache | ✅ Done | `MemorySmithItemRegistry.cs` — configurable via ItemCacheTtlSeconds |
+| AGENTS.md at repo root | ✅ Done | No magic numbers, C# + JS conventions, sprint workflow |
 
 ---
 
@@ -35,8 +38,8 @@
 
 | # | Task | File |
 |---|------|------|
-| 3a | Typed world events (replace Dictionary payload) | `Agent.Core/`, `Agent.World.Minecraft/WebSocketBridge.cs` |
-| 3b | FindFlatAreaTool (terrain scan, auto-set build origin) | `MineflayerAdapter/index.js` + new C# tool |
+| 3a | Typed world events (replace Dictionary payload) | `Agent.Core/`, `WebSocketBridge.cs` |
+| 3b | FindFlatAreaTool (terrain scan, auto-set build origin) | `index.js` + new C# tool |
 
 ---
 
@@ -49,12 +52,19 @@
 
 ---
 
-## Deferred (from Sprint 1 council review)
+## Deferred (from Sprint 1 council)
 
 | ID | Finding | Phase |
 |----|---------|-------|
-| D1 | Attempt count 6 vs spec's "5" — document or align | Sprint 2 |
-| D2 | "Reconnecting" WorldEvent not emitted on retry | Sprint 3 |
-| D3 | `_chatChannel` persistence across reconnects — document | Sprint 2 |
-| D4 | Normal `ProcessEventsAsync` completion → reconnect trigger — document | Sprint 2 |
-| D6 | NUnit2058 warning in MockMemoryGatewayTests.cs | Sprint 3 cleanup |
+| D1 (S1) | Reconnect attempt count 6 vs spec's "5" | Sprint 3 |
+| D2 (S1) | "Reconnecting" WorldEvent not emitted | Sprint 3 |
+| D3 (S1) | `_chatChannel` persistence across reconnects — document | Sprint 2 (done: AGENTS.md) |
+| D6 (S1) | NUnit2058 warning in MockMemoryGatewayTests.cs | Sprint 3 cleanup |
+
+## Deferred (from Sprint 2 council)
+
+| ID | Finding | Phase |
+|----|---------|-------|
+| D2 (S2) | Parallel miss race — two HTTP calls on concurrent cache miss | Sprint 3 |
+| D3 (S2) | `ToDictionary` throws on duplicate blueprint materials | Sprint 3 |
+| D4 (S2) | `TorchesPerCraft = 4` hardcoded vanilla recipe | future IRecipeRegistry |
