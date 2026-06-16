@@ -18,7 +18,7 @@ public sealed class StatusTool(IWorldAdapter worldAdapter) : ITool
 
     public async Task<ToolResult> ExecuteAsync(JsonElement arguments, CancellationToken cancellationToken = default)
     {
-        var action = new ActionData { Tool = "status" };
+        var action = new ActionData { Tool = ActionProtocol.Status };
         await worldAdapter.SendActionAsync(action, cancellationToken);
         return new ToolResult(true, "Status requested — await WorldEvent type 'status'.");
     }
