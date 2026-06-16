@@ -1,0 +1,15 @@
+{
+  "Id": "agent-architecture-bounded-contexts",
+  "Title": "MemorySmith.Agent — Three Bounded Contexts",
+  "Content": "The agent is split into three bounded contexts that communicate only through interfaces:\n\n1. Agent Core (Agent.Core, Agent.Planning, Agent.Tools, Agent.Personality): the 'brain'. IAgent, IGoal, IPlan, IMemoryGateway, ITool, IWorldAdapter, IPlanner, IGoalFactory.\n\n2. MemorySmith Knowledge (Agent.Memory): long-term memory. RestMemoryGateway implements IMemoryGateway via GET /api/search and GET/POST/PUT /api/pages on a live MemorySmith instance.\n\n3. World Adapters (Agent.World.Minecraft + MineflayerAdapter/): Minecraft-specific code. MinecraftAdapter (C#) spawns index.js (Node.js) as a subprocess, connects via WebSocket on WS_PORT (default 3000), and forwards ActionData commands. The WebSocket protocol: C# sends {action, arguments}; Node.js sends {event, ...payload}.\n\nWebUI.Blazor is the host: it owns the DI container, REST API, and AgentBackgroundService (IHostedService). Program.cs registers all services when Agent:Enabled=true.",
+  "Status": 2,
+  "Confidence": 0.98,
+  "Tags": ["agent", "architecture", "bounded-contexts", "kind:design", "audience:agent", "scope:architecture"],
+  "References": ["agent-phase-status-current", "agent-technology-stack"],
+  "Conflicts": [],
+  "SourceLinks": [
+    { "Label": "Architecture wiki page", "Uri": "%RepoRoot%Data/Pages/architecture.md", "StartLine": null, "EndLine": null }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-06-15T23:30:00Z"
+}
