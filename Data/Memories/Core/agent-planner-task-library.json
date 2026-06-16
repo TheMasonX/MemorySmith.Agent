@@ -1,0 +1,18 @@
+{
+  "Id": "agent-planner-task-library",
+  "Title": "MemorySmith.Agent — HTN Planner and Task Library",
+  "Content": "HtnPlanner (Agent.Planning) implements IPlanner. PlanAsync: tries goal-level decomposition first; if none, decomposes phase-by-phase. ReplanAsync: full restart using await/try-catch (NOT ContinueWith — see Phase 3 council fix). Returns null if no decomposition available.\n\nHtnTaskLibrary has 8 task methods:\n  GatherWood:     SearchMemory('wood trees') -> GetStatus -> MineBlock(oak_log, N) -> GetStatus\n  FindTree:       SearchMemory('nearest tree') -> GetStatus\n  MineWood:       MineBlock(oak_log, N) + MineBlock(birch_log, N)\n  Collect:        GetStatus\n  SurviveNight:   SearchMemory('shelter') -> GetStatus\n  FindShelter:    SearchMemory('shelter') -> GetStatus\n  LightArea:      GetStatus\n  WaitForSunrise: GetStatus\n\nGoals:\n  GatherWoodGoal(count): IsComplete when sum of *_log inventory >= count. HasFailed when goal:GatherWood:failed fact is set.\n  SurviveNightGoal: always incomplete (stub).\n\nGoalFactory: Create('GatherWood', {count:10}) -> GatherWoodGoal(10). Create('SurviveNight') -> SurviveNightGoal.\n\nPhase 4 TODO: block IDs are hardcoded (minecraft:oak_log). Need MinecraftVersion config for pre-1.13 servers where IDs differ.",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": ["agent", "planner", "htn", "goap", "goals", "kind:design", "audience:agent", "scope:planning"],
+  "References": ["agent-architecture-bounded-contexts"],
+  "Conflicts": [],
+  "SourceLinks": [
+    { "Label": "HtnPlanner.cs",       "Uri": "%RepoRoot%Agent.Planning/HtnPlanner.cs",       "StartLine": null, "EndLine": null },
+    { "Label": "HtnTaskLibrary.cs",   "Uri": "%RepoRoot%Agent.Planning/HtnTaskLibrary.cs",   "StartLine": null, "EndLine": null },
+    { "Label": "GatherWoodGoal.cs",   "Uri": "%RepoRoot%Agent.Planning/Goals/GatherWoodGoal.cs", "StartLine": null, "EndLine": null },
+    { "Label": "Planner wiki page",   "Uri": "%RepoRoot%Data/Pages/planner.md",              "StartLine": null, "EndLine": null }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-06-15T23:30:00Z"
+}
