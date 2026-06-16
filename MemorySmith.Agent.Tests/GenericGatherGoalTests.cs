@@ -1,1 +1,254 @@
-dXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuUGxhbm5pbmcuR29hbHM7CgpuYW1lc3BhY2UgTWVtb3J5U21pdGguQWdlbnQuVGVzdHM7CgovLy8gPHN1bW1hcnk+Ci8vLyBUZXN0cyBmb3IgPHNlZSBjcmVmPSJHZW5lcmljR2F0aGVyR29hbCIvPi4KLy8vCi8vLyBDb3ZlcnM6IElzQ29tcGxldGUgKG5vbi1zbWVsdGluZyArIHNtZWx0aW5nKSwgbXVsdGktc291cmNlIHN1bW1hdGlvbiwKLy8vIG5hbWVzcGFjZSBwcmVmaXggc3RyaXBwaW5nLCBIYXNGYWlsZWQgZmxhZywgTmFtZSAvIERlc2NyaXB0aW9uIC8gUGhhc2VzCi8vLyBzaGFwZSwgYW5kIGJvdW5kYXJ5IGNvbmRpdGlvbnMgKGVtcHR5IGludmVudG9yeSwgZXhhY3QgdGFyZ2V0IGNvdW50KS4KLy8vIDwvc3VtbWFyeT4KW1Rlc3RGaXh0dXJlXQpwdWJsaWMgY2xhc3MgR2VuZXJpY0dhdGhlckdvYWxUZXN0cwp7CiAgICAvLyDilIDilIAgRml4dHVyZSBoZWxwZXJzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIHByaXZhdGUgc3RhdGljIEl0ZW1TcGVjIE9ha0xvZ1NwZWMoKSA9PiBuZXcoKQogICAgewogICAgICAgIEl0ZW1JZCAgICAgICAgICAgPSAib2FrX2xvZyIsCiAgICAgICAgRGlzcGxheU5hbWUgICAgICA9ICJPYWsgTG9nIiwKICAgICAgICBTb3VyY2VCbG9ja3MgICAgID0gWyJvYWtfbG9nIiwgImJpcmNoX2xvZyIsICJzcHJ1Y2VfbG9nIl0sCiAgICAgICAgUmVxdWlyZXNTbWVsdGluZyA9IGZhbHNlLAogICAgICAgIE1pbkhhcnZlc3RMZXZlbCAgPSAwLAogICAgfTsKCiAgICBwcml2YXRlIHN0YXRpYyBJdGVtU3BlYyBJcm9uSW5nb3RTcGVjKCkgPT4gbmV3KCkKICAgIHsKICAgICAgICBJdGVtSWQgICAgICAgICAgID0gImlyb25faW5nb3QiLAogICAgICAgIERpc3BsYXlOYW1lICAgICAgPSAiSXJvbiBJbmdvdCIsCiAgICAgICAgU291cmNlQmxvY2tzICAgICA9IFsiaXJvbl9vcmUiLCAiZGVlcHNsYXRlX2lyb25fb3JlIl0sCiAgICAgICAgUmVxdWlyZXNTbWVsdGluZyA9IHRydWUsCiAgICAgICAgTWluSGFydmVzdExldmVsICA9IDIsCiAgICB9OwoKICAgIHByaXZhdGUgc3RhdGljIEl0ZW1TcGVjIERpYW1vbmRTcGVjKCkgPT4gbmV3KCkKICAgIHsKICAgICAgICBJdGVtSWQgICAgICAgICAgID0gImRpYW1vbmQiLAogICAgICAgIERpc3BsYXlOYW1lICAgICAgPSAiRGlhbW9uZCIsCiAgICAgICAgU291cmNlQmxvY2tzICAgICA9IFsiZGlhbW9uZF9vcmUiLCAiZGVlcHNsYXRlX2RpYW1vbmRfb3JlIl0sCiAgICAgICAgUmVxdWlyZXNTbWVsdGluZyA9IGZhbHNlLAogICAgICAgIE1pbkhhcnZlc3RMZXZlbCAgPSAzLAogICAgfTsKCiAgICBwcml2YXRlIHN0YXRpYyBJdGVtU3BlYyBOYW1lc3BhY2VkU3BlYygpID0+IG5ldygpCiAgICB7CiAgICAgICAgSXRlbUlkICAgICAgICAgICA9ICJvYWtfbG9nIiwKICAgICAgICBEaXNwbGF5TmFtZSAgICAgID0gIk9hayBMb2ciLAogICAgICAgIFNvdXJjZUJsb2NrcyAgICAgPSBbIm1pbmVjcmFmdDpvYWtfbG9nIiwgIm1pbmVjcmFmdDpiaXJjaF9sb2ciXSwKICAgICAgICBSZXF1aXJlc1NtZWx0aW5nID0gZmFsc2UsCiAgICAgICAgTWluSGFydmVzdExldmVsICA9IDAsCiAgICB9OwoKICAgIC8vIOKUgOKUgCBHb2FsIG1ldGFkYXRhIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgTmFtZV9JbmNsdWRlc0l0ZW1JZCgpCiAgICB7CiAgICAgICAgdmFyIGdvYWwgPSBuZXcgR2VuZXJpY0dhdGhlckdvYWwoT2FrTG9nU3BlYygpLCAxMCk7CiAgICAgICAgQXNzZXJ0LlRoYXQoZ29hbC5OYW1lLCBJcy5FcXVhbFRvKCJHYXRoZXI6b2FrX2xvZyIpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIE5hbWVfSXJvbkluZ290X0luY2x1ZGVzSXRlbUlkKCkKICAgIHsKICAgICAgICB2YXIgZ29hbCA9IG5ldyBHZW5lcmljR2F0aGVyR29hbChJcm9uSW5nb3RTcGVjKCksIDUpOwogICAgICAgIEFzc2VydC5UaGF0KGdvYWwuTmFtZSwgSXMuRXF1YWxUbygiR2F0aGVyOmlyb25faW5nb3QiKSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBEZXNjcmlwdGlvbl9JbmNsdWRlc1RhcmdldENvdW50QW5kRGlzcGxheU5hbWUoKQogICAgewogICAgICAgIHZhciBnb2FsID0gbmV3IEdlbmVyaWNHYXRoZXJHb2FsKE9ha0xvZ1NwZWMoKSwgMTApOwogICAgICAgIEFzc2VydC5UaGF0KGdvYWwuRGVzY3JpcHRpb24sIERvZXMuQ29udGFpbigiMTAiKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoZ29hbC5EZXNjcmlwdGlvbiwgRG9lcy5Db250YWluKCJPYWsgTG9nIikpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgUGhhc2VzX0FyZUNvcnJlY3QoKQogICAgewogICAgICAgIHZhciBnb2FsID0gbmV3IEdlbmVyaWNHYXRoZXJHb2FsKE9ha0xvZ1NwZWMoKSwgMTApOwogICAgICAgIEFzc2VydC5UaGF0KGdvYWwuUGhhc2VzLCBJcy5FcXVhbFRvKG5ld1tdIHsgIkZpbmRTb3VyY2UiLCAiTWluZSIsICJDb2xsZWN0IiB9KSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBTcGVjX1JldHVybnNJdGVtU3BlYygpCiAgICB7CiAgICAgICAgdmFyIHNwZWMgPSBPYWtMb2dTcGVjKCk7CiAgICAgICAgdmFyIGdvYWwgPSBuZXcgR2VuZXJpY0dhdGhlckdvYWwoc3BlYywgMTApOwogICAgICAgIEFzc2VydC5UaGF0KGdvYWwuU3BlYy5JdGVtSWQsIElzLkVxdWFsVG8oc3BlYy5JdGVtSWQpKTsKICAgIH0KCiAgICAvLyDilIDilIAgSXNDb21wbGV0ZSDigJQgbm9uLXNtZWx0aW5nIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgSXNDb21wbGV0ZV9FbXB0eUludmVudG9yeV9SZXR1cm5zRmFsc2UoKQogICAgewogICAgICAgIHZhciBnb2FsICA9IG5ldyBHZW5lcmljR2F0aGVyR29hbChPYWtMb2dTcGVjKCksIDEwKTsKICAgICAgICB2YXIgc3RhdGUgPSBuZXcgV29ybGRTdGF0ZSgpOwogICAgICAgIEFzc2VydC5UaGF0KGdvYWwuSXNDb21wbGV0ZShzdGF0ZSksIElzLkZhbHNlKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIElzQ29tcGxldGVfU2luZ2xlU291cmNlQmxvY2tfQmVsb3dUYXJnZXRfUmV0dXJuc0ZhbHNlKCkKICAgIHsKICAgICAgICB2YXIgZ29hbCAgPSBuZXcgR2VuZXJpY0dhdGhlckdvYWwoT2FrTG9nU3BlYygpLCAxMCk7CiAgICAgICAgdmFyIHN0YXRlID0gbmV3IFdvcmxkU3RhdGUoKS5XaXRoKGIgPT4gYi5BZGRJbnZlbnRvcnlJdGVtKCJvYWtfbG9nIiwgOSkpOwogICAgICAgIEFzc2VydC5UaGF0KGdvYWwuSXNDb21wbGV0ZShzdGF0ZSksIElzLkZhbHNlKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIElzQ29tcGxldGVfU2luZ2xlU291cmNlQmxvY2tfRXhhY3RUYXJnZXRfUmV0dXJuc1RydWUoKQogICAgewogICAgICAgIHZhciBnb2FsICA9IG5ldyBHZW5lcmljR2F0aGVyR29hbChPYWtMb2dTcGVjKCksIDEwKTsKICAgICAgICB2YXIgc3RhdGUgPSBuZXcgV29ybGRTdGF0ZSgpLldpdGgoYiA9PiBiLkFkZEludmVudG9yeUl0ZW0oIm9ha19sb2ciLCAxMCkpOwogICAgICAgIEFzc2VydC5UaGF0KGdvYWwuSXNDb21wbGV0ZShzdGF0ZSksIElzLlRydWUpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgSXNDb21wbGV0ZV9TaW5nbGVTb3VyY2VCbG9ja19BYm92ZVRhcmdldF9SZXR1cm5zVHJ1ZSgpCiAgICB7CiAgICAgICAgdmFyIGdvYWwgID0gbmV3IEdlbmVyaWNHYXRoZXJHb2FsKE9ha0xvZ1NwZWMoKSwgMTApOwogICAgICAgIHZhciBzdGF0ZSA9IG5ldyBXb3JsZFN0YXRlKCkuV2l0aChiID0+IGIuQWRkSW52ZW50b3J5SXRlbSgib2FrX2xvZyIsIDE1KSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoZ29hbC5Jc0NvbXBsZXRlKHN0YXRlKSwgSXMuVHJ1ZSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBJc0NvbXBsZXRlX011bHRpcGxlU291cmNlQmxvY2tzX1N1bXNBbGxfUmV0dXJuc1RydWUoKQogICAgewogICAgICAgIC8vIDQgb2FrX2xvZyArIDMgYmlyY2hfbG9nICsgNCBzcHJ1Y2VfbG9nID0gMTEg4omlIDEwCiAgICAgICAgdmFyIGdvYWwgID0gbmV3IEdlbmVyaWNHYXRoZXJHb2FsKE9ha0xvZ1NwZWMoKSwgMTApOwogICAgICAgIHZhciBzdGF0ZSA9IG5ldyBXb3JsZFN0YXRlKCkKICAgICAgICAgICAgLldpdGgoYiA9PiBiLkFkZEludmVudG9yeUl0ZW0oIm9ha19sb2ciLCAgICA0KSkKICAgICAgICAgICAgLldpdGgoYiA9PiBiLkFkZEludmVudG9yeUl0ZW0oImJpcmNoX2xvZyIsICAzKSkKICAgICAgICAgICAgLldpdGgoYiA9PiBiLkFkZEludmVudG9yeUl0ZW0oInNwcnVjZV9sb2ciLCA0KSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoZ29hbC5Jc0NvbXBsZXRlKHN0YXRlKSwgSXMuVHJ1ZSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBJc0NvbXBsZXRlX011bHRpcGxlU291cmNlQmxvY2tzX1BhcnRpYWxTdW1fUmV0dXJuc0ZhbHNlKCkKICAgIHsKICAgICAgICAvLyAzICsgMyA9IDYgPCAxMAogICAgICAgIHZhciBnb2FsICA9IG5ldyBHZW5lcmljR2F0aGVyR29hbChPYWtMb2dTcGVjKCksIDEwKTsKICAgICAgICB2YXIgc3RhdGUgPSBuZXcgV29ybGRTdGF0ZSgpCiAgICAgICAgICAgIC5XaXRoKGIgPT4gYi5BZGRJbnZlbnRvcnlJdGVtKCJvYWtfbG9nIiwgICAzKSkKICAgICAgICAgICAgLldpdGgoYiA9PiBiLkFkZEludmVudG9yeUl0ZW0oImJpcmNoX2xvZyIsIDMpKTsKICAgICAgICBBc3NlcnQuVGhhdChnb2FsLklzQ29tcGxldGUoc3RhdGUpLCBJcy5GYWxzZSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBJc0NvbXBsZXRlX05hbWVzcGFjZWRTb3VyY2VCbG9ja19TdHJpcHNNaW5lY3JhZnRQcmVmaXgoKQogICAgewogICAgICAgIC8vIFNvdXJjZUJsb2NrcyBoYXMgIm1pbmVjcmFmdDpvYWtfbG9nIiDigJQgaW52ZW50b3J5IGhhcyAib2FrX2xvZyIgKG5vIHByZWZpeCkKICAgICAgICB2YXIgZ29hbCAgPSBuZXcgR2VuZXJpY0dhdGhlckdvYWwoTmFtZXNwYWNlZFNwZWMoKSwgNSk7CiAgICAgICAgdmFyIHN0YXRlID0gbmV3IFdvcmxkU3RhdGUoKQogICAgICAgICAgICAuV2l0aChiID0+IGIuQWRkSW52ZW50b3J5SXRlbSgib2FrX2xvZyIsICAgMykpCiAgICAgICAgICAgIC5XaXRoKGIgPT4gYi5BZGRJbnZlbnRvcnlJdGVtKCJiaXJjaF9sb2ciLCAzKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoZ29hbC5Jc0NvbXBsZXRlKHN0YXRlKSwgSXMuVHJ1ZSk7ICAvLyA2IOKJpSA1CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBJc0NvbXBsZXRlX0RpYW1vbmRTaW5nbGVCbG9ja19FeGFjdFRhcmdldF9SZXR1cm5zVHJ1ZSgpCiAgICB7CiAgICAgICAgdmFyIGdvYWwgID0gbmV3IEdlbmVyaWNHYXRoZXJHb2FsKERpYW1vbmRTcGVjKCksIDMpOwogICAgICAgIHZhciBzdGF0ZSA9IG5ldyBXb3JsZFN0YXRlKCkKICAgICAgICAgICAgLldpdGgoYiA9PiBiLkFkZEludmVudG9yeUl0ZW0oImRpYW1vbmRfb3JlIiwgICAgICAgICAgICAxKSkKICAgICAgICAgICAgLldpdGgoYiA9PiBiLkFkZEludmVudG9yeUl0ZW0oImRlZXBzbGF0ZV9kaWFtb25kX29yZSIsICAyKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoZ29hbC5Jc0NvbXBsZXRlKHN0YXRlKSwgSXMuVHJ1ZSk7ICAvLyAxICsgMiA9IDMKICAgIH0KCiAgICAvLyDilIDilIAgSXNDb21wbGV0ZSDigJQgc21lbHRpbmcg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBJc0NvbXBsZXRlX1JlcXVpcmVzU21lbHRpbmdfQ2hlY2tzU21lbHRlZFByb2R1Y3RPbmx5KCkKICAgIHsKICAgICAgICB2YXIgZ29hbCAgPSBuZXcgR2VuZXJpY0dhdGhlckdvYWwoSXJvbkluZ290U3BlYygpLCA1KTsKICAgICAgICAvLyBIYXMgbG90cyBvZiByYXcgaXJvbiBvcmUgYnV0IG5vIHNtZWx0ZWQgaW5nb3RzCiAgICAgICAgdmFyIHN0YXRlID0gbmV3IFdvcmxkU3RhdGUoKQogICAgICAgICAgICAuV2l0aChiID0+IGIuQWRkSW52ZW50b3J5SXRlbSgiaXJvbl9vcmUiLCAyMCkpOwogICAgICAgIEFzc2VydC5UaGF0KGdvYWwuSXNDb21wbGV0ZShzdGF0ZSksIElzLkZhbHNlLAogICAgICAgICAgICAiUmF3IG9yZSBtdXN0IG5vdCBjb3VudCB0b3dhcmQgc21lbHRpbmcgZ29hbCBjb21wbGV0aW9uLiIpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgSXNDb21wbGV0ZV9SZXF1aXJlc1NtZWx0aW5nX1NtZWx0ZWRQcm9kdWN0QmVsb3dUYXJnZXRfUmV0dXJuc0ZhbHNlKCkKICAgIHsKICAgICAgICB2YXIgZ29hbCAgPSBuZXcgR2VuZXJpY0dhdGhlckdvYWwoSXJvbkluZ290U3BlYygpLCA1KTsKICAgICAgICB2YXIgc3RhdGUgPSBuZXcgV29ybGRTdGF0ZSgpCiAgICAgICAgICAgIC5XaXRoKGIgPT4gYi5BZGRJbnZlbnRvcnlJdGVtKCJpcm9uX2luZ290IiwgNCkpOwogICAgICAgIEFzc2VydC5UaGF0KGdvYWwuSXNDb21wbGV0ZShzdGF0ZSksIElzLkZhbHNlKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIElzQ29tcGxldGVfUmVxdWlyZXNTbWVsdGluZ19TbWVsdGVkUHJvZHVjdEV4YWN0VGFyZ2V0X1JldHVybnNUcnVlKCkKICAgIHsKICAgICAgICB2YXIgZ29hbCAgPSBuZXcgR2VuZXJpY0dhdGhlckdvYWwoSXJvbkluZ290U3BlYygpLCA1KTsKICAgICAgICB2YXIgc3RhdGUgPSBuZXcgV29ybGRTdGF0ZSgpCiAgICAgICAgICAgIC5XaXRoKGIgPT4gYi5BZGRJbnZlbnRvcnlJdGVtKCJpcm9uX2luZ290IiwgNSkpOwogICAgICAgIEFzc2VydC5UaGF0KGdvYWwuSXNDb21wbGV0ZShzdGF0ZSksIElzLlRydWUpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgSXNDb21wbGV0ZV9SZXF1aXJlc1NtZWx0aW5nX09yZUFuZEluZ290X09ubHlJbmdvdENvdW50cygpCiAgICB7CiAgICAgICAgdmFyIGdvYWwgID0gbmV3IEdlbmVyaWNHYXRoZXJHb2FsKElyb25JbmdvdFNwZWMoKSwgNSk7CiAgICAgICAgdmFyIHN0YXRlID0gbmV3IFdvcmxkU3RhdGUoKQogICAgICAgICAgICAuV2l0aChiID0+IGIuQWRkSW52ZW50b3J5SXRlbSgiaXJvbl9vcmUiLCAgIDIwKSkgICAvLyByYXcgb3JlIOKAlCBpZ25vcmVkCiAgICAgICAgICAgIC5XaXRoKGIgPT4gYi5BZGRJbnZlbnRvcnlJdGVtKCJpcm9uX2luZ290IiwgIDUpKTsgIC8vIHNtZWx0ZWQgcHJvZHVjdAogICAgICAgIEFzc2VydC5UaGF0KGdvYWwuSXNDb21wbGV0ZShzdGF0ZSksIElzLlRydWUpOwogICAgfQoKICAgIC8vIOKUgOKUgCBIYXNGYWlsZWQg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBIYXNGYWlsZWRfV2hlbkZhY3ROb3RTZXRfUmV0dXJuc0ZhbHNlKCkKICAgIHsKICAgICAgICB2YXIgZ29hbCAgPSBuZXcgR2VuZXJpY0dhdGhlckdvYWwoT2FrTG9nU3BlYygpLCAxMCk7CiAgICAgICAgdmFyIHN0YXRlID0gbmV3IFdvcmxkU3RhdGUoKTsKICAgICAgICBBc3NlcnQuVGhhdChnb2FsLkhhc0ZhaWxlZChzdGF0ZSksIElzLkZhbHNlKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIEhhc0ZhaWxlZF9XaGVuRmFjdFNldFRydWVfUmV0dXJuc1RydWUoKQogICAgewogICAgICAgIHZhciBnb2FsICA9IG5ldyBHZW5lcmljR2F0aGVyR29hbChPYWtMb2dTcGVjKCksIDEwKTsKICAgICAgICB2YXIgc3RhdGUgPSBuZXcgV29ybGRTdGF0ZSgpCiAgICAgICAgICAgIC5XaXRoKGIgPT4gYi5TZXRGYWN0KCJnb2FsOkdhdGhlcjpvYWtfbG9nOmZhaWxlZCIsIHRydWUpKTsKICAgICAgICBBc3NlcnQuVGhhdChnb2FsLkhhc0ZhaWxlZChzdGF0ZSksIElzLlRydWUpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgSGFzRmFpbGVkX1doZW5GYWN0U2V0RmFsc2VfUmV0dXJuc0ZhbHNlKCkKICAgIHsKICAgICAgICB2YXIgZ29hbCAgPSBuZXcgR2VuZXJpY0dhdGhlckdvYWwoT2FrTG9nU3BlYygpLCAxMCk7CiAgICAgICAgdmFyIHN0YXRlID0gbmV3IFdvcmxkU3RhdGUoKQogICAgICAgICAgICAuV2l0aChiID0+IGIuU2V0RmFjdCgiZ29hbDpHYXRoZXI6b2FrX2xvZzpmYWlsZWQiLCBmYWxzZSkpOwogICAgICAgIEFzc2VydC5UaGF0KGdvYWwuSGFzRmFpbGVkKHN0YXRlKSwgSXMuRmFsc2UpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgSGFzRmFpbGVkX0ZhY3RLZXlJbmNsdWRlc0l0ZW1JZCgpCiAgICB7CiAgICAgICAgLy8gRGlmZmVyZW50IGl0ZW0gSURzIG11c3QgdXNlIGRpZmZlcmVudCBmYWN0IGtleXMKICAgICAgICB2YXIgb2FrR29hbCAgPSBuZXcgR2VuZXJpY0dhdGhlckdvYWwoT2FrTG9nU3BlYygpLCAgICAxMCk7CiAgICAgICAgdmFyIGlyb25Hb2FsID0gbmV3IEdlbmVyaWNHYXRoZXJHb2FsKElyb25JbmdvdFNwZWMoKSwgNSk7CgogICAgICAgIC8vIE9ubHkgb2FrX2xvZyBpcyBtYXJrZWQgZmFpbGVkCiAgICAgICAgdmFyIHN0YXRlID0gbmV3IFdvcmxkU3RhdGUoKQogICAgICAgICAgICAuV2l0aChiID0+IGIuU2V0RmFjdCgiZ29hbDpHYXRoZXI6b2FrX2xvZzpmYWlsZWQiLCB0cnVlKSk7CgogICAgICAgIEFzc2VydC5UaGF0KG9ha0dvYWwuSGFzRmFpbGVkKHN0YXRlKSwgIElzLlRydWUpOwogICAgICAgIEFzc2VydC5UaGF0KGlyb25Hb2FsLkhhc0ZhaWxlZChzdGF0ZSksIElzLkZhbHNlKTsKICAgIH0KfQo=
+using Agent.Core;
+using Agent.Planning.Goals;
+
+namespace MemorySmith.Agent.Tests;
+
+/// <summary>
+/// Tests for <see cref="GenericGatherGoal"/>.
+///
+/// Covers: IsComplete (non-smelting + smelting), multi-source summation,
+/// namespace prefix stripping, HasFailed flag, Name / Description / Phases
+/// shape, and boundary conditions (empty inventory, exact target count).
+/// </summary>
+[TestFixture]
+public class GenericGatherGoalTests
+{
+    // ── Fixture helpers ───────────────────────────────────────────────────────
+
+    private static ItemSpec OakLogSpec() => new()
+    {
+        ItemId           = "oak_log",
+        DisplayName      = "Oak Log",
+        SourceBlocks     = ["oak_log", "birch_log", "spruce_log"],
+        RequiresSmelting = false,
+        MinHarvestLevel  = 0,
+    };
+
+    private static ItemSpec IronIngotSpec() => new()
+    {
+        ItemId           = "iron_ingot",
+        DisplayName      = "Iron Ingot",
+        SourceBlocks     = ["iron_ore", "deepslate_iron_ore"],
+        RequiresSmelting = true,
+        MinHarvestLevel  = 2,
+    };
+
+    private static ItemSpec DiamondSpec() => new()
+    {
+        ItemId           = "diamond",
+        DisplayName      = "Diamond",
+        SourceBlocks     = ["diamond_ore", "deepslate_diamond_ore"],
+        RequiresSmelting = false,
+        MinHarvestLevel  = 3,
+    };
+
+    private static ItemSpec NamespacedSpec() => new()
+    {
+        ItemId           = "oak_log",
+        DisplayName      = "Oak Log",
+        SourceBlocks     = ["minecraft:oak_log", "minecraft:birch_log"],
+        RequiresSmelting = false,
+        MinHarvestLevel  = 0,
+    };
+
+    // ── Goal metadata ─────────────────────────────────────────────────────────
+
+    [Test]
+    public void Name_IncludesItemId()
+    {
+        var goal = new GenericGatherGoal(OakLogSpec(), 10);
+        Assert.That(goal.Name, Is.EqualTo("Gather:oak_log"));
+    }
+
+    [Test]
+    public void Name_IronIngot_IncludesItemId()
+    {
+        var goal = new GenericGatherGoal(IronIngotSpec(), 5);
+        Assert.That(goal.Name, Is.EqualTo("Gather:iron_ingot"));
+    }
+
+    [Test]
+    public void Description_IncludesTargetCountAndDisplayName()
+    {
+        var goal = new GenericGatherGoal(OakLogSpec(), 10);
+        Assert.That(goal.Description, Does.Contain("10"));
+        Assert.That(goal.Description, Does.Contain("Oak Log"));
+    }
+
+    [Test]
+    public void Phases_AreCorrect()
+    {
+        var goal = new GenericGatherGoal(OakLogSpec(), 10);
+        Assert.That(goal.Phases, Is.EqualTo(new[] { "FindSource", "Mine", "Collect" }));
+    }
+
+    [Test]
+    public void Spec_ReturnsItemSpec()
+    {
+        var spec = OakLogSpec();
+        var goal = new GenericGatherGoal(spec, 10);
+        Assert.That(goal.Spec.ItemId, Is.EqualTo(spec.ItemId));
+    }
+
+    // ── IsComplete — non-smelting ─────────────────────────────────────────────
+
+    [Test]
+    public void IsComplete_EmptyInventory_ReturnsFalse()
+    {
+        var goal  = new GenericGatherGoal(OakLogSpec(), 10);
+        var state = new WorldState();
+        Assert.That(goal.IsComplete(state), Is.False);
+    }
+
+    [Test]
+    public void IsComplete_SingleSourceBlock_BelowTarget_ReturnsFalse()
+    {
+        var goal  = new GenericGatherGoal(OakLogSpec(), 10);
+        var state = new WorldState().With(b => b.AddInventoryItem("oak_log", 9));
+        Assert.That(goal.IsComplete(state), Is.False);
+    }
+
+    [Test]
+    public void IsComplete_SingleSourceBlock_ExactTarget_ReturnsTrue()
+    {
+        var goal  = new GenericGatherGoal(OakLogSpec(), 10);
+        var state = new WorldState().With(b => b.AddInventoryItem("oak_log", 10));
+        Assert.That(goal.IsComplete(state), Is.True);
+    }
+
+    [Test]
+    public void IsComplete_SingleSourceBlock_AboveTarget_ReturnsTrue()
+    {
+        var goal  = new GenericGatherGoal(OakLogSpec(), 10);
+        var state = new WorldState().With(b => b.AddInventoryItem("oak_log", 15));
+        Assert.That(goal.IsComplete(state), Is.True);
+    }
+
+    [Test]
+    public void IsComplete_MultipleSourceBlocks_SumsAll_ReturnsTrue()
+    {
+        // 4 oak_log + 3 birch_log + 4 spruce_log = 11 ≥ 10
+        var goal  = new GenericGatherGoal(OakLogSpec(), 10);
+        var state = new WorldState()
+            .With(b => b.AddInventoryItem("oak_log",    4))
+            .With(b => b.AddInventoryItem("birch_log",  3))
+            .With(b => b.AddInventoryItem("spruce_log", 4));
+        Assert.That(goal.IsComplete(state), Is.True);
+    }
+
+    [Test]
+    public void IsComplete_MultipleSourceBlocks_PartialSum_ReturnsFalse()
+    {
+        // 3 + 3 = 6 < 10
+        var goal  = new GenericGatherGoal(OakLogSpec(), 10);
+        var state = new WorldState()
+            .With(b => b.AddInventoryItem("oak_log",   3))
+            .With(b => b.AddInventoryItem("birch_log", 3));
+        Assert.That(goal.IsComplete(state), Is.False);
+    }
+
+    [Test]
+    public void IsComplete_NamespacedSourceBlock_StripsMinecraftPrefix()
+    {
+        // SourceBlocks has "minecraft:oak_log" — inventory has "oak_log" (no prefix)
+        var goal  = new GenericGatherGoal(NamespacedSpec(), 5);
+        var state = new WorldState()
+            .With(b => b.AddInventoryItem("oak_log",   3))
+            .With(b => b.AddInventoryItem("birch_log", 3));
+        Assert.That(goal.IsComplete(state), Is.True);  // 6 ≥ 5
+    }
+
+    [Test]
+    public void IsComplete_DiamondSingleBlock_ExactTarget_ReturnsTrue()
+    {
+        var goal  = new GenericGatherGoal(DiamondSpec(), 3);
+        var state = new WorldState()
+            .With(b => b.AddInventoryItem("diamond_ore",            1))
+            .With(b => b.AddInventoryItem("deepslate_diamond_ore",  2));
+        Assert.That(goal.IsComplete(state), Is.True);  // 1 + 2 = 3
+    }
+
+    // ── IsComplete — smelting ─────────────────────────────────────────────────
+
+    [Test]
+    public void IsComplete_RequiresSmelting_ChecksSmeltedProductOnly()
+    {
+        var goal  = new GenericGatherGoal(IronIngotSpec(), 5);
+        // Has lots of raw iron ore but no smelted ingots
+        var state = new WorldState()
+            .With(b => b.AddInventoryItem("iron_ore", 20));
+        Assert.That(goal.IsComplete(state), Is.False,
+            "Raw ore must not count toward smelting goal completion.");
+    }
+
+    [Test]
+    public void IsComplete_RequiresSmelting_SmeltedProductBelowTarget_ReturnsFalse()
+    {
+        var goal  = new GenericGatherGoal(IronIngotSpec(), 5);
+        var state = new WorldState()
+            .With(b => b.AddInventoryItem("iron_ingot", 4));
+        Assert.That(goal.IsComplete(state), Is.False);
+    }
+
+    [Test]
+    public void IsComplete_RequiresSmelting_SmeltedProductExactTarget_ReturnsTrue()
+    {
+        var goal  = new GenericGatherGoal(IronIngotSpec(), 5);
+        var state = new WorldState()
+            .With(b => b.AddInventoryItem("iron_ingot", 5));
+        Assert.That(goal.IsComplete(state), Is.True);
+    }
+
+    [Test]
+    public void IsComplete_RequiresSmelting_OreAndIngot_OnlyIngotCounts()
+    {
+        var goal  = new GenericGatherGoal(IronIngotSpec(), 5);
+        var state = new WorldState()
+            .With(b => b.AddInventoryItem("iron_ore",   20))   // raw ore — ignored
+            .With(b => b.AddInventoryItem("iron_ingot",  5));  // smelted product
+        Assert.That(goal.IsComplete(state), Is.True);
+    }
+
+    // ── HasFailed ─────────────────────────────────────────────────────────────
+
+    [Test]
+    public void HasFailed_WhenFactNotSet_ReturnsFalse()
+    {
+        var goal  = new GenericGatherGoal(OakLogSpec(), 10);
+        var state = new WorldState();
+        Assert.That(goal.HasFailed(state), Is.False);
+    }
+
+    [Test]
+    public void HasFailed_WhenFactSetTrue_ReturnsTrue()
+    {
+        var goal  = new GenericGatherGoal(OakLogSpec(), 10);
+        var state = new WorldState()
+            .With(b => b.SetFact("goal:Gather:oak_log:failed", true));
+        Assert.That(goal.HasFailed(state), Is.True);
+    }
+
+    [Test]
+    public void HasFailed_WhenFactSetFalse_ReturnsFalse()
+    {
+        var goal  = new GenericGatherGoal(OakLogSpec(), 10);
+        var state = new WorldState()
+            .With(b => b.SetFact("goal:Gather:oak_log:failed", false));
+        Assert.That(goal.HasFailed(state), Is.False);
+    }
+
+    [Test]
+    public void HasFailed_FactKeyIncludesItemId()
+    {
+        // Different item IDs must use different fact keys
+        var oakGoal  = new GenericGatherGoal(OakLogSpec(),    10);
+        var ironGoal = new GenericGatherGoal(IronIngotSpec(), 5);
+
+        // Only oak_log is marked failed
+        var state = new WorldState()
+            .With(b => b.SetFact("goal:Gather:oak_log:failed", true));
+
+        Assert.That(oakGoal.HasFailed(state),  Is.True);
+        Assert.That(ironGoal.HasFailed(state), Is.False);
+    }
+}
