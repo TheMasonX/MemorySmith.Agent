@@ -1,12 +1,19 @@
-﻿/**
- * MineflayerAdapter â€” Node.js bridge between the MemorySmith.Agent C# host
+/**
+ * MineflayerAdapter — Node.js bridge between the MemorySmith.Agent C# host
  * and a Minecraft server.
  *
  * Architecture:
  *   1. Starts a WebSocket server on WS_PORT (default: 3000).
  *   2. Creates a Mineflayer bot connecting to MC_HOST:MC_PORT.
- *   3. Forwards bot events (spawn, health, move, blockMinedâ€¦) to C# as JSON.
+ *   3. Forwards bot events (spawn, health, move, blockMined…) to C# as JSON.
  *   4. Accepts JSON action commands from C# and executes them via Mineflayer.
+ *
+ * Bug fixes (2026-06-16):
+ *   - Sequential command queue: commands are processed one at a time so overlapping
+ *     bot.dig() calls no longer abort each other ("Digging aborted").
+ *   - Mine auto-navigation: the mine case now pathfinds to the nearest matching
+ *     block (up to 64 blocks) before digging, so the bot moves to trees rather
+ *     than trying to mine from spawn.
  *
  * Environment variables:
  *   WS_PORT      WebSocket server port for C# connection (default: 3000)
@@ -25,14 +32,14 @@ import mflPathfinder from 'mineflayer-pathfinder';
 const { pathfinder, Movements, goals: pfGoals } = mflPathfinder;
 import { WebSocketServer } from 'ws';
 
-const WS_PORT  = parseInt(process.env.WS_PORT   ?? '3000',    10);
+const WS_PORT  = parseInt(process.env.WS_PORT   ?? '3000',  10);
 const MC_HOST  = process.env.MC_HOST   ?? 'localhost';
-const MC_PORT  = parseInt(process.env.MC_PORT   ?? '25565',   10);
+const MC_PORT  = parseInt(process.env.MC_PORT   ?? '25565', 10);
 const MC_USER  = process.env.MC_USERNAME ?? 'AgentBot';
-const MC_VER   = process.env.MC_VERSION;       // omit for auto-detect
-const WS_TOKEN = process.env.WS_TOKEN ?? null; // optional auth
+const MC_VER   = process.env.MC_VERSION;
+const WS_TOKEN = process.env.WS_TOKEN ?? null;
 
-// â”€â”€ WebSocket server (C# connects here) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── WebSocket server ─────────────────────────────────────────────────────────
 
 const wss = new WebSocketServer({ port: WS_PORT });
 let agentSocket = null;
@@ -43,13 +50,40 @@ function sendEvent(event, data = {}) {
   }
 }
 
-wss.on('listening', () => console.log(`[ws] server listening on port ${WS_PORT}`));
+// ── Sequential command queue (Fix 2) ────────────────────────────────────────
+// C# sends actions as fast as WebSocket allows. Without a queue, overlapping
+// bot.dig() calls cause mineflayer to throw "Digging aborted" on every but
+// the last command. This queue ensures actions run strictly one at a time.
+
+const cmdQueue = [];
+let dispatching = false;
+
+function enqueueCommand(msg) {
+  cmdQueue.push(msg);
+  if (!dispatching) drainQueue();
+}
+
+async function drainQueue() {
+  dispatching = true;
+  while (cmdQueue.length > 0) {
+    const msg = cmdQueue.shift();
+    await dispatch(msg).catch(e => {
+      console.error(`[dispatch] ${msg.action} failed:`, e.message);
+      sendEvent('error', { action: msg.action, message: e.message });
+    });
+  }
+  dispatching = false;
+}
+
+// ── WebSocket connection handling ────────────────────────────────────────────
+
+wss.on('listening', () => console.log(`[ws] listening on port ${WS_PORT}`));
 
 wss.on('connection', (ws) => {
   console.log('[ws] C# agent connected');
   agentSocket = ws;
 
-  ws.on('message', async (raw) => {
+  ws.on('message', (raw) => {
     let msg;
     try { msg = JSON.parse(raw.toString()); }
     catch (e) { console.error('[ws] bad JSON:', e.message); return; }
@@ -59,10 +93,7 @@ wss.on('connection', (ws) => {
       return;
     }
 
-    await dispatch(msg).catch(e => {
-      console.error(`[dispatch] ${msg.action} failed:`, e.message);
-      sendEvent('error', { action: msg.action, message: e.message });
-    });
+    enqueueCommand(msg);          // enqueue — do NOT await here
   });
 
   ws.on('close', () => {
@@ -72,11 +103,10 @@ wss.on('connection', (ws) => {
 
   ws.on('error', (e) => console.error('[ws] socket error:', e.message));
 
-  // Immediate status update so C# knows the bot state on connect
   if (bot?.entity) sendBotStatus();
 });
 
-// â”€â”€ Mineflayer bot â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Mineflayer bot ────────────────────────────────────────────────────────────
 
 const botOpts = {
   host: MC_HOST,
@@ -95,37 +125,38 @@ function botPos() {
 }
 
 function sendBotStatus() {
+  const invItems = bot.inventory?.items() ?? [];
+  const invMap = {};
+  for (const item of invItems) {
+    invMap[item.name] = (invMap[item.name] ?? 0) + item.count;
+  }
   sendEvent('status', {
     ...botPos(),
     hp:   bot.health ?? 20,
     food: bot.food   ?? 20,
-    inventory: Object.fromEntries(
-      (bot.inventory?.items() ?? []).map(item => [item.name, item.count])
-    ),
+    inventory: invMap,
   });
 }
 
-// Forward bot events to C#
+// ── Bot event forwarding ──────────────────────────────────────────────────────
+
 bot.once('spawn', () => {
   console.log('[mc] bot spawned at', botPos());
   sendEvent('spawn', { ...botPos(), hp: bot.health, food: bot.food });
 });
+
 bot.on('health', () => sendEvent('health', { hp: bot.health, food: bot.food }));
 bot.on('move',   () => sendEvent('move',   botPos()));
-bot.on('death',  () => sendEvent('death',  botPos()));
+bot.on('death',  () => { console.warn('[mc] bot died'); sendEvent('death', botPos()); });
 bot.on('kicked', (reason) => { console.warn('[mc] kicked:', reason); sendEvent('kicked', { reason }); });
-bot.on('error',  (e) => { console.error('[mc] error:', e.message); sendEvent('error', { message: e.message }); });
-
-bot.on('blockBreakProgressEnd', (block) =>
-  sendEvent('blockMined', { block: block.name, ...botPos() })
-);
+bot.on('error',  (e)      => { console.error('[mc] error:', e.message); sendEvent('error', { message: e.message }); });
 
 bot.on('chat', (username, message) => {
   if (username === bot.username) return;
   sendEvent('chat', { username, message });
 });
 
-// â”€â”€ Action dispatcher â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Action dispatcher ─────────────────────────────────────────────────────────
 
 async function dispatch({ action, arguments: args = {} }) {
   switch (action) {
@@ -142,16 +173,41 @@ async function dispatch({ action, arguments: args = {} }) {
     }
 
     case 'mine': {
+      // Fix 1b: auto-navigate to the target block before digging so the bot
+      // moves to trees rather than timing out at spawn.
       const { block: blockName, count = 1 } = args;
       if (!blockName) throw new Error('mine requires block name');
-      const blockId = bot.registry.blocksByName[blockName.replace('minecraft:', '')]?.id;
+
+      const shortName = blockName.replace('minecraft:', '');
+      const blockEntry = bot.registry.blocksByName[shortName];
+      if (!blockEntry) throw new Error(`Unknown block: ${blockName}`);
+      const blockId = blockEntry.id;
+
+      const movements = new Movements(bot);
+      bot.pathfinder.setMovements(movements);
+
       let mined = 0;
       while (mined < count) {
-        const target = bot.findBlock({ matching: blockId, maxDistance: 32 });
-        if (!target) { sendEvent('blockNotFound', { block: blockName }); break; }
-        await bot.dig(target);
+        // Search up to 64 blocks away (increased from 32)
+        const target = bot.findBlock({ matching: blockId, maxDistance: 64 });
+        if (!target) {
+          console.log(`[mine] no ${shortName} found within 64 blocks after ${mined} mined`);
+          sendEvent('blockNotFound', { block: blockName, mined });
+          break;
+        }
+
+        // Navigate to within 2 blocks of the target before digging
+        await bot.pathfinder.goto(
+          new pfGoals.GoalNear(target.position.x, target.position.y, target.position.z, 2)
+        );
+
+        // Re-fetch the block — it may have moved if the world changed during pathing
+        const fresh = bot.blockAt(target.position);
+        if (!fresh || fresh.type !== blockId) continue;  // gone, find another
+
+        await bot.dig(fresh);
         mined++;
-        sendEvent('blockMined', { block: blockName, count: mined, ...botPos() });
+        sendEvent('blockMined', { block: shortName, count: mined, ...botPos() });
       }
       break;
     }
@@ -182,7 +238,7 @@ async function dispatch({ action, arguments: args = {} }) {
   }
 }
 
-// â”€â”€ Graceful shutdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Graceful shutdown ─────────────────────────────────────────────────────────
 
 function shutdown() {
   console.log('[adapter] shutting down');
@@ -192,4 +248,3 @@ function shutdown() {
 }
 process.on('SIGINT',  shutdown);
 process.on('SIGTERM', shutdown);
-
