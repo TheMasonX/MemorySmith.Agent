@@ -1,1 +1,20 @@
-bmFtZXNwYWNlIEFnZW50LkNvcmU7CgovLy8gPHN1bW1hcnk+Ci8vLyBMb29rcyB1cCA8c2VlIGNyZWY9Ikl0ZW1TcGVjIi8+IHJlY29yZHMgYnkgaXRlbSBJRC4KLy8vCi8vLyBCYWNrZWQgYnkgTWVtb3J5U21pdGggd2lraSBwYWdlcyBhdCBwYXRoICJpdGVtLXJlZ2lzdHJ5L3tpdGVtSWR9Ii4KLy8vIFJldHVybnMgbnVsbCBmb3IgdW5rbm93biBpdGVtcyDigJQgY2FsbGVycyBhcmUgcmVzcG9uc2libGUgZm9yIGZhbGxpbmcgYmFjawovLy8gdG8gdGhlIExMTSBpZiBuZWVkZWQgKHBlciBELTAwMzogZGV0ZXJtaW5pc3RpYy1maXJzdCBwbGFubmluZykuCi8vLwovLy8gSW1wbGVtZW50YXRpb25zIE1VU1QgTk9UIGNhbGwgdGhlIExMTSB0aGVtc2VsdmVzLgovLy8gPC9zdW1tYXJ5PgpwdWJsaWMgaW50ZXJmYWNlIElJdGVtUmVnaXN0cnkKewogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIFJldHVybnMgdGhlIDxzZWUgY3JlZj0iSXRlbVNwZWMiLz4gZm9yIHRoZSBnaXZlbiBpdGVtIElELCBvciBudWxsIGlmIG5vdCBmb3VuZC4KICAgIC8vLyA8cGFyYW1yZWYgbmFtZT0iaXRlbUlkIi8+IGlzIHRoZSBzaG9ydCBmb3JtIHdpdGhvdXQgbmFtZXNwYWNlIHByZWZpeCwKICAgIC8vLyBlLmcuICJvYWtfbG9nIiwgImlyb25fb3JlIiwgImRpYW1vbmQiLgogICAgLy8vIDwvc3VtbWFyeT4KICAgIFRhc2s8SXRlbVNwZWM/PiBHZXRBc3luYyhzdHJpbmcgaXRlbUlkLCBDYW5jZWxsYXRpb25Ub2tlbiBjdCA9IGRlZmF1bHQpOwp9Cg==
+namespace Agent.Core;
+
+/// <summary>
+/// Looks up <see cref="ItemSpec"/> records by item ID.
+///
+/// Backed by MemorySmith wiki pages at path "item-registry/{itemId}".
+/// Returns null for unknown items — callers are responsible for falling back
+/// to the LLM if needed (per D-003: deterministic-first planning).
+///
+/// Implementations MUST NOT call the LLM themselves.
+/// </summary>
+public interface IItemRegistry
+{
+    /// <summary>
+    /// Returns the <see cref="ItemSpec"/> for the given item ID, or null if not found.
+    /// <paramref name="itemId"/> is the short form without namespace prefix,
+    /// e.g. "oak_log", "iron_ore", "diamond".
+    /// </summary>
+    Task<ItemSpec?> GetAsync(string itemId, CancellationToken ct = default);
+}
