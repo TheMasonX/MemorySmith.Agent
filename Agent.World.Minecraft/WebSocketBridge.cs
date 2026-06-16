@@ -28,6 +28,10 @@ using System.Threading.Channels;
 ///   {"event":"moveComplete", "x":110,"y":64,"z":110}
 ///   {"event":"status",       "x":100,"y":64,"z":100,"hp":20}
 ///   {"event":"error",        "message":"path blocked"}
+///
+/// Wire-name responsibility: each tool sets <see cref="ActionData.Tool"/> to the
+/// correct Node.js action name via <see cref="ActionProtocol"/> constants.
+/// This bridge forwards the value as-is (no lowercasing). See ADR-010.
 /// </summary>
 public sealed class WebSocketBridge(string uri) : IDisposable
 {
@@ -73,18 +77,20 @@ public sealed class WebSocketBridge(string uri) : IDisposable
     /// <summary>
     /// Serialises an <see cref="ActionData"/> to the Node.js command protocol
     /// and sends it over the WebSocket.
+    ///
+    /// The <see cref="ActionData.Tool"/> value is forwarded as-is — tools set the
+    /// correct wire name via <see cref="ActionProtocol"/> constants.
     /// </summary>
     public async Task SendAsync(ActionData action, CancellationToken cancellationToken = default)
     {
         if (_ws is not { State: WebSocketState.Open })
             throw new InvalidOperationException("WebSocket is not connected.");
 
-        // Node.js expects lowercase "action" + "arguments"
         using var ms = new System.IO.MemoryStream();
         using var writer = new Utf8JsonWriter(ms);
 
         writer.WriteStartObject();
-        writer.WriteString("action", action.Tool.ToLowerInvariant());
+        writer.WriteString("action", action.Tool); // wire name set by the tool via ActionProtocol
         writer.WritePropertyName("arguments");
         writer.WriteStartObject();
         foreach (var kv in action.Arguments)
