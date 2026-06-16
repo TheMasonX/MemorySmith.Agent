@@ -60,19 +60,15 @@ public sealed class HtnTaskLibrary
     {
         var count = parameters.Length > 0 && int.TryParse(parameters[0], out var c) ? c : 10;
 
-        // MoveTo uses the bot's current known position so the pathfinder at least
-        // confirms we're at spawn before mining.
-        // Phase 4 (TSK-0004) will replace this with real tree coordinates injected
-        // from a SearchMemory context-carry result.
-        // The Node.js mine action will auto-navigate to the nearest tree block
-        // within 64 blocks regardless of the MoveTo target.
+        // Wander first so the bot explores a new area before mining.
+        // This prevents the loop from repeatedly mining a depleted patch.
+        // Radius 40 gives good coverage; maxDistanceFromSpawn 200 keeps the bot
+        // from straying too far. Phase 4 (TSK-0004) will replace Wander with a
+        // context-injected MoveTo using coordinates from the SearchMemory result.
         return
         [
             MakeAction("SearchMemory", ("query", "wood trees oak log location nearby")),
-            MakeAction("MoveTo",
-                ("x", (object?)state.Position.X),
-                ("y", (object?)state.Position.Y),
-                ("z", (object?)state.Position.Z)),
+            MakeAction("Wander",   ("radius", (object?)40), ("maxDistanceFromSpawn", (object?)200)),
             MakeAction("MineBlock", ("block", "minecraft:oak_log"), ("count", (object?)count)),
             MakeAction("GetStatus"),
         ];
