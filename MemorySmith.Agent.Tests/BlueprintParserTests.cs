@@ -1,6 +1,6 @@
-namespace MemorySmith.Agent.Tests;
-
 using Agent.Construction;
+
+namespace MemorySmith.Agent.Tests;
 
 /// <summary>
 /// Unit tests for <see cref="BlueprintParser"/>: frontmatter extraction,
