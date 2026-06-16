@@ -1,9 +1,9 @@
-namespace MemorySmith.Agent.Tests;
-
 using Agent.Construction;
 using Agent.Core;
 using Agent.Planning;
 using Agent.Planning.Goals;
+
+namespace MemorySmith.Agent.Tests;
 
 /// <summary>
 /// Tests for <see cref="GoalFactory"/> Phase 4b additions:
