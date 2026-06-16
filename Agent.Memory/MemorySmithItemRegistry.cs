@@ -1,6 +1,7 @@
 namespace Agent.Memory;
 
 using Agent.Core;
+using System.Collections.Concurrent;
 
 /// <summary>
 /// <see cref="IItemRegistry"/> implementation backed by MemorySmith wiki pages.
@@ -22,17 +23,46 @@ using Agent.Core;
 /// valid key: value pairs (headings, comments, blank lines) are silently skipped.
 ///
 /// Returns null for unknown or malformed pages. Never calls the LLM (D-003).
+///
+/// Sprint 2c: In-memory TTL cache keyed by normalised item slug.
+/// TTL is controlled by <see cref="RestMemoryGatewayOptions.ItemCacheTtlSeconds"/>.
+/// Set to 0 to disable caching (useful for tests or when data changes frequently).
 /// </summary>
-public sealed class MemorySmithItemRegistry(IMemoryGateway memory) : IItemRegistry
+public sealed class MemorySmithItemRegistry(
+    IMemoryGateway memory,
+    RestMemoryGatewayOptions options) : IItemRegistry
 {
     private const string PagePrefix = "item-registry/";
+
+    // Cache entry: (nullable spec, expiry instant). Key is the normalised slug (lowercase, hyphens).
+    private readonly ConcurrentDictionary<string, (ItemSpec? Spec, DateTimeOffset Expires)> _cache = new();
+
+    private bool CachingEnabled => options.ItemCacheTtlSeconds > 0;
+    private TimeSpan CacheTtl   => TimeSpan.FromSeconds(options.ItemCacheTtlSeconds);
 
     /// <inheritdoc/>
     public async Task<ItemSpec?> GetAsync(string itemId, CancellationToken ct = default)
     {
         // Normalize itemId to slug form: underscores → hyphens, lowercase.
-        // Wiki pages are stored at "item-registry/oak-log", not "item-registry/oak_log".
         var slug = itemId.Replace('_', '-').ToLowerInvariant();
+
+        // Sprint 2c: cache look-up (before any HTTP call).
+        if (CachingEnabled && _cache.TryGetValue(slug, out var entry) && DateTimeOffset.UtcNow < entry.Expires)
+            return entry.Spec;
+
+        var spec = await FetchAsync(slug, itemId, ct);
+
+        // Sprint 2c: store result (including null — avoids hammering the API for missing items).
+        if (CachingEnabled)
+            _cache[slug] = (spec, DateTimeOffset.UtcNow.Add(CacheTtl));
+
+        return spec;
+    }
+
+    // ── Private helpers ───────────────────────────────────────────────────────
+
+    private async Task<ItemSpec?> FetchAsync(string slug, string itemId, CancellationToken ct)
+    {
         var pageId = $"{PagePrefix}{slug}";
 
         // 1. Direct page lookup (deterministic, fast — preferred path per D-003).
@@ -88,8 +118,6 @@ public sealed class MemorySmithItemRegistry(IMemoryGateway memory) : IItemRegist
             var key   = line[..colonIdx].Trim();
             var value = line[(colonIdx + 1)..].Trim();
 
-            // Only accept word-character keys (letters, digits, underscores).
-            // This rejects HTML comments (<!-- ... -->), URLs, etc.
             if (key.Length == 0 || !IsValidFieldKey(key) || value.Length == 0) continue;
 
             fields[key] = value;
