@@ -27,6 +27,12 @@ public static class ActionProtocol
     /// <summary>Walk in a random nearby direction. Node.js action: <c>wander</c>.</summary>
     public const string Wander = "wander";
 
-    /// <summary>Send a chat message in-game. Node.js action: <c>chat</c> (reserved for future use).</summary>
+    /// <summary>Send a chat message in-game. Node.js action: <c>chat</c>.</summary>
     public const string Chat = "chat";
+
+    /// <summary>Craft an item from inventory materials. Node.js action: <c>craft</c>.</summary>
+    public const string Craft = "craft";
+
+    /// <summary>Smelt an item in a nearby furnace. Node.js action: <c>smelt</c>.</summary>
+    public const string Smelt = "smelt";
 }
