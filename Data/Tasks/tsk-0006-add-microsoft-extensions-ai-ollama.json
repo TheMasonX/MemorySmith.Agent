@@ -1,0 +1,34 @@
+{
+  "Id": "tsk-0006-add-microsoft-extensions-ai-ollama",
+  "Key": "TSK-0006",
+  "Title": "Add Microsoft.Extensions.AI + Ollama LLM fallback to HtnPlanner",
+  "Description": "Phase 2b decision (D-005): use Microsoft.Extensions.AI for LLM abstraction.\n\nImplementation steps:\n1. Add Microsoft.Extensions.AI and OllamaSharp packages to Agent.Planning.csproj.\n2. Define IChatClient usage in HtnPlanner: when PlanAsync receives a goal with no task library entry, call the LLM to generate a JSON plan {goal, phases:[...]}\n3. Parse the LLM response into ActionData sequences using HtnTaskLibrary where possible.\n4. Add MockChatClient to tests for LLM fallback paths.\n5. Register IChatClient in Program.cs (Ollama as default, OpenAI as alternative).\n\nThe LLM call should be sparingly used -- only when the task library has no decomposition for the goal. Deterministic methods preferred for known tasks.",
+  "Type": "Feature",
+  "Status": "Backlog",
+  "Priority": "Medium",
+  "AssigneeMode": "Custom",
+  "AssigneeDirectoryId": null,
+  "AssigneeCustomText": "AI Agent",
+  "Reporter": "agent-session-20260615",
+  "Labels": [
+    "phase-4",
+    "llm",
+    "ollama",
+    "microsoft-extensions-ai"
+  ],
+  "Attachments": [],
+  "ExternalLinks": [],
+  "LinkedPages": [
+    "decisions",
+    "Tasks/phase4-tasks"
+  ],
+  "Comments": [],
+  "EpicId": null,
+  "ParentId": null,
+  "DueDateUtc": null,
+  "CreatedAtUtc": "2026-06-15T23:30:00Z",
+  "UpdatedAtUtc": "2026-06-15T23:30:00Z",
+  "CompletedAtUtc": null,
+  "Revision": 1,
+  "IsArchived": false
+}
