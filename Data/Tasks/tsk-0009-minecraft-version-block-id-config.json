@@ -1,0 +1,33 @@
+{
+  "Id": "tsk-0009-minecraft-version-block-id-config",
+  "Key": "TSK-0009",
+  "Title": "Add Minecraft version config and parameterize block IDs in HtnTaskLibrary",
+  "Description": "HtnTaskLibrary hardcodes 'minecraft:oak_log' which requires Minecraft 1.13+. Pre-1.13 servers use 'log' (integer data values).\n\nImplementation:\n1. Add MinecraftVersion string to MinecraftAdapterConfig (default: '1.21').\n2. Create BlockRegistry helper that maps semantic names to version-specific block IDs.\n3. Update HtnTaskLibrary to accept IBlockRegistry as a constructor parameter.\n4. Update GatherWoodDecompose to use BlockRegistry.LogBlock(version) instead of hardcoded string.\n5. Pass MinecraftAdapterConfig.MinecraftVersion through DI when creating HtnTaskLibrary in Program.cs.\n6. Add tests for pre-1.13 and 1.13+ block ID resolution.",
+  "Type": "Task",
+  "Status": "Backlog",
+  "Priority": "Low",
+  "AssigneeMode": "Custom",
+  "AssigneeDirectoryId": null,
+  "AssigneeCustomText": "AI Agent",
+  "Reporter": "agent-session-20260615",
+  "Labels": [
+    "phase-4",
+    "minecraft-version",
+    "block-ids",
+    "config"
+  ],
+  "Attachments": [],
+  "ExternalLinks": [],
+  "LinkedPages": [
+    "Tasks/phase4-tasks"
+  ],
+  "Comments": [],
+  "EpicId": null,
+  "ParentId": null,
+  "DueDateUtc": null,
+  "CreatedAtUtc": "2026-06-15T23:30:00Z",
+  "UpdatedAtUtc": "2026-06-15T23:30:00Z",
+  "CompletedAtUtc": null,
+  "Revision": 1,
+  "IsArchived": false
+}
