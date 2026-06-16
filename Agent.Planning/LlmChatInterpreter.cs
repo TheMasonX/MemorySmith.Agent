@@ -48,8 +48,8 @@ public sealed class LlmChatInterpreter(
 
         // 3. Distance gate — skip LLM if player is far and not addressing this bot
         if (quick.IntentType == ChatIntentType.NotAddressed
-            && playerPosition.HasValue
-            && Distance(botPosition, playerPosition.Value) > options.MaxResponseDistanceBlocks)
+            && playerPosition is not null
+            && Distance(botPosition, playerPosition) > options.MaxResponseDistanceBlocks)
         {
             return quick;
         }
