@@ -85,14 +85,14 @@ public sealed class LlmChatInterpreter(
     // ── Prompt construction ───────────────────────────────────────────────────
 
     private static string BuildSystemPrompt(
-        string botName, Position botPos, string? goal, int onlinePlayers) => $"""
-        You are {botName}, an autonomous Minecraft agent at ({botPos.X},{botPos.Y},{botPos.Z}).
-        Status: {(goal is not null ? $"pursuing goal: {goal}" : "idle")}. Players online: {onlinePlayers}.
+        string botName, Position botPos, string? goal, int onlinePlayers) => $$"""
+        You are {{botName}}, an autonomous Minecraft agent at ({{botPos.X}},{{botPos.Y}},{{botPos.Z}}).
+        Status: {{(goal is not null ? $"pursuing goal: {goal}" : "idle")}}. Players online: {{onlinePlayers}}.
 
         Decide if the next message is for you and what to do.
         Reply ONLY with valid JSON — no markdown, no prose:
 
-        {{
+        {
           "addressed": "yes" | "maybe" | "no",
           "intent": "gather" | "build" | "cancel" | "status" | "help" | "navigate" | "ignore" | "clarify",
           "item": "<minecraft_id or null>",
@@ -102,7 +102,7 @@ public sealed class LlmChatInterpreter(
           "y": <integer or null>,
           "z": <integer or null>,
           "response": "<in-game reply, max 50 words, empty if intent is ignore>"
-        }}
+        }
 
         Rules: "yes" when your name is used or only 1 player is online.
         "maybe" when it could be a command but your name isn't mentioned.
