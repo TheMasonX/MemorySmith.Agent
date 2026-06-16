@@ -1,0 +1,15 @@
+{
+  "Id": "agent-council-reviews",
+  "Title": "MemorySmith.Agent — Council Review History",
+  "Content": "Three council reviews have been completed (6 seats each, structured findings):\n\nPhase 0/1 Kickoff (2026-06-15): Accepted Phase 0 skeleton. Phase 1 priorities: MockWorldAdapter, DI wiring, WebSocket bridge, MoveTo tool. Found that test package alignment with MemorySmith versions was needed.\n\nPhase 2 Memory Integration (2026-06-15): Accepted Phase 2. Three fixes applied: (1) SearchResult.Kind field for page/memory disambiguation, (2) UpdatePageAsync graceful fallback for missing pages, (3) IHttpClientFactory adoption.\n\nPhase 3 Planner Architecture (2026-06-15): Accepted Phase 3. One immediate fix: ReplanAsync was using ContinueWith(OnlyOnRanToCompletion) — replaced with await/try-catch. Three Phase 4 items deferred: adaptive execution (SearchMemory result -> MoveTo coords), GatherWood replan parameter preservation, block ID version sensitivity.\n\nAll council review pages are in Data/Pages/council/. Future reviews should follow the 6-seat format: Source-Grounded Archivist, Data Model Architect, Retrieval Specialist, Human Learning Advocate, Skeptical Reviewer, Synthesizer.",
+  "Status": 2,
+  "Confidence": 0.99,
+  "Tags": ["agent", "council", "decisions", "kind:governance", "audience:agent", "scope:architecture"],
+  "References": ["agent-phase-status-current"],
+  "Conflicts": [],
+  "SourceLinks": [
+    { "Label": "Council reviews folder", "Uri": "%RepoRoot%Data/Pages/council/", "StartLine": null, "EndLine": null }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-06-15T23:30:00Z"
+}
