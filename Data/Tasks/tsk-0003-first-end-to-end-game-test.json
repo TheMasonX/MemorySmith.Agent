@@ -2,7 +2,7 @@
   "Id": "tsk-0003-first-end-to-end-game-test",
   "Key": "TSK-0003",
   "Title": "Run first end-to-end game test (GatherWood in Minecraft)",
-  "Description": "Validate that the full agent pipeline works against a real Minecraft server.\n\nPre-conditions:\n1. Minecraft server running (vanilla or Paper, 1.16.4+ for pathfinder)\n2. npm install run in MineflayerAdapter/\n3. Agent:Enabled=true, Agent:Minecraft:* configured in appsettings.json\n\nTest steps:\n1. dotnet run --project WebUI.Blazor\n2. Watch logs: should see 'Mineflayer adapter starting', 'Bot spawned', 'World adapter connected'\n3. POST http://localhost:5000/api/agent/plan {goalName:GatherWood, parameters:{count:5}}\n4. Watch bot navigate to a tree and mine 5 logs in-game\n5. GET /api/agent/status -- verify Health > 0 and Goal = GatherWood\n\nSuccess criteria:\n- Bot spawns and C# receives spawn event\n- MoveToTool dispatches a move command and bot navigates\n- MineBlock command executes and blockMined events are received\n- GatherWoodGoal.IsComplete returns true when oak_log count >= 5\n\nKnown gap: MoveToTool currently sends hardcoded {x:0, y:64, z:0} coordinates. For real wood gathering, Phase 4 adaptive execution (SearchMemory result -> MoveTo coords) must be implemented first.",
+  "Description": "Validate that the full agent pipeline works against a real Minecraft server.\n\nPre-conditions:\n1. Minecraft server running (vanilla or Paper, 1.16.4+ for pathfinder)\n2. npm install run in MineflayerAdapter/ (includes mineflayer-pathfinder)\n3. Agent:Enabled=true, Agent:Minecraft:* configured in appsettings.json\n\nTest steps:\n1. dotnet run --project WebUI.Blazor\n2. Watch logs: should see 'Mineflayer adapter starting', 'Bot spawned', 'World adapter connected'\n3. POST http://localhost:5000/api/agent/plan {goalName:GatherWood, parameters:{count:5}}\n4. Watch bot navigate to a tree and mine 5 logs in-game\n5. GET /api/agent/status -- verify Health > 0 and Goal = GatherWood\n\nSuccess criteria:\n- Bot spawns and C# receives spawn event; WorldState.Position updates\n- MoveToTool dispatches move command (bot navigates to bot's current position = no-op for now)\n- MineBlock command causes bot to auto-navigate to nearest oak_log within 64 blocks and dig it\n- blockMined events increment WorldState.Inventory['oak_log']\n- GatherWoodGoal.IsComplete returns true when oak_log count >= 5\n- Loop stops; agent logs 'Goal GatherWood completed'",
   "Type": "Task",
   "Status": "InProgress",
   "Priority": "High",
@@ -24,16 +24,22 @@
     {
       "Id": "c-tsk0003-001",
       "Author": "AI Agent",
-      "Body": "NOTE: MoveToTool sends coordinates from ActionData.Arguments. HtnTaskLibrary.GatherWoodDecompose does not set x/y/z in the MineBlock action -- it relies on the bot being near trees already. For a real test, either manually navigate the bot near trees first, or implement SearchMemory -> MoveTo context injection (Phase 4 adaptive execution) before this test.",
+      "Body": "First live test (2026-06-15): bot connected and spawned. Found 3 bugs:\n1. No MoveTo in plan - bot never moved to trees\n2. Overlapping mine commands caused 'Digging aborted' in Node.js\n3. blockMined events not tracked - inventory stayed empty, IsComplete always false",
       "CreatedAtUtc": "2026-06-15T23:30:00Z"
+    },
+    {
+      "Id": "c-tsk0003-002",
+      "Author": "AI Agent",
+      "Body": "Fixes applied 2026-06-16:\n- Bug0: MineBlockTool re-registered in Program.cs\n- Bug1a: GatherWoodDecompose now includes MoveTo(bot.Position) before MineBlock\n- Bug1b: Node.js mine case auto-navigates to nearest oak_log (64 block radius) before digging\n- Bug2: Sequential command queue in index.js prevents overlapping dig commands\n- Bug3: ProcessEventsAsync now parses blockMined/status/spawn/move events and updates WorldState.Inventory, Position, Food\n- Bug3: WorldState.Builder gains AddInventoryItem and SetInventory helpers\n\nReady for second game test.",
+      "CreatedAtUtc": "2026-06-16T01:43:00Z"
     }
   ],
   "EpicId": null,
   "ParentId": null,
   "DueDateUtc": null,
   "CreatedAtUtc": "2026-06-15T23:30:00Z",
-  "UpdatedAtUtc": "2026-06-15T23:30:00Z",
+  "UpdatedAtUtc": "2026-06-16T01:43:00Z",
   "CompletedAtUtc": null,
-  "Revision": 1,
+  "Revision": 2,
   "IsArchived": false
 }
