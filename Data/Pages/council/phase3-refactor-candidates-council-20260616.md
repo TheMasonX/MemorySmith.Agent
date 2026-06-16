@@ -70,3 +70,32 @@ Last green commit before this session: `a2f6895b91`
 - [x] ActionProtocol constants in Agent.Tools; all 5 tools updated; WebSocketBridge no longer lowercases
 - [x] ADR-009 and ADR-010 added to decisions.md
 - [ ] CI green on final commit (pending — check after push)
+
+---
+
+## Addendum — 2026-06-16 (deferred item resolved, same session)
+
+**Deferred item 2 from Retrieval Specialist now closed:**
+
+Add integration test verifying that `blockNotFound` / `error` events are written to `_gameErrors` Channel and increment `_consecutiveFailures`.
+
+**Root cause found during implementation**: `DispatchActionsAsync` Block 1 (re-planning guard) was missing `!_actionDispatchedThisCycle`. Without this guard, re-planning fires in the same loop iteration that should have entered the settle window, so the 300ms `Task.Delay` and the channel `TryRead` never execute. This made `_consecutiveFailures` via the error-channel path effectively dead code.
+
+**Fix** (commit `5d59d1c9`): Added `!_actionDispatchedThisCycle` to Block 1's guard:
+
+```csharp
+if (_queue.IsEmpty && _currentGoal is not null && !_actionDispatchedThisCycle)
+```
+
+When a plan cycle completes (all actions dispatched → `_actionDispatchedThisCycle = true`), re-planning is deferred one iteration. That iteration's Block 2 dequeues null, the `else` branch fires, and the settle runs. After the settle, `_actionDispatchedThisCycle = false` and Block 1 runs on the following iteration.
+
+**New constructor parameter** (commit `0880af81`): `maxConsecutiveFailures = 3` (optional, default unchanged) lets tests observe failure behaviour with a 1-failure threshold.
+
+**3 tests added** (commit `75d76dcb`, passing on `5d59d1c9`):
+- `BlockNotFoundEvent_MinedZero_WritesToErrorChannel_CausesGoalAbandonment`
+- `ErrorEvent_WritesToErrorChannel_CausesGoalAbandonment`
+- `BlockNotFoundEvent_MinedGreaterThanZero_DoesNotSignalError`
+
+CI green on `5d59d1c9` — all tests pass.
+
+**All Phase 3 council acceptance criteria now fully met.**
