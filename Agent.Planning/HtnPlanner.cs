@@ -1,5 +1,6 @@
 namespace Agent.Planning;
 
+using Agent.Construction;
 using Agent.Core;
 using Agent.Planning.Goals;
 
@@ -9,19 +10,20 @@ using Agent.Planning.Goals;
 /// Strategy:
 ///   1. If the goal name has a direct decomposition in the task library,
 ///      use it (single-shot decomposition).
-///   2. If the goal is a <see cref="GenericGatherGoal"/>, delegate to
-///      <see cref="HtnTaskLibrary.DecomposeGatherItem"/> with the goal's
-///      <see cref="ItemSpec"/>. This avoids registering one library entry per
-///      item ID while still allowing the full ItemSpec to drive action generation.
-///   3. Otherwise, iterate through the goal's phases and decompose each
-///      phase that has a known task method. Unknown phases are skipped.
-///   4. If no actions result after trying all paths, throw — caller must
-///      fall back to LLM (Phase 4 path, not yet implemented).
+///   2. If the goal implements <see cref="IItemSpecGoal"/> (e.g. <see cref="GenericGatherGoal"/>),
+///      delegate to <see cref="HtnTaskLibrary.DecomposeGatherItem"/> with the goal's
+///      <see cref="ItemSpec"/>. This avoids registering one library entry per item ID
+///      while still allowing the full ItemSpec to drive action generation.
+///   3. If the goal is a <see cref="BuildGoal"/>, delegate to
+///      <see cref="HtnTaskLibrary.DecomposeBuild"/> with the parsed block list and
+///      build origin from world-state facts.
+///   4. Otherwise, iterate through the goal's phases and decompose each phase
+///      that has a known task method. Unknown phases are skipped.
+///   5. If no actions result after all paths, throw — caller must fall back to
+///      LLM (Phase 4 path, not yet implemented).
 ///
-/// GOAP integration (Phase 4): when a specific phase fails at runtime,
-/// HtnPlanner.ReplanAsync will ask the GOAP engine to find an alternative
-/// action sequence for that phase. Currently, ReplanAsync just restarts
-/// the plan from scratch.
+/// GOAP integration (Phase 4): when a phase fails at runtime, ReplanAsync will ask
+/// the GOAP engine for an alternative sequence. Currently it restarts from scratch.
 /// </summary>
 public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
 {
@@ -30,26 +32,36 @@ public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
     {
         var actions = new List<ActionData>();
 
-        // 1. Try direct goal decomposition by name.
+        // 1. Direct task-library decomposition by goal name.
         if (library.HasTask(goal.Name))
         {
             actions.AddRange(library.Decompose(goal.Name, [], state));
         }
-        // 2. GenericGatherGoal — ItemSpec-aware decomposition.
-        //    Goal name is "Gather:{itemId}" which is not registered as a fixed task;
-        //    instead we delegate directly with the full ItemSpec.
-        else if (goal is GenericGatherGoal gg)
+        // 2. IItemSpecGoal — ItemSpec-aware decomposition (e.g. GenericGatherGoal).
+        //    Goal name is "Gather:{itemId}" which is not a fixed library task;
+        //    delegate with the full ItemSpec instead.
+        else if (goal is IItemSpecGoal isg)
         {
-            actions.AddRange(library.DecomposeGatherItem(gg.Spec, [], state));
+            actions.AddRange(library.DecomposeGatherItem(isg.Spec, [], state));
+        }
+        // 3. BuildGoal — blueprint-aware decomposition.
+        //    Emits material-gather actions followed by PlaceBlock actions.
+        //    Build origin is read from world-state facts; defaults to (0,0,0).
+        else if (goal is BuildGoal bg)
+        {
+            var ox = ReadOriginFact(state, bg.Blueprint.Id, "x");
+            var oy = ReadOriginFact(state, bg.Blueprint.Id, "y");
+            var oz = ReadOriginFact(state, bg.Blueprint.Id, "z");
+            actions.AddRange(library.DecomposeBuild(bg.Blueprint, bg.Blocks, ox, oy, oz, state));
         }
         else
         {
-            // 3. Phase-by-phase decomposition.
+            // 4. Phase-by-phase decomposition.
             foreach (var phase in goal.Phases)
             {
                 if (library.HasTask(phase))
                     actions.AddRange(library.Decompose(phase, [], state));
-                // Unknown phases skipped — will trigger LLM fallback in Phase 4
+                // Unknown phases skipped — triggers LLM fallback in Phase 4
             }
         }
 
@@ -59,7 +71,7 @@ public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
                 $"(phases: [{string.Join(", ", goal.Phases)}]). " +
                 "No matching task methods found. LLM fallback not yet implemented (Phase 4).");
 
-        return Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases, actions));
+        return Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases.ToArray(), actions));
     }
 
     public async Task<IPlan?> ReplanAsync(
@@ -67,8 +79,7 @@ public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
         CancellationToken cancellationToken = default)
     {
         // Phase 3: simple full-restart replan from the original goal phases.
-        // Phase 4: GOAP will substitute alternative actions for the failed phase
-        //   e.g. "path blocked on MoveToTree" → GOAP finds another route.
+        // Phase 4: GOAP will substitute alternative actions for the failed phase.
         var goal = new SimpleGoal(
             currentPlan.GoalName, "",
             [.. currentPlan.Phases],
@@ -83,5 +94,24 @@ public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
             // No decomposition available — caller falls back to idle or LLM (Phase 4)
             return null;
         }
+    }
+
+    /// <summary>
+    /// Reads an integer build origin coordinate from world-state facts.
+    /// Key format: "build:{blueprintId}:origin:{axis}".
+    /// Returns 0 if the fact is absent or unparseable.
+    /// </summary>
+    private static int ReadOriginFact(WorldState state, string blueprintId, string axis)
+    {
+        var key = $"build:{blueprintId}:origin:{axis}";
+        return state.Facts.TryGetValue(key, out var v)
+            ? v switch
+            {
+                int i                                          => i,
+                long l                                         => (int)l,
+                string s when int.TryParse(s, out var parsed) => parsed,
+                _                                              => 0,
+            }
+            : 0;
     }
 }
