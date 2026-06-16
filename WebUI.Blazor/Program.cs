@@ -47,24 +47,23 @@ if (agentEnabled)
         return new RestMemoryGateway(factory.CreateClient("memorysmith"), opts);
     });
 
-    // IToolCaller → ToolEngine with all tools
-    builder.Services.AddSingleton<ToolRegistry>();
+    // IToolCaller → ToolDispatcher (merged registry + executor — Candidate 2 deepening)
     builder.Services.AddSingleton<IToolCaller>(sp =>
     {
-        var registry = sp.GetRequiredService<ToolRegistry>();
-        var world    = sp.GetRequiredService<IWorldAdapter>();
-        var memory   = sp.GetRequiredService<IMemoryGateway>();
+        var world      = sp.GetRequiredService<IWorldAdapter>();
+        var memory     = sp.GetRequiredService<IMemoryGateway>();
+        var dispatcher = new ToolDispatcher();
 
-        registry.Register(new MoveToTool(world));
-        registry.Register(new StatusTool(world));
-        registry.Register(new MineBlockTool(world));
-        registry.Register(new WanderTool(world));
-        registry.Register(new PlaceBlockTool(world));
-        registry.Register(new SearchMemoryTool(memory));
-        registry.Register(new GetPageTool(memory));
-        registry.Register(new CreatePageTool(memory));
+        dispatcher.Register(new MoveToTool(world));
+        dispatcher.Register(new StatusTool(world));
+        dispatcher.Register(new MineBlockTool(world));
+        dispatcher.Register(new WanderTool(world));
+        dispatcher.Register(new PlaceBlockTool(world));
+        dispatcher.Register(new SearchMemoryTool(memory));
+        dispatcher.Register(new GetPageTool(memory));
+        dispatcher.Register(new CreatePageTool(memory));
 
-        return new ToolEngine(registry);
+        return dispatcher;
     });
 
     // IPlanner → HtnPlanner with default task library
