@@ -43,6 +43,7 @@ const WS_TOKEN = process.env.WS_TOKEN ?? null;
 
 const wss = new WebSocketServer({ port: WS_PORT });
 let agentSocket = null;
+let spawnPos = null;       // recorded on first spawn for boundary checks
 
 function sendEvent(event, data = {}) {
   if (agentSocket?.readyState === 1 /* OPEN */) {
@@ -141,6 +142,7 @@ function sendBotStatus() {
 // ── Bot event forwarding ──────────────────────────────────────────────────────
 
 bot.once('spawn', () => {
+  spawnPos = { x: bot.entity.position.x, y: bot.entity.position.y, z: bot.entity.position.z };
   console.log('[mc] bot spawned at', botPos());
   sendEvent('spawn', { ...botPos(), hp: bot.health, food: bot.food });
 });
@@ -213,15 +215,82 @@ async function dispatch({ action, arguments: args = {} }) {
     }
 
     case 'place': {
+      // Navigate to within reach, then try all six adjacent reference blocks.
       const { x, y, z, material } = args;
       if (x == null || !material) throw new Error('place requires x, y, z, material');
-      const refBlock = bot.blockAt(bot.entity.position.offset(0, -1, 0));
-      if (!refBlock) throw new Error('No ground block to place on');
-      const item = bot.inventory.items().find(i => i.name === material);
+
+      const movements = new Movements(bot);
+      bot.pathfinder.setMovements(movements);
+      await bot.pathfinder.goto(new pfGoals.GoalNear(x, y, z, 3));
+
+      const shortMat = material.replace('minecraft:', '');
+      const item = bot.inventory.items().find(i => i.name === shortMat || i.name === material);
       if (!item) throw new Error(`${material} not in inventory`);
       await bot.equip(item, 'hand');
-      await bot.placeBlock(refBlock, { x: 0, y: 1, z: 0 });
-      sendEvent('blockPlaced', { x, y, z, block: material });
+
+      // Try all six faces to find a solid reference block
+      const offsets = [
+        { dx: 0, dy: -1, dz: 0,  fx: 0,  fy: 1,  fz: 0  },  // below → place on top
+        { dx: 0, dy: 1,  dz: 0,  fx: 0,  fy: -1, fz: 0  },  // above → place underneath
+        { dx: -1, dy: 0, dz: 0,  fx: 1,  fy: 0,  fz: 0  },  // west face
+        { dx: 1,  dy: 0, dz: 0,  fx: -1, fy: 0,  fz: 0  },  // east face
+        { dx: 0,  dy: 0, dz: -1, fx: 0,  fy: 0,  fz: 1  },  // north face
+        { dx: 0,  dy: 0, dz: 1,  fx: 0,  fy: 0,  fz: -1 },  // south face
+      ];
+
+      let placed = false;
+      for (const { dx, dy, dz, fx, fy, fz } of offsets) {
+        const ref = bot.blockAt(bot.entity.position.offset(dx + (x - Math.round(bot.entity.position.x)),
+                                                           dy + (y - Math.round(bot.entity.position.y)),
+                                                           dz + (z - Math.round(bot.entity.position.z))));
+        if (!ref || ref.type === 0) continue;  // air
+        try {
+          await bot.placeBlock(ref, { x: fx, y: fy, z: fz });
+          placed = true;
+          break;
+        } catch { /* try next face */ }
+      }
+
+      if (!placed) throw new Error(`Cannot place ${material} at (${x},${y},${z}) — no solid reference block found`);
+      sendEvent('blockPlaced', { x, y, z, block: shortMat });
+      break;
+    }
+
+    case 'wander': {
+      // Walk in a random direction, clamped to maxDistanceFromSpawn from spawn.
+      const { radius = 20, maxDistanceFromSpawn = 100 } = args;
+      const angle = Math.random() * 2 * Math.PI;
+      const dist  = 5 + Math.random() * (radius - 5);  // at least 5 blocks
+
+      const curX = bot.entity.position.x;
+      const curZ = bot.entity.position.z;
+      let tX = curX + Math.cos(angle) * dist;
+      let tZ = curZ + Math.sin(angle) * dist;
+
+      // Clamp to spawn boundary if we have a recorded spawn and a limit
+      if (spawnPos && maxDistanceFromSpawn > 0) {
+        const dxS = tX - spawnPos.x;
+        const dzS = tZ - spawnPos.z;
+        const distFromSpawn = Math.sqrt(dxS * dxS + dzS * dzS);
+        if (distFromSpawn > maxDistanceFromSpawn) {
+          const scale = maxDistanceFromSpawn / distFromSpawn;
+          tX = spawnPos.x + dxS * scale;
+          tZ = spawnPos.z + dzS * scale;
+        }
+      }
+
+      const movements = new Movements(bot);
+      bot.pathfinder.setMovements(movements);
+      try {
+        await bot.pathfinder.goto(
+          new pfGoals.GoalNear(Math.round(tX), Math.round(bot.entity.position.y), Math.round(tZ), 2)
+        );
+        sendEvent('wanderComplete', { ...botPos(), targetX: Math.round(tX), targetZ: Math.round(tZ) });
+      } catch (e) {
+        // Destination may be unreachable (cliff, ocean) — not fatal
+        console.warn(`[wander] pathfinding failed: ${e.message}`);
+        sendEvent('wanderFailed', { message: e.message, ...botPos() });
+      }
       break;
     }
 
