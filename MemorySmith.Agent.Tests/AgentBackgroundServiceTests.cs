@@ -7,7 +7,9 @@ namespace MemorySmith.Agent.Tests;
 
 /// <summary>
 /// Integration tests for AgentBackgroundService verifying the planner is called
-/// when the action queue is empty and a goal is active (council Phase 3 acceptance criterion).
+/// when the action queue is empty and a goal is active (council Phase 3 acceptance criterion),
+/// and that game error events (blockNotFound, error) are routed through the typed
+/// Channel&lt;string&gt; and correctly increment _consecutiveFailures (council Phase 3 deferred).
 /// </summary>
 [TestFixture]
 public class AgentBackgroundServiceTests
@@ -26,10 +28,19 @@ public class AgentBackgroundServiceTests
         _planner   = new MockPlanner();
     }
 
-    // -- Helper ------------------------------------------------------------------------
+    // -- Helpers -----------------------------------------------------------------------
 
+    /// <summary>Creates a service with the default maxConsecutiveFailures (3).</summary>
     private WebUI.Blazor.AgentBackgroundService CreateService() =>
         new(_adapter, _toolCaller, NullLogger<WebUI.Blazor.AgentBackgroundService>.Instance, _planner);
+
+    /// <summary>
+    /// Creates a service with a custom maxConsecutiveFailures for faster failure detection
+    /// in tests that verify the error-channel path.
+    /// </summary>
+    private WebUI.Blazor.AgentBackgroundService CreateService(int maxConsecutiveFailures) =>
+        new(_adapter, _toolCaller, NullLogger<WebUI.Blazor.AgentBackgroundService>.Instance,
+            _planner, maxConsecutiveFailures);
 
     // -- PlanAsync call verification ---------------------------------------------------
 
@@ -158,6 +169,154 @@ public class AgentBackgroundServiceTests
 
         cts.Cancel();
         try { await task; } catch (OperationCanceledException) { }
+    }
+
+    // -- Error-channel path (deferred from Phase 3 council) ----------------------------
+
+    /// <summary>
+    /// Verifies that a blockNotFound event with mined=0 is written to the typed
+    /// Channel&lt;string&gt; error channel, which DispatchActionsAsync reads after
+    /// the settle delay, incrementing _consecutiveFailures.
+    ///
+    /// Observable via: with maxConsecutiveFailures=1, a single error abandons the goal
+    /// (CurrentGoal → null). This tests the complete signal path:
+    ///   PushEvent("blockNotFound") → ProcessEventsAsync writes to _gameErrors
+    ///   → settle delay → DispatchActionsAsync TryRead → _consecutiveFailures++
+    ///   → goal abandoned.
+    /// </summary>
+    [Test]
+    public async Task BlockNotFoundEvent_MinedZero_WritesToErrorChannel_CausesGoalAbandonment()
+    {
+        // maxConsecutiveFailures=1 so a single error abandons the goal immediately,
+        // making the channel-write observable without _consecutiveFailures being public.
+        _planner.PlanToReturn = new ActionPlan("Mine", [],
+            [new ActionData { Tool = "NoOp" }]);
+        _registry.Register(new NoOpTool("NoOp"));
+
+        var service = CreateService(maxConsecutiveFailures: 1);
+        service.SetGoal(new SimpleGoal("Mine", "", [], _ => false));
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
+        var serviceTask = service.StartAsync(cts.Token);
+
+        // Wait for the first plan cycle to begin (planner called)
+        var planDeadline = DateTime.UtcNow.AddSeconds(2);
+        while (_planner.PlanCalls.Count == 0 && DateTime.UtcNow < planDeadline)
+            await Task.Delay(10);
+        Assert.That(_planner.PlanCalls, Has.Count.GreaterThan(0),
+            "Planner must be called before injecting the error event.");
+
+        // Inject the blockNotFound event with mined=0 (total failure — no blocks found at all).
+        // ProcessEventsAsync picks it up and writes "$"blockNotFound:oak_log"" to _gameErrors.
+        _adapter.PushEvent("blockNotFound", new()
+        {
+            ["block"] = "minecraft:oak_log",
+            ["mined"] = 0
+        });
+
+        // Wait for the settle delay to fire (300ms) and for the dispatch loop to
+        // read the error, increment failures, and abandon the goal.
+        var abandonDeadline = DateTime.UtcNow.AddSeconds(3);
+        while (service.CurrentGoal is not null && DateTime.UtcNow < abandonDeadline)
+            await Task.Delay(20);
+
+        cts.Cancel();
+        try { await serviceTask; } catch (OperationCanceledException) { }
+
+        Assert.That(service.CurrentGoal, Is.Null,
+            "Goal should be abandoned after one blockNotFound(mined=0) failure " +
+            "when maxConsecutiveFailures=1 (error channel path verified).");
+    }
+
+    /// <summary>
+    /// Verifies the error event path: an "error" event (e.g. pathfinder timeout) is
+    /// written to the Channel&lt;string&gt; and causes the same failure increment.
+    /// </summary>
+    [Test]
+    public async Task ErrorEvent_WritesToErrorChannel_CausesGoalAbandonment()
+    {
+        _planner.PlanToReturn = new ActionPlan("Mine", [],
+            [new ActionData { Tool = "NoOp" }]);
+        _registry.Register(new NoOpTool("NoOp"));
+
+        var service = CreateService(maxConsecutiveFailures: 1);
+        service.SetGoal(new SimpleGoal("Mine", "", [], _ => false));
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
+        var serviceTask = service.StartAsync(cts.Token);
+
+        // Wait for the first plan cycle to begin
+        var planDeadline = DateTime.UtcNow.AddSeconds(2);
+        while (_planner.PlanCalls.Count == 0 && DateTime.UtcNow < planDeadline)
+            await Task.Delay(10);
+        Assert.That(_planner.PlanCalls, Has.Count.GreaterThan(0),
+            "Planner must be called before injecting the error event.");
+
+        // Inject a game "error" event (e.g. pathfinder blocked, cannot reach target).
+        _adapter.PushEvent("error", new()
+        {
+            ["action"]  = "mine",
+            ["message"] = "path blocked"
+        });
+
+        // Wait for the error to be consumed and the goal to be abandoned
+        var abandonDeadline = DateTime.UtcNow.AddSeconds(3);
+        while (service.CurrentGoal is not null && DateTime.UtcNow < abandonDeadline)
+            await Task.Delay(20);
+
+        cts.Cancel();
+        try { await serviceTask; } catch (OperationCanceledException) { }
+
+        Assert.That(service.CurrentGoal, Is.Null,
+            "Goal should be abandoned after one game error event " +
+            "when maxConsecutiveFailures=1 (error channel path verified).");
+    }
+
+    /// <summary>
+    /// Verifies that a blockNotFound event with mined &gt; 0 does NOT signal an error.
+    /// When some blocks were mined but the patch depleted, it is a partial success —
+    /// the bot collected what it could. The error channel must NOT receive an entry.
+    /// </summary>
+    [Test]
+    public async Task BlockNotFoundEvent_MinedGreaterThanZero_DoesNotSignalError()
+    {
+        _planner.PlanToReturn = new ActionPlan("Mine", [],
+            [new ActionData { Tool = "NoOp" }]);
+        _registry.Register(new NoOpTool("NoOp"));
+
+        // maxConsecutiveFailures=1: if an error IS incorrectly written, the goal
+        // will be abandoned within ~1s. We assert the goal is still alive after 800ms.
+        var service = CreateService(maxConsecutiveFailures: 1);
+        service.SetGoal(new SimpleGoal("Mine", "", [], _ => false));
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var serviceTask = service.StartAsync(cts.Token);
+
+        // Wait for the first plan cycle to begin
+        var planDeadline = DateTime.UtcNow.AddSeconds(2);
+        while (_planner.PlanCalls.Count == 0 && DateTime.UtcNow < planDeadline)
+            await Task.Delay(10);
+        Assert.That(_planner.PlanCalls, Has.Count.GreaterThan(0));
+
+        // Inject blockNotFound with mined=3 — partial success; should NOT cause a failure.
+        _adapter.PushEvent("blockNotFound", new()
+        {
+            ["block"] = "minecraft:oak_log",
+            ["mined"] = 3   // 3 blocks were collected before the patch depleted
+        });
+
+        // Wait one full settle window + safety margin (300ms settle + 500ms buffer = 800ms).
+        // If an error was written incorrectly, the goal would be gone by now.
+        await Task.Delay(800);
+
+        var goalBeforeCancel = service.CurrentGoal;
+
+        cts.Cancel();
+        try { await serviceTask; } catch (OperationCanceledException) { }
+
+        Assert.That(goalBeforeCancel, Is.Not.Null,
+            "Goal should NOT be abandoned when blockNotFound has mined>0 " +
+            "(partial success must not signal a game error).");
     }
 }
 
