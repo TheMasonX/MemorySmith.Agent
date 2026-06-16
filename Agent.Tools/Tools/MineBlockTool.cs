@@ -1,11 +1,11 @@
-﻿namespace Agent.Tools;
+namespace Agent.Tools;
 
 using Agent.Core;
 using System.Text.Json;
 
 /// <summary>
 /// Mines specified blocks near the bot's current position.
-/// Dispatches {"action":"mine","block":"minecraft:oak_log","count":5} to the world adapter.
+/// Dispatches {\"action\":\"mine\",\"block\":\"minecraft:oak_log\",\"count\":5} to the world adapter.
 /// </summary>
 public sealed class MineBlockTool(IWorldAdapter worldAdapter) : ITool
 {
@@ -35,7 +35,7 @@ public sealed class MineBlockTool(IWorldAdapter worldAdapter) : ITool
 
         var action = new ActionData
         {
-            Tool = "mine",
+            Tool = ActionProtocol.Mine,
             Arguments = { ["block"] = block, ["count"] = count }
         };
 
