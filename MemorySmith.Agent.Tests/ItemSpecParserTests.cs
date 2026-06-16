@@ -1,1 +1,217 @@
-dXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuTWVtb3J5OwoKbmFtZXNwYWNlIE1lbW9yeVNtaXRoLkFnZW50LlRlc3RzOwoKLy8vIDxzdW1tYXJ5PgovLy8gVW5pdCB0ZXN0cyBmb3IgPHNlZSBjcmVmPSJNZW1vcnlTbWl0aEl0ZW1SZWdpc3RyeS5QYXJzZUl0ZW1TcGVjIi8+LgovLy8gVGVzdHMgcnVuIGFnYWluc3QgcmF3IG1hcmtkb3duIHN0cmluZ3Mg4oCUIG5vIEhUVFAsIG5vIG1vY2sgZ2F0ZXdheS4KLy8vIENvdmVyczogaGFwcHkgcGF0aCwgbWlzc2luZyByZXF1aXJlZCBmaWVsZHMsIG1hbGZvcm1lZCB2YWx1ZXMsCi8vLyBleHRyYSB3aGl0ZXNwYWNlLCBjYXNlLWluc2Vuc2l0aXZlIGtleXMsIEhUTUwgY29tbWVudCBsaW5lcy4KLy8vIDwvc3VtbWFyeT4KW1Rlc3RGaXh0dXJlXQpwdWJsaWMgY2xhc3MgSXRlbVNwZWNQYXJzZXJUZXN0cwp7CiAgICAvLyDilIDilIAgSGVscGVycyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBwcml2YXRlIHN0YXRpYyBJdGVtU3BlYz8gUGFyc2Uoc3RyaW5nIGNvbnRlbnQpID0+CiAgICAgICAgTWVtb3J5U21pdGhJdGVtUmVnaXN0cnkuUGFyc2VJdGVtU3BlYyhjb250ZW50KTsKCiAgICAvLyDilIDilIAgSGFwcHkgcGF0aCDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIFBhcnNlSXRlbVNwZWNfVmFsaWRQYWdlX1JldHVybnNJdGVtU3BlYygpCiAgICB7CiAgICAgICAgY29uc3Qgc3RyaW5nIGNvbnRlbnQgPSAiIiIKICAgICAgICAgICAgIyBvYWstbG9nCgogICAgICAgICAgICBpdGVtX2lkOiBvYWtfbG9nCiAgICAgICAgICAgIGRpc3BsYXlfbmFtZTogT2FrIExvZwogICAgICAgICAgICBzb3VyY2VfYmxvY2tzOiBvYWtfbG9nLCBiaXJjaF9sb2csIHNwcnVjZV9sb2cKICAgICAgICAgICAgcmVxdWlyZXNfc21lbHRpbmc6IGZhbHNlCiAgICAgICAgICAgIG1pbl9oYXJ2ZXN0X2xldmVsOiAwCiAgICAgICAgICAgICIiIjsKCiAgICAgICAgdmFyIHNwZWMgPSBQYXJzZShjb250ZW50KTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjLCBJcy5Ob3QuTnVsbCk7CiAgICAgICAgQXNzZXJ0LlRoYXQoc3BlYyEuSXRlbUlkLCAgICAgICAgICBJcy5FcXVhbFRvKCJvYWtfbG9nIikpOwogICAgICAgIEFzc2VydC5UaGF0KHNwZWMuRGlzcGxheU5hbWUsICAgICAgIElzLkVxdWFsVG8oIk9hayBMb2ciKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoc3BlYy5Tb3VyY2VCbG9ja3MsICAgICAgSGFzLkNvdW50LkVxdWFsVG8oMykpOwogICAgICAgIEFzc2VydC5UaGF0KHNwZWMuUmVxdWlyZXNTbWVsdGluZywgIElzLkZhbHNlKTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjLk1pbkhhcnZlc3RMZXZlbCwgICBJcy5FcXVhbFRvKDApKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIFBhcnNlSXRlbVNwZWNfUmVxdWlyZXNTbWVsdGluZ19QYXJzZWRUcnVlKCkKICAgIHsKICAgICAgICBjb25zdCBzdHJpbmcgY29udGVudCA9ICIiIgogICAgICAgICAgICAjIGlyb24taW5nb3QKCiAgICAgICAgICAgIGl0ZW1faWQ6IGlyb25faW5nb3QKICAgICAgICAgICAgZGlzcGxheV9uYW1lOiBJcm9uIEluZ290CiAgICAgICAgICAgIHNvdXJjZV9ibG9ja3M6IGlyb25fb3JlLCBkZWVwc2xhdGVfaXJvbl9vcmUKICAgICAgICAgICAgcmVxdWlyZXNfc21lbHRpbmc6IHRydWUKICAgICAgICAgICAgbWluX2hhcnZlc3RfbGV2ZWw6IDIKICAgICAgICAgICAgIiIiOwoKICAgICAgICB2YXIgc3BlYyA9IFBhcnNlKGNvbnRlbnQpOwogICAgICAgIEFzc2VydC5UaGF0KHNwZWMsIElzLk5vdC5OdWxsKTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjIS5SZXF1aXJlc1NtZWx0aW5nLCBJcy5UcnVlKTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjLk1pbkhhcnZlc3RMZXZlbCwgICBJcy5FcXVhbFRvKDIpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIFBhcnNlSXRlbVNwZWNfTXVsdGlwbGVTb3VyY2VCbG9ja3NfQWxsUGFyc2VkKCkKICAgIHsKICAgICAgICBjb25zdCBzdHJpbmcgY29udGVudCA9ICIiIgogICAgICAgICAgICBpdGVtX2lkOiBhbGxfbG9ncwogICAgICAgICAgICBkaXNwbGF5X25hbWU6IEFueSBMb2cKICAgICAgICAgICAgc291cmNlX2Jsb2Nrczogb2FrX2xvZywgYmlyY2hfbG9nLCBzcHJ1Y2VfbG9nLCBkYXJrX29ha19sb2csIGp1bmdsZV9sb2csIGFjYWNpYV9sb2csIGNoZXJyeV9sb2cKICAgICAgICAgICAgIiIiOwoKICAgICAgICB2YXIgc3BlYyA9IFBhcnNlKGNvbnRlbnQpOwogICAgICAgIEFzc2VydC5UaGF0KHNwZWMsIElzLk5vdC5OdWxsKTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjIS5Tb3VyY2VCbG9ja3MsIEhhcy5Db3VudC5FcXVhbFRvKDcpKTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjLlNvdXJjZUJsb2NrcywgQ29udGFpbnMuSXRlbSgib2FrX2xvZyIpKTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjLlNvdXJjZUJsb2NrcywgQ29udGFpbnMuSXRlbSgiY2hlcnJ5X2xvZyIpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIFBhcnNlSXRlbVNwZWNfTWluSGFydmVzdExldmVsX1BhcnNlZENvcnJlY3RseSgpCiAgICB7CiAgICAgICAgY29uc3Qgc3RyaW5nIGNvbnRlbnQgPSAiIiIKICAgICAgICAgICAgaXRlbV9pZDogZGlhbW9uZAogICAgICAgICAgICBkaXNwbGF5X25hbWU6IERpYW1vbmQKICAgICAgICAgICAgc291cmNlX2Jsb2NrczogZGlhbW9uZF9vcmUsIGRlZXBzbGF0ZV9kaWFtb25kX29yZQogICAgICAgICAgICByZXF1aXJlc19zbWVsdGluZzogZmFsc2UKICAgICAgICAgICAgbWluX2hhcnZlc3RfbGV2ZWw6IDMKICAgICAgICAgICAgIiIiOwoKICAgICAgICB2YXIgc3BlYyA9IFBhcnNlKGNvbnRlbnQpOwogICAgICAgIEFzc2VydC5UaGF0KHNwZWMsIElzLk5vdC5OdWxsKTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjIS5NaW5IYXJ2ZXN0TGV2ZWwsIElzLkVxdWFsVG8oMykpOwogICAgfQoKICAgIC8vIOKUgOKUgCBUb2xlcmFuY2Ug4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBQYXJzZUl0ZW1TcGVjX0V4dHJhV2hpdGVzcGFjZV9Ub2xlcmF0ZWQoKQogICAgewogICAgICAgIGNvbnN0IHN0cmluZyBjb250ZW50ID0gIiAgaXRlbV9pZCAgOiAgIG9ha19sb2cgICBcbiAgZGlzcGxheV9uYW1lICA6ICBPYWsgTG9nICBcbiI7CiAgICAgICAgdmFyIHNwZWMgPSBQYXJzZShjb250ZW50KTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjLCBJcy5Ob3QuTnVsbCk7CiAgICAgICAgQXNzZXJ0LlRoYXQoc3BlYyEuSXRlbUlkLCAgICAgIElzLkVxdWFsVG8oIm9ha19sb2ciKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoc3BlYy5EaXNwbGF5TmFtZSwgIElzLkVxdWFsVG8oIk9hayBMb2ciKSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBQYXJzZUl0ZW1TcGVjX0Nhc2VJbnNlbnNpdGl2ZUZpZWxkTmFtZXNfUGFyc2VkKCkKICAgIHsKICAgICAgICBjb25zdCBzdHJpbmcgY29udGVudCA9ICIiIgogICAgICAgICAgICBJVEVNX0lEOiBvYWtfbG9nCiAgICAgICAgICAgIERJU1BMQVlfTkFNRTogT2FrIExvZwogICAgICAgICAgICBTT1VSQ0VfQkxPQ0tTOiBvYWtfbG9nCiAgICAgICAgICAgIFJFUVVJUkVTX1NNRUxUSU5HOiBmYWxzZQogICAgICAgICAgICBNSU5fSEFSVkVTVF9MRVZFTDogMAogICAgICAgICAgICAiIiI7CgogICAgICAgIHZhciBzcGVjID0gUGFyc2UoY29udGVudCk7CiAgICAgICAgQXNzZXJ0LlRoYXQoc3BlYywgSXMuTm90Lk51bGwpOwogICAgICAgIEFzc2VydC5UaGF0KHNwZWMhLkl0ZW1JZCwgICAgIElzLkVxdWFsVG8oIm9ha19sb2ciKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoc3BlYy5EaXNwbGF5TmFtZSwgSXMuRXF1YWxUbygiT2FrIExvZyIpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIFBhcnNlSXRlbVNwZWNfQ29tbWVudExpbmVzX0FyZUlnbm9yZWQoKQogICAgewogICAgICAgIGNvbnN0IHN0cmluZyBjb250ZW50ID0gIiIiCiAgICAgICAgICAgICMgb2FrLWxvZwoKICAgICAgICAgICAgPCEtLSBUaGlzIGlzIGEgY29tbWVudCB3aXRoOiBjb2xvbnMgaW4gaXQgLS0+CiAgICAgICAgICAgIGl0ZW1faWQ6IG9ha19sb2cKICAgICAgICAgICAgZGlzcGxheV9uYW1lOiBPYWsgTG9nCiAgICAgICAgICAgIHNvdXJjZV9ibG9ja3M6IG9ha19sb2cKICAgICAgICAgICAgIiIiOwoKICAgICAgICB2YXIgc3BlYyA9IFBhcnNlKGNvbnRlbnQpOwogICAgICAgIEFzc2VydC5UaGF0KHNwZWMsIElzLk5vdC5OdWxsKTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjIS5JdGVtSWQsIElzLkVxdWFsVG8oIm9ha19sb2ciKSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBQYXJzZUl0ZW1TcGVjX0JsYW5rTGluZXNfSWdub3JlZCgpCiAgICB7CiAgICAgICAgY29uc3Qgc3RyaW5nIGNvbnRlbnQgPSAiXG5cbml0ZW1faWQ6IG9ha19sb2dcblxuXG5kaXNwbGF5X25hbWU6IE9hayBMb2dcblxuIjsKICAgICAgICB2YXIgc3BlYyA9IFBhcnNlKGNvbnRlbnQpOwogICAgICAgIEFzc2VydC5UaGF0KHNwZWMsIElzLk5vdC5OdWxsKTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjIS5JdGVtSWQsIElzLkVxdWFsVG8oIm9ha19sb2ciKSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBQYXJzZUl0ZW1TcGVjX1NvdXJjZUJsb2Nrc19FeHRyYVdoaXRlc3BhY2VBcm91bmRDb21tYXNfVHJpbW1lZCgpCiAgICB7CiAgICAgICAgY29uc3Qgc3RyaW5nIGNvbnRlbnQgPSAiaXRlbV9pZDogb2FrX2xvZ1xuZGlzcGxheV9uYW1lOiBPYWsgTG9nXG5zb3VyY2VfYmxvY2tzOiAgb2FrX2xvZyAsICBiaXJjaF9sb2cgICwgIHNwcnVjZV9sb2cgIFxuIjsKICAgICAgICB2YXIgc3BlYyA9IFBhcnNlKGNvbnRlbnQpOwogICAgICAgIEFzc2VydC5UaGF0KHNwZWMsIElzLk5vdC5OdWxsKTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjIS5Tb3VyY2VCbG9ja3NbMF0sIElzLkVxdWFsVG8oIm9ha19sb2ciKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoc3BlYy5Tb3VyY2VCbG9ja3NbMV0sICBJcy5FcXVhbFRvKCJiaXJjaF9sb2ciKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoc3BlYy5Tb3VyY2VCbG9ja3NbMl0sICBJcy5FcXVhbFRvKCJzcHJ1Y2VfbG9nIikpOwogICAgfQoKICAgIC8vIOKUgOKUgCBGYWxsYmFjayBpdGVtX2lkIGZyb20gaGVhZGluZyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIFBhcnNlSXRlbVNwZWNfTm9JdGVtSWRGaWVsZF9Vc2VzSGVhZGluZygpCiAgICB7CiAgICAgICAgY29uc3Qgc3RyaW5nIGNvbnRlbnQgPSAiIiIKICAgICAgICAgICAgIyBvYWstbG9nCgogICAgICAgICAgICBkaXNwbGF5X25hbWU6IE9hayBMb2cKICAgICAgICAgICAgc291cmNlX2Jsb2Nrczogb2FrX2xvZwogICAgICAgICAgICAiIiI7CgogICAgICAgIC8vIE5vIGV4cGxpY2l0IGl0ZW1faWQgZmllbGQg4oCUIHNob3VsZCBmYWxsIGJhY2sgdG8gdGhlIGhlYWRpbmcgIm9hay1sb2ciIOKGkiAib2FrX2xvZyIKICAgICAgICB2YXIgc3BlYyA9IFBhcnNlKGNvbnRlbnQpOwogICAgICAgIEFzc2VydC5UaGF0KHNwZWMsIElzLk5vdC5OdWxsKTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjIS5JdGVtSWQsIElzLkVxdWFsVG8oIm9ha19sb2ciKSk7CiAgICB9CgogICAgLy8g4pSA4pSAIE1pc3NpbmcgcmVxdWlyZWQgZmllbGRzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgUGFyc2VJdGVtU3BlY19NaXNzaW5nRGlzcGxheU5hbWVfUmV0dXJuc051bGwoKQogICAgewogICAgICAgIGNvbnN0IHN0cmluZyBjb250ZW50ID0gIml0ZW1faWQ6IG9ha19sb2dcbnNvdXJjZV9ibG9ja3M6IG9ha19sb2dcbiI7CiAgICAgICAgdmFyIHNwZWMgPSBQYXJzZShjb250ZW50KTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjLCBJcy5OdWxsKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIFBhcnNlSXRlbVNwZWNfTWlzc2luZ0l0ZW1JZEFuZEhlYWRpbmdfUmV0dXJuc051bGwoKQogICAgewogICAgICAgIGNvbnN0IHN0cmluZyBjb250ZW50ID0gImRpc3BsYXlfbmFtZTogT2FrIExvZ1xuc291cmNlX2Jsb2Nrczogb2FrX2xvZ1xuIjsKICAgICAgICB2YXIgc3BlYyA9IFBhcnNlKGNvbnRlbnQpOwogICAgICAgIEFzc2VydC5UaGF0KHNwZWMsIElzLk51bGwpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgUGFyc2VJdGVtU3BlY19FbXB0eUNvbnRlbnRfUmV0dXJuc051bGwoKQogICAgewogICAgICAgIEFzc2VydC5UaGF0KFBhcnNlKCIiKSwgICAgICAgICAgSXMuTnVsbCk7CiAgICAgICAgQXNzZXJ0LlRoYXQoUGFyc2UoIiAgIiksICAgICAgICBJcy5OdWxsKTsKICAgICAgICBBc3NlcnQuVGhhdChQYXJzZSgiXG5cblxuIiksICAgIElzLk51bGwpOwogICAgfQoKICAgIC8vIOKUgOKUgCBPcHRpb25hbCBmaWVsZHMgZGVmYXVsdCBjb3JyZWN0bHkg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBQYXJzZUl0ZW1TcGVjX05vT3B0aW9uYWxGaWVsZHNfRGVmYXVsdHNBcHBsaWVkKCkKICAgIHsKICAgICAgICBjb25zdCBzdHJpbmcgY29udGVudCA9ICJpdGVtX2lkOiBvYWtfbG9nXG5kaXNwbGF5X25hbWU6IE9hayBMb2dcbiI7CiAgICAgICAgdmFyIHNwZWMgPSBQYXJzZShjb250ZW50KTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjLCBJcy5Ob3QuTnVsbCk7CiAgICAgICAgQXNzZXJ0LlRoYXQoc3BlYyEuU291cmNlQmxvY2tzLCAgICAgSXMuRW1wdHkpOwogICAgICAgIEFzc2VydC5UaGF0KHNwZWMuUmVxdWlyZXNTbWVsdGluZywgIElzLkZhbHNlKTsKICAgICAgICBBc3NlcnQuVGhhdChzcGVjLk1pbkhhcnZlc3RMZXZlbCwgICBJcy5FcXVhbFRvKDApKTsKICAgIH0KfQo=
+using Agent.Core;
+using Agent.Memory;
+
+namespace MemorySmith.Agent.Tests;
+
+/// <summary>
+/// Unit tests for <see cref="MemorySmithItemRegistry.ParseItemSpec"/>.
+/// Tests run against raw markdown strings — no HTTP, no mock gateway.
+/// Covers: happy path, missing required fields, malformed values,
+/// extra whitespace, case-insensitive keys, HTML comment lines.
+/// </summary>
+[TestFixture]
+public class ItemSpecParserTests
+{
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private static ItemSpec? Parse(string content) =>
+        MemorySmithItemRegistry.ParseItemSpec(content);
+
+    // ── Happy path ────────────────────────────────────────────────────────────
+
+    [Test]
+    public void ParseItemSpec_ValidPage_ReturnsItemSpec()
+    {
+        const string content = """
+            # oak-log
+
+            item_id: oak_log
+            display_name: Oak Log
+            source_blocks: oak_log, birch_log, spruce_log
+            requires_smelting: false
+            min_harvest_level: 0
+            """;
+
+        var spec = Parse(content);
+        Assert.That(spec, Is.Not.Null);
+        Assert.That(spec!.ItemId,          Is.EqualTo("oak_log"));
+        Assert.That(spec.DisplayName,       Is.EqualTo("Oak Log"));
+        Assert.That(spec.SourceBlocks,      Has.Count.EqualTo(3));
+        Assert.That(spec.RequiresSmelting,  Is.False);
+        Assert.That(spec.MinHarvestLevel,   Is.EqualTo(0));
+    }
+
+    [Test]
+    public void ParseItemSpec_RequiresSmelting_ParsedTrue()
+    {
+        const string content = """
+            # iron-ingot
+
+            item_id: iron_ingot
+            display_name: Iron Ingot
+            source_blocks: iron_ore, deepslate_iron_ore
+            requires_smelting: true
+            min_harvest_level: 2
+            """;
+
+        var spec = Parse(content);
+        Assert.That(spec, Is.Not.Null);
+        Assert.That(spec!.RequiresSmelting, Is.True);
+        Assert.That(spec.MinHarvestLevel,   Is.EqualTo(2));
+    }
+
+    [Test]
+    public void ParseItemSpec_MultipleSourceBlocks_AllParsed()
+    {
+        const string content = """
+            item_id: all_logs
+            display_name: Any Log
+            source_blocks: oak_log, birch_log, spruce_log, dark_oak_log, jungle_log, acacia_log, cherry_log
+            """;
+
+        var spec = Parse(content);
+        Assert.That(spec, Is.Not.Null);
+        Assert.That(spec!.SourceBlocks, Has.Count.EqualTo(7));
+        Assert.That(spec.SourceBlocks, Contains.Item("oak_log"));
+        Assert.That(spec.SourceBlocks, Contains.Item("cherry_log"));
+    }
+
+    [Test]
+    public void ParseItemSpec_MinHarvestLevel_ParsedCorrectly()
+    {
+        const string content = """
+            item_id: diamond
+            display_name: Diamond
+            source_blocks: diamond_ore, deepslate_diamond_ore
+            requires_smelting: false
+            min_harvest_level: 3
+            """;
+
+        var spec = Parse(content);
+        Assert.That(spec, Is.Not.Null);
+        Assert.That(spec!.MinHarvestLevel, Is.EqualTo(3));
+    }
+
+    // ── Tolerance ─────────────────────────────────────────────────────────────
+
+    [Test]
+    public void ParseItemSpec_ExtraWhitespace_Tolerated()
+    {
+        const string content = "  item_id  :   oak_log   \n  display_name  :  Oak Log  \n";
+        var spec = Parse(content);
+        Assert.That(spec, Is.Not.Null);
+        Assert.That(spec!.ItemId,      Is.EqualTo("oak_log"));
+        Assert.That(spec.DisplayName,  Is.EqualTo("Oak Log"));
+    }
+
+    [Test]
+    public void ParseItemSpec_CaseInsensitiveFieldNames_Parsed()
+    {
+        const string content = """
+            ITEM_ID: oak_log
+            DISPLAY_NAME: Oak Log
+            SOURCE_BLOCKS: oak_log
+            REQUIRES_SMELTING: false
+            MIN_HARVEST_LEVEL: 0
+            """;
+
+        var spec = Parse(content);
+        Assert.That(spec, Is.Not.Null);
+        Assert.That(spec!.ItemId,     Is.EqualTo("oak_log"));
+        Assert.That(spec.DisplayName, Is.EqualTo("Oak Log"));
+    }
+
+    [Test]
+    public void ParseItemSpec_CommentLines_AreIgnored()
+    {
+        const string content = """
+            # oak-log
+
+            <!-- This is a comment with: colons in it -->
+            item_id: oak_log
+            display_name: Oak Log
+            source_blocks: oak_log
+            """;
+
+        var spec = Parse(content);
+        Assert.That(spec, Is.Not.Null);
+        Assert.That(spec!.ItemId, Is.EqualTo("oak_log"));
+    }
+
+    [Test]
+    public void ParseItemSpec_BlankLines_Ignored()
+    {
+        const string content = "\n\nitem_id: oak_log\n\n\ndisplay_name: Oak Log\n\n";
+        var spec = Parse(content);
+        Assert.That(spec, Is.Not.Null);
+        Assert.That(spec!.ItemId, Is.EqualTo("oak_log"));
+    }
+
+    [Test]
+    public void ParseItemSpec_SourceBlocks_ExtraWhitespaceAroundCommas_Trimmed()
+    {
+        const string content = "item_id: oak_log\ndisplay_name: Oak Log\nsource_blocks:  oak_log ,  birch_log  ,  spruce_log  \n";
+        var spec = Parse(content);
+        Assert.That(spec, Is.Not.Null);
+        Assert.That(spec!.SourceBlocks[0], Is.EqualTo("oak_log"));
+        Assert.That(spec.SourceBlocks[1],  Is.EqualTo("birch_log"));
+        Assert.That(spec.SourceBlocks[2],  Is.EqualTo("spruce_log"));
+    }
+
+    // ── Fallback item_id from heading ─────────────────────────────────────────
+
+    [Test]
+    public void ParseItemSpec_NoItemIdField_UsesHeading()
+    {
+        const string content = """
+            # oak-log
+
+            display_name: Oak Log
+            source_blocks: oak_log
+            """;
+
+        // No explicit item_id field — should fall back to the heading "oak-log" → "oak_log"
+        var spec = Parse(content);
+        Assert.That(spec, Is.Not.Null);
+        Assert.That(spec!.ItemId, Is.EqualTo("oak_log"));
+    }
+
+    // ── Missing required fields ───────────────────────────────────────────────
+
+    [Test]
+    public void ParseItemSpec_MissingDisplayName_ReturnsNull()
+    {
+        const string content = "item_id: oak_log\nsource_blocks: oak_log\n";
+        var spec = Parse(content);
+        Assert.That(spec, Is.Null);
+    }
+
+    [Test]
+    public void ParseItemSpec_MissingItemIdAndHeading_ReturnsNull()
+    {
+        const string content = "display_name: Oak Log\nsource_blocks: oak_log\n";
+        var spec = Parse(content);
+        Assert.That(spec, Is.Null);
+    }
+
+    [Test]
+    public void ParseItemSpec_EmptyContent_ReturnsNull()
+    {
+        Assert.That(Parse(""),          Is.Null);
+        Assert.That(Parse("  "),        Is.Null);
+        Assert.That(Parse("\n\n\n"),    Is.Null);
+    }
+
+    // ── Optional fields default correctly ────────────────────────────────────
+
+    [Test]
+    public void ParseItemSpec_NoOptionalFields_DefaultsApplied()
+    {
+        const string content = "item_id: oak_log\ndisplay_name: Oak Log\n";
+        var spec = Parse(content);
+        Assert.That(spec, Is.Not.Null);
+        Assert.That(spec!.SourceBlocks,     Is.Empty);
+        Assert.That(spec.RequiresSmelting,  Is.False);
+        Assert.That(spec.MinHarvestLevel,   Is.EqualTo(0));
+    }
+}
