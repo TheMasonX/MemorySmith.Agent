@@ -9,6 +9,9 @@ using Agent.Core;
 /// gather tasks. <see cref="GatherWoodGoal"/> continues to exist as a backward-compatible
 /// factory entry (see GoalFactory / TSK-0010 design doc).
 ///
+/// Implements <see cref="IItemSpecGoal"/> so the planner can dispatch to the correct
+/// decomposer via a single interface check rather than a concrete type check (D2, TSK-0011).
+///
 /// Phases: FindSource → Mine → Collect
 ///   FindSource — search MemorySmith wiki for known source locations.
 ///   Mine       — mine the source blocks listed in <see cref="ItemSpec.SourceBlocks"/>.
@@ -26,7 +29,7 @@ using Agent.Core;
 /// HasFailed: world-state fact "goal:Gather:{ItemId}:failed" = true
 ///   (set by AgentBackgroundService after consecutive tool failures).
 /// </summary>
-public sealed class GenericGatherGoal(ItemSpec item, int targetCount) : IGoal
+public sealed class GenericGatherGoal(ItemSpec item, int targetCount) : IGoal, IItemSpecGoal
 {
     /// <summary>The ItemSpec that describes what to gather and how.</summary>
     public ItemSpec Spec => item;
