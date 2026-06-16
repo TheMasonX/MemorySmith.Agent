@@ -14,6 +14,13 @@ using System.Threading.Channels;
 /// Phase 5: chat event routing via <see cref="IChatInterpreter"/> (includes LLM path).
 /// Phase 5b: LlmChatInterpreter; player-position-aware chat routing; CancelGoal,
 ///           SetBuildOrigin, GetPendingActions public API.
+/// Phase 6 Sprint 1:
+///   1a — Non-blocking LLM: chat events are written to <see cref="_chatChannel"/> and
+///        processed by <see cref="ChatConsumerAsync"/> on a dedicated task, so a 5–10s
+///        LLM call never stalls health/death/blockMined processing.
+///   1b — Reconnect: <see cref="ExecuteAsync"/> retries ConnectAsync with exponential
+///        backoff (default 2s/4s/8s/16s/32s, max 5 retries). World state and current
+///        goal survive reconnects. Configurable delays for test speed.
 /// </summary>
 public sealed class AgentBackgroundService(
     IWorldAdapter worldAdapter,
@@ -23,12 +30,26 @@ public sealed class AgentBackgroundService(
     GoalFactory? goalFactory = null,
     IChatInterpreter? chatInterpreter = null,
     string botName = "AgentBot",
-    int maxConsecutiveFailures = 3) : BackgroundService
+    int maxConsecutiveFailures = 3,
+    TimeSpan[]? reconnectDelays = null) : BackgroundService
 {
+    // Sprint 1b: default exponential backoff delays
+    private static readonly TimeSpan[] DefaultReconnectDelays =
+        [TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(4), TimeSpan.FromSeconds(8),
+         TimeSpan.FromSeconds(16), TimeSpan.FromSeconds(32)];
+
+    private readonly TimeSpan[] _reconnectDelays = reconnectDelays ?? DefaultReconnectDelays;
+
     private readonly ActionQueue _queue = new();
     private readonly WorldStateProjector _projector = new();
+
     private readonly Channel<string> _gameErrors =
         Channel.CreateUnbounded<string>(new UnboundedChannelOptions { SingleWriter = true });
+
+    // Sprint 1a: chat events written here by ProcessEventsAsync; ChatConsumerAsync reads them
+    private readonly Channel<WorldEvent> _chatChannel =
+        Channel.CreateUnbounded<WorldEvent>(
+            new UnboundedChannelOptions { SingleReader = true, SingleWriter = true });
 
     private readonly List<ActionData> _pendingActions = [];
     private readonly object _pendingLock = new();
@@ -84,24 +105,75 @@ public sealed class AgentBackgroundService(
 
     // ── BackgroundService ─────────────────────────────────────────────────────
 
+    /// <summary>
+    /// Sprint 1b: Retry loop with exponential backoff.
+    /// World state and current goal survive reconnects — only the transport is re-opened.
+    /// </summary>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation("AgentBackgroundService starting...");
-        try
+        // attempts = delays.Length + 1 (first attempt + one per delay)
+        for (int attempt = 0; attempt <= _reconnectDelays.Length; attempt++)
         {
-            await worldAdapter.ConnectAsync(stoppingToken);
-            logger.LogInformation("World adapter connected.");
-            await Task.WhenAll(
-                ProcessEventsAsync(stoppingToken),
-                DispatchActionsAsync(stoppingToken));
+            if (stoppingToken.IsCancellationRequested) return;
+
+            if (attempt > 0)
+            {
+                var delay = _reconnectDelays[attempt - 1];
+                logger.LogWarning("Reconnecting (attempt {N}/{Max}) in {Delay}ms...",
+                    attempt + 1, _reconnectDelays.Length + 1, (int)delay.TotalMilliseconds);
+                try { await Task.Delay(delay, stoppingToken); }
+                catch (OperationCanceledException) { return; }
+            }
+
+            logger.LogInformation("AgentBackgroundService starting (attempt {N})...", attempt + 1);
+
+            // Per-connection CTS: cancelled when ProcessEventsAsync faults or stoppingToken fires
+            using var connectionCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+            try
+            {
+                await worldAdapter.ConnectAsync(connectionCts.Token);
+                logger.LogInformation("World adapter connected.");
+
+                await Task.WhenAll(
+                    // MonitorAndCancelOnFault ensures ProcessEventsAsync fault cancels siblings
+                    MonitorAndCancelOnFaultAsync(ProcessEventsAsync(connectionCts.Token), connectionCts),
+                    DispatchActionsAsync(connectionCts.Token),
+                    ChatConsumerAsync(connectionCts.Token));
+
+                return; // clean exit (stoppingToken cancelled all tasks gracefully)
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                return; // external stop — don't retry
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Connection attempt {N} failed.", attempt + 1);
+                // fall through to next retry iteration
+            }
+            finally
+            {
+                connectionCts.Cancel(); // stop any tasks still running for this attempt
+                try { await worldAdapter.DisconnectAsync(CancellationToken.None); }
+                catch { /* best-effort cleanup */ }
+            }
         }
-        catch (OperationCanceledException) { logger.LogInformation("AgentBackgroundService stopping."); }
-        catch (Exception ex) { logger.LogError(ex, "AgentBackgroundService encountered a fatal error."); }
-        finally
-        {
-            try { await worldAdapter.DisconnectAsync(stoppingToken); }
-            catch { /* best-effort */ }
-        }
+
+        logger.LogError("AgentBackgroundService: max reconnect attempts ({Max}) exhausted. Shutting down.",
+            _reconnectDelays.Length + 1);
+    }
+
+    /// <summary>
+    /// Awaits the task. If it faults (not OCE), cancels the CTS so sibling tasks stop.
+    /// Normal completion also cancels siblings (ProcessEventsAsync should not return normally
+    /// unless the adapter stream ends — treat that as a reconnect trigger too).
+    /// </summary>
+    private static async Task MonitorAndCancelOnFaultAsync(Task task, CancellationTokenSource cts)
+    {
+        try { await task; }
+        catch (OperationCanceledException) { throw; }
+        catch { cts.Cancel(); throw; }
+        cts.Cancel(); // stream ended normally — trigger reconnect via sibling cancellation
     }
 
     // ── Event processing ──────────────────────────────────────────────────────
@@ -142,12 +214,35 @@ public sealed class AgentBackgroundService(
                     break;
 
                 case "chat":
-                    await HandleChatEventAsync(worldEvent, ct);
+                    // Sprint 1a: offload to ChatConsumerAsync — LLM call never blocks event loop
+                    _chatChannel.Writer.TryWrite(worldEvent);
                     break;
 
                 default:
                     TryRouteAsError(worldEvent);
                     break;
+            }
+        }
+    }
+
+    // ── Chat consumer — Sprint 1a ─────────────────────────────────────────────
+
+    /// <summary>
+    /// Dedicated consumer for chat events. Runs independently of ProcessEventsAsync so
+    /// a 5–10s LLM call in HandleChatEventAsync never delays health/blockMined events.
+    /// </summary>
+    private async Task ChatConsumerAsync(CancellationToken ct)
+    {
+        await foreach (var chatEvent in _chatChannel.Reader.ReadAllAsync(ct))
+        {
+            try
+            {
+                await HandleChatEventAsync(chatEvent, ct);
+            }
+            catch (OperationCanceledException) { throw; }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error processing chat event in consumer.");
             }
         }
     }
@@ -164,7 +259,6 @@ public sealed class AgentBackgroundService(
 
         logger.LogInformation("[chat] <{Username}> {Message}", username, message);
 
-        // Extract player position from chat event payload (Phase 5b: sent by Mineflayer)
         var playerPos = ExtractPlayerPosition(worldEvent);
 
         var interpretation = await chatInterpreter.InterpretAsync(
@@ -174,7 +268,6 @@ public sealed class AgentBackgroundService(
         if (interpretation.IntentType == ChatIntentType.NotAddressed)
             return;
 
-        // Queue a chat response if one was generated
         if (!string.IsNullOrEmpty(interpretation.Response))
         {
             _queue.Enqueue(new ActionData
@@ -185,7 +278,6 @@ public sealed class AgentBackgroundService(
             chatInterpreter.RecordBotSpoke();
         }
 
-        // Act on the intent
         switch (interpretation.IntentType)
         {
             case ChatIntentType.CancelGoal:
@@ -213,8 +305,6 @@ public sealed class AgentBackgroundService(
                     });
                 }
                 break;
-
-            // ChatIntentType.Unknown → response already queued ("say 'help' for commands")
         }
     }
 
