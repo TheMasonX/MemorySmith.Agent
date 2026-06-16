@@ -1,4 +1,4 @@
-﻿// MemorySmith.Agent â€” Web UI & Agent Host
+// MemorySmith.Agent — Web UI & Agent Host
 // Phase 1: REST API endpoints, WebSocket bridge to Minecraft.
 // Phase 2: RestMemoryGateway (IMemoryGateway via MemorySmith REST).
 // Phase 3: HTN/GOAP planner, goal factory, POST /api/agent/plan endpoint.
@@ -13,25 +13,25 @@ using WebUI.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// â”€â”€ Options â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Options ──────────────────────────────────────────────────────────────────
 builder.Services.Configure<MinecraftAdapterConfig>(
     builder.Configuration.GetSection("Agent:Minecraft"));
 builder.Services.Configure<RestMemoryGatewayOptions>(
     builder.Configuration.GetSection("Agent:Memory"));
 
-// â”€â”€ Agent services (registered when Agent:Enabled = true) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Agent services (registered when Agent:Enabled = true) ───────────────────
 var agentEnabled = builder.Configuration.GetValue<bool>("Agent:Enabled");
 
 if (agentEnabled)
 {
-    // IWorldAdapter â†’ MinecraftAdapter
+    // IWorldAdapter → MinecraftAdapter
     builder.Services.AddSingleton<IWorldAdapter>(sp =>
     {
         var cfg = sp.GetRequiredService<IOptions<MinecraftAdapterConfig>>().Value;
         return new MinecraftAdapter(cfg);
     });
 
-    // IMemoryGateway â†’ RestMemoryGateway (IHttpClientFactory for pooling)
+    // IMemoryGateway → RestMemoryGateway (IHttpClientFactory for pooling)
     builder.Services.AddHttpClient("memorysmith", (sp, http) =>
     {
         var opts = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
@@ -47,7 +47,7 @@ if (agentEnabled)
         return new RestMemoryGateway(factory.CreateClient("memorysmith"), opts);
     });
 
-    // IToolCaller â†’ ToolEngine with all tools
+    // IToolCaller → ToolEngine with all tools
     builder.Services.AddSingleton<ToolRegistry>();
     builder.Services.AddSingleton<IToolCaller>(sp =>
     {
@@ -56,8 +56,8 @@ if (agentEnabled)
         var memory   = sp.GetRequiredService<IMemoryGateway>();
 
         registry.Register(new MoveToTool(world));
-        registry.Register(new MineBlockTool(world));
         registry.Register(new StatusTool(world));
+        registry.Register(new MineBlockTool(world));
         registry.Register(new SearchMemoryTool(memory));
         registry.Register(new GetPageTool(memory));
         registry.Register(new CreatePageTool(memory));
@@ -65,24 +65,24 @@ if (agentEnabled)
         return new ToolEngine(registry);
     });
 
-    // IPlanner â†’ HtnPlanner with default task library
+    // IPlanner → HtnPlanner with default task library
     builder.Services.AddSingleton<HtnTaskLibrary>();
     builder.Services.AddSingleton<IPlanner, HtnPlanner>();
 
-    // IGoalFactory â†’ GoalFactory
+    // IGoalFactory → GoalFactory
     builder.Services.AddSingleton<IGoalFactory, GoalFactory>();
 
-    // Hosted agent loop â€” registered as concrete type AND as IHostedService
+    // Hosted agent loop — registered as concrete type AND as IHostedService
     // so both /api/agent/plan (typed resolution) and DI work.
     builder.Services.AddSingleton<AgentBackgroundService>();
     builder.Services.AddHostedService(sp =>
         sp.GetRequiredService<AgentBackgroundService>());
 }
 
-// â”€â”€ Build â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Build ────────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
-// Static files (wwwroot/about.html â†’ /about)
+// Static files (wwwroot/about.html → /about)
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
@@ -94,7 +94,7 @@ app.MapGet("/api/about", () => Results.Ok(new
     Name        = "MemorySmith.Agent",
     Description = "A modular autonomous agent framework backed by the MemorySmith knowledge system.",
     Version     = "0.3.0",
-    Phase       = "Phase 3 â€” HTN/GOAP Planner (complete)",
+    Phase       = "Phase 3 — HTN/GOAP Planner (complete)",
     License     = "MIT",
     Repository  = "https://github.com/TheMasonX/MemorySmith.Agent",
     ProjectSource = "https://github.com/TheMasonX/MemorySmith",
@@ -160,4 +160,3 @@ app.Run();
 
 record CommandRequest(string Command);
 record PlanRequest(string GoalName, IReadOnlyDictionary<string, object?>? Parameters = null);
-
