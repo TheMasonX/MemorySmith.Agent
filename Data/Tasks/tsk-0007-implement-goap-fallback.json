@@ -1,0 +1,33 @@
+{
+  "Id": "tsk-0007-implement-goap-fallback",
+  "Key": "TSK-0007",
+  "Title": "Implement GOAP fallback in HtnPlanner.ReplanAsync",
+  "Description": "Currently ReplanAsync does a full restart of the failed goal. Phase 4 should add GOAP (Goal-Oriented Action Planning) to handle specific phase failures.\n\nExample: GatherWood phase 'MineWood' fails because 'no oak_log in reach'. GOAP backward-chains from the goal state and finds an alternative path (e.g. FindDifferentTree, MoveToNewArea).\n\nDesign:\n1. Define GoapAction record (Name, Preconditions: Dict<string,object>, Effects: Dict<string,object>, Cost: double)\n2. Implement GoapPlanner.Plan(goal: WorldState, current: WorldState, actions: IReadOnlyList<GoapAction>) -> IReadOnlyList<GoapAction>\n3. In HtnPlanner.ReplanAsync: if the failed phase has a GOAP action set, run GOAP with current WorldState\n4. Convert GOAP result to ActionData sequence\n\nThis is Phase 4 Priority 3 -- implement after adaptive execution and spatial analyzer.",
+  "Type": "Feature",
+  "Status": "Backlog",
+  "Priority": "Low",
+  "AssigneeMode": "Custom",
+  "AssigneeDirectoryId": null,
+  "AssigneeCustomText": "AI Agent",
+  "Reporter": "agent-session-20260615",
+  "Labels": [
+    "phase-4",
+    "goap",
+    "planner"
+  ],
+  "Attachments": [],
+  "ExternalLinks": [],
+  "LinkedPages": [
+    "planner",
+    "Tasks/phase4-tasks"
+  ],
+  "Comments": [],
+  "EpicId": null,
+  "ParentId": null,
+  "DueDateUtc": null,
+  "CreatedAtUtc": "2026-06-15T23:30:00Z",
+  "UpdatedAtUtc": "2026-06-15T23:30:00Z",
+  "CompletedAtUtc": null,
+  "Revision": 1,
+  "IsArchived": false
+}
