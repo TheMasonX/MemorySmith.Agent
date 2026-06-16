@@ -27,6 +27,7 @@ public sealed class AgentBackgroundService(
     private WorldState _worldState = new();
     private IGoal? _currentGoal;
     private int _consecutiveFailures;
+    private bool _actionDispatchedThisCycle;
 
     public WorldState WorldState => _worldState;
     public IGoal? CurrentGoal => _currentGoal;
@@ -222,6 +223,7 @@ public sealed class AgentBackgroundService(
                     }
 
                     _queue.EnqueueAll(plan.Actions);
+                    _actionDispatchedThisCycle = false; // reset for the new cycle
                     logger.LogInformation(
                         "New plan for '{Goal}': {Count} actions.",
                         _currentGoal.Name, plan.Actions.Count);
@@ -237,6 +239,7 @@ public sealed class AgentBackgroundService(
             var action = _queue.Dequeue();
             if (action is not null)
             {
+                _actionDispatchedThisCycle = true;
                 try
                 {
                     var argsJson = JsonSerializer.Serialize(action.Arguments);
@@ -245,7 +248,8 @@ public sealed class AgentBackgroundService(
 
                     if (result.Success)
                     {
-                        logger.LogInformation("Tool {Tool}: {Message}", action.Tool, result.Message);
+                        // Downgraded to Debug — individual tool dispatches are too noisy at Info
+                        logger.LogDebug("Tool {Tool}: {Message}", action.Tool, result.Message);
                         _consecutiveFailures = 0;
 
                         // Carry tool result data into the shared plan context
@@ -269,7 +273,18 @@ public sealed class AgentBackgroundService(
             }
             else
             {
-                await Task.Delay(50, ct);
+                // After a full plan cycle drains, pause briefly so in-flight blockMined /
+                // status events can arrive and update WorldState before we check IsComplete.
+                if (_actionDispatchedThisCycle)
+                {
+                    logger.LogDebug("Plan cycle complete — settling for 300 ms");
+                    await Task.Delay(300, ct);
+                    _actionDispatchedThisCycle = false;
+                }
+                else
+                {
+                    await Task.Delay(50, ct);
+                }
             }
         }
     }
