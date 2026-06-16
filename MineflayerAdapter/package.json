@@ -1,16 +1,17 @@
 {
   "name": "mineflayer-adapter",
-  "version": "0.1.0",
-  "description": "Node.js Mineflayer adapter for MemorySmith.Agent. Connects to a Minecraft server and bridges commands/events to the C# host via WebSocket.",
+  "version": "0.2.0",
+  "description": "Node.js Mineflayer adapter for MemorySmith.Agent. Connects to Minecraft and bridges commands/events to the C# host via WebSocket.",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "dev": "node --watch index.js"
+    "dev":   "node --watch index.js"
   },
   "dependencies": {
-    "mineflayer": "^4.23.0",
-    "ws": "^8.18.0"
+    "mineflayer":            "^4.23.0",
+    "mineflayer-pathfinder": "^2.4.5",
+    "ws":                    "^8.18.0"
   },
   "engines": {
     "node": ">=22"
