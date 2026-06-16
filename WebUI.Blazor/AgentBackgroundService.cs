@@ -119,15 +119,39 @@ public sealed class AgentBackgroundService(
                     if (worldEvent.Payload.TryGetValue("block", out var rawBlock) &&
                         rawBlock is string blockName)
                     {
-                        // Normalize "minecraft:oak_log" → "oak_log"
-                        var itemKey = blockName.Contains(':')
-                            ? blockName.Split(':')[1]
-                            : blockName;
+                        var itemKey = blockName.Contains(':') ? blockName.Split(':')[1] : blockName;
                         _worldState = _worldState.With(b => b.AddInventoryItem(itemKey, 1));
                         logger.LogInformation(
                             "Inventory +1 {Block} → total {Total}",
-                            itemKey,
-                            _worldState.Inventory.GetValueOrDefault(itemKey));
+                            itemKey, _worldState.Inventory.GetValueOrDefault(itemKey));
+                    }
+                    break;
+
+                case "blockNotFound":
+                    // Node.js could not find the block type within its search radius.
+                    // Only marks a game error when nothing was mined (mined=0 means
+                    // total failure; mined>0 means some blocks collected then ran out).
+                    if (worldEvent.Payload.TryGetValue("mined", out var minedObj) &&
+                        minedObj is int minedCount && minedCount == 0 &&
+                        worldEvent.Payload.TryGetValue("block", out var bObj) &&
+                        bObj is string bNotFound)
+                    {
+                        _worldState = _worldState.With(b =>
+                            b.SetFact("game.lastError", $"blockNotFound:{bNotFound}"));
+                        logger.LogWarning("No {Block} found in range — will count as failure.", bNotFound);
+                    }
+                    break;
+
+                case "error":
+                    // Game-side action failed (e.g. pathfinder timeout, block unreachable).
+                    // Set a fact that DispatchActionsAsync will consume after the settle delay
+                    // to increment _consecutiveFailures.
+                    {
+                        var act = worldEvent.Payload.TryGetValue("action",  out var a) && a is string sa ? sa : "?";
+                        var msg = worldEvent.Payload.TryGetValue("message", out var m) && m is string sm ? sm : "unknown";
+                        _worldState = _worldState.With(b =>
+                            b.SetFact("game.lastError", $"{act}:{msg}"));
+                        logger.LogWarning("Game error [{Action}]: {Message}", act, msg);
                     }
                     break;
             }
@@ -274,12 +298,24 @@ public sealed class AgentBackgroundService(
             else
             {
                 // After a full plan cycle drains, pause briefly so in-flight blockMined /
-                // status events can arrive and update WorldState before we check IsComplete.
+                // status / error events can arrive and update WorldState before we check IsComplete.
                 if (_actionDispatchedThisCycle)
                 {
                     logger.LogDebug("Plan cycle complete — settling for 300 ms");
                     await Task.Delay(300, ct);
                     _actionDispatchedThisCycle = false;
+
+                    // Consume any game-error fact set by ProcessEventsAsync during the plan cycle.
+                    // Doing this AFTER the settle ensures late-arriving error events are captured.
+                    if (_worldState.Facts.TryGetValue("game.lastError", out var gameErr) &&
+                        gameErr is string errMsg && !string.IsNullOrEmpty(errMsg))
+                    {
+                        _worldState = _worldState.With(b => b.SetFact("game.lastError", null));
+                        _consecutiveFailures++;
+                        logger.LogWarning(
+                            "Game error after cycle (failures={N}/{Max}): {Error}",
+                            _consecutiveFailures, MaxConsecutiveFailures, errMsg);
+                    }
                 }
                 else
                 {
