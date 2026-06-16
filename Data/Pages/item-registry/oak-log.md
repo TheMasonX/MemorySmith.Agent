@@ -1,1 +1,11 @@
-IyBvYWstbG9nCgppdGVtX2lkOiBvYWtfbG9nCmRpc3BsYXlfbmFtZTogT2FrIExvZwpzb3VyY2VfYmxvY2tzOiBvYWtfbG9nLCBiaXJjaF9sb2csIHNwcnVjZV9sb2csIGRhcmtfb2FrX2xvZywganVuZ2xlX2xvZywgYWNhY2lhX2xvZywgY2hlcnJ5X2xvZwpyZXF1aXJlc19zbWVsdGluZzogZmFsc2UKbWluX2hhcnZlc3RfbGV2ZWw6IDAKCldvb2QgbG9ncyBhcmUgdGhlIG1vc3QgY29tbW9uIGNyYWZ0aW5nIG1hdGVyaWFsIGluIE1pbmVjcmFmdC4KVGhleSBjYW4gYmUgb2J0YWluZWQgYnkgYnJlYWtpbmcgYW55IHRyZWUgdHJ1bmsgd2l0aCBhbnkgdG9vbCAob3IgYmFyZSBoYW5kcykuCkFsbCBsb2cgdmFyaWFudHMgYXJlIGludGVyY2hhbmdlYWJsZSBmb3IgbW9zdCBjcmFmdGluZyByZWNpcGVzLgo=
+# oak-log
+
+item_id: oak_log
+display_name: Oak Log
+source_blocks: oak_log, birch_log, spruce_log, dark_oak_log, jungle_log, acacia_log, cherry_log
+requires_smelting: false
+min_harvest_level: 0
+
+Wood logs are the most common crafting material in Minecraft.
+They can be obtained by breaking any tree trunk with any tool (or bare hands).
+All log variants are interchangeable for most crafting recipes.
