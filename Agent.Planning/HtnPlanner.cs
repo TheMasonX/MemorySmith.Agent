@@ -1,1 +1,87 @@
-bmFtZXNwYWNlIEFnZW50LlBsYW5uaW5nOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuUGxhbm5pbmcuR29hbHM7CgovLy8gPHN1bW1hcnk+Ci8vLyBIeWJyaWQgSFROIHBsYW5uZXIgaW1wbGVtZW50YXRpb24uCi8vLwovLy8gU3RyYXRlZ3k6Ci8vLyAgIDEuIElmIHRoZSBnb2FsIG5hbWUgaGFzIGEgZGlyZWN0IGRlY29tcG9zaXRpb24gaW4gdGhlIHRhc2sgbGlicmFyeSwKLy8vICAgICAgdXNlIGl0IChzaW5nbGUtc2hvdCBkZWNvbXBvc2l0aW9uKS4KLy8vICAgMi4gSWYgdGhlIGdvYWwgaXMgYSA8c2VlIGNyZWY9IkdlbmVyaWNHYXRoZXJHb2FsIi8+LCBkZWxlZ2F0ZSB0bwovLy8gICAgICA8c2VlIGNyZWY9Ikh0blRhc2tMaWJyYXJ5LkRlY29tcG9zZUdhdGhlckl0ZW0iLz4gd2l0aCB0aGUgZ29hbCdzCi8vLyAgICAgIDxzZWUgY3JlZj0iSXRlbVNwZWMiLz4uIFRoaXMgYXZvaWRzIHJlZ2lzdGVyaW5nIG9uZSBsaWJyYXJ5IGVudHJ5IHBlcgovLy8gICAgICBpdGVtIElEIHdoaWxlIHN0aWxsIGFsbG93aW5nIHRoZSBmdWxsIEl0ZW1TcGVjIHRvIGRyaXZlIGFjdGlvbiBnZW5lcmF0aW9uLgovLy8gICAzLiBPdGhlcndpc2UsIGl0ZXJhdGUgdGhyb3VnaCB0aGUgZ29hbCdzIHBoYXNlcyBhbmQgZGVjb21wb3NlIGVhY2gKLy8vICAgICAgcGhhc2UgdGhhdCBoYXMgYSBrbm93biB0YXNrIG1ldGhvZC4gVW5rbm93biBwaGFzZXMgYXJlIHNraXBwZWQuCi8vLyAgIDQuIElmIG5vIGFjdGlvbnMgcmVzdWx0IGFmdGVyIHRyeWluZyBhbGwgcGF0aHMsIHRocm93IOKAlCBjYWxsZXIgbXVzdAovLy8gICAgICBmYWxsIGJhY2sgdG8gTExNIChQaGFzZSA0IHBhdGgsIG5vdCB5ZXQgaW1wbGVtZW50ZWQpLgovLy8KLy8vIEdPQVAgaW50ZWdyYXRpb24gKFBoYXNlIDQpOiB3aGVuIGEgc3BlY2lmaWMgcGhhc2UgZmFpbHMgYXQgcnVudGltZSwKLy8vIEh0blBsYW5uZXIuUmVwbGFuQXN5bmMgd2lsbCBhc2sgdGhlIEdPQVAgZW5naW5lIHRvIGZpbmQgYW4gYWx0ZXJuYXRpdmUKLy8vIGFjdGlvbiBzZXF1ZW5jZSBmb3IgdGhhdCBwaGFzZS4gQ3VycmVudGx5LCBSZXBsYW5Bc3luYyBqdXN0IHJlc3RhcnRzCi8vLyB0aGUgcGxhbiBmcm9tIHNjcmF0Y2guCi8vLyA8L3N1bW1hcnk+CnB1YmxpYyBzZWFsZWQgY2xhc3MgSHRuUGxhbm5lcihIdG5UYXNrTGlicmFyeSBsaWJyYXJ5KSA6IElQbGFubmVyCnsKICAgIHB1YmxpYyBUYXNrPElQbGFuPiBQbGFuQXN5bmMoCiAgICAgICAgSUdvYWwgZ29hbCwgV29ybGRTdGF0ZSBzdGF0ZSwgQ2FuY2VsbGF0aW9uVG9rZW4gY2FuY2VsbGF0aW9uVG9rZW4gPSBkZWZhdWx0KQogICAgewogICAgICAgIHZhciBhY3Rpb25zID0gbmV3IExpc3Q8QWN0aW9uRGF0YT4oKTsKCiAgICAgICAgLy8gMS4gVHJ5IGRpcmVjdCBnb2FsIGRlY29tcG9zaXRpb24gYnkgbmFtZS4KICAgICAgICBpZiAobGlicmFyeS5IYXNUYXNrKGdvYWwuTmFtZSkpCiAgICAgICAgewogICAgICAgICAgICBhY3Rpb25zLkFkZFJhbmdlKGxpYnJhcnkuRGVjb21wb3NlKGdvYWwuTmFtZSwgW10sIHN0YXRlKSk7CiAgICAgICAgfQogICAgICAgIC8vIDIuIEdlbmVyaWNHYXRoZXJHb2FsIOKAlCBJdGVtU3BlYy1hd2FyZSBkZWNvbXBvc2l0aW9uLgogICAgICAgIC8vICAgIEdvYWwgbmFtZSBpcyAiR2F0aGVyOntpdGVtSWR9IiB3aGljaCBpcyBub3QgcmVnaXN0ZXJlZCBhcyBhIGZpeGVkIHRhc2s7CiAgICAgICAgLy8gICAgaW5zdGVhZCB3ZSBkZWxlZ2F0ZSBkaXJlY3RseSB3aXRoIHRoZSBmdWxsIEl0ZW1TcGVjLgogICAgICAgIGVsc2UgaWYgKGdvYWwgaXMgR2VuZXJpY0dhdGhlckdvYWwgZ2cpCiAgICAgICAgewogICAgICAgICAgICBhY3Rpb25zLkFkZFJhbmdlKGxpYnJhcnkuRGVjb21wb3NlR2F0aGVySXRlbShnZy5TcGVjLCBbXSwgc3RhdGUpKTsKICAgICAgICB9CiAgICAgICAgZWxzZQogICAgICAgIHsKICAgICAgICAgICAgLy8gMy4gUGhhc2UtYnktcGhhc2UgZGVjb21wb3NpdGlvbi4KICAgICAgICAgICAgZm9yZWFjaCAodmFyIHBoYXNlIGluIGdvYWwuUGhhc2VzKQogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICBpZiAobGlicmFyeS5IYXNUYXNrKHBoYXNlKSkKICAgICAgICAgICAgICAgICAgICBhY3Rpb25zLkFkZFJhbmdlKGxpYnJhcnkuRGVjb21wb3NlKHBoYXNlLCBbXSwgc3RhdGUpKTsKICAgICAgICAgICAgICAgIC8vIFVua25vd24gcGhhc2VzIHNraXBwZWQg4oCUIHdpbGwgdHJpZ2dlciBMTE0gZmFsbGJhY2sgaW4gUGhhc2UgNAogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICBpZiAoYWN0aW9ucy5Db3VudCA9PSAwKQogICAgICAgICAgICB0aHJvdyBuZXcgSW52YWxpZE9wZXJhdGlvbkV4Y2VwdGlvbigKICAgICAgICAgICAgICAgICQiSHRuUGxhbm5lciBjb3VsZCBub3QgZGVjb21wb3NlIGdvYWwgJ3tnb2FsLk5hbWV9JyAiICsKICAgICAgICAgICAgICAgICQiKHBoYXNlczogW3tzdHJpbmcuSm9pbigiLCAiLCBnb2FsLlBoYXNlcyl9XSkuICIgKwogICAgICAgICAgICAgICAgIk5vIG1hdGNoaW5nIHRhc2sgbWV0aG9kcyBmb3VuZC4gTExNIGZhbGxiYWNrIG5vdCB5ZXQgaW1wbGVtZW50ZWQgKFBoYXNlIDQpLiIpOwoKICAgICAgICByZXR1cm4gVGFzay5Gcm9tUmVzdWx0PElQbGFuPihuZXcgQWN0aW9uUGxhbihnb2FsLk5hbWUsIGdvYWwuUGhhc2VzLCBhY3Rpb25zKSk7CiAgICB9CgogICAgcHVibGljIGFzeW5jIFRhc2s8SVBsYW4/PiBSZXBsYW5Bc3luYygKICAgICAgICBJUGxhbiBjdXJyZW50UGxhbiwgV29ybGRTdGF0ZSBzdGF0ZSwgc3RyaW5nIGZhaWx1cmVSZWFzb24sCiAgICAgICAgQ2FuY2VsbGF0aW9uVG9rZW4gY2FuY2VsbGF0aW9uVG9rZW4gPSBkZWZhdWx0KQogICAgewogICAgICAgIC8vIFBoYXNlIDM6IHNpbXBsZSBmdWxsLXJlc3RhcnQgcmVwbGFuIGZyb20gdGhlIG9yaWdpbmFsIGdvYWwgcGhhc2VzLgogICAgICAgIC8vIFBoYXNlIDQ6IEdPQVAgd2lsbCBzdWJzdGl0dXRlIGFsdGVybmF0aXZlIGFjdGlvbnMgZm9yIHRoZSBmYWlsZWQgcGhhc2UKICAgICAgICAvLyAgIGUuZy4gInBhdGggYmxvY2tlZCBvbiBNb3ZlVG9UcmVlIiDihpIgR09BUCBmaW5kcyBhbm90aGVyIHJvdXRlLgogICAgICAgIHZhciBnb2FsID0gbmV3IFNpbXBsZUdvYWwoCiAgICAgICAgICAgIGN1cnJlbnRQbGFuLkdvYWxOYW1lLCAiIiwKICAgICAgICAgICAgWy4uIGN1cnJlbnRQbGFuLlBoYXNlc10sCiAgICAgICAgICAgIF8gPT4gZmFsc2UpOwoKICAgICAgICB0cnkKICAgICAgICB7CiAgICAgICAgICAgIHJldHVybiBhd2FpdCBQbGFuQXN5bmMoZ29hbCwgc3RhdGUsIGNhbmNlbGxhdGlvblRva2VuKTsKICAgICAgICB9CiAgICAgICAgY2F0Y2gKICAgICAgICB7CiAgICAgICAgICAgIC8vIE5vIGRlY29tcG9zaXRpb24gYXZhaWxhYmxlIOKAlCBjYWxsZXIgZmFsbHMgYmFjayB0byBpZGxlIG9yIExMTSAoUGhhc2UgNCkKICAgICAgICAgICAgcmV0dXJuIG51bGw7CiAgICAgICAgfQogICAgfQp9Cg==
+namespace Agent.Planning;
+
+using Agent.Core;
+using Agent.Planning.Goals;
+
+/// <summary>
+/// Hybrid HTN planner implementation.
+///
+/// Strategy:
+///   1. If the goal name has a direct decomposition in the task library,
+///      use it (single-shot decomposition).
+///   2. If the goal is a <see cref="GenericGatherGoal"/>, delegate to
+///      <see cref="HtnTaskLibrary.DecomposeGatherItem"/> with the goal's
+///      <see cref="ItemSpec"/>. This avoids registering one library entry per
+///      item ID while still allowing the full ItemSpec to drive action generation.
+///   3. Otherwise, iterate through the goal's phases and decompose each
+///      phase that has a known task method. Unknown phases are skipped.
+///   4. If no actions result after trying all paths, throw — caller must
+///      fall back to LLM (Phase 4 path, not yet implemented).
+///
+/// GOAP integration (Phase 4): when a specific phase fails at runtime,
+/// HtnPlanner.ReplanAsync will ask the GOAP engine to find an alternative
+/// action sequence for that phase. Currently, ReplanAsync just restarts
+/// the plan from scratch.
+/// </summary>
+public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
+{
+    public Task<IPlan> PlanAsync(
+        IGoal goal, WorldState state, CancellationToken cancellationToken = default)
+    {
+        var actions = new List<ActionData>();
+
+        // 1. Try direct goal decomposition by name.
+        if (library.HasTask(goal.Name))
+        {
+            actions.AddRange(library.Decompose(goal.Name, [], state));
+        }
+        // 2. GenericGatherGoal — ItemSpec-aware decomposition.
+        //    Goal name is "Gather:{itemId}" which is not registered as a fixed task;
+        //    instead we delegate directly with the full ItemSpec.
+        else if (goal is GenericGatherGoal gg)
+        {
+            actions.AddRange(library.DecomposeGatherItem(gg.Spec, [], state));
+        }
+        else
+        {
+            // 3. Phase-by-phase decomposition.
+            foreach (var phase in goal.Phases)
+            {
+                if (library.HasTask(phase))
+                    actions.AddRange(library.Decompose(phase, [], state));
+                // Unknown phases skipped — will trigger LLM fallback in Phase 4
+            }
+        }
+
+        if (actions.Count == 0)
+            throw new InvalidOperationException(
+                $"HtnPlanner could not decompose goal '{goal.Name}' " +
+                $"(phases: [{string.Join(", ", goal.Phases)}]). " +
+                "No matching task methods found. LLM fallback not yet implemented (Phase 4).");
+
+        return Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases, actions));
+    }
+
+    public async Task<IPlan?> ReplanAsync(
+        IPlan currentPlan, WorldState state, string failureReason,
+        CancellationToken cancellationToken = default)
+    {
+        // Phase 3: simple full-restart replan from the original goal phases.
+        // Phase 4: GOAP will substitute alternative actions for the failed phase
+        //   e.g. "path blocked on MoveToTree" → GOAP finds another route.
+        var goal = new SimpleGoal(
+            currentPlan.GoalName, "",
+            [.. currentPlan.Phases],
+            _ => false);
+
+        try
+        {
+            return await PlanAsync(goal, state, cancellationToken);
+        }
+        catch
+        {
+            // No decomposition available — caller falls back to idle or LLM (Phase 4)
+            return null;
+        }
+    }
+}
