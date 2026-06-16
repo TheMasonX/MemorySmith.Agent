@@ -87,7 +87,7 @@ public class ItemRegistryTests
         // Direct page lookup will miss ("item-registry/cobalt" not in mock)
         // but search will return a matching page result
         _gateway.AddSearchResult(
-            "item-registry cobalt",
+            "item-registry/cobalt",
             new SearchResult("item-registry/cobalt-ore", 0.88, "cobalt ore registry page", "page"));
         _gateway.AddPage("item-registry/cobalt-ore",
             "item_id: cobalt_ore\ndisplay_name: Cobalt Ore\nsource_blocks: cobalt_ore\nrequires_smelting: false\nmin_harvest_level: 3\n");
@@ -104,7 +104,7 @@ public class ItemRegistryTests
     {
         // A "memory" kind result should not be used as a page
         _gateway.AddSearchResult(
-            "item-registry unknown",
+            "item-registry/unknown",
             new SearchResult("memory-id-abc123", 0.5, "some memory snippet", "memory"));
 
         var spec = await _registry.GetAsync("unknown");
