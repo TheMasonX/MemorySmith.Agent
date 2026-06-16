@@ -1,0 +1,34 @@
+{
+  "Id": "tsk-0002-implement-mineflayer-adapter-full",
+  "Key": "TSK-0002",
+  "Title": "DONE: MineflayerAdapter/index.js fully implemented with pathfinder",
+  "Description": "MineflayerAdapter/index.js now implements:\n- WebSocket server (ws library) on WS_PORT so C# can connect\n- Mineflayer bot with pathfinder plugin for navigation\n- Event forwarding: spawn, health, move, death, blockMined, chat -> C#\n- Action dispatcher: move (pathfinder.goto), mine (bot.dig in loop), place, status, chat\n- Graceful shutdown on SIGINT/SIGTERM\n- package.json updated with mineflayer-pathfinder ^2.4.5 dependency\n\nPre-game steps: npm install in MineflayerAdapter/ to get the new pathfinder dep.\nCompleted 2026-06-15.",
+  "Type": "Task",
+  "Status": "Done",
+  "Priority": "Critical",
+  "AssigneeMode": "Custom",
+  "AssigneeDirectoryId": null,
+  "AssigneeCustomText": "AI Agent",
+  "Reporter": "agent-session-20260615",
+  "Labels": [
+    "game-testing",
+    "blocker",
+    "nodejs",
+    "mineflayer",
+    "phase-1"
+  ],
+  "Attachments": [],
+  "ExternalLinks": [],
+  "LinkedPages": [
+    "guides/getting-started"
+  ],
+  "Comments": [],
+  "EpicId": null,
+  "ParentId": null,
+  "DueDateUtc": null,
+  "CreatedAtUtc": "2026-06-15T23:30:00Z",
+  "UpdatedAtUtc": "2026-06-15T23:30:00Z",
+  "CompletedAtUtc": "2026-06-15T23:30:00Z",
+  "Revision": 1,
+  "IsArchived": false
+}
