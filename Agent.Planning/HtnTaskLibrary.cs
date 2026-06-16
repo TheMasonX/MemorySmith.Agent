@@ -29,6 +29,8 @@ public sealed class HtnTaskLibrary
             ["FindShelter"]     = FindShelterDecompose,
             ["LightArea"]       = LightAreaDecompose,
             ["WaitForSunrise"]  = WaitDecompose,
+            ["Wander"]          = WanderDecompose,
+            ["Explore"]         = ExploreDecompose,
         };
     }
 
@@ -125,6 +127,40 @@ public sealed class HtnTaskLibrary
     [
         MakeAction("GetStatus"),
     ];
+
+    /// <summary>
+    /// Single random wander step. Optional parameters: radius (default 20),
+    /// maxDistanceFromSpawn (default 100).
+    /// </summary>
+    private static IReadOnlyList<ActionData> WanderDecompose(
+        string[] parameters, WorldState state)
+    {
+        var radius  = parameters.Length > 0 && int.TryParse(parameters[0], out var r) ? r : 20;
+        var maxDist = parameters.Length > 1 && int.TryParse(parameters[1], out var m) ? m : 100;
+        return
+        [
+            MakeAction("Wander",    ("radius", (object?)radius), ("maxDistanceFromSpawn", (object?)maxDist)),
+            MakeAction("GetStatus"),
+        ];
+    }
+
+    /// <summary>
+    /// Three-step exploration: wander, observe surroundings, wander again.
+    /// Keeps the bot within 100 blocks of spawn by default.
+    /// </summary>
+    private static IReadOnlyList<ActionData> ExploreDecompose(
+        string[] parameters, WorldState state)
+    {
+        var maxDist = parameters.Length > 0 && int.TryParse(parameters[0], out var m) ? m : 100;
+        return
+        [
+            MakeAction("SearchMemory", ("query", "unexplored areas points of interest biome")),
+            MakeAction("Wander",       ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)maxDist)),
+            MakeAction("GetStatus"),
+            MakeAction("Wander",       ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)maxDist)),
+            MakeAction("GetStatus"),
+        ];
+    }
 
     // ── Factory helper ────────────────────────────────────────────────────────
 
