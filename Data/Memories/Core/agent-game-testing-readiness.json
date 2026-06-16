@@ -1,0 +1,17 @@
+{
+  "Id": "agent-game-testing-readiness",
+  "Title": "MemorySmith.Agent — Game Testing Readiness",
+  "Content": "As of 2026-06-15, the WebSocketBridge.cs is fully implemented with a background receive loop (Channel<WorldEvent>), proper JSON serialization ({action, arguments} format), and multi-frame message reassembly. MineflayerAdapter/index.js is fully implemented with mineflayer-pathfinder for navigation, and handles move/mine/place/status/chat actions.\n\nPre-game testing checklist:\n- [ ] Run 'npm install' in MineflayerAdapter/ to get mineflayer-pathfinder (new dependency).\n- [ ] Start a Minecraft server (vanilla or Paper, version 1.16.4+ required for pathfinder).\n- [ ] Set Agent:Enabled=true in WebUI.Blazor/appsettings.json.\n- [ ] Set Agent:Minecraft:ServerHost, ServerPort, BotUsername, AutoStartNode:true, NodeScriptPath:../MineflayerAdapter/index.js.\n- [ ] dotnet run --project WebUI.Blazor\n- [ ] Watch logs for 'Mineflayer adapter starting' then 'Bot spawned' then 'World adapter connected'.\n- [ ] POST /api/agent/plan with {goalName:GatherWood, parameters:{count:5}} and watch bot in game.\n\nIf the bot connects but doesn't pathfind: confirm mineflayer-pathfinder is installed and the server is 1.16.4+.",
+  "Status": 1,
+  "Confidence": 0.92,
+  "Tags": ["agent", "game-testing", "mineflayer", "websocket", "kind:operational", "audience:developer", "scope:testing"],
+  "References": ["agent-architecture-bounded-contexts", "agent-phase-status-current"],
+  "Conflicts": [],
+  "SourceLinks": [
+    { "Label": "MinecraftAdapter.cs", "Uri": "%RepoRoot%Agent.World.Minecraft/MinecraftAdapter.cs", "StartLine": null, "EndLine": null },
+    { "Label": "WebSocketBridge.cs",  "Uri": "%RepoRoot%Agent.World.Minecraft/WebSocketBridge.cs",  "StartLine": null, "EndLine": null },
+    { "Label": "MineflayerAdapter index.js", "Uri": "%RepoRoot%MineflayerAdapter/index.js", "StartLine": null, "EndLine": null }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-06-15T23:30:00Z"
+}
