@@ -6,7 +6,7 @@ using System.Text.Json;
 /// <summary>
 /// Navigates the bot to the specified block coordinates.
 /// Hides pathfinding internals from the LLM — it only sees MoveTo(x, y, z).
-/// Dispatches {"action":"move","x":…,"y":…,"z":…} to the world adapter.
+/// Dispatches {\"action\":\"move\",\"x\":…,\"y\":…,\"z\":…} to the world adapter.
 /// </summary>
 public sealed class MoveToTool(IWorldAdapter worldAdapter) : ITool
 {
@@ -36,7 +36,7 @@ public sealed class MoveToTool(IWorldAdapter worldAdapter) : ITool
 
         var action = new ActionData
         {
-            Tool = "move",
+            Tool = ActionProtocol.Move,
             Arguments = { ["x"] = x, ["y"] = y, ["z"] = z }
         };
 
