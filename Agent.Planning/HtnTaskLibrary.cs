@@ -3,6 +3,15 @@ namespace Agent.Planning;
 using Agent.Core;
 
 /// <summary>
+/// Decomposes a compound HTN task into a sequence of atomic <see cref="ActionData"/> items
+/// given optional string parameters and the current <see cref="WorldState"/>.
+///
+/// Moved here from HtnTask.cs (see ADR-009 in Data/Pages/decisions.md).
+/// </summary>
+public delegate IReadOnlyList<ActionData> TaskDecomposer(
+    string[] parameters, WorldState state);
+
+/// <summary>
 /// Registry of named HTN task decompositions.
 ///
 /// Each entry maps a task name to a TaskDecomposer delegate that returns the
