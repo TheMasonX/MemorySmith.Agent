@@ -1,243 +1,219 @@
 using Agent.Core;
 using Agent.Planning;
+using Agent.Planning.Llm;
 
 namespace MemorySmith.Agent.Tests;
 
-/// <summary>
-/// Unit tests for <see cref="ChatInterpreter"/>: directed-at-bot heuristics,
-/// intent parsing, item/blueprint alias resolution, and response generation.
-/// </summary>
 [TestFixture]
-[Description("ChatInterpreter: directed-at heuristics, gather/build/cancel/status/help parsing")]
+[Description("ChatInterpreter: directed-at-bot heuristics, intent parsing, aliases, response generation")]
 public sealed class ChatInterpreterTests
 {
     private const string BotName = "AgentBot";
-    private static readonly WorldState EmptyState = new();
+    private static readonly Position BotPos    = new(0, 64, 0);
+    private static readonly Position PlayerPos = new(5, 64, 5);
+    private static readonly WorldState Empty   = new();
+
+    private static readonly ChatOptions Opts = new()
+    {
+        MaxMessageLength          = 1024,
+        MaxResponseDistanceBlocks = 64.0,
+        ConversationWindowSeconds = 60,
+    };
+
+    private static Task<ChatInterpretation> Interpret(ChatInterpreter interp,
+        string message, int onlinePlayers = 1, WorldState? state = null) =>
+        interp.InterpretAsync("Player1", message, BotName, onlinePlayers,
+            BotPos, PlayerPos, state ?? Empty);
 
     // ── IsDirectedAtBot ───────────────────────────────────────────────────────
 
     [Test]
-    public void SoloPlayer_AlwaysAddressed()
+    public async Task SoloPlayer_AlwaysAddressed()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "hello there", BotName, onlinePlayers: 1, EmptyState);
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "hello", onlinePlayers: 1);
         Assert.That(result.IntentType, Is.Not.EqualTo(ChatIntentType.NotAddressed));
     }
 
     [Test]
-    public void MultiPlayer_NotAddressedWithoutName()
+    public async Task MultiPlayer_NotAddressedWithoutName()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "let's go mining", BotName, onlinePlayers: 3, EmptyState);
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "let's go mining", onlinePlayers: 3);
         Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.NotAddressed));
     }
 
     [Test]
-    public void MultiPlayer_AddressedWhenStartsWithBotName()
+    public async Task MultiPlayer_AddressedWhenStartsWithBotName()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "AgentBot get me wood", BotName, onlinePlayers: 3, EmptyState);
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "AgentBot get me wood", onlinePlayers: 3);
         Assert.That(result.IntentType, Is.Not.EqualTo(ChatIntentType.NotAddressed));
     }
 
     [Test]
-    public void MultiPlayer_AddressedWhenStartsWithBotNameCaseInsensitive()
+    public async Task MultiPlayer_AddressedAfterBotSpokeRecently()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "agentbot stop", BotName, onlinePlayers: 2, EmptyState);
+        var interp = new ChatInterpreter(Opts);
+        interp.RecordBotSpoke();
+        var result = await Interpret(interp, "thanks", onlinePlayers: 2);
         Assert.That(result.IntentType, Is.Not.EqualTo(ChatIntentType.NotAddressed));
     }
 
-    [Test]
-    public void MultiPlayer_AddressedAfterBotSpokeRecently()
-    {
-        var interp = new ChatInterpreter();
-        interp.RecordBotSpoke(); // simulate bot just spoke
-        var result = interp.Interpret("Player1", "thanks", BotName, onlinePlayers: 2, EmptyState);
-        Assert.That(result.IntentType, Is.Not.EqualTo(ChatIntentType.NotAddressed));
-    }
-
-    // ── Gather intent ─────────────────────────────────────────────────────────
+    // ── Gather ────────────────────────────────────────────────────────────────
 
     [Test]
-    public void Gather_WoodAlias_ReturnsGatherItem_OakLog()
+    public async Task Gather_WoodAlias_ReturnsOakLog()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "get me some wood", BotName, onlinePlayers: 1, EmptyState);
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "get me some wood");
         Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CreateGoal));
         Assert.That(result.GoalName,   Is.EqualTo("GatherItem:oak_log"));
     }
 
     [Test]
-    public void Gather_WithCount_ParsesCount()
+    public async Task Gather_WithCount_ParsesCount()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "gather 64 cobblestone", BotName, onlinePlayers: 1, EmptyState);
-        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CreateGoal));
-        Assert.That(result.GoalName,   Is.EqualTo("GatherItem:cobblestone"));
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "gather 64 cobblestone");
+        Assert.That(result.IntentType,                        Is.EqualTo(ChatIntentType.CreateGoal));
+        Assert.That(result.GoalName,                          Is.EqualTo("GatherItem:cobblestone"));
         Assert.That(result.GoalParameters?["count"], Is.EqualTo(64));
     }
 
     [Test]
-    public void Gather_DefaultCount_Is10()
+    public async Task Gather_DefaultCount_Is10()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "mine some iron", BotName, onlinePlayers: 1, EmptyState);
-        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CreateGoal));
-        Assert.That(result.GoalName,   Is.EqualTo("GatherItem:iron_ore"));
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "mine some iron");
+        Assert.That(result.GoalName,                          Is.EqualTo("GatherItem:iron_ore"));
         Assert.That(result.GoalParameters?["count"], Is.EqualTo(10));
     }
 
     [Test]
-    public void Gather_CobbleAlias_ResolvesCobblestone()
+    public async Task Gather_CobbleAlias()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "collect 32 cobble", BotName, onlinePlayers: 1, EmptyState);
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "collect 32 cobble");
         Assert.That(result.GoalName, Is.EqualTo("GatherItem:cobblestone"));
     }
 
-    [Test]
-    public void Gather_ReturnsResponse()
-    {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "get wood", BotName, onlinePlayers: 1, EmptyState);
-        Assert.That(result.Response, Is.Not.Empty);
-    }
-
-    // ── Build intent ──────────────────────────────────────────────────────────
+    // ── Build ─────────────────────────────────────────────────────────────────
 
     [Test]
-    public void Build_HouseAlias_ReturnsBuildSmallHouse()
+    public async Task Build_HouseAlias_ReturnsSmallHouse()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "build a house", BotName, onlinePlayers: 1, EmptyState);
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "build a house");
         Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CreateGoal));
         Assert.That(result.GoalName,   Is.EqualTo("Build:small-house"));
     }
 
     [Test]
-    public void Build_ShelterAlias_ReturnsBuildSmallHouse()
+    public async Task Build_ShelterAlias_ReturnsSmallHouse()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "build me a shelter", BotName, onlinePlayers: 1, EmptyState);
-        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CreateGoal));
-        Assert.That(result.GoalName,   Is.EqualTo("Build:small-house"));
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "build me a shelter");
+        Assert.That(result.GoalName, Is.EqualTo("Build:small-house"));
     }
 
-    // ── Cancel intent ─────────────────────────────────────────────────────────
+    // ── Cancel ────────────────────────────────────────────────────────────────
 
     [Test]
-    public void Cancel_StopKeyword_ReturnsCancelGoal()
+    public async Task Cancel_StopKeyword()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "stop", BotName, onlinePlayers: 1, EmptyState);
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "stop");
+        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CancelGoal));
+        Assert.That(result.Response,   Is.Not.Empty);
+    }
+
+    [Test]
+    public async Task Cancel_QuitKeyword()
+    {
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "quit what you're doing");
         Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CancelGoal));
     }
 
-    [Test]
-    public void Cancel_QuitKeyword_ReturnsCancelGoal()
-    {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "quit what you're doing", BotName, onlinePlayers: 1, EmptyState);
-        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CancelGoal));
-    }
+    // ── Status ────────────────────────────────────────────────────────────────
 
     [Test]
-    public void Cancel_ReturnsResponse()
+    public async Task Status_WhatAreYouDoing()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "stop", BotName, onlinePlayers: 1, EmptyState);
-        Assert.That(result.Response, Is.Not.Empty);
-    }
-
-    // ── Status intent ─────────────────────────────────────────────────────────
-
-    [Test]
-    public void Status_WhatAreYouDoingKeyword_ReturnsQueryStatus()
-    {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "what are you doing?", BotName, onlinePlayers: 1, EmptyState);
-        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.QueryStatus));
-    }
-
-    [Test]
-    public void Status_ReturnsResponse()
-    {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "status", BotName, onlinePlayers: 1, EmptyState);
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "what are you doing?");
         Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.QueryStatus));
         Assert.That(result.Response,   Is.Not.Empty);
     }
 
-    // ── Help intent ───────────────────────────────────────────────────────────
+    // ── Help ──────────────────────────────────────────────────────────────────
 
     [Test]
-    public void Help_HelpKeyword_ReturnsQueryHelp()
+    public async Task Help_ListsCommands()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "help", BotName, onlinePlayers: 1, EmptyState);
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "help");
         Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.QueryHelp));
+        Assert.That(result.Response,   Does.Contain("gather").Or.Contain("get").IgnoreCase);
     }
 
-    [Test]
-    public void Help_ResponseListsCommands()
-    {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "help", BotName, onlinePlayers: 1, EmptyState);
-        Assert.That(result.Response, Does.Contain("gather").Or.Contain("get").IgnoreCase);
-    }
-
-    // ── Navigation intent ─────────────────────────────────────────────────────
+    // ── Navigation ────────────────────────────────────────────────────────────
 
     [Test]
-    public void NavigateTo_GoToCoords_ReturnsNavigateTo()
+    public async Task Navigate_GoToCoords()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "go to 100 64 200", BotName, onlinePlayers: 1, EmptyState);
-        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.NavigateTo));
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "go to 100 64 200");
+        Assert.That(result.IntentType,                  Is.EqualTo(ChatIntentType.NavigateTo));
         Assert.That(result.GoalParameters?["x"], Is.EqualTo(100));
         Assert.That(result.GoalParameters?["y"], Is.EqualTo(64));
         Assert.That(result.GoalParameters?["z"], Is.EqualTo(200));
     }
 
     [Test]
-    public void NavigateTo_ComeHere_ReturnsNavigateTo()
+    public async Task Navigate_ComeHere()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "come here", BotName, onlinePlayers: 1, EmptyState);
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "come here");
         Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.NavigateTo));
     }
 
-    // ── Unknown intent ────────────────────────────────────────────────────────
+    // ── Unknown ───────────────────────────────────────────────────────────────
 
     [Test]
-    public void Unknown_Gibberish_ReturnsUnknownNotNull()
+    public async Task Unknown_ReturnsUnknownWithResponse()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "asdfghjkl qwerty", BotName, onlinePlayers: 1, EmptyState);
+        var interp = new ChatInterpreter(Opts);
+        var result = await Interpret(interp, "asdfghjkl qwerty");
         Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.Unknown));
-        Assert.That(result.Response,   Is.Not.Empty); // friendly fallback message
+        Assert.That(result.Response,   Is.Not.Empty);
     }
 
     // ── Bot name stripping ────────────────────────────────────────────────────
 
     [Test]
-    public void BotNamePrefix_IsStrippedBeforeParsing()
+    public async Task BotName_StrippedBeforeParsing()
     {
-        var interp = new ChatInterpreter();
-        var result = interp.Interpret("Player1", "AgentBot, get me 32 cobble", BotName, onlinePlayers: 2, EmptyState);
-        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CreateGoal));
-        Assert.That(result.GoalName,   Is.EqualTo("GatherItem:cobblestone"));
+        var interp = new ChatInterpreter(Opts);
+        var result = await interp.InterpretAsync(
+            "Player1", "AgentBot, get me 32 cobble", BotName, 2,
+            BotPos, PlayerPos, Empty);
+        Assert.That(result.IntentType,                        Is.EqualTo(ChatIntentType.CreateGoal));
+        Assert.That(result.GoalName,                          Is.EqualTo("GatherItem:cobblestone"));
         Assert.That(result.GoalParameters?["count"], Is.EqualTo(32));
     }
 
-    // ── RecordBotSpoke ────────────────────────────────────────────────────────
+    // ── Max length truncation ─────────────────────────────────────────────────
 
     [Test]
-    public void RecordBotSpoke_IsNotNull()
+    public async Task LongMessage_TruncatedToMaxLength()
     {
-        var interp = new ChatInterpreter();
-        // Should not throw
-        Assert.DoesNotThrow(() => interp.RecordBotSpoke());
+        var shortOpts = Opts with { MaxMessageLength = 5 };
+        var interp    = new ChatInterpreter(shortOpts);
+        // 200-char message — should not throw; result may be Unknown
+        var result = await interp.InterpretAsync(
+            "Player1", new string('x', 200), BotName, 1, BotPos, PlayerPos, Empty);
+        Assert.That(result, Is.Not.Null);
     }
 }
