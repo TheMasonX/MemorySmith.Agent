@@ -57,11 +57,21 @@ public sealed class HtnTaskLibrary
         string[] parameters, WorldState state)
     {
         var count = parameters.Length > 0 && int.TryParse(parameters[0], out var c) ? c : 10;
+
+        // MoveTo uses the bot's current known position so the pathfinder at least
+        // confirms we're at spawn before mining.
+        // Phase 4 (TSK-0004) will replace this with real tree coordinates injected
+        // from a SearchMemory context-carry result.
+        // The Node.js mine action will auto-navigate to the nearest tree block
+        // within 64 blocks regardless of the MoveTo target.
         return
         [
-            MakeAction("SearchMemory",  ("query", "wood trees oak log location nearby")),
-            MakeAction("GetStatus"),
-            MakeAction("MineBlock",     ("block", "minecraft:oak_log"), ("count", (object?)count)),
+            MakeAction("SearchMemory", ("query", "wood trees oak log location nearby")),
+            MakeAction("MoveTo",
+                ("x", (object?)state.Position.X),
+                ("y", (object?)state.Position.Y),
+                ("z", (object?)state.Position.Z)),
+            MakeAction("MineBlock", ("block", "minecraft:oak_log"), ("count", (object?)count)),
             MakeAction("GetStatus"),
         ];
     }
