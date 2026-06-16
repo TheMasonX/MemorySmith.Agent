@@ -1,0 +1,33 @@
+{
+  "Id": "tsk-0008-add-blazor-status-panel-signalr",
+  "Key": "TSK-0008",
+  "Title": "Add Blazor status panel with SignalR real-time push",
+  "Description": "WebUI.Blazor currently serves static files (about.html) and REST endpoints. Phase 1 goal was to add a Blazor status panel.\n\nImplementation:\n1. Add SignalR hub (AgentHub) pushing BotStatusUpdated, InventoryChanged, PlanChanged events.\n2. Wire AgentBackgroundService to broadcast on each WorldEvent received.\n3. Add Blazor components: StatusPanel (current goal, health, position), InventoryPanel, PlanPanel (current action queue).\n4. Add Connect/Stop buttons that call /api/agent/connect and /api/agent/stop.\n5. Update Program.cs to register SignalR and map AgentHub.\n\nNote: WebUI.Blazor already references Microsoft.NET.Sdk.Web so AddSignalR is available.",
+  "Type": "Feature",
+  "Status": "Backlog",
+  "Priority": "Medium",
+  "AssigneeMode": "Custom",
+  "AssigneeDirectoryId": null,
+  "AssigneeCustomText": "AI Agent",
+  "Reporter": "agent-session-20260615",
+  "Labels": [
+    "phase-1",
+    "blazor",
+    "signalr",
+    "ui"
+  ],
+  "Attachments": [],
+  "ExternalLinks": [],
+  "LinkedPages": [
+    "guides/api-reference"
+  ],
+  "Comments": [],
+  "EpicId": null,
+  "ParentId": null,
+  "DueDateUtc": null,
+  "CreatedAtUtc": "2026-06-15T23:30:00Z",
+  "UpdatedAtUtc": "2026-06-15T23:30:00Z",
+  "CompletedAtUtc": null,
+  "Revision": 1,
+  "IsArchived": false
+}
