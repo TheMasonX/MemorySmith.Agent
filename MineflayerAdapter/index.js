@@ -2,11 +2,14 @@
  * MineflayerAdapter — Node.js bridge between the MemorySmith.Agent C# host
  * and a Minecraft server.
  *
+ * Sprint 2a: craft case now pathfinds to the nearest crafting table before
+ *   calling bot.craft() for recipes that require one. Search radius expanded
+ *   from 4 to CRAFT_TABLE_SEARCH_RADIUS (8) blocks. Radius is also overridable
+ *   per-call via args.tableSearchRadius so C# can pass a custom value.
+ *
  * Phase 5b additions:
  *   - chat event: includes playerX/Y/Z (bot.players[username].entity.position)
  *     so C# can compute bot-to-player distance for the "closest agent" heuristic.
- *
- * Full changelog at top of Phase 5 version.
  */
 
 import mineflayer from 'mineflayer';
@@ -14,12 +17,27 @@ import mflPathfinder from 'mineflayer-pathfinder';
 const { pathfinder, Movements, goals: pfGoals } = mflPathfinder;
 import { WebSocketServer } from 'ws';
 
+// ── Environment / connection ──────────────────────────────────────────────────
+
 const WS_PORT  = parseInt(process.env.WS_PORT   ?? '3000',  10);
 const MC_HOST  = process.env.MC_HOST   ?? 'localhost';
 const MC_PORT  = parseInt(process.env.MC_PORT   ?? '25565', 10);
 const MC_USER  = process.env.MC_USERNAME ?? 'AgentBot';
 const MC_VER   = process.env.MC_VERSION;
 const WS_TOKEN = process.env.WS_TOKEN ?? null;
+
+// ── Tunable constants ─────────────────────────────────────────────────────────
+// All search radii, distances, and retry counts are named here.
+// Override per-call via args where supported.
+
+const MINE_SEARCH_RADIUS_NEAR    = 64;   // blocks — first findBlock pass
+const MINE_SEARCH_RADIUS_FAR     = 128;  // blocks — second findBlock pass
+const MAX_MINE_PATH_FAILURES     = 3;    // consecutive pathfinder failures before abort
+const CRAFT_TABLE_SEARCH_RADIUS  = 8;    // blocks — findBlock for crafting_table (Sprint 2a)
+const CRAFT_TABLE_REACH_DISTANCE = 2;    // blocks — GoalNear tolerance when pathfinding to table
+const FURNACE_SEARCH_RADIUS      = 16;   // blocks — findBlock for furnace
+const FURNACE_REACH_DISTANCE     = 2;    // blocks — GoalNear tolerance when pathfinding to furnace
+const SMELT_TIMEOUT_MS           = 40_000; // ms — max wait for smelting output
 
 // ── WebSocket server ─────────────────────────────────────────────────────────
 
@@ -132,9 +150,6 @@ bot.on('death',  () => { console.warn('[mc] bot died'); sendEvent('death', botPo
 bot.on('kicked', (reason) => { console.warn('[mc] kicked:', reason); sendEvent('kicked', { reason }); });
 bot.on('error',  (e)      => { console.error('[mc] error:', e.message); sendEvent('error', { message: e.message }); });
 
-// Phase 5b: include the speaker's world position so C# can compute distance.
-// playerX/Y/Z are null if the player's entity is not loaded (e.g. they spoke
-// before the bot could see them — happens at long distances).
 bot.on('chat', (username, message) => {
   if (username === bot.username) return;
   const onlinePlayers = Object.keys(bot.players).filter(p => p !== bot.username).length;
@@ -180,16 +195,15 @@ async function dispatch({ action, arguments: args = {} }) {
 
       let mined = 0;
       let pathFailures = 0;
-      const MAX_PATH_FAILURES = 3;
 
       while (mined < count) {
-        let target = bot.findBlock({ matching: blockId, maxDistance: 64 });
-        if (!target) target = bot.findBlock({ matching: blockId, maxDistance: 128 });
+        let target = bot.findBlock({ matching: blockId, maxDistance: MINE_SEARCH_RADIUS_NEAR });
+        if (!target) target = bot.findBlock({ matching: blockId, maxDistance: MINE_SEARCH_RADIUS_FAR });
 
         if (!target) {
-          console.log(`[mine] no ${shortName} found within 128 blocks after ${mined} mined`);
+          console.log(`[mine] no ${shortName} found within ${MINE_SEARCH_RADIUS_FAR} blocks after ${mined} mined`);
           sendEvent('blockNotFound', { block: blockName, mined });
-          if (mined === 0) throw new Error(`No ${shortName} found within 128 blocks`);
+          if (mined === 0) throw new Error(`No ${shortName} found within ${MINE_SEARCH_RADIUS_FAR} blocks`);
           break;
         }
 
@@ -200,9 +214,9 @@ async function dispatch({ action, arguments: args = {} }) {
           pathFailures = 0;
         } catch (e) {
           pathFailures++;
-          console.warn(`[mine] nav to ${shortName} failed (${pathFailures}/${MAX_PATH_FAILURES}): ${e.message}`);
-          if (pathFailures >= MAX_PATH_FAILURES)
-            throw new Error(`Pathfinding to ${shortName} failed ${MAX_PATH_FAILURES} times: ${e.message}`);
+          console.warn(`[mine] nav to ${shortName} failed (${pathFailures}/${MAX_MINE_PATH_FAILURES}): ${e.message}`);
+          if (pathFailures >= MAX_MINE_PATH_FAILURES)
+            throw new Error(`Pathfinding to ${shortName} failed ${MAX_MINE_PATH_FAILURES} times: ${e.message}`);
           await new Promise(r => setTimeout(r, 500));
           continue;
         }
@@ -311,7 +325,9 @@ async function dispatch({ action, arguments: args = {} }) {
       break;
 
     case 'craft': {
-      const { item: itemName, count = 1 } = args;
+      // Sprint 2a: pathfind to crafting table before crafting.
+      // tableSearchRadius can be overridden per-call; defaults to CRAFT_TABLE_SEARCH_RADIUS.
+      const { item: itemName, count = 1, tableSearchRadius = CRAFT_TABLE_SEARCH_RADIUS } = args;
       if (!itemName) throw new Error('craft requires item');
 
       const itemEntry = bot.registry.itemsByName[itemName];
@@ -327,8 +343,26 @@ async function dispatch({ action, arguments: args = {} }) {
       if (recipe.requiresTable) {
         const tableId = bot.registry.blocksByName['crafting_table']?.id;
         if (tableId == null) throw new Error('crafting_table not found in registry');
-        craftingTable = bot.findBlock({ matching: tableId, maxDistance: 4 });
-        if (!craftingTable) throw new Error('No crafting_table within 4 blocks');
+
+        // Sprint 2a: search with expanded radius and pathfind to the table.
+        craftingTable = bot.findBlock({ matching: tableId, maxDistance: tableSearchRadius });
+        if (!craftingTable)
+          throw new Error(`No crafting_table within ${tableSearchRadius} blocks`);
+
+        // Pathfind to the crafting table so bot.craft() can reach it.
+        const movements = new Movements(bot);
+        bot.pathfinder.setMovements(movements);
+        await bot.pathfinder.goto(new pfGoals.GoalNear(
+          craftingTable.position.x,
+          craftingTable.position.y,
+          craftingTable.position.z,
+          CRAFT_TABLE_REACH_DISTANCE
+        ));
+
+        // Re-fetch after navigation: bot may have shifted the chunk slightly.
+        craftingTable = bot.blockAt(craftingTable.position);
+        if (!craftingTable || craftingTable.type !== tableId)
+          throw new Error('Crafting table not found after navigation');
       }
 
       await bot.craft(recipe, count, craftingTable);
@@ -344,13 +378,14 @@ async function dispatch({ action, arguments: args = {} }) {
       const furnaceId = bot.registry.blocksByName['furnace']?.id;
       if (furnaceId == null) throw new Error('furnace not found in registry');
 
-      let furnaceBlock = bot.findBlock({ matching: furnaceId, maxDistance: 16 });
-      if (!furnaceBlock) throw new Error('No furnace found within 16 blocks');
+      let furnaceBlock = bot.findBlock({ matching: furnaceId, maxDistance: FURNACE_SEARCH_RADIUS });
+      if (!furnaceBlock) throw new Error(`No furnace found within ${FURNACE_SEARCH_RADIUS} blocks`);
 
       const movements = new Movements(bot);
       bot.pathfinder.setMovements(movements);
       await bot.pathfinder.goto(new pfGoals.GoalNear(
-        furnaceBlock.position.x, furnaceBlock.position.y, furnaceBlock.position.z, 2
+        furnaceBlock.position.x, furnaceBlock.position.y, furnaceBlock.position.z,
+        FURNACE_REACH_DISTANCE
       ));
 
       furnaceBlock = bot.blockAt(furnaceBlock.position);
@@ -372,7 +407,10 @@ async function dispatch({ action, arguments: args = {} }) {
         await furnace.putInput(inputItem.type, null, toSmelt);
 
         const outputName = await new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => reject(new Error('Smelting timed out after 40s')), 40_000);
+          const timeout = setTimeout(
+            () => reject(new Error(`Smelting timed out after ${SMELT_TIMEOUT_MS}ms`)),
+            SMELT_TIMEOUT_MS
+          );
           const check = () => {
             const out = furnace.outputItem();
             if (out) { clearTimeout(timeout); resolve(out.name); }
