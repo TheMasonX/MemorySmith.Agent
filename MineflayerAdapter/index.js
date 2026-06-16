@@ -316,6 +316,93 @@ async function dispatch({ action, arguments: args = {} }) {
       break;
     }
 
+    case 'findFlatArea': {
+      const { radius = 20, minFlatArea = 9 } = args;
+      const botPosObj = botPos();
+      const r = Math.max(1, Math.min(radius, 64));
+      const minArea = Math.max(1, Math.min(minFlatArea, 256));
+
+      // Build a height map: sample every column within radius, recording the
+      // Y level of the highest solid (opaque) block that has air above it.
+      const heightMap = new Map(); // key: "x,z", value: { x, z, y, isFlat }
+      for (let dx = -r; dx <= r; dx++) {
+        for (let dz = -r; dz <= r; dz++) {
+          const cx = botPosObj.x + dx;
+          const cz = botPosObj.z + dz;
+          // Scan top-down from bot's Y level
+          for (let cy = botPosObj.y + 4; cy >= botPosObj.y - 6; cy--) {
+            const block = bot.blockAt(new Vec3(cx, cy, cz));
+            if (!block) continue;
+            // Solid ground: block with bounding box (not empty/plant) + air above
+            if (block.name !== 'air' && block.boundingBox === 'block') {
+              const above = bot.blockAt(new Vec3(cx, cy + 1, cz));
+              if (!above || above.name === 'air' || above.boundingBox === 'empty') {
+                heightMap.set(`${cx},${cz}`, { x: cx, z: cz, y: cy + 1 });
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // Flood-fill to find the largest contiguous flat region
+      // "Flat" = adjacent columns whose Y values differ by at most 1
+      const visited = new Set();
+      let bestCandidate = null;
+      let bestArea = 0;
+
+      const isFlatNeighbor = (a, b) => a && b && Math.abs(a.y - b.y) <= 1;
+
+      for (const [key, col] of heightMap) {
+        if (visited.has(key)) continue;
+
+        // BFS to find the connected flat component
+        const component = [];
+        const queue = [col];
+        visited.add(key);
+
+        while (queue.length > 0) {
+          const cur = queue.shift();
+          component.push(cur);
+
+          for (const [ndx, ndz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const nk = `${cur.x + ndx},${cur.z + ndz}`;
+            const nbr = heightMap.get(nk);
+            if (nbr && !visited.has(nk) && isFlatNeighbor(cur, nbr)) {
+              visited.add(nk);
+              queue.push(nbr);
+            }
+          }
+        }
+
+        if (component.length >= minArea && component.length > bestArea) {
+          bestArea = component.length;
+          // Compute the centroid of the component
+          const avgY = Math.round(component.reduce((s, c) => s + c.y, 0) / component.length);
+          const minX = Math.min(...component.map(c => c.x));
+          const maxX = Math.max(...component.map(c => c.x));
+          const minZ = Math.min(...component.map(c => c.z));
+          const maxZ = Math.max(...component.map(c => c.z));
+          bestCandidate = {
+            x: Math.round((minX + maxX) / 2),
+            y: avgY,
+            z: Math.round((minZ + maxZ) / 2),
+            area: component.length,
+            minX, maxX, minZ, maxZ,
+          };
+        }
+      }
+
+      if (bestCandidate) {
+        sendEvent('flatAreaFound', bestCandidate);
+        console.log(`[findFlatArea] best candidate at (${bestCandidate.x},${bestCandidate.y},${bestCandidate.z}) area=${bestCandidate.area}`);
+      } else {
+        console.warn(`[findFlatArea] no flat area >= ${minArea} found within radius ${r}`);
+        sendEvent('flatAreaFound', { x: botPosObj.x, y: botPosObj.y + 1, z: botPosObj.z, area: 0 });
+      }
+      break;
+    }
+
     case 'status':
       sendBotStatus();
       break;

@@ -171,6 +171,10 @@ public sealed class WebSocketBridge(string uri) : IDisposable
 
     // ── JSON parsing ─────────────────────────────────────────────────────────
 
+    /// <summary>
+    /// Sprint 3a: Parse JSON into typed event subtypes instead of
+    /// <c>WorldEvent(string, Dictionary, DateTimeOffset)</c>.
+    /// </summary>
     private static WorldEvent? ParseEvent(string json)
     {
         try
@@ -181,31 +185,154 @@ public sealed class WebSocketBridge(string uri) : IDisposable
             if (!root.TryGetProperty("event", out var eventProp))
                 return null;
 
-            var eventType = eventProp.GetString() ?? "unknown";
-            var payload   = new Dictionary<string, object?>();
+            var eventType = eventProp.GetString() ?? string.Empty;
+            var now       = DateTimeOffset.UtcNow;
 
-            foreach (var prop in root.EnumerateObject())
+            return eventType switch
             {
-                if (prop.Name == "event") continue;
-                payload[prop.Name] = prop.Value.ValueKind switch
-                {
-                    JsonValueKind.Number  => prop.Value.TryGetInt32(out var i)
-                                                ? (object?)i
-                                                : prop.Value.GetDouble(),
-                    JsonValueKind.String  => prop.Value.GetString(),
-                    JsonValueKind.True    => true,
-                    JsonValueKind.False   => false,
-                    JsonValueKind.Null    => null,
-                    _                    => prop.Value.GetRawText(),
-                };
-            }
+                "spawn" => new SpawnEvent(
+                    Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+                    Health: GetInt(root, "hp", 20),
+                    Food: GetInt(root, "food", 20),
+                    Timestamp: now),
 
-            return new WorldEvent(eventType, payload, DateTimeOffset.UtcNow);
+                "health" => new HealthEvent(
+                    Health: GetInt(root, "hp", 20),
+                    Food: GetInt(root, "food", 20),
+                    Timestamp: now),
+
+                "move" or "moveComplete" => new MoveEvent(
+                    Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+                    Timestamp: now),
+
+                "blockMined" => new BlockMinedEvent(
+                    Block: GetString(root, "block") ?? "unknown",
+                    Count: GetInt(root, "count", 1),
+                    Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+                    Timestamp: now),
+
+                "chat" => new ChatEvent(
+                    Username: GetString(root, "username") ?? "?",
+                    Message: GetString(root, "message") ?? string.Empty,
+                    OnlinePlayers: GetInt(root, "onlinePlayers", 1),
+                    PlayerPos: root.TryGetProperty("playerX", out _)
+                        ? new Position(GetInt(root, "playerX"), GetInt(root, "playerY"), GetInt(root, "playerZ"))
+                        : null,
+                    Timestamp: now),
+
+                "error" => new ErrorEvent(
+                    Action: GetString(root, "action") ?? "?",
+                    Message: GetString(root, "message") ?? "unknown",
+                    Timestamp: now),
+
+                "blockNotFound" => new BlockNotFoundEvent(
+                    Block: GetString(root, "block") ?? "?",
+                    MinedCount: GetInt(root, "mined"),
+                    Timestamp: now),
+
+                "craftComplete" => new CraftCompleteEvent(
+                    Item: GetString(root, "item") ?? "?",
+                    Count: GetInt(root, "count", 1),
+                    Timestamp: now),
+
+                "smeltComplete" => new SmeltCompleteEvent(
+                    Input: GetString(root, "item") ?? "?",
+                    Result: GetString(root, "result") ?? "?",
+                    Count: GetInt(root, "count", 1),
+                    Timestamp: now),
+
+                "death" => new DeathEvent(
+                    Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+                    Timestamp: now),
+
+                "status" => ParseStatus(root, now),
+
+                "blockPlaced" => new BlockPlacedEvent(
+                    X: GetInt(root, "x"), Y: GetInt(root, "y"), Z: GetInt(root, "z"),
+                    Block: GetString(root, "block") ?? "?",
+                    Timestamp: now),
+
+                "wanderComplete" => new WanderCompleteEvent(
+                    Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+                    TargetX: GetInt(root, "targetX"),
+                    TargetZ: GetInt(root, "targetZ"),
+                    Timestamp: now),
+
+                "wanderFailed" => new WanderFailedEvent(
+                    Message: GetString(root, "message") ?? "?",
+                    Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+                    Timestamp: now),
+
+                "kicked" => new KickedEvent(
+                    Reason: GetString(root, "reason") ?? "?",
+                    Timestamp: now),
+
+                "flatAreaFound" => new FlatAreaFoundEvent(
+                    X: GetInt(root, "x"),
+                    Y: GetInt(root, "y"),
+                    Z: GetInt(root, "z"),
+                    Area: GetInt(root, "area"),
+                    MinX: GetInt(root, "minX"),
+                    MaxX: GetInt(root, "maxX"),
+                    MinZ: GetInt(root, "minZ"),
+                    MaxZ: GetInt(root, "maxZ"),
+                    Timestamp: now),
+
+                _ => null, // unknown event type — ignored
+            };
         }
         catch
         {
             return null;
         }
+    }
+
+    private static StatusEvent ParseStatus(JsonElement root, DateTimeOffset now)
+    {
+        var inv = new Dictionary<string, int>();
+        if (root.TryGetProperty("inventory", out var invEl))
+        {
+            if (invEl.ValueKind == JsonValueKind.String)
+            {
+                // legacy: inventory sent as JSON string
+                try
+                {
+                    using var invDoc = JsonDocument.Parse(invEl.GetString()!);
+                    foreach (var prop in invDoc.RootElement.EnumerateObject())
+                        if (prop.Value.TryGetInt32(out var qty) && qty > 0)
+                            inv[prop.Name] = qty;
+                }
+                catch { /* malformed inventory — leave empty */ }
+            }
+            else if (invEl.ValueKind == JsonValueKind.Object)
+            {
+                foreach (var prop in invEl.EnumerateObject())
+                    if (prop.Value.TryGetInt32(out var qty) && qty > 0)
+                        inv[prop.Name] = qty;
+            }
+        }
+
+        return new StatusEvent(
+            Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+            Health: GetInt(root, "hp", 20),
+            Food: GetInt(root, "food", 20),
+            Inventory: inv,
+            Timestamp: now);
+    }
+
+    // ── JSON helpers ──────────────────────────────────────────────────────────
+
+    private static int GetInt(JsonElement root, string key, int defaultValue = 0)
+    {
+        if (!root.TryGetProperty(key, out var el)) return defaultValue;
+        return el.ValueKind == JsonValueKind.Number && el.TryGetInt32(out var i)
+            ? i : defaultValue;
+    }
+
+    private static string? GetString(JsonElement root, string key, string? defaultValue = null)
+    {
+        if (!root.TryGetProperty(key, out var el)) return defaultValue;
+        return el.ValueKind == JsonValueKind.String ? el.GetString() : defaultValue;
     }
 
     // ── Dispose ──────────────────────────────────────────────────────────────

@@ -104,6 +104,7 @@ public sealed class HtnTaskLibrary
             ["WaitForSunrise"]  = WaitDecompose,
             ["Wander"]          = WanderDecompose,
             ["Explore"]         = ExploreDecompose,
+            ["FindFlatArea"]    = FindFlatAreaDecompose,
         };
     }
 
@@ -394,6 +395,18 @@ public sealed class HtnTaskLibrary
             MakeAction("Wander",       ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)maxDist)),
             MakeAction("GetStatus"),
             MakeAction("Wander",       ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)maxDist)),
+            MakeAction("GetStatus"),
+        ];
+    }
+
+    private static IReadOnlyList<ActionData> FindFlatAreaDecompose(
+        string[] parameters, WorldState state)
+    {
+        var radius      = parameters.Length > 0 && int.TryParse(parameters[0], out var r) ? r : 20;
+        var minFlatArea = parameters.Length > 1 && int.TryParse(parameters[1], out var a) ? a : 9;
+        return
+        [
+            MakeAction("FindFlatArea", ("radius", (object?)radius), ("minFlatArea", (object?)minFlatArea)),
             MakeAction("GetStatus"),
         ];
     }

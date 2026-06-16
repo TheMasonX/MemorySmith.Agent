@@ -35,4 +35,7 @@ public static class ActionProtocol
 
     /// <summary>Smelt an item in a nearby furnace. Node.js action: <c>smelt</c>.</summary>
     public const string Smelt = "smelt";
+
+    /// <summary>Scan for a flat, buildable area near the bot. Node.js action: <c>findFlatArea</c>.</summary>
+    public const string FindFlatArea = "findFlatArea";
 }

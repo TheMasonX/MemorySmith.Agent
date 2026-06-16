@@ -1,9 +1,7 @@
 namespace Agent.Core;
 
-using System.Text.Json;
-
 /// <summary>
-/// Pure, stateless projector that applies a <see cref="WorldEvent"/> to a
+/// Pure, stateless projector that applies a typed <see cref="WorldEvent"/> to a
 /// <see cref="WorldState"/> and returns the updated state.
 ///
 /// Each call is a pure function: no I/O, no logging, no mutable shared state.
@@ -13,7 +11,7 @@ using System.Text.Json;
 /// state fields (position, health, inventory) and stores raw event facts for
 /// debugging; it never writes <c>game.lastError</c>.
 ///
-/// Testable without any hosted-service infrastructure.
+/// Sprint 3a: Now uses pattern matching on typed event subtypes.
 /// </summary>
 public sealed class WorldStateProjector
 {
@@ -21,100 +19,195 @@ public sealed class WorldStateProjector
     /// Applies <paramref name="ev"/> to <paramref name="current"/> and returns
     /// the updated state. <paramref name="current"/> is never mutated.
     /// </summary>
-    public WorldState Apply(WorldState current, WorldEvent ev)
+    public WorldState Apply(WorldState current, WorldEvent ev) => ev switch
     {
-        // Store all payload fields as raw event facts for inspection / debugging.
-        var next = current.With(b =>
-        {
-            foreach (var kv in ev.Payload)
-                b.SetFact($"event:{ev.EventType}:{kv.Key}", kv.Value);
-        });
-
-        // Structured canonical state updates per event type.
-        return ev.EventType switch
-        {
-            "health" =>
-                ApplyHealthAndFood(next, ev.Payload),
-
-            "spawn" =>
-                ApplyHealthAndFood(ApplyPosition(next, ev.Payload), ev.Payload),
-
-            "move" or "moveComplete" =>
-                ApplyPosition(next, ev.Payload),
-
-            "status" =>
-                ApplyInventorySnapshot(
-                    ApplyHealthAndFood(
-                        ApplyPosition(next, ev.Payload), ev.Payload),
-                    ev.Payload),
-
-            "blockMined" =>
-                ApplyBlockMined(next, ev.Payload),
-
-            // "error", "blockNotFound", and unknown event types:
-            // raw facts are already stored above; no structured state change here.
-            // Callers (AgentBackgroundService) route these to a typed error channel.
-            _ => next,
-        };
-    }
+        SpawnEvent e => ApplySpawn(current, e),
+        HealthEvent e => ApplyHealth(current, e),
+        MoveEvent e => ApplyMove(current, e),
+        BlockMinedEvent e => ApplyBlockMined(current, e),
+        StatusEvent e => ApplyStatus(current, e),
+        // All other events (Chat, Error, BlockNotFound, CraftComplete, SmeltComplete,
+        // Death, BlockPlaced, WanderComplete, WanderFailed, Kicked):
+        // no structured state change; store raw facts for debugging only.
+        _ => StoreFacts(current, ev),
+    };
 
     // ── Private helpers ───────────────────────────────────────────────────────
 
-    private static WorldState ApplyPosition(
-        WorldState state, IReadOnlyDictionary<string, object?> payload)
+    private static WorldState ApplySpawn(WorldState current, SpawnEvent e)
     {
-        if (payload.TryGetValue("x", out var ox) && ox is int px &&
-            payload.TryGetValue("y", out var oy) && oy is int py &&
-            payload.TryGetValue("z", out var oz) && oz is int pz)
-        {
-            state = state with { Position = new Position(px, py, pz) };
-        }
-        return state;
+        var result = current with { Position = e.Pos, Health = e.Health, Food = e.Food };
+        return StoreFacts(result, e);
     }
 
-    private static WorldState ApplyHealthAndFood(
-        WorldState state, IReadOnlyDictionary<string, object?> payload)
+    private static WorldState ApplyHealth(WorldState current, HealthEvent e)
     {
-        if (payload.TryGetValue("hp",   out var ohp) && ohp is int hp)
-            state = state with { Health = hp };
-        if (payload.TryGetValue("food", out var of)  && of  is int food)
-            state = state with { Food = food };
-        return state;
+        var result = current with { Health = e.Health, Food = e.Food };
+        return StoreFacts(result, e);
     }
 
-    private static WorldState ApplyBlockMined(
-        WorldState state, IReadOnlyDictionary<string, object?> payload)
+    private static WorldState ApplyMove(WorldState current, MoveEvent e)
     {
-        if (payload.TryGetValue("block", out var rawBlock) && rawBlock is string blockName)
+        var result = current with { Position = e.Pos };
+        return StoreFacts(result, e);
+    }
+
+    private static WorldState ApplyBlockMined(WorldState current, BlockMinedEvent e)
+    {
+        var itemKey = e.Block.Contains(':') ? e.Block.Split(':')[1] : e.Block;
+        var result = current.With(b => b.AddInventoryItem(itemKey, 1));
+        return StoreFacts(result, e);
+    }
+
+    private static WorldState ApplyStatus(WorldState current, StatusEvent e)
+    {
+        var result = current.With(b =>
         {
-            var itemKey = blockName.Contains(':') ? blockName.Split(':')[1] : blockName;
-            state = state.With(b => b.AddInventoryItem(itemKey, 1));
-        }
-        return state;
+            b.SetPosition(e.Pos);
+            b.SetHealth(e.Health);
+            b.SetFood(e.Food);
+            b.SetInventory(e.Inventory);
+        });
+        return StoreFacts(result, e);
     }
 
     /// <summary>
-    /// Parses the "inventory" JSON string from a status-event payload
-    /// and replaces <see cref="WorldState.Inventory"/> with a full snapshot.
-    /// Malformed JSON is silently ignored (the rest of the state is still applied).
+    /// Records all named properties of the typed event as raw facts
+    /// (e.g. <c>event:Spawn:Health=20</c>). Fact keys use the event type name
+    /// (without "Event" suffix) as the namespace.
     /// </summary>
-    private static WorldState ApplyInventorySnapshot(
-        WorldState state, IReadOnlyDictionary<string, object?> payload)
+    private static WorldState StoreFacts(WorldState current, WorldEvent ev)
     {
-        if (!payload.TryGetValue("inventory", out var invRaw) || invRaw is not string invJson)
-            return state;
-        try
+        var prefix = $"event:{GetEventKind(ev)}:";
+        var result = current;
+
+        switch (ev)
         {
-            using var doc = JsonDocument.Parse(invJson);
-            var snap = new Dictionary<string, int>();
-            foreach (var prop in doc.RootElement.EnumerateObject())
-                if (prop.Value.TryGetInt32(out var qty) && qty > 0)
-                    snap[prop.Name] = qty;
-            return state.With(b => b.SetInventory(snap));
+            case SpawnEvent e:
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Pos", e.Pos);
+                    b.SetFact($"{prefix}Health", e.Health);
+                    b.SetFact($"{prefix}Food", e.Food);
+                });
+                break;
+            case HealthEvent e:
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Health", e.Health);
+                    b.SetFact($"{prefix}Food", e.Food);
+                });
+                break;
+            case MoveEvent e:
+                result = result.With(b => b.SetFact($"{prefix}Pos", e.Pos));
+                break;
+            case BlockMinedEvent e:
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Block", e.Block);
+                    b.SetFact($"{prefix}Count", e.Count);
+                    b.SetFact($"{prefix}Pos", e.Pos);
+                });
+                break;
+            case ChatEvent e:
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Username", e.Username);
+                    b.SetFact($"{prefix}Message", e.Message);
+                    b.SetFact($"{prefix}OnlinePlayers", e.OnlinePlayers);
+                    if (e.PlayerPos is { } pp)
+                        b.SetFact($"{prefix}PlayerPos", pp);
+                });
+                break;
+            case ErrorEvent e:
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Action", e.Action);
+                    b.SetFact($"{prefix}Message", e.Message);
+                });
+                break;
+            case BlockNotFoundEvent e:
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Block", e.Block);
+                    b.SetFact($"{prefix}MinedCount", e.MinedCount);
+                });
+                break;
+            case CraftCompleteEvent e:
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Item", e.Item);
+                    b.SetFact($"{prefix}Count", e.Count);
+                });
+                break;
+            case SmeltCompleteEvent e:
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Input", e.Input);
+                    b.SetFact($"{prefix}Result", e.Result);
+                    b.SetFact($"{prefix}Count", e.Count);
+                });
+                break;
+            case DeathEvent e:
+                result = result.With(b => b.SetFact($"{prefix}Pos", e.Pos));
+                break;
+            case StatusEvent e:
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Pos", e.Pos);
+                    b.SetFact($"{prefix}Health", e.Health);
+                    b.SetFact($"{prefix}Food", e.Food);
+                });
+                break;
+            case BlockPlacedEvent e:
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}X", e.X);
+                    b.SetFact($"{prefix}Y", e.Y);
+                    b.SetFact($"{prefix}Z", e.Z);
+                    b.SetFact($"{prefix}Block", e.Block);
+                });
+                break;
+            case WanderCompleteEvent e:
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Pos", e.Pos);
+                    b.SetFact($"{prefix}TargetX", e.TargetX);
+                    b.SetFact($"{prefix}TargetZ", e.TargetZ);
+                });
+                break;
+            case WanderFailedEvent e:
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Message", e.Message);
+                    b.SetFact($"{prefix}Pos", e.Pos);
+                });
+                break;
+            case KickedEvent e:
+                result = result.With(b => b.SetFact($"{prefix}Reason", e.Reason));
+                break;
+            case FlatAreaFoundEvent e:
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}X", e.X);
+                    b.SetFact($"{prefix}Y", e.Y);
+                    b.SetFact($"{prefix}Z", e.Z);
+                    b.SetFact($"{prefix}Area", e.Area);
+                    b.SetFact($"{prefix}MinX", e.MinX);
+                    b.SetFact($"{prefix}MaxX", e.MaxX);
+                    b.SetFact($"{prefix}MinZ", e.MinZ);
+                    b.SetFact($"{prefix}MaxZ", e.MaxZ);
+                });
+                break;
         }
-        catch
-        {
-            return state; // ignore malformed inventory JSON
-        }
+
+        return result;
     }
+
+    /// <summary>Strips "Event" suffix from the type name for fact key namespaces.</summary>
+    private static string GetEventKind(WorldEvent ev) => ev.GetType().Name switch
+    {
+        var n when n.EndsWith("Event") => n[..^5],
+        var n => n,
+    };
 }

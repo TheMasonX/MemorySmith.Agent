@@ -105,6 +105,7 @@ if (agentEnabled)
         d.Register(new ChatTool(world));
         d.Register(new CraftItemTool(world));
         d.Register(new FurnaceTool(world));
+        d.Register(new FindFlatAreaTool(world));
         return d;
     });
 
