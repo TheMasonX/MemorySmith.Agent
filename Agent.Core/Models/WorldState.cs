@@ -25,14 +25,43 @@ public record WorldState
     public sealed class Builder(WorldState source)
     {
         private WorldState _state = source;
+
         public Builder SetHealth(int hp) { _state = _state with { Health = hp }; return this; }
+        public Builder SetFood(int food) { _state = _state with { Food = food }; return this; }
         public Builder SetPosition(Position p) { _state = _state with { Position = p }; return this; }
+
         public Builder SetFact(string key, object? value)
         {
             var facts = new Dictionary<string, object?>(_state.Facts) { [key] = value };
             _state = _state with { Facts = facts, UpdatedAt = DateTimeOffset.UtcNow };
             return this;
         }
+
+        /// <summary>
+        /// Replaces the entire inventory with the supplied snapshot.
+        /// Used when a full status event arrives from the world adapter.
+        /// </summary>
+        public Builder SetInventory(IReadOnlyDictionary<string, int> snapshot)
+        {
+            _state = _state with { Inventory = new Dictionary<string, int>(snapshot) };
+            return this;
+        }
+
+        /// <summary>
+        /// Increments (or decrements) a single inventory item by <paramref name="delta"/>.
+        /// Removes the entry when the count drops to zero or below.
+        /// </summary>
+        public Builder AddInventoryItem(string item, int delta = 1)
+        {
+            var inv = new Dictionary<string, int>(_state.Inventory);
+            inv.TryGetValue(item, out var cur);
+            var next = cur + delta;
+            if (next <= 0) inv.Remove(item);
+            else           inv[item] = next;
+            _state = _state with { Inventory = inv };
+            return this;
+        }
+
         public WorldState Build() => _state with { UpdatedAt = DateTimeOffset.UtcNow };
     }
 }
