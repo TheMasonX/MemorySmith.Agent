@@ -400,15 +400,15 @@ file sealed class NoOpTool(string name) : ITool
 /// Sprint 1a: IChatInterpreter that sleeps for a configurable duration before returning
 /// NotAddressed. Simulates a slow LLM to verify the chat channel doesn't block the event loop.
 /// </summary>
-file sealed class SlowChatInterpreter(TimeSpan delay) : Agent.Planning.IChatInterpreter
+file sealed class SlowChatInterpreter(TimeSpan delay) : IChatInterpreter
 {
-    public async Task<Agent.Planning.ChatInterpretation> InterpretAsync(
+    public async Task<ChatInterpretation> InterpretAsync(
         string username, string message, string botName,
-        int onlinePlayers, Agent.Core.Position botPosition, Agent.Core.Position? playerPosition,
-        Agent.Core.WorldState state, CancellationToken ct = default)
+        int onlinePlayers, Position botPosition, Position? playerPosition,
+        WorldState state, CancellationToken ct = default)
     {
         await Task.Delay(delay, ct);
-        return new Agent.Planning.ChatInterpretation(Agent.Planning.ChatIntentType.NotAddressed);
+        return new ChatInterpretation(ChatIntentType.NotAddressed);
     }
 
     public void RecordBotSpoke() { }
