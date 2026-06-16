@@ -1,17 +1,8 @@
 namespace Agent.Planning;
 
-using Agent.Core;
-
-/// <summary>
-/// A compound HTN task definition. The name identifies the task;
-/// the description is injected into LLM prompts when the task is presented
-/// as a planning choice.
-/// </summary>
-public sealed record HtnTask(string Name, string Description, string[] SubTasks);
-
-/// <summary>
-/// Decomposes a compound HTN task into a sequence of atomic ActionData items
-/// given optional string parameters and the current WorldState.
-/// </summary>
-public delegate IReadOnlyList<ActionData> TaskDecomposer(
-    string[] parameters, WorldState state);
+// HtnTask record removed — it was never instantiated (dead code since Phase 2).
+// TaskDecomposer delegate moved to HtnTaskLibrary.cs.
+// See ADR-009 in Data/Pages/decisions.md for rationale.
+//
+// File kept as a tombstone so git history shows intent; may be deleted
+// entirely in a future cleanup pass.
