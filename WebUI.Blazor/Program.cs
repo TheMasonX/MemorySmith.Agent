@@ -58,6 +58,8 @@ if (agentEnabled)
         registry.Register(new MoveToTool(world));
         registry.Register(new StatusTool(world));
         registry.Register(new MineBlockTool(world));
+        registry.Register(new WanderTool(world));
+        registry.Register(new PlaceBlockTool(world));
         registry.Register(new SearchMemoryTool(memory));
         registry.Register(new GetPageTool(memory));
         registry.Register(new CreatePageTool(memory));
