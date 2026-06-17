@@ -9,7 +9,7 @@ namespace Agent.Memory;
 /// </summary>
 public enum CandidateType
 {
-    /// <summary>A block the bot can mine directly (no crafting). Source: IItemRegistry (SourceBlocks contains ItemId).</summary>
+    /// <summary>A block the bot can mine directly (no crafting). Source: IItemRegistry (SourceBlocks contains ItemId or ItemId is in CommonMinecraftBlocks.DirectMineBlocks).</summary>
     DirectMineable,
 
     /// <summary>An item crafted from other materials (not smelted). Source: IItemRegistry (RequiresSmelting=false, SourceBlocks non-empty, not self-sourced).</summary>
@@ -23,6 +23,9 @@ public enum CandidateType
 
     /// <summary>A general wiki page (blueprint, guide, or note). Source: IMemoryGateway.SearchAsync.</summary>
     WikiPage,
+
+    /// <summary>A runtime observation fact from WorldState.StructuredFacts (in-memory, live). Confidence decays with age: 0.70 within 60 s, 0.50 after. Source: WorldState.</summary>
+    WorldFact,
 }
 
 /// <summary>
@@ -70,9 +73,9 @@ public sealed record KnowledgeResult(
 /// Single-entry-point knowledge resolver for the Phase 7-B stub.
 ///
 /// Answers "what is X?" by checking registered knowledge sources in priority order.
-/// Retrieval strategy: lexical-first (normalize query → IItemRegistry → IMemoryGateway).
+/// Retrieval strategy: lexical-first (normalize query → IItemRegistry → IMemoryGateway → WorldState).
 ///
-/// <b>Phase 7-B scope constraint:</b> Two sources only — IItemRegistry and IMemoryGateway.
+/// <b>Phase 7-B scope constraint:</b> Three sources — IItemRegistry, IMemoryGateway, WorldState.StructuredFacts.
 /// No graph traversal, no planner wiring. API-accessible via GET /api/agent/resolve.
 /// The resolver grows in Phase 7-C when the observation pipeline is ready.
 ///
