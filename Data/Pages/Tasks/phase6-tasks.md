@@ -159,3 +159,64 @@ Sprints 1–14 have built the execution layer correctly (deterministic HTN, safe
 ### When to start Phase 7
 
 Start Phase 7-A after Sprint 14 council is clean and CI is green. The first task is **not** code — it is the architecture inventory described in Phase 0 of the Concrete Refactor Plan.
+
+---
+
+## Sprint 15 — Mining Count Fix & Coal Pre-gather (COMPLETE ✅)
+
+**CI commit:** Sprint 15 changes (fb569c0 + CI fix in same batch)  
+**Council:** `Data/Pages/council/sprint15-council-20260617.md` — no blockers  
+
+| ID | Task | File | Status |
+|----|------|------|--------|
+| CI-fix | `CraftItemGoalTests.cs` narrow `SkipsPreGather_WhenIngotsSufficient` to iron_ore/deepslate + SmeltItem | `CraftItemGoalTests.cs` | ✅ Done |
+| P0-count | `WorldStateProjector.ApplyBlockMined` uses `e.Count` not hardcoded `1` | `WorldStateProjector.cs` | ✅ Done |
+| P0-test | 2 new tests: multi-count BlockMined (count=5, count=64+namespaced) | `WorldStateProjectorTests.cs` | ✅ Done |
+| P0-coal | `DecomposeCraftItem` pre-gathers coal_ore before SmeltItem when coal insufficient | `HtnTaskLibrary.cs` | ✅ Done |
+| P0-coal-test | `EmitsCoalMine_WhenNoCoal` + `SkipsCoalMine_WhenCoalPresent` | `CraftItemGoalTests.cs` | ✅ Done |
+| P1-recovery | `TryCompleteCurrentGoalFromWorldUpdate` resets `_lastRecoveredGoalName = null` | `AgentBackgroundService.cs` | ✅ Done |
+| P1-stall | `_lastActionDispatchedAt` / `_lastStallWarnedAt` stall detection (10s warn, 30s suppress) | `AgentBackgroundService.cs` | ✅ Done |
+| Audit | 3 new audit docs → `Data/Pages/Audit/` | `Audit/*.md` | ✅ Done |
+| Synthesis | 6-seat + anonymous peer synthesis of all 7 audits | `audit-synthesis-council-20260617.md` | ✅ Done |
+| D6 | NUnit2058 in MockMemoryGatewayTests.cs — already fixed (`Is.Not.Null.And.Not.Empty`) | `MockMemoryGatewayTests.cs` | ✅ Done (pre-existing) |
+
+---
+
+## Sprint 16 — Planner Routing Docs & Knowledge Resolver Stub (COMPLETE ✅)
+
+**CI commit:** (queued — Sprint 16 push)  
+**Council:** `Data/Pages/council/sprint16-council-20260617.md` (pending)  
+**Branch:** `sprint-5-tool-safety` (PR #1)  
+
+| ID | Task | File | Status |
+|----|------|------|--------|
+| P0-a | Annotate `PlannerRouter.cs` — [IMPLEMENTED]/[ASPIRATIONAL] XML docs on all enum values + Select() | `Agent.Planning/Router/PlannerRouter.cs` | ✅ Done |
+| P0-b | Architecture inventory: `planner-routing-status-20260617.md` | `Data/Pages/Architecture/` (NEW) | ✅ Done |
+| P1-a | `IKnowledgeResolver` interface + `KnowledgeQuery`, `KnowledgeResult`, `KnowledgeCandidate`, `CandidateType` | `Agent.Memory/IKnowledgeResolver.cs` (NEW) | ✅ Done |
+| P1-b | `LocalKnowledgeResolver` stub — two sources (IItemRegistry + IMemoryGateway), lexical-first | `Agent.Memory/LocalKnowledgeResolver.cs` (NEW) | ✅ Done |
+| P1-c | DI registration + `GET /api/agent/resolve?q=` endpoint | `WebUI.Blazor/Program.cs` | ✅ Done |
+| P1-d | 8 unit tests: registry hit, smeltable, craftable, gateway fallback, TopN cap, threshold filter, type filter, ambiguity, empty | `MemorySmith.Agent.Tests/KnowledgeResolverTests.cs` (NEW) | ✅ Done |
+| P2-b | Extract crafting-table bootstrap → `AddCraftingTableIfNeeded` private helper | `Agent.Planning/HtnTaskLibrary.cs` | ✅ Done |
+| tasks | phase6-tasks.md Sprint 15 + Sprint 16 entries | `phase6-tasks.md` | ✅ Done |
+
+### Deferred from Sprint 16
+
+| ID | Finding | Target |
+|----|---------|--------|
+| B3 | Orientation-aware PlaceBlock (facing direction) | Sprint 17+ |
+| B5 | Clear-area action before building on slight slope | Sprint 17+ |
+| D2 (S2) | MemorySmithItemRegistry parallel miss race | Sprint 17+ |
+
+---
+
+## Phase 7 — Updated Roadmap (post Sprint 16)
+
+| Sub-phase | Focus | Sprint estimate |
+|-----------|-------|----------------|
+| **7-A (done)** | Architecture inventory; planner routing cleanup | Sprint 16 ✅ |
+| **7-B (next)** | Unified resolver growth (wire to SearchMemory tool; add CandidateType.WorldFact source) | Sprint 17 |
+| 7-C | Observation pipeline normalization | Sprint 18 |
+| 7-D | Belief layer + IBeliefState | Sprint 19 |
+| 7-E | Planner input migration to world model + beliefs | Sprint 21 |
+| 7-F | Reflection service | Sprint 22 |
+| 7-G | Page synthesis from memory clusters | Sprint 23 |
