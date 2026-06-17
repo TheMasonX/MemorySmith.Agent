@@ -97,6 +97,11 @@ public sealed class AgentBackgroundService(
     // that just failed, which would create an infinite recovery loop.
     private string? _lastAbandonedGoalName;
 
+    // Sprint 13: tracks the goal name for which recovery was last attempted.
+    // Prevents burning LLM rate-limit tokens on repeat recovery calls for
+    // the same failing goal (blockNotFound fires on every mine cycle).
+    private string? _lastRecoveredGoalName;
+
     public WorldState WorldState           => _worldState;
     public IGoal?     CurrentGoal          => _currentGoal;
     public int        ConsecutiveFailures  => _consecutiveFailures;
@@ -117,6 +122,8 @@ public sealed class AgentBackgroundService(
         _actionDispatchedThisCycle = false;
         // Sprint 12: clear recovery guard — this is a fresh goal, not a retry.
         _lastAbandonedGoalName = null;
+        // Sprint 13: clear recovery-rate guard so recovery can run for the new goal.
+        _lastRecoveredGoalName = null;
         lock (_pendingLock) _pendingActions.Clear();
         logger.LogInformation("Goal set: {Goal}", goal.Name);
         _journal?.Log(new JournalEntry(
@@ -135,6 +142,7 @@ public sealed class AgentBackgroundService(
         _journal?.Log(new JournalEntry(
             DateTimeOffset.UtcNow, JournalEntryType.GoalCancel, previousGoalName ?? "unknown"));
         _consecutiveFailures = 0;
+        _lastRecoveredGoalName = null; // Sprint 13: reset recovery rate-limiter
         _queue.Clear();
         lock (_pendingLock) _pendingActions.Clear();
         // Sprint 4b: push goal clear to dashboard
@@ -792,13 +800,27 @@ public sealed class AgentBackgroundService(
     /// Asks the LLM interpreter to suggest an alternative goal when the agent has hit
     /// a game error it cannot self-resolve.
     ///
-    /// Sprint 12: guards against the infinite recovery loop where the LLM suggests
-    /// the same goal that just failed. If <see cref="_lastAbandonedGoalName"/> matches
-    /// the suggestion, the suggestion is discarded and a warning is logged.
+    /// Sprint 12: guards against re-setting the goal that just failed.
+    /// Sprint 13: skips the LLM call entirely if recovery was already attempted for this
+    ///   goal (prevents burning rate budget on blockNotFound errors that fire every cycle).
+    ///   Also fixes the Sprint 12 naming mismatch (GoalNames are compared by item-ID suffix
+    ///   so "GatherItem:oak_log" correctly matches "Gather:oak_log").
     /// </summary>
     private async Task TryRecoverFromGameErrorAsync(string errMsg, CancellationToken ct)
     {
         if (chatInterpreter is null || _currentGoal is null) return;
+
+        // Sprint 13: skip LLM call if recovery was already attempted for this goal.
+        // blockNotFound events fire on every failed mine cycle, so without this guard
+        // we'd call the LLM on every cycle and exhaust the rate limit.
+        if (string.Equals(_currentGoal.Name, _lastRecoveredGoalName, StringComparison.OrdinalIgnoreCase))
+        {
+            logger.LogDebug(
+                "[recovery] already attempted recovery for '{Goal}' — skipping duplicate LLM call",
+                _currentGoal.Name);
+            return;
+        }
+        _lastRecoveredGoalName = _currentGoal.Name;
 
         _journal?.Log(new JournalEntry(
             DateTimeOffset.UtcNow, JournalEntryType.ErrorRecovery, errMsg,
@@ -831,12 +853,21 @@ public sealed class AgentBackgroundService(
 
             if (interpretation.IntentType == ChatIntentType.CreateGoal && interpretation.GoalName is not null)
             {
-                // Sprint 12: don't reset to the same goal that just failed — prevents infinite loop.
-                if (string.Equals(interpretation.GoalName, _lastAbandonedGoalName,
-                    StringComparison.OrdinalIgnoreCase))
+                // Sprint 13 fix: compare by item-ID suffix to handle the naming discrepancy
+                // between ChatInterpretation.GoalName ("GatherItem:oak_log") and
+                // GenericGatherGoal.Name ("Gather:oak_log"). Sprint 12's direct string
+                // comparison never fired because these strings don't match exactly.
+                if (GoalNamesMatch(interpretation.GoalName, _currentGoal?.Name))
+                {
+                    logger.LogDebug(
+                        "[recovery] LLM suggested current goal '{Goal}' — no change needed",
+                        interpretation.GoalName);
+                    return;
+                }
+                if (GoalNamesMatch(interpretation.GoalName, _lastAbandonedGoalName))
                 {
                     logger.LogWarning(
-                        "[recovery] LLM suggested '{Goal}' — same as recently abandoned goal; skipping to break loop",
+                        "[recovery] LLM suggested '{Goal}' — same item as recently abandoned; skipping to break loop",
                         interpretation.GoalName);
                     return;
                 }
@@ -849,5 +880,18 @@ public sealed class AgentBackgroundService(
         {
             logger.LogDebug(ex, "Recovery interpreter failed for error: {Error}", errMsg);
         }
+    }
+
+    /// <summary>
+    /// Compares two goal name strings by their item-ID suffix (everything after ':').
+    /// This handles the naming discrepancy between ChatInterpreter ("GatherItem:oak_log")
+    /// and GenericGatherGoal.Name ("Gather:oak_log") — both share the suffix "oak_log".
+    /// </summary>
+    private static bool GoalNamesMatch(string? a, string? b)
+    {
+        if (string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b)) return false;
+        var itemA = a.Contains(':') ? a[(a.IndexOf(':') + 1)..] : a;
+        var itemB = b.Contains(':') ? b[(b.IndexOf(':') + 1)..] : b;
+        return string.Equals(itemA, itemB, StringComparison.OrdinalIgnoreCase);
     }
 }
