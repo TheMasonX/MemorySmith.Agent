@@ -27,9 +27,13 @@ using System.Threading.Channels;
 ///   - TryRecoverFromGameErrorAsync: richer prompt (inventory + available actions);
 ///     immediate trigger for blockNotFound/recipeMissing; ErrorRecovery journal log.
 /// Sprint 9:
-///   - FlatAreaFoundEvent: when Area ≥ MinUsableFlatArea, auto-sets build origin
+///   - FlatAreaFoundEvent: when Area >= MinUsableFlatArea, auto-sets build origin
 ///     under the "auto" blueprint key so the next DecomposeBuild cycle can use it.
-///   - MinUsableFlatArea constant (9 = 3×3) guards against degenerate near-zero results.
+///   - MinUsableFlatArea constant (25 = 5x5) guards against degenerate near-zero results.
+/// Sprint 11:
+///   - EnqueueThinkingIfSlowAsync now logs when the indicator fires, so operators can
+///     see exactly when the LLM is taking longer than 1.5s.
+///   - HandleChatEventAsync logs the resolved intent after interpretation for visibility.
 /// </summary>
 public sealed class AgentBackgroundService(
     IWorldAdapter worldAdapter,
@@ -54,7 +58,7 @@ public sealed class AgentBackgroundService(
 
     /// <summary>
     /// Minimum flat area (in cells) for a FlatAreaFoundEvent to trigger auto build-origin
-    /// assignment. 25 = a 5×5 footprint — the smallest structure the HTN library can build.
+    /// assignment. 25 = a 5x5 footprint — the smallest structure the HTN library can build.
     /// Values below 9 risk selecting degenerate strips; below 25 rarely produce valid build sites.
     /// Council review 2026-06-17 raised this from 9 to 25.
     /// </summary>
@@ -242,7 +246,7 @@ public sealed class AgentBackgroundService(
 
                 case BlockMinedEvent e:
                     var itemKey = e.Block.Contains(':') ? e.Block.Split(':')[1] : e.Block;
-                    logger.LogInformation("Inventory +1 {Block} → total {Total}",
+                    logger.LogInformation("Inventory +1 {Block} -> total {Total}",
                         itemKey, _worldState.Inventory.GetValueOrDefault(itemKey));
                     break;
 
@@ -251,7 +255,7 @@ public sealed class AgentBackgroundService(
                     break;
 
                 case SmeltCompleteEvent e:
-                    logger.LogInformation("Smelted {Count}x {Input} → {Output}", e.Count, e.Input, e.Result);
+                    logger.LogInformation("Smelted {Count}x {Input} -> {Output}", e.Count, e.Input, e.Result);
                     break;
 
                 case ChatEvent:
@@ -300,7 +304,7 @@ public sealed class AgentBackgroundService(
 
     /// <summary>
     /// Dedicated consumer for chat events. Runs independently of ProcessEventsAsync so
-    /// a 5–10s LLM call in HandleChatEventAsync never delays health/blockMined events.
+    /// a 5-10s LLM call in HandleChatEventAsync never delays health/blockMined events.
     /// </summary>
     private async Task ChatConsumerAsync(CancellationToken ct)
     {
@@ -341,6 +345,12 @@ public sealed class AgentBackgroundService(
         // Cancel the thinking indicator now we have a result
         await thinkingCts.CancelAsync();
         try { await thinkingTask.ConfigureAwait(false); } catch (OperationCanceledException) { }
+
+        // Sprint 11: log the resolved intent for visibility — shows what the bot understood.
+        if (interpretation.IntentType != ChatIntentType.NotAddressed)
+            logger.LogInformation("[chat] <{Username}> -> {Intent}{Goal}",
+                chat.Username, interpretation.IntentType,
+                interpretation.GoalName is null ? "" : $" ({interpretation.GoalName})");
 
         if (interpretation.IntentType == ChatIntentType.NotAddressed)
         {
@@ -667,6 +677,9 @@ public sealed class AgentBackgroundService(
     /// Enqueues a flavour "thinking" message after a short delay so players know
     /// the bot is processing. Cancelled immediately for fast-path (pattern-matched)
     /// responses; only visible when the LLM takes more than ~1.5 s.
+    ///
+    /// Sprint 11: logs when the indicator fires so operators can see that the LLM
+    /// is slow — distinguishes "bot ignored me" from "bot is thinking".
     /// </summary>
     private async Task EnqueueThinkingIfSlowAsync(CancellationToken ct)
     {
@@ -675,6 +688,7 @@ public sealed class AgentBackgroundService(
             await Task.Delay(TimeSpan.FromSeconds(1.5), ct);
             var msg = _thinkingMessages[Random.Shared.Next(_thinkingMessages.Length)];
             _queue.Enqueue(new ActionData { Tool = "Chat", Arguments = { ["message"] = msg } });
+            logger.LogInformation("[chat] thinking indicator sent ('{Msg}') — LLM response pending >1.5s", msg);
         }
         catch (OperationCanceledException) { /* fast path — thinking not needed */ }
     }
@@ -802,7 +816,7 @@ public sealed class AgentBackgroundService(
     /// - Includes the bot's current inventory in the prompt so the LLM can make
     ///   inventory-aware suggestions ("you have planks, try crafting table instead").
     /// - Triggered immediately for blockNotFound / recipeMissing — these error types
-    ///   are unrecoverable without a goal change; waiting for ≥2 failures wastes cycles.
+    ///   are unrecoverable without a goal change; waiting for >=2 failures wastes cycles.
     /// </summary>
     private async Task TryRecoverFromGameErrorAsync(string errMsg, CancellationToken ct)
     {
