@@ -15,6 +15,10 @@ using Agent.Planning.Goals;
 /// - Added <c>CraftItem:{itemId}</c> prefix — returns a <see cref="CraftItemGoal"/>.
 /// - Added built-in fallback for direct-mine blocks (dirt, sand, iron_ore, oak_log, etc.)
 ///   so gather goals work without MemorySmith wiki pages for common items.
+///
+/// Sprint 14 P1a:
+/// - BuiltInDirectMineItems removed; now delegates to <see cref="CommonMinecraftBlocks.DirectMineBlocks"/>
+///   to eliminate the manual-sync requirement flagged in Sprint 13 council D1.
 /// </summary>
 public sealed class GoalFactory : IGoalFactory
 {
@@ -27,28 +31,6 @@ public sealed class GoalFactory : IGoalFactory
     {
         ["GatherWood"]   = p => new GatherWoodGoal(GetInt(p, "count", 10)),
         ["SurviveNight"] = _ => new SurviveNightGoal(),
-    };
-
-    /// <summary>
-    /// Common direct-mine blocks that don't need a MemorySmith wiki page.
-    /// Subset of <c>HtnTaskLibrary.DirectMineBlocks</c> — kept in sync manually.
-    /// </summary>
-    private static readonly HashSet<string> BuiltInDirectMineItems = new(StringComparer.OrdinalIgnoreCase)
-    {
-        // Earth / terrain
-        "dirt", "sand", "gravel", "clay", "snow", "snow_block",
-        // Wood
-        "oak_log", "birch_log", "spruce_log", "dark_oak_log",
-        "jungle_log", "acacia_log", "cherry_log", "mangrove_log",
-        // Stone
-        "cobblestone", "stone",
-        // Ores (surface + deepslate)
-        "iron_ore", "deepslate_iron_ore",
-        "gold_ore", "deepslate_gold_ore",
-        "coal_ore", "deepslate_coal_ore",
-        "diamond_ore", "deepslate_diamond_ore",
-        "redstone_ore", "deepslate_redstone_ore",
-        "lapis_ore", "deepslate_lapis_ore",
     };
 
     private readonly IItemRegistry?        _itemRegistry;
@@ -132,11 +114,14 @@ public sealed class GoalFactory : IGoalFactory
     /// <summary>
     /// Returns a minimal <see cref="ItemSpec"/> for common direct-mine blocks that
     /// do not require a MemorySmith wiki page. Returns null for unknown items.
+    ///
+    /// Sprint 14 P1a: now delegates to <see cref="CommonMinecraftBlocks.DirectMineBlocks"/>
+    /// instead of maintaining a separate private set.
     /// </summary>
     private static ItemSpec? TryMakeBuiltInSpec(string itemId)
     {
         var key = itemId.ToLowerInvariant().Replace('-', '_');
-        if (!BuiltInDirectMineItems.Contains(key)) return null;
+        if (!CommonMinecraftBlocks.DirectMineBlocks.Contains(key)) return null;
         return new ItemSpec
         {
             ItemId           = key,
