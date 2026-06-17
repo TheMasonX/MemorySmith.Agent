@@ -1,7 +1,7 @@
 // ──────────────────────────────────────────────────────────────────────────────
 // Sprint 4b — Chat History Context Window
 //
-// Maintains a rolling buffer of the last N chat turns (player → bot responses)
+// Maintains a rolling buffer of the last N chat turns (player -> bot responses)
 // so the LLM has conversational context when interpreting a new message.
 // ──────────────────────────────────────────────────────────────────────────────
 
@@ -15,9 +15,12 @@ public sealed record ChatTurn(string Speaker, string Message, DateTimeOffset Tim
 
 /// <summary>
 /// Thread-safe, bounded rolling buffer of recent chat turns.
-/// Thread safety: all writes go through a single consumer (ChatConsumerAsync);
-/// reads happen within the same serialized pipeline. No lock needed, but
-/// the API is safe for concurrent access via <see cref="Interlocked.Exchange"/>.
+/// Thread safety: implemented via <see cref="Volatile.Read"/> /
+/// <see cref="Volatile.Write"/> / <see cref="Interlocked.CompareExchange"/>.
+/// The backing field must NOT be declared <c>volatile</c> — passing a volatile
+/// field by reference (as ref T) strips the volatile semantics and causes
+/// CS0420. <c>Volatile.Read</c> and <c>Interlocked.CompareExchange</c> already
+/// provide the necessary acquire/release memory ordering on their own.
 /// </summary>
 public sealed class ChatHistory
 {
@@ -25,7 +28,11 @@ public sealed class ChatHistory
     public const int MaxTurnsDefault = 5;
 
     private readonly int _maxTurns;
-    private volatile ChatTurn[] _buffer = [];
+
+    // NOT volatile — Volatile.Read/Write/Interlocked.CompareExchange provide the
+    // required memory barriers. Declaring it volatile AND passing it by ref causes
+    // CS0420 because the ref operation strips the volatile guarantee.
+    private ChatTurn[] _buffer = [];
 
     public ChatHistory(int maxTurns = MaxTurnsDefault)
     {
