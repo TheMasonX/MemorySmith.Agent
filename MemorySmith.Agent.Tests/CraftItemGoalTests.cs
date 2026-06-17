@@ -213,17 +213,22 @@ public sealed class CraftItemGoalTests
         var library = new HtnTaskLibrary();
         var planner = new HtnPlanner(library);
         var goal    = new CraftItemGoal("iron_pickaxe", 1);
-        // 3 iron_ingots → no pre-gather needed
+        // 3 iron_ingots → no iron pre-gather needed.
+        // Note: plan may still emit MineBlock(oak_log) for the crafting-table step;
+        // this assertion only checks for iron-specific pre-gather actions.
         var state   = new WorldState().With(b => b.AddInventoryItem("iron_ingot", 3));
 
         var plan = await planner.PlanAsync(goal, state);
 
-        var preGatherActions = plan.Actions
-            .Where(a => a.Tool is "MineBlock" or "SmeltItem")
+        var ironPreGatherActions = plan.Actions
+            .Where(a => (a.Tool == "MineBlock" &&
+                         a.Arguments.TryGetValue("block", out var bl) &&
+                         bl?.ToString() is "iron_ore" or "deepslate_iron_ore") ||
+                        a.Tool == "SmeltItem")
             .ToList();
 
-        Assert.That(preGatherActions, Is.Empty,
-            "No MineBlock/SmeltItem should be emitted when iron ingots are already sufficient.");
+        Assert.That(ironPreGatherActions, Is.Empty,
+            "No iron mining or smelting should be emitted when iron ingots are already sufficient.");
     }
 
     [Test]
@@ -241,6 +246,49 @@ public sealed class CraftItemGoalTests
             a.Arguments.TryGetValue("block", out var b) &&
             b?.ToString() == "stone"), Is.True,
             "Plan for stone_sword must mine cobblestone/stone when none in inventory.");
+    }
+
+    // ── Sprint 15 P0: coal pre-gather ────────────────────────────────────────
+
+    [Test]
+    public async Task HtnPlanner_CraftItemGoal_IronPickaxe_EmitsCoalMine_WhenNoCoal()
+    {
+        var library = new HtnTaskLibrary();
+        var planner = new HtnPlanner(library);
+        var goal    = new CraftItemGoal("iron_pickaxe", 1);
+        // Iron ore is present but no coal — smelting needs coal
+        var state   = new WorldState().With(b => b.AddInventoryItem("iron_ore", 3));
+
+        var plan = await planner.PlanAsync(goal, state);
+
+        Assert.That(plan.Actions.Any(a =>
+            a.Tool == "MineBlock" &&
+            a.Arguments.TryGetValue("block", out var bl) &&
+            bl?.ToString() == "coal_ore"), Is.True,
+            "Plan must mine coal_ore when no coal is available and smelting is needed.");
+    }
+
+    [Test]
+    public async Task HtnPlanner_CraftItemGoal_IronPickaxe_SkipsCoalMine_WhenCoalPresent()
+    {
+        var library = new HtnTaskLibrary();
+        var planner = new HtnPlanner(library);
+        var goal    = new CraftItemGoal("iron_pickaxe", 1);
+        // 1 coal smelts up to 8 items — sufficient for 3 ingots
+        var state   = new WorldState()
+            .With(b => b.AddInventoryItem("iron_ore", 3))
+            .With(b => b.AddInventoryItem("coal", 1));
+
+        var plan = await planner.PlanAsync(goal, state);
+
+        var coalMineActions = plan.Actions
+            .Where(a => a.Tool == "MineBlock" &&
+                        a.Arguments.TryGetValue("block", out var bl) &&
+                        bl?.ToString() == "coal_ore")
+            .ToList();
+
+        Assert.That(coalMineActions, Is.Empty,
+            "Should not mine coal_ore when sufficient coal is already in inventory.");
     }
 
     [Test]
