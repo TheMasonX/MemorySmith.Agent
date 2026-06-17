@@ -196,6 +196,27 @@ public class WorldStateProjectorTests
     // ── blockMined ────────────────────────────────────────────────────────────
 
     [Test]
+    public void Apply_BlockMined_MultiCount_AccumulatesCorrectly()
+    {
+        // Sprint 15 P0: use e.Count not hardcoded 1
+        var ev = new BlockMinedEvent("oak_log", 5, new Position(0, 64, 0), Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(5),
+            "BlockMinedEvent with Count=5 must add 5 to inventory (was hardcoded to 1 before Sprint 15).");
+    }
+
+    [Test]
+    public void Apply_BlockMined_MultiCount_NamespacedId_AccumulatesCorrectly()
+    {
+        // Namespaced + multi-count
+        var ev = new BlockMinedEvent("minecraft:cobblestone", 64, new Position(0, 64, 0), Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Inventory.GetValueOrDefault("cobblestone"), Is.EqualTo(64));
+    }
+
+    [Test]
     public void Apply_BlockMined_NamespacedId_IncrementsInventory()
     {
         var ev = new BlockMinedEvent("minecraft:oak_log", 1, new Position(0, 64, 0), Now);
