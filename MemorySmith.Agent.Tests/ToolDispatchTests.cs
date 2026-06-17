@@ -262,18 +262,18 @@ public class ToolDispatchTests
         dispatcher.Register(new FindFlatAreaTool(_adapter));
         dispatcher.Register(new ChatTool(_adapter));
 
-        // Valid args for each tool
+        // Valid args for each tool — note: StatusTool.Name is "GetStatus", not "Status"
         var cases = new (string Name, string Args)[]
         {
-            ("MoveTo",    "{\"x\":10,\"y\":64,\"z\":-20}"),
-            ("MineBlock", "{\"block\":\"oak_log\"}"),
-            ("PlaceBlock","{\"x\":0,\"y\":64,\"z\":0,\"material\":\"cobblestone\"}"),
-            ("Status",    "{}"),
-            ("Wander",    "{\"radius\":30}"),
-            ("CraftItem", "{\"item\":\"stick\"}"),
-            ("SmeltItem", "{\"item\":\"iron_ore\"}"),
+            ("MoveTo",     "{\"x\":10,\"y\":64,\"z\":-20}"),
+            ("MineBlock",  "{\"block\":\"oak_log\"}"),
+            ("PlaceBlock", "{\"x\":0,\"y\":64,\"z\":0,\"material\":\"cobblestone\"}"),
+            ("GetStatus",  "{}"),   // StatusTool.Name == "GetStatus"
+            ("Wander",     "{\"radius\":30}"),
+            ("CraftItem",  "{\"item\":\"stick\"}"),
+            ("SmeltItem",  "{\"item\":\"iron_ore\"}"),
             ("FindFlatArea","{}"),
-            ("Chat",      "{\"message\":\"hello\"}"),
+            ("Chat",       "{\"message\":\"hello\"}"),
         };
 
         foreach (var (name, argsJson) in cases)
