@@ -6,6 +6,7 @@ namespace MemorySmith.Agent.Tests;
 /// Unit tests for <see cref="WorldStateProjector"/>.
 /// Verifies the pure-function contract: applying a WorldEvent returns the
 /// correct new WorldState without mutating the input.
+/// Sprint 14 P1b: added inventory key normalization tests for StatusEvent.
 /// </summary>
 [TestFixture]
 public class WorldStateProjectorTests
@@ -137,6 +138,59 @@ public class WorldStateProjectorTests
 
         Assert.That(result.Inventory.ContainsKey("dirt"), Is.False,
             "Zero-quantity items are already excluded by WebSocketBridge; projector never sees them.");
+    }
+
+    // ── Sprint 14 P1b: StatusEvent inventory key normalization ────────────────
+
+    [Test]
+    public void Apply_StatusEvent_NamespacedInventoryKey_IsNormalized()
+    {
+        // Mineflayer can return "minecraft:oak_log" in the status payload.
+        var inventory = new Dictionary<string, int> { ["minecraft:oak_log"] = 5 };
+        var ev = new StatusEvent(new Position(0, 64, 0), 20, 20, inventory, Now);
+
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(5),
+                "Bare key 'oak_log' should resolve after namespace strip.");
+            Assert.That(result.Inventory.ContainsKey("minecraft:oak_log"), Is.False,
+                "Original namespaced key must not remain in inventory.");
+        });
+    }
+
+    [Test]
+    public void Apply_StatusEvent_MixedNamespacedAndBare_AreUnified()
+    {
+        // Both forms present simultaneously — counts must be merged.
+        var inventory = new Dictionary<string, int>
+        {
+            ["minecraft:iron_ingot"] = 2,
+            ["iron_ingot"]           = 1,
+        };
+        var ev = new StatusEvent(new Position(0, 64, 0), 20, 20, inventory, Now);
+
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Inventory.GetValueOrDefault("iron_ingot"), Is.EqualTo(3),
+            "Namespaced and bare counts for the same item must be summed.");
+    }
+
+    [Test]
+    public void Apply_StatusEvent_BareKeys_PassThroughUnchanged()
+    {
+        // Fast path: no namespace prefix → no allocation, same semantics.
+        var inventory = new Dictionary<string, int> { ["cobblestone"] = 64, ["stick"] = 32 };
+        var ev = new StatusEvent(new Position(0, 64, 0), 20, 20, inventory, Now);
+
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Inventory.GetValueOrDefault("cobblestone"), Is.EqualTo(64));
+            Assert.That(result.Inventory.GetValueOrDefault("stick"),       Is.EqualTo(32));
+        });
     }
 
     // ── blockMined ────────────────────────────────────────────────────────────
