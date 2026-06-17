@@ -13,10 +13,12 @@ using System.Text.RegularExpressions;
 ///
 /// Evaluation pipeline for each incoming message:
 ///   1. Truncate message at <see cref="ChatOptions.MaxMessageLength"/> characters.
-///   2. Distance gate: if the player is &gt; <see cref="ChatOptions.MaxResponseDistanceBlocks"/>
+///   2. Distance gate: if the player is > <see cref="ChatOptions.MaxResponseDistanceBlocks"/>
 ///      blocks away AND didn't name this bot, return NotAddressed without calling the LLM.
 ///   3. Pattern fast-path: if <see cref="ChatInterpreter"/> returns a confident result
-///      (CreateGoal / CancelGoal / QueryHelp), skip the LLM and use it.
+///      (CreateGoal / CancelGoal / QueryHelp / NavigateTo), skip the LLM and use it.
+///      NavigateTo is always fast-pathed because the LLM cannot improve on it — player
+///      position is already resolved by the pattern matcher, not the LLM.
 ///   4. Rate-limit check: per-player and global window via <see cref="ChatRateLimiter"/>.
 ///   5. LLM call: <see cref="ILlmProvider.CompleteAsync"/> with a structured JSON prompt
 ///      that includes the last <see cref="ChatHistory.MaxTurnsDefault"/> conversation turns.
@@ -62,10 +64,14 @@ public sealed class LlmChatInterpreter(
             return quick;
         }
 
-        // 4. Pattern fast-path — skip LLM for unambiguous commands
+        // 4. Pattern fast-path — skip LLM for unambiguous commands.
+        //    NavigateTo is always fast-pathed: the LLM cannot improve on it because
+        //    player position is already known to the pattern matcher but NOT to the LLM
+        //    (the LLM has no way to determine where to navigate for "come here" etc.).
         if (quick.IntentType is ChatIntentType.CreateGoal
                               or ChatIntentType.CancelGoal
-                              or ChatIntentType.QueryHelp)
+                              or ChatIntentType.QueryHelp
+                              or ChatIntentType.NavigateTo)
         {
             logger?.LogDebug("[llm] pattern fast-path for {Username}: {Intent}", username, quick.IntentType);
             return quick;
@@ -90,7 +96,7 @@ public sealed class LlmChatInterpreter(
         var currentGoal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s ? s : null;
         var historyContext = history?.FormatForPrompt();
         var raw = await provider.CompleteAsync(
-            BuildSystemPrompt(botName, botPosition, currentGoal, onlinePlayers, historyContext),
+            BuildSystemPrompt(botName, botPosition, currentGoal, onlinePlayers, historyContext, playerPosition),
             $"{username} says: \"{effective}\"",
             ct);
 
@@ -116,9 +122,10 @@ public sealed class LlmChatInterpreter(
 
     private static string BuildSystemPrompt(
         string botName, Position botPos, string? goal, int onlinePlayers,
-        string? chatHistory) => $$"""
+        string? chatHistory, Position? playerPos = null) => $$"""
         You are {{botName}}, an autonomous Minecraft agent at ({{botPos.X}},{{botPos.Y}},{{botPos.Z}}).
         Status: {{(goal is not null ? $"pursuing goal: {goal}" : "idle")}}. Players online: {{onlinePlayers}}.
+        {{(playerPos is not null ? $"Player position: ({playerPos.X},{playerPos.Y},{playerPos.Z}) — use these coordinates for 'come here' / navigation commands." : "")}}
 
         {{(chatHistory is not null ? $"Recent conversation:\n{chatHistory}\n" : "")}}
         Decide if the next message is for you and what to do.
