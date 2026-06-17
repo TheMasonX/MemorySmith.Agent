@@ -11,6 +11,13 @@ public interface IGoal
     string Description { get; }
     string[] Phases { get; }
 
+    /// <summary>
+    /// Nullable failure reason. <see langword="null"/> means the goal hasn't
+    /// failed yet or no reason was recorded. Set by the agent service when
+    /// <see cref="HasFailed"/> returns <see langword="true"/>.
+    /// </summary>
+    string? FailureReason { get; }
+
     bool IsComplete(WorldState state);
     bool HasFailed(WorldState state);
 }

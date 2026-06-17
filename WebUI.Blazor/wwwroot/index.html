@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MemorySmith.Agent — Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 <style>
 :root {
   --bg:       #0d1117;
@@ -262,14 +263,131 @@ a:hover { text-decoration: underline; }
 let lastStatus = null;
 let registeredGoals = [];
 let chatMessages = [];
+let signalRConnected = false;
+let signalRConn = null;
 
 // ── Init ───────────────────────────────────────────────────────────────────────
 
 async function init() {
   await loadGoals();
   await refreshStatus();
-  setInterval(refreshStatus, 2000);
+  // Sprint 4a: WebSocket push for real-time updates (polling as fallback)
+  connectSignalR();
+  setInterval(refreshStatus, 2000);   // fallback if WebSocket disconnects
   setInterval(refreshQueue,  3000);
+}
+
+// ── SignalR real-time push — Sprint 4a/4b ─────────────────────────────────
+
+async function connectSignalR() {
+  try {
+    signalRConn = new signalR.HubConnectionBuilder()
+      .withUrl('/agent-hub')
+      .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Warning)
+      .build();
+
+    // Sprint 4a: full state snapshot pushed after every event tick
+    signalRConn.on('StatusUpdated', update => {
+      signalRConnected = true;
+      applyStatusUpdate(update);
+    });
+
+    // Sprint 4b: live chat messages (player & bot)
+    signalRConn.on('ChatMessage', msg => {
+      signalRConnected = true;
+      const who = msg.who ?? msg.type === 'bot' ? 'AgentBot' : null;
+      addChatMsg(msg.type, who, msg.text);
+    });
+
+    // Sprint 4b: goal changes (set/cancel)
+    signalRConn.on('GoalUpdate', g => {
+      signalRConnected = true;
+      lastStatus = lastStatus || {};
+      lastStatus.goal = g.goal ?? null;
+      lastStatus.goalDescription = g.description ?? '';
+      applyGoalDisplay(g.goal ?? null, g.description ?? '');
+    });
+
+    signalRConn.onreconnecting(() => {
+      signalRConnected = false;
+      document.getElementById('statusDot').className = 'dot';
+      document.getElementById('statusLabel').textContent = 'Reconnecting…';
+    });
+
+    signalRConn.onclose(() => {
+      signalRConnected = false;
+    });
+
+    await signalRConn.start();
+    signalRConnected = true;
+    console.log('SignalR connected to /agent-hub');
+  } catch (e) {
+    console.warn('SignalR unavailable, falling back to polling:', e.message);
+    signalRConnected = false;
+  }
+}
+
+function applyGoalDisplay(goal, description) {
+  const goalBox = document.getElementById('currentGoalBox');
+  const noGoal  = document.getElementById('noGoalBox');
+  if (goal) {
+    goalBox.style.display = '';
+    noGoal.style.display = 'none';
+    document.getElementById('currentGoalName').textContent = goal;
+    document.getElementById('currentGoalDesc').textContent = description || '';
+  } else {
+    goalBox.style.display = 'none';
+    noGoal.style.display = '';
+  }
+}
+
+function applyStatusUpdate(u) {
+  lastStatus = u;
+  const dot = document.getElementById('statusDot');
+  const label = document.getElementById('statusLabel');
+
+  if (u.status === 'reconnecting') {
+    dot.className = 'dot';
+    label.textContent = 'Reconnecting…';
+  } else if (u.goal) {
+    dot.className = 'dot active';
+    label.textContent = `Active — ${u.goal}`;
+  } else {
+    dot.className = 'dot idle';
+    label.textContent = 'Idle';
+  }
+
+  // Health & food bars
+  document.getElementById('hpBar').style.width   = Math.max(0, Math.min(100, (u.health / 20) * 100)) + '%';
+  document.getElementById('foodBar').style.width  = Math.max(0, Math.min(100, (u.food / 20) * 100)) + '%';
+  document.getElementById('hpVal').textContent    = u.health + '/20';
+  document.getElementById('foodVal').textContent  = u.food + '/20';
+
+  // Position
+  document.getElementById('posX').textContent = u.x;
+  document.getElementById('posY').textContent = u.y;
+  document.getElementById('posZ').textContent = u.z;
+
+  // Goal
+  applyGoalDisplay(u.goal ?? null, u.goalDescription ?? '');
+
+  // Inventory
+  renderInventory(u.inventory);
+  document.getElementById('queueCount').textContent = u.queuedActions;
+  document.getElementById('failCount').textContent  = u.consecutiveFailures;
+}
+
+function renderInventory(inv) {
+  const grid = document.getElementById('invGrid');
+  if (!inv || Object.keys(inv).length === 0) {
+    grid.innerHTML = '<div class="queue-empty">No inventory data yet.</div>';
+    return;
+  }
+  grid.innerHTML = Object.entries(inv)
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, count]) => `<div class="inv-item"><span class="name">${name}</span><span class="count">${count}</span></div>`)
+    .join('');
 }
 
 async function loadGoals() {
@@ -404,12 +522,13 @@ function useCurrentPos() {
 // ── Status refresh ─────────────────────────────────────────────────────────────
 
 async function refreshStatus() {
+  // Sprint 4a: skip HTTP poll when SignalR is live — push keeps UI current
+  if (signalRConnected) return;
   try {
     const res = await fetch('/api/agent/status');
     if (!res.ok) return;
-    const s = await res.json();
-    lastStatus = s;
-    applyStatus(s);
+    lastStatus = await res.json();
+    applyStatus(lastStatus);
   } catch(e) { setStatusOffline(); }
 }
 
@@ -531,9 +650,74 @@ function escapeHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+// ── SignalR (push updates) ────────────────────────────────────────────────────
+
+async function initSignalR() {
+  if (!signalR || typeof signalR.HubConnectionBuilder === 'undefined') {
+    console.warn('SignalR library not loaded; falling back to polling only.');
+    return;
+  }
+
+  signalRConn = new signalR.HubConnectionBuilder()
+    .withUrl('/agent-hub')
+    .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
+    .configureLogging(signalR.LogLevel.Warning)
+    .build();
+
+  signalRConn.on('StatusUpdate', (status) => {
+    lastStatus = status;
+    applyStatus(status);
+  });
+
+  signalRConn.on('ChatMessage', (msg) => {
+    addChatMsg(msg.type || 'msg', msg.who, msg.text);
+  });
+
+  signalRConn.on('GoalUpdate', (goalInfo) => {
+    if (goalInfo) {
+      document.getElementById('currentGoalBox').style.display   = '';
+      document.getElementById('noGoalBox').style.display = 'none';
+      document.getElementById('currentGoalName').textContent = goalInfo.name ?? '';
+      document.getElementById('currentGoalDesc').textContent = goalInfo.description ?? '';
+    } else {
+      document.getElementById('currentGoalBox').style.display   = 'none';
+      document.getElementById('noGoalBox').style.display = '';
+    }
+  });
+
+  signalRConn.onreconnecting(() => {
+    signalRConnected = false;
+    document.getElementById('statusLabel').textContent = 'Reconnecting…';
+    document.getElementById('statusDot').className = 'dot';
+  });
+
+  signalRConn.onreconnected(() => {
+    signalRConnected = true;
+    document.getElementById('statusLabel').textContent = 'Connected';
+    document.getElementById('statusDot').className = 'dot active';
+  });
+
+  signalRConn.onclose(() => {
+    signalRConnected = false;
+    document.getElementById('statusLabel').textContent = 'Offline (WS closed)';
+    document.getElementById('statusDot').className = 'dot';
+    // Trigger polling fallback
+    setTimeout(refreshStatus, 1000);
+  });
+
+  try {
+    await signalRConn.start();
+    signalRConnected = true;
+    console.log('SignalR connected.');
+  } catch (e) {
+    console.warn('SignalR start failed, relying on polling:', e.message);
+  }
+}
+
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 
 init();
+initSignalR();
 </script>
 </body>
 </html>

@@ -45,6 +45,9 @@ public sealed class BuildGoal(Blueprint blueprint, IReadOnlyList<PlacementBlock>
     public string[] Phases => ["GatherMaterials", "Build", "Verify"];
 
     /// <inheritdoc/>
+    public string? FailureReason { get; set; }
+
+    /// <inheritdoc/>
     public bool IsComplete(WorldState state) =>
         state.Facts.TryGetValue($"goal:Build:{blueprint.Id}:complete", out var v) && v is true;
 

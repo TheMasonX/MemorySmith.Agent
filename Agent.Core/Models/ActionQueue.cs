@@ -3,7 +3,7 @@ namespace Agent.Core;
 /// <summary>
 /// FIFO queue of pending tool invocations for the current plan.
 /// The agent loop dequeues one action per tick and dispatches it
-/// to the ToolEngine. Cleared when the plan is invalidated.
+/// to the ToolDispatcher. Cleared when the plan is invalidated.
 /// </summary>
 public sealed class ActionQueue
 {

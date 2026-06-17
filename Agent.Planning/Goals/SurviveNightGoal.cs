@@ -19,6 +19,9 @@ public sealed class SurviveNightGoal : IGoal
     public string Description => "Find shelter and survive until sunrise.";
     public string[] Phases => ["FindShelter", "LightArea", "WaitForSunrise"];
 
+    /// <inheritdoc/>
+    public string? FailureReason { get; set; }
+
     public bool IsComplete(WorldState state) =>
         IsDaytime(state) || IsInShelter(state);
 

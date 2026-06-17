@@ -7,7 +7,8 @@ using System.Text.RegularExpressions;
 
 /// <summary>
 /// <see cref="IChatInterpreter"/> that combines LLM-powered evaluation with
-/// deterministic pattern-matching fallback and a distance-based routing gate.
+/// deterministic pattern-matching fallback, a distance-based routing gate, and
+/// a rolling chat history window (Sprint 4b).
 ///
 /// Evaluation pipeline for each incoming message:
 ///   1. Truncate message at <see cref="ChatOptions.MaxMessageLength"/> characters.
@@ -16,7 +17,8 @@ using System.Text.RegularExpressions;
 ///   3. Pattern fast-path: if <see cref="ChatInterpreter"/> returns a confident result
 ///      (CreateGoal / CancelGoal / QueryHelp), skip the LLM and use it.
 ///   4. Rate-limit check: per-player and global window via <see cref="ChatRateLimiter"/>.
-///   5. LLM call: <see cref="ILlmProvider.CompleteAsync"/> with a structured JSON prompt.
+///   5. LLM call: <see cref="ILlmProvider.CompleteAsync"/> with a structured JSON prompt
+///      that includes the last <see cref="ChatHistory.MaxTurnsDefault"/> conversation turns.
 ///   6. JSON parse: extract <see cref="ChatInterpretation"/> from the raw text.
 ///   7. Fallback: if any of steps 4-6 fail, use the pattern-matcher result.
 ///
@@ -27,7 +29,8 @@ public sealed class LlmChatInterpreter(
     ILlmProvider provider,
     ChatInterpreter patternFallback,
     ChatRateLimiter rateLimiter,
-    ChatOptions options) : IChatInterpreter
+    ChatOptions options,
+    ChatHistory? history = null) : IChatInterpreter
 {
     // ── IChatInterpreter ──────────────────────────────────────────────────────
 
@@ -40,6 +43,9 @@ public sealed class LlmChatInterpreter(
         var effective = message.Length > options.MaxMessageLength
             ? message[..options.MaxMessageLength]
             : message;
+
+        // Sprint 4b: record the incoming player message in conversation history
+        history?.Record(username, effective);
 
         // 2. Get the pattern-matcher's view — used as fallback and fast-path
         var quick = await patternFallback.InterpretAsync(
@@ -68,8 +74,9 @@ public sealed class LlmChatInterpreter(
 
         // 6. LLM call
         var currentGoal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s ? s : null;
+        var historyContext = history?.FormatForPrompt();
         var raw = await provider.CompleteAsync(
-            BuildSystemPrompt(botName, botPosition, currentGoal, onlinePlayers),
+            BuildSystemPrompt(botName, botPosition, currentGoal, onlinePlayers, historyContext),
             $"{username} says: \"{effective}\"",
             ct);
 
@@ -85,10 +92,12 @@ public sealed class LlmChatInterpreter(
     // ── Prompt construction ───────────────────────────────────────────────────
 
     private static string BuildSystemPrompt(
-        string botName, Position botPos, string? goal, int onlinePlayers) => $$"""
+        string botName, Position botPos, string? goal, int onlinePlayers,
+        string? chatHistory) => $$"""
         You are {{botName}}, an autonomous Minecraft agent at ({{botPos.X}},{{botPos.Y}},{{botPos.Z}}).
         Status: {{(goal is not null ? $"pursuing goal: {goal}" : "idle")}}. Players online: {{onlinePlayers}}.
 
+        {{(chatHistory is not null ? $"Recent conversation:\n{chatHistory}\n" : "")}}
         Decide if the next message is for you and what to do.
         Reply ONLY with valid JSON — no markdown, no prose:
 
@@ -109,6 +118,7 @@ public sealed class LlmChatInterpreter(
         "no" when players are talking to each other, not you.
         "clarify" when uncertain — ask politely.
         Use Minecraft item IDs without namespace prefix (oak_log, cobblestone, iron_ore…).
+        Use conversation history for context (follow-up questions, multi-message requests).
         """;
 
     // ── Response parsing ──────────────────────────────────────────────────────

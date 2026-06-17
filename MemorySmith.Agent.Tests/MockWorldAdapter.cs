@@ -45,10 +45,6 @@ public sealed class MockWorldAdapter : IWorldAdapter
         }
     }
 
-    /// <summary>Push a world event into the receive queue.</summary>
+    /// <summary>Push a typed world event into the receive queue.</summary>
     public void PushEvent(WorldEvent ev) => _eventQueue.Enqueue(ev);
-
-    /// <summary>Push a typed world event by event type and payload.</summary>
-    public void PushEvent(string eventType, Dictionary<string, object?> payload) =>
-        _eventQueue.Enqueue(new WorldEvent(eventType, payload, DateTimeOffset.UtcNow));
 }

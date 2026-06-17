@@ -44,6 +44,9 @@ public sealed class GenericGatherGoal(ItemSpec item, int targetCount) : IGoal, I
     public string[] Phases => ["FindSource", "Mine", "Collect"];
 
     /// <inheritdoc/>
+    public string? FailureReason { get; set; }
+
+    /// <inheritdoc/>
     public bool IsComplete(WorldState state)
     {
         if (item.RequiresSmelting)

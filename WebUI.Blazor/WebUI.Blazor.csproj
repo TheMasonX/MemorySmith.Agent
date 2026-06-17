@@ -16,6 +16,6 @@
     <ProjectReference Include="../Agent.World.Minecraft/Agent.World.Minecraft.csproj" />
   </ItemGroup>
 
-  <!-- TODO Phase 1: add SignalR for real-time BotStatusUpdated events -->
+  <!-- Sprint 4a/4b: SignalR push for StatusUpdated, ChatMessage, GoalUpdate events -->
 
 </Project>

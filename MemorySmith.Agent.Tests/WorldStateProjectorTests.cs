@@ -17,25 +17,23 @@ public class WorldStateProjectorTests
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private static WorldEvent MakeEvent(string type, Dictionary<string, object?> payload) =>
-        new(type, payload, DateTimeOffset.UtcNow);
+    private static DateTimeOffset Now => DateTimeOffset.UtcNow;
 
     private static WorldState EmptyState => new();
 
     // Convenience: set position via a move event, then apply another event on top.
     private WorldState StateWithPosition(int x, int y, int z) =>
-        _projector.Apply(EmptyState, MakeEvent("move", new() { ["x"] = x, ["y"] = y, ["z"] = z }));
+        _projector.Apply(EmptyState, new MoveEvent(new Position(x, y, z), Now));
 
     private WorldState StateWithHealth(int hp, int food = 20) =>
-        _projector.Apply(EmptyState, MakeEvent("health", new() { ["hp"] = hp, ["food"] = food }));
+        _projector.Apply(EmptyState, new HealthEvent(hp, food, Now));
 
     // ── Health ────────────────────────────────────────────────────────────────
 
     [Test]
     public void Apply_HealthEvent_UpdatesHealthAndFood()
     {
-        var ev = MakeEvent("health", new() { ["hp"] = 15, ["food"] = 18 });
-
+        var ev = new HealthEvent(15, 18, Now);
         var result = _projector.Apply(EmptyState, ev);
 
         Assert.Multiple(() =>
@@ -49,7 +47,7 @@ public class WorldStateProjectorTests
     public void Apply_HealthEvent_DoesNotChangePosition()
     {
         var withPos    = StateWithPosition(5, 64, 5);
-        var afterHealth = _projector.Apply(withPos, MakeEvent("health", new() { ["hp"] = 10, ["food"] = 10 }));
+        var afterHealth = _projector.Apply(withPos, new HealthEvent(10, 10, Now));
 
         Assert.That(afterHealth.Position, Is.EqualTo(new Position(5, 64, 5)));
     }
@@ -59,12 +57,7 @@ public class WorldStateProjectorTests
     [Test]
     public void Apply_SpawnEvent_UpdatesPositionHealthAndFood()
     {
-        var ev = MakeEvent("spawn", new()
-        {
-            ["x"] = 10, ["y"] = 64, ["z"] = -20,
-            ["hp"] = 20, ["food"] = 20
-        });
-
+        var ev = new SpawnEvent(new Position(10, 64, -20), 20, 20, Now);
         var result = _projector.Apply(EmptyState, ev);
 
         Assert.Multiple(() =>
@@ -80,7 +73,7 @@ public class WorldStateProjectorTests
     [Test]
     public void Apply_MoveEvent_UpdatesPosition()
     {
-        var ev = MakeEvent("move", new() { ["x"] = 5, ["y"] = 63, ["z"] = 7 });
+        var ev = new MoveEvent(new Position(5, 63, 7), Now);
         var result = _projector.Apply(EmptyState, ev);
 
         Assert.That(result.Position, Is.EqualTo(new Position(5, 63, 7)));
@@ -89,7 +82,7 @@ public class WorldStateProjectorTests
     [Test]
     public void Apply_MoveCompleteEvent_UpdatesPosition()
     {
-        var ev = MakeEvent("moveComplete", new() { ["x"] = 9, ["y"] = 65, ["z"] = -1 });
+        var ev = new MoveEvent(new Position(9, 65, -1), Now);
         var result = _projector.Apply(EmptyState, ev);
 
         Assert.That(result.Position, Is.EqualTo(new Position(9, 65, -1)));
@@ -99,7 +92,7 @@ public class WorldStateProjectorTests
     public void Apply_MoveEvent_DoesNotChangeHealthOrFood()
     {
         var withHealth = StateWithHealth(14, 12);
-        var afterMove  = _projector.Apply(withHealth, MakeEvent("move", new() { ["x"] = 1, ["y"] = 1, ["z"] = 1 }));
+        var afterMove  = _projector.Apply(withHealth, new MoveEvent(new Position(1, 1, 1), Now));
 
         Assert.Multiple(() =>
         {
@@ -113,13 +106,8 @@ public class WorldStateProjectorTests
     [Test]
     public void Apply_StatusEvent_UpdatesPositionHealthAndInventory()
     {
-        var inventoryJson = "{\"oak_log\":3,\"stone\":10}";
-        var ev = MakeEvent("status", new()
-        {
-            ["x"] = 1, ["y"] = 2, ["z"] = 3,
-            ["hp"] = 19, ["food"] = 17,
-            ["inventory"] = inventoryJson
-        });
+        var inventory = new Dictionary<string, int> { ["oak_log"] = 3, ["stone"] = 10 };
+        var ev = new StatusEvent(new Position(1, 2, 3), 19, 17, inventory, Now);
 
         var result = _projector.Apply(EmptyState, ev);
 
@@ -133,42 +121,22 @@ public class WorldStateProjectorTests
         });
     }
 
-    [Test]
-    public void Apply_StatusEvent_MalformedInventory_RetainsOtherUpdates()
-    {
-        var ev = MakeEvent("status", new()
-        {
-            ["x"] = 7, ["y"] = 64, ["z"] = 3,
-            ["hp"] = 10, ["food"] = 10,
-            ["inventory"] = "not valid json {"
-        });
-
-        var result = _projector.Apply(EmptyState, ev);
-
-        // Position and health should still update; inventory stays empty
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Position, Is.EqualTo(new Position(7, 64, 3)));
-            Assert.That(result.Health,   Is.EqualTo(10));
-            Assert.That(result.Inventory, Is.Empty,
-                "Malformed inventory JSON should leave inventory unchanged.");
-        });
-    }
+    // StatusEvent inventory is already parsed by WebSocketBridge — malformed
+    // inventory is handled upstream, so this test is no longer applicable.
+    // (The projector receives a clean IReadOnlyDictionary, not a raw JSON string.)
 
     [Test]
     public void Apply_StatusEvent_ZeroQuantityItemsExcluded()
     {
-        var inventoryJson = "{\"oak_log\":3,\"dirt\":0,\"stone\":5}";
-        var ev = MakeEvent("status", new()
-        {
-            ["x"] = 0, ["y"] = 0, ["z"] = 0, ["hp"] = 20, ["food"] = 20,
-            ["inventory"] = inventoryJson
-        });
+        // StatusEvent already filters zero-quantity items in ParseStatus;
+        // we simulate a post-filter dictionary here.
+        var inventory = new Dictionary<string, int> { ["oak_log"] = 3, ["stone"] = 5 };
+        var ev = new StatusEvent(new Position(0, 0, 0), 20, 20, inventory, Now);
 
         var result = _projector.Apply(EmptyState, ev);
 
         Assert.That(result.Inventory.ContainsKey("dirt"), Is.False,
-            "Items with quantity 0 should not appear in inventory.");
+            "Zero-quantity items are already excluded by WebSocketBridge; projector never sees them.");
     }
 
     // ── blockMined ────────────────────────────────────────────────────────────
@@ -176,7 +144,7 @@ public class WorldStateProjectorTests
     [Test]
     public void Apply_BlockMined_NamespacedId_IncrementsInventory()
     {
-        var ev = MakeEvent("blockMined", new() { ["block"] = "minecraft:oak_log" });
+        var ev = new BlockMinedEvent("minecraft:oak_log", 1, new Position(0, 64, 0), Now);
         var result = _projector.Apply(EmptyState, ev);
 
         Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(1));
@@ -185,7 +153,7 @@ public class WorldStateProjectorTests
     [Test]
     public void Apply_BlockMined_ShortId_IncrementsInventory()
     {
-        var ev = MakeEvent("blockMined", new() { ["block"] = "oak_log" });
+        var ev = new BlockMinedEvent("oak_log", 1, new Position(0, 64, 0), Now);
         var result = _projector.Apply(EmptyState, ev);
 
         Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(1));
@@ -194,7 +162,7 @@ public class WorldStateProjectorTests
     [Test]
     public void Apply_BlockMined_Twice_AccumulatesCount()
     {
-        var ev     = MakeEvent("blockMined", new() { ["block"] = "minecraft:oak_log" });
+        var ev     = new BlockMinedEvent("minecraft:oak_log", 1, new Position(0, 64, 0), Now);
         var after1 = _projector.Apply(EmptyState, ev);
         var after2 = _projector.Apply(after1, ev);
 
@@ -207,12 +175,9 @@ public class WorldStateProjectorTests
     public void Apply_ErrorEvent_DoesNotChangeStructuredState()
     {
         var withHealth = StateWithHealth(20, 18);
-        var withPos    = _projector.Apply(withHealth, MakeEvent("move", new() { ["x"] = 1, ["y"] = 2, ["z"] = 3 }));
+        var withPos    = _projector.Apply(withHealth, new MoveEvent(new Position(1, 2, 3), Now));
 
-        var result = _projector.Apply(withPos, MakeEvent("error", new()
-        {
-            ["action"] = "mine", ["message"] = "path blocked"
-        }));
+        var result = _projector.Apply(withPos, new ErrorEvent("mine", "path blocked", Now));
 
         Assert.Multiple(() =>
         {
@@ -226,7 +191,7 @@ public class WorldStateProjectorTests
     [Test]
     public void Apply_ErrorEvent_DoesNotWriteGameLastErrorFact()
     {
-        var ev     = MakeEvent("error", new() { ["action"] = "mine", ["message"] = "timeout" });
+        var ev     = new ErrorEvent("mine", "timeout", Now);
         var result = _projector.Apply(EmptyState, ev);
 
         Assert.That(result.Facts.ContainsKey("game.lastError"), Is.False,
@@ -237,7 +202,7 @@ public class WorldStateProjectorTests
     public void Apply_BlockNotFoundEvent_DoesNotChangeStructuredState()
     {
         var withHealth = StateWithHealth(20);
-        var ev = MakeEvent("blockNotFound", new() { ["block"] = "minecraft:oak_log", ["mined"] = 0 });
+        var ev = new BlockNotFoundEvent("minecraft:oak_log", 0, Now);
 
         var result = _projector.Apply(withHealth, ev);
 
@@ -247,7 +212,7 @@ public class WorldStateProjectorTests
     [Test]
     public void Apply_BlockNotFoundEvent_DoesNotWriteGameLastErrorFact()
     {
-        var ev     = MakeEvent("blockNotFound", new() { ["block"] = "minecraft:oak_log", ["mined"] = 0 });
+        var ev     = new BlockNotFoundEvent("minecraft:oak_log", 0, Now);
         var result = _projector.Apply(EmptyState, ev);
 
         Assert.That(result.Facts.ContainsKey("game.lastError"), Is.False,
@@ -259,41 +224,42 @@ public class WorldStateProjectorTests
     [Test]
     public void Apply_StoresRawEventFacts_ForKnownEventTypes()
     {
-        var ev = MakeEvent("move", new() { ["x"] = 5, ["y"] = 64, ["z"] = 3 });
+        var ev = new MoveEvent(new Position(5, 64, 3), Now);
         var result = _projector.Apply(EmptyState, ev);
 
-        Assert.That(result.Facts.ContainsKey("event:move:x"), Is.True,
+        Assert.That(result.Facts.ContainsKey("event:Move:Pos"), Is.True,
             "Raw event facts should be stored for all event types.");
     }
 
     [Test]
     public void Apply_StoresRawEventFacts_ForErrorEvents()
     {
-        var ev = MakeEvent("error", new() { ["action"] = "mine", ["message"] = "path blocked" });
+        var ev = new ErrorEvent("mine", "path blocked", Now);
         var result = _projector.Apply(EmptyState, ev);
 
         Assert.Multiple(() =>
         {
-            Assert.That(result.Facts.ContainsKey("event:error:action"),  Is.True);
-            Assert.That(result.Facts.ContainsKey("event:error:message"), Is.True);
+            Assert.That(result.Facts.ContainsKey("event:Error:Action"),  Is.True);
+            Assert.That(result.Facts.ContainsKey("event:Error:Message"), Is.True);
         });
     }
 
-    // ── Unknown event ─────────────────────────────────────────────────────────
+    // ── Fallback events (typed but not state-changing) ────────────────────────
 
     [Test]
-    public void Apply_UnknownEventType_StoresRawFactsAndLeavesStructuredStateUnchanged()
+    public void Apply_NonStateChangingEvent_StoresRawFactsAndLeavesStructuredStateUnchanged()
     {
         var withHealth = StateWithHealth(15, 10);
-        var ev         = MakeEvent("customEvent", new() { ["someKey"] = "someValue" });
+        var ev         = new DeathEvent(new Position(0, 64, 0), Now);
 
         var result = _projector.Apply(withHealth, ev);
 
         Assert.Multiple(() =>
         {
             Assert.That(result.Health, Is.EqualTo(15),
-                "Unknown event should not change health.");
-            Assert.That(result.Facts.ContainsKey("event:customEvent:someKey"), Is.True);
+                "Non-state-changing event should not change health.");
+            Assert.That(result.Facts.ContainsKey("event:Death:Pos"), Is.True,
+                "Raw event facts should still be stored for non-state-changing events.");
         });
     }
 
@@ -306,7 +272,7 @@ public class WorldStateProjectorTests
         var originalHealth = original.Health;
         var originalFood   = original.Food;
 
-        var ev = MakeEvent("health", new() { ["hp"] = 5, ["food"] = 5 });
+        var ev = new HealthEvent(5, 5, Now);
         _projector.Apply(original, ev); // discard result
 
         Assert.Multiple(() =>
@@ -322,7 +288,7 @@ public class WorldStateProjectorTests
     public void Apply_ReturnsNewInstance_NotSameReference()
     {
         var original = EmptyState;
-        var ev       = MakeEvent("health", new() { ["hp"] = 10, ["food"] = 10 });
+        var ev       = new HealthEvent(10, 10, Now);
 
         var result = _projector.Apply(original, ev);
 

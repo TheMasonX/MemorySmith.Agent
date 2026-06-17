@@ -18,6 +18,9 @@ public sealed class GatherWoodGoal(int targetCount = 10) : IGoal
     public string Description => $"Gather at least {targetCount} wood logs from nearby trees.";
     public string[] Phases => ["FindTree", "MineWood", "Collect"];
 
+    /// <inheritdoc/>
+    public string? FailureReason { get; set; }
+
     public bool IsComplete(WorldState state) =>
         GetWoodCount(state) >= targetCount;
 
