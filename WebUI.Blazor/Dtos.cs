@@ -27,3 +27,19 @@ public record AgentStatusUpdate(
     int QueuedActions,
     int ConsecutiveFailures,
     IReadOnlyDictionary<string, int> Inventory);
+
+/// <summary>
+/// Typed REST API response shape for a single journal entry.
+/// Uses <see cref="string"/>-typed fields throughout to ensure predictable JSON serialisation —
+/// avoids the <c>object?</c> ambiguity in <see cref="Agent.Core.JournalEntry.Details"/> where
+/// boxed ints, DateTimeOffset, or other value types may serialise differently across runtimes.
+/// </summary>
+/// <param name="Timestamp">ISO-8601 timestamp (round-trip format "O").</param>
+/// <param name="Type">String name of the <see cref="Agent.Core.JournalEntryType"/> value.</param>
+/// <param name="Summary">Short human-readable summary of what happened.</param>
+/// <param name="Details">Key/value detail map — all values coerced to strings.</param>
+public record JournalEntryDto(
+    string Timestamp,
+    string Type,
+    string Summary,
+    IReadOnlyDictionary<string, string?> Details);
