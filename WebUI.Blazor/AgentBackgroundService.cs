@@ -289,9 +289,19 @@ public sealed class AgentBackgroundService(
         // Sprint 4b: push player message to dashboard immediately
         _ = PushChatToDashboardAsync("player", chat.Username, chat.Message);
 
+        // Start a "thinking" indicator — fires to in-game chat if the LLM takes > 1.5s.
+        // Fast-path messages (pattern-matched commands) return in <1ms so the indicator
+        // never fires for them. Slow LLM calls show the player the bot is working.
+        using var thinkingCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        var thinkingTask = EnqueueThinkingIfSlowAsync(thinkingCts.Token);
+
         var interpretation = await chatInterpreter.InterpretAsync(
             chat.Username, chat.Message, botName, chat.OnlinePlayers,
             _worldState.Position, chat.PlayerPos, _worldState, ct);
+
+        // Cancel the thinking indicator now we have a result
+        await thinkingCts.CancelAsync();
+        try { await thinkingTask.ConfigureAwait(false); } catch (OperationCanceledException) { }
 
         if (interpretation.IntentType == ChatIntentType.NotAddressed)
             return;
@@ -575,6 +585,27 @@ public sealed class AgentBackgroundService(
         }
     }
 
+    // ── Thinking indicator ─────────────────────────────────────────────────────
+
+    private static readonly string[] _thinkingMessages =
+        ["Hmm...", "...", "Let me think...", "*thinks*"];
+
+    /// <summary>
+    /// Enqueues a flavour "thinking" message after a short delay so players know
+    /// the bot is processing. Cancelled immediately for fast-path (pattern-matched)
+    /// responses; only visible when the LLM takes more than ~1.5 s.
+    /// </summary>
+    private async Task EnqueueThinkingIfSlowAsync(CancellationToken ct)
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(1.5), ct);
+            var msg = _thinkingMessages[Random.Shared.Next(_thinkingMessages.Length)];
+            _queue.Enqueue(new ActionData { Tool = "Chat", Arguments = { ["message"] = msg } });
+        }
+        catch (OperationCanceledException) { /* fast path — thinking not needed */ }
+    }
+
     // ── SignalR dashboard push — Sprint 4a ─────────────────────────────────
 
     /// <summary>
@@ -720,3 +751,4 @@ public sealed class AgentBackgroundService(
         }
     }
 }
+
