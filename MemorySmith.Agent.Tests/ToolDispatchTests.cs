@@ -86,6 +86,16 @@ public class ToolDispatchTests
         Assert.That(_adapter.SentActions[0].Tool, Is.EqualTo("status"));
     }
 
+    [Test]
+    public async Task GetStatusTool_SendsStatusAction()
+    {
+        var tool   = new GetStatusTool(_adapter);
+        var result = await tool.ExecuteAsync(Args("{}"));
+
+        Assert.That(result.Success, Is.True);
+        Assert.That(_adapter.SentActions[0].Tool, Is.EqualTo("status"));
+    }
+
     // ── WanderTool ────────────────────────────────────────────────────────────
 
     [Test]
@@ -256,6 +266,7 @@ public class ToolDispatchTests
         dispatcher.Register(new MineBlockTool(_adapter));
         dispatcher.Register(new PlaceBlockTool(_adapter));
         dispatcher.Register(new StatusTool(_adapter));
+        dispatcher.Register(new GetStatusTool(_adapter));
         dispatcher.Register(new WanderTool(_adapter));
         dispatcher.Register(new CraftItemTool(_adapter));
         dispatcher.Register(new FurnaceTool(_adapter));
@@ -269,6 +280,7 @@ public class ToolDispatchTests
             ("MineBlock", "{\"block\":\"oak_log\"}"),
             ("PlaceBlock","{\"x\":0,\"y\":64,\"z\":0,\"material\":\"cobblestone\"}"),
             ("Status",    "{}"),
+            ("GetStatus", "{}"),
             ("Wander",    "{\"radius\":30}"),
             ("CraftItem", "{\"item\":\"stick\"}"),
             ("SmeltItem", "{\"item\":\"iron_ore\"}"),

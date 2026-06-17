@@ -30,9 +30,11 @@ using System.Collections.Concurrent;
 /// </summary>
 public sealed class MemorySmithItemRegistry(
     IMemoryGateway memory,
-    RestMemoryGatewayOptions options) : IItemRegistry
+    RestMemoryGatewayOptions options,
+    string? localPagesRoot = null) : IItemRegistry
 {
     private const string PagePrefix = "item-registry/";
+    private readonly string? _localPagesRoot = localPagesRoot ?? FindLocalPagesRoot();
 
     // Cache entry: (nullable spec, expiry instant). Key is the normalised slug (lowercase, hyphens).
     private readonly ConcurrentDictionary<string, (ItemSpec? Spec, DateTimeOffset Expires)> _cache = new();
@@ -68,7 +70,11 @@ public sealed class MemorySmithItemRegistry(
         // 1. Direct page lookup (deterministic, fast — preferred path per D-003).
         var content = await memory.GetPageAsync(pageId, ct);
 
-        // 2. Fall back to search if direct lookup misses (e.g. modded items whose
+        // 2. Local file fallback for offline / dev runs using the repo's checked-in pages.
+        if (string.IsNullOrWhiteSpace(content))
+            content = LoadLocalPage(pageId);
+
+        // 3. Fall back to search if direct lookup misses (e.g. modded items whose
         //    slug doesn't match the normalisation convention).
         if (content is null)
         {
@@ -81,6 +87,32 @@ public sealed class MemorySmithItemRegistry(
         }
 
         return content is null ? null : ParseItemSpec(content);
+    }
+
+    private string? LoadLocalPage(string pageId)
+    {
+        if (string.IsNullOrWhiteSpace(_localPagesRoot)) return null;
+
+        var rel = pageId.Replace("item-registry/", string.Empty, StringComparison.OrdinalIgnoreCase);
+        var candidate = Path.Combine(_localPagesRoot, "Data", "Pages", "item-registry", $"{rel}.md");
+        return File.Exists(candidate) ? File.ReadAllText(candidate) : null;
+    }
+
+    private static string? FindLocalPagesRoot()
+    {
+        var current = AppContext.BaseDirectory;
+        while (!string.IsNullOrWhiteSpace(current))
+        {
+            var candidate = Path.Combine(current, "Data", "Pages", "item-registry");
+            if (Directory.Exists(candidate))
+                return current;
+
+            var parent = Directory.GetParent(current);
+            if (parent is null) break;
+            current = parent.FullName;
+        }
+
+        return null;
     }
 
     /// <summary>

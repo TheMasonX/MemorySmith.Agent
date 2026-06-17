@@ -1,0 +1,9 @@
+{
+  "Id": "tsk-0014-serilog-sqlite-sink",
+  "Title": "Add Serilog SQLite sink for agent runtime telemetry",
+  "Status": "Open",
+  "Priority": "Medium",
+  "Tags": ["logging", "serilog", "sqlite", "ops"],
+  "Description": "Serilog is now wired for console, rolling file logs, and Windows EventLog in WebUI.Blazor. Add a SQLite sink so runtime logs are queryable in-process for diagnostics dashboards and loop triage.\n\nImplementation:\n1. Add a supported Serilog SQLite sink package to WebUI.Blazor.\n2. Configure sink in Program.cs (or appsettings Serilog section) with DB path under logs/.\n3. Add schema migration/bootstrap if required by the chosen sink.\n4. Verify writes under live run (chat, planning loop, MineBlock failures).\n5. Add docs for querying common incidents (LLM null responses, repeated blockNotFound loops).\n\nAcceptance criteria:\n- Runtime emits entries to sqlite without crashing when db is locked or unavailable.\n- Existing sinks (file + EventLog) remain active.\n- At least one troubleshooting query documented for repeated gather loops.",
+  "References": ["tsk-0013-game-inventory-query-tool.json"]
+}

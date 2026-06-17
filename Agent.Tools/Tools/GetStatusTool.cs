@@ -4,12 +4,12 @@ using Agent.Core;
 using System.Text.Json;
 
 /// <summary>
-/// Requests current bot status (position, health, food, inventory) from the world adapter.
-/// The adapter responds asynchronously via a WorldEvent of type "status".
+/// Compatibility alias for plans that dispatch "GetStatus".
+/// Sends the same world action as <see cref="StatusTool"/>.
 /// </summary>
-public sealed class StatusTool(IWorldAdapter worldAdapter) : ITool
+public sealed class GetStatusTool(IWorldAdapter worldAdapter) : ITool
 {
-    public string Name => "Status";
+    public string Name => "GetStatus";
     public string Description => "Request current bot position, health, food level, and inventory.";
 
     public JsonElement InputSchema => JsonDocument.Parse("""

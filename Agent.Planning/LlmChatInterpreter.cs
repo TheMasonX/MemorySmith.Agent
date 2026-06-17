@@ -2,6 +2,7 @@ namespace Agent.Planning;
 
 using Agent.Core;
 using Agent.Planning.Llm;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -30,7 +31,8 @@ public sealed class LlmChatInterpreter(
     ChatInterpreter patternFallback,
     ChatRateLimiter rateLimiter,
     ChatOptions options,
-    ChatHistory? history = null) : IChatInterpreter
+    ChatHistory? history = null,
+    Microsoft.Extensions.Logging.ILogger<LlmChatInterpreter>? logger = null) : IChatInterpreter
 {
     // ── IChatInterpreter ──────────────────────────────────────────────────────
 
@@ -65,14 +67,26 @@ public sealed class LlmChatInterpreter(
                               or ChatIntentType.CancelGoal
                               or ChatIntentType.QueryHelp)
         {
+            logger?.LogDebug("[llm] pattern fast-path for {Username}: {Intent}", username, quick.IntentType);
             return quick;
         }
 
         // 5. Rate-limit check
-        if (!provider.IsAvailable || !rateLimiter.TryAcquire(username, out _))
+        if (!provider.IsAvailable)
+        {
+            logger?.LogDebug("[llm] provider unavailable ({Provider}) — using pattern result", provider.ProviderName);
             return quick;
+        }
+        if (!rateLimiter.TryAcquire(username, out _))
+        {
+            logger?.LogDebug("[llm] rate-limited for {Username} — using pattern result", username);
+            return quick;
+        }
 
         // 6. LLM call
+        var snippet = effective[..Math.Min(60, effective.Length)];
+        logger?.LogInformation("[llm] calling {Provider} ({Model}) for <{Username}> '{Snippet}'",
+            provider.ProviderName, options.LlmModel, username, snippet);
         var currentGoal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s ? s : null;
         var historyContext = history?.FormatForPrompt();
         var raw = await provider.CompleteAsync(
@@ -80,10 +94,19 @@ public sealed class LlmChatInterpreter(
             $"{username} says: \"{effective}\"",
             ct);
 
-        if (raw is null) return quick;
+        if (raw is null)
+        {
+            logger?.LogWarning("[llm] {Provider} returned null — falling back to pattern for <{Username}>",
+                provider.ProviderName, username);
+            return quick;
+        }
 
         // 7. Parse LLM response
+        logger?.LogDebug("[llm] raw response ({Len} chars): {Raw}",
+            raw.Length, raw[..Math.Min(200, raw.Length)]);
         var llmResult = ParseDecision(raw);
+        if (llmResult is null)
+            logger?.LogWarning("[llm] failed to parse JSON from {Provider} response", provider.ProviderName);
         return llmResult ?? quick;
     }
 

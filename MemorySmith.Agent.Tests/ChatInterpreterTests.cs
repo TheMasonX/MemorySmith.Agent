@@ -11,6 +11,7 @@ public sealed class ChatInterpreterTests
     private const string BotName = "AgentBot";
     private static readonly Position BotPos    = new(0, 64, 0);
     private static readonly Position PlayerPos = new(5, 64, 5);
+    private static readonly Position FarPlayerPos = new(200, 64, 200);
     private static readonly WorldState Empty   = new();
 
     private static readonly ChatOptions Opts = new()
@@ -21,9 +22,10 @@ public sealed class ChatInterpreterTests
     };
 
     private static Task<ChatInterpretation> Interpret(ChatInterpreter interp,
-        string message, int onlinePlayers = 1, WorldState? state = null) =>
+        string message, int onlinePlayers = 1, WorldState? state = null,
+        Position? playerPos = null) =>
         interp.InterpretAsync("Player1", message, BotName, onlinePlayers,
-            BotPos, PlayerPos, state ?? Empty);
+            BotPos, playerPos ?? PlayerPos, state ?? Empty);
 
     // ── IsDirectedAtBot ───────────────────────────────────────────────────────
 
@@ -39,7 +41,7 @@ public sealed class ChatInterpreterTests
     public async Task MultiPlayer_NotAddressedWithoutName()
     {
         var interp = new ChatInterpreter(Opts);
-        var result = await Interpret(interp, "let's go mining", onlinePlayers: 3);
+        var result = await Interpret(interp, "let's go mining", onlinePlayers: 3, playerPos: FarPlayerPos);
         Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.NotAddressed));
     }
 

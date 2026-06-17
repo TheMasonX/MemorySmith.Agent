@@ -10,9 +10,47 @@ using Agent.Tools;
 using Agent.World.Minecraft;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
+using Serilog;
+using Serilog.Events;
+using System.Diagnostics;
 using WebUI.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, services, loggerConfig) =>
+{
+    loggerConfig
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .WriteTo.File(
+            path: "logs/memorysmith-agent-.log",
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 14,
+            shared: true);
+
+    if (OperatingSystem.IsWindows())
+    {
+        try
+        {
+            if (EventLog.SourceExists("MemorySmith.Agent"))
+            {
+                loggerConfig.WriteTo.EventLog(
+                    source: "MemorySmith.Agent",
+                    manageEventSource: false,
+                    restrictedToMinimumLevel: LogEventLevel.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            loggerConfig.WriteTo.Console(
+                outputTemplate: "[Serilog-EventLog-Fallback] {Message:lj} {Exception}");
+            Console.WriteLine($"Serilog EventLog sink unavailable: {ex.Message}");
+        }
+    }
+});
 
 // ── Options ────────────────────────────────────────────────────────────────────────────
 builder.Services.Configure<MinecraftAdapterConfig>(
@@ -68,7 +106,12 @@ if (agentEnabled)
     builder.Services.AddSingleton<ChatHistory>();
 
     var chatOpts = new ChatOptions();
-    builder.Configuration.GetSection("Agent:Chat").Bind(chatOpts);
+    var chatSection = builder.Configuration.GetSection("Agent:Chat");
+    chatSection.Bind(chatOpts);
+    // Backward compatibility: support legacy Agent:Chat:Model alongside LlmModel.
+    var legacyModel = chatSection["Model"];
+    if (!string.IsNullOrWhiteSpace(legacyModel) && string.IsNullOrWhiteSpace(chatSection["LlmModel"]))
+        chatOpts = chatOpts with { LlmModel = legacyModel };
     builder.Services.AddSingleton(chatOpts);
 
     // LLM HttpClient — named "llm", BaseAddress set to the provider's URL
@@ -91,7 +134,8 @@ if (agentEnabled)
             sp.GetRequiredService<ChatInterpreter>(),
             sp.GetRequiredService<ChatRateLimiter>(),
             chatOpts,
-            sp.GetRequiredService<ChatHistory>()));      // Sprint 4b
+            sp.GetRequiredService<ChatHistory>(),
+            sp.GetRequiredService<ILogger<LlmChatInterpreter>>()));
 
     // ── Tools ─────────────────────────────────────────────────────────────────────────────────
     builder.Services.AddSingleton<IToolCaller>(sp =>
@@ -101,6 +145,7 @@ if (agentEnabled)
         var d      = new ToolDispatcher();
         d.Register(new MoveToTool(world));
         d.Register(new StatusTool(world));
+        d.Register(new GetStatusTool(world));
         d.Register(new MineBlockTool(world));
         d.Register(new WanderTool(world));
         d.Register(new PlaceBlockTool(world));
@@ -116,7 +161,10 @@ if (agentEnabled)
 
     // ── Planner ────────────────────────────────────────────────────────────────────────────────
     builder.Services.AddSingleton<HtnTaskLibrary>();
-    builder.Services.AddSingleton<IPlanner, HtnPlanner>();
+    builder.Services.AddSingleton<HtnPlanner>(sp =>
+        new HtnPlanner(sp.GetRequiredService<HtnTaskLibrary>()));
+    builder.Services.AddSingleton<IPlanner>(sp =>
+        sp.GetRequiredService<HtnPlanner>());
 
     // Sprint 6: World Model (belief + prediction + reconciliation)
     builder.Services.AddSingleton<IWorldModel>(new WorldModel());
@@ -159,8 +207,17 @@ if (agentEnabled)
 
 // ── Build ────────────────────────────────────────────────────────────────────────────
 var app = builder.Build();
+app.UseSerilogRequestLogging();
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+if (agentEnabled)
+{
+    var opts = app.Services.GetRequiredService<ChatOptions>();
+    app.Logger.LogInformation(
+        "Chat LLM config: enabled={Enabled}, provider={Provider}, model={Model}, baseUrl={BaseUrl}",
+        opts.LlmEnabled, opts.LlmProvider, opts.LlmModel, opts.ResolvedBaseUrl);
+}
 
 // Sprint 4a: map SignalR hub for real-time dashboard push
 if (agentEnabled)

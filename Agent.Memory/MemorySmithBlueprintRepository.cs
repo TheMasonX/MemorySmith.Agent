@@ -9,18 +9,21 @@ using Agent.Core;
 /// Blueprint pages must live at slug "blueprints/{blueprintId}" and use the
 /// standard blueprint markdown format: frontmatter + Y-layer grids + optional legend.
 ///
-/// Page lookup strategy mirrors <see cref="MemorySmithItemRegistry"/>:
-///   1. Direct slug lookup: "blueprints/{id-with-hyphens}"
-///   2. Search fallback: query "blueprints/{blueprintId}" and pick the first page hit
-///      whose PageId contains "blueprints/".
+/// Page lookup strategy (in order):
+///   1. Direct slug lookup on the live MemorySmith gateway.
+///   2. Local file fallback: {localPagesRoot}/Data/Pages/blueprints/{id}.md (for offline/dev).
+///   3. Search fallback via the gateway.
 ///
 /// Returns null for unknown blueprints. <see cref="SaveAsync"/> is not implemented in
 /// Phase 4b — blueprints are authored as wiki pages manually.
 /// Never calls the LLM (D-003).
 /// </summary>
-public sealed class MemorySmithBlueprintRepository(IMemoryGateway memory) : IBlueprintRepository
+public sealed class MemorySmithBlueprintRepository(
+    IMemoryGateway memory,
+    string? localPagesRoot = null) : IBlueprintRepository
 {
     private const string PagePrefix = "blueprints/";
+    private readonly string? _localPagesRoot = localPagesRoot ?? FindLocalPagesRoot();
 
     /// <inheritdoc/>
     public async Task<Blueprint?> GetAsync(
@@ -33,8 +36,12 @@ public sealed class MemorySmithBlueprintRepository(IMemoryGateway memory) : IBlu
         // 1. Direct page lookup (fast, deterministic — preferred per D-003).
         var content = await memory.GetPageAsync(pageId, ct);
 
-        // 2. Search fallback for IDs that don't match the normalisation convention.
-        if (content is null)
+        // 2. Local file fallback (offline / dev runs using checked-in pages).
+        if (string.IsNullOrWhiteSpace(content))
+            content = LoadLocalPage(slug);
+
+        // 3. Search fallback for IDs that don't match the normalisation convention.
+        if (string.IsNullOrWhiteSpace(content))
         {
             var results = await memory.SearchAsync($"{PagePrefix}{blueprintId}", ct);
             var hit = results.FirstOrDefault(r =>
@@ -44,7 +51,7 @@ public sealed class MemorySmithBlueprintRepository(IMemoryGateway memory) : IBlu
                 content = await memory.GetPageAsync(hit.PageId, ct);
         }
 
-        if (content is null) return null;
+        if (string.IsNullOrWhiteSpace(content)) return null;
 
         var (blueprint, _) = BlueprintParser.Parse(content);
         // Preserve the raw markdown so GoalFactory can re-parse blocks later.
@@ -70,6 +77,11 @@ public sealed class MemorySmithBlueprintRepository(IMemoryGateway memory) : IBlu
                 blueprints.Add(blueprint with { RawMarkdown = content });
         }
 
+        // Supplement with any locally available blueprints not returned by the gateway.
+        foreach (var local in LoadAllLocalBlueprints())
+            if (blueprints.All(b => !string.Equals(b.Id, local.Id, StringComparison.OrdinalIgnoreCase)))
+                blueprints.Add(local);
+
         return blueprints;
     }
 
@@ -81,4 +93,47 @@ public sealed class MemorySmithBlueprintRepository(IMemoryGateway memory) : IBlu
         throw new NotImplementedException(
             "MemorySmithBlueprintRepository.SaveAsync is not implemented in Phase 4b. " +
             "Author blueprints as MemorySmith wiki pages under blueprints/.");
+
+    // ── Local file helpers ────────────────────────────────────────────────────
+
+    private string? LoadLocalPage(string slug)
+    {
+        if (string.IsNullOrWhiteSpace(_localPagesRoot)) return null;
+
+        var candidate = Path.Combine(_localPagesRoot, "Data", "Pages", "blueprints", $"{slug}.md");
+        return File.Exists(candidate) ? File.ReadAllText(candidate) : null;
+    }
+
+    private IEnumerable<Blueprint> LoadAllLocalBlueprints()
+    {
+        if (string.IsNullOrWhiteSpace(_localPagesRoot)) yield break;
+
+        var dir = Path.Combine(_localPagesRoot, "Data", "Pages", "blueprints");
+        if (!Directory.Exists(dir)) yield break;
+
+        foreach (var file in Directory.EnumerateFiles(dir, "*.md"))
+        {
+            var content = File.ReadAllText(file);
+            var (blueprint, _) = BlueprintParser.Parse(content);
+            if (!string.IsNullOrEmpty(blueprint.Id))
+                yield return blueprint with { RawMarkdown = content };
+        }
+    }
+
+    private static string? FindLocalPagesRoot()
+    {
+        var current = AppContext.BaseDirectory;
+        while (!string.IsNullOrWhiteSpace(current))
+        {
+            var candidate = Path.Combine(current, "Data", "Pages", "blueprints");
+            if (Directory.Exists(candidate))
+                return current;
+
+            var parent = Directory.GetParent(current);
+            if (parent is null) break;
+            current = parent.FullName;
+        }
+
+        return null;
+    }
 }

@@ -248,6 +248,10 @@ public sealed class AgentBackgroundService(
                     break;
             }
 
+            // If world events satisfy the active goal, stop immediately instead of
+            // draining stale queued actions (prevents post-completion over-collection).
+            TryCompleteCurrentGoalFromWorldUpdate();
+
             // Sprint 4a: push status to dashboard after every event tick (fire-and-forget)
             _ = PushStatusToDashboardAsync(CancellationToken.None);
         }
@@ -319,10 +323,14 @@ public sealed class AgentBackgroundService(
                 await TryCreateGoalFromChatAsync(interpretation, ct);
                 break;
 
-            case ChatIntentType.NavigateTo when interpretation.GoalName == "MoveTo":
-                if (interpretation.GoalParameters is { } nav &&
-                    nav.TryGetValue("x", out var nx) && nav.TryGetValue("y", out var ny) &&
-                    nav.TryGetValue("z", out var nz))
+            case ChatIntentType.NavigateTo:
+                // Player-issued navigation commands should interrupt gather loops.
+                CancelGoal();
+
+                if (interpretation.GoalName == "MoveTo"
+                    && interpretation.GoalParameters is { } nav
+                    && nav.TryGetValue("x", out var nx) && nav.TryGetValue("y", out var ny)
+                    && nav.TryGetValue("z", out var nz))
                 {
                     _queue.Enqueue(new ActionData
                     {
@@ -330,8 +338,38 @@ public sealed class AgentBackgroundService(
                         Arguments = { ["x"] = nx, ["y"] = ny, ["z"] = nz }
                     });
                 }
+                else if (interpretation.GoalParameters is { } follow
+                    && follow.TryGetValue("target", out var target)
+                    && string.Equals(target?.ToString(), "player", StringComparison.OrdinalIgnoreCase)
+                    && chat.PlayerPos is { } playerPos)
+                {
+                    _queue.Enqueue(new ActionData
+                    {
+                        Tool = "MoveTo",
+                        Arguments =
+                        {
+                            ["x"] = playerPos.X,
+                            ["y"] = playerPos.Y,
+                            ["z"] = playerPos.Z,
+                        }
+                    });
+                }
                 break;
         }
+    }
+
+    private void TryCompleteCurrentGoalFromWorldUpdate()
+    {
+        if (_currentGoal is null) return;
+        if (!_currentGoal.IsComplete(_worldState)) return;
+
+        logger.LogInformation("Goal '{Goal}' completed.", _currentGoal.Name);
+        _currentGoal = null;
+        _consecutiveFailures = 0;
+        _lastFailureReason = null;
+        _queue.Clear();
+        lock (_pendingLock) _pendingActions.Clear();
+        _ = PushGoalToDashboardAsync();
     }
 
     private async Task TryCreateGoalFromChatAsync(ChatInterpretation interpretation, CancellationToken ct)
@@ -429,7 +467,6 @@ public sealed class AgentBackgroundService(
                     _journal?.Log(new JournalEntry(
                         DateTimeOffset.UtcNow, JournalEntryType.PlanCreated, _currentGoal.Name,
                         new Dictionary<string, object?> { ["actionCount"] = plan.Actions.Count }));
-                    _consecutiveFailures = 0;
                 }
                 catch (Exception ex)
                 {
@@ -468,8 +505,12 @@ public sealed class AgentBackgroundService(
                         logger.LogDebug("Tool {Tool}: {Message}", action.Tool, result.Message);
                         _journal?.Log(new JournalEntry(
                             DateTimeOffset.UtcNow, JournalEntryType.ActionCompleted, action.Tool));
-                        _consecutiveFailures = 0;
-                        _lastFailureReason = null;
+                        // Reset failure streak only on actions that indicate meaningful progress.
+                        if (IsProgressSignalTool(action.Tool))
+                        {
+                            _consecutiveFailures = 0;
+                            _lastFailureReason = null;
+                        }
                         if (result.Data is not null)
                             foreach (var kv in result.Data)
                                 planContext[kv.Key] = kv.Value;
@@ -521,6 +562,11 @@ public sealed class AgentBackgroundService(
                         _lastFailureReason ??= MapErrorToFailureReason(errMsg);
                         logger.LogWarning("Game error after cycle (failures={N}/{Max}): {Error}",
                             _consecutiveFailures, maxFailures, errMsg);
+
+                        // Recovery seam: for repeated game errors, ask the LLM interpreter
+                        // for an alternate action/goal when available.
+                        if (_consecutiveFailures >= 2)
+                            await TryRecoverFromGameErrorAsync(errMsg, ct);
                     }
                 }
                 else
@@ -626,6 +672,51 @@ public sealed class AgentBackgroundService(
             error.Contains("obstructed", StringComparison.OrdinalIgnoreCase))
             return FailureReason.TargetUnreachable;
 
+        if (error.Contains("found within", StringComparison.OrdinalIgnoreCase) &&
+            error.Contains("No ", StringComparison.OrdinalIgnoreCase))
+            return FailureReason.TargetUnreachable;
+
         return FailureReason.Unknown;
+    }
+
+    private static bool IsProgressSignalTool(string toolName) =>
+        toolName.Equals("MineBlock", StringComparison.OrdinalIgnoreCase)
+        || toolName.Equals("MoveTo", StringComparison.OrdinalIgnoreCase)
+        || toolName.Equals("PlaceBlock", StringComparison.OrdinalIgnoreCase)
+        || toolName.Equals("CraftItem", StringComparison.OrdinalIgnoreCase)
+        || toolName.Equals("SmeltItem", StringComparison.OrdinalIgnoreCase)
+        || toolName.Equals("FindFlatArea", StringComparison.OrdinalIgnoreCase)
+        || toolName.Equals("Wander", StringComparison.OrdinalIgnoreCase);
+
+    private async Task TryRecoverFromGameErrorAsync(string errMsg, CancellationToken ct)
+    {
+        if (chatInterpreter is null || _currentGoal is null) return;
+
+        try
+        {
+            var prompt =
+                $"recover from runtime error while executing goal {_currentGoal.Name}: {errMsg}. " +
+                "If gather target is unavailable, choose an alternative gather goal or navigate action.";
+
+            var interpretation = await chatInterpreter.InterpretAsync(
+                username: "system",
+                message: prompt,
+                botName: botName,
+                onlinePlayers: 1,
+                botPosition: _worldState.Position,
+                playerPosition: _worldState.Position,
+                state: _worldState,
+                ct: ct);
+
+            if (interpretation.IntentType == ChatIntentType.CreateGoal && interpretation.GoalName is not null)
+            {
+                logger.LogInformation("Recovery interpreter suggested goal: {Goal}", interpretation.GoalName);
+                await TryCreateGoalFromChatAsync(interpretation, ct);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "Recovery interpreter failed for error: {Error}", errMsg);
+        }
     }
 }
