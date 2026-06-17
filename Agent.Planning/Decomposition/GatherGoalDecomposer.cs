@@ -28,29 +28,16 @@ public sealed class GatherGoalDecomposer(HtnTaskLibrary taskLibrary) : IGoalDeco
 
     public ActionPlan Decompose(IGoal goal, WorldState state)
     {
-        return goal switch
+        var (spec, parameters) = goal switch
         {
-            GatherWoodGoal g =>
-            {
-                var parameters = new[] { g.TargetCount.ToString() };
-                var actions = taskLibrary.DecomposeGatherItem(
-                    OakLogSpec, parameters, state);
-                return new ActionPlan(g.Name, g.Phases, actions);
-            },
-            GenericGatherGoal gg =>
-            {
-                var actions = taskLibrary.DecomposeGatherItem(
-                    gg.Spec, [], state);
-                return new ActionPlan(gg.Name, gg.Phases, actions);
-            },
-            IItemSpecGoal isg =>
-            {
-                var actions = taskLibrary.DecomposeGatherItem(
-                    isg.Spec, [], state);
-                return new ActionPlan(isg.Name, isg.Phases, actions);
-            },
+            GatherWoodGoal g   => (OakLogSpec, new[] { g.TargetCount.ToString() }),
+            GenericGatherGoal gg => (gg.Spec, Array.Empty<string>()),
+            IItemSpecGoal isg  => (isg.Spec, Array.Empty<string>()),
             _ => throw new InvalidOperationException(
                 $"GatherGoalDecomposer cannot handle {goal.GetType().Name}")
         };
+
+        var actions = taskLibrary.DecomposeGatherItem(spec, parameters, state);
+        return new ActionPlan(goal.Name, goal.Phases, actions);
     }
 }
