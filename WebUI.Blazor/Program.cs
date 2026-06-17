@@ -230,7 +230,8 @@ app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
     RegisteredGoals = factory?.RegisteredGoals ?? [],
 }));
 
-app.MapGet("/api/agent/status", (AgentBackgroundService? agent) =>
+// Sprint 8 S7-D1: IWorldModel injected to expose uncertainty alongside agent vitals.
+app.MapGet("/api/agent/status", (AgentBackgroundService? agent, IWorldModel? worldModel) =>
     Results.Ok(new
     {
         Status              = agentEnabled ? (agent?.CurrentGoal != null ? "active" : "idle") : "disabled",
@@ -243,6 +244,7 @@ app.MapGet("/api/agent/status", (AgentBackgroundService? agent) =>
         Inventory           = agent?.WorldState.Inventory,
         QueuedActions       = agent?.GetPendingActions().Count ?? 0,
         ConsecutiveFailures = agent?.ConsecutiveFailures ?? 0,
+        Uncertainty         = worldModel?.Uncertainty ?? 0.0,
     }));
 
 app.MapGet("/api/goals", (IGoalFactory? factory) =>
@@ -321,20 +323,30 @@ app.MapPost("/api/agent/command", (CommandRequest req, AgentBackgroundService? a
 
 // ── Agent observability endpoints (Sprint 7 / D5) ─────────────────────────────────────
 
+// Sprint 8 S7-D2: returns typed JournalEntryDto instead of raw JournalEntry so that
+// object? Detail values serialise predictably (all coerced to string?).
 app.MapGet("/api/agent/journal", (
     IAgentJournal? journal,
     int limit = 50,
     string? type = null) =>
 {
     if (journal is NullAgentJournal or null)
-        return Results.Ok(new { count = 0, entries = Array.Empty<object>() });
+        return Results.Ok(new { count = 0, returned = 0, entries = Array.Empty<JournalEntryDto>() });
 
     JournalEntryType? typeFilter = null;
     if (type is not null && Enum.TryParse<JournalEntryType>(type, ignoreCase: true, out var t))
         typeFilter = t;
 
     var entries = journal.Query(typeFilter).Take(limit).ToList();
-    return Results.Ok(new { count = journal.Count, returned = entries.Count, entries });
+    var dtos = entries.Select(e => new JournalEntryDto(
+        e.Timestamp.ToString("O"),
+        e.Type.ToString(),
+        e.Summary,
+        (e.Details ?? new Dictionary<string, object?>())
+            .ToDictionary(kv => kv.Key, kv => kv.Value?.ToString())
+    )).ToList();
+
+    return Results.Ok(new { count = journal.Count, returned = dtos.Count, entries = dtos });
 });
 
 app.MapGet("/api/agent/worldmodel", (IWorldModel? model) =>
@@ -357,4 +369,3 @@ record CommandRequest(string Command);
 record PlanRequest(string GoalName, IReadOnlyDictionary<string, object?>? Parameters = null);
 record OriginRequest(string BlueprintId, int X, int Y, int Z);
 record ChatRequest(string? Message);
-
