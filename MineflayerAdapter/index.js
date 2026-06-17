@@ -10,6 +10,14 @@
  * Phase 5b additions:
  *   - chat event: includes playerX/Y/Z (bot.players[username].entity.position)
  *     so C# can compute bot-to-player distance for the "closest agent" heuristic.
+ *
+ * Sprint 9 (flat-area scanner):
+ *   - Vec3 bug fixed: replaced `new Vec3(...)` with plain `{x, y, z}` objects
+ *     (bot.blockAt reads .x/.y/.z — no Vec3 constructor required).
+ *   - A1: vertical scan window widened from ±5/6 to configurable (default +10/-16).
+ *   - A2: compactness scoring added — square regions score higher than thin strips.
+ *   - A5: slope/roughness penalty — components with high Y-range are penalised or filtered.
+ *   - All flat-area tuning constants are named and overridable per-call via args.
  */
 
 import mineflayer from 'mineflayer';
@@ -38,6 +46,27 @@ const CRAFT_TABLE_REACH_DISTANCE = 2;    // blocks — GoalNear tolerance when p
 const FURNACE_SEARCH_RADIUS      = 16;   // blocks — findBlock for furnace
 const FURNACE_REACH_DISTANCE     = 2;    // blocks — GoalNear tolerance when pathfinding to furnace
 const SMELT_TIMEOUT_MS           = 40_000; // ms — max wait for smelting output
+
+// Sprint 9: flat-area scan defaults. All overridable per-call via args.
+const FLAT_AREA_SCAN_RADIUS      = 20;   // blocks — XZ radius to scan around bot
+const FLAT_AREA_MIN_SIZE         = 25;   // cells — minimum qualifying area (5×5; council raised from 9)
+const FLAT_AREA_Y_ABOVE          = 10;   // blocks above bot Y to start scan (was 4)
+const FLAT_AREA_Y_BELOW          = 16;   // blocks below bot Y to end scan (was 6)
+const FLAT_AREA_MAX_SLOPE        = 3;    // blocks — max Y-range within a component; steeper = rejected
+
+// Scoring weights (sum = 1.0):
+//   area:        raw cell count — rewards larger regions
+//   compactness: area / (bboxW × bboxD) — rewards square shapes over thin strips
+//   flatness:    1 - yRange/maxSlope — rewards smooth terrain
+const FLAT_SCORE_WEIGHTS = Object.freeze({
+  area:        0.5,
+  compactness: 0.3,
+  flatness:    0.2,
+});
+
+// Liquid block names: these blocks are never safe build surfaces.
+// findFlatArea rejects any candidate whose ground OR surface column contains liquid.
+const LIQUID_BLOCK_NAMES = new Set(['water', 'lava', 'flowing_water', 'flowing_lava']);
 
 // ── WebSocket server ─────────────────────────────────────────────────────────
 
@@ -317,26 +346,57 @@ async function dispatch({ action, arguments: args = {} }) {
     }
 
     case 'findFlatArea': {
-      const { radius = 20, minFlatArea = 9 } = args;
+      // Sprint 9: all tuning values are named constants with per-call overrides.
+      const {
+        radius      = FLAT_AREA_SCAN_RADIUS,
+        minFlatArea = FLAT_AREA_MIN_SIZE,
+        yAbove      = FLAT_AREA_Y_ABOVE,
+        yBelow      = FLAT_AREA_Y_BELOW,
+        maxSlope    = FLAT_AREA_MAX_SLOPE,
+      } = args;
+
       const botPosObj = botPos();
-      const r = Math.max(1, Math.min(radius, 64));
+      const r       = Math.max(1, Math.min(radius, 64));
       const minArea = Math.max(1, Math.min(minFlatArea, 256));
 
-      // Build a height map: sample every column within radius, recording the
-      // Y level of the highest solid (opaque) block that has air above it.
-      const heightMap = new Map(); // key: "x,z", value: { x, z, y, isFlat }
+      // ── Height map ─────────────────────────────────────────────────────────
+      // For each column (cx, cz) within radius, find the Y of the topmost
+      // solid, non-liquid block that has traversable (air/empty) space above it.
+      //
+      // Sprint 9 A1: scan window widened from ±5/6 to configurable yAbove/yBelow.
+      // Sprint 9 Vec3 fix: bot.blockAt accepts {x,y,z} plain objects — no Vec3
+      //   import required (Mineflayer reads .x/.y/.z directly).
+      // Sprint 9 liquid check: candidate columns are rejected when the ground
+      //   block is liquid (lava/water), preventing unsafe build-site selection.
+
+      /** @type {Map<string, {x:number, z:number, y:number}>} */
+      const heightMap = new Map();
+
+      // Yield to the Node event loop every 200 columns so the adapter remains
+      // responsive during large scans (r=64 → ~16,600 columns).
+      let columnIdx = 0;
+
       for (let dx = -r; dx <= r; dx++) {
         for (let dz = -r; dz <= r; dz++) {
+          if (++columnIdx % 200 === 0) {
+            await new Promise(resolve => setImmediate(resolve));
+          }
+
           const cx = botPosObj.x + dx;
           const cz = botPosObj.z + dz;
-          // Scan top-down from bot's Y level
-          for (let cy = botPosObj.y + 4; cy >= botPosObj.y - 6; cy--) {
-            const block = bot.blockAt(new Vec3(cx, cy, cz));
+
+          for (let cy = botPosObj.y + yAbove; cy >= botPosObj.y - yBelow; cy--) {
+            const block = bot.blockAt({ x: cx, y: cy, z: cz });
             if (!block) continue;
-            // Solid ground: block with bounding box (not empty/plant) + air above
-            if (block.name !== 'air' && block.boundingBox === 'block') {
-              const above = bot.blockAt(new Vec3(cx, cy + 1, cz));
-              if (!above || above.name === 'air' || above.boundingBox === 'empty') {
+
+            // A solid, non-liquid block with bounding-box 'block'.
+            if (block.name !== 'air'
+                && block.boundingBox === 'block'
+                && !LIQUID_BLOCK_NAMES.has(block.name)) {
+              const above = bot.blockAt({ x: cx, y: cy + 1, z: cz });
+              // Surface (cy+1) must be traversable and not liquid.
+              if ((!above || above.name === 'air' || above.boundingBox === 'empty')
+                  && !LIQUID_BLOCK_NAMES.has(above?.name ?? '')) {
                 heightMap.set(`${cx},${cz}`, { x: cx, z: cz, y: cy + 1 });
                 break;
               }
@@ -345,20 +405,24 @@ async function dispatch({ action, arguments: args = {} }) {
         }
       }
 
-      // Flood-fill to find the largest contiguous flat region
-      // "Flat" = adjacent columns whose Y values differ by at most 1
-      const visited = new Set();
-      let bestCandidate = null;
-      let bestArea = 0;
+      // ── Flood-fill: find connected flat components ─────────────────────────
+      // "Flat neighbour" = adjacent column whose surface Y differs by ≤ 1 block.
+      // Sprint 9 A5: components with Y-range > maxSlope are filtered out.
 
-      const isFlatNeighbor = (a, b) => a && b && Math.abs(a.y - b.y) <= 1;
+      /** @param {{y:number}|undefined} a @param {{y:number}|undefined} b */
+      const isFlatNeighbour = (a, b) => a && b && Math.abs(a.y - b.y) <= 1;
+
+      const visited      = new Set();
+      let bestCandidate  = null;
+      let bestScore      = 0;
 
       for (const [key, col] of heightMap) {
         if (visited.has(key)) continue;
 
-        // BFS to find the connected flat component
+        // BFS to collect the connected flat component
+        /** @type {Array<{x:number, z:number, y:number}>} */
         const component = [];
-        const queue = [col];
+        const queue     = [col];
         visited.add(key);
 
         while (queue.length > 0) {
@@ -366,39 +430,80 @@ async function dispatch({ action, arguments: args = {} }) {
           component.push(cur);
 
           for (const [ndx, ndz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-            const nk = `${cur.x + ndx},${cur.z + ndz}`;
+            const nk  = `${cur.x + ndx},${cur.z + ndz}`;
             const nbr = heightMap.get(nk);
-            if (nbr && !visited.has(nk) && isFlatNeighbor(cur, nbr)) {
+            if (nbr && !visited.has(nk) && isFlatNeighbour(cur, nbr)) {
               visited.add(nk);
               queue.push(nbr);
             }
           }
         }
 
-        if (component.length >= minArea && component.length > bestArea) {
-          bestArea = component.length;
-          // Compute the centroid of the component
-          const avgY = Math.round(component.reduce((s, c) => s + c.y, 0) / component.length);
-          const minX = Math.min(...component.map(c => c.x));
-          const maxX = Math.max(...component.map(c => c.x));
-          const minZ = Math.min(...component.map(c => c.z));
-          const maxZ = Math.max(...component.map(c => c.z));
+        if (component.length < minArea) continue;
+
+        // ── Sprint 9 A5: slope/roughness check ─────────────────────────────
+        const yValues = component.map(c => c.y);
+        const yMin    = Math.min(...yValues);
+        const yMax    = Math.max(...yValues);
+        const yRange  = yMax - yMin;
+
+        // Hard reject: terrain is too steep for safe construction.
+        if (yRange > maxSlope) continue;
+
+        // ── Sprint 9 A2: composite score ───────────────────────────────────
+        // Combines three signals:
+        //   area:        raw cell count (larger = better)
+        //   compactness: ratio of area to bounding box (square > strip)
+        //   flatness:    inverse of normalised Y range (flat > sloped)
+
+        const minX  = Math.min(...component.map(c => c.x));
+        const maxX  = Math.max(...component.map(c => c.x));
+        const minZ  = Math.min(...component.map(c => c.z));
+        const maxZ  = Math.max(...component.map(c => c.z));
+        const bboxW = maxX - minX + 1;
+        const bboxD = maxZ - minZ + 1;
+
+        const compactness = component.length / (bboxW * bboxD); // 0.0–1.0
+        const flatness    = maxSlope > 0 ? 1 - yRange / maxSlope : 1; // 1.0 = perfectly flat
+        const score       = component.length * (
+          FLAT_SCORE_WEIGHTS.area        +
+          FLAT_SCORE_WEIGHTS.compactness * compactness +
+          FLAT_SCORE_WEIGHTS.flatness    * flatness
+        );
+
+        if (score > bestScore) {
+          bestScore = score;
+          const avgY = Math.round(yValues.reduce((s, y) => s + y, 0) / yValues.length);
           bestCandidate = {
             x: Math.round((minX + maxX) / 2),
             y: avgY,
             z: Math.round((minZ + maxZ) / 2),
             area: component.length,
             minX, maxX, minZ, maxZ,
+            // Sprint 9: include terrain quality metrics for observability
+            yRange,
+            compactness: Math.round(compactness * 100) / 100,
           };
         }
       }
 
       if (bestCandidate) {
         sendEvent('flatAreaFound', bestCandidate);
-        console.log(`[findFlatArea] best candidate at (${bestCandidate.x},${bestCandidate.y},${bestCandidate.z}) area=${bestCandidate.area}`);
+        console.log(
+          `[findFlatArea] best at (${bestCandidate.x},${bestCandidate.y},${bestCandidate.z})` +
+          ` area=${bestCandidate.area} yRange=${bestCandidate.yRange}` +
+          ` compact=${bestCandidate.compactness} score=${bestScore.toFixed(1)}`
+        );
       } else {
-        console.warn(`[findFlatArea] no flat area >= ${minArea} found within radius ${r}`);
-        sendEvent('flatAreaFound', { x: botPosObj.x, y: botPosObj.y + 1, z: botPosObj.z, area: 0 });
+        console.warn(
+          `[findFlatArea] no qualifying flat area found ` +
+          `(min=${minArea}, maxSlope=${maxSlope}, radius=${r}, columns=${columnIdx})`
+        );
+        sendEvent('flatAreaFound', {
+          x: botPosObj.x, y: botPosObj.y + 1, z: botPosObj.z,
+          area: 0, minX: botPosObj.x, maxX: botPosObj.x, minZ: botPosObj.z, maxZ: botPosObj.z,
+          yRange: 0, compactness: 0,
+        });
       }
       break;
     }
