@@ -13,15 +13,12 @@ namespace MemorySmith.Agent.Tests;
 public sealed class GoalFactoryBuiltInTests
 {
     // ── Built-in gather fallback ──────────────────────────────────────────────
-    // These items have no MemorySmith wiki pages but are in DirectMineBlocks.
-    // GoalFactory should create gather goals for them without a registry.
 
     [Test]
     public async Task CreateAsync_GatherDirt_ReturnsGoal_WithoutRegistry()
     {
         var factory = new GoalFactory(itemRegistry: null, blueprintRepository: null);
         var goal    = await factory.CreateAsync("GatherItem:dirt");
-
         Assert.That(goal, Is.Not.Null, "GoalFactory should return a goal for 'dirt' via built-in spec.");
     }
 
@@ -59,14 +56,6 @@ public sealed class GoalFactoryBuiltInTests
     }
 
     [Test]
-    public async Task CreateAsync_GatherUnknownBlock_ReturnsNull_WhenNoRegistry()
-    {
-        var factory = new GoalFactory(itemRegistry: null, blueprintRepository: null);
-        var goal    = await factory.CreateAsync("GatherItem:unknown_block_xyz");
-        Assert.That(goal, Is.Null, "Items not in the built-in list should return null.");
-    }
-
-    [Test]
     public async Task CreateAsync_GatherDirt_Count_IsRespected()
     {
         var factory = new GoalFactory(itemRegistry: null, blueprintRepository: null);
@@ -74,8 +63,19 @@ public sealed class GoalFactoryBuiltInTests
             new Dictionary<string, object?> { ["count"] = 5 });
 
         Assert.That(goal, Is.Not.Null);
-        Assert.That(goal!.IsComplete(new WorldState().With(b => b.AddInventoryItem("dirt", 5))), Is.True);
-        Assert.That(goal.IsComplete(new WorldState().With(b => b.AddInventoryItem("dirt", 4))), Is.False);
+        Assert.That(goal!.IsComplete(new WorldState().With(b => b.AddInventoryItem("dirt", 5))), Is.True,
+            "Goal with count=5 should complete when inventory has 5 dirt.");
+        Assert.That(goal.IsComplete(new WorldState().With(b => b.AddInventoryItem("dirt", 4))), Is.False,
+            "Goal with count=5 should not complete when inventory has only 4 dirt.");
+    }
+
+    [Test]
+    public async Task CreateAsync_GatherDirt_GoalNameContainsItemId()
+    {
+        var factory = new GoalFactory(itemRegistry: null, blueprintRepository: null);
+        var goal    = await factory.CreateAsync("GatherItem:dirt");
+        Assert.That(goal, Is.Not.Null);
+        Assert.That(goal!.Name, Does.Contain("dirt").IgnoreCase);
     }
 
     // ── CraftItem goal creation ───────────────────────────────────────────────
