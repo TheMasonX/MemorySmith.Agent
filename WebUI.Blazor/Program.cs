@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
-using System.Diagnostics;
 using WebUI.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,35 +20,21 @@ builder.Host.UseSerilog((context, services, loggerConfig) =>
 {
     loggerConfig
         .MinimumLevel.Information()
-        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-        .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft",              LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.AspNetCore",   LogEventLevel.Warning)
+        .MinimumLevel.Override("System.Net.Http",        LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.Extensions.Http", LogEventLevel.Warning)
         .Enrich.FromLogContext()
-        .WriteTo.Console()
+        // Clean console: no level prefix, no duplicate EventLog fallback
+        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss}] {Message:lj}{NewLine}{Exception}")
         .WriteTo.File(
             path: "logs/memorysmith-agent-.log",
             rollingInterval: RollingInterval.Day,
             retainedFileCountLimit: 14,
-            shared: true);
-
-    if (OperatingSystem.IsWindows())
-    {
-        try
-        {
-            if (EventLog.SourceExists("MemorySmith.Agent"))
-            {
-                loggerConfig.WriteTo.EventLog(
-                    source: "MemorySmith.Agent",
-                    manageEventSource: false,
-                    restrictedToMinimumLevel: LogEventLevel.Warning);
-            }
-        }
-        catch (Exception ex)
-        {
-            loggerConfig.WriteTo.Console(
-                outputTemplate: "[Serilog-EventLog-Fallback] {Message:lj} {Exception}");
-            Console.WriteLine($"Serilog EventLog sink unavailable: {ex.Message}");
-        }
-    }
+            shared: true,
+            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}");
+    // EventLog sink removed: requires Windows admin to create event source;
+    // its catch-block was adding a second Console sink that duplicated every log line.
 });
 
 // ── Options ────────────────────────────────────────────────────────────────────────────
