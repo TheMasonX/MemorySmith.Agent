@@ -1,5 +1,3 @@
-using Agent.Core;
-
 namespace Agent.Core;
 
 /// <summary>
@@ -11,6 +9,9 @@ public interface IAgentJournal
 {
     /// <summary>Append an entry. Thread-safe.</summary>
     void Log(JournalEntry entry);
+
+    /// <summary>Approximate number of entries currently stored. Thread-safe.</summary>
+    int Count { get; }
 
     /// <summary>All entries, newest-first.</summary>
     IReadOnlyList<JournalEntry> All { get; }
