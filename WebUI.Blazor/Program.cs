@@ -80,12 +80,14 @@ if (agentEnabled)
     builder.Services.AddSingleton<IBlueprintRepository>(sp =>
         new MemorySmithBlueprintRepository(sp.GetRequiredService<IMemoryGateway>()));
 
-    // Sprint 16 Phase 7-B: Unified knowledge resolver stub (IItemRegistry + IMemoryGateway).
-    // Two sources only — no graph traversal, no planner wiring. Exposed via /api/agent/resolve.
+    // Sprint 17 Phase 7-B: Knowledge resolver — three sources: IItemRegistry + IMemoryGateway + WorldState.
+    // WorldState is accessed via a factory delegate resolved lazily at query time, avoiding a
+    // forward-reference issue (LocalKnowledgeResolver is registered before AgentBackgroundService).
     builder.Services.AddSingleton<IKnowledgeResolver>(sp =>
         new LocalKnowledgeResolver(
             sp.GetRequiredService<IItemRegistry>(),
-            sp.GetRequiredService<IMemoryGateway>()));
+            sp.GetRequiredService<IMemoryGateway>(),
+            () => sp.GetService<AgentBackgroundService>()?.WorldState));
 
     // ── Goal factory ────────────────────────────────────────────────────────────────────────
     builder.Services.AddSingleton<GoalFactory>(sp => new GoalFactory(
@@ -176,7 +178,7 @@ if (agentEnabled)
     // ── Journal (execution trace) ────────────────────────────────────────────────────────────
     builder.Services.AddSingleton<IAgentJournal>(new AgentJournal());
 
-    // ── SignalR dashboard push — Sprint 4a ────────────────────────────────────────
+    // ── SignalR dashboard push — Sprint 4a ────────────────────────────────────
     builder.Services.AddSignalR();
 
     // ── Background service ───────────────────────────────────────────────────────────────────
@@ -387,8 +389,8 @@ app.MapGet("/api/agent/worldmodel", (IWorldModel? model, bool detail = true) =>
 });
 
 // Sprint 16 Phase 7-B: /api/agent/resolve — single-entry knowledge lookup.
-// Queries IKnowledgeResolver (two sources: IItemRegistry + IMemoryGateway) and returns
-// ranked KnowledgeCandidates. Example: GET /api/agent/resolve?q=oak_log&topN=3
+// Queries IKnowledgeResolver (three sources as of Sprint 17: IItemRegistry + IMemoryGateway + WorldState)
+// and returns ranked KnowledgeCandidates. Example: GET /api/agent/resolve?q=oak_log&topN=3
 //
 // Query parameters:
 //   q                  — item ID or natural-language query (required)
