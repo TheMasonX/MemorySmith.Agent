@@ -24,6 +24,8 @@ using System.Text.RegularExpressions;
 ///   4. Rate-limit check: per-player and global window via <see cref="ChatRateLimiter"/>.
 ///   5. LLM call: <see cref="ILlmProvider.CompleteAsync"/> with a structured JSON prompt
 ///      that includes the last <see cref="ChatHistory.MaxTurnsDefault"/> conversation turns.
+///      A per-request timeout (<see cref="ChatOptions.LlmTimeoutSeconds"/>) prevents a
+///      hung Ollama from stalling the chat consumer indefinitely (Sprint 11).
 ///   6. JSON parse: extract <see cref="ChatInterpretation"/> from the raw text.
 ///   7. Empty-response guard: if the LLM produced an addressed intent with no response
 ///      text, substitute the pattern fallback's response to avoid "Hmm..." then silence.
@@ -38,7 +40,7 @@ public sealed class LlmChatInterpreter(
     ChatRateLimiter rateLimiter,
     ChatOptions options,
     ChatHistory? history = null,
-    Microsoft.Extensions.Logging.ILogger<LlmChatInterpreter>? logger = null) : IChatInterpreter
+    ILogger<LlmChatInterpreter>? logger = null) : IChatInterpreter
 {
     // ── IChatInterpreter ──────────────────────────────────────────────────────
 
@@ -94,20 +96,39 @@ public sealed class LlmChatInterpreter(
         }
         if (!rateLimiter.TryAcquire(username, out _))
         {
-            logger?.LogDebug("[llm] rate-limited for {Username} — using pattern result", username);
+            logger?.LogInformation("[llm] rate-limited for {Username} (cooldown={Cooldown}s, globalMax={Max}/min) — using pattern result",
+                username, options.PlayerCooldownSeconds, options.GlobalPerMinuteMax);
             return quick;
         }
 
-        // 6. LLM call
+        // 6. LLM call — hard per-request timeout via linked CancellationTokenSource.
+        //    Sprint 11: prevents a hung Ollama from blocking the chat consumer for minutes.
+        //    options.LlmTimeoutSeconds defaults to 10; set higher for slow hardware.
         var snippet = effective[..Math.Min(60, effective.Length)];
         logger?.LogInformation("[llm] calling {Provider} ({Model}) for <{Username}> '{Snippet}'",
             provider.ProviderName, options.LlmModel, username, snippet);
         var currentGoal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s ? s : null;
         var historyContext = history?.FormatForPrompt();
-        var raw = await provider.CompleteAsync(
-            BuildSystemPrompt(botName, botPosition, currentGoal, onlinePlayers, historyContext, playerPosition, state),
-            $"{username} says: \"{effective}\"",
-            ct);
+
+        using var llmCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        llmCts.CancelAfter(TimeSpan.FromSeconds(options.LlmTimeoutSeconds));
+
+        string? raw;
+        try
+        {
+            raw = await provider.CompleteAsync(
+                BuildSystemPrompt(botName, botPosition, currentGoal, onlinePlayers, historyContext, playerPosition, state),
+                $"{username} says: \"{effective}\"",
+                llmCts.Token);
+        }
+        catch (OperationCanceledException) when (llmCts.IsCancellationRequested && !ct.IsCancellationRequested)
+        {
+            // Only the per-request timeout fired — parent loop is still alive.
+            logger?.LogWarning(
+                "[llm] timed out after {Timeout}s for <{Username}> '{Snippet}' — using pattern result",
+                options.LlmTimeoutSeconds, username, effective[..Math.Min(40, effective.Length)]);
+            return quick;
+        }
 
         if (raw is null)
         {
@@ -121,7 +142,8 @@ public sealed class LlmChatInterpreter(
             raw.Length, raw[..Math.Min(200, raw.Length)]);
         var llmResult = ParseDecision(raw);
         if (llmResult is null)
-            logger?.LogWarning("[llm] failed to parse JSON from {Provider} response", provider.ProviderName);
+            logger?.LogWarning("[llm] failed to parse JSON from {Provider} response: '{Snippet}'",
+                provider.ProviderName, raw[..Math.Min(100, raw.Length)]);
 
         // 8. Empty-response guard — prevents "Hmm..." then silence when the LLM produces
         //    an addressed intent (Chat, Unknown, etc.) but omits the response field.
@@ -182,7 +204,7 @@ public sealed class LlmChatInterpreter(
         Use "chat" for greetings, questions, or conversation — always include a "response".
         Use "clarify" when you need more info — ask a short question.
         Never leave "response" empty for "yes" or "maybe" addressed messages.
-        Use Minecraft item IDs without namespace prefix (oak_log, cobblestone, iron_ore…).
+        Use Minecraft item IDs without namespace prefix (oak_log, cobblestone, iron_ore...).
         """;
 
     private static string FormatInventory(WorldState? state)
@@ -191,7 +213,7 @@ public sealed class LlmChatInterpreter(
         var top = state.Inventory
             .OrderByDescending(kv => kv.Value)
             .Take(6)
-            .Select(kv => $"{kv.Value}×{kv.Key}");
+            .Select(kv => $"{kv.Value}x{kv.Key}");
         return string.Join(", ", top)
             + (state.Inventory.Count > 6 ? $" (+{state.Inventory.Count - 6} more)" : "");
     }
