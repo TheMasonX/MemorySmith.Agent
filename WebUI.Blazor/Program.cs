@@ -80,6 +80,13 @@ if (agentEnabled)
     builder.Services.AddSingleton<IBlueprintRepository>(sp =>
         new MemorySmithBlueprintRepository(sp.GetRequiredService<IMemoryGateway>()));
 
+    // Sprint 16 Phase 7-B: Unified knowledge resolver stub (IItemRegistry + IMemoryGateway).
+    // Two sources only — no graph traversal, no planner wiring. Exposed via /api/agent/resolve.
+    builder.Services.AddSingleton<IKnowledgeResolver>(sp =>
+        new LocalKnowledgeResolver(
+            sp.GetRequiredService<IItemRegistry>(),
+            sp.GetRequiredService<IMemoryGateway>()));
+
     // ── Goal factory ────────────────────────────────────────────────────────────────────────
     builder.Services.AddSingleton<GoalFactory>(sp => new GoalFactory(
         sp.GetRequiredService<IItemRegistry>(),
@@ -169,7 +176,7 @@ if (agentEnabled)
     // ── Journal (execution trace) ────────────────────────────────────────────────────────────
     builder.Services.AddSingleton<IAgentJournal>(new AgentJournal());
 
-    // ── SignalR dashboard push — Sprint 4a ────────────────────────────────────────────
+    // ── SignalR dashboard push — Sprint 4a ────────────────────────────────────────
     builder.Services.AddSignalR();
 
     // ── Background service ───────────────────────────────────────────────────────────────────
@@ -376,6 +383,60 @@ app.MapGet("/api/agent/worldmodel", (IWorldModel? model, bool detail = true) =>
         uncertainty = model.Uncertainty,
         belief      = model.Belief,
         observed    = model.Observed,
+    });
+});
+
+// Sprint 16 Phase 7-B: /api/agent/resolve — single-entry knowledge lookup.
+// Queries IKnowledgeResolver (two sources: IItemRegistry + IMemoryGateway) and returns
+// ranked KnowledgeCandidates. Example: GET /api/agent/resolve?q=oak_log&topN=3
+//
+// Query parameters:
+//   q                  — item ID or natural-language query (required)
+//   types              — comma-separated CandidateType filter (optional)
+//   confidenceThreshold— minimum confidence 0.0–1.0 (optional, default 0.0)
+//   topN               — max candidates to return (optional, default 5)
+app.MapGet("/api/agent/resolve", async (
+    IKnowledgeResolver? resolver,
+    string? q,
+    string? types = null,
+    float confidenceThreshold = 0.0f,
+    int topN = 5) =>
+{
+    if (resolver is null)
+        return Results.Problem("Knowledge resolver not available. Set Agent:Enabled=true.");
+
+    if (string.IsNullOrWhiteSpace(q))
+        return Results.BadRequest(new { Error = "q parameter is required." });
+
+    CandidateType[]? typeFilter = null;
+    if (!string.IsNullOrWhiteSpace(types))
+    {
+        typeFilter = types
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(t => Enum.TryParse<CandidateType>(t, ignoreCase: true, out _))
+            .Select(t => Enum.Parse<CandidateType>(t, ignoreCase: true))
+            .ToArray();
+    }
+
+    var query  = new KnowledgeQuery(q, typeFilter, confidenceThreshold, Math.Max(1, topN));
+    var result = await resolver.ResolveAsync(query);
+
+    return Results.Ok(new
+    {
+        query          = q,
+        candidateCount = result.Candidates.Count,
+        wasAmbiguous   = result.WasAmbiguous,
+        best           = result.Best is { } b
+            ? new { b.Id, b.DisplayName, type = b.Type.ToString(), b.Confidence, b.Detail }
+            : (object?)null,
+        candidates = result.Candidates.Select(c => new
+        {
+            c.Id,
+            c.DisplayName,
+            type       = c.Type.ToString(),
+            c.Confidence,
+            c.Detail,
+        }),
     });
 });
 
