@@ -12,12 +12,20 @@ using System.Text.Json;
 /// from four types (IToolRegistry, IToolCaller, ToolRegistry, ToolEngine) to two
 /// (IToolCaller stays for DI; ToolDispatcher is the single concrete class).
 ///
-/// When the LLM path matures, schema validation lives here — not scattered across callers.
+/// Sprint 5: schema validation is now enforced at the dispatch boundary. Every tool's
+/// InputSchema is validated before execution — this is the safety boundary between
+/// untrusted arguments (from LLMs or REST API) and the tool layer.
 /// </summary>
 public sealed class ToolDispatcher : IToolCaller
 {
     private readonly ConcurrentDictionary<string, ITool> _tools =
         new(StringComparer.OrdinalIgnoreCase);
+    private readonly IAgentJournal? _journal;
+
+    public ToolDispatcher(IAgentJournal? journal = null)
+    {
+        _journal = journal;
+    }
 
     // ── Registration ──────────────────────────────────────────────────────────
 
@@ -31,19 +39,124 @@ public sealed class ToolDispatcher : IToolCaller
     // ── Dispatch ──────────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Resolves the named tool and executes it.
-    /// Returns a failure result (not throws) when the tool is unknown —
-    /// the caller's dispatch loop decides whether to retry or abandon.
+    /// Resolves the named tool, validates arguments against its InputSchema,
+    /// and executes. Returns a failure result (not throws) when the tool is
+    /// unknown or the arguments are malformed — the caller's dispatch loop
+    /// decides whether to retry or abandon.
     /// </summary>
     public async Task<ToolResult> CallAsync(
         string toolName, JsonElement arguments,
         CancellationToken cancellationToken = default)
     {
-        var tool = _tools.TryGetValue(toolName, out var t) ? t : null;
-        if (tool is null)
+        if (!_tools.TryGetValue(toolName, out var tool))
+        {
+            var unknownEntry = new JournalEntry(
+                DateTimeOffset.UtcNow,
+                JournalEntryType.ActionFailed,
+                $"Tool '{toolName}' not registered");
+            _journal?.Log(unknownEntry);
             return new ToolResult(false, $"Tool '{toolName}' is not registered.");
+        }
 
-        // TODO: validate arguments against tool.InputSchema before dispatching
-        return await tool.ExecuteAsync(arguments, cancellationToken);
+        // Sprint 5: validate arguments against the tool's declared InputSchema
+        var schema = tool.InputSchema;
+        if (schema.ValueKind != JsonValueKind.Undefined)
+        {
+            var validationError = ValidateAgainstSchema(arguments, schema);
+            if (validationError is not null)
+            {
+                var failEntry = new JournalEntry(
+                    DateTimeOffset.UtcNow,
+                    JournalEntryType.ActionFailed,
+                    $"Validation failed for '{toolName}': {validationError}");
+                _journal?.Log(failEntry);
+                return new ToolResult(false, $"Schema validation failed for '{toolName}': {validationError}");
+            }
+        }
+
+        var result = await tool.ExecuteAsync(arguments, cancellationToken);
+
+        var entry = new JournalEntry(
+            DateTimeOffset.UtcNow,
+            result.Success ? JournalEntryType.ActionCompleted : JournalEntryType.ActionFailed,
+            result.Success
+                ? $"Tool '{toolName}' succeeded"
+                : $"Tool '{toolName}' failed: {result.Message}");
+        _journal?.Log(entry);
+
+        return result;
+    }
+
+    // ── Schema validation ─────────────────────────────────────────────────────
+    //
+    // Lightweight JSON Schema validator covering the subset used by tool schemas:
+    // type (object), properties (name → { type, description }), required array.
+    // This is intentionally minimal — it validates the guard-rail subset, not full
+    // JSON Schema Draft support. All 12 registered tools use this subset.
+
+    /// <summary>
+    /// Validates <paramref name="args"/> against a JSON Schema object.
+    /// Returns null on success, or an error message string on failure.
+    /// </summary>
+    internal static string? ValidateAgainstSchema(JsonElement args, JsonElement schema)
+    {
+        // Schema root must declare type "object"
+        if (schema.TryGetProperty("type", out var rootType) &&
+            rootType.GetString() != "object")
+            return $"Schema root type must be 'object', got '{rootType.GetString()}'.";
+
+        // If args is not an object, it can never satisfy a "type": "object" schema
+        if (args.ValueKind != JsonValueKind.Object)
+            return "Arguments must be a JSON object.";
+
+        // Gather the set of expected property names
+        if (!schema.TryGetProperty("properties", out var schemaProps))
+            return null; // no property constraints — accept anything
+
+        var knownProps = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var prop in schemaProps.EnumerateObject())
+            knownProps.Add(prop.Name);
+
+        // Check that all provided properties are declared in the schema
+        foreach (var argProp in args.EnumerateObject())
+        {
+            if (!knownProps.Contains(argProp.Name))
+                return $"Unexpected property '{argProp.Name}' is not declared in the tool schema.";
+
+            if (schemaProps.TryGetProperty(argProp.Name, out var propSchema) &&
+                propSchema.TryGetProperty("type", out var expectedType))
+            {
+                var error = CheckType(argProp.Name, argProp.Value, expectedType.GetString()!);
+                if (error is not null) return error;
+            }
+        }
+
+        // Check that all required properties are present
+        if (schema.TryGetProperty("required", out var required))
+        {
+            foreach (var req in required.EnumerateArray())
+            {
+                var name = req.GetString()!;
+                if (!args.TryGetProperty(name, out _))
+                    return $"Missing required property '{name}'.";
+            }
+        }
+
+        return null;
+    }
+
+    private static string? CheckType(string name, JsonElement value, string expected)
+    {
+        return expected switch
+        {
+            "integer" when value.ValueKind != JsonValueKind.Number ||
+                          value.GetRawText().Contains('.') => $"Property '{name}' must be an integer, got '{value.GetRawText()}'.",
+            "number" when value.ValueKind != JsonValueKind.Number => $"Property '{name}' must be a number, got '{value.GetRawText()}'.",
+            "string" when value.ValueKind != JsonValueKind.String => $"Property '{name}' must be a string, got '{value.GetRawText()}'.",
+            "boolean" when value.ValueKind is not JsonValueKind.True and not JsonValueKind.False => $"Property '{name}' must be a boolean, got '{value.GetRawText()}'.",
+            "object" when value.ValueKind != JsonValueKind.Object => $"Property '{name}' must be an object, got '{value.GetRawText()}'.",
+            "array" when value.ValueKind != JsonValueKind.Array => $"Property '{name}' must be an array, got '{value.GetRawText()}'.",
+            _ => null, // unknown type — accept (forward-compatible)
+        };
     }
 }

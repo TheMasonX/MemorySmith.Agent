@@ -63,6 +63,9 @@ if (agentEnabled)
     builder.Services.AddSingleton<IGoalFactory>(sp => sp.GetRequiredService<GoalFactory>());
 
     // ── Chat / LLM services ───────────────────────────────────────────────────────────────────
+    // Sprint 4b: rolling chat history context window (last 5 turns)
+    builder.Services.AddSingleton<ChatHistory>();
+
     var chatOpts = new ChatOptions();
     builder.Configuration.GetSection("Agent:Chat").Bind(chatOpts);
     builder.Services.AddSingleton(chatOpts);
@@ -86,7 +89,8 @@ if (agentEnabled)
             sp.GetRequiredService<ILlmProvider>(),
             sp.GetRequiredService<ChatInterpreter>(),
             sp.GetRequiredService<ChatRateLimiter>(),
-            chatOpts));
+            chatOpts,
+            sp.GetRequiredService<ChatHistory>()));      // Sprint 4b
 
     // ── Tools ─────────────────────────────────────────────────────────────────────────────────
     builder.Services.AddSingleton<IToolCaller>(sp =>
@@ -113,6 +117,12 @@ if (agentEnabled)
     builder.Services.AddSingleton<HtnTaskLibrary>();
     builder.Services.AddSingleton<IPlanner, HtnPlanner>();
 
+    // ── Journal (execution trace) ────────────────────────────────────────────────────────────
+    builder.Services.AddSingleton<IAgentJournal>(new AgentJournal());
+
+    // ── SignalR dashboard push — Sprint 4a ────────────────────────────────────────────
+    builder.Services.AddSignalR();
+
     // ── Background service ───────────────────────────────────────────────────────────────────
     builder.Services.AddSingleton<AgentBackgroundService>(sp =>
     {
@@ -122,9 +132,11 @@ if (agentEnabled)
             sp.GetRequiredService<IToolCaller>(),
             sp.GetRequiredService<ILogger<AgentBackgroundService>>(),
             sp.GetRequiredService<IPlanner>(),
+            hubContext:      sp.GetRequiredService<IHubContext<AgentHub>>(),
             goalFactory:     sp.GetRequiredService<GoalFactory>(),
             chatInterpreter: sp.GetRequiredService<IChatInterpreter>(),
-            botName:         cfg.BotUsername);
+            botName:         cfg.BotUsername,
+            journal:         sp.GetRequiredService<IAgentJournal>());
     });
     builder.Services.AddHostedService(sp => sp.GetRequiredService<AgentBackgroundService>());
 }
@@ -133,6 +145,10 @@ if (agentEnabled)
 var app = builder.Build();
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+// Sprint 4a: map SignalR hub for real-time dashboard push
+if (agentEnabled)
+    app.MapHub<AgentHub>("/agent-hub");
 
 app.MapGet("/", () => "MemorySmith.Agent is running.");
 
@@ -223,9 +239,15 @@ app.MapGet("/api/blueprints", () => Results.Ok(new[]
 
 app.MapPost("/api/agent/connect", () => Results.Ok(new { Status = "connected" }));
 app.MapPost("/api/agent/stop",    () => Results.Ok(new { Status = "stopped" }));
-app.MapPost("/api/agent/command", (CommandRequest req, AgentBackgroundService? agent) =>
+// Sprint 5: locked down — validates against registered tools instead of accepting anything
+app.MapPost("/api/agent/command", (CommandRequest req, AgentBackgroundService? agent,
+    IToolCaller? tools) =>
 {
     if (agent is null) return Results.BadRequest("Agent not enabled.");
+    if (tools is not ToolDispatcher dispatcher)
+        return Results.Problem("Tool dispatcher not available.");
+    if (dispatcher.Get(req.Command) is null)
+        return Results.BadRequest(new { Error = $"Unknown tool '{req.Command}'.", Registered = dispatcher.All.Select(t => t.Name) });
     agent.Enqueue(new ActionData { Tool = req.Command });
     return Results.Ok(new { Received = req.Command, Status = "queued" });
 });

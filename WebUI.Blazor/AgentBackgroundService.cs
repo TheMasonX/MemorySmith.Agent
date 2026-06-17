@@ -3,6 +3,7 @@ namespace WebUI.Blazor;
 using Agent.Core;
 using Agent.Planning;
 using Agent.Tools;
+using Microsoft.AspNetCore.SignalR;
 using System.Text.Json;
 using System.Threading.Channels;
 
@@ -27,10 +28,12 @@ public sealed class AgentBackgroundService(
     IToolCaller toolCaller,
     ILogger<AgentBackgroundService> logger,
     IPlanner planner,
+    IHubContext<AgentHub>? hubContext = null,
     GoalFactory? goalFactory = null,
     IChatInterpreter? chatInterpreter = null,
     string botName = "AgentBot",
     int maxConsecutiveFailures = 3,
+    IAgentJournal? journal = null,
     TimeSpan[]? reconnectDelays = null) : BackgroundService
 {
     // Sprint 1b: default exponential backoff delays
@@ -38,10 +41,14 @@ public sealed class AgentBackgroundService(
         [TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(4), TimeSpan.FromSeconds(8),
          TimeSpan.FromSeconds(16), TimeSpan.FromSeconds(32)];
 
+    /// <summary>Per-action timeout in seconds. 0 = no timeout.</summary>
+    private const int DefaultActionTimeoutSeconds = 30;
+
     private readonly TimeSpan[] _reconnectDelays = reconnectDelays ?? DefaultReconnectDelays;
 
     private readonly ActionQueue _queue = new();
     private readonly WorldStateProjector _projector = new();
+    private readonly IAgentJournal? _journal = journal;
 
     private readonly Channel<string> _gameErrors =
         Channel.CreateUnbounded<string>(new UnboundedChannelOptions { SingleWriter = true });
@@ -57,7 +64,10 @@ public sealed class AgentBackgroundService(
     private WorldState _worldState = new();
     private IGoal? _currentGoal;
     private int _consecutiveFailures;
+    private FailureReason? _lastFailureReason;
     private bool _actionDispatchedThisCycle;
+    // Sprint 4a: connection status for SignalR push; D2: "reconnecting" broadcast
+    private string _connectionStatus = "disconnected";
 
     public WorldState WorldState           => _worldState;
     public IGoal?     CurrentGoal          => _currentGoal;
@@ -70,20 +80,32 @@ public sealed class AgentBackgroundService(
     public void SetGoal(IGoal goal)
     {
         _currentGoal = goal;
+        _currentGoal.FailureReason = null;
         _queue.Clear();
         _consecutiveFailures = 0;
+        _lastFailureReason = null;
         lock (_pendingLock) _pendingActions.Clear();
         logger.LogInformation("Goal set: {Goal}", goal.Name);
+        _journal?.Log(new JournalEntry(
+            DateTimeOffset.UtcNow, JournalEntryType.GoalSet, goal.Name,
+            new Dictionary<string, object?> { ["description"] = goal.Description }));
+        // Sprint 4b: push goal change to dashboard
+        _ = PushGoalToDashboardAsync();
     }
 
     public void CancelGoal()
     {
         if (_currentGoal is not null)
             logger.LogInformation("Goal cancelled: {Goal}", _currentGoal.Name);
+        var previousGoalName = _currentGoal?.Name;
         _currentGoal = null;
+        _journal?.Log(new JournalEntry(
+            DateTimeOffset.UtcNow, JournalEntryType.GoalCancel, previousGoalName ?? "unknown"));
         _consecutiveFailures = 0;
         _queue.Clear();
         lock (_pendingLock) _pendingActions.Clear();
+        // Sprint 4b: push goal clear to dashboard
+        _ = PushGoalToDashboardAsync();
     }
 
     public void SetBuildOrigin(string blueprintId, int x, int y, int z)
@@ -107,40 +129,47 @@ public sealed class AgentBackgroundService(
 
     /// <summary>
     /// Sprint 1b: Retry loop with exponential backoff.
+    /// Max 5 attempts (1 initial + 4 retries per DefaultReconnectDelays length).
     /// World state and current goal survive reconnects — only the transport is re-opened.
+    /// Sprint 4a / D2: broadcasts "reconnecting" status to dashboard during backoff.
     /// </summary>
+    private const int MaxConnectionAttempts = 5;
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // attempts = delays.Length + 1 (first attempt + one per delay)
-        for (int attempt = 0; attempt <= _reconnectDelays.Length; attempt++)
+        for (int attempt = 0; attempt < MaxConnectionAttempts; attempt++)
         {
             if (stoppingToken.IsCancellationRequested) return;
 
             if (attempt > 0)
             {
-                var delay = _reconnectDelays[attempt - 1];
+                var delay = attempt - 1 < _reconnectDelays.Length
+                    ? _reconnectDelays[attempt - 1] : TimeSpan.FromSeconds(64);
+                _connectionStatus = "reconnecting";
+                _ = PushStatusToDashboardAsync(stoppingToken);
                 logger.LogWarning("Reconnecting (attempt {N}/{Max}) in {Delay}ms...",
-                    attempt + 1, _reconnectDelays.Length + 1, (int)delay.TotalMilliseconds);
+                    attempt + 1, MaxConnectionAttempts, (int)delay.TotalMilliseconds);
                 try { await Task.Delay(delay, stoppingToken); }
                 catch (OperationCanceledException) { return; }
             }
 
             logger.LogInformation("AgentBackgroundService starting (attempt {N})...", attempt + 1);
 
-            // Per-connection CTS: cancelled when ProcessEventsAsync faults or stoppingToken fires
             using var connectionCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
             try
             {
                 await worldAdapter.ConnectAsync(connectionCts.Token);
+                _connectionStatus = "connected";
                 logger.LogInformation("World adapter connected.");
+                _journal?.Log(new JournalEntry(
+                    DateTimeOffset.UtcNow, JournalEntryType.AgentStarted, "Agent connected"));
 
                 await Task.WhenAll(
-                    // MonitorAndCancelOnFault ensures ProcessEventsAsync fault cancels siblings
                     MonitorAndCancelOnFaultAsync(ProcessEventsAsync(connectionCts.Token), connectionCts),
                     DispatchActionsAsync(connectionCts.Token),
                     ChatConsumerAsync(connectionCts.Token));
 
-                return; // clean exit (stoppingToken cancelled all tasks gracefully)
+                return; // clean exit
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -149,18 +178,22 @@ public sealed class AgentBackgroundService(
             catch (Exception ex)
             {
                 logger.LogError(ex, "Connection attempt {N} failed.", attempt + 1);
-                // fall through to next retry iteration
             }
             finally
             {
-                connectionCts.Cancel(); // stop any tasks still running for this attempt
+                connectionCts.Cancel();
                 try { await worldAdapter.DisconnectAsync(CancellationToken.None); }
                 catch { /* best-effort cleanup */ }
             }
         }
 
+        _connectionStatus = "disconnected";
+        _ = PushStatusToDashboardAsync(stoppingToken);
+        _journal?.Log(new JournalEntry(
+            DateTimeOffset.UtcNow, JournalEntryType.AgentStopped,
+            $"Max reconnect attempts ({MaxConnectionAttempts}) exhausted"));
         logger.LogError("AgentBackgroundService: max reconnect attempts ({Max}) exhausted. Shutting down.",
-            _reconnectDelays.Length + 1);
+            MaxConnectionAttempts);
     }
 
     /// <summary>
@@ -182,38 +215,30 @@ public sealed class AgentBackgroundService(
     {
         await foreach (var worldEvent in worldAdapter.ReceiveEventsAsync(ct))
         {
-            logger.LogDebug("World event: {Type}", worldEvent.EventType);
+            logger.LogDebug("World event: {Type}", worldEvent.GetType().Name);
             _worldState = _projector.Apply(_worldState, worldEvent);
 
-            switch (worldEvent.EventType)
+            switch (worldEvent)
             {
-                case "spawn":
+                case SpawnEvent:
                     logger.LogInformation("Bot spawned at {Pos}", _worldState.Position);
                     break;
 
-                case "blockMined":
-                    if (worldEvent.Payload.TryGetValue("block", out var rawBlock) && rawBlock is string blockName)
-                    {
-                        var itemKey = blockName.Contains(':') ? blockName.Split(':')[1] : blockName;
-                        logger.LogInformation("Inventory +1 {Block} → total {Total}",
-                            itemKey, _worldState.Inventory.GetValueOrDefault(itemKey));
-                    }
+                case BlockMinedEvent e:
+                    var itemKey = e.Block.Contains(':') ? e.Block.Split(':')[1] : e.Block;
+                    logger.LogInformation("Inventory +1 {Block} → total {Total}",
+                        itemKey, _worldState.Inventory.GetValueOrDefault(itemKey));
                     break;
 
-                case "craftComplete":
-                    if (worldEvent.Payload.TryGetValue("item",  out var ci) && ci  is string ciStr &&
-                        worldEvent.Payload.TryGetValue("count", out var cc) && cc is int    ccInt)
-                        logger.LogInformation("Crafted {Count}x {Item}", ccInt, ciStr);
+                case CraftCompleteEvent e:
+                    logger.LogInformation("Crafted {Count}x {Item}", e.Count, e.Item);
                     break;
 
-                case "smeltComplete":
-                    if (worldEvent.Payload.TryGetValue("item",   out var si) && si is string siStr &&
-                        worldEvent.Payload.TryGetValue("result", out var sr) && sr is string srStr &&
-                        worldEvent.Payload.TryGetValue("count",  out var sc) && sc is int    scInt)
-                        logger.LogInformation("Smelted {Count}x {Input} → {Output}", scInt, siStr, srStr);
+                case SmeltCompleteEvent e:
+                    logger.LogInformation("Smelted {Count}x {Input} → {Output}", e.Count, e.Input, e.Result);
                     break;
 
-                case "chat":
+                case ChatEvent:
                     // Sprint 1a: offload to ChatConsumerAsync — LLM call never blocks event loop
                     _chatChannel.Writer.TryWrite(worldEvent);
                     break;
@@ -222,6 +247,9 @@ public sealed class AgentBackgroundService(
                     TryRouteAsError(worldEvent);
                     break;
             }
+
+            // Sprint 4a: push status to dashboard after every event tick (fire-and-forget)
+            _ = PushStatusToDashboardAsync(CancellationToken.None);
         }
     }
 
@@ -250,20 +278,16 @@ public sealed class AgentBackgroundService(
     private async Task HandleChatEventAsync(WorldEvent worldEvent, CancellationToken ct)
     {
         if (chatInterpreter is null) return;
+        if (worldEvent is not ChatEvent chat) return;
 
-        if (!worldEvent.Payload.TryGetValue("username", out var uObj) || uObj is not string username) return;
-        if (!worldEvent.Payload.TryGetValue("message",  out var mObj) || mObj is not string message)  return;
+        logger.LogInformation("[chat] <{Username}> {Message}", chat.Username, chat.Message);
 
-        var onlinePlayers = worldEvent.Payload.TryGetValue("onlinePlayers", out var opObj) && opObj is int op
-            ? op : 1;
-
-        logger.LogInformation("[chat] <{Username}> {Message}", username, message);
-
-        var playerPos = ExtractPlayerPosition(worldEvent);
+        // Sprint 4b: push player message to dashboard immediately
+        _ = PushChatToDashboardAsync("player", chat.Username, chat.Message);
 
         var interpretation = await chatInterpreter.InterpretAsync(
-            username, message, botName, onlinePlayers,
-            _worldState.Position, playerPos, _worldState, ct);
+            chat.Username, chat.Message, botName, chat.OnlinePlayers,
+            _worldState.Position, chat.PlayerPos, _worldState, ct);
 
         if (interpretation.IntentType == ChatIntentType.NotAddressed)
             return;
@@ -276,6 +300,8 @@ public sealed class AgentBackgroundService(
                 Arguments = { ["message"] = interpretation.Response }
             });
             chatInterpreter.RecordBotSpoke();
+            // Sprint 4b: push bot response to dashboard
+            _ = PushChatToDashboardAsync("bot", botName, interpretation.Response);
         }
 
         switch (interpretation.IntentType)
@@ -340,30 +366,17 @@ public sealed class AgentBackgroundService(
     private void TryRouteAsError(WorldEvent worldEvent)
     {
         string? errMsg = null;
-        if (worldEvent.EventType == "blockNotFound" &&
-            worldEvent.Payload.TryGetValue("mined", out var mined) && mined is int mc && mc == 0 &&
-            worldEvent.Payload.TryGetValue("block", out var bn) && bn is string bStr)
+        if (worldEvent is BlockNotFoundEvent bnf && bnf.MinedCount == 0)
         {
-            errMsg = $"blockNotFound:{bStr}";
-            logger.LogWarning("No {Block} found in range — will count as failure.", bStr);
+            errMsg = $"blockNotFound:{bnf.Block}";
+            logger.LogWarning("No {Block} found in range — will count as failure.", bnf.Block);
         }
-        else if (worldEvent.EventType == "error")
+        else if (worldEvent is ErrorEvent err)
         {
-            var act = worldEvent.Payload.TryGetValue("action",  out var a) && a is string sa ? sa : "?";
-            var msg = worldEvent.Payload.TryGetValue("message", out var m) && m is string sm ? sm : "unknown";
-            errMsg = $"{act}:{msg}";
-            logger.LogWarning("Game error [{Action}]: {Message}", act, msg);
+            errMsg = $"{err.Action}:{err.Message}";
+            logger.LogWarning("Game error [{Action}]: {Message}", err.Action, err.Message);
         }
         if (errMsg is not null) _gameErrors.Writer.TryWrite(errMsg);
-    }
-
-    private static Position? ExtractPlayerPosition(WorldEvent worldEvent)
-    {
-        if (worldEvent.Payload.TryGetValue("playerX", out var px) && px is int x &&
-            worldEvent.Payload.TryGetValue("playerY", out var py) && py is int y &&
-            worldEvent.Payload.TryGetValue("playerZ", out var pz) && pz is int z)
-            return new Position(x, y, z);
-        return null;
     }
 
     // ── Action dispatch ────────────────────────────────────────────────────────
@@ -386,8 +399,16 @@ public sealed class AgentBackgroundService(
                 }
                 if (_currentGoal.HasFailed(_worldState) || _consecutiveFailures >= maxFailures)
                 {
-                    logger.LogWarning("Goal '{Goal}' failed (failures={N}).", _currentGoal.Name, _consecutiveFailures);
-                    _currentGoal = null; _consecutiveFailures = 0; planContext.Clear();
+                    var reason = _currentGoal.HasFailed(_worldState)
+                        ? _lastFailureReason?.ToString() ?? FailureReason.Unknown.ToString()
+                        : (_lastFailureReason ?? FailureReason.ConsecutiveFailures).ToString();
+                    _currentGoal.FailureReason = reason;
+                    _journal?.Log(new JournalEntry(
+                        DateTimeOffset.UtcNow, JournalEntryType.ReplanTriggered, _currentGoal.Name));
+                    logger.LogWarning("Goal '{Goal}' failed (failures={N}, reason={Reason}).",
+                        _currentGoal.Name, _consecutiveFailures, reason);
+                    _currentGoal = null; _consecutiveFailures = 0; _lastFailureReason = null;
+                    planContext.Clear();
                     lock (_pendingLock) _pendingActions.Clear();
                     continue;
                 }
@@ -405,12 +426,18 @@ public sealed class AgentBackgroundService(
                         _pendingActions.AddRange(plan.Actions);
                     }
                     logger.LogInformation("New plan for '{Goal}': {Count} actions.", _currentGoal.Name, plan.Actions.Count);
+                    _journal?.Log(new JournalEntry(
+                        DateTimeOffset.UtcNow, JournalEntryType.PlanCreated, _currentGoal.Name,
+                        new Dictionary<string, object?> { ["actionCount"] = plan.Actions.Count }));
                     _consecutiveFailures = 0;
                 }
                 catch (Exception ex)
                 {
+                    if (_currentGoal is not null)
+                        _currentGoal.FailureReason = FailureReason.NoValidActions.ToString();
                     logger.LogWarning(ex, "Planning failed for goal '{Goal}'.", _currentGoal?.Name);
                     _currentGoal = null;
+                    _lastFailureReason = null;
                 }
             }
 
@@ -426,11 +453,23 @@ public sealed class AgentBackgroundService(
                 {
                     var argsJson = JsonSerializer.Serialize(action.Arguments);
                     using var doc = JsonDocument.Parse(argsJson);
-                    var result = await toolCaller.CallAsync(action.Tool, doc.RootElement, ct);
+
+                    using var timeoutCts = new CancellationTokenSource(
+                        TimeSpan.FromSeconds(DefaultActionTimeoutSeconds));
+                    using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
+                        ct, timeoutCts.Token);
+
+                    _journal?.Log(new JournalEntry(
+                        DateTimeOffset.UtcNow, JournalEntryType.ActionDispatched, action.Tool));
+                    var result = await toolCaller.CallAsync(
+                        action.Tool, doc.RootElement, linkedCts.Token);
                     if (result.Success)
                     {
                         logger.LogDebug("Tool {Tool}: {Message}", action.Tool, result.Message);
+                        _journal?.Log(new JournalEntry(
+                            DateTimeOffset.UtcNow, JournalEntryType.ActionCompleted, action.Tool));
                         _consecutiveFailures = 0;
+                        _lastFailureReason = null;
                         if (result.Data is not null)
                             foreach (var kv in result.Data)
                                 planContext[kv.Key] = kv.Value;
@@ -438,13 +477,35 @@ public sealed class AgentBackgroundService(
                     else
                     {
                         logger.LogWarning("Tool {Tool} failed: {Message}", action.Tool, result.Message);
+                        _journal?.Log(new JournalEntry(
+                            DateTimeOffset.UtcNow, JournalEntryType.ActionFailed, action.Tool,
+                            new Dictionary<string, object?> { ["error"] = result.Message ?? "" }));
                         _consecutiveFailures++;
+                        _lastFailureReason ??= MapErrorToFailureReason(result.Message);
                     }
+                }
+                catch (OperationCanceledException oce)
+                    when (!ct.IsCancellationRequested)
+                {
+                    // Only the per-action timeout fired — parent loop is still alive
+                    logger.LogWarning(oce,
+                        "Tool {Tool} timed out after {Seconds}s (failure {N}/{Max})",
+                        action.Tool, DefaultActionTimeoutSeconds,
+                        _consecutiveFailures + 1, maxConsecutiveFailures);
+                    _journal?.Log(new JournalEntry(
+                        DateTimeOffset.UtcNow, JournalEntryType.ActionFailed, action.Tool,
+                        new Dictionary<string, object?> { ["error"] = "timed out" }));
+                    _consecutiveFailures++;
+                    _lastFailureReason = FailureReason.ToolTimeout;
                 }
                 catch (Exception ex)
                 {
                     logger.LogError(ex, "Exception dispatching tool {Tool}", action.Tool);
+                    _journal?.Log(new JournalEntry(
+                        DateTimeOffset.UtcNow, JournalEntryType.ActionFailed, action.Tool,
+                        new Dictionary<string, object?> { ["error"] = ex.Message }));
                     _consecutiveFailures++;
+                    _lastFailureReason ??= FailureReason.Unknown;
                 }
             }
             else
@@ -457,6 +518,7 @@ public sealed class AgentBackgroundService(
                     if (_gameErrors.Reader.TryRead(out var errMsg))
                     {
                         _consecutiveFailures++;
+                        _lastFailureReason ??= MapErrorToFailureReason(errMsg);
                         logger.LogWarning("Game error after cycle (failures={N}/{Max}): {Error}",
                             _consecutiveFailures, maxFailures, errMsg);
                     }
@@ -465,5 +527,105 @@ public sealed class AgentBackgroundService(
                     await Task.Delay(50, ct);
             }
         }
+    }
+
+    // ── SignalR dashboard push — Sprint 4a ─────────────────────────────────
+
+    /// <summary>
+    /// Fires a status snapshot to all connected dashboard clients. Never throws —
+    /// a disconnected SignalR hub is a best-effort path, not a fatal error.
+    /// </summary>
+    private async Task PushStatusToDashboardAsync(CancellationToken ct)
+    {
+        if (hubContext is null) return;
+        try
+        {
+            var inv = _worldState.Inventory ?? new Dictionary<string, int>();
+            var update = new AgentStatusUpdate(
+                Status: _connectionStatus == "reconnecting" ? "reconnecting"
+                    : _currentGoal is not null ? "active" : "idle",
+                Goal: _currentGoal?.Name,
+                GoalDescription: _currentGoal?.Description,
+                Health: _worldState.Health,
+                Food: _worldState.Food,
+                X: _worldState.Position.X,
+                Y: _worldState.Position.Y,
+                Z: _worldState.Position.Z,
+                QueuedActions: _queue.Count,
+                ConsecutiveFailures: _consecutiveFailures,
+                Inventory: inv
+            );
+            await hubContext.Clients.Group("dashboard").SendAsync("StatusUpdated", update, ct);
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "SignalR status push failed (best-effort).");
+        }
+    }
+
+    // Sprint 4b: push chat messages and goal changes to dashboard via SignalR
+
+    private async Task PushChatToDashboardAsync(string type, string? who, string text)
+    {
+        if (hubContext is null) return;
+        try
+        {
+            await hubContext.Clients.Group("dashboard")
+                .SendAsync("ChatMessage", new { type, who, text });
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "SignalR chat push failed (best-effort).");
+        }
+    }
+
+    private async Task PushGoalToDashboardAsync()
+    {
+        if (hubContext is null) return;
+        try
+        {
+            await hubContext.Clients.Group("dashboard").SendAsync("GoalUpdate", new
+            {
+                goal = _currentGoal?.Name,
+                description = _currentGoal?.Description
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "SignalR goal push failed (best-effort).");
+        }
+    }
+
+    // ── Failure reason mapping ─────────────────────────────────────────────
+
+    /// <summary>
+    /// Maps an error string (from a tool result or game event) to a
+    /// <see cref="FailureReason"/>. Uses prefix matching so that messages like
+    /// "blockNotFound:oak_log" map to <see cref="FailureReason.TargetUnreachable"/>.
+    /// </summary>
+    private static FailureReason MapErrorToFailureReason(string? error)
+    {
+        if (string.IsNullOrWhiteSpace(error))
+            return FailureReason.Unknown;
+
+        if (error.StartsWith("blockNotFound:", StringComparison.OrdinalIgnoreCase))
+            return FailureReason.TargetUnreachable;
+
+        if (error.Contains("inventory full", StringComparison.OrdinalIgnoreCase) ||
+            error.Contains("inventory is full", StringComparison.OrdinalIgnoreCase))
+            return FailureReason.InventoryFull;
+
+        if (error.Contains("recipe", StringComparison.OrdinalIgnoreCase) &&
+            (error.Contains("missing", StringComparison.OrdinalIgnoreCase) ||
+             error.Contains("unknown", StringComparison.OrdinalIgnoreCase) ||
+             error.Contains("not found", StringComparison.OrdinalIgnoreCase)))
+            return FailureReason.RecipeMissing;
+
+        if (error.Contains("unreachable", StringComparison.OrdinalIgnoreCase) ||
+            error.Contains("cannot reach", StringComparison.OrdinalIgnoreCase) ||
+            error.Contains("obstructed", StringComparison.OrdinalIgnoreCase))
+            return FailureReason.TargetUnreachable;
+
+        return FailureReason.Unknown;
     }
 }

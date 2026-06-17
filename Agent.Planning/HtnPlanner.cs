@@ -74,12 +74,35 @@ public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
         return Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases.ToArray(), actions));
     }
 
+    /// <summary>
+    /// Context key prefixes that carry inter-action state across replans.
+    /// Tools such as SearchMemoryTool, FindFlatAreaTool, CraftItemTool,
+    /// BuildTask, and MoveToTool write results with these prefixes so
+    /// subsequent actions can consume them. Transient keys (e.g. single-action
+    /// scratch values) are not in this set and will be dropped.
+    /// </summary>
+    private static readonly string[] PreservedContextPrefixes =
+        ["SearchMemory:", "CraftItem:", "FindFlatArea:", "Build:", "MoveTo:"];
+
     public async Task<IPlan?> ReplanAsync(
         IPlan currentPlan, WorldState state, string failureReason,
         CancellationToken cancellationToken = default)
     {
-        // Phase 3: simple full-restart replan from the original goal phases.
-        // Phase 4: GOAP will substitute alternative actions for the failed phase.
+        // 1. Capture inter-action context entries from the previous plan
+        //    whose keys start with one of the preserved prefixes.
+        var preservedContext = new Dictionary<string, object?>();
+        foreach (var action in currentPlan.Actions)
+        {
+            foreach (var (key, value) in action.Context)
+            {
+                if (Array.Exists(PreservedContextPrefixes, prefix => key.StartsWith(prefix, StringComparison.Ordinal)))
+                    preservedContext.TryAdd(key, value);
+            }
+        }
+
+        // 2. Build a fresh plan from the original goal phases.
+        //    Phase 3: simple full-restart replan from the original goal phases.
+        //    Phase 4: GOAP will substitute alternative actions for the failed phase.
         var goal = new SimpleGoal(
             currentPlan.GoalName, "",
             [.. currentPlan.Phases],
@@ -87,7 +110,20 @@ public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
 
         try
         {
-            return await PlanAsync(goal, state, cancellationToken);
+            var newPlan = await PlanAsync(goal, state, cancellationToken);
+
+            // 3. Restore preserved context entries into the new plan's actions
+            //    so inter-action state survives the replan.
+            if (preservedContext.Count > 0)
+            {
+                foreach (var newAction in (newPlan as ActionPlan)?.Actions ?? newPlan.Actions)
+                {
+                    foreach (var (key, value) in preservedContext)
+                        newAction.Context.TryAdd(key, value);
+                }
+            }
+
+            return newPlan;
         }
         catch
         {

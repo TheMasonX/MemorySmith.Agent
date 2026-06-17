@@ -168,4 +168,119 @@ public class ToolDispatchTests
         Assert.That(result.Data!.ContainsKey("bestPageId"), Is.True);
         Assert.That(result.Data["bestPageId"]?.ToString(), Is.EqualTo("forest-page"));
     }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // Sprint 5 — Schema Validation via ToolDispatcher
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    [Test]
+    public async Task Dispatcher_ValidMoveTo_Dispatches()
+    {
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new MoveToTool(_adapter));
+
+        var result = await dispatcher.CallAsync("MoveTo", Args("{\"x\":10,\"y\":64,\"z\":-20}"));
+        Assert.That(result.Success, Is.True);
+    }
+
+    [Test]
+    public async Task Dispatcher_MissingRequired_ReturnsFailureWithMessage()
+    {
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new MoveToTool(_adapter));
+
+        var result = await dispatcher.CallAsync("MoveTo", Args("{\"x\":10}"));
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Message, Does.Contain("Schema validation failed"));
+        Assert.That(result.Message, Does.Contain("'y'"));
+    }
+
+    [Test]
+    public async Task Dispatcher_UnknownProperty_ReturnsFailure()
+    {
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new MoveToTool(_adapter));
+
+        // "colour" is not declared in MoveTo's schema
+        var result = await dispatcher.CallAsync("MoveTo",
+            Args("{\"x\":10,\"y\":64,\"z\":-20,\"colour\":\"blue\"}"));
+
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Message, Does.Contain("'colour'"));
+    }
+
+    [Test]
+    public async Task Dispatcher_WrongType_ReturnsFailure()
+    {
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new MoveToTool(_adapter));
+
+        // x must be integer, but "north" is a string
+        var result = await dispatcher.CallAsync("MoveTo",
+            Args("{\"x\":\"north\",\"y\":64,\"z\":-20}"));
+
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Message, Does.Contain("'x'"));
+        Assert.That(result.Message, Does.Contain("integer"));
+    }
+
+    [Test]
+    public async Task Dispatcher_NonObject_ReturnsFailure()
+    {
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new MoveToTool(_adapter));
+
+        // "north" — a string, not an object
+        var result = await dispatcher.CallAsync("MoveTo", Args("\"north\""));
+
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Message, Does.Contain("JSON object"));
+    }
+
+    [Test]
+    public async Task Dispatcher_UnknownTool_ReturnsFailure()
+    {
+        var dispatcher = new ToolDispatcher();
+
+        var result = await dispatcher.CallAsync("DoSomethingDangerous", Args("{}"));
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Message, Does.Contain("not registered"));
+    }
+
+    [Test]
+    public async Task Dispatcher_AllRegisteredTools_ValidateWithoutError()
+    {
+        // Sanity test: every registered tool's schema matches its expected arguments
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new MoveToTool(_adapter));
+        dispatcher.Register(new MineBlockTool(_adapter));
+        dispatcher.Register(new PlaceBlockTool(_adapter));
+        dispatcher.Register(new StatusTool(_adapter));
+        dispatcher.Register(new WanderTool(_adapter));
+        dispatcher.Register(new CraftItemTool(_adapter));
+        dispatcher.Register(new FurnaceTool(_adapter));
+        dispatcher.Register(new FindFlatAreaTool(_adapter));
+        dispatcher.Register(new ChatTool(_adapter));
+
+        // Valid args for each tool
+        var cases = new (string Name, string Args)[]
+        {
+            ("MoveTo",    "{\"x\":10,\"y\":64,\"z\":-20}"),
+            ("MineBlock", "{\"block\":\"oak_log\"}"),
+            ("PlaceBlock","{\"x\":0,\"y\":64,\"z\":0,\"material\":\"cobblestone\"}"),
+            ("Status",    "{}"),
+            ("Wander",    "{\"radius\":30}"),
+            ("CraftItem", "{\"item\":\"stick\"}"),
+            ("SmeltItem", "{\"item\":\"iron_ore\"}"),
+            ("FindFlatArea","{}"),
+            ("Chat",      "{\"message\":\"hello\"}"),
+        };
+
+        foreach (var (name, argsJson) in cases)
+        {
+            var result = await dispatcher.CallAsync(name, Args(argsJson));
+            Assert.That(result.Success, Is.True,
+                $"Tool '{name}' with args {argsJson} should succeed but got: {result.Message}");
+        }
+    }
 }
