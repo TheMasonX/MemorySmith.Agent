@@ -304,7 +304,11 @@ public sealed class AgentBackgroundService(
         try { await thinkingTask.ConfigureAwait(false); } catch (OperationCanceledException) { }
 
         if (interpretation.IntentType == ChatIntentType.NotAddressed)
+        {
+            logger.LogDebug("[chat] not-addressed from <{Username}>: '{Snippet}'",
+                chat.Username, chat.Message[..Math.Min(40, chat.Message.Length)]);
             return;
+        }
 
         if (!string.IsNullOrEmpty(interpretation.Response))
         {
@@ -313,10 +317,13 @@ public sealed class AgentBackgroundService(
                 Tool      = "Chat",
                 Arguments = { ["message"] = interpretation.Response }
             });
-            chatInterpreter.RecordBotSpoke();
             // Sprint 4b: push bot response to dashboard
             _ = PushChatToDashboardAsync("bot", botName, interpretation.Response);
         }
+
+        // Always mark that the bot processed this addressed message — even with an
+        // empty response — so the conversation window stays open for follow-ups.
+        chatInterpreter.RecordBotSpoke();
 
         switch (interpretation.IntentType)
         {
