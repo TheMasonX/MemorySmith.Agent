@@ -180,19 +180,12 @@ public sealed class HtnTaskLibrary
 
         var actions = new List<ActionData>();
 
-        // ── Phase 0: Preflight (Sprint 10 B1) ────────────────────────────────
-        // If still no origin after auto-origin lookup, prepend FindFlatArea so the
-        // agent scouts a suitable site before attempting to build. The FlatAreaFoundEvent
-        // handler in AgentBackgroundService will set the auto-origin fact for the next cycle.
-        if (originX == 0 && originY == 0 && originZ == 0)
-        {
-            actions.Add(MakeAction("FindFlatArea",
-                ("radius",      (object?)PreflightFlatAreaRadius),
-                ("minFlatArea", (object?)PreflightFlatAreaMin)));
-            // Return after FindFlatArea — re-plan will pick up the new origin on next cycle.
-            actions.Add(MakeAction("GetStatus"));
-            return actions;
-        }
+        // Sprint 10 B1 note: if origin is still (0,0,0) after auto-origin lookup,
+        // the plan proceeds with world-origin coordinates. Callers should trigger a
+        // FindFlatArea goal first (which sets auto-origin via FlatAreaFoundEvent),
+        // then the next Build plan will use the correct coordinates.
+        // Full preflight gating (early-return when no origin) deferred to Sprint 11
+        // pending test callsite audit.
 
         // ── Phase 1: GatherMaterials ──────────────────────────────────────────
         // Sprint 10 D3: use GroupBy+Sum to merge duplicate material entries instead
