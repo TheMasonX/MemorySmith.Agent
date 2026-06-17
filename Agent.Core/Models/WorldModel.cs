@@ -1,6 +1,5 @@
 namespace Agent.Core;
 
-using System.Collections.Concurrent;
 using System.Text.Json;
 
 /// <summary>
@@ -15,8 +14,8 @@ public sealed class WorldModel : IWorldModel
     private ObservationState _observed;
     private BeliefState _belief;
 
-    // Running uncertainty tracking
-    private readonly ConcurrentQueue<double> _recentDeviationScores = new();
+    // Running uncertainty tracking — plain Queue guarded by _lock (no need for ConcurrentQueue)
+    private readonly Queue<double> _recentDeviationScores = new();
     private const int MaxDeviationSamples = 20;
     private double _cachedUncertainty;
 
@@ -80,12 +79,17 @@ public sealed class WorldModel : IWorldModel
         };
     }
 
+    /// <summary>
+    /// Computes how well the prediction matched the actual observation and updates
+    /// the running uncertainty average. The entire operation (enqueue, trim, cache-update)
+    /// is performed under <see cref="_lock"/> so concurrent Reconcile calls are fully atomic.
+    /// </summary>
     public double Reconcile(PredictionState prediction, ObservationState actual)
     {
+        // Compute deviation from the (immutable) passed-in arguments — no shared state involved.
         double score = 0.0;
         int factors = 0;
 
-        // Position deviation
         if (prediction.PredictedPosition is { } pp && actual.Position is { } ap)
         {
             var dx = pp.X - ap.X;
@@ -107,14 +111,13 @@ public sealed class WorldModel : IWorldModel
 
         var deviation = factors > 0 ? score / factors : 0.0;
 
-        // Track running average
-        _recentDeviationScores.Enqueue(deviation);
-        while (_recentDeviationScores.Count > MaxDeviationSamples)
-            _recentDeviationScores.TryDequeue(out _);
-
+        // Update running average under _lock so enqueue, trim, and cache-update are atomic.
         lock (_lock)
         {
-            _cachedUncertainty = _recentDeviationScores.Any()
+            _recentDeviationScores.Enqueue(deviation);
+            while (_recentDeviationScores.Count > MaxDeviationSamples)
+                _recentDeviationScores.TryDequeue(out _);
+            _cachedUncertainty = _recentDeviationScores.Count > 0
                 ? _recentDeviationScores.Average()
                 : deviation;
         }
