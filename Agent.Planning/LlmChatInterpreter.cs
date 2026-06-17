@@ -169,7 +169,7 @@ public sealed class LlmChatInterpreter(
 
     private static string FormatInventory(WorldState? state)
     {
-        if (state is null || state.Inventory.Count == 0) return "empty";
+        if (state is null || state.Inventory is null || state.Inventory.Count == 0) return "empty";
         var top = state.Inventory
             .OrderByDescending(kv => kv.Value)
             .Take(6)
