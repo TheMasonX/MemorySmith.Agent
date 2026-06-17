@@ -294,4 +294,64 @@ public class WorldStateProjectorTests
 
         Assert.That(result, Is.Not.SameAs(original));
     }
+
+    // ── FlatAreaFound (Sprint 9 A4) ──────────────────────────────────────────
+
+    [Test]
+    public void Apply_FlatAreaFoundEvent_StoresAllFieldsAsFacts_AndLeavesStructuredStateUnchanged()
+    {
+        var withHealth = StateWithHealth(20);
+        var ev = new FlatAreaFoundEvent(
+            X: 10, Y: 64, Z: -5,
+            Area: 36,
+            MinX: 7, MaxX: 13, MinZ: -8, MaxZ: -2,
+            Timestamp: Now);
+
+        var result = _projector.Apply(withHealth, ev);
+
+        Assert.Multiple(() =>
+        {
+            // Structured state must be unchanged
+            Assert.That(result.Health, Is.EqualTo(20),
+                "FlatAreaFound must not change Health.");
+            Assert.That(result.Inventory, Is.Empty,
+                "FlatAreaFound must not affect inventory.");
+
+            // Per-event raw facts
+            Assert.That(result.Facts.ContainsKey("event:FlatAreaFound:X"), Is.True);
+            Assert.That(result.Facts.ContainsKey("event:FlatAreaFound:Area"), Is.True);
+            Assert.That(result.Facts.ContainsKey("event:FlatAreaFound:MinX"), Is.True);
+            Assert.That(result.Facts["event:FlatAreaFound:X"]?.ToString(),    Is.EqualTo("10"));
+            Assert.That(result.Facts["event:FlatAreaFound:Area"]?.ToString(), Is.EqualTo("36"));
+            Assert.That(result.Facts["event:FlatAreaFound:MinX"]?.ToString(), Is.EqualTo("7"));
+            Assert.That(result.Facts["event:FlatAreaFound:MaxZ"]?.ToString(), Is.EqualTo("-2"));
+
+            // Sprint 9: cross-event summary key readable by planners
+            Assert.That(result.Facts.ContainsKey(BuildFactKeys.LastFlatArea), Is.True,
+                "LastFlatArea summary fact should be written for planner access.");
+            Assert.That(result.Facts[BuildFactKeys.LastFlatArea]?.ToString(), Is.EqualTo("36"));
+        });
+    }
+
+    [Test]
+    public void Apply_FlatAreaFoundEvent_ZeroArea_StillStoresFacts()
+    {
+        // Area=0 means no suitable flat region was found by the scanner
+        var ev = new FlatAreaFoundEvent(
+            X: 0, Y: 64, Z: 0,
+            Area: 0,
+            MinX: 0, MaxX: 0, MinZ: 0, MaxZ: 0,
+            Timestamp: Now);
+
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Facts.ContainsKey("event:FlatAreaFound:Area"), Is.True);
+            Assert.That(result.Facts["event:FlatAreaFound:Area"]?.ToString(), Is.EqualTo("0"),
+                "Area=0 (no flat area found) should still be stored as a fact.");
+            Assert.That(result.Facts.ContainsKey(BuildFactKeys.LastFlatArea), Is.True,
+                "LastFlatArea should be stored even for area=0 result (no flat area found).");
+        });
+    }
 }
