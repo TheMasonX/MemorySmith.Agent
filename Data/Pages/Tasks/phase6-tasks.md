@@ -115,10 +115,15 @@
 | fix: FindFlatAreaTool.InputSchema use-after-dispose | ✅ Done | `0ec465e` |
 | fix: NavigateTo LLM fast-path (named come-here was broken) | ✅ Done | `8efe6b7` |
 | fix: inject playerPos into LLM system prompt | ✅ Done | `8efe6b7` |
+| fix: QueryStatus added to LLM fast-path | ✅ Done | `a9e91d6` |
+| feat: Thinking indicator — Hmm... after 1.5s if LLM is slow | ✅ Done | `bf03b50` |
+| feat(D3): IAgentJournal.Count property | ✅ Done | `86d2499`, `541e2c0` |
+| feat(D6): NullAgentJournal singleton | ✅ Done | `c847e94` |
+| feat(D5): GET /api/agent/journal?limit&type endpoint | ✅ Done | `26a6186` |
+| feat(D5): GET /api/agent/worldmodel endpoint | ✅ Done | `26a6186` |
 | docs: sprint3b-audit.md captured in repo | ✅ Done | `4384ee3` |
-| P0: GET /api/agent/journal + /api/agent/worldmodel endpoints | 🔲 Todo | D5 |
-| P0: NullAgentJournal singleton | 🔲 Todo | D6 |
-| P1: IAgentJournal.Count, Reconcile lock, DecomposerRegistry audit | 🔲 Todo | D3/D4/D7 |
+| P1: WorldModel.Reconcile lock inconsistency (D4) | 🔲 Todo | minor |
+| P1: DecomposerRegistry thread-safety audit (D7) | 🔲 Todo | minor |
 | P2: Merge PR #1 → main | 🔲 Todo | |
 | A1/A2: Widen flat-area scan window + compactness scoring | 🔲 Todo | Sprint 3b audit |
 | A3: FlatAreaFoundEvent → auto-set build origin in planner | 🔲 Todo | Sprint 3b audit |
