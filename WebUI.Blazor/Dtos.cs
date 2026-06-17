@@ -1,1 +1,29 @@
-bmFtZXNwYWNlIFdlYlVJLkJsYXpvcjsKCi8vLyA8c3VtbWFyeT4KLy8vIFNpZ25hbFIgcGF5bG9hZCBmb3IgcmVhbC10aW1lIGFnZW50IHN0YXR1cyB1cGRhdGVzIHB1c2hlZCB0byB0aGUgZGFzaGJvYXJkLgovLy8gU2VudCB2aWEgSUh1YkNvbnRleHQmbHQ7QWdlbnRIdWImZ3Q7LkNsaWVudHMuR3JvdXAoImRhc2hib2FyZCIpLlNlbmRBc3luYygiU3RhdHVzVXBkYXRlZCIsIC4uLikuCi8vLyA8L3N1bW1hcnk+Ci8vLyA8cGFyYW0gbmFtZT0iU3RhdHVzIj5BZ2VudCBsaWZlY3ljbGUgc3RhdGU6ICJhY3RpdmUiLCAiaWRsZSIsICJyZWNvbm5lY3RpbmciLCBvciAiZGlzY29ubmVjdGVkIi48L3BhcmFtPgovLy8gPHBhcmFtIG5hbWU9IkdvYWwiPkN1cnJlbnQgZ29hbCBuYW1lLCBvciBudWxsIGlmIHRoZSBhZ2VudCBpcyBpZGxlLjwvcGFyYW0+Ci8vLyA8cGFyYW0gbmFtZT0iR29hbERlc2NyaXB0aW9uIj5IdW1hbi1yZWFkYWJsZSBnb2FsIGRlc2NyaXB0aW9uLCBvciBudWxsLjwvcGFyYW0+Ci8vLyA8cGFyYW0gbmFtZT0iSGVhbHRoIj5BZ2VudCBoZWFsdGggKDDigJMyMCkuPC9wYXJhbT4KLy8vIDxwYXJhbSBuYW1lPSJGb29kIj5BZ2VudCBmb29kIGxldmVsICgw4oCTMjApLjwvcGFyYW0+Ci8vLyA8cGFyYW0gbmFtZT0iWCI+V29ybGQgWCBjb29yZGluYXRlLjwvcGFyYW0+Ci8vLyA8cGFyYW0gbmFtZT0iWSI+V29ybGQgWSBjb29yZGluYXRlLjwvcGFyYW0+Ci8vLyA8cGFyYW0gbmFtZT0iWiI+V29ybGQgWiBjb29yZGluYXRlLjwvcGFyYW0+Ci8vLyA8cGFyYW0gbmFtZT0iUXVldWVkQWN0aW9ucyI+TnVtYmVyIG9mIGFjdGlvbnMgY3VycmVudGx5IGluIHRoZSBkaXNwYXRjaCBxdWV1ZS48L3BhcmFtPgovLy8gPHBhcmFtIG5hbWU9IkNvbnNlY3V0aXZlRmFpbHVyZXMiPlJ1bm5pbmcgY291bnQgb2YgY29uc2VjdXRpdmUgYWN0aW9uIGZhaWx1cmVzLjwvcGFyYW0+Ci8vLyA8cGFyYW0gbmFtZT0iSW52ZW50b3J5Ij5JdGVt4oaSY291bnQgc25hcHNob3Qgb2YgdGhlIGFnZW50J3MgaW52ZW50b3J5LjwvcGFyYW0+CnB1YmxpYyByZWNvcmQgQWdlbnRTdGF0dXNVcGRhdGUoCiAgICBzdHJpbmcgU3RhdHVzLAogICAgc3RyaW5nPyBHb2FsLAogICAgc3RyaW5nPyBHb2FsRGVzY3JpcHRpb24sCiAgICBpbnQgSGVhbHRoLAogICAgaW50IEZvb2QsCiAgICBpbnQgWCwKICAgIGludCBZLAogICAgaW50IFosCiAgICBpbnQgUXVldWVkQWN0aW9ucywKICAgIGludCBDb25zZWN1dGl2ZUZhaWx1cmVzLAogICAgSVJlYWRPbmx5RGljdGlvbmFyeTxzdHJpbmcsIGludD4gSW52ZW50b3J5KTsK
+namespace WebUI.Blazor;
+
+/// <summary>
+/// SignalR payload for real-time agent status updates pushed to the dashboard.
+/// Sent via IHubContext&lt;AgentHub&gt;.Clients.Group("dashboard").SendAsync("StatusUpdated", ...).
+/// </summary>
+/// <param name="Status">Agent lifecycle state: "active", "idle", "reconnecting", or "disconnected".</param>
+/// <param name="Goal">Current goal name, or null if the agent is idle.</param>
+/// <param name="GoalDescription">Human-readable goal description, or null.</param>
+/// <param name="Health">Agent health (0–20).</param>
+/// <param name="Food">Agent food level (0–20).</param>
+/// <param name="X">World X coordinate.</param>
+/// <param name="Y">World Y coordinate.</param>
+/// <param name="Z">World Z coordinate.</param>
+/// <param name="QueuedActions">Number of actions currently in the dispatch queue.</param>
+/// <param name="ConsecutiveFailures">Running count of consecutive action failures.</param>
+/// <param name="Inventory">Item→count snapshot of the agent's inventory.</param>
+public record AgentStatusUpdate(
+    string Status,
+    string? Goal,
+    string? GoalDescription,
+    int Health,
+    int Food,
+    int X,
+    int Y,
+    int Z,
+    int QueuedActions,
+    int ConsecutiveFailures,
+    IReadOnlyDictionary<string, int> Inventory);
