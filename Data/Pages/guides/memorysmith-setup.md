@@ -12,7 +12,8 @@ cd MemorySmith
 dotnet run --project MemorySmith.App
 ```
 
-Default: `http://localhost:5000`
+Default local MemorySmith app: `http://localhost:5000`.
+For the repo-scoped MCP probe in this repo, use `http://localhost:6868/mcp` with the local `X-Api-Key` from `.vscode/mcp.json`.
 
 ## Configure the agent
 
@@ -56,6 +57,19 @@ curl http://localhost:5000/api/search?query=architecture
 ```
 
 Should return a list of matching pages. If you get a 401, configure the `ApiKey`.
+
+## Verified local MCP probe
+
+Use the repo-local key in `.vscode/mcp.json` for non-destructive checks:
+
+```bash
+curl -i -H "X-Api-Key: <key>" http://localhost:6868/health
+curl -i -H "X-Api-Key: <key>" http://localhost:6868/api/health/live
+curl -i -H "X-Api-Key: <key>" http://localhost:6868/api/health/ready
+curl -i -H "X-Api-Key: <key>" http://localhost:6868/mcp
+```
+
+`/api/diagnostics` is protected and currently returns `401 Unauthorized` without a valid auth context. `/mcp/status` is not a valid route.
 
 ## IMemoryGateway patterns
 

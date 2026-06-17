@@ -1,0 +1,22 @@
+{
+  "Title": "SteveBot MCP verified baseline",
+  "Kind": "Operational",
+  "Status": "Core",
+  "Summary": "Verified the local MemorySmith.Agent MCP endpoint and live tool inventory using the repo-local key. This memory records the non-destructive route behavior and the current caveats for SteveBot and the MCP skill docs.",
+  "Confidence": 98,
+  "Tags": ["stevebot", "mcp", "memorysmith-agent", "tools", "verification"],
+  "Evidence": [
+    "GET /health returned 200 with status Healthy.",
+    "GET /api/health/live returned 200 with status Healthy.",
+    "GET /api/health/ready returned 200 with status Ready.",
+    "GET /api/diagnostics returned 401 Unauthorized, so diagnostic endpoints require authenticated access.",
+    "GET /mcp returned the live tool catalog: memorysmith_search, memorysmith_hybrid_search, memorysmith_context_pack, memorysmith_get, memorysmith_code_search, memorysmith_code_search_status, memorysmith_page_search, memorysmith_page_get, memorysmith_task_list, memorysmith_task_get.",
+    "POST /mcp initialize/ping/tools/list returned 200 JSON-RPC responses.",
+    "The semantic-search fallback path remains limited because the ONNX embedding model is not currently present."
+  ],
+  "Notes": [
+    "Use the repo-local X-Api-Key from .vscode/mcp.json for any live route probes.",
+    "Keep any MCP work scoped to MemorySmith.Agent and its local memory/docs/tasks surfaces.",
+    "Update docs and task records from verified tool inventory rather than inferred tool names."
+  ]
+}

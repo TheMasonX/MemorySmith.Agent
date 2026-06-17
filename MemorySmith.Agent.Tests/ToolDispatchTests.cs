@@ -86,6 +86,16 @@ public class ToolDispatchTests
         Assert.That(_adapter.SentActions[0].Tool, Is.EqualTo("status"));
     }
 
+    [Test]
+    public async Task GetStatusTool_SendsStatusAction()
+    {
+        var tool   = new GetStatusTool(_adapter);
+        var result = await tool.ExecuteAsync(Args("{}"));
+
+        Assert.That(result.Success, Is.True);
+        Assert.That(_adapter.SentActions[0].Tool, Is.EqualTo("status"));
+    }
+
     // ── WanderTool ────────────────────────────────────────────────────────────
 
     [Test]
@@ -256,24 +266,27 @@ public class ToolDispatchTests
         dispatcher.Register(new MineBlockTool(_adapter));
         dispatcher.Register(new PlaceBlockTool(_adapter));
         dispatcher.Register(new StatusTool(_adapter));
+        dispatcher.Register(new GetStatusTool(_adapter));
         dispatcher.Register(new WanderTool(_adapter));
         dispatcher.Register(new CraftItemTool(_adapter));
         dispatcher.Register(new FurnaceTool(_adapter));
         dispatcher.Register(new FindFlatAreaTool(_adapter));
         dispatcher.Register(new ChatTool(_adapter));
 
-        // Valid args for each tool — note: StatusTool.Name is "GetStatus", not "Status"
+        // Valid args for each tool — StatusTool uses the canonical name "Status",
+        // and GetStatusTool is the compatibility alias used by planner/runtime paths.
         var cases = new (string Name, string Args)[]
         {
-            ("MoveTo",     "{\"x\":10,\"y\":64,\"z\":-20}"),
-            ("MineBlock",  "{\"block\":\"oak_log\"}"),
-            ("PlaceBlock", "{\"x\":0,\"y\":64,\"z\":0,\"material\":\"cobblestone\"}"),
-            ("GetStatus",  "{}"),   // StatusTool.Name == "GetStatus"
-            ("Wander",     "{\"radius\":30}"),
-            ("CraftItem",  "{\"item\":\"stick\"}"),
-            ("SmeltItem",  "{\"item\":\"iron_ore\"}"),
+            ("MoveTo",      "{\"x\":10,\"y\":64,\"z\":-20}"),
+            ("MineBlock",   "{\"block\":\"oak_log\"}"),
+            ("PlaceBlock",  "{\"x\":0,\"y\":64,\"z\":0,\"material\":\"cobblestone\"}"),
+            ("Status",      "{}"),
+            ("GetStatus",   "{}"),
+            ("Wander",      "{\"radius\":30}"),
+            ("CraftItem",   "{\"item\":\"stick\"}"),
+            ("SmeltItem",   "{\"item\":\"iron_ore\"}"),
             ("FindFlatArea","{}"),
-            ("Chat",       "{\"message\":\"hello\"}"),
+            ("Chat",        "{\"message\":\"hello\"}"),
         };
 
         foreach (var (name, argsJson) in cases)

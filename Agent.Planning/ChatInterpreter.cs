@@ -30,7 +30,7 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
             ? message[..options.MaxMessageLength]
             : message;
 
-        if (!IsDirectedAtBot(effective, botName, onlinePlayers))
+        if (!IsDirectedAtBot(effective, botName, onlinePlayers, botPosition, playerPosition))
             return Task.FromResult(new ChatInterpretation(ChatIntentType.NotAddressed));
 
         var stripped = StripBotName(effective.Trim(), botName);
@@ -162,12 +162,29 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
 
     // ── Heuristics ─────────────────────────────────────────────────────────────
 
-    private bool IsDirectedAtBot(string message, string botName, int onlinePlayers)
+    // Proximity in blocks within which all chat is treated as addressed at the bot.
+    private const int ProximityAddressBlocks = 32;
+
+    private bool IsDirectedAtBot(
+        string message, string botName, int onlinePlayers,
+        Position botPosition, Position? playerPosition)
     {
+        // Solo play — only one non-bot player online.
         if (onlinePlayers <= 1) return true;
+        // Bot explicitly named at the start of the message.
         if (message.StartsWith(botName, StringComparison.OrdinalIgnoreCase)) return true;
+        // Bot spoke recently — continue the conversation thread.
         var window = TimeSpan.FromSeconds(options.ConversationWindowSeconds);
         if (DateTimeOffset.UtcNow - _lastBotSpoke < window) return true;
+        // Player is within proximity range — treat as a local conversation.
+        if (playerPosition is not null)
+        {
+            var dx = botPosition.X - playerPosition.X;
+            var dy = botPosition.Y - playerPosition.Y;
+            var dz = botPosition.Z - playerPosition.Z;
+            var distSq = dx * dx + dy * dy + dz * dz;
+            if (distSq <= ProximityAddressBlocks * ProximityAddressBlocks) return true;
+        }
         return false;
     }
 

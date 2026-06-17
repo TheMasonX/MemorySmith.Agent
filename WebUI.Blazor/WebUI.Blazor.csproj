@@ -16,6 +16,13 @@
     <ProjectReference Include="../Agent.World.Minecraft/Agent.World.Minecraft.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Serilog.Sinks.EventLog" Version="4.0.0" />
+  </ItemGroup>
+
   <!-- Sprint 4a/4b: SignalR push for StatusUpdated, ChatMessage, GoalUpdate events -->
 
 </Project>

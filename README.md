@@ -52,6 +52,23 @@ npm install
 node index.js
 ```
 
+## MCP verification baseline
+
+The local repo-scoped MCP endpoint is available at `http://localhost:6868/mcp` and currently advertises these tool names:
+
+- `memorysmith_search`
+- `memorysmith_hybrid_search`
+- `memorysmith_context_pack`
+- `memorysmith_get`
+- `memorysmith_code_search`
+- `memorysmith_code_search_status`
+- `memorysmith_page_search`
+- `memorysmith_page_get`
+- `memorysmith_task_list`
+- `memorysmith_task_get`
+
+Non-destructive checks should use the repo-local key from `.vscode/mcp.json`, and `/api/diagnostics` remains protected (`401 Unauthorized`) unless authentication is present.
+
 ## Roadmap
 
 | Phase | Scope | Status |

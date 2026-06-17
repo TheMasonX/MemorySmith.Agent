@@ -316,7 +316,9 @@ public sealed class HtnTaskLibrary
             MakeAction("Wander", ("radius", (object?)40), ("maxDistanceFromSpawn", (object?)200)),
         };
 
-        foreach (var block in spec.SourceBlocks.Take(2))
+        // Emit a MineBlock for every source-block variant so the bot tries all
+        // of them in the current biome (e.g. spruce_log in snowy/taiga biomes).
+        foreach (var block in spec.SourceBlocks)
             actions.Add(MakeAction("MineBlock", ("block", block), ("count", (object?)count)));
 
         actions.Add(MakeAction("GetStatus"));
