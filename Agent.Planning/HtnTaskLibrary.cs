@@ -2,6 +2,7 @@ namespace Agent.Planning;
 
 using Agent.Construction;
 using Agent.Core;
+using System.Text.Json;
 
 /// <summary>
 /// Decomposes a compound HTN task into a sequence of atomic <see cref="ActionData"/> items
@@ -13,31 +14,19 @@ public delegate IReadOnlyList<ActionData> TaskDecomposer(
 /// <summary>
 /// Registry of named HTN task decompositions.
 ///
-/// Sprint 9 A3: DecomposeBuild reads auto-origin from WorldState.Facts (via BuildFactKeys)
-///   when the caller supplies (0, 0, 0) as a "let the scanner decide" sentinel. If no
-///   auto-origin is stored, a FindFlatArea action is prepended to locate a suitable site.
-///
-/// Sprint 10 D3: <see cref="BuildCraftingChain"/> now uses GroupBy to merge duplicate
-///   blueprint material entries instead of throwing <see cref="ArgumentException"/>.
-///
-/// Sprint 10 B4: Expanded <see cref="CraftingChainOrder"/> — more plank variants, fences,
-///   stairs, and basic wooden/stone tools; <see cref="DirectMineBlocks"/> updated to match.
-///
-/// Sprint 10 B1: DecomposeBuild prepends a FindFlatArea step when no origin is available.
-///
-/// Sprint 10 B2: DecomposeBuild reads checkpoint fact (<see cref="BuildFactKeys.BuildProgressIndex"/>)
-///   and resumes from the last successfully placed block instead of replaying from scratch.
-///
-/// Sprint 11 B1-v2: DecomposeBuild accepts a <c>requireOrigin</c> flag. When true and no
-///   valid origin is available after auto-origin lookup, it returns a single FindFlatArea
-///   action and stops — the caller must wait for a FlatAreaFoundEvent to set the origin
-///   before the next planning cycle proceeds to the full build plan.
+/// Sprint 9 A3: DecomposeBuild reads auto-origin from WorldState.Facts (via BuildFactKeys).
+/// Sprint 10 D3: BuildCraftingChain uses GroupBy to merge duplicate blueprint materials.
+/// Sprint 10 B4: Expanded CraftingChainOrder with more tools and plank variants.
+/// Sprint 10 B2: DecomposeBuild reads checkpoint and resumes from last placed block.
+/// Sprint 11 B1-v2: DecomposeBuild accepts a requireOrigin flag.
+/// Sprint 13 D2: TryGetIntFact now handles JsonElement values (from JSON deserialization).
+/// Sprint 13: Added DecomposeCraftItem for CraftItemGoal decomposition.
 /// </summary>
 public sealed class HtnTaskLibrary
 {
     // ── Crafting constants ────────────────────────────────────────────────────
 
-    /// <summary>Vanilla: 1 stick + 1 coal → 4 torches.</summary>
+    /// <summary>Vanilla: 1 stick + 1 coal -> 4 torches.</summary>
     private const int TorchesPerCraft = 4;
 
     /// <summary>Radius passed to FindFlatArea when DecomposeBuild has no origin set.</summary>
@@ -76,40 +65,14 @@ public sealed class HtnTaskLibrary
     };
 
     // Sprint 10 B4: expanded crafting chain.
-    // Ordered from least-dependent (no table) to most-dependent.
     private static readonly IReadOnlyList<string> CraftingChainOrder =
     [
-        // Planks (no table required) — all log variants
-        "oak_planks",
-        "birch_planks",
-        "spruce_planks",
-        "dark_oak_planks",
-        "jungle_planks",
-        "acacia_planks",
-        "mangrove_planks",
-        "cherry_planks",
-        // Crafting table (from planks, no table required)
-        "crafting_table",
-        // Sticks (from planks, no table required)
-        "stick",
-        // Table-dependent items
-        "oak_slab",
-        "oak_stairs",
-        "oak_door",
-        "oak_fence",
-        "oak_fence_gate",
-        "chest",
-        // Basic wooden tools (sticks + planks, table required)
-        "wooden_pickaxe",
-        "wooden_axe",
-        "wooden_shovel",
-        // Basic stone tools (sticks + cobblestone, table required)
-        "stone_pickaxe",
-        "stone_axe",
-        "stone_shovel",
-        "stone_sword",
-        // Iron tools (sticks + iron_ingot, table required)
-        // iron_ingot requires SmeltItem — handled via smelting step, not plain CraftItem
+        "oak_planks", "birch_planks", "spruce_planks", "dark_oak_planks",
+        "jungle_planks", "acacia_planks", "mangrove_planks", "cherry_planks",
+        "crafting_table", "stick",
+        "oak_slab", "oak_stairs", "oak_door", "oak_fence", "oak_fence_gate", "chest",
+        "wooden_pickaxe", "wooden_axe", "wooden_shovel",
+        "stone_pickaxe", "stone_axe", "stone_shovel", "stone_sword",
     ];
 
     // Items in CraftingChainOrder that require a crafting table.
@@ -118,10 +81,12 @@ public sealed class HtnTaskLibrary
         "oak_slab", "oak_stairs", "oak_door", "oak_fence", "oak_fence_gate",
         "chest", "wooden_pickaxe", "wooden_axe", "wooden_shovel",
         "stone_pickaxe", "stone_axe", "stone_shovel", "stone_sword",
+        // Iron tools also require a crafting table
+        "iron_pickaxe", "iron_axe", "iron_shovel", "iron_sword", "iron_hoe",
+        "iron_helmet", "iron_chestplate", "iron_leggings", "iron_boots",
     };
 
     // Items that additionally require cobblestone to craft (stone tools).
-    // Cobblestone must be in DirectMineBlocks for these to work.
     private static readonly HashSet<string> RequiresCobblestone = new(StringComparer.OrdinalIgnoreCase)
     {
         "stone_pickaxe", "stone_axe", "stone_shovel", "stone_sword",
@@ -164,24 +129,46 @@ public sealed class HtnTaskLibrary
         GatherItemDecompose(spec, parameters, state);
 
     /// <summary>
-    /// Decomposes a <see cref="BuildGoal"/> into a phased action plan.
+    /// Decomposes a <see cref="Goals.CraftItemGoal"/> into a sequence of prerequisite
+    /// and crafting actions.
     ///
-    /// Phase 0 (B1 preflight): resolve auto-origin when caller passes (0, 0, 0).
-    ///   Sprint 11 B1-v2: if <paramref name="requireOrigin"/> is true and no valid
-    ///   origin is found after auto-origin lookup, return a single FindFlatArea action.
-    ///   The caller must wait for a FlatAreaFoundEvent to write the origin fact before
-    ///   the next planning cycle can proceed to the full build plan.
-    /// Phase 1: GatherMaterials — mine raw blocks.
-    /// Phase 2: CraftingChain — craft intermediates in dependency order.
-    /// Phase 3: Navigate to build site.
-    /// Phase 4: Build — emit PlaceBlock actions from checkpoint (Sprint 10 B2).
-    /// Phase 5: Verify — GetStatus.
+    /// Sprint 13: first implementation. Ensures a crafting table is available for
+    /// table-requiring recipes. Assumes materials are in inventory; if not, the
+    /// CraftItemTool returns failure and TryRecoverFromGameErrorAsync suggests gathering.
     /// </summary>
-    /// <param name="requireOrigin">
-    /// When true, the plan aborts with a single FindFlatArea action if no valid build
-    /// origin can be resolved. When false (default), the plan proceeds with (0,0,0)
-    /// if no origin is available — preserving backward-compatible behaviour.
-    /// </param>
+    public IReadOnlyList<ActionData> DecomposeCraftItem(
+        string itemId, int count, WorldState state)
+    {
+        var actions = new List<ActionData>();
+
+        // Ensure a crafting table is present for table-requiring recipes.
+        if (RequiresCraftingTable.Contains(itemId) &&
+            state.Inventory.GetValueOrDefault("crafting_table") == 0)
+        {
+            // Need 4 oak_planks for the table; planks need 1 oak_log.
+            if (state.Inventory.GetValueOrDefault("oak_planks") < 4)
+            {
+                if (state.Inventory.GetValueOrDefault("oak_log") < 1)
+                    actions.Add(MakeAction("MineBlock", ("block", "oak_log"), ("count", (object?)1)));
+                actions.Add(MakeAction("CraftItem", ("item", "oak_planks"), ("count", (object?)4)));
+            }
+            actions.Add(MakeAction("CraftItem", ("item", "crafting_table"), ("count", (object?)1)));
+        }
+
+        // The craft — materials must already be in inventory.
+        // If they're absent, CraftItemTool returns failure; error recovery suggests gathering.
+        actions.Add(MakeAction("CraftItem", ("item", itemId), ("count", (object?)count)));
+        actions.Add(MakeAction("GetStatus"));
+        return actions;
+    }
+
+    /// <summary>
+    /// Decomposes a <see cref="Goals.BuildGoal"/> into a phased action plan.
+    ///
+    /// Sprint 11 B1-v2: accepts <paramref name="requireOrigin"/> — when true and no valid
+    /// origin is resolvable, returns a single FindFlatArea action.
+    /// Sprint 10 B2: resumes from checkpoint.
+    /// </summary>
     public IReadOnlyList<ActionData> DecomposeBuild(
         Blueprint blueprint,
         IReadOnlyList<PlacementBlock> blocks,
@@ -189,14 +176,9 @@ public sealed class HtnTaskLibrary
         WorldState state,
         bool requireOrigin = false)
     {
-        // Sprint 9 A3: resolve auto-origin when caller passes the (0,0,0) sentinel.
         if (originX == 0 && originY == 0 && originZ == 0)
             ResolveAutoOrigin(state, ref originX, ref originY, ref originZ);
 
-        // Sprint 11 B1-v2: if the caller requires a valid origin and we still have
-        // (0,0,0) after auto-origin lookup, emit a FindFlatArea preflight only.
-        // The scanner will fire a FlatAreaFoundEvent which AgentBackgroundService
-        // converts to auto-origin facts; the next PlanAsync cycle will succeed.
         if (requireOrigin && originX == 0 && originY == 0 && originZ == 0)
         {
             return [MakeAction("FindFlatArea",
@@ -206,9 +188,6 @@ public sealed class HtnTaskLibrary
 
         var actions = new List<ActionData>();
 
-        // ── Phase 1: GatherMaterials ──────────────────────────────────────────
-        // Sprint 10 D3: use GroupBy+Sum to merge duplicate material entries instead
-        // of throwing ArgumentException from ToDictionary on duplicate keys.
         var materials = blueprint.Materials
             .GroupBy(m => m.Block, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(g => g.Key, g => g.Sum(m => m.Quantity), StringComparer.OrdinalIgnoreCase);
@@ -216,19 +195,14 @@ public sealed class HtnTaskLibrary
         foreach (var (block, quantity) in materials)
         {
             if (!DirectMineBlocks.Contains(block)) continue;
-
             var have   = state.Inventory.GetValueOrDefault(block);
             var needed = quantity - have;
             if (needed <= 0) continue;
-
             actions.Add(MakeAction("SearchMemory", ("query", $"{block} nearby source location")));
-            actions.Add(MakeAction("Wander",
-                ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)150)));
-            actions.Add(MakeAction("MineBlock",
-                ("block", block), ("count", (object?)needed)));
+            actions.Add(MakeAction("Wander", ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)150)));
+            actions.Add(MakeAction("MineBlock", ("block", block), ("count", (object?)needed)));
         }
 
-        // Gather coal for torches.
         var torchEntry = materials.TryGetValue("torch", out var tq) ? (int?)tq : null;
         if (torchEntry is not null)
         {
@@ -240,13 +214,11 @@ public sealed class HtnTaskLibrary
                 if (haveCoal < coalNeeded)
                 {
                     actions.Add(MakeAction("SearchMemory", ("query", "coal ore location nearby")));
-                    actions.Add(MakeAction("MineBlock",
-                        ("block", "coal_ore"), ("count", (object?)(coalNeeded - haveCoal))));
+                    actions.Add(MakeAction("MineBlock", ("block", "coal_ore"), ("count", (object?)(coalNeeded - haveCoal))));
                 }
             }
         }
 
-        // Sprint 10 B4: SmeltItem for iron_ingot if needed.
         if (materials.TryGetValue("iron_ingot", out var ironNeeded))
         {
             var haveIron = state.Inventory.GetValueOrDefault("iron_ingot");
@@ -254,44 +226,34 @@ public sealed class HtnTaskLibrary
             if (toSmelt > 0)
             {
                 actions.Add(MakeAction("SearchMemory", ("query", "furnace iron ore location")));
-                actions.Add(MakeAction("MineBlock",
-                    ("block", "iron_ore"), ("count", (object?)toSmelt)));
-                actions.Add(MakeAction("SmeltItem",
-                    ("item", "iron_ore"), ("count", (object?)toSmelt), ("fuel", "coal")));
+                actions.Add(MakeAction("MineBlock", ("block", "iron_ore"), ("count", (object?)toSmelt)));
+                actions.Add(MakeAction("SmeltItem", ("item", "iron_ore"), ("count", (object?)toSmelt), ("fuel", "coal")));
             }
         }
 
-        // ── Phase 2: CraftingChain ────────────────────────────────────────────
         actions.AddRange(BuildCraftingChain(blueprint, materials, state,
             hasTorch: torchEntry is not null, torchNeeded: torchEntry ?? 0));
 
-        // ── Phase 3: Navigate to build site ──────────────────────────────────
-        actions.Add(MakeAction("SearchMemory",
-            ("query", $"flat area build location {blueprint.Name}")));
-        actions.Add(MakeAction("MoveTo",
-            ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)));
+        actions.Add(MakeAction("SearchMemory", ("query", $"flat area build location {blueprint.Name}")));
+        actions.Add(MakeAction("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)));
 
-        // ── Phase 4: Build (Sprint 10 B2: resume from checkpoint) ────────────
         var progressKey     = BuildFactKeys.BuildProgressIndex(blueprint.Name);
         var checkpointIndex = 0;
         if (TryGetIntFact(state, progressKey, out var lastPlaced))
-            checkpointIndex = lastPlaced + 1; // next unplaced block
+            checkpointIndex = lastPlaced + 1;
 
-        var executor    = new BlueprintExecutor();
+        var executor     = new BlueprintExecutor();
         var blockActions = executor.Execute(blocks, originX, originY, originZ);
 
         for (int i = checkpointIndex; i < blockActions.Count; i++)
         {
             var placeAction = blockActions[i];
-            // Add context so AgentBackgroundService can write the checkpoint fact on success.
             placeAction.Context[BuildFactKeys.PlaceBlockProgressBlueprintId] = blueprint.Name;
             placeAction.Context[BuildFactKeys.PlaceBlockProgressBlockIndex]  = i;
             actions.Add(placeAction);
         }
 
-        // ── Phase 5: Verify ───────────────────────────────────────────────────
         actions.Add(MakeAction("GetStatus"));
-
         return actions;
     }
 
@@ -304,6 +266,14 @@ public sealed class HtnTaskLibrary
         if (TryGetIntFact(state, BuildFactKeys.AutoOriginZ, out var az)) z = az;
     }
 
+    /// <summary>
+    /// Reads an integer from <see cref="WorldState.Facts"/>, handling the common
+    /// boxed types stored by different code paths.
+    ///
+    /// Sprint 13 D2: added <see cref="JsonElement"/> branch so checkpoint facts
+    /// that arrive via JSON deserialization (e.g. from a saved state payload)
+    /// are coerced correctly instead of silently returning false.
+    /// </summary>
     private static bool TryGetIntFact(WorldState state, string key, out int result)
     {
         result = 0;
@@ -314,6 +284,8 @@ public sealed class HtnTaskLibrary
             long l   => (result = (int)l) != int.MinValue,
             double d => (result = (int)d) != int.MinValue,
             string s => int.TryParse(s, out result),
+            // Sprint 13 D2: JsonElement values from deserialized state payloads
+            JsonElement je when je.ValueKind == JsonValueKind.Number => je.TryGetInt32(out result),
             _        => false,
         };
     }
@@ -329,8 +301,6 @@ public sealed class HtnTaskLibrary
     {
         var actions = new List<ActionData>();
 
-        // B1: if any table-requiring item is needed and crafting_table isn't in the blueprint,
-        // auto-craft one as a preparatory step.
         bool anyTableRequired = materials.Keys.Any(RequiresCraftingTable.Contains);
         if (anyTableRequired
             && !materials.ContainsKey("crafting_table")
@@ -342,19 +312,16 @@ public sealed class HtnTaskLibrary
         foreach (var item in CraftingChainOrder)
             EmitCraftIfNeeded(item, materials, state, actions);
 
-        // Torch: sticks then torches.
         if (hasTorch && torchNeeded > 0)
         {
-            var needed    = torchNeeded - state.Inventory.GetValueOrDefault("torch");
+            var needed = torchNeeded - state.Inventory.GetValueOrDefault("torch");
             if (needed > 0)
             {
                 var sticksNeeded = Math.Max(1, (needed + TorchesPerCraft - 1) / TorchesPerCraft);
                 var haveSticks   = state.Inventory.GetValueOrDefault("stick");
                 if (haveSticks < sticksNeeded)
-                    actions.Add(MakeAction("CraftItem",
-                        ("item", "stick"), ("count", (object?)(sticksNeeded - haveSticks))));
-                actions.Add(MakeAction("CraftItem",
-                    ("item", "torch"), ("count", (object?)needed)));
+                    actions.Add(MakeAction("CraftItem", ("item", "stick"), ("count", (object?)(sticksNeeded - haveSticks))));
+                actions.Add(MakeAction("CraftItem", ("item", "torch"), ("count", (object?)needed)));
             }
         }
 
