@@ -194,10 +194,8 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
     /// but NOT "Leopold". Fixes addressing for natural speech patterns.
     /// </summary>
     private static bool ContainsBotName(string message, string botName) =>
-        Regex.IsMatch(message, $@"(?<![a-zA-Z0-9]){Regex.Escape(botName)}(?![a-zA-Z0-9])",
+        Regex.IsMatch(message, $@"(?<![a-zA-Z0-9_]){Regex.Escape(botName)}(?![a-zA-Z0-9_])",
             RegexOptions.IgnoreCase);
-        return false;
-    }
 
     private static string StripBotName(string message, string botName)
     {
