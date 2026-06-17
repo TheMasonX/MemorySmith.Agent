@@ -16,6 +16,12 @@ public enum JournalEntryType
     Error,
     AgentStarted,
     AgentStopped,
+    /// <summary>
+    /// The LLM interpreter was invoked to recover from a game error (blockNotFound,
+    /// recipeMissing, etc.). Logged before the recovery interpreter call so failures
+    /// are visible in the journal even if the recovery itself throws.
+    /// </summary>
+    ErrorRecovery,
 }
 
 /// <summary>
