@@ -23,6 +23,7 @@ public delegate IReadOnlyList<ActionData> TaskDecomposer(
 /// Sprint 13: Added DecomposeCraftItem for CraftItemGoal decomposition.
 /// Sprint 14 P0: DecomposeCraftItem pre-gathers iron ingots (iron tools) and cobblestone (stone tools).
 /// Sprint 14 P1a: DirectMineBlocks now delegates to CommonMinecraftBlocks.DirectMineBlocks.
+/// Sprint 16 D3-S15: Extracted crafting-table bootstrap into AddCraftingTableIfNeeded helper.
 /// </summary>
 public sealed class HtnTaskLibrary
 {
@@ -155,6 +156,11 @@ public sealed class HtnTaskLibrary
     /// - Iron tools: mines iron_ore and smelts to iron_ingots if inventory is short.
     /// - Stone tools: mines cobblestone if inventory is short.
     /// - Crafting table: mines oak_log and crafts planks/table if none in inventory.
+    ///
+    /// Sprint 16 D3-S15: crafting-table bootstrap extracted to
+    /// <see cref="AddCraftingTableIfNeeded"/> so it is visually distinct from
+    /// material pre-gather (iron_ore, cobblestone). The MineBlock(oak_log) emitted
+    /// by that helper is for the TABLE prerequisite, not for the item being crafted.
     /// </summary>
     public IReadOnlyList<ActionData> DecomposeCraftItem(
         string itemId, int count, WorldState state)
@@ -210,25 +216,52 @@ public sealed class HtnTaskLibrary
             }
         }
 
-        // ── Ensure a crafting table for table-requiring recipes ───────────────
-        if (RequiresCraftingTable.Contains(itemId) &&
-            state.Inventory.GetValueOrDefault("crafting_table") == 0)
-        {
-            // Need 4 oak_planks for the table; planks need 1 oak_log.
-            if (state.Inventory.GetValueOrDefault("oak_planks") < 4)
-            {
-                if (state.Inventory.GetValueOrDefault("oak_log") < 1)
-                    actions.Add(MakeAction("MineBlock", ("block", "oak_log"), ("count", (object?)1)));
-                actions.Add(MakeAction("CraftItem", ("item", "oak_planks"), ("count", (object?)4)));
-            }
-            actions.Add(MakeAction("CraftItem", ("item", "crafting_table"), ("count", (object?)1)));
-        }
+        // ── Ensure crafting table is available (Sprint 16: extracted helper) ──
+        // Note: any MineBlock(oak_log) emitted here is for the TABLE PREREQUISITE,
+        // not for the item being crafted. See AddCraftingTableIfNeeded for rationale.
+        AddCraftingTableIfNeeded(itemId, state, actions);
 
         // ── The craft ─────────────────────────────────────────────────────────
         // Materials should now be in inventory; CraftItemTool returns failure if not.
         actions.Add(MakeAction("CraftItem", ("item", itemId), ("count", (object?)count)));
         actions.Add(MakeAction("GetStatus"));
         return actions;
+    }
+
+    /// <summary>
+    /// Emits the minimum actions needed to bootstrap a crafting table into the bot's
+    /// inventory before crafting <paramref name="itemId"/>.
+    ///
+    /// A crafting table is needed when <paramref name="itemId"/> is in
+    /// <see cref="RequiresCraftingTable"/> and the bot's inventory shows zero tables.
+    ///
+    /// Steps emitted (each guarded against unnecessary work):
+    /// <list type="number">
+    ///   <item><c>MineBlock(oak_log, 1)</c>   — only when oak_log == 0 AND oak_planks &lt; 4</item>
+    ///   <item><c>CraftItem(oak_planks, 4)</c> — only when oak_planks &lt; 4</item>
+    ///   <item><c>CraftItem(crafting_table, 1)</c> — always (pre-condition: crafting_table == 0)</item>
+    /// </list>
+    ///
+    /// <b>This is a separate concern from material pre-gather</b> (iron_ore, cobblestone).
+    /// It bootstraps the <em>tool needed for the craft</em>, not the material being crafted.
+    ///
+    /// Sprint 16 D3-S15: extracted from the body of <see cref="DecomposeCraftItem"/> so that
+    /// the MineBlock(oak_log) emitted here is clearly labelled as a table prerequisite
+    /// and not mistaken for an iron/stone material pre-gather step.
+    /// </summary>
+    private static void AddCraftingTableIfNeeded(string itemId, WorldState state, List<ActionData> actions)
+    {
+        if (!RequiresCraftingTable.Contains(itemId)) return;
+        if (state.Inventory.GetValueOrDefault("crafting_table") > 0) return;
+
+        // Need 4 oak_planks for the table; planks need 1 oak_log each.
+        if (state.Inventory.GetValueOrDefault("oak_planks") < 4)
+        {
+            if (state.Inventory.GetValueOrDefault("oak_log") < 1)
+                actions.Add(MakeAction("MineBlock", ("block", "oak_log"), ("count", (object?)1)));
+            actions.Add(MakeAction("CraftItem", ("item", "oak_planks"), ("count", (object?)4)));
+        }
+        actions.Add(MakeAction("CraftItem", ("item", "crafting_table"), ("count", (object?)1)));
     }
 
     /// <summary>
