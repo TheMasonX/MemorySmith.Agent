@@ -14,6 +14,8 @@ namespace Agent.Core;
 /// Sprint 3a: Now uses pattern matching on typed event subtypes.
 /// Sprint 9:  FlatAreaFoundEvent also writes <see cref="BuildFactKeys.LastFlatArea"/>
 ///            so planners can read the last scan result without accessing per-event keys.
+/// Sprint 14 P1b: ApplyStatus normalizes inventory keys by stripping the "minecraft:"
+///            namespace prefix so "minecraft:oak_log" and "oak_log" map to the same slot.
 /// </summary>
 public sealed class WorldStateProjector
 {
@@ -68,9 +70,38 @@ public sealed class WorldStateProjector
             b.SetPosition(e.Pos);
             b.SetHealth(e.Health);
             b.SetFood(e.Food);
-            b.SetInventory(e.Inventory);
+            b.SetInventory(NormalizeInventory(e.Inventory));
         });
         return StoreFacts(result, e);
+    }
+
+    /// <summary>
+    /// Strips the Minecraft namespace prefix (e.g. "minecraft:") from inventory item keys
+    /// so that "minecraft:oak_log" and "oak_log" map to the same inventory slot.
+    ///
+    /// Sprint 14 P1b: Mineflayer's status event may return fully-qualified item IDs.
+    /// Without normalization, IsComplete checks in GenericGatherGoal and CraftItemGoal
+    /// would fail silently because the inventory key never matched the bare item ID.
+    /// </summary>
+    private static IReadOnlyDictionary<string, int> NormalizeInventory(
+        IReadOnlyDictionary<string, int> raw)
+    {
+        // Fast path: no namespaced keys → return original dictionary unchanged.
+        bool needsWork = false;
+        foreach (var key in raw.Keys)
+        {
+            if (key.Contains(':')) { needsWork = true; break; }
+        }
+        if (!needsWork) return raw;
+
+        var result = new Dictionary<string, int>(raw.Count, StringComparer.OrdinalIgnoreCase);
+        foreach (var (key, value) in raw)
+        {
+            var normalized = key.Contains(':') ? key.Split(':', 2)[1] : key;
+            result[normalized] = result.TryGetValue(normalized, out var existing)
+                ? existing + value : value;
+        }
+        return result;
     }
 
     /// <summary>
