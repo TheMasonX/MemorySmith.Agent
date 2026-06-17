@@ -179,6 +179,19 @@ public sealed class HtnTaskLibrary
                     actions.Add(MakeAction("MineBlock",
                         ("block", "iron_ore"), ("count", (object?)needOre)));
                 }
+
+                // Sprint 15 P0: ensure coal is available before smelting.
+                // 1 coal smelts up to 8 items; use ceiling(needIngots/8) coal.
+                var coalNeeded = Math.Max(1, (needIngots + 7) / 8);
+                var haveCoal   = state.Inventory.GetValueOrDefault("coal");
+                if (haveCoal < coalNeeded)
+                {
+                    var coalToMine = coalNeeded - haveCoal;
+                    actions.Add(MakeAction("SearchMemory", ("query", "coal ore location nearby")));
+                    actions.Add(MakeAction("MineBlock",
+                        ("block", "coal_ore"), ("count", (object?)coalToMine)));
+                }
+
                 actions.Add(MakeAction("SmeltItem",
                     ("item", "iron_ore"), ("count", (object?)needIngots), ("fuel", "coal")));
             }
