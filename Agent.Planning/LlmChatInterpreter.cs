@@ -76,9 +76,13 @@ public sealed class LlmChatInterpreter(
                               or ChatIntentType.QueryStatus
                               or ChatIntentType.NavigateTo)
         {
-            logger?.LogDebug("[llm] pattern fast-path for {Username}: {Intent}", username, quick.IntentType);
+            logger?.LogDebug("[llm] fast-path {Intent} for {Username}", quick.IntentType, username);
             return quick;
         }
+
+        // Log when a message is about to go through the full LLM path vs. be skipped
+        logger?.LogDebug("[llm] will call LLM for <{Username}> (pattern={Intent}): '{Snippet}'",
+            username, quick.IntentType, effective[..Math.Min(40, effective.Length)]);
 
         // 5. Rate-limit check
         if (!provider.IsAvailable)
@@ -99,7 +103,7 @@ public sealed class LlmChatInterpreter(
         var currentGoal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s ? s : null;
         var historyContext = history?.FormatForPrompt();
         var raw = await provider.CompleteAsync(
-            BuildSystemPrompt(botName, botPosition, currentGoal, onlinePlayers, historyContext, playerPosition),
+            BuildSystemPrompt(botName, botPosition, currentGoal, onlinePlayers, historyContext, playerPosition, state),
             $"{username} says: \"{effective}\"",
             ct);
 
@@ -125,34 +129,54 @@ public sealed class LlmChatInterpreter(
 
     private static string BuildSystemPrompt(
         string botName, Position botPos, string? goal, int onlinePlayers,
-        string? chatHistory, Position? playerPos = null) => $$"""
-        You are {{botName}}, an autonomous Minecraft agent at ({{botPos.X}},{{botPos.Y}},{{botPos.Z}}).
-        Status: {{(goal is not null ? $"pursuing goal: {goal}" : "idle")}}. Players online: {{onlinePlayers}}.
-        {{(playerPos is not null ? $"Player position: ({playerPos.X},{playerPos.Y},{playerPos.Z}) — use these coordinates for 'come here' / navigation commands." : "")}}
+        string? chatHistory, Position? playerPos = null,
+        WorldState? state = null) => $$"""
+        You are {{botName}}, an autonomous Minecraft survival bot.
+        Game: Minecraft Java Edition. Your position: ({{botPos.X}},{{botPos.Y}},{{botPos.Z}}).
+        Health: {{state?.Health ?? 20}}/20. Food: {{state?.Food ?? 20}}/20.
+        Inventory: {{FormatInventory(state)}}.
+        Status: {{(goal is not null ? $"pursuing goal: {goal}" : "idle")}}. Players nearby: {{onlinePlayers}}.
+        {{(playerPos is not null ? $"Player at: ({playerPos.X},{playerPos.Y},{playerPos.Z}) — use for navigation." : "")}}
+
+        What you can do: gather/mine items, build structures, navigate (come here / go to X Y Z),
+        craft items, smelt ores, report status and inventory, answer questions.
 
         {{(chatHistory is not null ? $"Recent conversation:\n{chatHistory}\n" : "")}}
-        Decide if the next message is for you and what to do.
+        Decide if the next message is for you and respond.
         Reply ONLY with valid JSON — no markdown, no prose:
 
         {
           "addressed": "yes" | "maybe" | "no",
-          "intent": "gather" | "build" | "cancel" | "status" | "help" | "navigate" | "ignore" | "clarify",
+          "intent": "gather" | "build" | "cancel" | "status" | "help" | "navigate" | "chat" | "clarify",
           "item": "<minecraft_id or null>",
           "blueprint": "<blueprint_id or null>",
           "count": <integer or null>,
           "x": <integer or null>,
           "y": <integer or null>,
           "z": <integer or null>,
-          "response": "<in-game reply, max 50 words, empty if intent is ignore>"
+          "response": "<in-game reply, max 50 words — never empty for addressed messages>"
         }
 
-        Rules: "yes" when your name is used or only 1 player is online.
-        "maybe" when it could be a command but your name isn't mentioned.
-        "no" when players are talking to each other, not you.
-        "clarify" when uncertain — ask politely.
+        Rules:
+        "yes" when your name is used or only 1 player is online.
+        "maybe" when it could be for you but your name isn't mentioned.
+        "no" when players are clearly talking to each other, not you.
+        Use "chat" for greetings, questions, or conversation — always include a "response".
+        Use "clarify" when you need more info — ask a short question.
+        Never leave "response" empty for "yes" or "maybe" addressed messages.
         Use Minecraft item IDs without namespace prefix (oak_log, cobblestone, iron_ore…).
-        Use conversation history for context (follow-up questions, multi-message requests).
         """;
+
+    private static string FormatInventory(WorldState? state)
+    {
+        if (state is null || state.Inventory.Count == 0) return "empty";
+        var top = state.Inventory
+            .OrderByDescending(kv => kv.Value)
+            .Take(6)
+            .Select(kv => $"{kv.Value}\u00d7{kv.Key}");
+        return string.Join(", ", top)
+            + (state.Inventory.Count > 6 ? $" (+{state.Inventory.Count - 6} more)" : "");
+    }
 
     // ── Response parsing ──────────────────────────────────────────────────────
 
@@ -220,6 +244,7 @@ public sealed class LlmChatInterpreter(
                 "status"            => ChatIntentType.QueryStatus,
                 "help"              => ChatIntentType.QueryHelp,
                 "navigate"          => ChatIntentType.NavigateTo,
+                "chat"              => ChatIntentType.Chat,
                 "clarify"           => ChatIntentType.Unknown,
                 _                   => isUncertain ? ChatIntentType.Unknown : ChatIntentType.NotAddressed,
             };
