@@ -17,23 +17,28 @@ using System.Threading.Channels;
 ///           SetBuildOrigin, GetPendingActions public API.
 /// Phase 6 Sprint 1:
 ///   1a — Non-blocking LLM: chat events are written to <see cref="_chatChannel"/> and
-///        processed by <see cref="ChatConsumerAsync"/> on a dedicated task, so a 5–10s
+///        processed by <see cref="ChatConsumerAsync"/> on a dedicated task, so a 5-10s
 ///        LLM call never stalls health/death/blockMined processing.
 ///   1b — Reconnect: <see cref="ExecuteAsync"/> retries ConnectAsync with exponential
 ///        backoff (default 2s/4s/8s/16s/32s, max 5 retries). World state and current
 ///        goal survive reconnects. Configurable delays for test speed.
 /// Sprint 8:
-///   - Explicit ChatIntentType.Chat case in HandleChatEventAsync switch (clarity).
 ///   - TryRecoverFromGameErrorAsync: richer prompt (inventory + available actions);
 ///     immediate trigger for blockNotFound/recipeMissing; ErrorRecovery journal log.
 /// Sprint 9:
-///   - FlatAreaFoundEvent: when Area >= MinUsableFlatArea, auto-sets build origin
-///     under the "auto" blueprint key so the next DecomposeBuild cycle can use it.
-///   - MinUsableFlatArea constant (25 = 5x5) guards against degenerate near-zero results.
+///   - FlatAreaFoundEvent: when Area >= MinUsableFlatArea, auto-sets build origin.
 /// Sprint 11:
-///   - EnqueueThinkingIfSlowAsync now logs when the indicator fires, so operators can
-///     see exactly when the LLM is taking longer than 1.5s.
-///   - HandleChatEventAsync logs the resolved intent after interpretation for visibility.
+///   - EnqueueThinkingIfSlowAsync logs when indicator fires.
+///   - HandleChatEventAsync logs resolved intent after interpretation.
+/// Sprint 12:
+///   - ActionQueue switched to ConcurrentQueue — fixes infinite planning loop caused
+///     by non-thread-safe Queue being accessed from two concurrent async tasks.
+///   - HandleChatEventAsync defers response enqueue to AFTER the switch — fixes the
+///     bug where SetGoal/CancelGoal cleared the queued chat response before dispatch.
+///   - SetGoal resets _actionDispatchedThisCycle so DispatchActionsAsync can plan
+///     immediately rather than waiting for the 300ms settle window.
+///   - _lastAbandonedGoalName guards TryRecoverFromGameErrorAsync from re-setting the
+///     same goal that just failed, breaking the infinite recovery loop.
 /// </summary>
 public sealed class AgentBackgroundService(
     IWorldAdapter worldAdapter,
@@ -59,8 +64,6 @@ public sealed class AgentBackgroundService(
     /// <summary>
     /// Minimum flat area (in cells) for a FlatAreaFoundEvent to trigger auto build-origin
     /// assignment. 25 = a 5x5 footprint — the smallest structure the HTN library can build.
-    /// Values below 9 risk selecting degenerate strips; below 25 rarely produce valid build sites.
-    /// Council review 2026-06-17 raised this from 9 to 25.
     /// </summary>
     private const int MinUsableFlatArea = 25;
 
@@ -89,6 +92,11 @@ public sealed class AgentBackgroundService(
     // Sprint 4a: connection status for SignalR push; D2: "reconnecting" broadcast
     private string _connectionStatus = "disconnected";
 
+    // Sprint 12: tracks the name of the most-recently abandoned goal.
+    // TryRecoverFromGameErrorAsync checks this to avoid re-setting the same goal
+    // that just failed, which would create an infinite recovery loop.
+    private string? _lastAbandonedGoalName;
+
     public WorldState WorldState           => _worldState;
     public IGoal?     CurrentGoal          => _currentGoal;
     public int        ConsecutiveFailures  => _consecutiveFailures;
@@ -104,6 +112,11 @@ public sealed class AgentBackgroundService(
         _queue.Clear();
         _consecutiveFailures = 0;
         _lastFailureReason = null;
+        // Sprint 12: reset so DispatchActionsAsync can plan immediately without
+        // waiting for the 300ms post-cycle settle delay.
+        _actionDispatchedThisCycle = false;
+        // Sprint 12: clear recovery guard — this is a fresh goal, not a retry.
+        _lastAbandonedGoalName = null;
         lock (_pendingLock) _pendingActions.Clear();
         logger.LogInformation("Goal set: {Goal}", goal.Name);
         _journal?.Log(new JournalEntry(
@@ -147,12 +160,6 @@ public sealed class AgentBackgroundService(
 
     // ── BackgroundService ─────────────────────────────────────────────────────
 
-    /// <summary>
-    /// Sprint 1b: Retry loop with exponential backoff.
-    /// Max 5 attempts (1 initial + 4 retries per DefaultReconnectDelays length).
-    /// World state and current goal survive reconnects — only the transport is re-opened.
-    /// Sprint 4a / D2: broadcasts "reconnecting" status to dashboard during backoff.
-    /// </summary>
     private const int MaxConnectionAttempts = 5;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -216,17 +223,12 @@ public sealed class AgentBackgroundService(
             MaxConnectionAttempts);
     }
 
-    /// <summary>
-    /// Awaits the task. If it faults (not OCE), cancels the CTS so sibling tasks stop.
-    /// Normal completion also cancels siblings (ProcessEventsAsync should not return normally
-    /// unless the adapter stream ends — treat that as a reconnect trigger too).
-    /// </summary>
     private static async Task MonitorAndCancelOnFaultAsync(Task task, CancellationTokenSource cts)
     {
         try { await task; }
         catch (OperationCanceledException) { throw; }
         catch { cts.Cancel(); throw; }
-        cts.Cancel(); // stream ended normally — trigger reconnect via sibling cancellation
+        cts.Cancel();
     }
 
     // ── Event processing ──────────────────────────────────────────────────────
@@ -263,9 +265,6 @@ public sealed class AgentBackgroundService(
                     _chatChannel.Writer.TryWrite(worldEvent);
                     break;
 
-                // Sprint 9 A3: when the terrain scanner returns a qualifying flat site,
-                // auto-register it as the "auto" build origin (using BuildFactKeys constants)
-                // so the next DecomposeBuild cycle can use it without an explicit /api/agent/origin call.
                 case FlatAreaFoundEvent ffa when ffa.Area >= MinUsableFlatArea:
                     SetBuildOrigin(BuildFactKeys.AutoBlueprintId, ffa.X, ffa.Y, ffa.Z);
                     _journal?.Log(new JournalEntry(
@@ -279,7 +278,6 @@ public sealed class AgentBackgroundService(
                         ffa.X, ffa.Y, ffa.Z, ffa.Area);
                     break;
 
-                // Degenerate scan result: log but do not modify facts.
                 case FlatAreaFoundEvent ffa:
                     logger.LogInformation(
                         "[findFlatArea] scan area={Area} below minimum {Min} — auto-origin not updated",
@@ -291,21 +289,13 @@ public sealed class AgentBackgroundService(
                     break;
             }
 
-            // If world events satisfy the active goal, stop immediately instead of
-            // draining stale queued actions (prevents post-completion over-collection).
             TryCompleteCurrentGoalFromWorldUpdate();
-
-            // Sprint 4a: push status to dashboard after every event tick (fire-and-forget)
             _ = PushStatusToDashboardAsync(CancellationToken.None);
         }
     }
 
     // ── Chat consumer — Sprint 1a ─────────────────────────────────────────────
 
-    /// <summary>
-    /// Dedicated consumer for chat events. Runs independently of ProcessEventsAsync so
-    /// a 5-10s LLM call in HandleChatEventAsync never delays health/blockMined events.
-    /// </summary>
     private async Task ChatConsumerAsync(CancellationToken ct)
     {
         await foreach (var chatEvent in _chatChannel.Reader.ReadAllAsync(ct))
@@ -328,13 +318,8 @@ public sealed class AgentBackgroundService(
         if (worldEvent is not ChatEvent chat) return;
 
         logger.LogInformation("[chat] <{Username}> {Message}", chat.Username, chat.Message);
-
-        // Sprint 4b: push player message to dashboard immediately
         _ = PushChatToDashboardAsync("player", chat.Username, chat.Message);
 
-        // Start a "thinking" indicator — fires to in-game chat if the LLM takes > 1.5s.
-        // Fast-path messages (pattern-matched commands) return in <1ms so the indicator
-        // never fires for them. Slow LLM calls show the player the bot is working.
         using var thinkingCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         var thinkingTask = EnqueueThinkingIfSlowAsync(thinkingCts.Token);
 
@@ -342,11 +327,10 @@ public sealed class AgentBackgroundService(
             chat.Username, chat.Message, botName, chat.OnlinePlayers,
             _worldState.Position, chat.PlayerPos, _worldState, ct);
 
-        // Cancel the thinking indicator now we have a result
         await thinkingCts.CancelAsync();
         try { await thinkingTask.ConfigureAwait(false); } catch (OperationCanceledException) { }
 
-        // Sprint 11: log the resolved intent for visibility — shows what the bot understood.
+        // Sprint 11: log the resolved intent for visibility
         if (interpretation.IntentType != ChatIntentType.NotAddressed)
             logger.LogInformation("[chat] <{Username}> -> {Intent}{Goal}",
                 chat.Username, interpretation.IntentType,
@@ -359,19 +343,15 @@ public sealed class AgentBackgroundService(
             return;
         }
 
-        if (!string.IsNullOrEmpty(interpretation.Response))
-        {
-            _queue.Enqueue(new ActionData
-            {
-                Tool      = "Chat",
-                Arguments = { ["message"] = interpretation.Response }
-            });
-            // Sprint 4b: push bot response to dashboard
-            _ = PushChatToDashboardAsync("bot", botName, interpretation.Response);
-        }
+        // Sprint 12: IMPORTANT — save the response BEFORE the switch.
+        // SetGoal (called via CreateGoal path) and CancelGoal both call _queue.Clear(),
+        // which would wipe a chat response enqueued before the switch.
+        // We enqueue it AFTER the switch so goal changes cannot clear it.
+        var pendingResponse = !string.IsNullOrEmpty(interpretation.Response)
+            ? interpretation.Response : null;
 
-        // Always mark that the bot processed this addressed message — even with an
-        // empty response — so the conversation window stays open for follow-ups.
+        // Always mark that the bot processed this addressed message so the
+        // conversation window stays open for follow-ups.
         chatInterpreter.RecordBotSpoke();
 
         switch (interpretation.IntentType)
@@ -390,8 +370,21 @@ public sealed class AgentBackgroundService(
                 break;
 
             case ChatIntentType.NavigateTo:
-                // Player-issued navigation commands should interrupt gather loops.
+                // Player navigation should interrupt any active gather loop.
                 CancelGoal();
+
+                // Sprint 12: enqueue chat response BEFORE the movement action so the
+                // player sees "On my way!" / "Heading to..." immediately, not after arrival.
+                if (pendingResponse is not null)
+                {
+                    _queue.Enqueue(new ActionData
+                    {
+                        Tool      = "Chat",
+                        Arguments = { ["message"] = pendingResponse }
+                    });
+                    _ = PushChatToDashboardAsync("bot", botName, pendingResponse);
+                    pendingResponse = null; // consumed here — skip the post-switch enqueue
+                }
 
                 if (interpretation.GoalName == "MoveTo"
                     && interpretation.GoalParameters is { } nav
@@ -422,10 +415,23 @@ public sealed class AgentBackgroundService(
                 }
                 break;
 
-            // Sprint 8: explicit cases for Chat and Unknown — response already enqueued above.
             case ChatIntentType.Chat:
             case ChatIntentType.Unknown:
                 break;
+        }
+
+        // Sprint 12: enqueue response AFTER the switch so it survives SetGoal/CancelGoal clears.
+        // For CreateGoal: this runs after SetGoal, so the response is at the HEAD of the queue
+        // and DispatchActionsAsync says it BEFORE executing any plan actions.
+        // For NavigateTo: already consumed above (pendingResponse = null).
+        if (pendingResponse is not null)
+        {
+            _queue.Enqueue(new ActionData
+            {
+                Tool      = "Chat",
+                Arguments = { ["message"] = pendingResponse }
+            });
+            _ = PushChatToDashboardAsync("bot", botName, pendingResponse);
         }
     }
 
@@ -512,6 +518,9 @@ public sealed class AgentBackgroundService(
                         ? _lastFailureReason?.ToString() ?? FailureReason.Unknown.ToString()
                         : (_lastFailureReason ?? FailureReason.ConsecutiveFailures).ToString();
                     _currentGoal.FailureReason = reason;
+                    // Sprint 12: record before clearing, so TryRecoverFromGameErrorAsync
+                    // can avoid re-suggesting this same goal.
+                    _lastAbandonedGoalName = _currentGoal.Name;
                     _journal?.Log(new JournalEntry(
                         DateTimeOffset.UtcNow, JournalEntryType.ReplanTriggered, _currentGoal.Name));
                     logger.LogWarning("Goal '{Goal}' failed (failures={N}, reason={Reason}).",
@@ -576,7 +585,6 @@ public sealed class AgentBackgroundService(
                         logger.LogDebug("Tool {Tool}: {Message}", action.Tool, result.Message);
                         _journal?.Log(new JournalEntry(
                             DateTimeOffset.UtcNow, JournalEntryType.ActionCompleted, action.Tool));
-                        // Reset failure streak only on actions that indicate meaningful progress.
                         if (IsProgressSignalTool(action.Tool))
                         {
                             _consecutiveFailures = 0;
@@ -586,9 +594,6 @@ public sealed class AgentBackgroundService(
                             foreach (var kv in result.Data)
                                 planContext[kv.Key] = kv.Value;
 
-                        // Sprint 10 B2: persist build checkpoint when a PlaceBlock succeeds.
-                        // DecomposeBuild reads this on the next planning cycle and resumes
-                        // from (checkpoint + 1) instead of replaying from block 0.
                         if (action.Tool.Equals("PlaceBlock", StringComparison.OrdinalIgnoreCase)
                             && action.Context.TryGetValue(
                                 BuildFactKeys.PlaceBlockProgressBlueprintId, out var bpId)
@@ -615,7 +620,6 @@ public sealed class AgentBackgroundService(
                 catch (OperationCanceledException oce)
                     when (!ct.IsCancellationRequested)
                 {
-                    // Only the per-action timeout fired — parent loop is still alive
                     logger.LogWarning(oce,
                         "Tool {Tool} timed out after {Seconds}s (failure {N}/{Max})",
                         action.Tool, DefaultActionTimeoutSeconds,
@@ -650,9 +654,6 @@ public sealed class AgentBackgroundService(
                         logger.LogWarning("Game error after cycle (failures={N}/{Max}): {Error}",
                             _consecutiveFailures, maxFailures, errMsg);
 
-                        // Sprint 8 P3: trigger recovery immediately for blockNotFound and
-                        // recipeMissing errors (don't wait for 2 failures — these are
-                        // unrecoverable without a goal change and the LLM can suggest one).
                         var isImmediateRecovery =
                             errMsg.StartsWith("blockNotFound:", StringComparison.OrdinalIgnoreCase) ||
                             (errMsg.Contains("recipe", StringComparison.OrdinalIgnoreCase) &&
@@ -673,14 +674,6 @@ public sealed class AgentBackgroundService(
     private static readonly string[] _thinkingMessages =
         ["Hmm...", "...", "Let me think...", "*thinks*"];
 
-    /// <summary>
-    /// Enqueues a flavour "thinking" message after a short delay so players know
-    /// the bot is processing. Cancelled immediately for fast-path (pattern-matched)
-    /// responses; only visible when the LLM takes more than ~1.5 s.
-    ///
-    /// Sprint 11: logs when the indicator fires so operators can see that the LLM
-    /// is slow — distinguishes "bot ignored me" from "bot is thinking".
-    /// </summary>
     private async Task EnqueueThinkingIfSlowAsync(CancellationToken ct)
     {
         try
@@ -695,10 +688,6 @@ public sealed class AgentBackgroundService(
 
     // ── SignalR dashboard push — Sprint 4a ─────────────────────────────────
 
-    /// <summary>
-    /// Fires a status snapshot to all connected dashboard clients. Never throws —
-    /// a disconnected SignalR hub is a best-effort path, not a fatal error.
-    /// </summary>
     private async Task PushStatusToDashboardAsync(CancellationToken ct)
     {
         if (hubContext is null) return;
@@ -726,8 +715,6 @@ public sealed class AgentBackgroundService(
             logger.LogDebug(ex, "SignalR status push failed (best-effort).");
         }
     }
-
-    // Sprint 4b: push chat messages and goal changes to dashboard via SignalR
 
     private async Task PushChatToDashboardAsync(string type, string? who, string text)
     {
@@ -762,11 +749,6 @@ public sealed class AgentBackgroundService(
 
     // ── Failure reason mapping ─────────────────────────────────────────────
 
-    /// <summary>
-    /// Maps an error string (from a tool result or game event) to a
-    /// <see cref="FailureReason"/>. Uses prefix matching so that messages like
-    /// "blockNotFound:oak_log" map to <see cref="FailureReason.TargetUnreachable"/>.
-    /// </summary>
     private static FailureReason MapErrorToFailureReason(string? error)
     {
         if (string.IsNullOrWhiteSpace(error))
@@ -807,22 +789,17 @@ public sealed class AgentBackgroundService(
         || toolName.Equals("Wander", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Asks the LLM interpreter to suggest an alternative goal or action when the
-    /// agent has hit a game error it cannot self-resolve.
+    /// Asks the LLM interpreter to suggest an alternative goal when the agent has hit
+    /// a game error it cannot self-resolve.
     ///
-    /// Sprint 8 P3 improvements:
-    /// - Logs an <see cref="JournalEntryType.ErrorRecovery"/> entry before calling the LLM
-    ///   so failures are visible in the audit trail even if the interpreter call throws.
-    /// - Includes the bot's current inventory in the prompt so the LLM can make
-    ///   inventory-aware suggestions ("you have planks, try crafting table instead").
-    /// - Triggered immediately for blockNotFound / recipeMissing — these error types
-    ///   are unrecoverable without a goal change; waiting for >=2 failures wastes cycles.
+    /// Sprint 12: guards against the infinite recovery loop where the LLM suggests
+    /// the same goal that just failed. If <see cref="_lastAbandonedGoalName"/> matches
+    /// the suggestion, the suggestion is discarded and a warning is logged.
     /// </summary>
     private async Task TryRecoverFromGameErrorAsync(string errMsg, CancellationToken ct)
     {
         if (chatInterpreter is null || _currentGoal is null) return;
 
-        // Journal the recovery attempt for audit visibility.
         _journal?.Log(new JournalEntry(
             DateTimeOffset.UtcNow, JournalEntryType.ErrorRecovery, errMsg,
             new Dictionary<string, object?> { ["goal"] = _currentGoal.Name }));
@@ -854,6 +831,16 @@ public sealed class AgentBackgroundService(
 
             if (interpretation.IntentType == ChatIntentType.CreateGoal && interpretation.GoalName is not null)
             {
+                // Sprint 12: don't reset to the same goal that just failed — prevents infinite loop.
+                if (string.Equals(interpretation.GoalName, _lastAbandonedGoalName,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    logger.LogWarning(
+                        "[recovery] LLM suggested '{Goal}' — same as recently abandoned goal; skipping to break loop",
+                        interpretation.GoalName);
+                    return;
+                }
+
                 logger.LogInformation("Recovery interpreter suggested goal: {Goal}", interpretation.GoalName);
                 await TryCreateGoalFromChatAsync(interpretation, ct);
             }
