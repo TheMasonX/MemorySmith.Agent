@@ -6,8 +6,6 @@ using Agent.Core;
 /// <summary>
 /// Decomposes a compound HTN task into a sequence of atomic <see cref="ActionData"/> items
 /// given optional string parameters and the current <see cref="WorldState"/>.
-///
-/// Moved here from HtnTask.cs (see ADR-009 in Data/Pages/decisions.md).
 /// </summary>
 public delegate IReadOnlyList<ActionData> TaskDecomposer(
     string[] parameters, WorldState state);
@@ -15,33 +13,34 @@ public delegate IReadOnlyList<ActionData> TaskDecomposer(
 /// <summary>
 /// Registry of named HTN task decompositions.
 ///
-/// Each entry maps a task name to a TaskDecomposer delegate that returns the
-/// atomic ActionData sequence for that task. Decomposers are deterministic —
-/// no LLM involvement. Unknown tasks must be handled by the LLM fallback in
-/// HtnPlanner (Phase 4).
-///
-/// Phase 3 tasks: GatherWood, FindTree, MineWood, Collect, SurviveNight,
-///               FindShelter, LightArea, WaitForSunrise.
-/// Phase 4a additions: GatherItemDecompose (generic item gathering via ItemSpec).
-/// Phase 4b additions: DecomposeBuild (blueprint construction via PlacementBlock list).
-/// Sprint 2b: DecomposeBuild now emits a CraftingChain after raw material gathering.
 /// Sprint 9 A3: DecomposeBuild reads auto-origin from WorldState.Facts (via BuildFactKeys)
-///   when the caller supplies (0, 0, 0) as a "let the scanner decide" sentinel.
-///   If no auto-origin is stored and origin is zero, logs a warning and proceeds.
+///   when the caller supplies (0, 0, 0) as a "let the scanner decide" sentinel. If no
+///   auto-origin is stored, a FindFlatArea action is prepended to locate a suitable site.
+///
+/// Sprint 10 D3: <see cref="BuildCraftingChain"/> now uses GroupBy to merge duplicate
+///   blueprint material entries instead of throwing <see cref="ArgumentException"/>.
+///
+/// Sprint 10 B4: Expanded <see cref="CraftingChainOrder"/> — more plank variants, fences,
+///   stairs, and basic wooden/stone tools; <see cref="DirectMineBlocks"/> updated to match.
+///
+/// Sprint 10 B1: DecomposeBuild prepends a FindFlatArea step when no origin is available.
+///
+/// Sprint 10 B2: DecomposeBuild reads checkpoint fact (<see cref="BuildFactKeys.BuildProgressIndex"/>)
+///   and resumes from the last successfully placed block instead of replaying from scratch.
 /// </summary>
 public sealed class HtnTaskLibrary
 {
     // ── Crafting constants ────────────────────────────────────────────────────
 
-    /// <summary>
-    /// Vanilla Minecraft: 1 stick + 1 coal → 4 torches.
-    /// Used to compute the number of sticks and coal needed when torch is in the blueprint.
-    /// </summary>
+    /// <summary>Vanilla: 1 stick + 1 coal → 4 torches.</summary>
     private const int TorchesPerCraft = 4;
 
-    // Built-in ItemSpec for oak logs — used as the GatherWood fallback so that
-    // GatherWoodDecompose can delegate to GatherItemDecompose without needing
-    // an IItemRegistry at construction time.
+    /// <summary>Radius passed to FindFlatArea when DecomposeBuild has no origin set.</summary>
+    private const int PreflightFlatAreaRadius = 30;
+
+    /// <summary>Minimum qualifying flat area (cells) passed to FindFlatArea during preflight.</summary>
+    private const int PreflightFlatAreaMin = 25;
+
     private static readonly ItemSpec OakLogSpec = new()
     {
         ItemId          = "oak_log",
@@ -52,43 +51,75 @@ public sealed class HtnTaskLibrary
         MinHarvestLevel  = 0,
     };
 
-    // Blocks that can be directly mined by the bot (no crafting required).
-    // Used by DecomposeBuild to determine which blueprint materials need gather actions.
+    // Blocks the bot can mine directly (no crafting required).
     private static readonly HashSet<string> DirectMineBlocks = new(StringComparer.OrdinalIgnoreCase)
     {
+        // Stone / earth
         "cobblestone", "stone", "dirt", "gravel", "sand",
+        // Wood
         "oak_log", "birch_log", "spruce_log", "dark_oak_log",
         "jungle_log", "acacia_log", "cherry_log", "mangrove_log",
+        // Ores
         "iron_ore", "deepslate_iron_ore",
         "gold_ore", "deepslate_gold_ore",
         "coal_ore", "deepslate_coal_ore",
         "diamond_ore", "deepslate_diamond_ore",
         "redstone_ore", "deepslate_redstone_ore",
         "lapis_ore", "deepslate_lapis_ore",
+        // Other
         "gravel",
     };
 
-    // Items that can be crafted by DecomposeBuild via the CraftingChain phase.
-    // Key = craftable item; Value = the raw log/ore source that must already be in
-    // inventory (gathered in the earlier phase or found via DirectMineBlocks).
-    // Ordered: planks first (no table), then table (no table), then table-dependent items.
+    // Sprint 10 B4: expanded crafting chain.
+    // Ordered from least-dependent (no table) to most-dependent.
     private static readonly IReadOnlyList<string> CraftingChainOrder =
     [
+        // Planks (no table required) — all log variants
         "oak_planks",
         "birch_planks",
         "spruce_planks",
+        "dark_oak_planks",
+        "jungle_planks",
+        "acacia_planks",
+        "mangrove_planks",
+        "cherry_planks",
+        // Crafting table (from planks, no table required)
         "crafting_table",
+        // Sticks (from planks, no table required)
+        "stick",
+        // Table-dependent items
         "oak_slab",
+        "oak_stairs",
         "oak_door",
+        "oak_fence",
+        "oak_fence_gate",
         "chest",
-        // torch handled separately (requires intermediate stick step)
+        // Basic wooden tools (sticks + planks, table required)
+        "wooden_pickaxe",
+        "wooden_axe",
+        "wooden_shovel",
+        // Basic stone tools (sticks + cobblestone, table required)
+        "stone_pickaxe",
+        "stone_axe",
+        "stone_shovel",
+        "stone_sword",
+        // Iron tools (sticks + iron_ingot, table required)
+        // iron_ingot requires SmeltItem — handled via smelting step, not plain CraftItem
     ];
 
-    // Items in the crafting chain that require a crafting table placed in the world.
-    // The bot must have crafted and placed a crafting_table before reaching these.
+    // Items in CraftingChainOrder that require a crafting table.
     private static readonly HashSet<string> RequiresCraftingTable = new(StringComparer.OrdinalIgnoreCase)
     {
-        "oak_slab", "oak_door", "chest",
+        "oak_slab", "oak_stairs", "oak_door", "oak_fence", "oak_fence_gate",
+        "chest", "wooden_pickaxe", "wooden_axe", "wooden_shovel",
+        "stone_pickaxe", "stone_axe", "stone_shovel", "stone_sword",
+    };
+
+    // Items that additionally require cobblestone to craft (stone tools).
+    // Cobblestone must be in DirectMineBlocks for these to work.
+    private static readonly HashSet<string> RequiresCobblestone = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "stone_pickaxe", "stone_axe", "stone_shovel", "stone_sword",
     };
 
     private readonly Dictionary<string, TaskDecomposer> _methods;
@@ -111,14 +142,8 @@ public sealed class HtnTaskLibrary
         };
     }
 
-    /// <summary>Returns true if a decomposition exists for the given task name.</summary>
-    public bool HasTask(string taskName) =>
-        _methods.ContainsKey(taskName);
+    public bool HasTask(string taskName) => _methods.ContainsKey(taskName);
 
-    /// <summary>
-    /// Decomposes the named task into atomic actions.
-    /// Throws InvalidOperationException if no method exists.
-    /// </summary>
     public IReadOnlyList<ActionData> Decompose(
         string taskName, string[] parameters, WorldState state)
     {
@@ -126,39 +151,22 @@ public sealed class HtnTaskLibrary
             throw new InvalidOperationException(
                 $"No decomposition registered for task '{taskName}'. " +
                 "Add a method to HtnTaskLibrary or use the LLM fallback.");
-
         return decompose(parameters, state);
     }
 
-    /// <summary>
-    /// Decomposes a generic item-gather goal into concrete actions using the
-    /// provided <paramref name="spec"/>. Called directly by
-    /// <see cref="HtnPlanner"/> when it encounters an <see cref="IItemSpecGoal"/>,
-    /// bypassing the string-keyed dispatch table so that the full
-    /// <see cref="ItemSpec"/> is available.
-    /// </summary>
     public IReadOnlyList<ActionData> DecomposeGatherItem(
         ItemSpec spec, string[] parameters, WorldState state) =>
         GatherItemDecompose(spec, parameters, state);
 
     /// <summary>
-    /// Decomposes a <see cref="BuildGoal"/> into:
-    ///   1. GatherMaterials — mine directly-mineable raw blocks (cobblestone, oak_log, coal_ore…).
-    ///   2. CraftingChain — emit CraftItem actions for crafted blueprint materials
-    ///      (planks → crafting_table → slabs, doors, chests; sticks+coal → torches).
-    ///   3. Navigate to build site.
-    ///   4. Build — one PlaceBlock per block in blueprint order.
-    ///   5. Verify — GetStatus.
+    /// Decomposes a <see cref="BuildGoal"/> into a phased action plan.
     ///
-    /// Sprint 2b: Phase 2 (CraftingChain) is new.
-    ///
-    /// Sprint 9 A3: if <paramref name="originX"/>, <paramref name="originY"/>, and
-    /// <paramref name="originZ"/> are all zero, the method looks up the auto-detected
-    /// build origin stored in <paramref name="state"/> by <c>AgentBackgroundService</c>
-    /// when a qualifying <see cref="FlatAreaFoundEvent"/> was received. If no auto-origin
-    /// is stored and the origin remains (0, 0, 0), a warning is logged and the plan
-    /// proceeds — callers that genuinely want to build at world origin must pass explicit
-    /// coordinates or pre-populate the auto-origin facts via a scan.
+    /// Phase 0 (B1 preflight): if no build origin is known, prepend FindFlatArea to locate one.
+    /// Phase 1: GatherMaterials — mine raw blocks.
+    /// Phase 2: CraftingChain — craft intermediates in dependency order.
+    /// Phase 3: Navigate to build site.
+    /// Phase 4: Build — emit PlaceBlock actions from checkpoint (Sprint 10 B2).
+    /// Phase 5: Verify — GetStatus.
     /// </summary>
     public IReadOnlyList<ActionData> DecomposeBuild(
         Blueprint blueprint,
@@ -172,33 +180,47 @@ public sealed class HtnTaskLibrary
 
         var actions = new List<ActionData>();
 
-        // ── Phase 1: GatherMaterials ──────────────────────────────────────────
-        // Mine directly-mineable raw blocks (cobblestone, oak_log, coal_ore, etc.)
-        foreach (var material in blueprint.Materials)
+        // ── Phase 0: Preflight (Sprint 10 B1) ────────────────────────────────
+        // If still no origin after auto-origin lookup, prepend FindFlatArea so the
+        // agent scouts a suitable site before attempting to build. The FlatAreaFoundEvent
+        // handler in AgentBackgroundService will set the auto-origin fact for the next cycle.
+        if (originX == 0 && originY == 0 && originZ == 0)
         {
-            if (!DirectMineBlocks.Contains(material.Block)) continue;
-
-            var have   = state.Inventory.GetValueOrDefault(material.Block);
-            var needed = material.Quantity - have;
-            if (needed <= 0) continue;
-
-            var searchQuery = $"{material.Block} nearby source location";
-            actions.Add(MakeAction("SearchMemory", ("query", searchQuery)));
-            actions.Add(MakeAction("Wander",
-                ("radius", (object?)30),
-                ("maxDistanceFromSpawn", (object?)150)));
-            actions.Add(MakeAction("MineBlock",
-                ("block",  material.Block),
-                ("count",  (object?)needed)));
+            actions.Add(MakeAction("FindFlatArea",
+                ("radius",      (object?)PreflightFlatAreaRadius),
+                ("minFlatArea", (object?)PreflightFlatAreaMin)));
+            // Return after FindFlatArea — re-plan will pick up the new origin on next cycle.
+            actions.Add(MakeAction("GetStatus"));
+            return actions;
         }
 
-        // Sprint 2b: Gather coal if torch is in blueprint (coal_ore not in blueprint Materials,
-        // but is needed as an ingredient for crafting torches).
-        var torchEntry = blueprint.Materials
-            .FirstOrDefault(m => string.Equals(m.Block, "torch", StringComparison.OrdinalIgnoreCase));
+        // ── Phase 1: GatherMaterials ──────────────────────────────────────────
+        // Sprint 10 D3: use GroupBy+Sum to merge duplicate material entries instead
+        // of throwing ArgumentException from ToDictionary on duplicate keys.
+        var materials = blueprint.Materials
+            .GroupBy(m => m.Block, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.Sum(m => m.Quantity), StringComparer.OrdinalIgnoreCase);
+
+        foreach (var (block, quantity) in materials)
+        {
+            if (!DirectMineBlocks.Contains(block)) continue;
+
+            var have   = state.Inventory.GetValueOrDefault(block);
+            var needed = quantity - have;
+            if (needed <= 0) continue;
+
+            actions.Add(MakeAction("SearchMemory", ("query", $"{block} nearby source location")));
+            actions.Add(MakeAction("Wander",
+                ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)150)));
+            actions.Add(MakeAction("MineBlock",
+                ("block", block), ("count", (object?)needed)));
+        }
+
+        // Gather coal for torches.
+        var torchEntry = materials.TryGetValue("torch", out var tq) ? (int?)tq : null;
         if (torchEntry is not null)
         {
-            var torchNeeded = torchEntry.Quantity - state.Inventory.GetValueOrDefault("torch");
+            var torchNeeded = torchEntry.Value - state.Inventory.GetValueOrDefault("torch");
             if (torchNeeded > 0)
             {
                 var coalNeeded = Math.Max(1, (torchNeeded + TorchesPerCraft - 1) / TorchesPerCraft);
@@ -207,26 +229,53 @@ public sealed class HtnTaskLibrary
                 {
                     actions.Add(MakeAction("SearchMemory", ("query", "coal ore location nearby")));
                     actions.Add(MakeAction("MineBlock",
-                        ("block", "coal_ore"),
-                        ("count", (object?)(coalNeeded - haveCoal))));
+                        ("block", "coal_ore"), ("count", (object?)(coalNeeded - haveCoal))));
                 }
             }
         }
 
+        // Sprint 10 B4: SmeltItem for iron_ingot if needed.
+        if (materials.TryGetValue("iron_ingot", out var ironNeeded))
+        {
+            var haveIron = state.Inventory.GetValueOrDefault("iron_ingot");
+            var toSmelt  = ironNeeded - haveIron;
+            if (toSmelt > 0)
+            {
+                actions.Add(MakeAction("SearchMemory", ("query", "furnace iron ore location")));
+                actions.Add(MakeAction("MineBlock",
+                    ("block", "iron_ore"), ("count", (object?)toSmelt)));
+                actions.Add(MakeAction("SmeltItem",
+                    ("item", "iron_ore"), ("count", (object?)toSmelt), ("fuel", "coal")));
+            }
+        }
+
         // ── Phase 2: CraftingChain ────────────────────────────────────────────
-        actions.AddRange(BuildCraftingChain(blueprint, state, torchEntry));
+        actions.AddRange(BuildCraftingChain(blueprint, materials, state,
+            hasTorch: torchEntry is not null, torchNeeded: torchEntry ?? 0));
 
         // ── Phase 3: Navigate to build site ──────────────────────────────────
         actions.Add(MakeAction("SearchMemory",
             ("query", $"flat area build location {blueprint.Name}")));
         actions.Add(MakeAction("MoveTo",
-            ("x", (object?)originX),
-            ("y", (object?)originY),
-            ("z", (object?)originZ)));
+            ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)));
 
-        // ── Phase 4: Build — emit PlaceBlock for every block in order ─────────
-        var executor = new BlueprintExecutor();
-        actions.AddRange(executor.Execute(blocks, originX, originY, originZ));
+        // ── Phase 4: Build (Sprint 10 B2: resume from checkpoint) ────────────
+        var progressKey     = BuildFactKeys.BuildProgressIndex(blueprint.Name);
+        var checkpointIndex = 0;
+        if (TryGetIntFact(state, progressKey, out var lastPlaced))
+            checkpointIndex = lastPlaced + 1; // next unplaced block
+
+        var executor    = new BlueprintExecutor();
+        var blockActions = executor.Execute(blocks, originX, originY, originZ);
+
+        for (int i = checkpointIndex; i < blockActions.Count; i++)
+        {
+            var placeAction = blockActions[i];
+            // Add context so AgentBackgroundService can write the checkpoint fact on success.
+            placeAction.Context[BuildFactKeys.PlaceBlockProgressBlueprintId] = blueprint.Name;
+            placeAction.Context[BuildFactKeys.PlaceBlockProgressBlockIndex]  = i;
+            actions.Add(placeAction);
+        }
 
         // ── Phase 5: Verify ───────────────────────────────────────────────────
         actions.Add(MakeAction("GetStatus"));
@@ -236,15 +285,6 @@ public sealed class HtnTaskLibrary
 
     // ── Auto-origin resolution ────────────────────────────────────────────────
 
-    /// <summary>
-    /// Reads the auto-detected build origin from WorldState facts (written by
-    /// <c>AgentBackgroundService</c> when a qualifying <see cref="FlatAreaFoundEvent"/>
-    /// is received). Uses <see cref="BuildFactKeys"/> constants to avoid string duplication.
-    ///
-    /// Does not modify the origin if the facts are absent — callers must handle
-    /// the (0, 0, 0) sentinel case themselves (e.g. by logging a warning or enqueueing
-    /// a FindFlatArea scan before the build goal).
-    /// </summary>
     private static void ResolveAutoOrigin(WorldState state, ref int x, ref int y, ref int z)
     {
         if (TryGetIntFact(state, BuildFactKeys.AutoOriginX, out var ax)) x = ax;
@@ -252,46 +292,33 @@ public sealed class HtnTaskLibrary
         if (TryGetIntFact(state, BuildFactKeys.AutoOriginZ, out var az)) z = az;
     }
 
-    /// <summary>
-    /// Safely reads an integer value from <see cref="WorldState.Facts"/>, handling
-    /// boxed int, long, double, and string representations.
-    /// </summary>
     private static bool TryGetIntFact(WorldState state, string key, out int result)
     {
         result = 0;
         if (!state.Facts.TryGetValue(key, out var v)) return false;
-        switch (v)
+        return v switch
         {
-            case int i:    result = i;        return true;
-            case long l:   result = (int)l;   return true;
-            case double d: result = (int)d;   return true;
-            case string s: return int.TryParse(s, out result);
-            default:       return false;
-        }
+            int i    => (result = i)      != int.MinValue,
+            long l   => (result = (int)l) != int.MinValue,
+            double d => (result = (int)d) != int.MinValue,
+            string s => int.TryParse(s, out result),
+            _        => false,
+        };
     }
 
     // ── Crafting chain helper ─────────────────────────────────────────────────
 
-    /// <summary>
-    /// Builds the CraftItem action sequence for crafted blueprint materials.
-    /// Steps are emitted in dependency order only when the item appears in
-    /// the blueprint and inventory is insufficient.
-    ///
-    /// B1 fix: if any item in <see cref="RequiresCraftingTable"/> is needed and
-    /// <c>crafting_table</c> is not already listed in the blueprint Materials,
-    /// a preparatory <c>CraftItem(crafting_table, 1)</c> step is auto-emitted.
-    /// </summary>
     private static IReadOnlyList<ActionData> BuildCraftingChain(
         Blueprint blueprint,
+        IReadOnlyDictionary<string, int> materials,
         WorldState state,
-        MaterialEntry? torchEntry)
+        bool hasTorch,
+        int torchNeeded)
     {
-        var actions    = new List<ActionData>();
-        var materials  = blueprint.Materials
-            .ToDictionary(m => m.Block, m => m.Quantity, StringComparer.OrdinalIgnoreCase);
+        var actions = new List<ActionData>();
 
-        // B1: if any table-requiring item (slab, door, chest) is needed and crafting_table is
-        // not explicitly in the blueprint Materials, auto-craft one as a preparatory step.
+        // B1: if any table-requiring item is needed and crafting_table isn't in the blueprint,
+        // auto-craft one as a preparatory step.
         bool anyTableRequired = materials.Keys.Any(RequiresCraftingTable.Contains);
         if (anyTableRequired
             && !materials.ContainsKey("crafting_table")
@@ -300,37 +327,28 @@ public sealed class HtnTaskLibrary
             actions.Add(MakeAction("CraftItem", ("item", "crafting_table"), ("count", (object?)1)));
         }
 
-        // Emit each step in CraftingChainOrder if the item is in the blueprint
-        // and the bot doesn't already have enough.
         foreach (var item in CraftingChainOrder)
             EmitCraftIfNeeded(item, materials, state, actions);
 
-        // Torch requires an intermediate stick step (sticks are not in blueprints directly).
-        if (torchEntry is not null)
+        // Torch: sticks then torches.
+        if (hasTorch && torchNeeded > 0)
         {
-            var torchNeeded = torchEntry.Quantity - state.Inventory.GetValueOrDefault("torch");
-            if (torchNeeded > 0)
+            var needed    = torchNeeded - state.Inventory.GetValueOrDefault("torch");
+            if (needed > 0)
             {
-                var sticksNeeded = Math.Max(1, (torchNeeded + TorchesPerCraft - 1) / TorchesPerCraft);
+                var sticksNeeded = Math.Max(1, (needed + TorchesPerCraft - 1) / TorchesPerCraft);
                 var haveSticks   = state.Inventory.GetValueOrDefault("stick");
                 if (haveSticks < sticksNeeded)
                     actions.Add(MakeAction("CraftItem",
-                        ("item",  "stick"),
-                        ("count", (object?)(sticksNeeded - haveSticks))));
-
+                        ("item", "stick"), ("count", (object?)(sticksNeeded - haveSticks))));
                 actions.Add(MakeAction("CraftItem",
-                    ("item",  "torch"),
-                    ("count", (object?)torchNeeded)));
+                    ("item", "torch"), ("count", (object?)needed)));
             }
         }
 
         return actions;
     }
 
-    /// <summary>
-    /// Adds a CraftItem action for <paramref name="item"/> if it is listed in
-    /// <paramref name="materials"/> and the current inventory is insufficient.
-    /// </summary>
     private static void EmitCraftIfNeeded(
         string item,
         IReadOnlyDictionary<string, int> materials,
@@ -354,23 +372,18 @@ public sealed class HtnTaskLibrary
         ItemSpec spec, string[] parameters, WorldState state)
     {
         var count = parameters.Length > 0 && int.TryParse(parameters[0], out var c) ? c : 10;
-        var searchQuery = $"{spec.ItemId} location nearby source";
-
         var actions = new List<ActionData>
         {
-            MakeAction("SearchMemory", ("query", searchQuery)),
+            MakeAction("SearchMemory", ("query", $"{spec.ItemId} location nearby source")),
             MakeAction("Wander", ("radius", (object?)40), ("maxDistanceFromSpawn", (object?)200)),
         };
-
         foreach (var block in spec.SourceBlocks)
             actions.Add(MakeAction("MineBlock", ("block", block), ("count", (object?)count)));
-
         actions.Add(MakeAction("GetStatus"));
         return actions;
     }
 
-    private static IReadOnlyList<ActionData> FindTreeDecompose(
-        string[] _, WorldState state) =>
+    private static IReadOnlyList<ActionData> FindTreeDecompose(string[] _, WorldState state) =>
     [
         MakeAction("SearchMemory", ("query", "nearest oak birch spruce tree coordinates")),
         MakeAction("GetStatus"),
@@ -388,10 +401,7 @@ public sealed class HtnTaskLibrary
     }
 
     private static IReadOnlyList<ActionData> CollectDecompose(
-        string[] _, WorldState __) =>
-    [
-        MakeAction("GetStatus"),
-    ];
+        string[] _, WorldState __) => [MakeAction("GetStatus")];
 
     private static IReadOnlyList<ActionData> SurviveNightDecompose(
         string[] _, WorldState state) =>
@@ -408,16 +418,10 @@ public sealed class HtnTaskLibrary
     ];
 
     private static IReadOnlyList<ActionData> LightAreaDecompose(
-        string[] _, WorldState __) =>
-    [
-        MakeAction("GetStatus"),
-    ];
+        string[] _, WorldState __) => [MakeAction("GetStatus")];
 
     private static IReadOnlyList<ActionData> WaitDecompose(
-        string[] _, WorldState __) =>
-    [
-        MakeAction("GetStatus"),
-    ];
+        string[] _, WorldState __) => [MakeAction("GetStatus")];
 
     private static IReadOnlyList<ActionData> WanderDecompose(
         string[] parameters, WorldState state)
