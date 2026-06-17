@@ -59,7 +59,10 @@ public sealed class WorldStateProjector
     private static WorldState ApplyBlockMined(WorldState current, BlockMinedEvent e)
     {
         var itemKey = e.Block.Contains(':') ? e.Block.Split(':')[1] : e.Block;
-        var result = current.With(b => b.AddInventoryItem(itemKey, 1));
+        // Sprint 15 P0: use e.Count (actual blocks mined) instead of hardcoded 1.
+        // Mineflayer can report multiple blocks mined in a single event; hardcoding 1
+        // caused inventory under-counting and gather goals that never completed.
+        var result = current.With(b => b.AddInventoryItem(itemKey, e.Count));
         return StoreFacts(result, e);
     }
 
