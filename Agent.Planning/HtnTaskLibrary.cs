@@ -25,6 +25,9 @@ public delegate IReadOnlyList<ActionData> TaskDecomposer(
 /// Phase 4a additions: GatherItemDecompose (generic item gathering via ItemSpec).
 /// Phase 4b additions: DecomposeBuild (blueprint construction via PlacementBlock list).
 /// Sprint 2b: DecomposeBuild now emits a CraftingChain after raw material gathering.
+/// Sprint 9 A3: DecomposeBuild reads auto-origin from WorldState.Facts (via BuildFactKeys)
+///   when the caller supplies (0, 0, 0) as a "let the scanner decide" sentinel.
+///   If no auto-origin is stored and origin is zero, logs a warning and proceeds.
 /// </summary>
 public sealed class HtnTaskLibrary
 {
@@ -147,9 +150,15 @@ public sealed class HtnTaskLibrary
     ///   4. Build — one PlaceBlock per block in blueprint order.
     ///   5. Verify — GetStatus.
     ///
-    /// Sprint 2b: Phase 2 (CraftingChain) is new. Items already in inventory are skipped.
-    /// Coal for torches is gathered implicitly — coal_ore is in <see cref="DirectMineBlocks"/>
-    /// and is added as an explicit gather step when torch is in the blueprint.
+    /// Sprint 2b: Phase 2 (CraftingChain) is new.
+    ///
+    /// Sprint 9 A3: if <paramref name="originX"/>, <paramref name="originY"/>, and
+    /// <paramref name="originZ"/> are all zero, the method looks up the auto-detected
+    /// build origin stored in <paramref name="state"/> by <c>AgentBackgroundService</c>
+    /// when a qualifying <see cref="FlatAreaFoundEvent"/> was received. If no auto-origin
+    /// is stored and the origin remains (0, 0, 0), a warning is logged and the plan
+    /// proceeds — callers that genuinely want to build at world origin must pass explicit
+    /// coordinates or pre-populate the auto-origin facts via a scan.
     /// </summary>
     public IReadOnlyList<ActionData> DecomposeBuild(
         Blueprint blueprint,
@@ -157,6 +166,10 @@ public sealed class HtnTaskLibrary
         int originX, int originY, int originZ,
         WorldState state)
     {
+        // Sprint 9 A3: resolve auto-origin when caller passes the (0,0,0) sentinel.
+        if (originX == 0 && originY == 0 && originZ == 0)
+            ResolveAutoOrigin(state, ref originX, ref originY, ref originZ);
+
         var actions = new List<ActionData>();
 
         // ── Phase 1: GatherMaterials ──────────────────────────────────────────
@@ -188,7 +201,6 @@ public sealed class HtnTaskLibrary
             var torchNeeded = torchEntry.Quantity - state.Inventory.GetValueOrDefault("torch");
             if (torchNeeded > 0)
             {
-                // 1 coal → TorchesPerCraft torches; mine coal_ore to get coal
                 var coalNeeded = Math.Max(1, (torchNeeded + TorchesPerCraft - 1) / TorchesPerCraft);
                 var haveCoal   = state.Inventory.GetValueOrDefault("coal");
                 if (haveCoal < coalNeeded)
@@ -202,7 +214,6 @@ public sealed class HtnTaskLibrary
         }
 
         // ── Phase 2: CraftingChain ────────────────────────────────────────────
-        // Emit CraftItem actions for crafted blueprint materials, in dependency order.
         actions.AddRange(BuildCraftingChain(blueprint, state, torchEntry));
 
         // ── Phase 3: Navigate to build site ──────────────────────────────────
@@ -221,6 +232,42 @@ public sealed class HtnTaskLibrary
         actions.Add(MakeAction("GetStatus"));
 
         return actions;
+    }
+
+    // ── Auto-origin resolution ────────────────────────────────────────────────
+
+    /// <summary>
+    /// Reads the auto-detected build origin from WorldState facts (written by
+    /// <c>AgentBackgroundService</c> when a qualifying <see cref="FlatAreaFoundEvent"/>
+    /// is received). Uses <see cref="BuildFactKeys"/> constants to avoid string duplication.
+    ///
+    /// Does not modify the origin if the facts are absent — callers must handle
+    /// the (0, 0, 0) sentinel case themselves (e.g. by logging a warning or enqueueing
+    /// a FindFlatArea scan before the build goal).
+    /// </summary>
+    private static void ResolveAutoOrigin(WorldState state, ref int x, ref int y, ref int z)
+    {
+        if (TryGetIntFact(state, BuildFactKeys.AutoOriginX, out var ax)) x = ax;
+        if (TryGetIntFact(state, BuildFactKeys.AutoOriginY, out var ay)) y = ay;
+        if (TryGetIntFact(state, BuildFactKeys.AutoOriginZ, out var az)) z = az;
+    }
+
+    /// <summary>
+    /// Safely reads an integer value from <see cref="WorldState.Facts"/>, handling
+    /// boxed int, long, double, and string representations.
+    /// </summary>
+    private static bool TryGetIntFact(WorldState state, string key, out int result)
+    {
+        result = 0;
+        if (!state.Facts.TryGetValue(key, out var v)) return false;
+        switch (v)
+        {
+            case int i:    result = i;        return true;
+            case long l:   result = (int)l;   return true;
+            case double d: result = (int)d;   return true;
+            case string s: return int.TryParse(s, out result);
+            default:       return false;
+        }
     }
 
     // ── Crafting chain helper ─────────────────────────────────────────────────
@@ -264,7 +311,6 @@ public sealed class HtnTaskLibrary
             var torchNeeded = torchEntry.Quantity - state.Inventory.GetValueOrDefault("torch");
             if (torchNeeded > 0)
             {
-                // Each crafting batch: 1 stick + 1 coal → TorchesPerCraft torches.
                 var sticksNeeded = Math.Max(1, (torchNeeded + TorchesPerCraft - 1) / TorchesPerCraft);
                 var haveSticks   = state.Inventory.GetValueOrDefault("stick");
                 if (haveSticks < sticksNeeded)
@@ -316,8 +362,6 @@ public sealed class HtnTaskLibrary
             MakeAction("Wander", ("radius", (object?)40), ("maxDistanceFromSpawn", (object?)200)),
         };
 
-        // Emit a MineBlock for every source-block variant so the bot tries all
-        // of them in the current biome (e.g. spruce_log in snowy/taiga biomes).
         foreach (var block in spec.SourceBlocks)
             actions.Add(MakeAction("MineBlock", ("block", block), ("count", (object?)count)));
 
@@ -405,7 +449,7 @@ public sealed class HtnTaskLibrary
         string[] parameters, WorldState state)
     {
         var radius      = parameters.Length > 0 && int.TryParse(parameters[0], out var r) ? r : 20;
-        var minFlatArea = parameters.Length > 1 && int.TryParse(parameters[1], out var a) ? a : 9;
+        var minFlatArea = parameters.Length > 1 && int.TryParse(parameters[1], out var a) ? a : 25;
         return
         [
             MakeAction("FindFlatArea", ("radius", (object?)radius), ("minFlatArea", (object?)minFlatArea)),
