@@ -26,7 +26,10 @@ public sealed class FindFlatAreaTool(IWorldAdapter worldAdapter) : ITool
         "Use 'radius' (default 20) to control search radius and 'minFlatArea' (default 9) " +
         "for the minimum number of contiguous flat blocks required.";
 
-    public JsonElement InputSchema => JsonDocument.Parse("""
+    // Cache the document so the returned JsonElement is never backed by a disposed object.
+    // (Returning JsonDocument.Parse(...).RootElement directly is a correctness bug —
+    // the document is disposed immediately, leaving the element over freed memory.)
+    private static readonly JsonDocument _schemaDoc = JsonDocument.Parse("""
         {
           "type": "object",
           "properties": {
@@ -41,7 +44,9 @@ public sealed class FindFlatAreaTool(IWorldAdapter worldAdapter) : ITool
           },
           "required": []
         }
-        """).RootElement;
+        """);
+
+    public JsonElement InputSchema => _schemaDoc.RootElement;
 
     public async Task<ToolResult> ExecuteAsync(
         JsonElement arguments, CancellationToken cancellationToken = default)
