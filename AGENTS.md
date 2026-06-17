@@ -53,6 +53,14 @@ If you add regex: use the compiled `static readonly Regex` pattern at class leve
 The `Queue<double>` inside `WorldModel` is guarded by `_lock`. Don't "optimize" it by
 splitting the lock scope — the enqueue+trim+cache-update must be atomic.
 
+**8. Warnings are errors — fix them before pushing.**
+`Directory.Build.props` sets `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>` globally.
+Any warning you introduce will fail CI. Fix the warning; do NOT suppress it without a comment
+explaining exactly why the suppression is necessary and why the code is still correct.
+If a third-party SDK emits a warning you cannot control, suppress it with `#pragma warning disable <ID>`
+on the specific line, with a comment like `// false positive from Serilog — field is read-only after init`.
+Suppressing a whole file or project is not acceptable unless all engineers have reviewed it.
+
 ---
 
 ## Where things live
@@ -60,7 +68,7 @@ splitting the lock scope — the enqueue+trim+cache-update must be atomic.
 | Concern | File |
 |---------|------|
 | Typed world events | `Agent.Core/Events/WorldEvents.cs` |
-| State projection (events → facts) | `Agent.Core/WorldStateProjector.cs` |
+| State projection (events -> facts) | `Agent.Core/WorldStateProjector.cs` |
 | HTN task decompositions | `Agent.Planning/HtnTaskLibrary.cs` |
 | Chat fast-path (no LLM) | `Agent.Planning/ChatInterpreter.cs` |
 | LLM chat + history | `Agent.Planning/LlmChatInterpreter.cs` |
@@ -80,10 +88,10 @@ splitting the lock scope — the enqueue+trim+cache-update must be atomic.
 ## How sprints work
 
 ```
-implement → local build/test → push via github__create_or_update_file →
-CI green (build-and-test: success) →
-LLM council review (Data/Pages/council/sprint<N>-council-<date>.md) →
-fix blockers → push fixes → confirm CI green → next sprint
+implement -> local build/test -> push via github__create_or_update_file ->
+CI green (build-and-test: success) ->
+LLM council review (Data/Pages/council/sprint<N>-council-<date>.md) ->
+fix blockers -> push fixes -> confirm CI green -> next sprint
 ```
 
 **Never move to the next sprint with a blocking council finding open.**
@@ -143,8 +151,8 @@ For **new files**, omit `sha`. For **existing files**, `sha` is the blob SHA fro
 
 ## Don't do these things
 
-| ❌ Don't | ✅ Do instead |
-|---------|--------------|
+| Don't | Do instead |
+|-------|------------|
 | `new Vec3(x, y, z)` in `index.js` | `{ x, y, z }` plain object — `bot.blockAt` reads `.x/.y/.z` |
 | `ToDictionary` on a list that may contain duplicate keys | `GroupBy(...).ToDictionary(g => g.Key, g => g.Sum(...))` |
 | Lock only the cache-update inside `WorldModel.Reconcile` | Lock the full enqueue+trim+cache-update body |
@@ -155,6 +163,11 @@ For **new files**, omit `sha`. For **existing files**, `sha` is the blob SHA fro
 | Accept liquid/water/lava as a valid build surface | Check `LIQUID_BLOCK_NAMES` before adding to heightMap |
 | Use `"build:auto:origin:x"` as a raw string in two files | `BuildFactKeys.AutoOriginX` |
 | Start a build from index 0 if a checkpoint exists | Read `BuildFactKeys.BuildProgressIndex(blueprintId)` from facts |
+| Enqueue a chat response before `SetGoal` or `CancelGoal` | Enqueue AFTER the switch in `HandleChatEventAsync` — both methods call `_queue.Clear()` |
+| Use non-thread-safe `Queue<T>` for `ActionQueue` | `ConcurrentQueue<T>` — two tasks access the queue concurrently |
+| Declare a field `volatile` AND pass it by `ref` | Remove `volatile`; use `Volatile.Read` / `Interlocked` methods directly |
+| Set the same goal the recovery interpreter just abandoned | Check `_lastAbandonedGoalName` in `TryRecoverFromGameErrorAsync` |
+| Ignore build warnings | Fix them. `TreatWarningsAsErrors=true`. If you can't fix, suppress with a comment. |
 
 ---
 
