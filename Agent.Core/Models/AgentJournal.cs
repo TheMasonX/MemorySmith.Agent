@@ -13,21 +13,21 @@ public sealed class AgentJournal : IAgentJournal
     public const int MaxEntries = 1000;
 
     private readonly ConcurrentQueue<JournalEntry> _entries = new();
-    private volatile int _count;
+    private int _count;
 
     public IReadOnlyList<JournalEntry> All => [.. _entries.Reverse()];
 
     public void Log(JournalEntry entry)
     {
         _entries.Enqueue(entry);
-        var current = Interlocked.Increment(ref _count);
 
-        // Trim oldest if over capacity (fire-and-forget, best-effort)
-        while (current > MaxEntries)
+        // Best-effort trim: dequeue one oldest entry when over capacity.
+        // The queue may transiently hold up to MaxEntries + (concurrent callers) entries,
+        // but it never grows unboundedly and does not over-drain.
+        if (Interlocked.Increment(ref _count) > MaxEntries)
         {
             if (_entries.TryDequeue(out _))
                 Interlocked.Decrement(ref _count);
-            current = Volatile.Read(ref _count);
         }
     }
 
@@ -52,6 +52,6 @@ public sealed class AgentJournal : IAgentJournal
     public void Clear()
     {
         while (_entries.TryDequeue(out _)) { }
-        _count = 0;
+        Interlocked.Exchange(ref _count, 0);
     }
 }
