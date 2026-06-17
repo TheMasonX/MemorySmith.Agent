@@ -26,6 +26,10 @@ using System.Threading.Channels;
 ///   - Explicit ChatIntentType.Chat case in HandleChatEventAsync switch (clarity).
 ///   - TryRecoverFromGameErrorAsync: richer prompt (inventory + available actions);
 ///     immediate trigger for blockNotFound/recipeMissing; ErrorRecovery journal log.
+/// Sprint 9:
+///   - FlatAreaFoundEvent: when Area ≥ MinUsableFlatArea, auto-sets build origin
+///     under the "auto" blueprint key so the next DecomposeBuild cycle can use it.
+///   - MinUsableFlatArea constant (9 = 3×3) guards against degenerate near-zero results.
 /// </summary>
 public sealed class AgentBackgroundService(
     IWorldAdapter worldAdapter,
@@ -47,6 +51,14 @@ public sealed class AgentBackgroundService(
 
     /// <summary>Per-action timeout in seconds. 0 = no timeout.</summary>
     private const int DefaultActionTimeoutSeconds = 30;
+
+    /// <summary>
+    /// Minimum flat area (in cells) for a FlatAreaFoundEvent to trigger auto build-origin
+    /// assignment. 25 = a 5×5 footprint — the smallest structure the HTN library can build.
+    /// Values below 9 risk selecting degenerate strips; below 25 rarely produce valid build sites.
+    /// Council review 2026-06-17 raised this from 9 to 25.
+    /// </summary>
+    private const int MinUsableFlatArea = 25;
 
     private readonly TimeSpan[] _reconnectDelays = reconnectDelays ?? DefaultReconnectDelays;
 
@@ -245,6 +257,29 @@ public sealed class AgentBackgroundService(
                 case ChatEvent:
                     // Sprint 1a: offload to ChatConsumerAsync — LLM call never blocks event loop
                     _chatChannel.Writer.TryWrite(worldEvent);
+                    break;
+
+                // Sprint 9 A3: when the terrain scanner returns a qualifying flat site,
+                // auto-register it as the "auto" build origin (using BuildFactKeys constants)
+                // so the next DecomposeBuild cycle can use it without an explicit /api/agent/origin call.
+                case FlatAreaFoundEvent ffa when ffa.Area >= MinUsableFlatArea:
+                    SetBuildOrigin(BuildFactKeys.AutoBlueprintId, ffa.X, ffa.Y, ffa.Z);
+                    _journal?.Log(new JournalEntry(
+                        DateTimeOffset.UtcNow, JournalEntryType.Observation, "FlatAreaFound",
+                        new Dictionary<string, object?>
+                        {
+                            ["x"] = ffa.X, ["y"] = ffa.Y, ["z"] = ffa.Z, ["area"] = ffa.Area,
+                        }));
+                    logger.LogInformation(
+                        "[findFlatArea] auto-set build origin ({X},{Y},{Z}) area={Area}",
+                        ffa.X, ffa.Y, ffa.Z, ffa.Area);
+                    break;
+
+                // Degenerate scan result: log but do not modify facts.
+                case FlatAreaFoundEvent ffa:
+                    logger.LogInformation(
+                        "[findFlatArea] scan area={Area} below minimum {Min} — auto-origin not updated",
+                        ffa.Area, MinUsableFlatArea);
                     break;
 
                 default:
@@ -747,9 +782,9 @@ public sealed class AgentBackgroundService(
     ///
     /// Sprint 8 P3 improvements:
     /// - Logs an <see cref="JournalEntryType.ErrorRecovery"/> entry before calling the LLM
-    ///   so failures are visible in the audit trail even if the interpreter throws.
-    /// - Includes the bot's current inventory in the prompt so the LLM can suggest
-    ///   inventory-aware alternatives (e.g. "you have planks, try crafting instead").
+    ///   so failures are visible in the audit trail even if the interpreter call throws.
+    /// - Includes the bot's current inventory in the prompt so the LLM can make
+    ///   inventory-aware suggestions ("you have planks, try crafting table instead").
     /// - Triggered immediately for blockNotFound / recipeMissing — these error types
     ///   are unrecoverable without a goal change; waiting for ≥2 failures wastes cycles.
     /// </summary>
