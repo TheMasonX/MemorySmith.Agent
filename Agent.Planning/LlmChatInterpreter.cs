@@ -25,7 +25,9 @@ using System.Text.RegularExpressions;
 ///   5. LLM call: <see cref="ILlmProvider.CompleteAsync"/> with a structured JSON prompt
 ///      that includes the last <see cref="ChatHistory.MaxTurnsDefault"/> conversation turns.
 ///   6. JSON parse: extract <see cref="ChatInterpretation"/> from the raw text.
-///   7. Fallback: if any of steps 4-6 fail, use the pattern-matcher result.
+///   7. Empty-response guard: if the LLM produced an addressed intent with no response
+///      text, substitute the pattern fallback's response to avoid "Hmm..." then silence.
+///   8. Fallback: if any of steps 4-6 fail, use the pattern-matcher result.
 ///
 /// "Split-brain" terminology: step 3 is the deterministic brain; steps 5-6 are the
 /// reasoning brain. The deterministic brain always wins for clear commands.
@@ -120,6 +122,22 @@ public sealed class LlmChatInterpreter(
         var llmResult = ParseDecision(raw);
         if (llmResult is null)
             logger?.LogWarning("[llm] failed to parse JSON from {Provider} response", provider.ProviderName);
+
+        // 8. Empty-response guard — prevents "Hmm..." then silence when the LLM produces
+        //    an addressed intent (Chat, Unknown, etc.) but omits the response field.
+        //    Substitute the pattern-matcher's non-empty fallback in that case.
+        if (llmResult is not null
+            && llmResult.IntentType != ChatIntentType.NotAddressed
+            && string.IsNullOrEmpty(llmResult.Response))
+        {
+            var fallback = !string.IsNullOrEmpty(quick.Response)
+                ? quick.Response
+                : "Sorry, I didn't quite catch that.";
+            logger?.LogDebug("[llm] substituting empty LLM response with pattern fallback for intent {Intent}",
+                llmResult.IntentType);
+            return llmResult with { Response = fallback };
+        }
+
         return llmResult ?? quick;
     }
 
@@ -173,7 +191,7 @@ public sealed class LlmChatInterpreter(
         var top = state.Inventory
             .OrderByDescending(kv => kv.Value)
             .Take(6)
-            .Select(kv => $"{kv.Value}\u00d7{kv.Key}");
+            .Select(kv => $"{kv.Value}×{kv.Key}");
         return string.Join(", ", top)
             + (state.Inventory.Count > 6 ? $" (+{state.Inventory.Count - 6} more)" : "");
     }
