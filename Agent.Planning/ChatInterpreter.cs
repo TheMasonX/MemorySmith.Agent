@@ -169,10 +169,10 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
         string message, string botName, int onlinePlayers,
         Position botPosition, Position? playerPosition)
     {
-        // Solo play — only one non-bot player online.
         if (onlinePlayers <= 1) return true;
-        // Bot explicitly named at the start of the message.
-        if (message.StartsWith(botName, StringComparison.OrdinalIgnoreCase)) return true;
+        // Whole-word name match anywhere in message so that
+        // "hello Leo" and "Leo, come here" both address the bot correctly.
+        if (ContainsBotName(message, botName)) return true;
         // Bot spoke recently — continue the conversation thread.
         var window = TimeSpan.FromSeconds(options.ConversationWindowSeconds);
         if (DateTimeOffset.UtcNow - _lastBotSpoke < window) return true;
@@ -185,6 +185,17 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
             var distSq = dx * dx + dy * dy + dz * dz;
             if (distSq <= ProximityAddressBlocks * ProximityAddressBlocks) return true;
         }
+        return false;
+    }
+
+    /// <summary>
+    /// Returns true when <paramref name="message"/> contains <paramref name="botName"/>
+    /// as a whole word. Case-insensitive. Matches "hello Leo", "Leo come here", "Leo,"
+    /// but NOT "Leopold". Fixes addressing for natural speech patterns.
+    /// </summary>
+    private static bool ContainsBotName(string message, string botName) =>
+        Regex.IsMatch(message, $@"(?<![a-zA-Z0-9]){Regex.Escape(botName)}(?![a-zA-Z0-9])",
+            RegexOptions.IgnoreCase);
         return false;
     }
 
