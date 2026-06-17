@@ -16,9 +16,11 @@ using System.Text.RegularExpressions;
 ///   2. Distance gate: if the player is > <see cref="ChatOptions.MaxResponseDistanceBlocks"/>
 ///      blocks away AND didn't name this bot, return NotAddressed without calling the LLM.
 ///   3. Pattern fast-path: if <see cref="ChatInterpreter"/> returns a confident result
-///      (CreateGoal / CancelGoal / QueryHelp / NavigateTo), skip the LLM and use it.
-///      NavigateTo is always fast-pathed because the LLM cannot improve on it — player
-///      position is already resolved by the pattern matcher, not the LLM.
+///      (CreateGoal / CancelGoal / QueryHelp / QueryStatus / NavigateTo), skip the LLM.
+///      NavigateTo is fast-pathed because the LLM cannot improve on it — player position
+///      is already resolved by the pattern matcher, not the LLM.
+///      QueryStatus/QueryHelp are fast-pathed because the pattern response is complete and
+///      correct; calling the LLM just adds latency.
 ///   4. Rate-limit check: per-player and global window via <see cref="ChatRateLimiter"/>.
 ///   5. LLM call: <see cref="ILlmProvider.CompleteAsync"/> with a structured JSON prompt
 ///      that includes the last <see cref="ChatHistory.MaxTurnsDefault"/> conversation turns.
@@ -64,13 +66,14 @@ public sealed class LlmChatInterpreter(
             return quick;
         }
 
-        // 4. Pattern fast-path — skip LLM for unambiguous commands.
-        //    NavigateTo is always fast-pathed: the LLM cannot improve on it because
-        //    player position is already known to the pattern matcher but NOT to the LLM
-        //    (the LLM has no way to determine where to navigate for "come here" etc.).
+        // 4. Pattern fast-path — skip LLM for commands where the pattern response is
+        //    already complete and correct. The LLM cannot improve these.
+        //    NavigateTo: pattern knows player position; LLM does not.
+        //    QueryStatus/QueryHelp: deterministic responses; LLM adds only latency.
         if (quick.IntentType is ChatIntentType.CreateGoal
                               or ChatIntentType.CancelGoal
                               or ChatIntentType.QueryHelp
+                              or ChatIntentType.QueryStatus
                               or ChatIntentType.NavigateTo)
         {
             logger?.LogDebug("[llm] pattern fast-path for {Username}: {Intent}", username, quick.IntentType);
