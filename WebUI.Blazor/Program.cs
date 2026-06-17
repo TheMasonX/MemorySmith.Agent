@@ -349,10 +349,26 @@ app.MapGet("/api/agent/journal", (
     return Results.Ok(new { count = journal.Count, returned = dtos.Count, entries = dtos });
 });
 
-app.MapGet("/api/agent/worldmodel", (IWorldModel? model) =>
+// Sprint 9 S7-D3: ?detail=false returns a lightweight summary that omits the
+// potentially-large RecentObservations list in BeliefState / ObservationState.
+// Default (no param or ?detail=true) preserves full backward-compatible payload.
+app.MapGet("/api/agent/worldmodel", (IWorldModel? model, bool detail = true) =>
 {
     if (model is null)
         return Results.Ok(new { available = false });
+
+    if (!detail)
+    {
+        return Results.Ok(new
+        {
+            available      = true,
+            uncertainty    = model.Uncertainty,
+            position       = model.Belief.Position,
+            health         = model.Belief.Health,
+            food           = model.Belief.Food,
+            inventoryCount = model.Belief.Inventory.Count,
+        });
+    }
 
     return Results.Ok(new
     {
