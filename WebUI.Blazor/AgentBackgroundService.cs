@@ -22,6 +22,10 @@ using System.Threading.Channels;
 ///   1b — Reconnect: <see cref="ExecuteAsync"/> retries ConnectAsync with exponential
 ///        backoff (default 2s/4s/8s/16s/32s, max 5 retries). World state and current
 ///        goal survive reconnects. Configurable delays for test speed.
+/// Sprint 8:
+///   - Explicit ChatIntentType.Chat case in HandleChatEventAsync switch (clarity).
+///   - TryRecoverFromGameErrorAsync: richer prompt (inventory + available actions);
+///     immediate trigger for blockNotFound/recipeMissing; ErrorRecovery journal log.
 /// </summary>
 public sealed class AgentBackgroundService(
     IWorldAdapter worldAdapter,
@@ -372,6 +376,11 @@ public sealed class AgentBackgroundService(
                     });
                 }
                 break;
+
+            // Sprint 8: explicit cases for Chat and Unknown — response already enqueued above.
+            case ChatIntentType.Chat:
+            case ChatIntentType.Unknown:
+                break;
         }
     }
 
@@ -580,9 +589,15 @@ public sealed class AgentBackgroundService(
                         logger.LogWarning("Game error after cycle (failures={N}/{Max}): {Error}",
                             _consecutiveFailures, maxFailures, errMsg);
 
-                        // Recovery seam: for repeated game errors, ask the LLM interpreter
-                        // for an alternate action/goal when available.
-                        if (_consecutiveFailures >= 2)
+                        // Sprint 8 P3: trigger recovery immediately for blockNotFound and
+                        // recipeMissing errors (don't wait for 2 failures — these are
+                        // unrecoverable without a goal change and the LLM can suggest one).
+                        var isImmediateRecovery =
+                            errMsg.StartsWith("blockNotFound:", StringComparison.OrdinalIgnoreCase) ||
+                            (errMsg.Contains("recipe", StringComparison.OrdinalIgnoreCase) &&
+                             errMsg.Contains("missing", StringComparison.OrdinalIgnoreCase));
+
+                        if (_consecutiveFailures >= 2 || isImmediateRecovery)
                             await TryRecoverFromGameErrorAsync(errMsg, ct);
                     }
                 }
@@ -726,15 +741,41 @@ public sealed class AgentBackgroundService(
         || toolName.Equals("FindFlatArea", StringComparison.OrdinalIgnoreCase)
         || toolName.Equals("Wander", StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Asks the LLM interpreter to suggest an alternative goal or action when the
+    /// agent has hit a game error it cannot self-resolve.
+    ///
+    /// Sprint 8 P3 improvements:
+    /// - Logs an <see cref="JournalEntryType.ErrorRecovery"/> entry before calling the LLM
+    ///   so failures are visible in the audit trail even if the interpreter throws.
+    /// - Includes the bot's current inventory in the prompt so the LLM can suggest
+    ///   inventory-aware alternatives (e.g. "you have planks, try crafting instead").
+    /// - Triggered immediately for blockNotFound / recipeMissing — these error types
+    ///   are unrecoverable without a goal change; waiting for ≥2 failures wastes cycles.
+    /// </summary>
     private async Task TryRecoverFromGameErrorAsync(string errMsg, CancellationToken ct)
     {
         if (chatInterpreter is null || _currentGoal is null) return;
 
+        // Journal the recovery attempt for audit visibility.
+        _journal?.Log(new JournalEntry(
+            DateTimeOffset.UtcNow, JournalEntryType.ErrorRecovery, errMsg,
+            new Dictionary<string, object?> { ["goal"] = _currentGoal.Name }));
+
         try
         {
+            var invSummary = _worldState.Inventory.Count > 0
+                ? string.Join(", ", _worldState.Inventory
+                    .OrderByDescending(kv => kv.Value).Take(5)
+                    .Select(kv => $"{kv.Value}x{kv.Key}"))
+                : "empty";
+
             var prompt =
                 $"recover from runtime error while executing goal {_currentGoal.Name}: {errMsg}. " +
-                "If gather target is unavailable, choose an alternative gather goal or navigate action.";
+                $"Bot inventory: {invSummary}. " +
+                "Available actions: gather, navigate, status, craft, smelt. " +
+                "If gather target is unavailable, choose an alternative gather goal or navigate action. " +
+                "If recipe is missing, check whether a crafting table or raw material is needed first.";
 
             var interpretation = await chatInterpreter.InterpretAsync(
                 username: "system",
@@ -758,4 +799,3 @@ public sealed class AgentBackgroundService(
         }
     }
 }
-
