@@ -43,7 +43,9 @@ public class MockMemoryGatewayTests
         var gateway = new MockMemoryGateway();
         var id = await gateway.CreatePageAsync("Blueprint", "# GothicCathedral", "blueprint");
 
-        Assert.That(id, Is.Not.Null.Or.Empty);
+        // NUnit2058 fix: Is.Not.Null.Or.Empty is equivalent to Is.Not.Null (always true for non-null).
+        // The correct constraint is Is.Not.Null.And.Not.Empty — must be both non-null AND non-empty.
+        Assert.That(id, Is.Not.Null.And.Not.Empty);
         var content = await gateway.GetPageAsync(id);
         Assert.That(content, Is.EqualTo("# GothicCathedral"));
     }
