@@ -9,6 +9,12 @@ namespace MemorySmith.Agent.Tests;
 /// Tests for <see cref="HtnPlanner"/> Phase 4b: BuildGoal decomposition produces
 /// the correct mix of MineBlock (material gathering) and PlaceBlock (construction)
 /// actions, and applies the build origin from world-state facts.
+///
+/// Sprint 13 D3: HtnPlanner passes requireOrigin:true to DecomposeBuild, so tests
+/// that use MakePlan must ensure the state has a resolvable origin. MakePlan now
+/// sets BuildFactKeys.AutoOrigin{X,Y,Z} defaults (x=0, y=64, z=0) so the auto-origin
+/// resolver finds a valid, non-zero-Y value and the full build plan is generated.
+/// Tests that explicitly set blueprint-specific origin facts override this default.
 /// </summary>
 [TestFixture]
 [Description("HtnPlanner BuildGoal: PlaceBlock actions, material gathering, origin offset")]
@@ -133,12 +139,13 @@ public sealed class HtnPlannerBuildTests
     [Test]
     public async Task PlanAsync_BuildGoal_DoesNotMine_NonMineableBlocks()
     {
-        // oak_planks is crafted — should never emit a MineBlock("oak_planks") action
+        // oak_planks is crafted — should never emit a MineBlock("oak_planks") action.
+        // Sprint 13 D3: provide explicit origin so the full build plan is generated.
         var blueprint = MakeBlueprintWithMaterials(
             materials: [new MaterialEntry("oak_planks", 64)]);
         var blocks = new[] { new PlacementBlock(0, 1, 0, "oak_planks") };
         var goal   = new BuildGoal(blueprint, blocks);
-        var state  = new WorldState();
+        var state  = WithAutoOrigin(new WorldState());
 
         var plan    = await new HtnPlanner(new HtnTaskLibrary()).PlanAsync(goal, state);
         var mining  = plan.Actions.Where(a => a.Tool == "MineBlock").ToList();
@@ -181,8 +188,24 @@ public sealed class HtnPlannerBuildTests
         var planner = new HtnPlanner(library);
         var bp      = MakeBlueprintWithMaterials(id: blueprintId);
         var goal    = new BuildGoal(bp, blocks);
-        return await planner.PlanAsync(goal, state);
+        // Sprint 13 D3: HtnPlanner passes requireOrigin:true; ensure a valid origin
+        // (y=64) is set via auto-origin facts so the full plan is generated.
+        // Tests that set explicit blueprint origin facts will use those instead.
+        return await planner.PlanAsync(goal, WithAutoOrigin(state));
     }
+
+    /// <summary>
+    /// Adds auto-origin defaults (x=0, y=64, z=0) to a WorldState so that
+    /// DecomposeBuild's requireOrigin check passes when no explicit origin is set.
+    /// y=64 is a typical overworld surface height — non-zero, so (0,64,0) != (0,0,0).
+    /// </summary>
+    private static WorldState WithAutoOrigin(WorldState state) =>
+        state.With(b =>
+        {
+            b.SetFact(BuildFactKeys.AutoOriginX, 0);
+            b.SetFact(BuildFactKeys.AutoOriginY, 64);
+            b.SetFact(BuildFactKeys.AutoOriginZ, 0);
+        });
 
     private static int CountTool(IPlan plan, string toolName) =>
         plan.Actions.Count(a =>
