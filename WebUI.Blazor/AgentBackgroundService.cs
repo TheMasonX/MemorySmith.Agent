@@ -575,6 +575,22 @@ public sealed class AgentBackgroundService(
                         if (result.Data is not null)
                             foreach (var kv in result.Data)
                                 planContext[kv.Key] = kv.Value;
+
+                        // Sprint 10 B2: persist build checkpoint when a PlaceBlock succeeds.
+                        // DecomposeBuild reads this on the next planning cycle and resumes
+                        // from (checkpoint + 1) instead of replaying from block 0.
+                        if (action.Tool.Equals("PlaceBlock", StringComparison.OrdinalIgnoreCase)
+                            && action.Context.TryGetValue(
+                                BuildFactKeys.PlaceBlockProgressBlueprintId, out var bpId)
+                            && action.Context.TryGetValue(
+                                BuildFactKeys.PlaceBlockProgressBlockIndex, out var bpIdx))
+                        {
+                            var progressFactKey = BuildFactKeys.BuildProgressIndex(
+                                bpId?.ToString() ?? string.Empty);
+                            _worldState = _worldState.With(b => b.SetFact(progressFactKey, bpIdx));
+                            logger.LogDebug("[build] checkpoint: {Blueprint} block {Index} placed",
+                                bpId, bpIdx);
+                        }
                     }
                     else
                     {
