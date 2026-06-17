@@ -117,6 +117,21 @@ if (agentEnabled)
     builder.Services.AddSingleton<HtnTaskLibrary>();
     builder.Services.AddSingleton<IPlanner, HtnPlanner>();
 
+    // Sprint 6: World Model (belief + prediction + reconciliation)
+    builder.Services.AddSingleton<IWorldModel>(new WorldModel());
+
+    // Sprint 6: Decomposer registry + PlannerRouter (extensible planning)
+    builder.Services.AddSingleton<DecomposerRegistry>(sp =>
+    {
+        var lib = sp.GetRequiredService<HtnTaskLibrary>();
+        var reg = new DecomposerRegistry();
+        reg.Register(new BuildGoalDecomposer(lib));
+        reg.Register(new GatherGoalDecomposer(lib));
+        reg.Register(new SurviveNightGoalDecomposer(lib));
+        return reg;
+    });
+    builder.Services.AddSingleton<PlannerRouter>();
+
     // ── Journal (execution trace) ────────────────────────────────────────────────────────────
     builder.Services.AddSingleton<IAgentJournal>(new AgentJournal());
 
