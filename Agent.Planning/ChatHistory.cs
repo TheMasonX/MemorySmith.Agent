@@ -33,7 +33,14 @@ public sealed class ChatHistory
     }
 
     /// <summary>Number of turns currently stored (up to <c>maxTurns</c>).</summary>
-    public int Count => Volatile.Read(ref _buffer).Length;
+    public int Count
+    {
+        get
+        {
+            var current = Volatile.Read(ref _buffer);
+            return current.Length;
+        }
+    }
 
     /// <summary>
     /// Records a new turn. If the buffer is full, the oldest turn is dropped.
@@ -44,9 +51,19 @@ public sealed class ChatHistory
         while (true)
         {
             var current = Volatile.Read(ref _buffer);
-            var updated = current.Length < _maxTurns
-                ? [.. current, turn]
-                : [.. current[1..], turn];
+            ChatTurn[] updated;
+            if (current.Length < _maxTurns)
+            {
+                updated = new ChatTurn[current.Length + 1];
+                Array.Copy(current, 0, updated, 0, current.Length);
+                updated[current.Length] = turn;
+            }
+            else
+            {
+                updated = new ChatTurn[current.Length];
+                Array.Copy(current, 1, updated, 0, current.Length - 1);
+                updated[current.Length - 1] = turn;
+            }
             if (Interlocked.CompareExchange(ref _buffer, updated, current) == current)
                 return;
         }
@@ -66,12 +83,6 @@ public sealed class ChatHistory
     /// <summary>Clears all history (e.g. on reconnect or goal reset).</summary>
     public void Clear()
     {
-        while (true)
-        {
-            var current = Volatile.Read(ref _buffer);
-            if (current.Length == 0) return;
-            if (Interlocked.CompareExchange(ref _buffer, [], current) == current)
-                return;
-        }
+        Volatile.Write(ref _buffer, []);
     }
 }
