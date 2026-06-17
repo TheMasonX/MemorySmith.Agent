@@ -21,6 +21,8 @@ public delegate IReadOnlyList<ActionData> TaskDecomposer(
 /// Sprint 11 B1-v2: DecomposeBuild accepts a requireOrigin flag.
 /// Sprint 13 D2: TryGetIntFact now handles JsonElement values (from JSON deserialization).
 /// Sprint 13: Added DecomposeCraftItem for CraftItemGoal decomposition.
+/// Sprint 14 P0: DecomposeCraftItem pre-gathers iron ingots (iron tools) and cobblestone (stone tools).
+/// Sprint 14 P1a: DirectMineBlocks now delegates to CommonMinecraftBlocks.DirectMineBlocks.
 /// </summary>
 public sealed class HtnTaskLibrary
 {
@@ -45,24 +47,12 @@ public sealed class HtnTaskLibrary
         MinHarvestLevel  = 0,
     };
 
-    // Blocks the bot can mine directly (no crafting required).
-    private static readonly HashSet<string> DirectMineBlocks = new(StringComparer.OrdinalIgnoreCase)
-    {
-        // Stone / earth
-        "cobblestone", "stone", "dirt", "gravel", "sand",
-        // Wood
-        "oak_log", "birch_log", "spruce_log", "dark_oak_log",
-        "jungle_log", "acacia_log", "cherry_log", "mangrove_log",
-        // Ores
-        "iron_ore", "deepslate_iron_ore",
-        "gold_ore", "deepslate_gold_ore",
-        "coal_ore", "deepslate_coal_ore",
-        "diamond_ore", "deepslate_diamond_ore",
-        "redstone_ore", "deepslate_redstone_ore",
-        "lapis_ore", "deepslate_lapis_ore",
-        // Other
-        "gravel",
-    };
+    /// <summary>
+    /// Blocks the bot can mine directly (no crafting required).
+    /// Delegates to <see cref="CommonMinecraftBlocks.DirectMineBlocks"/> — single source of truth.
+    /// Sprint 14 P1a: was a private copy; now shared with GoalFactory.
+    /// </summary>
+    private static HashSet<string> DirectMineBlocks => CommonMinecraftBlocks.DirectMineBlocks;
 
     // Sprint 10 B4: expanded crafting chain.
     private static readonly IReadOnlyList<string> CraftingChainOrder =
@@ -86,10 +76,36 @@ public sealed class HtnTaskLibrary
         "iron_helmet", "iron_chestplate", "iron_leggings", "iron_boots",
     };
 
-    // Items that additionally require cobblestone to craft (stone tools).
-    private static readonly HashSet<string> RequiresCobblestone = new(StringComparer.OrdinalIgnoreCase)
+    /// <summary>
+    /// Iron ingots required to craft each iron tool or armour piece.
+    /// Sprint 14 P0: used by DecomposeCraftItem to pre-gather iron before crafting.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, int> IronIngotRequirements =
+        new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
     {
-        "stone_pickaxe", "stone_axe", "stone_shovel", "stone_sword",
+        ["iron_pickaxe"]    = 3,
+        ["iron_axe"]        = 3,
+        ["iron_shovel"]     = 1,
+        ["iron_sword"]      = 2,
+        ["iron_hoe"]        = 2,
+        ["iron_helmet"]     = 5,
+        ["iron_chestplate"] = 8,
+        ["iron_leggings"]   = 7,
+        ["iron_boots"]      = 4,
+    };
+
+    /// <summary>
+    /// Cobblestone required to craft each stone tool.
+    /// Sprint 14 P0: used by DecomposeCraftItem to pre-gather cobblestone before crafting.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, int> CobblestoneRequirements =
+        new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["stone_pickaxe"] = 3,
+        ["stone_axe"]     = 3,
+        ["stone_shovel"]  = 1,
+        ["stone_sword"]   = 2,
+        ["stone_hoe"]     = 2,
     };
 
     private readonly Dictionary<string, TaskDecomposer> _methods;
@@ -132,16 +148,56 @@ public sealed class HtnTaskLibrary
     /// Decomposes a <see cref="Goals.CraftItemGoal"/> into a sequence of prerequisite
     /// and crafting actions.
     ///
-    /// Sprint 13: first implementation. Ensures a crafting table is available for
-    /// table-requiring recipes. Assumes materials are in inventory; if not, the
-    /// CraftItemTool returns failure and TryRecoverFromGameErrorAsync suggests gathering.
+    /// Sprint 13: first implementation — ensures a crafting table is present for
+    /// table-requiring recipes.
+    ///
+    /// Sprint 14 P0: pre-gathers materials before attempting the craft.
+    /// - Iron tools: mines iron_ore and smelts to iron_ingots if inventory is short.
+    /// - Stone tools: mines cobblestone if inventory is short.
+    /// - Crafting table: mines oak_log and crafts planks/table if none in inventory.
     /// </summary>
     public IReadOnlyList<ActionData> DecomposeCraftItem(
         string itemId, int count, WorldState state)
     {
         var actions = new List<ActionData>();
 
-        // Ensure a crafting table is present for table-requiring recipes.
+        // ── Pre-gather iron ingots for iron tools ─────────────────────────────
+        if (IronIngotRequirements.TryGetValue(itemId, out var ingotCount))
+        {
+            var haveIngots = state.Inventory.GetValueOrDefault("iron_ingot");
+            var needIngots = ingotCount - haveIngots;
+            if (needIngots > 0)
+            {
+                var haveOre  = state.Inventory.GetValueOrDefault("iron_ore")
+                             + state.Inventory.GetValueOrDefault("deepslate_iron_ore");
+                var needOre  = Math.Max(0, needIngots - haveOre);
+                if (needOre > 0)
+                {
+                    actions.Add(MakeAction("SearchMemory", ("query", "iron ore mine location")));
+                    actions.Add(MakeAction("Wander",
+                        ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)150)));
+                    actions.Add(MakeAction("MineBlock",
+                        ("block", "iron_ore"), ("count", (object?)needOre)));
+                }
+                actions.Add(MakeAction("SmeltItem",
+                    ("item", "iron_ore"), ("count", (object?)needIngots), ("fuel", "coal")));
+            }
+        }
+
+        // ── Pre-gather cobblestone for stone tools ────────────────────────────
+        if (CobblestoneRequirements.TryGetValue(itemId, out var cobbleCount))
+        {
+            var haveCobble = state.Inventory.GetValueOrDefault("cobblestone");
+            var needCobble = cobbleCount - haveCobble;
+            if (needCobble > 0)
+            {
+                actions.Add(MakeAction("SearchMemory", ("query", "stone cobblestone mine location")));
+                actions.Add(MakeAction("MineBlock",
+                    ("block", "stone"), ("count", (object?)needCobble)));
+            }
+        }
+
+        // ── Ensure a crafting table for table-requiring recipes ───────────────
         if (RequiresCraftingTable.Contains(itemId) &&
             state.Inventory.GetValueOrDefault("crafting_table") == 0)
         {
@@ -155,8 +211,8 @@ public sealed class HtnTaskLibrary
             actions.Add(MakeAction("CraftItem", ("item", "crafting_table"), ("count", (object?)1)));
         }
 
-        // The craft — materials must already be in inventory.
-        // If they're absent, CraftItemTool returns failure; error recovery suggests gathering.
+        // ── The craft ─────────────────────────────────────────────────────────
+        // Materials should now be in inventory; CraftItemTool returns failure if not.
         actions.Add(MakeAction("CraftItem", ("item", itemId), ("count", (object?)count)));
         actions.Add(MakeAction("GetStatus"));
         return actions;
