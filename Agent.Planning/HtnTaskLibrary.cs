@@ -27,6 +27,11 @@ public delegate IReadOnlyList<ActionData> TaskDecomposer(
 ///
 /// Sprint 10 B2: DecomposeBuild reads checkpoint fact (<see cref="BuildFactKeys.BuildProgressIndex"/>)
 ///   and resumes from the last successfully placed block instead of replaying from scratch.
+///
+/// Sprint 11 B1-v2: DecomposeBuild accepts a <c>requireOrigin</c> flag. When true and no
+///   valid origin is available after auto-origin lookup, it returns a single FindFlatArea
+///   action and stops — the caller must wait for a FlatAreaFoundEvent to set the origin
+///   before the next planning cycle proceeds to the full build plan.
 /// </summary>
 public sealed class HtnTaskLibrary
 {
@@ -161,31 +166,45 @@ public sealed class HtnTaskLibrary
     /// <summary>
     /// Decomposes a <see cref="BuildGoal"/> into a phased action plan.
     ///
-    /// Phase 0 (B1 preflight): if no build origin is known, prepend FindFlatArea to locate one.
+    /// Phase 0 (B1 preflight): resolve auto-origin when caller passes (0, 0, 0).
+    ///   Sprint 11 B1-v2: if <paramref name="requireOrigin"/> is true and no valid
+    ///   origin is found after auto-origin lookup, return a single FindFlatArea action.
+    ///   The caller must wait for a FlatAreaFoundEvent to write the origin fact before
+    ///   the next planning cycle can proceed to the full build plan.
     /// Phase 1: GatherMaterials — mine raw blocks.
     /// Phase 2: CraftingChain — craft intermediates in dependency order.
     /// Phase 3: Navigate to build site.
     /// Phase 4: Build — emit PlaceBlock actions from checkpoint (Sprint 10 B2).
     /// Phase 5: Verify — GetStatus.
     /// </summary>
+    /// <param name="requireOrigin">
+    /// When true, the plan aborts with a single FindFlatArea action if no valid build
+    /// origin can be resolved. When false (default), the plan proceeds with (0,0,0)
+    /// if no origin is available — preserving backward-compatible behaviour.
+    /// </param>
     public IReadOnlyList<ActionData> DecomposeBuild(
         Blueprint blueprint,
         IReadOnlyList<PlacementBlock> blocks,
         int originX, int originY, int originZ,
-        WorldState state)
+        WorldState state,
+        bool requireOrigin = false)
     {
         // Sprint 9 A3: resolve auto-origin when caller passes the (0,0,0) sentinel.
         if (originX == 0 && originY == 0 && originZ == 0)
             ResolveAutoOrigin(state, ref originX, ref originY, ref originZ);
 
-        var actions = new List<ActionData>();
+        // Sprint 11 B1-v2: if the caller requires a valid origin and we still have
+        // (0,0,0) after auto-origin lookup, emit a FindFlatArea preflight only.
+        // The scanner will fire a FlatAreaFoundEvent which AgentBackgroundService
+        // converts to auto-origin facts; the next PlanAsync cycle will succeed.
+        if (requireOrigin && originX == 0 && originY == 0 && originZ == 0)
+        {
+            return [MakeAction("FindFlatArea",
+                ("radius", (object?)PreflightFlatAreaRadius),
+                ("minFlatArea", (object?)PreflightFlatAreaMin))];
+        }
 
-        // Sprint 10 B1 note: if origin is still (0,0,0) after auto-origin lookup,
-        // the plan proceeds with world-origin coordinates. Callers should trigger a
-        // FindFlatArea goal first (which sets auto-origin via FlatAreaFoundEvent),
-        // then the next Build plan will use the correct coordinates.
-        // Full preflight gating (early-return when no origin) deferred to Sprint 11
-        // pending test callsite audit.
+        var actions = new List<ActionData>();
 
         // ── Phase 1: GatherMaterials ──────────────────────────────────────────
         // Sprint 10 D3: use GroupBy+Sum to merge duplicate material entries instead
