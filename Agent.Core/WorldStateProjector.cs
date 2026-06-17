@@ -12,6 +12,8 @@ namespace Agent.Core;
 /// debugging; it never writes <c>game.lastError</c>.
 ///
 /// Sprint 3a: Now uses pattern matching on typed event subtypes.
+/// Sprint 9:  FlatAreaFoundEvent also writes <see cref="BuildFactKeys.LastFlatArea"/>
+///            so planners can read the last scan result without accessing per-event keys.
 /// </summary>
 public sealed class WorldStateProjector
 {
@@ -198,6 +200,9 @@ public sealed class WorldStateProjector
                     b.SetFact($"{prefix}MaxX", e.MaxX.ToString(), source);
                     b.SetFact($"{prefix}MinZ", e.MinZ.ToString(), source);
                     b.SetFact($"{prefix}MaxZ", e.MaxZ.ToString(), source);
+                    // Sprint 9: cross-event summary key — lets planners read the last
+                    // flat-area scan result via BuildFactKeys without parsing per-event keys.
+                    b.SetFact(BuildFactKeys.LastFlatArea, e.Area.ToString(), source);
                 });
                 break;
         }
