@@ -15,6 +15,9 @@ public sealed class AgentJournal : IAgentJournal
     private readonly ConcurrentQueue<JournalEntry> _entries = new();
     private int _count;
 
+    /// <inheritdoc/>
+    public int Count => Volatile.Read(ref _count);
+
     public IReadOnlyList<JournalEntry> All => [.. _entries.Reverse()];
 
     public void Log(JournalEntry entry)
@@ -23,7 +26,7 @@ public sealed class AgentJournal : IAgentJournal
 
         // Best-effort trim: dequeue one oldest entry when over capacity.
         // The queue may transiently hold up to MaxEntries + (concurrent callers) entries,
-        // but it never grows unboundedly and does not over-drain.
+        // but never grows unboundedly and does not over-drain.
         if (Interlocked.Increment(ref _count) > MaxEntries)
         {
             if (_entries.TryDequeue(out _))
