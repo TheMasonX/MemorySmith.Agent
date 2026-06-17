@@ -188,14 +188,22 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
         return false;
     }
 
+    // Cached per-instance — botName is fixed at startup; no need to recompile every call.
+    private Regex? _botNameRegex;
+
     /// <summary>
     /// Returns true when <paramref name="message"/> contains <paramref name="botName"/>
-    /// as a whole word. Case-insensitive. Matches "hello Leo", "Leo come here", "Leo,"
-    /// but NOT "Leopold". Fixes addressing for natural speech patterns.
+    /// as a whole word (not part of a longer word or username). Case-insensitive.
+    /// Matches "hello Leo", "Leo come here", "Leo," but NOT "Leopold" or "Leo_bot".
+    /// Regex is compiled once per interpreter instance for performance.
     /// </summary>
-    private static bool ContainsBotName(string message, string botName) =>
-        Regex.IsMatch(message, $@"(?<![a-zA-Z0-9_]){Regex.Escape(botName)}(?![a-zA-Z0-9_])",
-            RegexOptions.IgnoreCase);
+    private bool ContainsBotName(string message, string botName)
+    {
+        _botNameRegex ??= new Regex(
+            $@"(?<![a-zA-Z0-9_]){Regex.Escape(botName)}(?![a-zA-Z0-9_])",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        return _botNameRegex.IsMatch(message);
+    }
 
     private static string StripBotName(string message, string botName)
     {
