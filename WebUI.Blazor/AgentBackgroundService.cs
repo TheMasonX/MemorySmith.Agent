@@ -39,6 +39,11 @@ using System.Threading.Channels;
 ///     immediately rather than waiting for the 300ms settle window.
 ///   - _lastAbandonedGoalName guards TryRecoverFromGameErrorAsync from re-setting the
 ///     same goal that just failed, breaking the infinite recovery loop.
+/// Sprint 15 P1:
+///   - TryCompleteCurrentGoalFromWorldUpdate now resets _lastRecoveredGoalName so
+///     the next run of the same goal can use recovery fresh (Sprint 13 D3).
+///   - DispatchActionsAsync: stall detection — warns when no action is dispatched
+///     for >10s with an active goal (D4 from Sprint 9-10 council).
 /// </summary>
 public sealed class AgentBackgroundService(
     IWorldAdapter worldAdapter,
@@ -67,6 +72,12 @@ public sealed class AgentBackgroundService(
     /// </summary>
     private const int MinUsableFlatArea = 25;
 
+    /// <summary>Seconds of inactivity before a stall warning fires.</summary>
+    private const int StallWarningSeconds = 10;
+
+    /// <summary>Minimum seconds between consecutive stall warnings for the same goal.</summary>
+    private const int StallWarningSuppressSeconds = 30;
+
     private readonly TimeSpan[] _reconnectDelays = reconnectDelays ?? DefaultReconnectDelays;
 
     private readonly ActionQueue _queue = new();
@@ -93,14 +104,14 @@ public sealed class AgentBackgroundService(
     private string _connectionStatus = "disconnected";
 
     // Sprint 12: tracks the name of the most-recently abandoned goal.
-    // TryRecoverFromGameErrorAsync checks this to avoid re-setting the same goal
-    // that just failed, which would create an infinite recovery loop.
     private string? _lastAbandonedGoalName;
 
     // Sprint 13: tracks the goal name for which recovery was last attempted.
-    // Prevents burning LLM rate-limit tokens on repeat recovery calls for
-    // the same failing goal (blockNotFound fires on every mine cycle).
     private string? _lastRecoveredGoalName;
+
+    // Sprint 15 P1: stall detection — tracks when an action was last dispatched.
+    private DateTimeOffset _lastActionDispatchedAt = DateTimeOffset.MinValue;
+    private DateTimeOffset _lastStallWarnedAt       = DateTimeOffset.MinValue;
 
     public WorldState WorldState           => _worldState;
     public IGoal?     CurrentGoal          => _currentGoal;
@@ -117,13 +128,15 @@ public sealed class AgentBackgroundService(
         _queue.Clear();
         _consecutiveFailures = 0;
         _lastFailureReason = null;
-        // Sprint 12: reset so DispatchActionsAsync can plan immediately without
-        // waiting for the 300ms post-cycle settle delay.
+        // Sprint 12: reset so DispatchActionsAsync can plan immediately.
         _actionDispatchedThisCycle = false;
         // Sprint 12: clear recovery guard — this is a fresh goal, not a retry.
         _lastAbandonedGoalName = null;
         // Sprint 13: clear recovery-rate guard so recovery can run for the new goal.
         _lastRecoveredGoalName = null;
+        // Sprint 15 P1: reset stall clock for the new goal.
+        _lastActionDispatchedAt = DateTimeOffset.UtcNow;
+        _lastStallWarnedAt      = DateTimeOffset.MinValue;
         lock (_pendingLock) _pendingActions.Clear();
         logger.LogInformation("Goal set: {Goal}", goal.Name);
         _journal?.Log(new JournalEntry(
@@ -256,8 +269,9 @@ public sealed class AgentBackgroundService(
 
                 case BlockMinedEvent e:
                     var itemKey = e.Block.Contains(':') ? e.Block.Split(':')[1] : e.Block;
-                    logger.LogInformation("Inventory +1 {Block} -> total {Total}",
-                        itemKey, _worldState.Inventory.GetValueOrDefault(itemKey));
+                    // Sprint 15 P0: log actual count (was always 1 before the projector fix)
+                    logger.LogInformation("Inventory +{Count} {Block} -> total {Total}",
+                        e.Count, itemKey, _worldState.Inventory.GetValueOrDefault(itemKey));
                     break;
 
                 case CraftCompleteEvent e:
@@ -352,14 +366,9 @@ public sealed class AgentBackgroundService(
         }
 
         // Sprint 12: IMPORTANT — save the response BEFORE the switch.
-        // SetGoal (called via CreateGoal path) and CancelGoal both call _queue.Clear(),
-        // which would wipe a chat response enqueued before the switch.
-        // We enqueue it AFTER the switch so goal changes cannot clear it.
         var pendingResponse = !string.IsNullOrEmpty(interpretation.Response)
             ? interpretation.Response : null;
 
-        // Always mark that the bot processed this addressed message so the
-        // conversation window stays open for follow-ups.
         chatInterpreter.RecordBotSpoke();
 
         switch (interpretation.IntentType)
@@ -378,11 +387,8 @@ public sealed class AgentBackgroundService(
                 break;
 
             case ChatIntentType.NavigateTo:
-                // Player navigation should interrupt any active gather loop.
                 CancelGoal();
 
-                // Sprint 12: enqueue chat response BEFORE the movement action so the
-                // player sees "On my way!" / "Heading to..." immediately, not after arrival.
                 if (pendingResponse is not null)
                 {
                     _queue.Enqueue(new ActionData
@@ -391,7 +397,7 @@ public sealed class AgentBackgroundService(
                         Arguments = { ["message"] = pendingResponse }
                     });
                     _ = PushChatToDashboardAsync("bot", botName, pendingResponse);
-                    pendingResponse = null; // consumed here — skip the post-switch enqueue
+                    pendingResponse = null;
                 }
 
                 if (interpretation.GoalName == "MoveTo"
@@ -428,10 +434,6 @@ public sealed class AgentBackgroundService(
                 break;
         }
 
-        // Sprint 12: enqueue response AFTER the switch so it survives SetGoal/CancelGoal clears.
-        // For CreateGoal: this runs after SetGoal, so the response is at the HEAD of the queue
-        // and DispatchActionsAsync says it BEFORE executing any plan actions.
-        // For NavigateTo: already consumed above (pendingResponse = null).
         if (pendingResponse is not null)
         {
             _queue.Enqueue(new ActionData
@@ -452,6 +454,9 @@ public sealed class AgentBackgroundService(
         _currentGoal = null;
         _consecutiveFailures = 0;
         _lastFailureReason = null;
+        // Sprint 15 P1 (Sprint 13 D3): clear recovery rate-limiter so the next run
+        // of the same goal can trigger recovery fresh if it fails again.
+        _lastRecoveredGoalName = null;
         _queue.Clear();
         lock (_pendingLock) _pendingActions.Clear();
         _ = PushGoalToDashboardAsync();
@@ -526,8 +531,6 @@ public sealed class AgentBackgroundService(
                         ? _lastFailureReason?.ToString() ?? FailureReason.Unknown.ToString()
                         : (_lastFailureReason ?? FailureReason.ConsecutiveFailures).ToString();
                     _currentGoal.FailureReason = reason;
-                    // Sprint 12: record before clearing, so TryRecoverFromGameErrorAsync
-                    // can avoid re-suggesting this same goal.
                     _lastAbandonedGoalName = _currentGoal.Name;
                     _journal?.Log(new JournalEntry(
                         DateTimeOffset.UtcNow, JournalEntryType.ReplanTriggered, _currentGoal.Name));
@@ -570,6 +573,8 @@ public sealed class AgentBackgroundService(
             if (action is not null)
             {
                 _actionDispatchedThisCycle = true;
+                // Sprint 15 P1: record dispatch time for stall detection
+                _lastActionDispatchedAt = DateTimeOffset.UtcNow;
                 lock (_pendingLock)
                 {
                     if (_pendingActions.Count > 0) _pendingActions.RemoveAt(0);
@@ -669,6 +674,21 @@ public sealed class AgentBackgroundService(
 
                         if (_consecutiveFailures >= 2 || isImmediateRecovery)
                             await TryRecoverFromGameErrorAsync(errMsg, ct);
+                    }
+
+                    // Sprint 15 P1: stall detection — warn if no action dispatched recently
+                    // while a goal is still active. Fires at most once per StallWarningSuppressSeconds.
+                    if (_currentGoal is not null)
+                    {
+                        var stalledFor = DateTimeOffset.UtcNow - _lastActionDispatchedAt;
+                        if (stalledFor.TotalSeconds > StallWarningSeconds &&
+                            (DateTimeOffset.UtcNow - _lastStallWarnedAt).TotalSeconds > StallWarningSuppressSeconds)
+                        {
+                            _lastStallWarnedAt = DateTimeOffset.UtcNow;
+                            logger.LogWarning(
+                                "[stall] No action dispatched in {Elapsed:N0}s with active goal '{Goal}' — agent may be stuck.",
+                                (int)stalledFor.TotalSeconds, _currentGoal.Name);
+                        }
                     }
                 }
                 else
@@ -810,9 +830,6 @@ public sealed class AgentBackgroundService(
     {
         if (chatInterpreter is null || _currentGoal is null) return;
 
-        // Sprint 13: skip LLM call if recovery was already attempted for this goal.
-        // blockNotFound events fire on every failed mine cycle, so without this guard
-        // we'd call the LLM on every cycle and exhaust the rate limit.
         if (string.Equals(_currentGoal.Name, _lastRecoveredGoalName, StringComparison.OrdinalIgnoreCase))
         {
             logger.LogDebug(
@@ -853,10 +870,6 @@ public sealed class AgentBackgroundService(
 
             if (interpretation.IntentType == ChatIntentType.CreateGoal && interpretation.GoalName is not null)
             {
-                // Sprint 13 fix: compare by item-ID suffix to handle the naming discrepancy
-                // between ChatInterpretation.GoalName ("GatherItem:oak_log") and
-                // GenericGatherGoal.Name ("Gather:oak_log"). Sprint 12's direct string
-                // comparison never fired because these strings don't match exactly.
                 if (GoalNamesMatch(interpretation.GoalName, _currentGoal?.Name))
                 {
                     logger.LogDebug(
@@ -884,8 +897,6 @@ public sealed class AgentBackgroundService(
 
     /// <summary>
     /// Compares two goal name strings by their item-ID suffix (everything after ':').
-    /// This handles the naming discrepancy between ChatInterpreter ("GatherItem:oak_log")
-    /// and GenericGatherGoal.Name ("Gather:oak_log") — both share the suffix "oak_log".
     /// </summary>
     private static bool GoalNamesMatch(string? a, string? b)
     {
