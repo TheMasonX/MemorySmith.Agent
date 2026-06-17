@@ -10,6 +10,12 @@ namespace MemorySmith.Agent.Tests;
 /// - D1: RegisteredGoals exposes Build:{blueprintId} and GatherItem:{itemId} prefixes.
 /// - D3: CreateAsync returns null (not an exception) when the repository is null.
 /// - Build:{blueprintId} prefix creates a <see cref="BuildGoal"/> from a repository.
+///
+/// Sprint 13: updated CreateAsync_GatherItemPrefix_NoItemRegistry test to reflect
+/// the new built-in fallback behaviour. With no IItemRegistry, common direct-mine
+/// blocks (oak_log, dirt, iron_ore, etc.) now return a goal via the built-in spec
+/// rather than null. Non-mineable items (e.g. "emerald", "player_head") still return
+/// null when the registry is absent.
 /// </summary>
 [TestFixture]
 [Description("GoalFactory Build: D1 registered goals, D3 null-repository warning, Build prefix")]
@@ -69,12 +75,33 @@ public sealed class GoalFactoryBuildTests
         Assert.That(goal, Is.Null);
     }
 
+    /// <summary>
+    /// Sprint 13: GoalFactory now has a built-in fallback spec for common direct-mine
+    /// blocks (oak_log, dirt, iron_ore, etc.). With no IItemRegistry, these items
+    /// return a GenericGatherGoal via the fallback instead of returning null.
+    /// This enables "leo gather wood" / "leo gather dirt" to work without MemorySmith
+    /// wiki pages for common items.
+    /// </summary>
     [Test]
-    public async Task CreateAsync_GatherItemPrefix_NoItemRegistry_ReturnsNull()
+    public async Task CreateAsync_GatherItemPrefix_NoItemRegistry_BuiltInBlock_ReturnsGoal()
+    {
+        var factory = new GoalFactory(); // no registry — built-in fallback applies
+        var goal    = await factory.CreateAsync("GatherItem:oak_log");
+        Assert.That(goal, Is.Not.Null,
+            "oak_log is in the built-in spec list; GoalFactory should return a goal even without a registry.");
+    }
+
+    /// <summary>
+    /// Non-mineable items (emerald, player_head, etc.) are NOT in the built-in list.
+    /// Without a registry, these still return null.
+    /// </summary>
+    [Test]
+    public async Task CreateAsync_GatherItemPrefix_NoItemRegistry_NonBuiltInBlock_ReturnsNull()
     {
         var factory = new GoalFactory(); // no registry
-        var goal    = await factory.CreateAsync("GatherItem:oak_log");
-        Assert.That(goal, Is.Null);
+        var goal    = await factory.CreateAsync("GatherItem:emerald_block_xyz");
+        Assert.That(goal, Is.Null,
+            "Items not in the built-in spec list should return null when no registry is provided.");
     }
 
     // ── Build prefix with repository ──────────────────────────────────────────
@@ -140,7 +167,7 @@ public sealed class GoalFactoryBuildTests
         var goal    = (BuildGoal?)await factory.CreateAsync("Build:floor-test");
 
         Assert.That(goal, Is.Not.Null);
-        Assert.That(goal!.Blocks, Has.Count.EqualTo(6)); // 3×2 = 6 cobblestone
+        Assert.That(goal!.Blocks, Has.Count.EqualTo(6)); // 3x2 = 6 cobblestone
     }
 
     // ── Case-insensitivity ────────────────────────────────────────────────────
