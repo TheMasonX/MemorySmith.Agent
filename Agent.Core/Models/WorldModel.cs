@@ -1,6 +1,7 @@
 namespace Agent.Core;
 
 using System.Collections.Concurrent;
+using System.Text.Json;
 
 /// <summary>
 /// Rule-based world model that tracks observations, beliefs, and predictions.
@@ -186,11 +187,22 @@ public sealed class WorldModel : IWorldModel
         new(tool, args, null, b.Health, b.Food, b.Inventory,
             0.30, $"Unknown tool '{tool}' — low confidence prediction");
 
+    /// <summary>
+    /// Extracts an integer argument from the args dictionary.
+    /// Handles int, long, double, and JsonElement (JSON-deserialised args) gracefully.
+    /// Returns <paramref name="fallback"/> if the key is absent or the value is not numeric.
+    /// </summary>
     private static int GetIntArg(IReadOnlyDictionary<string, object?> args, string key, int fallback = 0)
     {
-        if (args.TryGetValue(key, out var v) && v is int i) return i;
-        if (args.TryGetValue(key, out var v2) && v2 is long l) return (int)l;
-        return fallback;
+        if (!args.TryGetValue(key, out var v)) return fallback;
+        return v switch
+        {
+            int i    => i,
+            long l   => (int)l,
+            double d => (int)d,
+            JsonElement je when je.ValueKind == JsonValueKind.Number => je.GetInt32(),
+            _ => fallback,
+        };
     }
 
     private static string GetStrArg(IReadOnlyDictionary<string, object?> args, string key, string fallback = "unknown")
