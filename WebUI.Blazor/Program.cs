@@ -205,6 +205,15 @@ if (agentEnabled)
     builder.Services.AddHostedService(sp => sp.GetRequiredService<AgentBackgroundService>());
 }
 
+// ── Fallback singletons for when agent is disabled ────────────────────────────────────
+// These ensure endpoints that depend on IAgentJournal / IWorldModel resolve cleanly
+// even when Agent:Enabled=false, instead of returning 500.
+if (!agentEnabled)
+{
+    builder.Services.AddSingleton<IAgentJournal>(NullAgentJournal.Instance);
+    builder.Services.AddSingleton<IWorldModel>(new WorldModel());
+}
+
 // ── Build ────────────────────────────────────────────────────────────────────────────
 var app = builder.Build();
 app.UseSerilogRequestLogging();
@@ -325,9 +334,42 @@ app.MapPost("/api/agent/command", (CommandRequest req, AgentBackgroundService? a
     return Results.Ok(new { Received = req.Command, Status = "queued" });
 });
 
+// ── Agent observability endpoints (Sprint 7 / D5) ─────────────────────────────────────
+
+app.MapGet("/api/agent/journal", (
+    IAgentJournal? journal,
+    int limit = 50,
+    string? type = null) =>
+{
+    if (journal is NullAgentJournal or null)
+        return Results.Ok(new { count = 0, entries = Array.Empty<object>() });
+
+    JournalEntryType? typeFilter = null;
+    if (type is not null && Enum.TryParse<JournalEntryType>(type, ignoreCase: true, out var t))
+        typeFilter = t;
+
+    var entries = journal.Query(typeFilter).Take(limit).ToList();
+    return Results.Ok(new { count = journal.Count, returned = entries.Count, entries });
+});
+
+app.MapGet("/api/agent/worldmodel", (IWorldModel? model) =>
+{
+    if (model is null)
+        return Results.Ok(new { available = false });
+
+    return Results.Ok(new
+    {
+        available   = true,
+        uncertainty = model.Uncertainty,
+        belief      = model.Belief,
+        observed    = model.Observed,
+    });
+});
+
 app.Run();
 
 record CommandRequest(string Command);
 record PlanRequest(string GoalName, IReadOnlyDictionary<string, object?>? Parameters = null);
 record OriginRequest(string BlueprintId, int X, int Y, int Z);
 record ChatRequest(string? Message);
+
