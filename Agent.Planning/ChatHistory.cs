@@ -19,12 +19,18 @@ public sealed record ChatTurn(string Speaker, string Message, DateTimeOffset Tim
 /// reads happen within the same serialized pipeline. No lock needed, but
 /// the API is safe for concurrent access via <see cref="Interlocked.Exchange"/>.
 /// </summary>
-public sealed class ChatHistory(int maxTurns = MaxTurnsDefault)
+public sealed class ChatHistory
 {
     /// <summary>Default context window size (from Sprint 4b spec).</summary>
     public const int MaxTurnsDefault = 5;
 
+    private readonly int _maxTurns;
     private volatile ChatTurn[] _buffer = [];
+
+    public ChatHistory(int maxTurns = MaxTurnsDefault)
+    {
+        _maxTurns = maxTurns;
+    }
 
     /// <summary>Number of turns currently stored (up to <c>maxTurns</c>).</summary>
     public int Count => Volatile.Read(ref _buffer).Length;
@@ -38,7 +44,7 @@ public sealed class ChatHistory(int maxTurns = MaxTurnsDefault)
         while (true)
         {
             var current = Volatile.Read(ref _buffer);
-            var updated = current.Length < maxTurns
+            var updated = current.Length < _maxTurns
                 ? [.. current, turn]
                 : [.. current[1..], turn];
             if (Interlocked.CompareExchange(ref _buffer, updated, current) == current)
