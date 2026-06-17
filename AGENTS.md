@@ -132,6 +132,33 @@ Each seat must state: confidence %, explicit dissent, blocking vs. deferred.
 2. Register it in `_methods` inside the constructor: `["Foo"] = FooDecompose`.
 3. If it returns `PlaceBlock` actions for a build: add `buildProgressBlueprintId` and `buildProgressBlockIndex` context entries to each `PlaceBlock` action for checkpoint tracking.
 
+### Testing the /api/agent/resolve endpoint (Sprint 16+)
+
+`GET /api/agent/resolve` is the single-entry knowledge lookup added in Sprint 16.
+Use these `curl` examples to verify the resolver is working after code changes:
+
+```bash
+# Look up an item by ID (registry hit expected — oak_log is a DirectMineable item)
+curl -s "http://localhost:5000/api/agent/resolve?q=oak_log" | python3 -m json.tool
+
+# Look up a smeltable item
+curl -s "http://localhost:5000/api/agent/resolve?q=iron_ingot" | python3 -m json.tool
+
+# Filter by CandidateType (only WikiPage results)
+curl -s "http://localhost:5000/api/agent/resolve?q=iron+ore&types=WikiPage" | python3 -m json.tool
+
+# Filter by confidence threshold (only high-confidence matches)
+curl -s "http://localhost:5000/api/agent/resolve?q=diamond&confidenceThreshold=0.8" | python3 -m json.tool
+
+# Inspect WorldFact results from live WorldState (Sprint 17+; requires agent running)
+curl -s "http://localhost:5000/api/agent/resolve?q=inventory&types=WorldFact&topN=10" | python3 -m json.tool
+```
+
+**Notes:**
+- `Agent:Enabled=true` must be set in configuration; otherwise the endpoint returns HTTP 500.
+- `SearchAsync` in the wiki fallback receives the **raw un-normalized query** (e.g., `"iron ore"` not `"iron_ore"`) — this is intentional; the semantic search engine handles natural-language phrases better than underscored identifiers.
+- `wasAmbiguous=true` means the top-2 candidates are within 0.05 confidence of each other. Callers should surface a clarification prompt rather than auto-picking the best result.
+
 ### Pushing files via GitHub MCP
 
 ```python
