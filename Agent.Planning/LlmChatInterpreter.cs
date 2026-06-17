@@ -17,22 +17,18 @@ using System.Text.RegularExpressions;
 ///      blocks away AND didn't name this bot, return NotAddressed without calling the LLM.
 ///   3. Pattern fast-path: if <see cref="ChatInterpreter"/> returns a confident result
 ///      (CreateGoal / CancelGoal / QueryHelp / QueryStatus / NavigateTo), skip the LLM.
-///      NavigateTo is fast-pathed because the LLM cannot improve on it — player position
-///      is already resolved by the pattern matcher, not the LLM.
-///      QueryStatus/QueryHelp are fast-pathed because the pattern response is complete and
-///      correct; calling the LLM just adds latency.
 ///   4. Rate-limit check: per-player and global window via <see cref="ChatRateLimiter"/>.
-///   5. LLM call: <see cref="ILlmProvider.CompleteAsync"/> with a structured JSON prompt
-///      that includes the last <see cref="ChatHistory.MaxTurnsDefault"/> conversation turns.
-///      A per-request timeout (<see cref="ChatOptions.LlmTimeoutSeconds"/>) prevents a
-///      hung Ollama from stalling the chat consumer indefinitely (Sprint 11).
+///   5. LLM call: <see cref="ILlmProvider.CompleteAsync"/> with a structured JSON prompt.
+///      Two-layer timeout (Sprint 11 + Sprint 12):
+///        Layer 1 — <see cref="CancellationTokenSource.CancelAfter"/>: signals the provider
+///          to abort via the CancellationToken it was passed. Works when the provider
+///          correctly propagates the token through its HTTP/stream read loop.
+///        Layer 2 — <see cref="Task.WhenAny"/> hard deadline: ensures <c>InterpretAsync</c>
+///          returns within the timeout window even when the provider ignores cancellation
+///          (e.g. Ollama streaming that blocks on response generation regardless of CT).
 ///   6. JSON parse: extract <see cref="ChatInterpretation"/> from the raw text.
-///   7. Empty-response guard: if the LLM produced an addressed intent with no response
-///      text, substitute the pattern fallback's response to avoid "Hmm..." then silence.
+///   7. Empty-response guard: substitutes pattern fallback when LLM response is empty.
 ///   8. Fallback: if any of steps 4-6 fail, use the pattern-matcher result.
-///
-/// "Split-brain" terminology: step 3 is the deterministic brain; steps 5-6 are the
-/// reasoning brain. The deterministic brain always wins for clear commands.
 /// </summary>
 public sealed class LlmChatInterpreter(
     ILlmProvider provider,
@@ -71,9 +67,7 @@ public sealed class LlmChatInterpreter(
         }
 
         // 4. Pattern fast-path — skip LLM for commands where the pattern response is
-        //    already complete and correct. The LLM cannot improve these.
-        //    NavigateTo: pattern knows player position; LLM does not.
-        //    QueryStatus/QueryHelp: deterministic responses; LLM adds only latency.
+        //    already complete and correct.
         if (quick.IntentType is ChatIntentType.CreateGoal
                               or ChatIntentType.CancelGoal
                               or ChatIntentType.QueryHelp
@@ -84,7 +78,6 @@ public sealed class LlmChatInterpreter(
             return quick;
         }
 
-        // Log when a message is about to go through the full LLM path vs. be skipped
         logger?.LogDebug("[llm] will call LLM for <{Username}> (pattern={Intent}): '{Snippet}'",
             username, quick.IntentType, effective[..Math.Min(40, effective.Length)]);
 
@@ -96,37 +89,59 @@ public sealed class LlmChatInterpreter(
         }
         if (!rateLimiter.TryAcquire(username, out _))
         {
-            logger?.LogInformation("[llm] rate-limited for {Username} (cooldown={Cooldown}s, globalMax={Max}/min) — using pattern result",
+            logger?.LogInformation(
+                "[llm] rate-limited for {Username} (cooldown={Cooldown}s, globalMax={Max}/min) — using pattern result",
                 username, options.PlayerCooldownSeconds, options.GlobalPerMinuteMax);
             return quick;
         }
 
-        // 6. LLM call — hard per-request timeout via linked CancellationTokenSource.
-        //    Sprint 11: prevents a hung Ollama from blocking the chat consumer for minutes.
-        //    options.LlmTimeoutSeconds defaults to 10; set higher for slow hardware.
+        // 6. LLM call — two-layer timeout.
+        //    Layer 1: CTS signals the provider to abort via CancellationToken.
+        //    Layer 2: Task.WhenAny is a hard deadline that fires even if the provider
+        //             ignores the CancellationToken (e.g. Ollama streaming on slow hardware).
         var snippet = effective[..Math.Min(60, effective.Length)];
         logger?.LogInformation("[llm] calling {Provider} ({Model}) for <{Username}> '{Snippet}'",
             provider.ProviderName, options.LlmModel, username, snippet);
-        var currentGoal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s ? s : null;
+
+        var currentGoal    = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s ? s : null;
         var historyContext = history?.FormatForPrompt();
+        var systemPrompt   = BuildSystemPrompt(botName, botPosition, currentGoal, onlinePlayers,
+                                               historyContext, playerPosition, state);
+        var userMsg        = $"{username} says: \"{effective}\"";
 
         using var llmCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        llmCts.CancelAfter(TimeSpan.FromSeconds(options.LlmTimeoutSeconds));
+        llmCts.CancelAfter(TimeSpan.FromSeconds(options.LlmTimeoutSeconds)); // Layer 1
 
         string? raw;
         try
         {
-            raw = await provider.CompleteAsync(
-                BuildSystemPrompt(botName, botPosition, currentGoal, onlinePlayers, historyContext, playerPosition, state),
-                $"{username} says: \"{effective}\"",
-                llmCts.Token);
+            var providerTask = provider.CompleteAsync(systemPrompt, userMsg, llmCts.Token);
+            // Layer 2: hard deadline — +1s grace so Layer 1 fires first under normal conditions.
+            var hardDeadline = Task.Delay(TimeSpan.FromSeconds(options.LlmTimeoutSeconds + 1), ct);
+
+            if (await Task.WhenAny(providerTask, hardDeadline) == hardDeadline)
+            {
+                await llmCts.CancelAsync(); // signal provider to stop
+                logger?.LogWarning(
+                    "[llm] hard timeout after {Timeout}s for <{Username}> '{Snippet}' — using pattern result",
+                    options.LlmTimeoutSeconds, username, effective[..Math.Min(40, effective.Length)]);
+                return quick;
+            }
+
+            // providerTask won — await to observe its result or exception
+            raw = await providerTask;
         }
         catch (OperationCanceledException) when (llmCts.IsCancellationRequested && !ct.IsCancellationRequested)
         {
-            // Only the per-request timeout fired — parent loop is still alive.
+            // Layer 1 CTS fired and the provider raised OCE — clean path
             logger?.LogWarning(
                 "[llm] timed out after {Timeout}s for <{Username}> '{Snippet}' — using pattern result",
                 options.LlmTimeoutSeconds, username, effective[..Math.Min(40, effective.Length)]);
+            return quick;
+        }
+        catch (Exception ex)
+        {
+            logger?.LogWarning(ex, "[llm] provider threw for <{Username}> — using pattern result", username);
             return quick;
         }
 
@@ -145,9 +160,7 @@ public sealed class LlmChatInterpreter(
             logger?.LogWarning("[llm] failed to parse JSON from {Provider} response: '{Snippet}'",
                 provider.ProviderName, raw[..Math.Min(100, raw.Length)]);
 
-        // 8. Empty-response guard — prevents "Hmm..." then silence when the LLM produces
-        //    an addressed intent (Chat, Unknown, etc.) but omits the response field.
-        //    Substitute the pattern-matcher's non-empty fallback in that case.
+        // 8. Empty-response guard
         if (llmResult is not null
             && llmResult.IntentType != ChatIntentType.NotAddressed
             && string.IsNullOrEmpty(llmResult.Response))
