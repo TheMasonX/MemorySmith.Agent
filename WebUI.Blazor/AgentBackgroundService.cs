@@ -29,7 +29,8 @@ public sealed class AgentBackgroundService(
     string botName = "AgentBot",
     int maxConsecutiveFailures = 3,
     IAgentJournal? journal = null,
-    TimeSpan[]? reconnectDelays = null) : BackgroundService
+    TimeSpan[]? reconnectDelays = null,
+    IReplanGovernor? replanGovernor = null) : BackgroundService
 {
     // Sprint 1b: default exponential backoff delays
     private static readonly TimeSpan[] DefaultReconnectDelays =
@@ -129,6 +130,8 @@ public sealed class AgentBackgroundService(
         _lastStallWarnedAt      = DateTimeOffset.MinValue;
         // Sprint 18: reset replan timer so the first plan fires without waiting.
         _lastReplanAt = DateTimeOffset.MinValue;
+        // Sprint 19: reset governor for the new goal.
+        replanGovernor?.Reset();
         lock (_pendingLock) _pendingActions.Clear();
         logger.LogInformation("[goal] set: {Goal} — {Description} | inventory: [{Inventory}]",
             goal.Name, goal.Description, SummarizeInventory());
@@ -153,6 +156,8 @@ public sealed class AgentBackgroundService(
             DateTimeOffset.UtcNow, JournalEntryType.GoalCancel, previousGoalName ?? "unknown"));
         _consecutiveFailures = 0;
         _lastRecoveredGoalName = null; // Sprint 13: reset recovery rate-limiter
+        // Sprint 19: reset governor on cancel.
+        replanGovernor?.Reset();
         _queue.Clear();
         lock (_pendingLock) _pendingActions.Clear();
         // Sprint 4b: push goal clear to dashboard
@@ -555,6 +560,25 @@ public sealed class AgentBackgroundService(
                 try
                 {
                     var plan = await planner.PlanAsync(_currentGoal, _worldState, ct);
+
+                    // Sprint 19: governor evaluates plan fingerprint before enqueueing.
+                    // Fingerprint = goal key + action type sequence (excludes parameters
+                    // since Wander coordinates change each cycle).
+                    var actionSequence = string.Join(",", plan.Actions.Select(a => a.Tool));
+                    var fingerprint = $"{_currentGoal.Name}:{actionSequence}";
+                    if (replanGovernor is not null)
+                    {
+                        var verdict = replanGovernor.Evaluate(fingerprint);
+                        if (verdict == ReplanVerdict.Stalled)
+                        {
+                            _lastReplanAt = DateTimeOffset.UtcNow;
+                            logger.LogWarning(
+                                "[governor] STALLED: goal '{Goal}' — identical plan repeated {Threshold}+ times with no progress. Auto-retry in {TimeoutSec}s.",
+                                _currentGoal.Name, 3, 60);
+                            continue;
+                        }
+                    }
+
                     foreach (var planAction in plan.Actions)
                         foreach (var kv in planContext)
                             planAction.Context.TryAdd(kv.Key, kv.Value);
@@ -567,9 +591,9 @@ public sealed class AgentBackgroundService(
                     }
                     _lastReplanAt = DateTimeOffset.UtcNow; // Sprint 18: record plan time
                     // Sprint 19: log action sequence for tracing plan structure
-                    var actionSequence = string.Join(" → ", plan.Actions.Select(a => a.Tool));
+                    var displaySequence = string.Join(" → ", plan.Actions.Select(a => a.Tool));
                     logger.LogInformation("[plan] {Goal}: {ActionCount} actions [{ActionSequence}]",
-                        _currentGoal.Name, plan.Actions.Count, actionSequence);
+                        _currentGoal.Name, plan.Actions.Count, displaySequence);
                     _journal?.Log(new JournalEntry(
                         DateTimeOffset.UtcNow, JournalEntryType.PlanCreated, _currentGoal.Name,
                         new Dictionary<string, object?> { ["actionCount"] = plan.Actions.Count }));
@@ -623,6 +647,8 @@ public sealed class AgentBackgroundService(
                         {
                             _consecutiveFailures = 0;
                             _lastFailureReason = null;
+                            // Sprint 19: signal progress to governor
+                            replanGovernor?.RecordProgress();
                         }
                         if (result.Data is not null)
                             foreach (var kv in result.Data)
