@@ -28,6 +28,10 @@ using Agent.Core;
 ///
 /// HasFailed: world-state fact "goal:Gather:{ItemId}:failed" = true
 ///   (set by AgentBackgroundService after consecutive tool failures).
+///
+/// Sprint 21 P0-A: IsComplete returns false when <see cref="WorldState.IsInventoryStale"/> is
+/// true, preventing false-completion when the WorldState has stale inventory data (e.g. after
+/// an admin /clear command that the bot did not observe via a game event).
 /// </summary>
 public sealed class GenericGatherGoal(ItemSpec item, int targetCount) : IGoal, IItemSpecGoal
 {
@@ -57,6 +61,12 @@ public sealed class GenericGatherGoal(ItemSpec item, int targetCount) : IGoal, I
     /// <inheritdoc/>
     public bool IsComplete(WorldState state)
     {
+        // Sprint 21 P0-A: inventory freshness gate.
+        // SetGoal marks inventory stale; cleared when a fresh StatusEvent arrives via GetStatus.
+        // Prevents false-completion when WorldState.Inventory is outdated (e.g. after admin /clear).
+        if (state.IsInventoryStale)
+            return false;
+
         if (item.RequiresSmelting)
         {
             // Check for the smelted product in inventory.
