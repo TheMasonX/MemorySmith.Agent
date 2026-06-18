@@ -253,8 +253,53 @@ bot.on('death',  () => { console.warn('[mc] bot died'); sendEvent('death', botPo
 bot.on('kicked', (reason) => { console.warn('[mc] kicked:', reason); sendEvent('kicked', { reason }); });
 bot.on('error',  (e)      => { console.error('[mc] error:', e.message); sendEvent('error', { message: e.message }); });
 
+// ── Sprint 19: System message filtering ───────────────────────────────────────
+// Server-generated messages (teleport confirmations, join/leave, time set, etc.)
+// must never reach the LLM chat pipeline. In solo play, all messages pass the
+// IsDirectedAtBot heuristic, so a teleport like "Teleported TheMasonX23 to Leo"
+// triggers a 15-second Ollama call that returns null. Filter them at the source.
+
+const SYSTEM_MESSAGE_PATTERNS = [
+  /^Teleported\s+\S+\s+to\s+\S+/i,      // Teleport confirmations
+  /^\S+\s+joined\s+the\s+game$/i,       // Join messages
+  /^\S+\s+left\s+the\s+game$/i,         // Leave messages
+  /^\[Server\]/i,                       // Server-prefixed messages
+  /^Set\s+the\s+time\s+to\s+/i,         // Time set
+  /^Set\s+\S+\s+game\s+mode\s+to\s+/i,  // Gamemode changes
+  /^Killed\s+/i,                        // Kill notifications
+  /^Gave\s+\d+\s+/i,                    // /give command confirmations
+  /^Set\s+own\s+game\s+mode/i,          // Own gamemode change
+];
+
+/**
+ * Returns true if the message is a Minecraft server system message that should
+ * not be forwarded to the C# chat pipeline.
+ */
+function isSystemMessage(username, message) {
+  // No username or empty username = server message
+  if (!username || username.trim() === '') return true;
+  return SYSTEM_MESSAGE_PATTERNS.some(re => re.test(message));
+}
+
 bot.on('chat', (username, message) => {
   if (username === bot.username) return;
+
+  // Sprint 19: filter system messages before they reach the LLM pipeline
+  if (isSystemMessage(username, message)) {
+    logStructured('debug', 'chat', 'system message filtered', { username, message });
+    // If the bot was teleported, emit a position update so WorldState stays current
+    const teleportMatch = message.match(/^Teleported\s+(\S+)\s+to\s+(\S+)/i);
+    if (teleportMatch && teleportMatch[1].toLowerCase() === bot.username.toLowerCase()) {
+      setTimeout(() => {
+        if (bot.entity) {
+          sendEvent('move', botPos());
+          logStructured('info', 'chat', 'bot teleport detected — position update sent', botPos());
+        }
+      }, 100);
+    }
+    return;
+  }
+
   const onlinePlayers = Object.keys(bot.players).filter(p => p !== bot.username).length;
   const playerEntity  = bot.players[username]?.entity;
   const playerPos     = playerEntity?.position ?? null;
