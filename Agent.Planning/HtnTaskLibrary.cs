@@ -283,8 +283,15 @@ public sealed class HtnTaskLibrary
 
         if (requireOrigin && originX == 0 && originY == 0 && originZ == 0)
         {
+            // Sprint 19: expand search radius if the last scan returned area=0.
+            // First attempt uses default radius (30); subsequent attempts use 48.
+            // The replan governor (Sprint 19) prevents infinite retry loops.
+            var lastAreaStr = state.Facts.TryGetValue(BuildFactKeys.LastFlatArea, out var la) ? la : null;
+            var lastArea = lastAreaStr is string las && int.TryParse(las, out var parsed) ? parsed : -1;
+            var searchRadius = lastArea == 0 ? 48 : PreflightFlatAreaRadius;
+
             return [MakeAction("FindFlatArea",
-                ("radius", (object?)PreflightFlatAreaRadius),
+                ("radius", (object?)searchRadius),
                 ("minFlatArea", (object?)PreflightFlatAreaMin))];
         }
 
