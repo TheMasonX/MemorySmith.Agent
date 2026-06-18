@@ -273,7 +273,7 @@ const SYSTEM_MESSAGE_PATTERNS = [
   /^Set\s+own\s+game\s+mode/i,          // Own gamemode change
   // Sprint 20: additional server-confirmation patterns observed in runtime
   /^Removed\s+\d+\s+items?\s+from\s+/i, // /clear response: "Removed 13 items from player Leo"
-  /^Cleared\s+\S+/i,                     // /clear alt: "Cleared TheMasonX23's inventory"
+  /^Cleared\s+(?:\d+|\S+'s|the\s+inventory)/i, // /clear: "Cleared 64 items", "Cleared Leo's inventory", "Cleared the inventory of Leo"
   /^Gave\s+\S+\s+\d+\s+/i,             // /give alt: "Gave TheMasonX23 64 [Dirt]"
 ];
 
