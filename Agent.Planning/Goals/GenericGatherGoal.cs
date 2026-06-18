@@ -34,6 +34,14 @@ public sealed class GenericGatherGoal(ItemSpec item, int targetCount) : IGoal, I
     /// <summary>The ItemSpec that describes what to gather and how.</summary>
     public ItemSpec Spec => item;
 
+    /// <summary>
+    /// The target quantity to gather.
+    /// Sprint 18: exposed as a public property so <see cref="GatherGoalDecomposer"/>
+    /// can pass the correct count to <c>HtnTaskLibrary.GatherItemDecompose</c> rather
+    /// than always defaulting to 10 (the bug that caused "get 1 dirt" to mine 10).
+    /// </summary>
+    public int TargetCount => targetCount;
+
     /// <inheritdoc/>
     public string Name => $"Gather:{item.ItemId}";
 
