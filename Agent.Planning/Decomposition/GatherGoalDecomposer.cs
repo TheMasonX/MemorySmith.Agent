@@ -30,9 +30,11 @@ public sealed class GatherGoalDecomposer(HtnTaskLibrary taskLibrary) : IGoalDeco
     {
         var (spec, parameters) = goal switch
         {
-            GatherWoodGoal g   => (OakLogSpec, new[] { g.TargetCount.ToString() }),
-            GenericGatherGoal gg => (gg.Spec, Array.Empty<string>()),
-            IItemSpecGoal isg  => (isg.Spec, Array.Empty<string>()),
+            GatherWoodGoal g     => (OakLogSpec, new[] { g.TargetCount.ToString() }),
+            // Sprint 18 fix: pass TargetCount so GatherItemDecompose uses the requested
+            // quantity instead of always defaulting to 10 (the "get 1 dirt mines 10" bug).
+            GenericGatherGoal gg => (gg.Spec, new[] { gg.TargetCount.ToString() }),
+            IItemSpecGoal isg    => (isg.Spec, Array.Empty<string>()),
             _ => throw new InvalidOperationException(
                 $"GatherGoalDecomposer cannot handle {goal.GetType().Name}")
         };
