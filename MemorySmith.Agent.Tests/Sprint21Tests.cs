@@ -1,6 +1,7 @@
 using Agent.Core;
 using Agent.Planning;
 using Agent.Planning.Goals;
+using Agent.Tools;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 
