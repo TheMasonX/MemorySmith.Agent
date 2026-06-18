@@ -16,6 +16,8 @@ namespace Agent.Core;
 ///            so planners can read the last scan result without accessing per-event keys.
 /// Sprint 14 P1b: ApplyStatus normalizes inventory keys by stripping the "minecraft:"
 ///            namespace prefix so "minecraft:oak_log" and "oak_log" map to the same slot.
+/// Sprint 21 P0-A: ApplyStatus clears WorldState.IsInventoryStale so GenericGatherGoal
+///            knows inventory is fresh after a GetStatus response.
 /// </summary>
 public sealed class WorldStateProjector
 {
@@ -74,6 +76,9 @@ public sealed class WorldStateProjector
             b.SetHealth(e.Health);
             b.SetFood(e.Food);
             b.SetInventory(NormalizeInventory(e.Inventory));
+            // Sprint 21 P0-A: a GetStatus response confirms the current server-side inventory.
+            // Clearing the stale flag allows GenericGatherGoal.IsComplete to proceed normally.
+            b.SetInventoryStale(false);
         });
         return StoreFacts(result, e);
     }
