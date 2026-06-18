@@ -273,7 +273,7 @@ public sealed class Sprint20SystemMessageFilterTests
         new(@"^Set\s+own\s+game\s+mode",       System.Text.RegularExpressions.RegexOptions.IgnoreCase),
         // Sprint 20 additions:
         new(@"^Removed\s+\d+\s+item", System.Text.RegularExpressions.RegexOptions.IgnoreCase),  // matches item, items, item(s)
-        new(@"^Cleared\s+\S+",                    System.Text.RegularExpressions.RegexOptions.IgnoreCase),
+        new(@"^Cleared\s+(?:\d+|\S+'s|the\s+inventory)",  System.Text.RegularExpressions.RegexOptions.IgnoreCase),
         new(@"^Gave\s+\S+\s+\d+\s+",             System.Text.RegularExpressions.RegexOptions.IgnoreCase),
     ];
 
@@ -308,13 +308,7 @@ public sealed class Sprint20SystemMessageFilterTests
     [TestCase("Cleared out all the dirt in my inventory")]  // player speaking, starts with Cleared but different form
     public void PlayerMessages_AreNotFiltered(string message)
     {
-        // Note: "Cleared out all..." would match /^Cleared\s+\S+/ — the pattern might
-        // need tuning. For now we test that common commands pass through.
-        if (message.StartsWith("Cleared "))
-        {
-            Assert.Ignore($"'{message}' is an edge case — current pattern is intentionally broad.");
-            return;
-        }
+        // Sprint 21 P1-D: "Cleared out all..." pattern tightened; now correctly passes through.
         Assert.That(IsSystemMessage(message), Is.False,
             $"'{message}' should NOT be identified as a system message.");
     }
