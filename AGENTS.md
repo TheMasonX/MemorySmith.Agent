@@ -229,3 +229,28 @@ dotnet run --project WebUI.Blazor --launch-profile WebUI.Blazor
 dotnet test MemorySmith.Agent.Tests
 ```
 - Sprint 20 complete: progress-hash governor, inventory freshness gate, LLM truncation recovery, expanded system message filter.
+
+## Rule: Never patch C# verbatim-string files via agent intermediary
+
+C# verbatim strings use `""` (doubled double-quotes) as the escape for a literal `"`.
+When a subagent reads a C# file and passes the content to `github__create_or_update_file`,
+the agent's JSON encoding converts `""` to `\"`, corrupting verbatim string literals.
+
+**Always use mcp__t__ExecuteIntegration with a paramsFile for C# file pushes:**
+
+```python
+import json
+with open('myfile.cs', 'r', encoding='utf-8') as f:
+    content = f.read()
+params = {"owner": "TheMasonX", "repo": "MemorySmith.Agent",
+          "path": "...", "branch": "sprint-5-tool-safety",
+          "message": "...", "content": content,
+          "sha": "current-file-sha",
+          "committer": {"name": "MemorySmith Agent", "email": "agent@memorysmith.dev"}}
+with open('/agent/workspace/params.json', 'w') as f:
+    json.dump(params, f, ensure_ascii=False)
+```
+Then: `mcp__t__ExecuteIntegration(action="github__create_or_update_file", paramsFile="/agent/workspace/params.json")`
+
+Also: files fetched via GitHub API are base64-encoded. If a file was previously pushed by an agent
+(double-encoded), you must double-decode: `base64.b64decode(base64.b64decode(api_content))`.
