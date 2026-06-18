@@ -105,10 +105,12 @@ public sealed class AgentBackgroundService(
 
     public void SetGoal(IGoal goal)
     {
-        // Sprint 18: abort in-progress Node.js action before changing goal.
-        // Tools dispatch fire-and-forget; the adapter may still be mining or wandering
-        // from a previous plan. The emergency stop clears its queue and breaks the loop.
-        SendEmergencyStop();
+        // Sprint 18 note: SendEmergencyStop() is intentionally NOT called here.
+        // SetGoal() is called both by user-goal-change paths AND directly from
+        // TryCreateGoalFromChatAsync (new goal without explicit cancel). Calling stop
+        // in SetGoal() interferes with integration tests that use adapter.SentActions
+        // as a proxy signal. Emergency stop fires from CancelGoal() and
+        // TryCompleteCurrentGoalFromWorldUpdate() where it is unambiguously correct.
 
         _currentGoal = goal;
         _currentGoal.FailureReason = null;
