@@ -2,6 +2,7 @@ namespace Agent.Planning;
 
 using Agent.Core;
 using Agent.Planning.Llm;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -27,7 +28,9 @@ public sealed class LlmChatInterpreter(
     ILlmProvider provider,
     ChatInterpreter patternFallback,
     ChatRateLimiter rateLimiter,
-    ChatOptions options) : IChatInterpreter
+    ChatOptions options,
+    ChatHistory? history = null,
+    ILogger<LlmChatInterpreter>? logger = null) : IChatInterpreter
 {
     // ── IChatInterpreter ──────────────────────────────────────────────────────
 
