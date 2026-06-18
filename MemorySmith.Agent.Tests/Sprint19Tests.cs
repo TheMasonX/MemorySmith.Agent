@@ -1,6 +1,7 @@
 using Agent.Core;
 using Agent.Planning;
 using Agent.Planning.Goals;
+using Agent.Planning.Llm;
 
 namespace MemorySmith.Agent.Tests;
 
