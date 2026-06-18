@@ -21,6 +21,15 @@ public record WorldState
     public IReadOnlyList<Fact> StructuredFacts { get; init; } = [];
     public DateTimeOffset UpdatedAt { get; init; } = DateTimeOffset.UtcNow;
 
+    /// <summary>
+    /// Sprint 21 P0-A: true when inventory was marked potentially stale by
+    /// <see cref="WebUI.Blazor.AgentBackgroundService.SetGoal"/>.
+    /// Cleared by <see cref="WorldStateProjector"/> when a fresh <c>StatusEvent</c> arrives.
+    /// <see cref="Agent.Planning.Goals.GenericGatherGoal.IsComplete"/> returns false while
+    /// this flag is set, preventing false-completion after admin <c>/clear</c>.
+    /// </summary>
+    public bool IsInventoryStale { get; init; } = false;
+
     public WorldState With(Action<WorldState.Builder> configure)
     {
         var b = new Builder(this);
@@ -87,6 +96,17 @@ public record WorldState
             if (next <= 0) inv.Remove(item);
             else           inv[item] = next;
             _state = _state with { Inventory = inv };
+            return this;
+        }
+
+        /// <summary>
+        /// Sprint 21 P0-A: marks the inventory as potentially stale (true) or confirmed
+        /// fresh (false). Set to true by AgentBackgroundService.SetGoal; cleared by
+        /// WorldStateProjector when a StatusEvent arrives from GetStatus.
+        /// </summary>
+        public Builder SetInventoryStale(bool stale)
+        {
+            _state = _state with { IsInventoryStale = stale };
             return this;
         }
 
