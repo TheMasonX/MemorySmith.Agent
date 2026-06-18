@@ -1,1 +1,269 @@
-bmFtZXNwYWNlIEFnZW50LlBsYW5uaW5nOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuUGxhbm5pbmcuTGxtOwp1c2luZyBNaWNyb3NvZnQuRXh0ZW5zaW9ucy5Mb2dnaW5nOwp1c2luZyBTeXN0ZW0uVGV4dC5Kc29uOwp1c2luZyBTeXN0ZW0uVGV4dC5SZWd1bGFyRXhwcmVzc2lvbnM7CgovLy8gPHN1bW1hcnk+Ci8vLyA8c2VlIGNyZWY9IklDaGF0SW50ZXJwcmV0ZXIiLz4gdGhhdCBjb21iaW5lcyBMTE0tcG93ZXJlZCBldmFsdWF0aW9uIHdpdGgKLy8vIGRldGVybWluaXN0aWMgcGF0dGVybi1tYXRjaGluZyBmYWxsYmFjayBhbmQgYSBkaXN0YW5jZS1iYXNlZCByb3V0aW5nIGdhdGUuCi8vLwovLy8gRXZhbHVhdGlvbiBwaXBlbGluZSBmb3IgZWFjaCBpbmNvbWluZyBtZXNzYWdlOgovLy8gICAxLiBUcnVuY2F0ZSBtZXNzYWdlIGF0IDxzZWUgY3JlZj0iQ2hhdE9wdGlvbnMuTWF4TWVzc2FnZUxlbmd0aCIvPiBjaGFyYWN0ZXJzLgovLy8gICAyLiBEaXN0YW5jZSBnYXRlOiBpZiB0aGUgcGxheWVyIGlzICZndDsgPHNlZSBjcmVmPSJDaGF0T3B0aW9ucy5NYXhSZXNwb25zZURpc3RhbmNlQmxvY2tzIi8+Ci8vLyAgICAgIGJsb2NrcyBhd2F5IEFORCBkaWRuJ3QgbmFtZSB0aGlzIGJvdCwgcmV0dXJuIE5vdEFkZHJlc3NlZCB3aXRob3V0IGNhbGxpbmcgdGhlIExMTS4KLy8vICAgMy4gUGF0dGVybiBmYXN0LXBhdGg6IGlmIDxzZWUgY3JlZj0iQ2hhdEludGVycHJldGVyIi8+IHJldHVybnMgYSBjb25maWRlbnQgcmVzdWx0Ci8vLyAgICAgIChDcmVhdGVHb2FsIC8gQ2FuY2VsR29hbCAvIFF1ZXJ5SGVscCksIHNraXAgdGhlIExMTSBhbmQgdXNlIGl0LgovLy8gICA0LiBSYXRlLWxpbWl0IGNoZWNrOiBwZXItcGxheWVyIGFuZCBnbG9iYWwgd2luZG93IHZpYSA8c2VlIGNyZWY9IkNoYXRSYXRlTGltaXRlciIvPi4KLy8vICAgNS4gTExNIGNhbGw6IDxzZWUgY3JlZj0iSUxsbVByb3ZpZGVyLkNvbXBsZXRlQXN5bmMiLz4gd2l0aCBhIHN0cnVjdHVyZWQgSlNPTiBwcm9tcHQuCi8vLyAgIDYuIEpTT04gcGFyc2U6IGV4dHJhY3QgPHNlZSBjcmVmPSJDaGF0SW50ZXJwcmV0YXRpb24iLz4gZnJvbSB0aGUgcmF3IHRleHQuCi8vLyAgIDcuIEZhbGxiYWNrOiBpZiBhbnkgb2Ygc3RlcHMgNC02IGZhaWwsIHVzZSB0aGUgcGF0dGVybi1tYXRjaGVyIHJlc3VsdC4KLy8vCi8vLyAiU3BsaXQtYnJhaW4iIHRlcm1pbm9sb2d5OiBzdGVwIDMgaXMgdGhlIGRldGVybWluaXN0aWMgYnJhaW47IHN0ZXBzIDUtNiBhcmUgdGhlCi8vLyByZWFzb25pbmcgYnJhaW4uIFRoZSBkZXRlcm1pbmlzdGljIGJyYWluIGFsd2F5cyB3aW5zIGZvciBjbGVhciBjb21tYW5kcy4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCBjbGFzcyBMbG1DaGF0SW50ZXJwcmV0ZXIoCiAgICBJTGxtUHJvdmlkZXIgcHJvdmlkZXIsCiAgICBDaGF0SW50ZXJwcmV0ZXIgcGF0dGVybkZhbGxiYWNrLAogICAgQ2hhdFJhdGVMaW1pdGVyIHJhdGVMaW1pdGVyLAogICAgQ2hhdE9wdGlvbnMgb3B0aW9ucywKICAgIENoYXRIaXN0b3J5PyBoaXN0b3J5ID0gbnVsbCwKICAgIElMb2dnZXI8TGxtQ2hhdEludGVycHJldGVyPj8gbG9nZ2VyID0gbnVsbCkgOiBJQ2hhdEludGVycHJldGVyCnsKICAgIC8vIOKUgOKUgCBJQ2hhdEludGVycHJldGVyIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIHB1YmxpYyBhc3luYyBUYXNrPENoYXRJbnRlcnByZXRhdGlvbj4gSW50ZXJwcmV0QXN5bmMoCiAgICAgICAgc3RyaW5nIHVzZXJuYW1lLCBzdHJpbmcgbWVzc2FnZSwgc3RyaW5nIGJvdE5hbWUsCiAgICAgICAgaW50IG9ubGluZVBsYXllcnMsIFBvc2l0aW9uIGJvdFBvc2l0aW9uLCBQb3NpdGlvbj8gcGxheWVyUG9zaXRpb24sCiAgICAgICAgV29ybGRTdGF0ZSBzdGF0ZSwgQ2FuY2VsbGF0aW9uVG9rZW4gY3QgPSBkZWZhdWx0KQogICAgewogICAgICAgIC8vIDEuIEVuZm9yY2UgbWF4IGxlbmd0aCBiZWZvcmUgYW55IHByb2Nlc3NpbmcKICAgICAgICB2YXIgZWZmZWN0aXZlID0gbWVzc2FnZS5MZW5ndGggPiBvcHRpb25zLk1heE1lc3NhZ2VMZW5ndGgKICAgICAgICAgICAgPyBtZXNzYWdlWy4ub3B0aW9ucy5NYXhNZXNzYWdlTGVuZ3RoXQogICAgICAgICAgICA6IG1lc3NhZ2U7CgogICAgICAgIC8vIFNwcmludCA0YjogcmVjb3JkIGluY29taW5nIHBsYXllciBtZXNzYWdlIGluIGNvbnZlcnNhdGlvbiBoaXN0b3J5CiAgICAgICAgaGlzdG9yeT8uUmVjb3JkKHVzZXJuYW1lLCBlZmZlY3RpdmUpOwoKICAgICAgICAvLyAyLiBHZXQgdGhlIHBhdHRlcm4tbWF0Y2hlcidzIHZpZXcg4oCUIHVzZWQgYXMgZmFsbGJhY2sgYW5kIGZhc3QtcGF0aAogICAgICAgIHZhciBxdWljayA9IGF3YWl0IHBhdHRlcm5GYWxsYmFjay5JbnRlcnByZXRBc3luYygKICAgICAgICAgICAgdXNlcm5hbWUsIGVmZmVjdGl2ZSwgYm90TmFtZSwgb25saW5lUGxheWVycywKICAgICAgICAgICAgYm90UG9zaXRpb24sIHBsYXllclBvc2l0aW9uLCBzdGF0ZSwgY3QpOwoKICAgICAgICAvLyAzLiBEaXN0YW5jZSBnYXRlIOKAlCBza2lwIExMTSBpZiBwbGF5ZXIgaXMgZmFyIGFuZCBub3QgYWRkcmVzc2luZyB0aGlzIGJvdAogICAgICAgIGlmIChxdWljay5JbnRlbnRUeXBlID09IENoYXRJbnRlbnRUeXBlLk5vdEFkZHJlc3NlZAogICAgICAgICAgICAmJiBwbGF5ZXJQb3NpdGlvbiBpcyBub3QgbnVsbAogICAgICAgICAgICAmJiBEaXN0YW5jZShib3RQb3NpdGlvbiwgcGxheWVyUG9zaXRpb24pID4gb3B0aW9ucy5NYXhSZXNwb25zZURpc3RhbmNlQmxvY2tzKQogICAgICAgIHsKICAgICAgICAgICAgcmV0dXJuIHF1aWNrOwogICAgICAgIH0KCiAgICAgICAgLy8gNC4gUGF0dGVybiBmYXN0LXBhdGgg4oCUIHNraXAgTExNIGZvciB1bmFtYmlndW91cyBjb21tYW5kcwogICAgICAgIGlmIChxdWljay5JbnRlbnRUeXBlIGlzIENoYXRJbnRlbnRUeXBlLkNyZWF0ZUdvYWwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgb3IgQ2hhdEludGVudFR5cGUuQ2FuY2VsR29hbAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBvciBDaGF0SW50ZW50VHlwZS5RdWVyeUhlbHApCiAgICAgICAgewogICAgICAgICAgICByZXR1cm4gcXVpY2s7CiAgICAgICAgfQoKICAgICAgICAvLyA1LiBSYXRlLWxpbWl0IGNoZWNrCiAgICAgICAgaWYgKCFwcm92aWRlci5Jc0F2YWlsYWJsZSB8fCAhcmF0ZUxpbWl0ZXIuVHJ5QWNxdWlyZSh1c2VybmFtZSwgb3V0IF8pKQogICAgICAgICAgICByZXR1cm4gcXVpY2s7CgogICAgICAgIC8vIDYuIExMTSBjYWxsCiAgICAgICAgdmFyIGN1cnJlbnRHb2FsID0gc3RhdGUuRmFjdHMuVHJ5R2V0VmFsdWUoImN1cnJlbnRHb2FsIiwgb3V0IHZhciBjZykgJiYgY2cgaXMgc3RyaW5nIHMgPyBzIDogbnVsbDsKICAgICAgICBsb2dnZXI/LkxvZ0luZm9ybWF0aW9uKCJbbGxtXSBjYWxsaW5nIHtQcm92aWRlcn0gKHtNb2RlbH0pIGZvciA8e1VzZXJuYW1lfT4gJ3tNZXNzYWdlfSciLAogICAgICAgICAgICBwcm92aWRlci5Qcm92aWRlck5hbWUsIG9wdGlvbnMuTGxtTW9kZWwsIHVzZXJuYW1lLAogICAgICAgICAgICBlZmZlY3RpdmUuTGVuZ3RoID4gNjAgPyBlZmZlY3RpdmVbLi42MF0gOiBlZmZlY3RpdmUpOwogICAgICAgIHZhciByYXcgPSBhd2FpdCBwcm92aWRlci5Db21wbGV0ZUFzeW5jKAogICAgICAgICAgICBCdWlsZFN5c3RlbVByb21wdChib3ROYW1lLCBib3RQb3NpdGlvbiwgY3VycmVudEdvYWwsIG9ubGluZVBsYXllcnMpLAogICAgICAgICAgICAkInt1c2VybmFtZX0gc2F5czogXCJ7ZWZmZWN0aXZlfVwiIiwKICAgICAgICAgICAgY3QpOwoKICAgICAgICBpZiAocmF3IGlzIG51bGwpCiAgICAgICAgewogICAgICAgICAgICBsb2dnZXI/LkxvZ1dhcm5pbmcoIltsbG1dIHtQcm92aWRlcn0gcmV0dXJuZWQgbnVsbCDigJQgZmFsbGluZyBiYWNrIHRvIHBhdHRlcm4gZm9yIDx7VXNlcm5hbWV9PiIsCiAgICAgICAgICAgICAgICBwcm92aWRlci5Qcm92aWRlck5hbWUsIHVzZXJuYW1lKTsKICAgICAgICAgICAgcmV0dXJuIHF1aWNrOwogICAgICAgIH0KCiAgICAgICAgLy8gNy4gUGFyc2UgTExNIHJlc3BvbnNlCiAgICAgICAgdmFyIGxsbVJlc3VsdCA9IFBhcnNlRGVjaXNpb24ocmF3KTsKICAgICAgICBpZiAobGxtUmVzdWx0IGlzIG51bGwpCiAgICAgICAgICAgIGxvZ2dlcj8uTG9nV2FybmluZygiW2xsbV0gZmFpbGVkIHRvIHBhcnNlIEpTT04gZnJvbSB7UHJvdmlkZXJ9IHJlc3BvbnNlOiAne0NvbnRlbnR9JyIsCiAgICAgICAgICAgICAgICBwcm92aWRlci5Qcm92aWRlck5hbWUsIHJhdy5MZW5ndGggPiAxMDAgPyByYXdbLi4xMDBdIDogcmF3KTsKICAgICAgICByZXR1cm4gbGxtUmVzdWx0ID8/IHF1aWNrOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIFJlY29yZEJvdFNwb2tlKCkgPT4gcGF0dGVybkZhbGxiYWNrLlJlY29yZEJvdFNwb2tlKCk7CgogICAgLy8g4pSA4pSAIFByb21wdCBjb25zdHJ1Y3Rpb24g4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgcHJpdmF0ZSBzdGF0aWMgc3RyaW5nIEJ1aWxkU3lzdGVtUHJvbXB0KAogICAgICAgIHN0cmluZyBib3ROYW1lLCBQb3NpdGlvbiBib3RQb3MsIHN0cmluZz8gZ29hbCwgaW50IG9ubGluZVBsYXllcnMpID0+ICQkIiIiCiAgICAgICAgWW91IGFyZSB7e2JvdE5hbWV9fSwgYW4gYXV0b25vbW91cyBNaW5lY3JhZnQgYWdlbnQgYXQgKHt7Ym90UG9zLlh9fSx7e2JvdFBvcy5ZfX0se3tib3RQb3MuWn19KS4KICAgICAgICBTdGF0dXM6IHt7KGdvYWwgaXMgbm90IG51bGwgPyAkInB1cnN1aW5nIGdvYWw6IHtnb2FsfSIgOiAiaWRsZSIpfX0uIFBsYXllcnMgb25saW5lOiB7e29ubGluZVBsYXllcnN9fS4KCiAgICAgICAgRGVjaWRlIGlmIHRoZSBuZXh0IG1lc3NhZ2UgaXMgZm9yIHlvdSBhbmQgd2hhdCB0byBkby4KICAgICAgICBSZXBseSBPTkxZIHdpdGggdmFsaWQgSlNPTiDigJQgbm8gbWFya2Rvd24sIG5vIHByb3NlOgoKICAgICAgICB7CiAgICAgICAgICAiYWRkcmVzc2VkIjogInllcyIgfCAibWF5YmUiIHwgIm5vIiwKICAgICAgICAgICJpbnRlbnQiOiAiZ2F0aGVyIiB8ICJidWlsZCIgfCAiY2FuY2VsIiB8ICJzdGF0dXMiIHwgImhlbHAiIHwgIm5hdmlnYXRlIiB8ICJpZ25vcmUiIHwgImNsYXJpZnkiLAogICAgICAgICAgIml0ZW0iOiAiPG1pbmVjcmFmdF9pZCBvciBudWxsPiIsCiAgICAgICAgICAiYmx1ZXByaW50IjogIjxibHVlcHJpbnRfaWQgb3IgbnVsbD4iLAogICAgICAgICAgImNvdW50IjogPGludGVnZXIgb3IgbnVsbD4sCiAgICAgICAgICAieCI6IDxpbnRlZ2VyIG9yIG51bGw+LAogICAgICAgICAgInkiOiA8aW50ZWdlciBvciBudWxsPiwKICAgICAgICAgICJ6IjogPGludGVnZXIgb3IgbnVsbD4sCiAgICAgICAgICAicmVzcG9uc2UiOiAiPGluLWdhbWUgcmVwbHksIG1heCA1MCB3b3JkcywgZW1wdHkgaWYgaW50ZW50IGlzIGlnbm9yZT4iCiAgICAgICAgfQoKICAgICAgICBSdWxlczogInllcyIgd2hlbiB5b3VyIG5hbWUgaXMgdXNlZCBvciBvbmx5IDEgcGxheWVyIGlzIG9ubGluZS4KICAgICAgICAibWF5YmUiIHdoZW4gaXQgY291bGQgYmUgYSBjb21tYW5kIGJ1dCB5b3VyIG5hbWUgaXNuJ3QgbWVudGlvbmVkLgogICAgICAgICJubyIgd2hlbiBwbGF5ZXJzIGFyZSB0YWxraW5nIHRvIGVhY2ggb3RoZXIsIG5vdCB5b3UuCiAgICAgICAgImNsYXJpZnkiIHdoZW4gdW5jZXJ0YWluIOKAlCBhc2sgcG9saXRlbHkuCiAgICAgICAgVXNlIE1pbmVjcmFmdCBpdGVtIElEcyB3aXRob3V0IG5hbWVzcGFjZSBwcmVmaXggKG9ha19sb2csIGNvYmJsZXN0b25lLCBpcm9uX29yZeKApikuCiAgICAgICAgIiIiOwoKICAgIC8vIOKUgOKUgCBSZXNwb25zZSBwYXJzaW5nIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIHByaXZhdGUgc3RhdGljIHJlYWRvbmx5IFJlZ2V4IENvZGVGZW5jZVJlZ2V4ID0KICAgICAgICBuZXcoQCJgYGAoPzpqc29uKT9ccyooPzxib2R5Pltcc1xTXSo/KWBgYCIsIFJlZ2V4T3B0aW9ucy5Db21waWxlZCB8IFJlZ2V4T3B0aW9ucy5JZ25vcmVDYXNlKTsKCiAgICBwcml2YXRlIHN0YXRpYyByZWFkb25seSBSZWdleCBCcmFjZVJlZ2V4ID0KICAgICAgICBuZXcoQCJce1tcc1xTXSpcfSIsIFJlZ2V4T3B0aW9ucy5Db21waWxlZCk7CgogICAgcHJpdmF0ZSBzdGF0aWMgQ2hhdEludGVycHJldGF0aW9uPyBQYXJzZURlY2lzaW9uKHN0cmluZyBjb250ZW50KQogICAgewogICAgICAgIHRyeQogICAgICAgIHsKICAgICAgICAgICAgdmFyIGpzb24gPSBDb2RlRmVuY2VSZWdleC5Jc01hdGNoKGNvbnRlbnQpCiAgICAgICAgICAgICAgICA/IENvZGVGZW5jZVJlZ2V4Lk1hdGNoKGNvbnRlbnQpLkdyb3Vwc1siYm9keSJdLlZhbHVlCiAgICAgICAgICAgICAgICA6IGNvbnRlbnQ7CgogICAgICAgICAgICB2YXIgbSA9IEJyYWNlUmVnZXguTWF0Y2goanNvbik7CiAgICAgICAgICAgIGlmICghbS5TdWNjZXNzKQogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAvLyBTcHJpbnQgMjA6IHRyeSB0byBzYWx2YWdlIGludGVudCBmcm9tIHRydW5jYXRlZCBKU09OIChubyBjbG9zaW5nIGJyYWNlKS4KICAgICAgICAgICAgICAgIHJldHVybiBUcnlQYXJzZVRydW5jYXRlZEpzb24oanNvbik7CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIHVzaW5nIHZhciBkb2MgPSBKc29uRG9jdW1lbnQuUGFyc2UobS5WYWx1ZSk7CiAgICAgICAgICAgIHZhciByb290ID0gZG9jLlJvb3RFbGVtZW50OwogICAgICAgICAgICB2YXIgYWRkcmVzc2VkID0gR2V0U3RyKHJvb3QsICJhZGRyZXNzZWQiKSA/PyAibm8iOwoKICAgICAgICAgICAgaWYgKHN0cmluZy5FcXVhbHMoYWRkcmVzc2VkLCAibm8iLCBTdHJpbmdDb21wYXJpc29uLk9yZGluYWxJZ25vcmVDYXNlKSkKICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ2hhdEludGVycHJldGF0aW9uKENoYXRJbnRlbnRUeXBlLk5vdEFkZHJlc3NlZCk7CgogICAgICAgICAgICB2YXIgaXNVbmNlcnRhaW4gPSBzdHJpbmcuRXF1YWxzKGFkZHJlc3NlZCwgIm1heWJlIiwgU3RyaW5nQ29tcGFyaXNvbi5PcmRpbmFsSWdub3JlQ2FzZSk7CiAgICAgICAgICAgIHZhciBpbnRlbnQgPSBHZXRTdHIocm9vdCwgImludGVudCIpID8/ICJpZ25vcmUiOwogICAgICAgICAgICB2YXIgcmVzcG9uc2UgPSBHZXRTdHIocm9vdCwgInJlc3BvbnNlIikgPz8gc3RyaW5nLkVtcHR5OwoKICAgICAgICAgICAgc3RyaW5nPyBnb2FsTmFtZSA9IG51bGw7CiAgICAgICAgICAgIElSZWFkT25seURpY3Rpb25hcnk8c3RyaW5nLCBvYmplY3Q/Pj8gcGFyYW1ldGVycyA9IG51bGw7CgogICAgICAgICAgICBzd2l0Y2ggKGludGVudC5Ub0xvd2VySW52YXJpYW50KCkpCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgIGNhc2UgImdhdGhlciI6CiAgICAgICAgICAgICAgICAgICAgdmFyIGl0ZW0gPSBHZXRTdHIocm9vdCwgIml0ZW0iKTsKICAgICAgICAgICAgICAgICAgICBpZiAoaXRlbSBpcyBub3QgbnVsbCkKICAgICAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgICAgIGdvYWxOYW1lID0gJCJHYXRoZXJJdGVtOntpdGVtfSI7CiAgICAgICAgICAgICAgICAgICAgICAgIHBhcmFtZXRlcnMgPSBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+IHsgWyJjb3VudCJdID0gR2V0SW50KHJvb3QsICJjb3VudCIpID8/IDEwIH07CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGJyZWFrOwogICAgICAgICAgICAgICAgY2FzZSAiYnVpbGQiOgogICAgICAgICAgICAgICAgICAgIHZhciBicCA9IEdldFN0cihyb290LCAiYmx1ZXByaW50Iik7CiAgICAgICAgICAgICAgICAgICAgaWYgKGJwIGlzIG5vdCBudWxsKSBnb2FsTmFtZSA9ICQiQnVpbGQ6e2JwfSI7CiAgICAgICAgICAgICAgICAgICAgYnJlYWs7CiAgICAgICAgICAgICAgICBjYXNlICJuYXZpZ2F0ZSI6CiAgICAgICAgICAgICAgICAgICAgdmFyIHggPSBHZXRJbnQocm9vdCwgIngiKTsKICAgICAgICAgICAgICAgICAgICB2YXIgeSA9IEdldEludChyb290LCAieSIpOwogICAgICAgICAgICAgICAgICAgIHZhciB6ID0gR2V0SW50KHJvb3QsICJ6Iik7CiAgICAgICAgICAgICAgICAgICAgaWYgKHggaXMgbm90IG51bGwgJiYgeSBpcyBub3QgbnVsbCAmJiB6IGlzIG5vdCBudWxsKQogICAgICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAgICAgZ29hbE5hbWUgPSAiTW92ZVRvIjsKICAgICAgICAgICAgICAgICAgICAgICAgcGFyYW1ldGVycyA9IG5ldyBEaWN0aW9uYXJ5PHN0cmluZywgb2JqZWN0Pz4geyBbIngiXSA9IHgsIFsieSJdID0geSwgWyJ6Il0gPSB6IH07CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGJyZWFrOwogICAgICAgICAgICB9CgogICAgICAgICAgICB2YXIgaW50ZW50VHlwZSA9IGludGVudC5Ub0xvd2VySW52YXJpYW50KCkgc3dpdGNoCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICJnYXRoZXIiIG9yICJidWlsZCIgPT4gQ2hhdEludGVudFR5cGUuQ3JlYXRlR29hbCwKICAgICAgICAgICAgICAgICJjYW5jZWwiID0+IENoYXRJbnRlbnRUeXBlLkNhbmNlbEdvYWwsCiAgICAgICAgICAgICAgICAic3RhdHVzIiA9PiBDaGF0SW50ZW50VHlwZS5RdWVyeVN0YXR1cywKICAgICAgICAgICAgICAgICJoZWxwIiA9PiBDaGF0SW50ZW50VHlwZS5RdWVyeUhlbHAsCiAgICAgICAgICAgICAgICAibmF2aWdhdGUiID0+IENoYXRJbnRlbnRUeXBlLk5hdmlnYXRlVG8sCiAgICAgICAgICAgICAgICAiY2xhcmlmeSIgPT4gQ2hhdEludGVudFR5cGUuVW5rbm93biwKICAgICAgICAgICAgICAgIF8gPT4gaXNVbmNlcnRhaW4gPyBDaGF0SW50ZW50VHlwZS5Vbmtub3duIDogQ2hhdEludGVudFR5cGUuTm90QWRkcmVzc2VkLAogICAgICAgICAgICB9OwoKICAgICAgICAgICAgcmV0dXJuIG5ldyBDaGF0SW50ZXJwcmV0YXRpb24oaW50ZW50VHlwZSwgZ29hbE5hbWUsIHBhcmFtZXRlcnMsIHJlc3BvbnNlKTsKICAgICAgICB9CiAgICAgICAgY2F0Y2ggeyByZXR1cm4gbnVsbDsgfQogICAgfQoKICAgIHByaXZhdGUgc3RhdGljIHN0cmluZz8gR2V0U3RyKEpzb25FbGVtZW50IHJvb3QsIHN0cmluZyBrZXkpCiAgICB7CiAgICAgICAgaWYgKHJvb3QuVHJ5R2V0UHJvcGVydHkoa2V5LCBvdXQgdmFyIGVsKSAmJiBlbC5WYWx1ZUtpbmQgPT0gSnNvblZhbHVlS2luZC5TdHJpbmcpCiAgICAgICAgICAgIHJldHVybiBlbC5HZXRTdHJpbmcoKTsKICAgICAgICByZXR1cm4gbnVsbDsKICAgIH0KCiAgICBwcml2YXRlIHN0YXRpYyBpbnQ/IEdldEludChKc29uRWxlbWVudCByb290LCBzdHJpbmcga2V5KQogICAgewogICAgICAgIGlmIChyb290LlRyeUdldFByb3BlcnR5KGtleSwgb3V0IHZhciBlbCkpCiAgICAgICAgewogICAgICAgICAgICBpZiAoZWwuVmFsdWVLaW5kID09IEpzb25WYWx1ZUtpbmQuTnVtYmVyKSByZXR1cm4gZWwuR2V0SW50MzIoKTsKICAgICAgICAgICAgaWYgKGVsLlZhbHVlS2luZCA9PSBKc29uVmFsdWVLaW5kLlN0cmluZyAmJiBpbnQuVHJ5UGFyc2UoZWwuR2V0U3RyaW5nKCksIG91dCB2YXIgaSkpIHJldHVybiBpOwogICAgICAgIH0KICAgICAgICByZXR1cm4gbnVsbDsKICAgIH0KCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gU3ByaW50IDIwOiBiZXN0LWVmZm9ydCBleHRyYWN0aW9uIGZyb20gdHJ1bmNhdGVkIEpTT04gbWlzc2luZyB0aGUgY2xvc2luZyBicmFjZS4KICAgIC8vLyBDb21tb24gd2l0aCBzbWFsbCBtb2RlbHMgKGxsYW1hMy4yOjNiKSBoaXR0aW5nIG51bV9wcmVkaWN0IGxpbWl0cy4KICAgIC8vLyBPbmx5IHJlY292ZXJzIGFkZHJlc3NlZCArIGludGVudDsgcGFyYW1ldGVycyBhcmUgc2tpcHBlZCAobm8gY2xvc2luZyBicmFja2V0KS4KICAgIC8vLyA8L3N1bW1hcnk+CiAgICBwcml2YXRlIHN0YXRpYyBDaGF0SW50ZXJwcmV0YXRpb24/IFRyeVBhcnNlVHJ1bmNhdGVkSnNvbihzdHJpbmcganNvbikKICAgIHsKICAgICAgICB0cnkKICAgICAgICB7CiAgICAgICAgICAgIHZhciBhZGRyZXNzZWRNID0gUmVnZXguTWF0Y2goanNvbiwKICAgICAgICAgICAgICAgIEAiIiJhZGRyZXNzZWQiIlxzKjpccyoiIig/PHY+W14iIl0rKSIiIiwgUmVnZXhPcHRpb25zLklnbm9yZUNhc2UpOwogICAgICAgICAgICB2YXIgaW50ZW50TSA9IFJlZ2V4Lk1hdGNoKGpzb24sCiAgICAgICAgICAgICAgICBAIiIiaW50ZW50IiJccyo6XHMqIiIoPzx2PlteIiJdKykiIiIsIFJlZ2V4T3B0aW9ucy5JZ25vcmVDYXNlKTsKICAgICAgICAgICAgaWYgKCFhZGRyZXNzZWRNLlN1Y2Nlc3MpIHJldHVybiBudWxsOwoKICAgICAgICAgICAgdmFyIGFkZHJlc3NlZCA9IGFkZHJlc3NlZE0uR3JvdXBzWyJ2Il0uVmFsdWU7CiAgICAgICAgICAgIGlmIChzdHJpbmcuRXF1YWxzKGFkZHJlc3NlZCwgIm5vIiwgU3RyaW5nQ29tcGFyaXNvbi5PcmRpbmFsSWdub3JlQ2FzZSkpCiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENoYXRJbnRlcnByZXRhdGlvbihDaGF0SW50ZW50VHlwZS5Ob3RBZGRyZXNzZWQpOwoKICAgICAgICAgICAgdmFyIGludGVudCA9IGludGVudE0uU3VjY2VzcyA/IGludGVudE0uR3JvdXBzWyJ2Il0uVmFsdWUgOiAiaWdub3JlIjsKICAgICAgICAgICAgdmFyIGludGVudFR5cGUgPSBpbnRlbnQuVG9Mb3dlckludmFyaWFudCgpIHN3aXRjaAogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAiY2FuY2VsIiA9PiBDaGF0SW50ZW50VHlwZS5DYW5jZWxHb2FsLAogICAgICAgICAgICAgICAgInN0YXR1cyIgPT4gQ2hhdEludGVudFR5cGUuUXVlcnlTdGF0dXMsCiAgICAgICAgICAgICAgICAiaGVscCIgPT4gQ2hhdEludGVudFR5cGUuUXVlcnlIZWxwLAogICAgICAgICAgICAgICAgImNsYXJpZnkiID0+IENoYXRJbnRlbnRUeXBlLlVua25vd24sCiAgICAgICAgICAgICAgICAiaWdub3JlIiA9PiBDaGF0SW50ZW50VHlwZS5Ob3RBZGRyZXNzZWQsCiAgICAgICAgICAgICAgICBfID0+IENoYXRJbnRlbnRUeXBlLlVua25vd24sCiAgICAgICAgICAgIH07CgogICAgICAgICAgICB2YXIgcmVzcG9uc2VNID0gUmVnZXguTWF0Y2goanNvbiwKICAgICAgICAgICAgICAgIEAiIiJyZXNwb25zZSIiXHMqOlxzKiIiKD88dj5bXiIiXFxdKig/OlxcLlteIiJcXF0qKSopIiIiKTsKICAgICAgICAgICAgdmFyIHJlc3BvbnNlID0gcmVzcG9uc2VNLlN1Y2Nlc3MgPyByZXNwb25zZU0uR3JvdXBzWyJ2Il0uVmFsdWUgOiBzdHJpbmcuRW1wdHk7CgogICAgICAgICAgICByZXR1cm4gbmV3IENoYXRJbnRlcnByZXRhdGlvbihpbnRlbnRUeXBlLCBSZXNwb25zZTogcmVzcG9uc2UpOwogICAgICAgIH0KICAgICAgICBjYXRjaCB7IHJldHVybiBudWxsOyB9CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgZG91YmxlIERpc3RhbmNlKFBvc2l0aW9uIGEsIFBvc2l0aW9uIGIpCiAgICB7CiAgICAgICAgdmFyIGR4ID0gYS5YIC0gYi5YOyB2YXIgZHkgPSBhLlkgLSBiLlk7IHZhciBkeiA9IGEuWiAtIGIuWjsKICAgICAgICByZXR1cm4gTWF0aC5TcXJ0KGR4ICogZHggKyBkeSAqIGR5ICsgZHogKiBkeik7CiAgICB9Cn0K
+namespace Agent.Planning;
+
+using Agent.Core;
+using Agent.Planning.Llm;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+
+/// <summary>
+/// <see cref="IChatInterpreter"/> that combines LLM-powered evaluation with
+/// deterministic pattern-matching fallback and a distance-based routing gate.
+///
+/// Evaluation pipeline for each incoming message:
+///   1. Truncate message at <see cref="ChatOptions.MaxMessageLength"/> characters.
+///   2. Distance gate: player far away and not naming bot = NotAddressed.
+///   3. Pattern fast-path: CreateGoal/CancelGoal/QueryHelp/QueryStatus/NavigateTo skip LLM.
+///   4. Rate-limit check: per-player and global window.
+///   5. LLM call: ILlmProvider.CompleteAsync with a structured JSON prompt.
+///   6. JSON parse: extract ChatInterpretation from raw text.
+///   7. Fallback: use pattern-matcher result if LLM fails.
+///   8. Truncation recovery: TryParseTruncatedJson extracts intent from cut-off JSON. (Sprint 20)
+/// </summary>
+public sealed class LlmChatInterpreter(
+    ILlmProvider provider,
+    ChatInterpreter patternFallback,
+    ChatRateLimiter rateLimiter,
+    ChatOptions options,
+    ChatHistory? history = null,
+    ILogger<LlmChatInterpreter>? logger = null) : IChatInterpreter
+{
+    // -- IChatInterpreter ---------------------------------------------------------
+
+    public async Task<ChatInterpretation> InterpretAsync(
+        string username, string message, string botName,
+        int onlinePlayers, Position botPosition, Position? playerPosition,
+        WorldState state, CancellationToken ct = default)
+    {
+        // 1. Enforce max length before any processing
+        var effective = message.Length > options.MaxMessageLength
+            ? message[..options.MaxMessageLength]
+            : message;
+
+        // Sprint 4b: record the incoming player message in conversation history
+        history?.Record(username, effective);
+
+        // 2. Get the pattern-matcher's view -- used as fallback and fast-path
+        var quick = await patternFallback.InterpretAsync(
+            username, effective, botName, onlinePlayers,
+            botPosition, playerPosition, state, ct);
+
+        // 3. Distance gate
+        if (quick.IntentType == ChatIntentType.NotAddressed
+            && playerPosition is not null
+            && Distance(botPosition, playerPosition) > options.MaxResponseDistanceBlocks)
+        {
+            return quick;
+        }
+
+        // 4. Pattern fast-path
+        if (quick.IntentType is ChatIntentType.CreateGoal
+                              or ChatIntentType.CancelGoal
+                              or ChatIntentType.QueryHelp
+                              or ChatIntentType.QueryStatus
+                              or ChatIntentType.NavigateTo)
+        {
+            return quick;
+        }
+
+        // 5. Rate-limit check
+        if (!provider.IsAvailable || !rateLimiter.TryAcquire(username, out _))
+            return quick;
+
+        // 6. LLM call
+        var currentGoal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s ? s : null;
+        logger?.LogInformation("[llm] calling {Provider} ({Model}) for <{Username}> '{Message}'",
+            provider.ProviderName, options.LlmModel, username,
+            effective.Length > 60 ? effective[..60] : effective);
+        var raw = await provider.CompleteAsync(
+            BuildSystemPrompt(botName, botPosition, currentGoal, onlinePlayers),
+            $"{username} says: \"{effective}\"",
+            ct);
+
+        if (raw is null)
+        {
+            logger?.LogWarning("[llm] {Provider} returned null -- falling back to pattern for <{Username}>",
+                provider.ProviderName, username);
+            return quick;
+        }
+
+        // 7. Parse LLM response
+        var llmResult = ParseDecision(raw);
+        if (llmResult is null)
+            logger?.LogWarning("[llm] failed to parse JSON from {Provider} response: '{Content}'",
+                provider.ProviderName, raw.Length > 100 ? raw[..100] : raw);
+        return llmResult ?? quick;
+    }
+
+    public void RecordBotSpoke() => patternFallback.RecordBotSpoke();
+
+    // -- Prompt construction ------------------------------------------------------
+
+    private static string BuildSystemPrompt(
+        string botName, Position botPos, string? goal, int onlinePlayers) => $$"""
+        You are {{botName}}, an autonomous Minecraft agent at ({{botPos.X}},{{botPos.Y}},{{botPos.Z}}).
+        Status: {{(goal is not null ? $"pursuing goal: {goal}" : "idle")}}. Players online: {{onlinePlayers}}.
+
+        Decide if the next message is for you and what to do.
+        Reply ONLY with valid JSON -- no markdown, no prose:
+
+        {
+          "addressed": "yes" | "maybe" | "no",
+          "intent": "gather" | "build" | "cancel" | "status" | "help" | "navigate" | "ignore" | "clarify",
+          "item": "<minecraft_id or null>",
+          "blueprint": "<blueprint_id or null>",
+          "count": <integer or null>,
+          "x": <integer or null>,
+          "y": <integer or null>,
+          "z": <integer or null>,
+          "response": "<in-game reply, max 50 words, empty if intent is ignore>"
+        }
+
+        Rules: "yes" when your name is used or only 1 player is online.
+        "maybe" when it could be a command but your name is not mentioned.
+        "no" when players are talking to each other, not you.
+        "clarify" when uncertain -- ask politely.
+        Use Minecraft item IDs without namespace prefix (oak_log, cobblestone, iron_ore).
+        """;
+
+    // -- Response parsing ---------------------------------------------------------
+
+    private static readonly Regex CodeFenceRegex =
+        new(@"```(?:json)?\s*(?<body>[\s\S]*?)```", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private static readonly Regex BraceRegex =
+        new(@"\{[\s\S]*\}", RegexOptions.Compiled);
+
+    private static ChatInterpretation? ParseDecision(string content)
+    {
+        try
+        {
+            var json = CodeFenceRegex.IsMatch(content)
+                ? CodeFenceRegex.Match(content).Groups["body"].Value
+                : content;
+
+            var m = BraceRegex.Match(json);
+            if (!m.Success)
+            {
+                // Sprint 20: try to salvage intent from truncated JSON (no closing brace).
+                return TryParseTruncatedJson(json);
+            }
+
+            using var doc  = JsonDocument.Parse(m.Value);
+            var root       = doc.RootElement;
+            var addressed  = GetStr(root, "addressed") ?? "no";
+
+            if (string.Equals(addressed, "no", StringComparison.OrdinalIgnoreCase))
+                return new ChatInterpretation(ChatIntentType.NotAddressed);
+
+            var isUncertain = string.Equals(addressed, "maybe", StringComparison.OrdinalIgnoreCase);
+            var intent      = GetStr(root, "intent") ?? "ignore";
+            var response    = GetStr(root, "response") ?? string.Empty;
+
+            string? goalName = null;
+            IReadOnlyDictionary<string, object?>? parameters = null;
+
+            switch (intent.ToLowerInvariant())
+            {
+                case "gather":
+                    var item = GetStr(root, "item");
+                    if (item is not null)
+                    {
+                        goalName   = $"GatherItem:{item}";
+                        parameters = new Dictionary<string, object?> { ["count"] = GetInt(root, "count") ?? 10 };
+                    }
+                    break;
+                case "build":
+                    var bp = GetStr(root, "blueprint");
+                    if (bp is not null) goalName = $"Build:{bp}";
+                    break;
+                case "navigate":
+                    var x = GetInt(root, "x");
+                    var y = GetInt(root, "y");
+                    var z = GetInt(root, "z");
+                    if (x is not null && y is not null && z is not null)
+                    {
+                        goalName   = "MoveTo";
+                        parameters = new Dictionary<string, object?> { ["x"] = x, ["y"] = y, ["z"] = z };
+                    }
+                    break;
+            }
+
+            var intentType = intent.ToLowerInvariant() switch
+            {
+                "gather" or "build" => ChatIntentType.CreateGoal,
+                "cancel"            => ChatIntentType.CancelGoal,
+                "status"            => ChatIntentType.QueryStatus,
+                "help"              => ChatIntentType.QueryHelp,
+                "navigate"          => ChatIntentType.NavigateTo,
+                "clarify"           => ChatIntentType.Unknown,
+                _                   => isUncertain ? ChatIntentType.Unknown : ChatIntentType.NotAddressed,
+            };
+
+            return new ChatInterpretation(intentType, goalName, parameters, response);
+        }
+        catch { return null; }
+    }
+
+    private static string? GetStr(JsonElement root, string key)
+    {
+        if (root.TryGetProperty(key, out var el) && el.ValueKind == JsonValueKind.String)
+            return el.GetString();
+        return null;
+    }
+
+    private static int? GetInt(JsonElement root, string key)
+    {
+        if (root.TryGetProperty(key, out var el))
+        {
+            if (el.ValueKind == JsonValueKind.Number) return el.GetInt32();
+            if (el.ValueKind == JsonValueKind.String && int.TryParse(el.GetString(), out var i)) return i;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Sprint 20: best-effort extraction from truncated JSON missing the closing brace.
+    /// Common with small models (llama3.2:3b) hitting num_predict limits.
+    /// Only recovers addressed + intent; parameters are skipped (no closing bracket).
+    /// </summary>
+    private static ChatInterpretation? TryParseTruncatedJson(string json)
+    {
+        try
+        {
+            var addressedM = Regex.Match(json,
+                @"\"addressed\"\s*:\s*\"(?<v>[^\"]+)\"", RegexOptions.IgnoreCase);
+            var intentM = Regex.Match(json,
+                @"\"intent\"\s*:\s*\"(?<v>[^\"]+)\"", RegexOptions.IgnoreCase);
+            if (!addressedM.Success) return null;
+
+            var addressed = addressedM.Groups["v"].Value;
+            if (string.Equals(addressed, "no", StringComparison.OrdinalIgnoreCase))
+                return new ChatInterpretation(ChatIntentType.NotAddressed);
+
+            var intent = intentM.Success ? intentM.Groups["v"].Value : "ignore";
+            var intentType = intent.ToLowerInvariant() switch
+            {
+                "cancel"  => ChatIntentType.CancelGoal,
+                "status"  => ChatIntentType.QueryStatus,
+                "help"    => ChatIntentType.QueryHelp,
+                "clarify" => ChatIntentType.Unknown,
+                "ignore"  => ChatIntentType.NotAddressed,
+                _         => ChatIntentType.Unknown,
+            };
+
+            var responseM = Regex.Match(json,
+                @"\"response\"\s*:\s*\"(?<v>[^\"\\]*(?:\\.[^\"\\]*)*)\"");
+            var response = responseM.Success ? responseM.Groups["v"].Value : string.Empty;
+
+            return new ChatInterpretation(intentType, Response: response);
+        }
+        catch { return null; }
+    }
+
+    private static double Distance(Position a, Position b)
+    {
+        var dx = a.X - b.X; var dy = a.Y - b.Y; var dz = a.Z - b.Z;
+        return Math.Sqrt(dx * dx + dy * dy + dz * dz);
+    }
+}
