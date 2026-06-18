@@ -53,6 +53,12 @@ public sealed class AgentBackgroundService(
     private const int StallWarningSuppressSeconds = 30;
 
     /// <summary>
+    /// Sprint 22 P0: health (hearts) below which the agent issues an emergency GetStatus
+    /// to assess drowning or critical-damage state. 6 = 3 hearts.
+    /// </summary>
+    private const int HealthCriticalThreshold = 6;
+
+    /// <summary>
     /// Minimum seconds between successive replans.
     /// Sprint 18: tools dispatch fire-and-forget to Node.js; without this guard the planner
     /// runs at CPU speed (every 50–300 ms) before Node.js executes any action.
@@ -270,6 +276,18 @@ public sealed class AgentBackgroundService(
         {
             logger.LogDebug("World event: {Type}", worldEvent.GetType().Name);
             _worldState = _projector.Apply(_worldState, worldEvent);
+
+            // Sprint 22 P0: health-critical interrupt.
+            // Any event that causes a health update (e.g. StatusEvent) will trigger this.
+            // If health drops below threshold while a goal is active, queue an urgent GetStatus
+            // so the next plan cycle starts with an accurate WorldState before replanning.
+            if (_worldState.Health is > 0 and < HealthCriticalThreshold && _currentGoal is not null)
+            {
+                logger.LogWarning(
+                    "[health] CRITICAL: {Health}/20 — queuing GetStatus to assess recovery state",
+                    _worldState.Health);
+                _queue.Enqueue(new ActionData { Tool = "GetStatus" });
+            }
 
             switch (worldEvent)
             {
@@ -534,7 +552,15 @@ public sealed class AgentBackgroundService(
         {
             if (_queue.IsEmpty && _currentGoal is not null && !_actionDispatchedThisCycle)
             {
-                if (_currentGoal.IsComplete(_worldState))
+                   // Sprint 22 D-1: staleness debug log at IsComplete call site.
+                // Fires only when stale (SetGoal → before first GetStatus arrives),
+                // so this is infrequent and won't flood logs during normal operation.
+                if (_worldState.IsInventoryStale)
+                    logger.LogDebug(
+                        "[goal] {Goal}: IsComplete deferred — inventory stale (awaiting GetStatus)",
+                        _currentGoal.Name);
+
+             if (_currentGoal.IsComplete(_worldState))
                 {
                     logger.LogInformation("[goal] completed: {Goal} | inventory: [{Inventory}]",
                         _currentGoal.Name, SummarizeInventory());
