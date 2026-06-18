@@ -27,12 +27,15 @@ builder.Host.UseSerilog((context, services, loggerConfig) =>
         .Enrich.FromLogContext()
         // Clean console: no level prefix, no duplicate EventLog fallback
         .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss}] {Message:lj}{NewLine}{Exception}")
+        // Rolling file: Debug-level for full diagnostics (console stays at Information).
+        // Sprint 19: added .fff ms precision, {Properties:j} for structured data, Debug floor.
         .WriteTo.File(
             path: "logs/memorysmith-agent-.log",
             rollingInterval: RollingInterval.Day,
             retainedFileCountLimit: 14,
             shared: true,
-            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}");
+            restrictedToMinimumLevel: LogEventLevel.Debug,
+            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {SourceContext}: {Message:lj} {Properties:j}{NewLine}{Exception}");
     // EventLog sink removed: requires Windows admin to create event source;
     // its catch-block was adding a second Console sink that duplicated every log line.
 });
