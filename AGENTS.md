@@ -254,3 +254,33 @@ Then: `mcp__t__ExecuteIntegration(action="github__create_or_update_file", params
 
 Also: files fetched via GitHub API are base64-encoded. If a file was previously pushed by an agent
 (double-encoded), you must double-decode: `base64.b64decode(base64.b64decode(api_content))`.
+
+### Additional warning: verbatim regex files
+
+Files that contain `@"..."` verbatim strings with regex escaping
+(`LlmChatInterpreter.cs`, `WorldStateProjector.cs`) require extra care:
+
+```python
+# Safe pattern: fetch raw bytes, patch with a byte-level find-replace
+import urllib.request, base64, json, os
+
+proxy = os.environ.get('HTTPS_PROXY', '')
+url = 'https://raw.githubusercontent.com/TheMasonX/MemorySmith.Agent/sprint-5-tool-safety/Agent.Planning/LlmChatInterpreter.cs'
+opener = urllib.request.build_opener(urllib.request.ProxyHandler({'https': proxy, 'http': proxy}))
+with opener.open(url) as resp:
+    src = resp.read().decode('utf-8')
+
+# Make targeted replacements using exact byte sequences — no repr() or manual escaping
+old = 'exact source string including regex chars'
+new = 'exact replacement string'
+src = src.replace(old, new, 1)
+
+# Write params with ensure_ascii=False to preserve the patched text
+params = { ..., 'content': src }
+with open('/agent/workspace/params.json', 'w', encoding='utf-8') as f:
+    json.dump(params, f, ensure_ascii=False)
+```
+
+**Never** copy-paste verbatim-string content from a tool output into a Python string literal —
+the escaping layers (Python repr → string → C# verbatim → regex) corrupt `""` and `\\` sequences.
+Always use `replace()` on the decoded-string form of the raw file.
