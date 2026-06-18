@@ -4,6 +4,7 @@ using Agent.Core;
 using Agent.Planning;
 using Agent.Tools;
 using Microsoft.AspNetCore.SignalR;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Channels;
 
@@ -129,7 +130,8 @@ public sealed class AgentBackgroundService(
         // Sprint 18: reset replan timer so the first plan fires without waiting.
         _lastReplanAt = DateTimeOffset.MinValue;
         lock (_pendingLock) _pendingActions.Clear();
-        logger.LogInformation("Goal set: {Goal}", goal.Name);
+        logger.LogInformation("[goal] set: {Goal} — {Description} | inventory: [{Inventory}]",
+            goal.Name, goal.Description, SummarizeInventory());
         _journal?.Log(new JournalEntry(
             DateTimeOffset.UtcNow, JournalEntryType.GoalSet, goal.Name,
             new Dictionary<string, object?> { ["description"] = goal.Description }));
@@ -143,7 +145,8 @@ public sealed class AgentBackgroundService(
         SendEmergencyStop();
 
         if (_currentGoal is not null)
-            logger.LogInformation("Goal cancelled: {Goal}", _currentGoal.Name);
+            logger.LogInformation("[goal] cancelled: {Goal} | pending actions: {PendingCount}",
+                _currentGoal.Name, _queue.Count);
         var previousGoalName = _currentGoal?.Name;
         _currentGoal = null;
         _journal?.Log(new JournalEntry(
@@ -444,7 +447,8 @@ public sealed class AgentBackgroundService(
         if (_currentGoal is null) return;
         if (!_currentGoal.IsComplete(_worldState)) return;
 
-        logger.LogInformation("Goal '{Goal}' completed.", _currentGoal.Name);
+        logger.LogInformation("[goal] completed: {Goal} | inventory: [{Inventory}]",
+            _currentGoal.Name, SummarizeInventory());
         _currentGoal = null;
         _consecutiveFailures = 0;
         _lastFailureReason = null;
@@ -516,7 +520,8 @@ public sealed class AgentBackgroundService(
             {
                 if (_currentGoal.IsComplete(_worldState))
                 {
-                    logger.LogInformation("Goal '{Goal}' completed.", _currentGoal.Name);
+                    logger.LogInformation("[goal] completed: {Goal} | inventory: [{Inventory}]",
+                        _currentGoal.Name, SummarizeInventory());
                     _currentGoal = null; _consecutiveFailures = 0; planContext.Clear();
                     lock (_pendingLock) _pendingActions.Clear();
                     continue;
@@ -530,8 +535,8 @@ public sealed class AgentBackgroundService(
                     _lastAbandonedGoalName = _currentGoal.Name;
                     _journal?.Log(new JournalEntry(
                         DateTimeOffset.UtcNow, JournalEntryType.ReplanTriggered, _currentGoal.Name));
-                    logger.LogWarning("Goal '{Goal}' failed (failures={N}, reason={Reason}).",
-                        _currentGoal.Name, _consecutiveFailures, reason);
+                    logger.LogWarning("[goal] failed: {Goal} (failures={FailureCount}, reason={Reason}) | inventory: [{Inventory}]",
+                        _currentGoal.Name, _consecutiveFailures, reason, SummarizeInventory());
                     _currentGoal = null; _consecutiveFailures = 0; _lastFailureReason = null;
                     planContext.Clear();
                     lock (_pendingLock) _pendingActions.Clear();
@@ -561,7 +566,10 @@ public sealed class AgentBackgroundService(
                         _pendingActions.AddRange(plan.Actions);
                     }
                     _lastReplanAt = DateTimeOffset.UtcNow; // Sprint 18: record plan time
-                    logger.LogInformation("New plan for '{Goal}': {Count} actions.", _currentGoal.Name, plan.Actions.Count);
+                    // Sprint 19: log action sequence for tracing plan structure
+                    var actionSequence = string.Join(" → ", plan.Actions.Select(a => a.Tool));
+                    logger.LogInformation("[plan] {Goal}: {ActionCount} actions [{ActionSequence}]",
+                        _currentGoal.Name, plan.Actions.Count, actionSequence);
                     _journal?.Log(new JournalEntry(
                         DateTimeOffset.UtcNow, JournalEntryType.PlanCreated, _currentGoal.Name,
                         new Dictionary<string, object?> { ["actionCount"] = plan.Actions.Count }));
@@ -596,13 +604,19 @@ public sealed class AgentBackgroundService(
                     using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
                         ct, timeoutCts.Token);
 
+                    // Sprint 19: log args at Debug level (file only) for diagnostics
+                    logger.LogDebug("[dispatch] {Tool} args: {Args}", action.Tool, argsJson);
                     _journal?.Log(new JournalEntry(
                         DateTimeOffset.UtcNow, JournalEntryType.ActionDispatched, action.Tool));
+                    var sw = Stopwatch.StartNew();
                     var result = await toolCaller.CallAsync(
                         action.Tool, doc.RootElement, linkedCts.Token);
+                    sw.Stop();
                     if (result.Success)
                     {
-                        logger.LogDebug("Tool {Tool}: {Message}", action.Tool, result.Message);
+                        // Sprint 19: elevated to Info with timing for runtime visibility
+                        logger.LogInformation("[action] {Tool} OK ({ElapsedMs}ms)",
+                            action.Tool, sw.ElapsedMilliseconds);
                         _journal?.Log(new JournalEntry(
                             DateTimeOffset.UtcNow, JournalEntryType.ActionCompleted, action.Tool));
                         if (IsProgressSignalTool(action.Tool))
@@ -629,7 +643,8 @@ public sealed class AgentBackgroundService(
                     }
                     else
                     {
-                        logger.LogWarning("Tool {Tool} failed: {Message}", action.Tool, result.Message);
+                        logger.LogWarning("[action] {Tool} FAIL ({ElapsedMs}ms): {Message}",
+                            action.Tool, sw.ElapsedMilliseconds, result.Message);
                         _journal?.Log(new JournalEntry(
                             DateTimeOffset.UtcNow, JournalEntryType.ActionFailed, action.Tool,
                             new Dictionary<string, object?> { ["error"] = result.Message ?? "" }));
@@ -701,6 +716,21 @@ public sealed class AgentBackgroundService(
                     await Task.Delay(50, ct);
             }
         }
+    }
+
+    // ── Inventory summary (Sprint 19) ────────────────────────────────────────
+
+    /// <summary>
+    /// Returns a concise inventory summary string for log messages.
+    /// Shows the top <paramref name="maxItems"/> items by count.
+    /// </summary>
+    private string SummarizeInventory(int maxItems = 5)
+    {
+        if (_worldState.Inventory.Count == 0) return "empty";
+        return string.Join(", ", _worldState.Inventory
+            .OrderByDescending(kv => kv.Value)
+            .Take(maxItems)
+            .Select(kv => $"{kv.Value}x {kv.Key}"));
     }
 
     // ── Emergency stop ────────────────────────────────────────────────────────
@@ -875,11 +905,8 @@ public sealed class AgentBackgroundService(
 
         try
         {
-            var invSummary = _worldState.Inventory.Count > 0
-                ? string.Join(", ", _worldState.Inventory
-                    .OrderByDescending(kv => kv.Value).Take(5)
-                    .Select(kv => $"{kv.Value}x{kv.Key}"))
-                : "empty";
+            // Sprint 19: refactored to use shared SummarizeInventory helper
+            var invSummary = SummarizeInventory();
 
             var prompt =
                 $"recover from runtime error while executing goal {_currentGoal.Name}: {errMsg}. " +
