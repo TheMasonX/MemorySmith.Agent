@@ -136,6 +136,10 @@ public sealed class AgentBackgroundService(
         replanGovernor?.Reset();
         // Sprint 20: reset inventory snapshot so the first cycle measures from scratch.
         _cycleInventorySnapshot = -1;
+        // Sprint 21 P0-A: mark inventory as potentially stale so GenericGatherGoal.IsComplete
+        // won't false-complete on stale inventory (e.g. after admin /clear). Cleared by
+        // WorldStateProjector.ApplyStatus when a fresh StatusEvent arrives via GetStatus.
+        _worldState = _worldState.With(b => b.SetInventoryStale(true));
         lock (_pendingLock) _pendingActions.Clear();
         logger.LogInformation("[goal] set: {Goal} — {Description} | inventory: [{Inventory}]",
             goal.Name, goal.Description, SummarizeInventory());
@@ -555,6 +559,19 @@ public sealed class AgentBackgroundService(
                     continue;
                 }
 
+                // Sprint 21 P0-B: pre-plan governor check. When already STALLED, skip PlanAsync
+                // entirely and wait 10s before rechecking. Previously PlanAsync was called every
+                // 2s even during STALL (governor only checked *after* the plan was created), which
+                // wasted planner CPU and produced misleading plan-sequence log lines.
+                if (replanGovernor?.IsStalled == true)
+                {
+                    _lastReplanAt = DateTimeOffset.UtcNow;
+                    logger.LogDebug(
+                        "[governor] STALLED — skipping PlanAsync, waiting 10s before retry check");
+                    await Task.Delay(TimeSpan.FromSeconds(10), ct);
+                    continue;
+                }
+
                 // Sprint 18: minimum replan interval — prevents replanning storm under the
                 // fire-and-forget architecture where tools return in <1 ms after sending to Node.js.
                 // Without this, the planner runs ~3x/second; with it, at most once per 2 seconds.
@@ -721,7 +738,7 @@ public sealed class AgentBackgroundService(
                     if (_cycleInventorySnapshot >= 0 && currentInventorySum != _cycleInventorySnapshot)
                     {
                         replanGovernor?.RecordProgress();
-                        logger.LogDebug("[governor] progress detected — inventory Σ {Before}→{After} (stagnation counter reset)",
+                        logger.LogInformation("[governor] progress detected — inventory Σ {Before}→{After} (stagnation counter reset)",
                             _cycleInventorySnapshot, currentInventorySum);
                     }
                     _cycleInventorySnapshot = currentInventorySum;
