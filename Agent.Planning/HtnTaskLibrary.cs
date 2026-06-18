@@ -449,6 +449,14 @@ public sealed class HtnTaskLibrary
         string[] parameters, WorldState state) =>
         GatherItemDecompose(OakLogSpec, parameters, state);
 
+    /// <summary>
+    /// Sprint 19: Wander is now conditional on a recent BlockNotFound for one of this
+    /// spec's source blocks. The JS adapter's <c>bot.findBlock({maxDistance:64})</c> already
+    /// locates the nearest matching block — wandering BEFORE mining just moves the bot
+    /// away from resources it could mine locally. Default plan: SearchMemory → MineBlock
+    /// → GetStatus (3 actions). Wander is inserted only when the WorldState indicates
+    /// the bot failed to find the target block on a previous cycle.
+    /// </summary>
     private static IReadOnlyList<ActionData> GatherItemDecompose(
         ItemSpec spec, string[] parameters, WorldState state)
     {
@@ -456,8 +464,18 @@ public sealed class HtnTaskLibrary
         var actions = new List<ActionData>
         {
             MakeAction("SearchMemory", ("query", $"{spec.ItemId} location nearby source")),
-            MakeAction("Wander", ("radius", (object?)40), ("maxDistanceFromSpawn", (object?)200)),
         };
+
+        // Include Wander only when the last BlockNotFound was for one of this item's
+        // source blocks. First gather attempt (no fact) → mine directly.
+        if (state.Facts.TryGetValue("event:BlockNotFound:Block", out var lastMissed)
+            && lastMissed is string missedBlock
+            && spec.SourceBlocks.Any(b =>
+                string.Equals(b, missedBlock, StringComparison.OrdinalIgnoreCase)))
+        {
+            actions.Add(MakeAction("Wander", ("radius", (object?)40), ("maxDistanceFromSpawn", (object?)200)));
+        }
+
         foreach (var block in spec.SourceBlocks)
             actions.Add(MakeAction("MineBlock", ("block", block), ("count", (object?)count)));
         actions.Add(MakeAction("GetStatus"));
