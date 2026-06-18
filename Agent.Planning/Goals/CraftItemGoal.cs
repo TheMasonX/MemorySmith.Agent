@@ -11,6 +11,10 @@ using Agent.Core;
 ///
 /// If the required materials are absent, <c>CraftItemTool</c> returns a failure and
 /// <c>TryRecoverFromGameErrorAsync</c> asks the LLM to suggest the appropriate gather goal.
+///
+/// Sprint 22 P0: IsComplete now guards on <see cref="WorldState.IsInventoryStale"/>,
+/// mirroring the GenericGatherGoal fix from Sprint 21. Prevents false-completion after
+/// an admin /clear command that the bot did not observe via GetStatus.
 /// </summary>
 public sealed class CraftItemGoal(string itemId, int count = 1) : IGoal
 {
@@ -27,9 +31,18 @@ public sealed class CraftItemGoal(string itemId, int count = 1) : IGoal
     /// <summary>
     /// Goal is complete when the inventory holds at least <see cref="Count"/>
     /// units of <see cref="ItemId"/>.
+    ///
+    /// Sprint 22 P0: returns false when inventory is stale (SetGoal marks it stale;
+    /// WorldStateProjector.ApplyStatus clears it on fresh StatusEvent from GetStatus).
     /// </summary>
-    public bool IsComplete(WorldState state) =>
-        state.Inventory.GetValueOrDefault(itemId) >= count;
+    public bool IsComplete(WorldState state)
+    {
+        // Sprint 22 P0: inventory freshness gate — mirrors GenericGatherGoal (Sprint 21 P0-A).
+        if (state.IsInventoryStale)
+            return false;
+
+        return state.Inventory.GetValueOrDefault(itemId) >= count;
+    }
 
     /// <inheritdoc/>
     public bool HasFailed(WorldState state) =>
