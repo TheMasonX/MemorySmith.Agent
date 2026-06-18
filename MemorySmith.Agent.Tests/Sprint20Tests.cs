@@ -272,7 +272,7 @@ public sealed class Sprint20SystemMessageFilterTests
         new(@"^Gave\s+\d+\s+",                System.Text.RegularExpressions.RegexOptions.IgnoreCase),
         new(@"^Set\s+own\s+game\s+mode",       System.Text.RegularExpressions.RegexOptions.IgnoreCase),
         // Sprint 20 additions:
-        new(@"^Removed\s+\d+\s+items?\s+from\s+", System.Text.RegularExpressions.RegexOptions.IgnoreCase),
+        new(@"^Removed\s+\d+\s+item", System.Text.RegularExpressions.RegexOptions.IgnoreCase),  // matches item, items, item(s)
         new(@"^Cleared\s+\S+",                    System.Text.RegularExpressions.RegexOptions.IgnoreCase),
         new(@"^Gave\s+\S+\s+\d+\s+",             System.Text.RegularExpressions.RegexOptions.IgnoreCase),
     ];
