@@ -12,7 +12,7 @@ namespace Agent.Core;
 ///
 /// <para><b>ACTIVE state:</b> Each call to <see cref="Evaluate"/> compares the fingerprint
 /// to the previous one. If identical, an internal counter increments. When the counter
-/// reaches <see cref="IdenticalPlanThreshold"/> (3), the governor transitions to STALLED.</para>
+/// reaches <see cref="_threshold"/> (3), the governor transitions to STALLED.</para>
 ///
 /// <para><b>STALLED state:</b> <see cref="Evaluate"/> returns <see cref="ReplanVerdict.Stalled"/>
 /// until one of three recovery conditions is met:
@@ -27,22 +27,29 @@ namespace Agent.Core;
 /// </summary>
 public sealed class ReplanGovernor : IReplanGovernor
 {
-    /// <summary>
-    /// Number of consecutive identical plan fingerprints required to trigger STALLED.
-    /// </summary>
-    private const int IdenticalPlanThreshold = 3;
+    private const int Default_threshold = 3;
+    private static readonly TimeSpan Default_recoveryTimeout = TimeSpan.FromSeconds(60);
 
-    /// <summary>
-    /// How long the governor stays in STALLED before allowing one retry attempt.
-    /// </summary>
-    private static readonly TimeSpan StalledRecoveryTimeout = TimeSpan.FromSeconds(60);
-
+    private readonly int _threshold;
+    private readonly TimeSpan _recoveryTimeout;
     private readonly object _lock = new();
 
     private string? _lastFingerprint;
     private int _identicalPlanCount;
     private bool _isStalled;
     private DateTimeOffset _stalledAt = DateTimeOffset.MinValue;
+
+    /// <summary>
+    /// Creates a governor with configurable thresholds. Defaults are suitable for
+    /// production (3 identical plans, 60s recovery). Tests can override for speed.
+    /// </summary>
+    public ReplanGovernor(
+        int identicalPlanThreshold = Default_threshold,
+        TimeSpan? stalledRecoveryTimeout = null)
+    {
+        _threshold = identicalPlanThreshold;
+        _recoveryTimeout = stalledRecoveryTimeout ?? Default_recoveryTimeout;
+    }
 
     /// <inheritdoc/>
     public bool IsStalled
@@ -58,7 +65,7 @@ public sealed class ReplanGovernor : IReplanGovernor
             if (_isStalled)
             {
                 // Auto-recovery: allow one retry after timeout
-                if ((DateTimeOffset.UtcNow - _stalledAt) >= StalledRecoveryTimeout)
+                if ((DateTimeOffset.UtcNow - _stalledAt) >= _recoveryTimeout)
                 {
                     _isStalled = false;
                     _identicalPlanCount = 1;
@@ -71,7 +78,7 @@ public sealed class ReplanGovernor : IReplanGovernor
             if (string.Equals(planFingerprint, _lastFingerprint, StringComparison.Ordinal))
             {
                 _identicalPlanCount++;
-                if (_identicalPlanCount >= IdenticalPlanThreshold)
+                if (_identicalPlanCount >= _threshold)
                 {
                     _isStalled = true;
                     _stalledAt = DateTimeOffset.UtcNow;
