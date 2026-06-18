@@ -1,8 +1,8 @@
-namespace MemorySmith.Agent.Tests;
-
 using Agent.Core;
 using Agent.Planning;
 using NUnit.Framework;
+
+namespace MemorySmith.Agent.Tests;
 
 /// <summary>
 /// Sprint 20: Tests for progress-hash stagnation detection and inventory staleness gate.
