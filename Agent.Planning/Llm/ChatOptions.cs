@@ -60,6 +60,13 @@ public sealed record ChatOptions
     /// <summary>Per-request LLM timeout in seconds. Default: 10.</summary>
     public int LlmTimeoutSeconds { get; init; } = 10;
 
+    /// <summary>
+    /// Maximum tokens the LLM may generate per response (Ollama num_predict).
+    /// Sprint 20: prevents JSON truncation from small models like llama3.2:3b.
+    /// 0 = use the model's default.
+    /// </summary>
+    public int LlmMaxResponseTokens { get; init; } = 300;
+
     // ── Rate limiting ─────────────────────────────────────────────────────────
 
     /// <summary>Minimum seconds between LLM calls for the same player. Default: 3.</summary>
