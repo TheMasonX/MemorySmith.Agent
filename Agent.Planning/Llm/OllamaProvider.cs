@@ -42,7 +42,11 @@ public sealed class OllamaProvider(HttpClient http, ChatOptions options) : ILlmP
                     new OllamaMessage { Role = "system", Content = systemPrompt },
                     new OllamaMessage { Role = "user",   Content = userMessage  },
                 ],
-                Stream = false,
+                Stream  = false,
+                // Sprint 20: cap response length to avoid JSON truncation mid-brace.
+                Options = options.LlmMaxResponseTokens > 0
+                    ? new OllamaOptions { NumPredict = options.LlmMaxResponseTokens }
+                    : null,
             };
 
             var response = await http.PostAsJsonAsync("/api/chat", request, cts.Token);
@@ -65,6 +69,13 @@ public sealed class OllamaProvider(HttpClient http, ChatOptions options) : ILlmP
         [JsonPropertyName("model")]    public string Model    { get; set; } = string.Empty;
         [JsonPropertyName("messages")] public OllamaMessage[] Messages { get; set; } = [];
         [JsonPropertyName("stream")]   public bool Stream { get; set; } = false;
+        // Sprint 20: optional generation parameters
+        [JsonPropertyName("options")]  public OllamaOptions? Options   { get; set; }
+    }
+
+    private sealed class OllamaOptions
+    {
+        [JsonPropertyName("num_predict")] public int NumPredict { get; set; }
     }
 
     private sealed class OllamaMessage
