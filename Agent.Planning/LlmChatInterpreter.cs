@@ -290,7 +290,7 @@ public sealed class LlmChatInterpreter(
             return new ChatInterpretation(intentType, goalName, parameters, response);
         }
         catch { return null; }
-    }   }
+    }
 
     private static double Distance(Position a, Position b)
     {
