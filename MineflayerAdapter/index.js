@@ -27,6 +27,7 @@ import mineflayer from 'mineflayer';
 import mflPathfinder from 'mineflayer-pathfinder';
 const { pathfinder, Movements, goals: pfGoals } = mflPathfinder;
 import { WebSocketServer } from 'ws';
+import { appendFileSync, mkdirSync, existsSync } from 'node:fs';
 
 // ── Environment / connection ──────────────────────────────────────────────────
 
@@ -62,6 +63,35 @@ const FLAT_SCORE_WEIGHTS = Object.freeze({
 });
 
 const LIQUID_BLOCK_NAMES = new Set(['water', 'lava', 'flowing_water', 'flowing_lava']);
+
+// ── Sprint 19: Structured file logging ────────────────────────────────────────
+// Writes JSON lines to a daily rolling log file alongside the C# host's Serilog output.
+// Console stays concise (summary lines only); the file captures full structured context
+// for post-hoc diagnostics: block names, counts, coordinates, timing, args.
+
+const LOG_DIR = process.env.LOG_DIR ?? './logs';
+try { if (!existsSync(LOG_DIR)) mkdirSync(LOG_DIR, { recursive: true }); } catch { /* best-effort */ }
+
+/**
+ * Writes a structured JSON line to the daily adapter log file.
+ * @param {'debug'|'info'|'warn'|'error'} level
+ * @param {string} category - action category (mine, wander, findFlatArea, craft, smelt, dispatch)
+ * @param {string} message - human-readable summary
+ * @param {Object} [data] - structured context (merged into the JSON entry)
+ */
+function logStructured(level, category, message, data = {}) {
+  const entry = JSON.stringify({
+    t: new Date().toISOString(),
+    l: level,
+    c: category,
+    m: message,
+    ...data,
+  });
+  const dateStr = new Date().toISOString().split('T')[0];
+  try {
+    appendFileSync(`${LOG_DIR}/adapter-${dateStr}.log`, entry + '\n');
+  } catch { /* best-effort — never crash the bot on log I/O failure */ }
+}
 
 // ── Sprint 18: Emergency stop state ───────────────────────────────────────────
 // Set by handleStop(), cleared at the start of each action case.
@@ -241,6 +271,9 @@ bot.on('chat', (username, message) => {
 // ── Action dispatcher ─────────────────────────────────────────────────────────
 
 async function dispatch({ action, arguments: args = {} }) {
+  const _dispatchStart = Date.now();
+  logStructured('debug', 'dispatch', 'received', { action, args });
+  try {
   switch (action) {
 
     case 'move': {
@@ -271,6 +304,8 @@ async function dispatch({ action, arguments: args = {} }) {
 
       // Sprint 18: reset stop flag for this action
       _stopRequested = false;
+      const _mineStart = Date.now();
+      logStructured('info', 'mine', 'start', { block: shortName, targetCount: count, pos: botPos() });
 
       while (mined < count) {
         // Sprint 18: check stop flag at start of each iteration
@@ -284,7 +319,11 @@ async function dispatch({ action, arguments: args = {} }) {
         if (!target) target = bot.findBlock({ matching: blockId, maxDistance: MINE_SEARCH_RADIUS_FAR });
 
         if (!target) {
-          console.log(`[mine] no ${shortName} found within ${MINE_SEARCH_RADIUS_FAR} blocks after ${mined} mined`);
+          console.log(`[mine] no ${shortName} found (mined ${mined}/${count})`);
+          logStructured('warn', 'mine', 'no blocks in range', {
+            block: shortName, mined, targetCount: count,
+            searchRadius: MINE_SEARCH_RADIUS_FAR, elapsedMs: Date.now() - _mineStart,
+          });
           sendEvent('blockNotFound', { block: blockName, mined });
           if (mined === 0) throw new Error(`No ${shortName} found within ${MINE_SEARCH_RADIUS_FAR} blocks`);
           break;
@@ -325,6 +364,9 @@ async function dispatch({ action, arguments: args = {} }) {
           await new Promise(r => setTimeout(r, 500));
         }
       }
+      logStructured('info', 'mine', 'complete', {
+        block: shortName, mined, targetCount: count, elapsedMs: Date.now() - _mineStart,
+      });
       break;
     }
 
@@ -393,6 +435,10 @@ async function dispatch({ action, arguments: args = {} }) {
       // Sprint 18: reset stop flag; pathfinder.setGoal(null) in handleStop() will
       // cause goto() to throw, which is caught below — no extra check needed.
       _stopRequested = false;
+      logStructured('info', 'wander', 'start', {
+        radius, maxDistanceFromSpawn, targetX: Math.round(tX), targetZ: Math.round(tZ),
+        fromPos: botPos(),
+      });
 
       const movements = new Movements(bot);
       bot.pathfinder.setMovements(movements);
@@ -428,6 +474,8 @@ async function dispatch({ action, arguments: args = {} }) {
 
       // Sprint 18: reset stop flag for this scan
       _stopRequested = false;
+      const _scanStart = Date.now();
+      logStructured('info', 'findFlatArea', 'start', { radius: r, minArea, botPos: botPosObj });
 
       // ── Height map ─────────────────────────────────────────────────────────
       // Sprint 18 fix: bot.blockAt() now calls pos.floored() internally in current
@@ -546,16 +594,23 @@ async function dispatch({ action, arguments: args = {} }) {
 
       if (bestCandidate) {
         sendEvent('flatAreaFound', bestCandidate);
+        const scanElapsed = Date.now() - _scanStart;
         console.log(
           `[findFlatArea] best at (${bestCandidate.x},${bestCandidate.y},${bestCandidate.z})` +
           ` area=${bestCandidate.area} yRange=${bestCandidate.yRange}` +
-          ` compact=${bestCandidate.compactness} score=${bestScore.toFixed(1)}`
+          ` compact=${bestCandidate.compactness} score=${bestScore.toFixed(1)} (${scanElapsed}ms)`
         );
+        logStructured('info', 'findFlatArea', 'found', {
+          ...bestCandidate, score: +bestScore.toFixed(1), columns: columnIdx, elapsedMs: scanElapsed,
+        });
       } else {
         console.warn(
           `[findFlatArea] no qualifying flat area found ` +
           `(min=${minArea}, maxSlope=${maxSlope}, radius=${r}, columns=${columnIdx})`
         );
+        logStructured('warn', 'findFlatArea', 'no qualifying area', {
+          minArea, maxSlope, radius: r, columns: columnIdx, elapsedMs: Date.now() - _scanStart,
+        });
         sendEvent('flatAreaFound', {
           x: botPosObj.x, y: botPosObj.y + 1, z: botPosObj.z,
           area: 0, minX: botPosObj.x, maxX: botPosObj.x, minZ: botPosObj.z, maxZ: botPosObj.z,
@@ -674,6 +729,9 @@ async function dispatch({ action, arguments: args = {} }) {
 
     default:
       throw new Error(`Unknown action: ${action}`);
+  }
+  } finally {
+    logStructured('info', 'dispatch', 'done', { action, elapsedMs: Date.now() - _dispatchStart });
   }
 }
 
