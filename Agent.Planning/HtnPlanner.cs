@@ -14,6 +14,10 @@ using Agent.Planning.Goals;
 ///   4. CraftItemGoal -> DecomposeCraftItem (Sprint 13).
 ///   5. Phase-by-phase decomposition.
 ///   6. Throw if no actions result (caller falls back to LLM).
+///
+/// Sprint 22 P1: IItemSpecGoal branch now passes the goal's TargetCount as
+/// parameters[0] to GatherItemDecompose. Previously the empty array [] caused
+/// the decomposer to default to count=10 regardless of the user's requested quantity.
 /// </summary>
 public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
 {
@@ -28,9 +32,14 @@ public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
             actions.AddRange(library.Decompose(goal.Name, [], state));
         }
         // 2. IItemSpecGoal — ItemSpec-aware decomposition (e.g. GenericGatherGoal).
+        //    Sprint 22 P1: pass TargetCount so GatherItemDecompose emits the correct
+        //    MineBlock count (fixes "get 100 sand" emitting count=10 plan).
         else if (goal is IItemSpecGoal isg)
         {
-            actions.AddRange(library.DecomposeGatherItem(isg.Spec, [], state));
+            var parameters = isg is GenericGatherGoal ggg
+                ? new[] { ggg.TargetCount.ToString() }
+                : Array.Empty<string>();
+            actions.AddRange(library.DecomposeGatherItem(isg.Spec, parameters, state));
         }
         // 3. BuildGoal — blueprint-aware decomposition.
         //    Sprint 13 D3: pass requireOrigin:true — if no valid build origin is available,
