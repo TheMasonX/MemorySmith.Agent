@@ -220,6 +220,18 @@ if (agentEnabled)
     app.Logger.LogInformation(
         "Chat LLM config: enabled={Enabled}, provider={Provider}, model={Model}, baseUrl={BaseUrl}",
         opts.LlmEnabled, opts.LlmProvider, opts.LlmModel, opts.ResolvedBaseUrl);
+
+    // Sprint 18: concise startup config summary so users can verify key settings at a glance.
+    // Includes LLM timeout (most-impactful for "bot hangs thinking") and rate-limit values.
+    var mcCfg  = app.Services.GetRequiredService<IOptions<MinecraftAdapterConfig>>().Value;
+    var memCfg = app.Services.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
+    app.Logger.LogInformation(
+        "=== Agent config: bot={Bot} mc={Host}:{McPort} | " +
+        "llmTimeout={LlmTimeout}s rateCooldown={Cooldown}s maxPerMin={Max} | " +
+        "memory={MemUrl} actionTimeout=30s replanInterval=2s ===",
+        mcCfg.BotUsername, mcCfg.ServerHost, mcCfg.ServerPort,
+        opts.LlmTimeoutSeconds, opts.PlayerCooldownSeconds, opts.GlobalPerMinuteMax,
+        memCfg.BaseUrl);
 }
 
 // Sprint 4a: map SignalR hub for real-time dashboard push
