@@ -50,7 +50,9 @@ const FURNACE_REACH_DISTANCE     = 2;
 const SMELT_TIMEOUT_MS           = 40_000;
 
 // Sprint 9: flat-area scan defaults.
-const FLAT_AREA_SCAN_RADIUS      = 20;
+// Sprint 19: increased default radius from 20 to 32 for better initial coverage.
+// C# planner sends radius=48 on retry after a zero-area result.
+const FLAT_AREA_SCAN_RADIUS      = 32;
 const FLAT_AREA_MIN_SIZE         = 25;
 const FLAT_AREA_Y_ABOVE          = 10;
 const FLAT_AREA_Y_BELOW          = 16;
@@ -656,10 +658,12 @@ async function dispatch({ action, arguments: args = {} }) {
         logStructured('warn', 'findFlatArea', 'no qualifying area', {
           minArea, maxSlope, radius: r, columns: columnIdx, elapsedMs: Date.now() - _scanStart,
         });
+        // Sprint 19: include searchedRadius so C# can distinguish "searched small area"
+        // from "searched large area". DecomposeBuild uses this to expand radius on retry.
         sendEvent('flatAreaFound', {
           x: botPosObj.x, y: botPosObj.y + 1, z: botPosObj.z,
           area: 0, minX: botPosObj.x, maxX: botPosObj.x, minZ: botPosObj.z, maxZ: botPosObj.z,
-          yRange: 0, compactness: 0,
+          yRange: 0, compactness: 0, searchedRadius: r,
         });
       }
       break;
