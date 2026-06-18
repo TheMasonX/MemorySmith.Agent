@@ -228,3 +228,4 @@ dotnet run --project WebUI.Blazor --launch-profile WebUI.Blazor
 # 3. Run tests
 dotnet test MemorySmith.Agent.Tests
 ```
+- Sprint 20 complete: progress-hash governor, inventory freshness gate, LLM truncation recovery, expanded system message filter.
