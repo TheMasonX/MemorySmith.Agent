@@ -9,41 +9,13 @@ using System.Threading.Channels;
 
 /// <summary>
 /// Hosted service that owns the agent loop.
+/// (see class header in original for phase notes)
 ///
-/// Phase 1: basic loop.
-/// Phase 3: IPlanner integration.
-/// Phase 5: chat event routing via <see cref="IChatInterpreter"/> (includes LLM path).
-/// Phase 5b: LlmChatInterpreter; player-position-aware chat routing; CancelGoal,
-///           SetBuildOrigin, GetPendingActions public API.
-/// Phase 6 Sprint 1:
-///   1a — Non-blocking LLM: chat events are written to <see cref="_chatChannel"/> and
-///        processed by <see cref="ChatConsumerAsync"/> on a dedicated task, so a 5-10s
-///        LLM call never stalls health/death/blockMined processing.
-///   1b — Reconnect: <see cref="ExecuteAsync"/> retries ConnectAsync with exponential
-///        backoff (default 2s/4s/8s/16s/32s, max 5 retries). World state and current
-///        goal survive reconnects. Configurable delays for test speed.
-/// Sprint 8:
-///   - TryRecoverFromGameErrorAsync: richer prompt (inventory + available actions);
-///     immediate trigger for blockNotFound/recipeMissing; ErrorRecovery journal log.
-/// Sprint 9:
-///   - FlatAreaFoundEvent: when Area >= MinUsableFlatArea, auto-sets build origin.
-/// Sprint 11:
-///   - EnqueueThinkingIfSlowAsync logs when indicator fires.
-///   - HandleChatEventAsync logs resolved intent after interpretation.
-/// Sprint 12:
-///   - ActionQueue switched to ConcurrentQueue — fixes infinite planning loop caused
-///     by non-thread-safe Queue being accessed from two concurrent async tasks.
-///   - HandleChatEventAsync defers response enqueue to AFTER the switch — fixes the
-///     bug where SetGoal/CancelGoal cleared the queued chat response before dispatch.
-///   - SetGoal resets _actionDispatchedThisCycle so DispatchActionsAsync can plan
-///     immediately rather than waiting for the 300ms settle window.
-///   - _lastAbandonedGoalName guards TryRecoverFromGameErrorAsync from re-setting the
-///     same goal that just failed, breaking the infinite recovery loop.
-/// Sprint 15 P1:
-///   - TryCompleteCurrentGoalFromWorldUpdate now resets _lastRecoveredGoalName so
-///     the next run of the same goal can use recovery fresh (Sprint 13 D3).
-///   - DispatchActionsAsync: stall detection — warns when no action is dispatched
-///     for >10s with an active goal (D4 from Sprint 9-10 council).
+/// Sprint 18:
+///   - SendEmergencyStop(): dispatches {action:"stop"} to Node.js on goal set/cancel to
+///     abort in-progress mine/wander loops (fire-and-forget: resolves "leo stop" not working).
+///   - DispatchActionsAsync: MinReplanIntervalSeconds (2s) guard prevents replanning at CPU
+///     speed under the fire-and-forget tool architecture (resolves 3x/sec replan storm).
 /// </summary>
 public sealed class AgentBackgroundService(
     IWorldAdapter worldAdapter,
@@ -77,6 +49,13 @@ public sealed class AgentBackgroundService(
 
     /// <summary>Minimum seconds between consecutive stall warnings for the same goal.</summary>
     private const int StallWarningSuppressSeconds = 30;
+
+    /// <summary>
+    /// Minimum seconds between successive replans.
+    /// Sprint 18: tools dispatch fire-and-forget to Node.js; without this guard the planner
+    /// runs at CPU speed (every 50–300 ms) before Node.js executes any action.
+    /// </summary>
+    private const int MinReplanIntervalSeconds = 2;
 
     private readonly TimeSpan[] _reconnectDelays = reconnectDelays ?? DefaultReconnectDelays;
 
@@ -113,6 +92,9 @@ public sealed class AgentBackgroundService(
     private DateTimeOffset _lastActionDispatchedAt = DateTimeOffset.MinValue;
     private DateTimeOffset _lastStallWarnedAt       = DateTimeOffset.MinValue;
 
+    // Sprint 18: minimum replan interval guard — companion to MinReplanIntervalSeconds.
+    private DateTimeOffset _lastReplanAt = DateTimeOffset.MinValue;
+
     public WorldState WorldState           => _worldState;
     public IGoal?     CurrentGoal          => _currentGoal;
     public int        ConsecutiveFailures  => _consecutiveFailures;
@@ -123,6 +105,11 @@ public sealed class AgentBackgroundService(
 
     public void SetGoal(IGoal goal)
     {
+        // Sprint 18: abort in-progress Node.js action before changing goal.
+        // Tools dispatch fire-and-forget; the adapter may still be mining or wandering
+        // from a previous plan. The emergency stop clears its queue and breaks the loop.
+        SendEmergencyStop();
+
         _currentGoal = goal;
         _currentGoal.FailureReason = null;
         _queue.Clear();
@@ -137,6 +124,8 @@ public sealed class AgentBackgroundService(
         // Sprint 15 P1: reset stall clock for the new goal.
         _lastActionDispatchedAt = DateTimeOffset.UtcNow;
         _lastStallWarnedAt      = DateTimeOffset.MinValue;
+        // Sprint 18: reset replan timer so the first plan fires without waiting.
+        _lastReplanAt = DateTimeOffset.MinValue;
         lock (_pendingLock) _pendingActions.Clear();
         logger.LogInformation("Goal set: {Goal}", goal.Name);
         _journal?.Log(new JournalEntry(
@@ -148,6 +137,9 @@ public sealed class AgentBackgroundService(
 
     public void CancelGoal()
     {
+        // Sprint 18: abort in-progress Node.js action immediately on cancel.
+        SendEmergencyStop();
+
         if (_currentGoal is not null)
             logger.LogInformation("Goal cancelled: {Goal}", _currentGoal.Name);
         var previousGoalName = _currentGoal?.Name;
@@ -459,6 +451,8 @@ public sealed class AgentBackgroundService(
         _lastRecoveredGoalName = null;
         _queue.Clear();
         lock (_pendingLock) _pendingActions.Clear();
+        // Sprint 18: emit stop so Node.js also aborts the in-progress mine action.
+        SendEmergencyStop();
         _ = PushGoalToDashboardAsync();
     }
 
@@ -541,6 +535,16 @@ public sealed class AgentBackgroundService(
                     lock (_pendingLock) _pendingActions.Clear();
                     continue;
                 }
+
+                // Sprint 18: minimum replan interval — prevents replanning storm under the
+                // fire-and-forget architecture where tools return in <1 ms after sending to Node.js.
+                // Without this, the planner runs ~3x/second; with it, at most once per 2 seconds.
+                if ((DateTimeOffset.UtcNow - _lastReplanAt) < TimeSpan.FromSeconds(MinReplanIntervalSeconds))
+                {
+                    await Task.Delay(50, ct);
+                    continue;
+                }
+
                 try
                 {
                     var plan = await planner.PlanAsync(_currentGoal, _worldState, ct);
@@ -554,6 +558,7 @@ public sealed class AgentBackgroundService(
                         _pendingActions.Clear();
                         _pendingActions.AddRange(plan.Actions);
                     }
+                    _lastReplanAt = DateTimeOffset.UtcNow; // Sprint 18: record plan time
                     logger.LogInformation("New plan for '{Goal}': {Count} actions.", _currentGoal.Name, plan.Actions.Count);
                     _journal?.Log(new JournalEntry(
                         DateTimeOffset.UtcNow, JournalEntryType.PlanCreated, _currentGoal.Name,
@@ -676,8 +681,7 @@ public sealed class AgentBackgroundService(
                             await TryRecoverFromGameErrorAsync(errMsg, ct);
                     }
 
-                    // Sprint 15 P1: stall detection — warn if no action dispatched recently
-                    // while a goal is still active. Fires at most once per StallWarningSuppressSeconds.
+                    // Sprint 15 P1: stall detection
                     if (_currentGoal is not null)
                     {
                         var stalledFor = DateTimeOffset.UtcNow - _lastActionDispatchedAt;
@@ -694,6 +698,36 @@ public sealed class AgentBackgroundService(
                 else
                     await Task.Delay(50, ct);
             }
+        }
+    }
+
+    // ── Emergency stop ────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Dispatches an emergency stop signal to the world adapter, aborting any in-progress
+    /// Node.js action (mine loop, pathfinding, findFlatArea scan).
+    ///
+    /// Fire-and-forget: does not await a response. The C# queue is already cleared by the
+    /// caller (SetGoal / CancelGoal / TryCompleteCurrentGoalFromWorldUpdate). This signal
+    /// ensures the Node.js side also stops promptly rather than completing the in-flight action.
+    ///
+    /// The "stop" action is handled in index.js before entering cmdQueue (bypasses the command
+    /// queue), so it takes effect immediately regardless of pending commands.
+    ///
+    /// Sprint 18: resolves "leo stop" not stopping Node.js and goal completion not aborting
+    /// in-progress mine loops.
+    /// </summary>
+    private void SendEmergencyStop()
+    {
+        try
+        {
+            _ = worldAdapter.SendActionAsync(
+                new ActionData { Tool = "stop" }, CancellationToken.None);
+            logger.LogInformation("[stop] emergency stop dispatched to adapter");
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "[stop] failed to dispatch emergency stop (adapter may not be connected): {Error}", ex.Message);
         }
     }
 
@@ -819,12 +853,6 @@ public sealed class AgentBackgroundService(
     /// <summary>
     /// Asks the LLM interpreter to suggest an alternative goal when the agent has hit
     /// a game error it cannot self-resolve.
-    ///
-    /// Sprint 12: guards against re-setting the goal that just failed.
-    /// Sprint 13: skips the LLM call entirely if recovery was already attempted for this
-    ///   goal (prevents burning rate budget on blockNotFound errors that fire every cycle).
-    ///   Also fixes the Sprint 12 naming mismatch (GoalNames are compared by item-ID suffix
-    ///   so "GatherItem:oak_log" correctly matches "Gather:oak_log").
     /// </summary>
     private async Task TryRecoverFromGameErrorAsync(string errMsg, CancellationToken ct)
     {
@@ -895,9 +923,7 @@ public sealed class AgentBackgroundService(
         }
     }
 
-    /// <summary>
-    /// Compares two goal name strings by their item-ID suffix (everything after ':').
-    /// </summary>
+    /// <summary>Compares two goal name strings by their item-ID suffix (everything after ':').</summary>
     private static bool GoalNamesMatch(string? a, string? b)
     {
         if (string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b)) return false;
