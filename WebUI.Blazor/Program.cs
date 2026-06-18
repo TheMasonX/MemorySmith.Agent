@@ -181,6 +181,9 @@ if (agentEnabled)
     // ── Journal (execution trace) ────────────────────────────────────────────────────────────
     builder.Services.AddSingleton<IAgentJournal>(new AgentJournal());
 
+    // ── Sprint 19: Replan governor (2-state: ACTIVE → STALLED) ────────────────────────────
+    builder.Services.AddSingleton<IReplanGovernor, ReplanGovernor>();
+
     // ── SignalR dashboard push — Sprint 4a ────────────────────────────────────
     builder.Services.AddSignalR();
 
@@ -197,7 +200,8 @@ if (agentEnabled)
             goalFactory:     sp.GetRequiredService<GoalFactory>(),
             chatInterpreter: sp.GetRequiredService<IChatInterpreter>(),
             botName:         cfg.BotUsername,
-            journal:         sp.GetRequiredService<IAgentJournal>());
+            journal:         sp.GetRequiredService<IAgentJournal>(),
+            replanGovernor:  sp.GetRequiredService<IReplanGovernor>());
     });
     builder.Services.AddHostedService(sp => sp.GetRequiredService<AgentBackgroundService>());
 }
