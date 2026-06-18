@@ -3,21 +3,24 @@
  * and a Minecraft server.
  *
  * Sprint 2a: craft case now pathfinds to the nearest crafting table before
- *   calling bot.craft() for recipes that require one. Search radius expanded
- *   from 4 to CRAFT_TABLE_SEARCH_RADIUS (8) blocks. Radius is also overridable
- *   per-call via args.tableSearchRadius so C# can pass a custom value.
+ *   calling bot.craft() for recipes that require one.
  *
  * Phase 5b additions:
- *   - chat event: includes playerX/Y/Z (bot.players[username].entity.position)
- *     so C# can compute bot-to-player distance for the "closest agent" heuristic.
+ *   - chat event: includes playerX/Y/Z.
  *
  * Sprint 9 (flat-area scanner):
- *   - Vec3 bug fixed: replaced `new Vec3(...)` with plain `{x, y, z}` objects
- *     (bot.blockAt reads .x/.y/.z — no Vec3 constructor required).
- *   - A1: vertical scan window widened from ±5/6 to configurable (default +10/-16).
- *   - A2: compactness scoring added — square regions score higher than thin strips.
- *   - A5: slope/roughness penalty — components with high Y-range are penalised or filtered.
- *   - All flat-area tuning constants are named and overridable per-call via args.
+ *   - A1: vertical scan window widened.
+ *   - A2: compactness scoring added.
+ *   - A5: slope/roughness penalty.
+ *
+ * Sprint 18 (house-building MVP):
+ *   - toVec3(x,y,z): helper that creates a position object with .floored() so
+ *     bot.blockAt() doesn't crash. Mineflayer now calls pos.floored() internally;
+ *     plain {x,y,z} objects no longer work. All blockAt calls in findFlatArea updated.
+ *   - Emergency stop: handleStop() clears cmdQueue, stops pathfinder, sets _stopRequested.
+ *     The "stop" action bypasses the command queue and executes immediately in the ws
+ *     message handler — so "leo stop" now truly stops in-progress mining/pathfinding.
+ *   - Mine/wander/findFlatArea check _stopRequested at the start of each iteration.
  */
 
 import mineflayer from 'mineflayer';
@@ -35,38 +38,71 @@ const MC_VER   = process.env.MC_VERSION;
 const WS_TOKEN = process.env.WS_TOKEN ?? null;
 
 // ── Tunable constants ─────────────────────────────────────────────────────────
-// All search radii, distances, and retry counts are named here.
-// Override per-call via args where supported.
 
-const MINE_SEARCH_RADIUS_NEAR    = 64;   // blocks — first findBlock pass
-const MINE_SEARCH_RADIUS_FAR     = 128;  // blocks — second findBlock pass
-const MAX_MINE_PATH_FAILURES     = 3;    // consecutive pathfinder failures before abort
-const CRAFT_TABLE_SEARCH_RADIUS  = 8;    // blocks — findBlock for crafting_table (Sprint 2a)
-const CRAFT_TABLE_REACH_DISTANCE = 2;    // blocks — GoalNear tolerance when pathfinding to table
-const FURNACE_SEARCH_RADIUS      = 16;   // blocks — findBlock for furnace
-const FURNACE_REACH_DISTANCE     = 2;    // blocks — GoalNear tolerance when pathfinding to furnace
-const SMELT_TIMEOUT_MS           = 40_000; // ms — max wait for smelting output
+const MINE_SEARCH_RADIUS_NEAR    = 64;
+const MINE_SEARCH_RADIUS_FAR     = 128;
+const MAX_MINE_PATH_FAILURES     = 3;
+const CRAFT_TABLE_SEARCH_RADIUS  = 8;
+const CRAFT_TABLE_REACH_DISTANCE = 2;
+const FURNACE_SEARCH_RADIUS      = 16;
+const FURNACE_REACH_DISTANCE     = 2;
+const SMELT_TIMEOUT_MS           = 40_000;
 
-// Sprint 9: flat-area scan defaults. All overridable per-call via args.
-const FLAT_AREA_SCAN_RADIUS      = 20;   // blocks — XZ radius to scan around bot
-const FLAT_AREA_MIN_SIZE         = 25;   // cells — minimum qualifying area (5×5; council raised from 9)
-const FLAT_AREA_Y_ABOVE          = 10;   // blocks above bot Y to start scan (was 4)
-const FLAT_AREA_Y_BELOW          = 16;   // blocks below bot Y to end scan (was 6)
-const FLAT_AREA_MAX_SLOPE        = 3;    // blocks — max Y-range within a component; steeper = rejected
+// Sprint 9: flat-area scan defaults.
+const FLAT_AREA_SCAN_RADIUS      = 20;
+const FLAT_AREA_MIN_SIZE         = 25;
+const FLAT_AREA_Y_ABOVE          = 10;
+const FLAT_AREA_Y_BELOW          = 16;
+const FLAT_AREA_MAX_SLOPE        = 3;
 
-// Scoring weights (sum = 1.0):
-//   area:        raw cell count — rewards larger regions
-//   compactness: area / (bboxW × bboxD) — rewards square shapes over thin strips
-//   flatness:    1 - yRange/maxSlope — rewards smooth terrain
 const FLAT_SCORE_WEIGHTS = Object.freeze({
   area:        0.5,
   compactness: 0.3,
   flatness:    0.2,
 });
 
-// Liquid block names: these blocks are never safe build surfaces.
-// findFlatArea rejects any candidate whose ground OR surface column contains liquid.
 const LIQUID_BLOCK_NAMES = new Set(['water', 'lava', 'flowing_water', 'flowing_lava']);
+
+// ── Sprint 18: Emergency stop state ───────────────────────────────────────────
+// Set by handleStop(), cleared at the start of each action case.
+// Checked inside long-running loops (mine while, findFlatArea column scan) to
+// allow the C# "stop" command to abort in-progress actions immediately.
+
+let _stopRequested = false;
+
+/**
+ * Immediately aborts the current operation:
+ *   1. Sets _stopRequested so in-progress loops exit on next iteration.
+ *   2. Clears cmdQueue so no more queued commands run.
+ *   3. Calls bot.pathfinder.setGoal(null) to cancel active pathfinding.
+ *
+ * Called directly from the WebSocket message handler (bypasses enqueueCommand)
+ * so it takes effect immediately without waiting for the queue to drain.
+ */
+function handleStop() {
+  console.log('[stop] emergency stop — clearing queue, stopping pathfinder');
+  _stopRequested = true;
+  cmdQueue.length = 0; // Drain pending commands
+  try { bot.pathfinder.setGoal(null); } catch { /* ignore — bot may not be connected */ }
+  sendEvent('stopComplete', {});
+  console.log('[stop] done');
+}
+
+// ── Sprint 18: Vec3 compatibility helper ──────────────────────────────────────
+// Mineflayer's bot.blockAt() and world.getBlock() call pos.floored() internally.
+// Plain {x,y,z} objects no longer work in current Mineflayer versions.
+// This helper creates a minimal Vec3-compatible object for integer coordinates.
+// .floored() is a no-op (values are already integers from Math.round/Math.floor).
+// .offset() returns another toVec3 so chained calls also work.
+
+function toVec3(x, y, z) {
+  const ix = Math.floor(x), iy = Math.floor(y), iz = Math.floor(z);
+  return {
+    x: ix, y: iy, z: iz,
+    floored() { return this; },
+    offset(dx, dy, dz) { return toVec3(ix + dx, iy + dy, iz + dz); },
+  };
+}
 
 // ── WebSocket server ─────────────────────────────────────────────────────────
 
@@ -117,6 +153,14 @@ wss.on('connection', (ws) => {
 
     if (WS_TOKEN && msg.token !== WS_TOKEN) {
       ws.close(1008, 'Unauthorized');
+      return;
+    }
+
+    // Sprint 18: emergency stop bypasses the command queue — execute immediately.
+    // This ensures "leo stop" actually stops in-progress mining/pathfinding
+    // rather than being queued behind the current action.
+    if (msg.action === 'stop') {
+      handleStop();
       return;
     }
 
@@ -225,7 +269,17 @@ async function dispatch({ action, arguments: args = {} }) {
       let mined = 0;
       let pathFailures = 0;
 
+      // Sprint 18: reset stop flag for this action
+      _stopRequested = false;
+
       while (mined < count) {
+        // Sprint 18: check stop flag at start of each iteration
+        if (_stopRequested) {
+          console.log(`[mine] aborted by stop signal after ${mined}/${count} ${shortName}`);
+          sendEvent('mineAborted', { block: shortName, mined });
+          return; // Exit dispatch — don't send a normal completion event
+        }
+
         let target = bot.findBlock({ matching: blockId, maxDistance: MINE_SEARCH_RADIUS_NEAR });
         if (!target) target = bot.findBlock({ matching: blockId, maxDistance: MINE_SEARCH_RADIUS_FAR });
 
@@ -242,6 +296,10 @@ async function dispatch({ action, arguments: args = {} }) {
           );
           pathFailures = 0;
         } catch (e) {
+          if (_stopRequested) {
+            console.log(`[mine] aborted during navigation after ${mined}/${count} ${shortName}`);
+            return;
+          }
           pathFailures++;
           console.warn(`[mine] nav to ${shortName} failed (${pathFailures}/${MAX_MINE_PATH_FAILURES}): ${e.message}`);
           if (pathFailures >= MAX_MINE_PATH_FAILURES)
@@ -262,6 +320,7 @@ async function dispatch({ action, arguments: args = {} }) {
           pathFailures = 0;
           sendEvent('blockMined', { block: shortName, count: mined, ...botPos() });
         } catch (e) {
+          if (_stopRequested) { console.log(`[mine] aborted after dig error`); return; }
           console.warn(`[mine] dig failed: ${e.message}`);
           await new Promise(r => setTimeout(r, 500));
         }
@@ -331,6 +390,10 @@ async function dispatch({ action, arguments: args = {} }) {
         }
       }
 
+      // Sprint 18: reset stop flag; pathfinder.setGoal(null) in handleStop() will
+      // cause goto() to throw, which is caught below — no extra check needed.
+      _stopRequested = false;
+
       const movements = new Movements(bot);
       bot.pathfinder.setMovements(movements);
       try {
@@ -339,6 +402,10 @@ async function dispatch({ action, arguments: args = {} }) {
         );
         sendEvent('wanderComplete', { ...botPos(), targetX: Math.round(tX), targetZ: Math.round(tZ) });
       } catch (e) {
+        if (_stopRequested) {
+          console.log('[wander] aborted by stop signal');
+          return;
+        }
         console.warn(`[wander] pathfinding failed: ${e.message}`);
         sendEvent('wanderFailed', { message: e.message, ...botPos() });
       }
@@ -359,24 +426,26 @@ async function dispatch({ action, arguments: args = {} }) {
       const r       = Math.max(1, Math.min(radius, 64));
       const minArea = Math.max(1, Math.min(minFlatArea, 256));
 
+      // Sprint 18: reset stop flag for this scan
+      _stopRequested = false;
+
       // ── Height map ─────────────────────────────────────────────────────────
-      // For each column (cx, cz) within radius, find the Y of the topmost
-      // solid, non-liquid block that has traversable (air/empty) space above it.
-      //
-      // Sprint 9 A1: scan window widened from ±5/6 to configurable yAbove/yBelow.
-      // Sprint 9 Vec3 fix: bot.blockAt accepts {x,y,z} plain objects — no Vec3
-      //   import required (Mineflayer reads .x/.y/.z directly).
-      // Sprint 9 liquid check: candidate columns are rejected when the ground
-      //   block is liquid (lava/water), preventing unsafe build-site selection.
+      // Sprint 18 fix: bot.blockAt() now calls pos.floored() internally in current
+      // Mineflayer. Plain {x,y,z} objects fail with "pos.floored is not a function".
+      // Use toVec3() which provides a compatible .floored() pass-through.
 
       /** @type {Map<string, {x:number, z:number, y:number}>} */
       const heightMap = new Map();
 
-      // Yield to the Node event loop every 200 columns so the adapter remains
-      // responsive during large scans (r=64 → ~16,600 columns).
       let columnIdx = 0;
 
       for (let dx = -r; dx <= r; dx++) {
+        // Sprint 18: check stop flag every outer column strip
+        if (_stopRequested) {
+          console.log('[findFlatArea] aborted by stop signal');
+          return;
+        }
+
         for (let dz = -r; dz <= r; dz++) {
           if (++columnIdx % 200 === 0) {
             await new Promise(resolve => setImmediate(resolve));
@@ -386,15 +455,15 @@ async function dispatch({ action, arguments: args = {} }) {
           const cz = botPosObj.z + dz;
 
           for (let cy = botPosObj.y + yAbove; cy >= botPosObj.y - yBelow; cy--) {
-            const block = bot.blockAt({ x: cx, y: cy, z: cz });
+            // Sprint 18: use toVec3 so bot.blockAt() gets .floored() method
+            const block = bot.blockAt(toVec3(cx, cy, cz));
             if (!block) continue;
 
-            // A solid, non-liquid block with bounding-box 'block'.
             if (block.name !== 'air'
                 && block.boundingBox === 'block'
                 && !LIQUID_BLOCK_NAMES.has(block.name)) {
-              const above = bot.blockAt({ x: cx, y: cy + 1, z: cz });
-              // Surface (cy+1) must be traversable and not liquid.
+              // Sprint 18: use toVec3 for the above-block check too
+              const above = bot.blockAt(toVec3(cx, cy + 1, cz));
               if ((!above || above.name === 'air' || above.boundingBox === 'empty')
                   && !LIQUID_BLOCK_NAMES.has(above?.name ?? '')) {
                 heightMap.set(`${cx},${cz}`, { x: cx, z: cz, y: cy + 1 });
@@ -406,8 +475,6 @@ async function dispatch({ action, arguments: args = {} }) {
       }
 
       // ── Flood-fill: find connected flat components ─────────────────────────
-      // "Flat neighbour" = adjacent column whose surface Y differs by ≤ 1 block.
-      // Sprint 9 A5: components with Y-range > maxSlope are filtered out.
 
       /** @param {{y:number}|undefined} a @param {{y:number}|undefined} b */
       const isFlatNeighbour = (a, b) => a && b && Math.abs(a.y - b.y) <= 1;
@@ -419,7 +486,6 @@ async function dispatch({ action, arguments: args = {} }) {
       for (const [key, col] of heightMap) {
         if (visited.has(key)) continue;
 
-        // BFS to collect the connected flat component
         /** @type {Array<{x:number, z:number, y:number}>} */
         const component = [];
         const queue     = [col];
@@ -441,20 +507,12 @@ async function dispatch({ action, arguments: args = {} }) {
 
         if (component.length < minArea) continue;
 
-        // ── Sprint 9 A5: slope/roughness check ─────────────────────────────
         const yValues = component.map(c => c.y);
         const yMin    = Math.min(...yValues);
         const yMax    = Math.max(...yValues);
         const yRange  = yMax - yMin;
 
-        // Hard reject: terrain is too steep for safe construction.
         if (yRange > maxSlope) continue;
-
-        // ── Sprint 9 A2: composite score ───────────────────────────────────
-        // Combines three signals:
-        //   area:        raw cell count (larger = better)
-        //   compactness: ratio of area to bounding box (square > strip)
-        //   flatness:    inverse of normalised Y range (flat > sloped)
 
         const minX  = Math.min(...component.map(c => c.x));
         const maxX  = Math.max(...component.map(c => c.x));
@@ -463,8 +521,8 @@ async function dispatch({ action, arguments: args = {} }) {
         const bboxW = maxX - minX + 1;
         const bboxD = maxZ - minZ + 1;
 
-        const compactness = component.length / (bboxW * bboxD); // 0.0–1.0
-        const flatness    = maxSlope > 0 ? 1 - yRange / maxSlope : 1; // 1.0 = perfectly flat
+        const compactness = component.length / (bboxW * bboxD);
+        const flatness    = maxSlope > 0 ? 1 - yRange / maxSlope : 1;
         const score       = component.length * (
           FLAT_SCORE_WEIGHTS.area        +
           FLAT_SCORE_WEIGHTS.compactness * compactness +
@@ -480,7 +538,6 @@ async function dispatch({ action, arguments: args = {} }) {
             z: Math.round((minZ + maxZ) / 2),
             area: component.length,
             minX, maxX, minZ, maxZ,
-            // Sprint 9: include terrain quality metrics for observability
             yRange,
             compactness: Math.round(compactness * 100) / 100,
           };
@@ -517,8 +574,6 @@ async function dispatch({ action, arguments: args = {} }) {
       break;
 
     case 'craft': {
-      // Sprint 2a: pathfind to crafting table before crafting.
-      // tableSearchRadius can be overridden per-call; defaults to CRAFT_TABLE_SEARCH_RADIUS.
       const { item: itemName, count = 1, tableSearchRadius = CRAFT_TABLE_SEARCH_RADIUS } = args;
       if (!itemName) throw new Error('craft requires item');
 
@@ -536,12 +591,10 @@ async function dispatch({ action, arguments: args = {} }) {
         const tableId = bot.registry.blocksByName['crafting_table']?.id;
         if (tableId == null) throw new Error('crafting_table not found in registry');
 
-        // Sprint 2a: search with expanded radius and pathfind to the table.
         craftingTable = bot.findBlock({ matching: tableId, maxDistance: tableSearchRadius });
         if (!craftingTable)
           throw new Error(`No crafting_table within ${tableSearchRadius} blocks`);
 
-        // Pathfind to the crafting table so bot.craft() can reach it.
         const movements = new Movements(bot);
         bot.pathfinder.setMovements(movements);
         await bot.pathfinder.goto(new pfGoals.GoalNear(
@@ -551,7 +604,6 @@ async function dispatch({ action, arguments: args = {} }) {
           CRAFT_TABLE_REACH_DISTANCE
         ));
 
-        // Re-fetch after navigation: bot may have shifted the chunk slightly.
         craftingTable = bot.blockAt(craftingTable.position);
         if (!craftingTable || craftingTable.type !== tableId)
           throw new Error('Crafting table not found after navigation');
