@@ -118,16 +118,36 @@ public sealed class GoalFactory : IGoalFactory
     /// Sprint 14 P1a: now delegates to <see cref="CommonMinecraftBlocks.DirectMineBlocks"/>
     /// instead of maintaining a separate private set.
     /// </summary>
+    /// <summary>
+    /// Items whose drop differs from the mined block. When the user asks to gather
+    /// the key item, SourceBlocks must include both the block name AND the drop name
+    /// so <see cref="GenericGatherGoal.IsComplete"/> counts inventory correctly.
+    ///
+    /// Sprint 19: fixes "get stone" — mining stone drops cobblestone, so both
+    /// "stone" (the block) and "cobblestone" (the drop) count toward completion.
+    /// </summary>
+    private static readonly Dictionary<string, string[]> YieldSourceBlocks =
+        new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["stone"] = ["stone", "cobblestone"],
+    };
+
     private static ItemSpec? TryMakeBuiltInSpec(string itemId)
     {
         var key = itemId.ToLowerInvariant().Replace('-', '_');
         if (!CommonMinecraftBlocks.DirectMineBlocks.Contains(key)) return null;
+
+        // Sprint 19: use yield-aware SourceBlocks when the drop differs from the block
+        var sourceBlocks = YieldSourceBlocks.TryGetValue(key, out var yieldBlocks)
+            ? yieldBlocks
+            : new[] { key };
+
         return new ItemSpec
         {
             ItemId           = key,
             DisplayName      = System.Globalization.CultureInfo.InvariantCulture
                                    .TextInfo.ToTitleCase(key.Replace('_', ' ')),
-            SourceBlocks     = [key],
+            SourceBlocks     = sourceBlocks,
             RequiresSmelting = false,
             MinHarvestLevel  = 0,
         };
