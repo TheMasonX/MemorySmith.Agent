@@ -58,7 +58,8 @@ if (agentEnabled)
         return new MinecraftAdapter(cfg);
     });
 
-    // ── Memory gateway ────────────────────────────────────────────────────────────────────
+    // ── Memory gateway — agent codebase KB ───────────────────────────────────────────────
+    // Stores: sprint docs, council reviews, architecture notes, API contracts.
     builder.Services.AddHttpClient("memorysmith", (sp, http) =>
     {
         var opts = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
@@ -72,6 +73,36 @@ if (agentEnabled)
         var factory = sp.GetRequiredService<IHttpClientFactory>();
         var opts    = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
         return new RestMemoryGateway(factory.CreateClient("memorysmith"), opts);
+    });
+
+    // ── Memory gateway — world KB (Sprint 22) ─────────────────────────────────────────────
+    // Stores: block locations, exploration notes, crafting observations — Minecraft world data.
+    // Registered as a keyed singleton ("world") so future tools can inject it explicitly:
+    //   [FromKeyedServices("world")] IMemoryGateway worldMemory
+    // When WorldKbUrl is null/empty, falls back to the agent KB (safe default).
+    // See Data/Pages/Guides/world-kb-deployment.md for how to run a separate MemorySmith instance.
+    builder.Services.AddHttpClient("memorysmith-world", (sp, http) =>
+    {
+        var opts     = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
+        var worldUrl = string.IsNullOrWhiteSpace(opts.WorldKbUrl) ? opts.BaseUrl : opts.WorldKbUrl;
+        http.BaseAddress = new Uri(worldUrl);
+        http.Timeout     = TimeSpan.FromSeconds(opts.WorldTimeoutSeconds);
+        var apiKey   = opts.WorldApiKey ?? opts.ApiKey;
+        if (!string.IsNullOrEmpty(apiKey))
+            http.DefaultRequestHeaders.Add("X-Api-Key", apiKey);
+    });
+    builder.Services.AddKeyedSingleton<IMemoryGateway>("world", (sp, _) =>
+    {
+        var factory  = sp.GetRequiredService<IHttpClientFactory>();
+        var opts     = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
+        var worldUrl = string.IsNullOrWhiteSpace(opts.WorldKbUrl) ? opts.BaseUrl : opts.WorldKbUrl;
+        var worldOpts = opts with
+        {
+            BaseUrl        = worldUrl,
+            ApiKey         = opts.WorldApiKey ?? opts.ApiKey,
+            TimeoutSeconds = opts.WorldTimeoutSeconds,
+        };
+        return new RestMemoryGateway(factory.CreateClient("memorysmith-world"), worldOpts);
     });
 
     // ── Registries ────────────────────────────────────────────────────────────────────────────
@@ -250,8 +281,8 @@ app.MapGet("/", () => "MemorySmith.Agent is running.");
 app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
 {
     Name    = "MemorySmith.Agent",
-    Version = "0.7.0",
-    Phase   = "Phase 5b — LLM chat, multi-provider, configurable rate limits",
+    Version = "0.22.0",
+    Phase   = "Sprint 22 — Planner completeness + World KB separation",
     License = "MIT",
     Repository  = "https://github.com/TheMasonX/MemorySmith.Agent",
     Dashboard   = "/",
