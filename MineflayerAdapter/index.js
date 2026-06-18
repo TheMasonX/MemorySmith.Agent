@@ -271,6 +271,10 @@ const SYSTEM_MESSAGE_PATTERNS = [
   /^Killed\s+/i,                        // Kill notifications
   /^Gave\s+\d+\s+/i,                    // /give command confirmations
   /^Set\s+own\s+game\s+mode/i,          // Own gamemode change
+  // Sprint 20: additional server-confirmation patterns observed in runtime
+  /^Removed\s+\d+\s+items?\s+from\s+/i, // /clear response: "Removed 13 items from player Leo"
+  /^Cleared\s+\S+/i,                     // /clear alt: "Cleared TheMasonX23's inventory"
+  /^Gave\s+\S+\s+\d+\s+/i,             // /give alt: "Gave TheMasonX23 64 [Dirt]"
 ];
 
 /**
