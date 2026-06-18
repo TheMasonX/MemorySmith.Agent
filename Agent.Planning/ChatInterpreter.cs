@@ -52,7 +52,9 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
         ["wood"]       = "oak_log",  ["log"]          = "oak_log",   ["logs"]      = "oak_log",
         ["oak"]        = "oak_log",  ["oak log"]       = "oak_log",  ["oak logs"]  = "oak_log",
         ["birch"]      = "birch_log", ["spruce"]       = "spruce_log",
-        ["cobble"]     = "cobblestone", ["cobblestone"] = "cobblestone", ["stone"]  = "cobblestone",
+        ["cobble"]     = "cobblestone", ["cobblestone"] = "cobblestone",
+        // Sprint 19: "stone" resolves to "stone" — GoalFactory maps yield (cobblestone)
+        ["stone"]      = "stone",
         ["iron"]       = "iron_ore", ["iron ore"]      = "iron_ore",
         ["gold"]       = "gold_ore", ["gold ore"]      = "gold_ore",
         ["coal"]       = "coal_ore", ["coal ore"]      = "coal_ore",
