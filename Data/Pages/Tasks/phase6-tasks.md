@@ -95,37 +95,56 @@ Summary:
 | ID | Task | File | Status |
 |----|------|------|--------|
 | P0-classify | `ClassifySpec` checks `DirectMineBlocks.Contains(spec.ItemId) OR SourceBlocks.Contains(spec.ItemId)` | `Agent.Memory/LocalKnowledgeResolver.cs` | ✅ Done |
-| P0-drops | Expand `DirectMineBlocks` with raw ore drops (diamond, coal, emerald, redstone, lapis_lazuli) + emerald_ore/deepslate_emerald_ore | `Agent.Core/CommonMinecraftBlocks.cs` | ✅ Done |
+| P0-drops | Expand `DirectMineBlocks` with raw ore drops + emerald_ore/deepslate_emerald_ore | `Agent.Core/CommonMinecraftBlocks.cs` | ✅ Done |
 | P1-enum | Add `CandidateType.WorldFact` to IKnowledgeResolver enum | `Agent.Memory/IKnowledgeResolver.cs` | ✅ Done |
-| P1-source | LocalKnowledgeResolver step 4: WorldFact scan via `Func<WorldState?>` accessor; confidence 0.70/0.50 | `Agent.Memory/LocalKnowledgeResolver.cs` | ✅ Done |
-| P1-di | Wire `() => sp.GetService<AgentBackgroundService>()?.WorldState` to resolver in DI | `WebUI.Blazor/Program.cs` | ✅ Done |
-| Tests | 4 new tests: ClassifySpec_Diamond, ClassifySpec_OakLog, WorldFact_Match, WorldFact_OldFact; MakeResolver gains worldState param | `MemorySmith.Agent.Tests/KnowledgeResolverTests.cs` | ✅ Done |
+| P1-source | LocalKnowledgeResolver step 4: WorldFact scan via Func accessor; confidence 0.70/0.50 | `Agent.Memory/LocalKnowledgeResolver.cs` | ✅ Done |
+| P1-di | Wire WorldState factory delegate to resolver in DI | `WebUI.Blazor/Program.cs` | ✅ Done |
+| Tests | 4 new tests: ClassifySpec_Diamond, ClassifySpec_OakLog, WorldFact_Match, WorldFact_OldFact | `MemorySmith.Agent.Tests/KnowledgeResolverTests.cs` | ✅ Done |
 | D2 | SearchAsync raw-query comment in LocalKnowledgeResolver | `Agent.Memory/LocalKnowledgeResolver.cs` | ✅ Done |
-| D3 | /api/agent/resolve curl examples + behavior notes in AGENTS.md | `AGENTS.md` | ✅ Done |
-
-### Deferred from Sprint 17
-
-| ID | Finding | Target |
-|----|---------|--------|
-| D1 | WorldFact confidence decay is binary step; consider smooth decay in Phase 7-C | Sprint 19+ |
-| D2 | Document: suggest `confidenceThreshold ≥ 0.3` for WorldFact queries in AGENTS.md | Sprint 18 |
-| D4 | No integration test for /api/agent/resolve HTTP endpoint | Sprint 18+ |
-| B3 | Orientation-aware PlaceBlock (facing direction) | Sprint 18+ |
-| B5 | Clear-area action before building on slight slope | Sprint 18+ |
-| D2 (S2) | MemorySmithItemRegistry parallel miss race | Sprint 18+ |
+| D3 | /api/agent/resolve curl examples + notes added to AGENTS.md | `AGENTS.md` | ✅ Done |
 
 ---
 
-## Phase 7 — Updated Roadmap (post Sprint 17)
+## Sprint 18 — Runtime Bug Fixes & House-Building MVP Unblock (COMPLETE ✅)
+
+**CI commit:** `84cab34` (CI fix — remove SendEmergencyStop from SetGoal)  
+**CI run:** 27727986513 (build-and-test: success)  
+**Council:** `Data/Pages/council/sprint18-council-20260617.md` — no blockers, approved  
+**Branch:** `sprint-5-tool-safety` (PR #1)  
+
+| ID | Task | File | Status |
+|----|------|------|--------|
+| P0-floored | `toVec3(x,y,z)` helper fixes `pos.floored is not a function` in findFlatArea | `MineflayerAdapter/index.js` | ✅ Done |
+| P0-stop | `case 'stop':` bypasses cmdQueue; `handleStop()` clears queue + stops pathfinder + sets `_stopRequested` | `MineflayerAdapter/index.js` | ✅ Done |
+| P0-abort | `_stopRequested` checked in mine while loop, findFlatArea outer loop, wander | `MineflayerAdapter/index.js` | ✅ Done |
+| P0-replan | `MinReplanIntervalSeconds = 2` guard; replan storm drops from 3x/sec to ≤ 0.5x/sec | `AgentBackgroundService.cs` | ✅ Done |
+| P0-stop-c# | `SendEmergencyStop()` in `CancelGoal()` and `TryCompleteCurrentGoalFromWorldUpdate()` | `AgentBackgroundService.cs` | ✅ Done |
+| P1-count | `GenericGatherGoal.TargetCount` public property; `GatherGoalDecomposer` passes count | `Goals/GenericGatherGoal.cs`, `Decomposition/GatherGoalDecomposer.cs` | ✅ Done |
+| P2-config | Startup `=== Agent config ===` log (bot, LLM timeout, rate limits, memory URL) | `WebUI.Blazor/Program.cs` | ✅ Done |
+| CI-fix | Removed `SendEmergencyStop()` from `SetGoal()` — preserves test's `SentActions` invariant | `AgentBackgroundService.cs` | ✅ Done |
+| Test plan | `Data/Pages/Guides/test-plan-mvp.md` — 7-phase house-building test plan | `Data/Pages/Guides/` (NEW) | ✅ Done |
+
+### Deferred from Sprint 18
+
+| ID | Finding | Target |
+|----|---------|--------|
+| D1 | MinReplanInterval=2s adds latency for fast actions; make configurable | Sprint 19 |
+| D2 | Goal change via TryCreateGoalFromChatAsync doesn't stop old mining | Sprint 19 |
+| D3 | No test for gather count fix (GatherGoalDecomposer count pass-through) | Sprint 19 |
+| D6 | MemorySmith wiki not deployed — SearchMemory returns empty; blueprint reading blocked | Sprint 19 P0 |
+
+---
+
+## Phase 7 — Updated Roadmap (post Sprint 18)
 
 | Sub-phase | Focus | Sprint estimate |
 |-----------|-------|----------------|
 | **7-A (done)** | Architecture inventory; planner routing cleanup | Sprint 16 ✅ |
 | **7-B (done)** | Resolver growth: ClassifySpec fix + WorldFact source | Sprint 17 ✅ |
-| **7-C (next)** | Observation pipeline normalization (ObservationNormalizer + WorldModel.Observe wiring) | Sprint 18 |
-| 7-D | Belief layer + IBeliefState | Sprint 19 |
-| 7-E | Episodic memory + IEpisode | Sprint 20 |
-| 7-F | Planner input migration to world model + beliefs | Sprint 21 |
-| 7-G | Reflection service | Sprint 22 |
-| 7-H | Page synthesis from memory clusters | Sprint 23 |
-| 7-I | Adapter generalization audit | Sprint 24 |
+| **7-C (next)** | Observation pipeline normalization (ObservationNormalizer) | Sprint 19 |
+| 7-D | Belief layer + IBeliefState | Sprint 20 |
+| 7-E | Episodic memory + IEpisode | Sprint 21 |
+| 7-F | Planner input migration to world model + beliefs | Sprint 22 |
+| 7-G | Reflection service | Sprint 23 |
+| 7-H | Page synthesis from memory clusters | Sprint 24 |
+| 7-I | Adapter generalization audit | Sprint 25 |
