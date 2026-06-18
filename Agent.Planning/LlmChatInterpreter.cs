@@ -283,8 +283,7 @@ public sealed class LlmChatInterpreter(
             };
 
             var responseM = Regex.Match(json,
-                @"""response""\s*:\s*""(?<v>[^""\]*(?:\.[^""\]*)*)"""""
-                + @"""");
+                @"""response""\s*:\s*""(?<v>[^""\\]*(?:\\.[^""\\]*)*)""");
             var response = responseM.Success ? responseM.Groups["v"].Value : string.Empty;
 
             return new ChatInterpretation(intentType, goalName, parameters, response);
