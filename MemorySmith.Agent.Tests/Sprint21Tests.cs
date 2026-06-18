@@ -269,7 +269,7 @@ public sealed class Sprint21BlockNotFoundFactTests
     public void GatherItemDecompose_InsertsWander_WhenBlockNotFoundFactMatches()
     {
         // Verify that HtnTaskLibrary inserts Wander when event:BlockNotFound:Block matches spec
-        var lib = new Agent.Planning.HtnTaskLibrary();
+        var lib = new HtnTaskLibrary();
 
         // State where oak_log was not found
         var state = new WorldState();
@@ -294,7 +294,7 @@ public sealed class Sprint21BlockNotFoundFactTests
     [Test]
     public void GatherItemDecompose_NoWander_WhenNoBlockNotFoundFact()
     {
-        var lib = new Agent.Planning.HtnTaskLibrary();
+        var lib = new HtnTaskLibrary();
         var state = new WorldState(); // no BlockNotFound fact
 
         var spec = new ItemSpec
