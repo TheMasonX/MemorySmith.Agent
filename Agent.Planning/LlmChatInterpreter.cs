@@ -225,7 +225,8 @@ public sealed class LlmChatInterpreter(
     /// <summary>
     /// Sprint 20: best-effort extraction from truncated JSON missing the closing brace.
     /// Common with small models (llama3.2:3b) hitting num_predict limits.
-    /// Only recovers addressed + intent; parameters are skipped (no closing bracket).
+    /// Sprint 21 P1-C: extended to extract item/count from truncated gather JSON and
+    /// blueprint from truncated build JSON. Previously these fell through to Unknown.
     /// </summary>
     private static ChatInterpretation? TryParseTruncatedJson(string json)
     {
@@ -242,24 +243,54 @@ public sealed class LlmChatInterpreter(
                 return new ChatInterpretation(ChatIntentType.NotAddressed);
 
             var intent = intentM.Success ? intentM.Groups["v"].Value : "ignore";
+
+            // Sprint 21 P1-C: extract goal parameters from truncated gather/build JSON.
+            string? goalName = null;
+            IReadOnlyDictionary<string, object?>? parameters = null;
+
+            switch (intent.ToLowerInvariant())
+            {
+                case "gather":
+                {
+                    var itemM  = Regex.Match(json, @"""item""\s*:\s*""(?<v>[^""]+)""",  RegexOptions.IgnoreCase);
+                    var countM = Regex.Match(json, @"""count""\s*:\s*(?<v>\d+)",         RegexOptions.IgnoreCase);
+                    if (itemM.Success)
+                    {
+                        goalName   = $"GatherItem:{itemM.Groups["v"].Value}";
+                        var cnt    = countM.Success && int.TryParse(countM.Groups["v"].Value, out var c) ? c : 10;
+                        parameters = new Dictionary<string, object?> { ["count"] = cnt };
+                    }
+                    break;
+                }
+                case "build":
+                {
+                    var bpM = Regex.Match(json, @"""blueprint""\s*:\s*""(?<v>[^""]+)""", RegexOptions.IgnoreCase);
+                    if (bpM.Success)
+                        goalName = $"Build:{bpM.Groups["v"].Value}";
+                    break;
+                }
+            }
+
             var intentType = intent.ToLowerInvariant() switch
             {
-                "cancel"  => ChatIntentType.CancelGoal,
-                "status"  => ChatIntentType.QueryStatus,
-                "help"    => ChatIntentType.QueryHelp,
-                "clarify" => ChatIntentType.Unknown,
-                "ignore"  => ChatIntentType.NotAddressed,
-                _         => ChatIntentType.Unknown,
+                "gather" or "build" => goalName is not null ? ChatIntentType.CreateGoal : ChatIntentType.Unknown,
+                "cancel"            => ChatIntentType.CancelGoal,
+                "status"            => ChatIntentType.QueryStatus,
+                "help"              => ChatIntentType.QueryHelp,
+                "clarify"           => ChatIntentType.Unknown,
+                "ignore"            => ChatIntentType.NotAddressed,
+                _                   => ChatIntentType.Unknown,
             };
 
             var responseM = Regex.Match(json,
-                @"""response""\s*:\s*""(?<v>[^""\\]*(?:\\.[^""\\]*)*)""");
+                @"""response""\s*:\s*""(?<v>[^""\]*(?:\.[^""\]*)*)"""""
+                + @"""");
             var response = responseM.Success ? responseM.Groups["v"].Value : string.Empty;
 
-            return new ChatInterpretation(intentType, Response: response);
+            return new ChatInterpretation(intentType, goalName, parameters, response);
         }
         catch { return null; }
-    }
+    }   }
 
     private static double Distance(Position a, Position b)
     {
