@@ -2,25 +2,25 @@
 
 Practical notes for contributing to MemorySmith.Agent or running sessions with AI agents in this repo.
 
-## Repository structure
+## Repository Structure
 
 ```
 MemorySmith.Agent.slnx   Solution file (VS 2022 .slnx format)
-Agent.Core/              Domain models, core interfaces
-Agent.Memory/            IMemoryGateway → RestMemoryGateway
-Agent.Planning/          HTN/GOAP planner, goals, task library
-Agent.Personality/       Agent profile, voice (Phase 4+)
-Agent.Tools/             MCP tool registry and implementations
+Agent.Core/              Domain models, core interfaces, WorldState, ActionQueue
+Agent.Memory/            IMemoryGateway → RestMemoryGateway, World KB support
+Agent.Planning/          HTN planner, goals, GoalFactory, decomposers, governor
+Agent.Personality/       Chat interpretation, LLM pipeline, rate limiting
+Agent.Tools/             ToolDispatcher (single dispatcher) + MCP tool implementations
 Agent.Vision/            ISpatialAnalyzer, IVisionModel (Phase 4+)
-Agent.Construction/      IArchitect, IBlueprintRepository (Phase 3+)
-Agent.World.Minecraft/   Mineflayer/Node.js adapter
-WebUI.Blazor/            Dashboard host (REST API + future Blazor UI)
-MemorySmith.Agent.Tests/ NUnit test suite
-MineflayerAdapter/       Node.js Mineflayer bot
+Agent.Construction/      IArchitect, IBlueprintRepository
+Agent.World.Minecraft/   Mineflayer/Node.js adapter, WebSocket bridge
+WebUI.Blazor/            Dashboard host (REST API + future Blazor UI), DI root
+MemorySmith.Agent.Tests/ NUnit test suite (200+ tests)
+MineflayerAdapter/       Node.js Mineflayer bot + logStructured file logger
 Data/Pages/              Wiki pages served by MemorySmith
 ```
 
-## Build commands
+## Build Commands
 
 ```bash
 # Full solution
@@ -35,15 +35,28 @@ dotnet build Agent.Planning/Agent.Planning.csproj --configuration Release
 dotnet run --project WebUI.Blazor
 ```
 
-## Test conventions
+## Sprint Workflow
+
+```
+implement → push → CI green (conclusion: success) →
+6-seat council review (Data/Pages/council/) → fix blockers → next sprint
+```
+
+- No sprint ships with a failing CI or a **blocking** council finding.
+- Council review written to `Data/Pages/council/<topic>-council-<date>.md`.
+- Workflow: implement → local build/test → push → council review → fix blockers → confirm CI green.
+
+**Council seats:** Source-Grounded Archivist · Data Model Architect · Retrieval Specialist · Human Learning Advocate · Skeptical Reviewer · Synthesizer. Each seat: confidence %, explicit dissent, blocking vs deferred.
+
+## Test Conventions
 
 - All tests use **NUnit 4.6.1** with `[TestFixture]` and `[Test]`.
 - `GlobalUsings.cs` in the test project imports `NUnit.Framework` globally.
 - Use mock implementations: `MockWorldAdapter`, `MockMemoryGateway`, `MockPlanner`.
 - File-scoped helper classes use the `file` modifier to avoid name collisions.
-- Never use raw string literals with JSON + curly braces when content will be pushed via API — use regular escaped strings instead (prevents subagent double-encoding).
+- **AGENTS.md Rule E-1:** Never patch C# verbatim-string files (`""`) via agent intermediary — use `github__create_or_update_file` directly with paramsFile. Verbatim regex safe patch pattern documented in AGENTS.md.
 
-## Test naming conventions
+## Test Naming Conventions
 
 ```
 {Subject}_{Condition}_{ExpectedBehavior}
@@ -53,27 +66,47 @@ Examples:
 - `WorldState_DefaultPosition_IsOrigin`
 - `HtnPlanner_GatherWoodGoal_ContainsMineBlockAction`
 - `RestMemoryGateway_SearchAsync_PreservesKind`
+- `ReplanGovernor_ThreeIdenticalFingerprints_TransitionsToStalled`
 
-## CI pipeline
+## Baseline Test Count
 
-GitHub Actions runs on every push to `main` / `feature/**`:
+| Version | Passed | Skipped | Notes |
+|---------|--------|---------|-------|
+| v0.23.0 | 200+ | 10 | CUDA/ONNX skips expected |
+
+The 10 skipped tests are CUDA/ONNX-model-dependent. Any other skip is a regression.
+
+## CI Pipeline
+
+GitHub Actions runs on every push to `main`:
 
 1. `dotnet restore MemorySmith.Agent.slnx`
 2. `dotnet build --configuration Release --no-restore`
 3. `dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage"`
 
-Coverage artifacts are uploaded. Failing tests appear as GitHub annotations via `GitHubActionsTestLogger`.
+Coverage artifacts uploaded. Failing tests surface as GitHub annotations via `GitHubActionsTestLogger`.
 
-## Sandbox build notes
+To diagnose CI failures without admin rights: use `github__pull_request_read method=get_check_runs` plus `...commits/<sha>/check-runs` and `.../check-runs/<id>/annotations` REST endpoints.
+
+## Serilog Structured Logging
+
+Log files are in `logs/`:
+- `logs/agent-<date>.log` — human-readable (Debug level, ms precision)
+- `logs/agent-structured-<date>.json` — machine-readable JSON with structured properties
+
+See [Logging Guide](logging.md) for key message patterns and log analysis.
+
+## Sandbox Build Notes
 
 If building in the Hyperagent sandbox (proxy-restricted environment):
 
 1. Install .NET 10: `curl -sL https://builds.dotnet.microsoft.com/dotnet/scripts/v1/dotnet-install.sh | bash -s -- --channel 10.0`
-2. NuGet requires overriding BOTH `HTTPS_PROXY` and `https_proxy` (lowercase) env vars pointing to the auth proxy on port 9081.
+2. NuGet requires overriding **BOTH** `HTTPS_PROXY` and `https_proxy` (lowercase) env vars pointing to the auth proxy on port 9081.
 3. Run the auth proxy: `python3 authproxy.py &`
 4. Build flags: `-p:CopilotSkipCliDownload=true` (skips npm download for GitHub Copilot SDK)
+5. Source fetch: `curl -sL https://codeload.github.com/TheMasonX/MemorySmith.Agent/tar.gz/<sha>`
 
-## Adding new packages to tests
+## Adding New Packages to Tests
 
 Test project packages must match MemorySmith versions:
 - `Microsoft.NET.Test.Sdk 18.6.0`
@@ -82,7 +115,7 @@ Test project packages must match MemorySmith versions:
 - `coverlet.collector 10.0.1`
 - `GitHubActionsTestLogger 2.4.1`
 
-## Namespace conventions
+## Namespace Conventions
 
 | Project | Root namespace |
 |---|---|
@@ -95,12 +128,12 @@ Test project packages must match MemorySmith versions:
 | `WebUI.Blazor` | `WebUI.Blazor` |
 | Tests | `MemorySmith.Agent.Tests` |
 
-## Council review process
+**Important:** All `using` directives must appear **before** the file-scoped `namespace` declaration. Never use fully-qualified names like `Agent.Core.Position` inside `MemorySmith.Agent.Tests` — the `Agent` prefix resolves to `MemorySmith.Agent`, not the root.
 
-High-impact architectural decisions use the MemorySmith council review format (see `Data/Pages/council/`). The process runs 6 seats (Source-Grounded Archivist, Data Model Architect, Retrieval Specialist, Human Learning Advocate, Skeptical Reviewer, Synthesizer) with explicit dissent and acceptance criteria.
+## Key Coding Rules (from AGENTS.md)
 
-When to run a council review:
-- New bounded context or project added
-- Interface signature changes
-- Integration pattern changes (memory gateway, world adapter)
-- Before starting a new phase
+- All timeouts, TTLs, radii → named constants or `*Options` properties (no magic numbers)
+- `*Options` classes must be `sealed record`
+- Timeouts stored as `int *Seconds`, convert to `TimeSpan` at use site
+- Test-injectable delays: optional constructor params with `null = use defaults`
+- `TreatWarningsAsErrors = true` — zero warnings policy
