@@ -10,11 +10,10 @@
 
 The MemorySmith.Agent interprets Minecraft in-game chat and turns it into agent goals.
 All chat received by the Mineflayer bot is forwarded to C# as a `chat` WorldEvent.
-The `AgentBackgroundService` routes it through the `IChatInterpreter` pipeline.
+`AgentBackgroundService` routes it through the `IChatInterpreter` pipeline.
 
 The agent responds in-chat when it determines the message is for it, and can ask
-clarifying questions when uncertain. Multiple bot instances use player proximity to
-decide which bot should respond.
+clarifying questions when uncertain.
 
 ---
 
@@ -26,20 +25,27 @@ Player speaks in Minecraft chat
 Mineflayer bot.on('chat', ...)
   • includes: username, message, onlinePlayers, playerX/Y/Z
          ↓
+System message filter (index.js) — 9 SYSTEM_MESSAGE_PATTERNS
+  • blocks: teleport, join/leave, server messages, /clear responses, /give responses
+  • passes through: normal player chat only
+         ↓
 WebSocketBridge parses JSON → WorldEvent{EventType="chat"}
          ↓
 AgentBackgroundService.HandleChatEventAsync
-  • extracts playerPosition from payload
+  • logs resolved intent after interpretation: [chat] <Username> -> CreateGoal (CraftItem:iron_pickaxe)
          ↓
 IChatInterpreter.InterpretAsync(username, message, botName, onlinePlayers, botPos, playerPos, state)
          ↓
     LlmChatInterpreter (default)
     ├─ 1. Distance gate: if player > 64 blocks away AND not named this bot → NotAddressed
-    ├─ 2. Pattern fast-path: if ChatInterpreter returns confident result (CreateGoal/CancelGoal/Help) → use it
-    ├─ 3. Rate limit check: per-player 3s + global 1s
-    ├─ 4. OllamaLlmClient.EvaluateAsync (5-second timeout)
+    ├─ 2. CraftRegex fast-path: "craft/forge/smelt <item>" → CraftItem goal (no LLM call)
+    ├─ 3. Pattern fast-path: ChatInterpreter returns confident CreateGoal/CancelGoal/Help → use it
+    ├─ 4. Rate limit check: per-player 3s cooldown + global 1s minimum
+    │      logs: "Rate limited <username>: cooldown 3s remaining (max 1/min global)"
+    ├─ 5. OllamaLlmClient.EvaluateAsync (10-second timeout via linked CancellationToken)
     │      └─ POST http://localhost:11434/api/chat → structured JSON response
-    └─ 5. Fallback: ChatInterpreter pattern-matching
+    │      (TryParseTruncatedJson recovery if JSON cut off before closing })
+    └─ 6. Fallback: ChatInterpreter pattern-matching
          ↓
 ChatInterpretation { IntentType, GoalName, GoalParameters, Response }
          ↓
@@ -50,20 +56,26 @@ AgentBackgroundService acts:
 
 ---
 
-## Directed-at-Bot Heuristics
+## CraftRegex Fast-Path (Sprint 11)
 
-The bot uses these rules to determine if a message is addressed to it.
-Any one condition being true is sufficient to proceed with interpretation.
+Before the LLM is consulted, `LlmChatInterpreter` checks for crafting intent via regex:
+
+```
+Pattern: (craft|forge|smelt)\s+(?:an?\s+)?(.+)
+Example: "craft an iron pickaxe" → CraftItem:iron_pickaxe (no LLM call)
+```
+
+This eliminates the 2-minute Ollama hang when the bot receives simple crafting commands. The regex is always tried even when `Llm.Enabled = false`.
+
+---
+
+## Directed-at-Bot Heuristics
 
 | Condition | Rule |
 |-----------|------|
 | Solo play | `onlinePlayers <= 1` → always addressed |
-| Named explicitly | Message starts with bot username (case-insensitive), e.g. "AgentBot, help" |
+| Named explicitly | Message starts with bot username (case-insensitive) |
 | Active conversation | Bot spoke within the last 60 seconds |
-
-When using the LLM path, the model also evaluates intent = "clarify" for messages
-that *might* be intended for the bot but aren't clear. In that case the bot asks:
-"Did you mean me?" rather than silently ignoring.
 
 ---
 
@@ -72,6 +84,7 @@ that *might* be intended for the bot but aren't clear. In that case the bot asks
 | Player says | Bot does |
 |-------------|----------|
 | `get/gather/mine/collect [N] <item>` | GatherItem:{itemId} goal |
+| `craft/forge/smelt <item>` | CraftItem:{itemId} goal (CraftRegex, no LLM) |
 | `build [a/the] <blueprint>` | Build:{blueprintId} goal |
 | `stop`, `cancel`, `quit`, `abort` | Cancel current goal |
 | `status`, `what are you doing` | Report health + current goal |
@@ -79,12 +92,9 @@ that *might* be intended for the bot but aren't clear. In that case the bot asks
 | `come here`, `follow me` | MoveTo player position |
 | `go to X Y Z` | MoveTo coordinates |
 
-Common item aliases:
-`wood/log → oak_log`, `cobble/stone → cobblestone`, `iron → iron_ore`,
+Common item aliases:  
+`wood/log → oak_log`, `cobble/stone → cobblestone`, `iron → iron_ore`,  
 `coal → coal_ore`, `diamond`, `sand`, `gravel`, `planks → oak_planks`
-
-Common blueprint aliases:
-`house/shelter/home → small-house`
 
 ---
 
@@ -98,31 +108,23 @@ Common blueprint aliases:
     "Llm": {
       "Enabled": true,
       "OllamaUrl": "http://localhost:11434",
-      "Model": "llama3.2"
+      "Model": "llama3.2",
+      "LlmTimeoutSeconds": 10,
+      "LlmMaxResponseTokens": 300
     }
   }
 }
 ```
 
-### Setup
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `Enabled` | `false` | Enable LLM interpretation |
+| `OllamaUrl` | `http://localhost:11434` | Ollama API base URL |
+| `Model` | `llama3.2` | Model to use |
+| `LlmTimeoutSeconds` | `10` | Timeout per LLM call (Sprint 11) |
+| `LlmMaxResponseTokens` | `300` | Max response tokens via `num_predict` (Sprint 20) |
 
-```bash
-# Install Ollama (https://ollama.com)
-curl -fsSL https://ollama.com/install.sh | sh
-
-# Pull a model (3B parameter, fast on CPU)
-ollama pull llama3.2
-
-# Optionally use a larger model for better understanding
-ollama pull mistral
-```
-
-When `Enabled: false` (default), `OllamaLlmClient` always returns null and the
-system falls back to pattern matching. Changing this setting requires an app restart.
-
-### LLM response schema
-
-The model is instructed to return ONLY this JSON:
+### LLM Response Schema
 
 ```json
 {
@@ -136,50 +138,62 @@ The model is instructed to return ONLY this JSON:
 }
 ```
 
-`addressed = "maybe"` → bot responds with a clarifying question.
-`addressed = "no"` → message is ignored entirely.
+`addressed = "maybe"` → bot asks "Did you mean me?"  
+`addressed = "no"` → message ignored entirely
+
+### LLM Truncation Recovery (Sprint 20)
+
+When Ollama truncates the JSON response before the closing `}`, `TryParseTruncatedJson` attempts to extract `intent`, `item`, `count`, `blueprint` from the partial output. `num_predict = 300` prevents most truncation but the recovery handles edge cases.
+
+---
+
+## System Message Filtering (Sprint 19–21)
+
+`SYSTEM_MESSAGE_PATTERNS` in `index.js` blocks server/admin messages from the LLM pipeline:
+
+```js
+const SYSTEM_MESSAGE_PATTERNS = [
+  /teleported/i,
+  /joined the game/i,
+  /left the game/i,
+  /^\[Server\]/i,
+  /^You are now/i,
+  /^\/clear/i,           // /clear command echo
+  /Removed \d+ item/i,   // /clear response
+  /^Cleared\s+(?:\d+|\S+'s|the\s+inventory)/i,  // alternate clear format
+  /^\/give/i             // /give command echo
+];
+```
+
+Matched messages are dropped before reaching the WebSocket bridge and never touch the LLM.
 
 ---
 
 ## Rate Limiting
-
-Two limits are enforced to prevent overloading Ollama:
 
 | Limit | Value |
 |-------|-------|
 | Per-player cooldown | 3 seconds |
 | Global minimum interval | 1 second |
 
-When rate-limited, the system falls back to pattern matching without delay.
-Rate limit state is held in-memory (resets on app restart).
+When rate-limited, the system falls back to pattern matching without delay. Rate limit events are logged: `"Rate limited <username>: 3s cooldown"`.
 
 ---
 
-## Closest-Agent Routing
+## Logging & Observability (Sprint 11 + 19)
 
-When multiple bots are running (future: multi-agent support), the agent closest to
-the player should respond to prevent all bots answering at once.
-
-**Phase 5b implementation:** Distance gate in `LlmChatInterpreter`.
-- If `playerPosition` is available (from Mineflayer's `bot.players[username].entity`)
-  AND the player is > 64 blocks from the bot AND the bot was not named → `NotAddressed`.
-- Player position is included in all chat events as `playerX/Y/Z` (null if player is
-  too far for their entity to be loaded).
-
-**Phase 6:** Shared `ChatCoordinator` service with "first to claim wins" semaphore
-for in-process multi-agent coordination.
+| Log event | Level | Content |
+|-----------|-------|---------|
+| Intent resolved | `Information` | `[chat] <Username> -> CreateGoal (CraftItem:iron_pickaxe)` |
+| "Hmm..." thinking indicator fires | `Information` | `[thinking] LLM slow — EnqueueThinkingIfSlowAsync fired` |
+| Rate limit | `Information` | `Rate limited <username>: 3s cooldown (1/min global max)` |
+| LLM timeout | `Warning` | `LLM call timed out after 10s for <username>` |
 
 ---
 
-## Known Limitations (Phase 5b)
+## Known Limitations
 
-1. **No push to dashboard:** Chat messages received in-game are not displayed in the
-   web dashboard. Would require SignalR/SSE. Phase 6.
-2. **Player position may be null:** At distances > ~128 blocks, Mineflayer doesn't
-   load the player entity. Distance gate falls back to standard heuristics.
-3. **LLM model quality:** Smaller models (llama3.2 3B) may misclassify ambiguous
-   messages. Use `mistral` or `llama3.2:11b` for better results.
-4. **No multi-bot claim coordination:** Multiple bots within 64 blocks may both
-   respond. Use bot names to disambiguate: "AgentBot1, get me wood".
-5. **Crafting/smelting via chat:** Player can say "craft oak_planks" but this creates
-   a plain CraftItem tool action, not a full crafting-chain goal. Phase 6.
+1. **No push to dashboard:** Chat messages are not displayed in the web dashboard. Phase 6.
+2. **Player position may be null:** At distances > ~128 blocks, entity not loaded. Distance gate falls back to standard heuristics.
+3. **LLM model quality:** 3B models may misclassify ambiguous messages. Use `mistral` or `llama3.2:11b` for better results.
+4. **No multi-bot claim coordination:** Multiple bots within 64 blocks may both respond. Use bot names to disambiguate.
