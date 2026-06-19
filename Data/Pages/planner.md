@@ -1,60 +1,130 @@
-# HTN/GOAP Hybrid Planner
+# HTN Planner & Agent Loop
 
-The agent uses a **hybrid planner**: LLMs generate high-level goals/plans; deterministic HTN/GOAP logic decomposes them into atomic actions. This minimizes token usage, latency, and hallucination risk.
+The agent uses a **hierarchical task network (HTN)** planner with a **decomposer registry** that makes goal decomposition pluggable. Deterministic decomposers handle known goals; the planner falls back to HTN methods for unrecognized goals.
 
 ## Agent Loop
 
-On each tick or event, the agent runs a reasoning cycle:
+`AgentBackgroundService` processes events and drives the agent loop:
 
-1. **Receive world event** — Node.js sends JSON (e.g. `{"event":"health","hp":8}`). `WorldState` is updated.
-2. **Goal evaluation** — if current goal is complete or failed, decide next action.
-3. **Planner call** — if a new plan is needed, call `IPlanner.PlanAsync(goal, state)`.
-   - For *known* goals: HTN method library decomposes deterministically.
-   - For *novel* goals: call LLM (via `IChatClient`) to produce a JSON plan.
-4. **HTN decomposition** — break plan phases into atomic actions (through GOAP precondition checks).
-5. **Action queue** — primitive actions enqueued (e.g. `MoveTo`, `MineBlock`, `GatherWood`).
-6. **Execution** — `ToolEngine.Execute("MoveToTool", {x, y, z})` dispatches via the adapter.
-7. **Repeat** until goal is done or user interrupts.
+1. **Process events** — `ProcessEventsAsync` drains the event queue:
+   - `HealthEvent` → update `WorldState`, synthesize `DamageTakenEvent` if delta is negative
+   - `DamageTakenEvent` → `TryInterruptOnDamage` (see [Damage Interrupt](guides/damage-interrupt.md))
+   - `ChatEvent` → `HandleChatEventAsync` → `IChatInterpreter`
+   - `PositionEvent`, `InventoryEvent` → update `WorldState`
+   - `BlockNotFoundEvent` → `WorldStateProjector.Apply` → adds `BlockNotFound` fact
 
-## HTN (Hierarchical Task Network)
+2. **Goal evaluation** — if current goal `IsComplete` or `HasFailed`, clear goal and idle.
 
-A library of compound tasks with predefined decomposition methods:
+3. **Governor check** — `IReplanGovernor.IsStalled` checked before planning. If stalled: 10s delay, skip `PlanAsync`.
 
-- `GatherWoodGoal` → `[FindTree, MoveTo(tree), MineBlock(log) × N, CollectInventory]`
-- `BuildHouseGoal` → `[GatherWood, GatherStone, LayFoundation, BuildWalls, AddRoof]`
-- `SurviveNightGoal` → `[FindShelter | BuildShelter, LightArea, Wait(sunrise)]`
+4. **Planner call** — `PlannerRouter.PlanAsync(goal, state)`:
+   - Tries each `IGoalDecomposer` in `DecomposerRegistry` via `CanHandle`
+   - Falls back to `HtnPlanner` for unmatched goals
 
-The LLM selects which HTN task to apply; code decomposes it.
+5. **Action dispatch** — `DispatchActionsAsync` iterates the plan:
+   - Calls `ToolDispatcher.CallAsync` per action with 30s timeout
+   - Records timing via `Stopwatch`
+   - Checks `IsStalled` before each replan
+   - Logs staleness when `IsComplete` returns false due to stale inventory
 
-## GOAP (Goal-Oriented Action Planning)
+6. **Progress recording** — `ReplanGovernor.RecordProgress()` called when `sum(Inventory)` changes after 300ms settle.
 
-For ad-hoc problems where no HTN method matches, GOAP plans backward from goal to actions using action preconditions/effects.
+7. **Repeat** — loops until goal complete or user interrupts.
 
-Example: "no coal" sub-task fails during `BuildHouseGoal` → GOAP re-plans a `FindCoal` route.
+## Decomposer Registry (Sprint 6)
 
-## LLM Plan Format
+`DecomposerRegistry` holds pluggable `IGoalDecomposer` implementations:
 
-```json
+```csharp
+public interface IGoalDecomposer
 {
-  "goal": "BuildCathedral",
-  "phases": ["GatherStone", "LayFoundation", "BuildWalls", "FinishRoof"]
+    bool CanHandle(IGoal goal);
+    IPlan Decompose(IGoal goal, WorldState state);
 }
 ```
 
-The planner returns this; HTN decomposes each phase into atomic actions.
+Registered decomposers (all in DI):
 
-## Failure & Replanning
+| Decomposer | Handles | Default Plan |
+|---|---|---|
+| `BuildGoalDecomposer` | `Build:*` goals | FindFlatArea → [gather materials] → [place blocks] |
+| `GatherGoalDecomposer` | `Gather:*`, `GatherItem:*` goals | SearchMemory → MineBlock → GetStatus |
+| `SurviveNightGoalDecomposer` | `SurviveNight` goals | FindFlatArea → build shelter → Chat |
 
-- Action fails (e.g. path blocked) → log context to MemorySmith, call `IPlanner.ReplanAsync`.
-- Repeated failure → LLM queried for emergency plan.
-- User can inject tasks or override via `ManualOverride` flag via the Blazor UI.
+`PlannerRouter` tries decomposers first, then falls back to `HtnPlanner`.
+
+## Goal Decomposition Details
+
+### Gather Goal
+
+Default gather plan (Sprint 19):
+1. `SearchMemory` — query World KB for known block locations
+2. `MineBlock` — mine target block
+3. `GetStatus` — refresh inventory state
+
+`Wander` is **conditional** — only added when `WorldState` has a `BlockNotFound` fact matching the source block name. This prevents aimless wandering when the bot simply hasn't looked yet.
+
+### Build Goal
+
+`BuildGoalDecomposer` with `requireOrigin` flag:
+- `requireOrigin: false` (default) — can plan without a known origin
+- `requireOrigin: true` — returns `FindFlatArea`-only plan if no origin resolvable
+
+Radius retry: first pass uses radius 32; if `FindFlatArea` returns zero area, retry with radius 48.
+
+### HtnPlanner
+
+For goals not matched by a decomposer, `HtnPlanner` uses a method library:
+
+- `GatherWoodGoal` → `[FindTree, MoveTo(tree), MineBlock(log) × N, GetStatus]`
+- `BuildHouseGoal` → `[GatherWood, GatherStone, LayFoundation, BuildWalls, AddRoof]`
+- `SurviveNightGoal` → `[FindShelter | BuildShelter, LightArea, Wait(sunrise)]`
+
+`HtnPlanner.IItemSpecGoal` branch passes `GenericGatherGoal.TargetCount` as `parameters[0]`, ensuring "get 100 sand" produces a count=100 plan not count=10.
+
+## Replanning
+
+`ReplanAsync` preserves context across replans — entries with these prefixes survive context wipe:
+- `SearchMemory:`, `CraftItem:`, `FindFlatArea:`, `Build:`, `MoveTo:`
+
+This ensures the agent doesn't lose block-location knowledge when replanning due to a single action failure.
+
+## Replan Governor
+
+See [Replan Governor Guide](guides/replan-governor.md) for full details.
+
+**Quick summary:** `ReplanGovernor` tracks:
+1. Plan fingerprints (hash of action sequence)
+2. Inventory delta (sum of all inventory item counts)
+
+If 3 consecutive identical plan fingerprints occur **without** any inventory change → STALLED.  
+Recovery: 60s auto-recovery to ACTIVE state.
+
+## GoalFactory & Item Classification
+
+`GoalFactory` creates `IGoal` instances from goal names and parameters. Item classification via `LocalKnowledgeResolver`:
+
+1. Check `CraftingRecipes` — item has a recipe → `Craftable`
+2. Check `DirectMineBlocks` — item is directly mineable (includes ore drops: diamond, coal, emerald, redstone, lapis_lazuli) → `DirectMineable`
+3. Check `SourceBlocks` — item drops from a source block → `DirectMineable`
+4. Check `WorldState.StructuredFacts` — world-fact-based confidence (Sprint 17)
+5. Fallback → `Unknown`
+
+Stone aliases: `stone` resolves `SourceBlocks` to include `cobblestone` for correct `IsComplete` behavior.
 
 ## Implementation Status
 
 | Component | Status |
 |---|---|
 | `IPlanner` interface | ✅ Defined |
-| `HtnPlanner` stub | ✅ Phase 3 |
-| GOAP engine | ⬜ Phase 3 |
-| LLM integration (`IChatClient`) | ⬜ Phase 2 |
-| Predefined task library | ⬜ Phase 3 |
+| `HtnPlanner` | ✅ Sprint 3 |
+| `DecomposerRegistry` | ✅ Sprint 6 |
+| `BuildGoalDecomposer` | ✅ Sprint 6 |
+| `GatherGoalDecomposer` | ✅ Sprint 6 |
+| `SurviveNightGoalDecomposer` | ✅ Sprint 6 |
+| `PlannerRouter` | ✅ Sprint 6 |
+| `ReplanGovernor` (ACTIVE/STALLED) | ✅ Sprint 19 |
+| Progress-hash governor | ✅ Sprint 20 |
+| Governor pre-plan check | ✅ Sprint 21 |
+| `IItemSpecGoal` count fix | ✅ Sprint 22 |
+| LLM integration (`IChatClient`) | ⬜ Phase 4 |
