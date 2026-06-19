@@ -33,6 +33,61 @@ var ttl = TimeSpan.FromSeconds(_opts.ItemCacheTtlSeconds); // use site
 
 ---
 
+## Rule E-1: Never Patch C# Verbatim-String Files via Agent Intermediary
+
+C# files containing verbatim strings (`@"..."` or raw string literals `"""..."""`) are
+**unsafe to patch** via agent text-manipulation tools (Edit, sed, regex substitution).
+The agent's output layer corrupts escape sequences inside verbatim strings — especially
+`\"`, `\\`, and curly-brace sequences — producing invalid C# that silently breaks builds.
+
+Sprint 20 required 13 fix commits because of this failure mode.
+
+**Affected files** — any C# file containing:
+- `@"..."` verbatim string literals
+- `"""..."""` raw string literals
+- `Regex` patterns with backslashes or embedded quotes
+- JSON strings with curly braces inside string assignments
+
+**Safe patch recipe:**
+
+```
+1. Fetch the current blob SHA:
+   github__get_file_contents → captures {sha}
+
+2. Read the file, make changes locally in the sandbox (Bash/Edit on local copy)
+
+3. Write the complete replacement as a paramsFile:
+   Write({ file_path: "/tmp/params.json", content: JSON.stringify({
+     owner, repo, path, message, content: <full file text>, sha, branch
+   }) })
+
+4. Submit:
+   github__create_or_update_file with paramsFile: "/tmp/params.json"
+   (never pass content inline — token truncation will corrupt it)
+```
+
+**Verbatim-regex safe patch pattern** (when you must change a string inside a verbatim block):
+
+Use the Bash `sed` with escaped delimiter to avoid misinterpreting backslashes, then commit
+the whole file via paramsFile:
+
+```bash
+# Read file → modify in sandbox → write paramsFile → commit
+cp Agent.Foo/Bar.cs /tmp/Bar.cs
+# Edit /tmp/Bar.cs with your change
+python3 -c "
+import json
+content = open('/tmp/Bar.cs').read()
+params = {'owner':'TheMasonX','repo':'MemorySmith.Agent',
+          'path':'Agent.Foo/Bar.cs','message':'fix: ...','content':content,
+          'sha':'<blob_sha>','branch':'main'}
+json.dump(params, open('/tmp/params.json','w'))
+"
+# Then: github__create_or_update_file paramsFile=/tmp/params.json
+```
+
+---
+
 ## C# Conventions
 
 - `*Options` classes must be `sealed record` so tests can use `with {}` expressions.
@@ -46,6 +101,8 @@ var ttl = TimeSpan.FromSeconds(_opts.ItemCacheTtlSeconds); // use site
 - Never use fully-qualified names like `Agent.Core.Position` inside `MemorySmith.Agent.Tests`.
   The `Agent` prefix resolves to the parent namespace `MemorySmith.Agent`, not the root.
 - Use the `file` modifier on test-only helper classes to avoid name collisions across test files.
+- `TreatWarningsAsErrors = true` (set in `Directory.Build.props`) — the build rejects any new
+  compiler warning. Fix warnings immediately; never suppress with `#pragma warning disable`.
 
 ---
 
@@ -59,6 +116,8 @@ var ttl = TimeSpan.FromSeconds(_opts.ItemCacheTtlSeconds); // use site
   const CRAFT_TABLE_SEARCH_RADIUS  = 8;    // blocks — findBlock for crafting_table
   const CRAFT_TABLE_REACH_DISTANCE = 2;    // blocks — pathfinder GoalNear tolerance
   const MAX_MINE_PATH_FAILURES     = 3;    // consecutive pathfinder failures before abort
+  const FLAT_AREA_DEFAULT_RADIUS   = 32;   // blocks — findFlatArea default search radius
+  const FLAT_AREA_RETRY_RADIUS     = 48;   // blocks — findFlatArea retry after zero-area result
   ```
 - Optional `args` override constants at call-time:
   ```js
@@ -67,6 +126,11 @@ var ttl = TimeSpan.FromSeconds(_opts.ItemCacheTtlSeconds); // use site
   ```
 - Always use `pathfinder.goto()` **before** proximity-dependent actions
   (craft, place, smelt, interact). Never assume the bot is already in range.
+- System message filtering: `SYSTEM_MESSAGE_PATTERNS` in `index.js` must block all
+  server/admin messages from reaching the LLM pipeline. Add new patterns for any
+  server output that leaks through (e.g. `/clear` responses, `/give` echoes, teleport
+  announcements). Never remove existing patterns without verifying they don't filter
+  real player chat.
 
 ---
 
@@ -78,9 +142,12 @@ implement → push → CI green (conclusion: success) →
 ```
 
 - No sprint ships with a failing CI or a **blocking** council finding.
+- Council review written to `Data/Pages/council/<topic>-council-<date>.md`.
+- Pre-council doc written to `Data/Pages/council/<topic>-pre-council-<date>.md` for context.
 - Council seats: Source-Grounded Archivist · Data Model Architect · Retrieval Specialist ·
   Human Learning Advocate · Skeptical Reviewer · Synthesizer.
-  Each seat: confidence %, explicit dissent, blocking vs deferred.
+  Each seat: confidence %, explicit dissent, blocking vs deferred triage,
+  testable acceptance criteria.
 
 ---
 
@@ -88,8 +155,14 @@ implement → push → CI green (conclusion: success) →
 
 - Use `github__create_or_update_file` per file. Pass content as plain text (never base64).
 - Existing files require their current blob SHA — fetch via `github__get_file_contents` first.
+- For any file > ~5 KB or containing verbatim strings: use `paramsFile` (see Rule E-1).
+- `github__push_files` (trees API) is blocked on this token — use `create_or_update_file` per file.
 - `.github/workflows/*.yml` requires the `workflow` OAuth scope (403 otherwise).
   Surface workflow YAML to the user for manual apply via the GitHub web UI.
+- `github__pull_request_read` uses `method` param: `get`, `get_diff`, `get_status`,
+  `get_files`, `get_reviews`, `get_check_runs`.
+- CI annotations (no admin required): `GET .../commits/<sha>/check-runs` then
+  `GET .../check-runs/<id>/annotations`.
 
 ---
 
@@ -105,3 +178,22 @@ implement → push → CI green (conclusion: success) →
 | D-010 | ActionProtocol wire names (all lowercase) |
 
 Full decisions in `Data/Pages/decisions.md`.
+
+---
+
+## Key Interfaces (quick reference)
+
+| Interface | Location | Purpose |
+|-----------|----------|---------|
+| `IGoal` | `Agent.Core` | Goal evaluation; `DamageInterruptThresholdHp` per-goal override |
+| `IPlanner` | `Agent.Planning` | `PlanAsync` + `ReplanAsync` |
+| `IGoalDecomposer` | `Agent.Planning` | Pluggable goal decomposition (CanHandle + Decompose) |
+| `IReplanGovernor` | `Agent.Planning` | Stall detection (IsStalled, RecordPlan, RecordProgress) |
+| `IAgentJournal` | `Agent.Core` | Append-only event log (Append, GetRecent, Clear) |
+| `IWorldModel` | `Agent.Core` | Observe / Predict / Reconcile / Uncertainty |
+| `IMemoryGateway` | `Agent.Memory` | Search / GetPage / CreatePage / UpdatePage |
+| `ITool` | `Agent.Tools` | Name, Description, InputSchema, ExecuteAsync |
+| `IWorldAdapter` | `Agent.World.Minecraft` | Connect, SendAction, ReceiveEvents |
+| `IChatInterpreter` | `Agent.Personality` | InterpretAsync → ChatInterpretation |
+
+See `Data/Pages/architecture.md` for the full interface list and runtime flow.
