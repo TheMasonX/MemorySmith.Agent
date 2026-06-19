@@ -1,83 +1,76 @@
-# Phased Roadmap
+# Roadmap & Sprint History
 
-Five development phases, each with deliverables and confidence scores from the Executive Summary.
+MemorySmith.Agent uses a sprint-based delivery model. Each sprint is council-reviewed by a 6-seat panel before merge.
 
-## Phase 0 — Skeleton ✅ COMPLETE (2026-06-15)
-
-**Scope**: All interfaces defined, solution structure, wiki pages, CI workflow, NUnit test project.
-
-**Delivered**:
-- `MemorySmith.Agent.slnx` — 9-project solution (8 libs + tests)
-- All core interfaces: `IAgent`, `IGoal`, `IPlan`, `IMemoryGateway`, `ITool`, `IWorldAdapter`, `IPlanner`, `ISpatialAnalyzer`, `IVisionModel`, `IArchitect`, `IBlueprintRepository`
-- 10 wiki pages seeded from Executive Summary
-- `MineflayerAdapter/` Node.js stub
-- GitHub Actions CI: build + test green
+**Current version: v0.23.0** | **Latest: Sprint 23 (2026-06-19)**
 
 ---
 
-## Phase 1 — Core Agent MVP (2–3 weeks, confidence 0.95) 🔄 IN PROGRESS
+## Completed Phases
 
-**Scope**: AgentHost scaffolding, WebSocket bridge, basic movement tools, simple goal (gather wood), Blazor UI (status, start bot). No LLM — hardcode a small state machine.
+### Phase 0 — Skeleton ✅ COMPLETE (2026-06-15)
 
-**Delivered so far**:
-- `GlobalUsings.cs` — prevents per-file NUnit boilerplate
-- `MockMemoryGateway` — test isolation for memory operations
-- `MoveToTool`, `StatusTool` — Phase 1 movement tools
-- `MinecraftAdapterConfig` — typed config for the adapter
-- `MinecraftAdapter.ConnectAsync` — subprocess launch + port-wait
-- `AgentBackgroundService` — hosted agent loop (event processing + action dispatch)
-- `MineflayerAdapter/package-lock.json` — deterministic npm installs
-- 18 passing tests (7 domain + 7 gateway + 4 tool engine)
+All interfaces defined, solution structure, wiki pages, CI workflow, NUnit test project.
 
-**Remaining Phase 1 tasks**:
-- [ ] Wire `AgentBackgroundService` into `WebUI.Blazor/Program.cs` DI
-- [ ] Add `MockWorldAdapter` for test isolation
-- [ ] Integration test: `MinecraftAdapter` → Node.js → event round-trip
-- [ ] Blazor status panel with SignalR `BotStatusUpdated` push
-- [ ] `/api/agent/command` → `AgentBackgroundService.Enqueue` wiring
-- [ ] `RestMemoryGateway` stub against live MemorySmith instance
+### Phase 1 — Core Agent MVP ✅ COMPLETE
+
+AgentHost, WebSocket bridge, basic movement tools, goal/action loop, Blazor status.
+
+### Phase 2 — Memory Integration ✅ COMPLETE
+
+`IMemoryGateway`, `RestMemoryGateway`, MemorySmith connection, memory tool implementations.
+
+### Phase 3 — HTN/GOAP Planner ✅ COMPLETE
+
+`HtnPlanner`, goal decomposition, task library, `GoalFactory`, `IPlanner.ReplanAsync`.
 
 ---
 
-## Phase 2 — Memory & Basic LLM (3–4 weeks, confidence 0.85)
+## Sprint History (Sprints 5–23)
 
-**Scope**: Integrate MemorySmith in-process and via MCP. Add Ollama/OpenAI via Microsoft.Extensions.AI. Implement tool registry with memory tools. Sample memory pages.
-
-**Planned deliverables**:
-- `IMemoryGateway` + MemorySmith connection (`RestMemoryGateway`)
-- `IChatClient` via Microsoft.Extensions.AI (Ollama + OpenAI)
-- Sample tool definitions and one-shot chat loop
-- Example memory pages (VillageX, AgentProfile)
-
----
-
-## Phase 3 — Planner & Tasks (4–5 weeks, confidence 0.80)
-
-**Scope**: Build HTN/GOAP planner core. Define goal/task classes. Add LLM-call triggers only for high-level planning. More tools (crafting, building). Blueprint repository V1.
-
-**Planned deliverables**:
-- Planner engine (HTN/GOAP)
-- Several predefined tasks (`GatherWoodGoal`, `BuildHouseGoal`)
-- Demonstration: agent builds small structure from blueprint
-
----
-
-## Phase 4 — Vision & Aesthetics (4–5 weeks, confidence 0.60)
-
-**Scope**: Integrate vision tools. Add `TakeScreenshot` tool, call Ollama/Gemma for aesthetic critique. Link vision output to plan refinement.
-
----
-
-## Phase 5 — Advanced Features (4–6 weeks, confidence 0.50)
-
-**Scope**: Multi-agent support, persona plugin, analytics, fallback improvements. Vector embeddings search in Memory. Multiple LLM providers. CI/CD pipelines.
+| Sprint | Date | Theme | Key Deliverables |
+|--------|------|-------|-----------------|
+| **5** | 2026-06-16 | Tool Safety & Memory Lifecycle | ToolDispatcher validation, /api/agent/command lockdown, WorldState.Facts capped 1000, Fact record, context-preserving replan, 30s action timeout, FailureReason enum |
+| **6** | 2026-06-17 | Journal, World Model, Decomposers | IAgentJournal (1000 entries, 11 types), IWorldModel (predict/reconcile/uncertainty), DecomposerRegistry, Build/Gather/SurviveNight decomposers, PlannerRouter |
+| **11** | 2026-06-17 | Chat Observability + Correctness | CraftRegex fast-path (no LLM for craft/forge/smelt), LLM 10s timeout, thinking indicator log, intent log, requireOrigin flag |
+| **17** | 2026-06-17 | Resolver Growth | ClassifySpec ore-drop fix, WorldFact third resolver source (0.70/0.50 confidence), /api/agent/resolve curl examples |
+| **19** | 2026-06-18 | Logging + Planner Fixes | Serilog file sink, JS logStructured, 9 SYSTEM_MESSAGE_PATTERNS, gather plan rework (SearchMemory→MineBlock→GetStatus), replan governor (ACTIVE/STALLED, 3-fingerprint threshold), findFlatArea radius 32→48 retry |
+| **20** | 2026-06-18 | Runtime Failure Recovery | Progress-hash governor (inventory-delta), 3 new system message patterns, TryParseTruncatedJson, OllamaProvider num_predict=300 |
+| **21** | 2026-06-18 | Inventory Freshness + Governor Pre-Plan | IsInventoryStale flag, governor pre-plan IsStalled check (10s delay in STALL), D-2 BlockNotFoundEvent integration tests |
+| **22** | 2026-06-18 | Planner Completeness + World KB | CraftItemGoal.IsComplete staleness gate, HtnPlanner IItemSpecGoal count fix, health-critical threshold, World KB separation (WorldKbUrl, named HttpClient, AddKeyedSingleton) |
+| **23** | 2026-06-19 | Damage Interrupt + World KB Routing | DamageTakenEvent, per-goal DamageInterruptThresholdHp, ActionQueue.ClearAndEnqueue atomic, SearchMemory/CreatePage → World KB, GetPage → Agent KB, WorldKbUrl null default + startup warning |
 
 ---
 
 ## CI Health
 
-| Commit | Status | Tests |
-|---|---|---|
-| `ec623e6` (2026-06-15) | ✅ build-and-test green | 7/7 |
+| Version | Sprint | Tests | Status |
+|---------|--------|-------|--------|
+| v0.23.0 | 23 | 200+ | ✅ green |
+| v0.22.0 | 22 | 185+ | ✅ green |
+| v0.21.0 | 21 | 171+ | ✅ green |
+| v0.20.0 | 20 | 155+ | ✅ green |
+| v0.19.0 | 19 | 142+ | ✅ green |
 
-See [council review](council/phase0-bootstrap-phase1-kickoff-council-20260615.md) for Phase 0 acceptance criteria and Phase 1 priorities.
+---
+
+## Sprint 24 Priorities (Upcoming)
+
+| Priority | Item |
+|----------|------|
+| P0 | Integration test for `TryInterruptOnDamage` (was deferred D-8 from Sprint 23) |
+| P1 | `GatherGoalDecomposer` TargetCount pass-through fix |
+| P1 | `TimeProvider` abstraction for testable time-dependent logic (D-8 Sprint 19) |
+| P2 | `IWorldObservationGateway` interface note / design doc (D-5 Sprint 23) |
+
+---
+
+## Future Phases
+
+### Phase 4 — Vision & Aesthetics (confidence 0.60)
+
+ISpatialAnalyzer, IVisionModel, `TakeScreenshot` tool, aesthetic critique via Ollama/Gemma.
+
+### Phase 5 — Advanced Features (confidence 0.50)
+
+Multi-agent support, persona plugin, vector embeddings in Memory, multiple LLM providers, CI/CD pipelines.
