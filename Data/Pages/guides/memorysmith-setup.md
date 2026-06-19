@@ -1,33 +1,36 @@
 # Guide: Configuring MemorySmith Integration
 
-MemorySmith.Agent uses MemorySmith as its long-term memory (wiki pages, blueprints, plans). This guide shows how to connect them.
+MemorySmith.Agent uses up to **two** MemorySmith instances as memory backends:
 
-## Prerequisites
+| Instance | Role | Default Port |
+|----------|------|-------------|
+| **Agent KB** | Codebase knowledge — guides, architecture, blueprints, agent profile | 5001 |
+| **World KB** | World knowledge — block locations, exploration log, world facts | 6869 |
 
-1. A running MemorySmith instance. Clone and run:
+---
+
+## Part 1: Agent KB Setup
+
+### Prerequisites
+
+1. Clone and run MemorySmith:
 
 ```bash
 git clone https://github.com/TheMasonX/MemorySmith
 cd MemorySmith
-dotnet run --project MemorySmith.App
+dotnet run --project MemorySmith.App --urls http://localhost:5001
 ```
 
-Default local MemorySmith app: `http://localhost:5000`.
-For the repo-scoped MCP probe in this repo, use `http://localhost:6868/mcp` with the local `X-Api-Key` from `.vscode/mcp.json`.
-
-## Configure the agent
-
-In `WebUI.Blazor/appsettings.json`:
+### Configure in appsettings.json
 
 ```json
 {
   "Agent": {
     "Enabled": true,
     "Memory": {
-      "BaseUrl": "http://localhost:5000",
+      "BaseUrl": "http://localhost:5001",
       "ApiKey": "",
-      "TimeoutSeconds": 30,
-      "DefaultPageRole": "Anonymous"
+      "TimeoutSeconds": 30
     }
   }
 }
@@ -35,55 +38,82 @@ In `WebUI.Blazor/appsettings.json`:
 
 | Field | Description |
 |---|---|
-| `BaseUrl` | URL of the MemorySmith instance |
-| `ApiKey` | Optional API key (set in MemorySmith's `appsettings.json` under `ApiKey`) |
-| `DefaultPageRole` | Access level for pages created by the agent: `Anonymous`, `Authenticated`, or `Admin` |
+| `BaseUrl` | URL of the agent KB MemorySmith instance |
+| `ApiKey` | Optional API key (must match MemorySmith's `ApiKey` setting) |
+| `TimeoutSeconds` | HTTP timeout for all memory requests |
 
-## Seeding the wiki
+### Seeding the Wiki
 
-The repo includes 10 wiki pages in `Data/Pages/` seeded from the Executive Summary. To populate MemorySmith with these:
+The repo includes pages in `Data/Pages/` that serve as the agent's self-knowledge base. Upload them via the MemorySmith import API or copy them into its data directory.
 
-```bash
-# Using the MemorySmith bulk-import feature (if available) or POST individually:
-curl -X POST http://localhost:5000/api/pages \
-  -H "Content-Type: application/json" \
-  -d '{"slug":"agent/architecture","title":"Architecture","body":"..."}'
-```
-
-## Verify connectivity
+### Verify Connectivity
 
 ```bash
-curl http://localhost:5000/api/search?query=architecture
+curl http://localhost:5001/api/search?query=architecture
 ```
 
-Should return a list of matching pages. If you get a 401, configure the `ApiKey`.
+Should return matching pages. If you get a 401, configure the `ApiKey`.
 
-## Verified local MCP probe
+---
 
-Use the repo-local key in `.vscode/mcp.json` for non-destructive checks:
+## Part 2: World KB Setup (Sprint 22+)
+
+The World KB stores the agent's observations about the Minecraft world — block locations, exploration events, world facts. It's separate from the Agent KB so world facts don't pollute codebase knowledge.
+
+### Run a Second MemorySmith Instance
 
 ```bash
-curl -i -H "X-Api-Key: <key>" http://localhost:6868/health
-curl -i -H "X-Api-Key: <key>" http://localhost:6868/api/health/live
-curl -i -H "X-Api-Key: <key>" http://localhost:6868/api/health/ready
-curl -i -H "X-Api-Key: <key>" http://localhost:6868/mcp
+# From a second terminal / different working directory
+cd /path/to/world-kb
+git clone https://github.com/TheMasonX/MemorySmith .
+dotnet run --project MemorySmith.App --urls http://localhost:6869
 ```
 
-`/api/diagnostics` is protected and currently returns `401 Unauthorized` without a valid auth context. `/mcp/status` is not a valid route.
+### Configure WorldKbUrl
 
-## IMemoryGateway patterns
+```json
+{
+  "Agent": {
+    "WorldKb": {
+      "WorldKbUrl": "http://localhost:6869",
+      "WorldApiKey": "",
+      "WorldTimeoutSeconds": 30
+    }
+  }
+}
+```
 
-The agent uses three integration modes (see `memory.md`):
-
-| Mode | When to use |
+| Field | Description |
 |---|---|
-| **RestApi** (default) | MemorySmith runs separately on its own port |
-| **InProcess** | Agent and MemorySmith run in the same process (faster) |
-| **MockGateway** | Testing — use `MockMemoryGateway` in test projects |
+| `WorldKbUrl` | URL of the world KB instance. `null` = disabled (warning logged at startup) |
+| `WorldApiKey` | Optional API key for world KB |
+| `WorldTimeoutSeconds` | HTTP timeout for world KB requests |
 
-## Authentication
+### Startup Warning
 
-If MemorySmith is configured with `ApiKey` auth:
+If `WorldKbUrl` is null or empty, the agent logs at startup:
+
+```
+[Warning] WorldKbUrl is not configured — world knowledge base is disabled. 
+SearchMemory and CreatePage tools will return empty results.
+```
+
+The agent continues to operate; world KB tools gracefully degrade.
+
+### Tool Routing
+
+Once configured, tool calls are routed automatically:
+- `SearchMemory` → World KB (searches world observations)
+- `CreatePage` → World KB (saves new world observations)
+- `GetPage` → Agent KB (retrieves codebase guides)
+
+See [World KB Guide](world-kb.md) for details.
+
+---
+
+## Part 3: Authentication
+
+If MemorySmith is configured with API key auth:
 
 ```json
 // MemorySmith appsettings.json
@@ -95,28 +125,48 @@ If MemorySmith is configured with `ApiKey` auth:
 
 The agent adds `X-Api-Key: {key}` to every request automatically.
 
-## Remote MemorySmith (production)
+---
 
-For production deployments with MemorySmith on a different host:
+## IMemoryGateway Patterns
+
+The agent supports three integration modes (all use the same interface):
+
+| Mode | When to use |
+|---|---|
+| **RestApi** (default) | MemorySmith runs separately on its own port |
+| **MockGateway** | Testing — use `MockMemoryGateway` in test projects |
+| **InProcess** | Agent and MemorySmith in same process (future optimization) |
+
+---
+
+## Troubleshooting
+
+| Error | Cause | Fix |
+|---|---|---|
+| `Connection refused on :5001` | Agent KB not running | Start MemorySmith on port 5001 |
+| `Connection refused on :6869` | World KB not running | Start second MemorySmith on port 6869 |
+| `401 Unauthorized` | Missing ApiKey | Set `ApiKey` in both configs |
+| `404` on GetPage | Page doesn't exist | Create it first via POST /api/pages |
+| `Timeout` | Slow MemorySmith | Increase `TimeoutSeconds` |
+| Startup warning: WorldKbUrl not configured | No World KB URL | Set `WorldKbUrl` or ignore if World KB not needed |
+
+---
+
+## Remote MemorySmith (Production)
 
 ```json
 {
   "Agent": {
     "Memory": {
-      "BaseUrl": "https://memorysmith.myserver.com",
+      "BaseUrl": "https://agentmemory.myserver.com",
       "ApiKey": "prod-key-here"
+    },
+    "WorldKb": {
+      "WorldKbUrl": "https://worldmemory.myserver.com",
+      "WorldApiKey": "world-prod-key-here"
     }
   }
 }
 ```
 
 Enable `AllowRemoteApi` in MemorySmith for remote access.
-
-## Troubleshooting
-
-| Error | Cause | Fix |
-|---|---|---|
-| `Connection refused` | MemorySmith not running | Start MemorySmith first |
-| `401 Unauthorized` | Missing ApiKey | Set `ApiKey` in both configs |
-| `404` on GetPage | Page doesn't exist | Create it first via POST /api/pages |
-| `Timeout` | Slow MemorySmith | Increase `TimeoutSeconds` |
