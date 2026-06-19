@@ -2,6 +2,10 @@
 
 All REST endpoints exposed by `WebUI.Blazor` (default: `http://localhost:5000`).
 
+**Current version: v0.23.0**
+
+---
+
 ## Status
 
 ### GET /
@@ -16,9 +20,12 @@ Returns current agent state.
 
 ```json
 {
-  "status": "idle",
-  "goal": "GatherWood",
-  "health": 20
+  "status": "executing",
+  "goal": "GatherItem:oak_log",
+  "health": 20,
+  "food": 20,
+  "position": { "x": 10, "y": 64, "z": -5 },
+  "version": "0.23.0"
 }
 ```
 
@@ -26,7 +33,9 @@ Returns current agent state.
 |---|---|---|
 | `status` | string | `"idle"`, `"planning"`, `"executing"`, or `"disabled"` |
 | `goal` | string? | Current active goal name, or null |
-| `health` | int? | Bot health from last world event |
+| `health` | int? | Bot health from last GetStatus event |
+| `food` | int? | Bot food level |
+| `position` | object? | Last known position |
 
 ---
 
@@ -34,7 +43,7 @@ Returns current agent state.
 
 ### POST /api/agent/connect
 
-Triggers a connect signal (Phase 1 stub).
+Triggers a Mineflayer connect attempt.
 
 ```json
 { "status": "connected" }
@@ -42,7 +51,7 @@ Triggers a connect signal (Phase 1 stub).
 
 ### POST /api/agent/stop
 
-Stops the agent (Phase 1 stub).
+Stops the agent and cancels the current goal.
 
 ```json
 { "status": "stopped" }
@@ -50,36 +59,32 @@ Stops the agent (Phase 1 stub).
 
 ---
 
-## Planning
+## Planning & Goals
 
 ### POST /api/agent/plan
 
-Enqueues a predefined goal plan. The agent will execute the plan's actions in order.
+Enqueues a goal by name. The agent will decompose and execute the plan.
 
 **Request:**
 
 ```json
 {
-  "goalName": "GatherWood",
+  "goalName": "GatherItem",
   "parameters": {
-    "count": 10
+    "item": "oak_log",
+    "count": 32
   }
 }
 ```
-
-| Field | Required | Description |
-|---|---|---|
-| `goalName` | YES | Name of a registered goal (see `/api/goals`) |
-| `parameters` | NO | Goal-specific parameters (e.g. `count` for GatherWood) |
 
 **Response 200:**
 
 ```json
 {
-  "goal": "GatherWood",
-  "description": "Gather at least 10 wood logs from nearby trees.",
-  "actionCount": 4,
-  "phases": ["FindTree", "MineWood", "Collect"]
+  "goal": "GatherItem:oak_log",
+  "description": "Gather at least 32 oak_log.",
+  "actionCount": 3,
+  "phases": ["SearchMemory", "MineBlock", "GetStatus"]
 }
 ```
 
@@ -88,18 +93,13 @@ Enqueues a predefined goal plan. The agent will execute the plan's actions in or
 ```json
 {
   "error": "Unknown goal 'FlyToMoon'.",
-  "available": ["GatherWood", "SurviveNight"]
+  "available": ["GatherItem", "CraftItem", "Build", "SurviveNight"]
 }
 ```
 
-**Response 500 (agent disabled):**
-Set `Agent:Enabled = true` in `appsettings.json`.
-
----
-
 ### POST /api/agent/command
 
-Enqueues a single raw tool call by tool name.
+Enqueues a single raw tool call by name. Only registered tool names are accepted (Sprint 5 lockdown).
 
 **Request:**
 
@@ -113,15 +113,103 @@ Enqueues a single raw tool call by tool name.
 { "received": "GetStatus", "status": "queued" }
 ```
 
----
+**Response 400 (unknown tool):**
+
+```json
+{
+  "error": "Unknown tool 'FlyToMoon'.",
+  "available": ["GetStatus", "MoveTo", "MineBlock", "SearchMemory", "GetPage", "CreatePage", "CraftItem", "SmeltItem", "Chat", "Wander", "FindFlatArea"]
+}
+```
 
 ### GET /api/goals
 
 Lists all registered goal names.
 
 ```json
-["GatherWood", "SurviveNight"]
+["GatherItem", "CraftItem", "Build", "SurviveNight"]
 ```
+
+---
+
+## Knowledge Resolution
+
+### GET /api/agent/resolve
+
+Resolves an item spec through the `LocalKnowledgeResolver` pipeline.
+
+**Request:**
+
+```bash
+curl "http://localhost:5000/api/agent/resolve?item=diamond"
+```
+
+**Response 200:**
+
+```json
+{
+  "itemId": "diamond",
+  "candidateType": "DirectMineable",
+  "confidence": 0.90,
+  "sourceBlocks": ["diamond_ore", "deepslate_diamond_ore"],
+  "resolvedAt": "2026-06-19T14:00:00Z"
+}
+```
+
+| `candidateType` | Meaning |
+|---|---|
+| `Craftable` | Item has a crafting recipe |
+| `DirectMineable` | Item is dropped by mining a block |
+| `WorldFact` | Found in WorldState.StructuredFacts |
+| `Unknown` | Not resolved |
+
+---
+
+## World State
+
+### GET /api/agent/worldstate
+
+Returns the current `WorldState` snapshot.
+
+```json
+{
+  "position": { "x": 10, "y": 64, "z": -5 },
+  "health": 20,
+  "food": 20,
+  "inventory": { "oak_log": 8, "cobblestone": 16 },
+  "isInventoryStale": false,
+  "factCount": 12
+}
+```
+
+---
+
+## Journal
+
+### GET /api/agent/journal
+
+Returns the most recent agent journal entries (up to 100).
+
+```json
+[
+  {
+    "type": "ActionCompleted",
+    "toolName": "MineBlock",
+    "goalName": "GatherItem:oak_log",
+    "timestamp": "2026-06-19T14:00:00Z",
+    "details": "mined 8 oak_log"
+  }
+]
+```
+
+**Query parameters:**
+
+| Param | Default | Description |
+|---|---|---|
+| `limit` | 100 | Max entries to return |
+| `type` | (all) | Filter by event type |
+
+**Event types:** `GoalSet`, `GoalComplete`, `GoalFailed`, `GoalCancelled`, `PlanCreated`, `ActionDispatched`, `ActionCompleted`, `ActionFailed`, `ReplanTriggered`, `AgentStarted`, `AgentStopped`
 
 ---
 
@@ -129,11 +217,13 @@ Lists all registered goal names.
 
 ### GET /api/blueprints
 
-Returns the blueprint catalog (Phase 3 stub — returns empty array).
+Returns the blueprint catalog.
 
 ```json
 []
 ```
+
+*(Population from World KB planned for Phase 4.)*
 
 ---
 
@@ -141,13 +231,13 @@ Returns the blueprint catalog (Phase 3 stub — returns empty array).
 
 ### GET /api/about
 
-Returns project metadata including version, license, and phase status.
+Returns project metadata.
 
 ```json
 {
   "name": "MemorySmith.Agent",
-  "version": "0.3.0",
-  "phase": "Phase 3 — HTN/GOAP Planner",
+  "version": "0.23.0",
+  "description": "Modular autonomous agent framework — Sprint 23",
   "license": "MIT",
   "repository": "https://github.com/TheMasonX/MemorySmith.Agent"
 }
@@ -155,18 +245,23 @@ Returns project metadata including version, license, and phase status.
 
 ---
 
-## Error codes
+## Error Codes
 
 | Code | Meaning |
 |---|---|
-| 400 | Bad request — invalid goal name or missing required fields |
-| 500 | Server error — usually means `Agent:Enabled = false` |
+| 400 | Bad request — invalid goal/tool name, missing required field, schema validation failure |
+| 404 | Resource not found — goal, page, or item not found |
+| 500 | Server error — usually `Agent:Enabled = false` or unhandled exception |
 
 ---
 
-## Future endpoints (Phase 4+)
+## SignalR Hub
 
-- `GET /api/worldstate` — current bot position, inventory, facts
-- `GET /api/plan/current` — active plan with remaining actions
-- `POST /api/goal/cancel` — cancel the active goal
-- `WS /ws/events` — real-time world events via WebSocket
+`/hubs/agent` — real-time agent status updates via SignalR.
+
+**Events pushed to clients:**
+
+| Event | Payload |
+|---|---|
+| `AgentStatusUpdate` | `{ status, goal, health, food, position }` |
+| `ChatMessage` | `{ username, message }` (future) |
