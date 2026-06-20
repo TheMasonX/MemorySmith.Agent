@@ -1,1 +1,37 @@
-bmFtZXNwYWNlIEFnZW50LlRvb2xzOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuTWVtb3J5OwoKLy8vIDxzdW1tYXJ5PgovLy8gQ3JlYXRlcyBvciB1cGRhdGVzIGEgcGFnZSBpbiB0aGUgd29ybGQga25vd2xlZGdlIGJhc2UgdG8gcmVjb3JkIGluLXdvcmxkCi8vLyBvYnNlcnZhdGlvbnMsIGJsb2NrIGRpc2NvdmVyaWVzLCBvciBleHBsb3JhdGlvbiBub3Rlcy4KLy8vIDxwYXJhPgovLy8gU3ByaW50IDIzIFAwLUI6IHJvdXRlZCB0byB0aGUgd29ybGQta2V5ZWQgPHNlZSBjcmVmPSJJTWVtb3J5R2F0ZXdheSIvPi4KLy8vIFdvcmxkIG9ic2VydmF0aW9ucyBhcmUgc3RvcmVkIHNlcGFyYXRlbHkgZnJvbSBhZ2VudCBjb2RlYmFzZSBkb2N1bWVudGF0aW9uLAovLy8ga2VlcGluZyB0aGUgYWdlbnQgS0IgY2xlYW4gZm9yIHNwcmludCBkb2NzLCBkZXNpZ24gbm90ZXMsIGFuZCBjb2RlLWxldmVsCi8vLyByZWZlcmVuY2VzIHdoaWxlIHdvcmxkIGRhdGEgYWNjdW11bGF0ZXMgaW4gaXRzIG93biBNZW1vcnlTbWl0aCBpbnN0YW5jZS4KLy8vIDwvcGFyYT4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCBjbGFzcyBDcmVhdGVQYWdlVG9vbCA6IElUb29sCnsKICAgIHByaXZhdGUgcmVhZG9ubHkgSU1lbW9yeUdhdGV3YXkgX21lbW9yeTsKCiAgICBwdWJsaWMgQ3JlYXRlUGFnZVRvb2woSU1lbW9yeUdhdGV3YXkgbWVtb3J5KSA9PiBfbWVtb3J5ID0gbWVtb3J5OwoKICAgIHB1YmxpYyBzdHJpbmcgTmFtZSA9PiAiQ3JlYXRlUGFnZSI7CgogICAgcHVibGljIHN0cmluZyBEZXNjcmlwdGlvbiA9PiAiQ3JlYXRlcyBvciB1cGRhdGVzIGEgcGFnZSBpbiB0aGUgd29ybGQga25vd2xlZGdlIGJhc2UgdG8gcmVjb3JkIGluLXdvcmxkIG9ic2VydmF0aW9ucywgYmxvY2sgZGlzY292ZXJpZXMsIG9yIGV4cGxvcmF0aW9uIG5vdGVzLiBSb3V0ZXMgdG8gdGhlIHdvcmxkIEtCIGluc3RhbmNlIChzZWUgV29ybGRLYlVybCBpbiBhcHBzZXR0aW5ncykuIFVzZSBDcmVhdGVQYWdlIGZvciB3b3JsZCBkYXRhOyB1c2UgR2V0UGFnZSBmb3IgYWdlbnQga25vd2xlZGdlIGJhc2UgcmV0cmlldmFsLiI7CgogICAgcHVibGljIGFzeW5jIFRhc2s8VG9vbFJlc3VsdD4gRXhlY3V0ZUFzeW5jKEFjdGlvbkRhdGEgYWN0aW9uLCBDYW5jZWxsYXRpb25Ub2tlbiBjdCkKICAgIHsKICAgICAgICB2YXIgdGl0bGUgPSBhY3Rpb24uR2V0U3RyaW5nKCJ0aXRsZSIpCiAgICAgICAgICAgICAgICAgICAgPz8gdGhyb3cgbmV3IEFyZ3VtZW50RXhjZXB0aW9uKCJDcmVhdGVQYWdlIHJlcXVpcmVzICd0aXRsZScgcGFyYW1ldGVyLiIpOwogICAgICAgIHZhciBib2R5ICA9IGFjdGlvbi5HZXRTdHJpbmcoImJvZHkiKQogICAgICAgICAgICAgICAgICAgID8/IHRocm93IG5ldyBBcmd1bWVudEV4Y2VwdGlvbigiQ3JlYXRlUGFnZSByZXF1aXJlcyAnYm9keScgcGFyYW1ldGVyLiIpOwogICAgICAgIHZhciB0eXBlICA9IGFjdGlvbi5HZXRTdHJpbmcoInR5cGUiKTsKCiAgICAgICAgdmFyIHBhZ2UgPSBhd2FpdCBfbWVtb3J5LkNyZWF0ZVBhZ2VBc3luYyh0aXRsZSwgYm9keSwgdHlwZSwgY3QpLkNvbmZpZ3VyZUF3YWl0KGZhbHNlKTsKICAgICAgICByZXR1cm4gVG9vbFJlc3VsdC5PayhuZXcgeyBwYWdlIH0pOwogICAgfQp9Cg==
+namespace Agent.Tools;
+
+using Agent.Core;
+using Agent.Memory;
+
+/// <summary>
+/// Creates or updates a page in the world knowledge base to record in-world
+/// observations, block discoveries, or exploration notes.
+/// <para>
+/// Sprint 23 P0-B: routed to the world-keyed <see cref="IMemoryGateway"/>.
+/// World observations are stored separately from agent codebase documentation,
+/// keeping the agent KB clean for sprint docs, design notes, and code-level
+/// references while world data accumulates in its own MemorySmith instance.
+/// </para>
+/// </summary>
+public sealed class CreatePageTool : ITool
+{
+    private readonly IMemoryGateway _memory;
+
+    public CreatePageTool(IMemoryGateway memory) => _memory = memory;
+
+    public string Name => "CreatePage";
+
+    public string Description => "Creates or updates a page in the world knowledge base to record in-world observations, block discoveries, or exploration notes. Routes to the world KB instance (see WorldKbUrl in appsettings). Use CreatePage for world data; use GetPage for agent knowledge base retrieval.";
+
+    public async Task<ToolResult> ExecuteAsync(ActionData action, CancellationToken ct)
+    {
+        var title = action.GetString("title")
+                    ?? throw new ArgumentException("CreatePage requires 'title' parameter.");
+        var body  = action.GetString("body")
+                    ?? throw new ArgumentException("CreatePage requires 'body' parameter.");
+        var type  = action.GetString("type");
+
+        var page = await _memory.CreatePageAsync(title, body, type, ct).ConfigureAwait(false);
+        return ToolResult.Ok(new { page });
+    }
+}
