@@ -1,1 +1,178 @@
-bmFtZXNwYWNlIE1lbW9yeVNtaXRoLkFnZW50LlRlc3RzOwoKdXNpbmcgU3lzdGVtLk5ldDsKdXNpbmcgU3lzdGVtLk5ldC5IdHRwOwp1c2luZyBTeXN0ZW0uVGhyZWFkaW5nOwp1c2luZyBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzOwp1c2luZyBNaWNyb3NvZnQuQXNwTmV0Q29yZS5CdWlsZGVyOwp1c2luZyBNaWNyb3NvZnQuQXNwTmV0Q29yZS5Ib3N0aW5nOwp1c2luZyBNaWNyb3NvZnQuQXNwTmV0Q29yZS5IdHRwOwp1c2luZyBNaWNyb3NvZnQuQXNwTmV0Q29yZS5UZXN0SG9zdDsKdXNpbmcgTWljcm9zb2Z0LkV4dGVuc2lvbnMuQ29uZmlndXJhdGlvbjsKdXNpbmcgTWljcm9zb2Z0LkV4dGVuc2lvbnMuRGVwZW5kZW5jeUluamVjdGlvbjsKdXNpbmcgTWljcm9zb2Z0LkV4dGVuc2lvbnMuTG9nZ2luZzsKdXNpbmcgTlVuaXQuRnJhbWV3b3JrOwp1c2luZyBBZ2VudC5QbGFubmluZzsKCi8vLyA8c3VtbWFyeT4KLy8vIFNwcmludCAzMiB0ZXN0czoKLy8vICAgUDEtMiDigJQgQXBpS2V5TWlkZGxld2FyZSByZWplY3Rpb24gcGF0aCAoaGFwcHksIG1pc3Npbmcga2V5LCBpbnZhbGlkIGtleSkKLy8vICAgUDEtMSDigJQgV2ViU29ja2V0IGhhbmRzaGFrZSBhdXRoIGdhdGUgKGNvbm5lY3Rpb24gd2l0aG91dCBzZWNyZXQgcmVqZWN0ZWQpCi8vLyAgIFAyLTEg4oCUIEdvYWxGYWN0b3J5IHVzZXMgSUxvZ2dlciBpbnN0ZWFkIG9mIERlYnVnLldyaXRlTGluZQovLy8gPC9zdW1tYXJ5PgpbVGVzdEZpeHR1cmVdCnB1YmxpYyBjbGFzcyBTcHJpbnQzMlRlc3RzCnsKICAgIC8vIOKUgOKUgCBQMS0yOiBBcGlLZXlNaWRkbGV3YXJlIHJlamVjdGlvbiBwYXRoIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAogICAgLy8KICAgIC8vIFdlIHVzZSBhbiBpbi1wcm9jZXNzIFRlc3RTZXJ2ZXIgKE1pY3Jvc29mdC5Bc3BOZXRDb3JlLlRlc3RIb3N0KSB0byBleGVyY2lzZQogICAgLy8gdGhlIG1pZGRsZXdhcmUgcGlwZWxpbmUgd2l0aG91dCBhIHJlYWwgSFRUUCBzZXJ2ZXIuIFRoZSBUZXN0U2VydmVyIHdpcmVzIHVwIGEKICAgIC8vIG1pbmltYWwgQVNQLk5FVCBDb3JlIHBpcGVsaW5lOiBBcGlLZXlNaWRkbGV3YXJlIG9uIC9hcGkvKiByb3V0ZXMsIGEgcGxhaW4KICAgIC8vIHJlc3BvbnNlIGhhbmRsZXIgZm9yIHRoZSBlbmRwb2ludCwgYW5kIGNvbmZpZyBmcm9tIGFuIGluLW1lbW9yeSBkaWN0aW9uYXJ5LgoKICAgIHByaXZhdGUgc3RhdGljIFdlYkFwcGxpY2F0aW9uIEJ1aWxkVGVzdEFwcChzdHJpbmc/IGNvbmZpZ3VyZWRBcGlLZXkpCiAgICB7CiAgICAgICAgdmFyIGJ1aWxkZXIgPSBXZWJBcHBsaWNhdGlvbi5DcmVhdGVCdWlsZGVyKCk7CiAgICAgICAgYnVpbGRlci5XZWJIb3N0LlVzZVRlc3RTZXJ2ZXIoKTsKCiAgICAgICAgLy8gSW5qZWN0IHRoZSBBUEkga2V5IGludG8gY29uZmlndXJhdGlvbiAoc2FtZSBwYXRoIEFwaUtleU1pZGRsZXdhcmUgcmVhZHMpLgogICAgICAgIHZhciBjZmcgPSBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIHN0cmluZz8+KCk7CiAgICAgICAgaWYgKGNvbmZpZ3VyZWRBcGlLZXkgaXMgbm90IG51bGwpCiAgICAgICAgICAgIGNmZ1siQWdlbnQ6QXBpS2V5Il0gPSBjb25maWd1cmVkQXBpS2V5OwogICAgICAgIGJ1aWxkZXIuQ29uZmlndXJhdGlvbi5BZGRJbk1lbW9yeUNvbGxlY3Rpb24oY2ZnKTsKCiAgICAgICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRMb2dnaW5nKGxiID0+IGxiLlNldE1pbmltdW1MZXZlbChMb2dMZXZlbC5Ob25lKSk7CgogICAgICAgIHZhciBhcHAgPSBidWlsZGVyLkJ1aWxkKCk7CgogICAgICAgIC8vIE1pcnJvciB0aGUgcHJvZHVjdGlvbiBwaXBlbGluZTogZ2F0ZSAvYXBpLyogcm91dGVzIGJlaGluZCBBcGlLZXlNaWRkbGV3YXJlLgogICAgICAgIGFwcC5Vc2VXaGVuKAogICAgICAgICAgICBjdHggPT4gY3R4LlJlcXVlc3QuUGF0aC5TdGFydHNXaXRoU2VnbWVudHMoIi9hcGkiKSwKICAgICAgICAgICAgYnJhbmNoID0+IGJyYW5jaC5Vc2VNaWRkbGV3YXJlPFdlYlVJLkJsYXpvci5BcGlLZXlNaWRkbGV3YXJlPigpKTsKCiAgICAgICAgYXBwLk1hcEdldCgiL2FwaS9hYm91dCIsICgpID0+IFJlc3VsdHMuT2sobmV3IHsgdmVyc2lvbiA9ICJ0ZXN0IiB9KSk7CiAgICAgICAgYXBwLk1hcEdldCgiL2hlYWx0aCIsICgpID0+IFJlc3VsdHMuT2soIm9rIikpOwoKICAgICAgICByZXR1cm4gYXBwOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgQXBpS2V5TWlkZGxld2FyZV9Ob0tleUNvbmZpZ3VyZWRfQWxsb3dzUmVxdWVzdCgpCiAgICB7CiAgICAgICAgLy8gV2hlbiBubyBBUEkga2V5IGlzIGNvbmZpZ3VyZWQsIG1pZGRsZXdhcmUgbXVzdCBwYXNzIGFsbCByZXF1ZXN0cyB0aHJvdWdoCiAgICAgICAgLy8gKGRldi9sb2NhbGhvc3QgY29udmVuaWVuY2UgbW9kZSkuCiAgICAgICAgYXdhaXQgdXNpbmcgdmFyIGFwcCA9IEJ1aWxkVGVzdEFwcChjb25maWd1cmVkQXBpS2V5OiBudWxsKTsKICAgICAgICBhd2FpdCBhcHAuU3RhcnRBc3luYygpOwoKICAgICAgICB2YXIgY2xpZW50ID0gYXBwLkdldFRlc3RDbGllbnQoKTsKICAgICAgICB2YXIgcmVzcG9uc2UgPSBhd2FpdCBjbGllbnQuR2V0QXN5bmMoIi9hcGkvYWJvdXQiKTsKCiAgICAgICAgQXNzZXJ0LlRoYXQocmVzcG9uc2UuU3RhdHVzQ29kZSwgSXMuRXF1YWxUbyhIdHRwU3RhdHVzQ29kZS5PSyksCiAgICAgICAgICAgICJObyBBcGlLZXkgY29uZmlndXJlZCDihpIgbWlkZGxld2FyZSBtdXN0IHBhc3MgYWxsIHJlcXVlc3RzIChkZXYgbW9kZSkuIik7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgYXN5bmMgVGFzayBBcGlLZXlNaWRkbGV3YXJlX1ZhbGlkS2V5X0FsbG93c1JlcXVlc3QoKQogICAgewogICAgICAgIC8vIEhhcHB5IHBhdGg6IGNvcnJlY3QgWC1BcGktS2V5IGhlYWRlciDihpIgcmVxdWVzdCBwcm9jZWVkcy4KICAgICAgICBjb25zdCBzdHJpbmcga2V5ID0gInRlc3Qtc2VjcmV0LWtleS00MiI7CiAgICAgICAgYXdhaXQgdXNpbmcgdmFyIGFwcCA9IEJ1aWxkVGVzdEFwcChjb25maWd1cmVkQXBpS2V5OiBrZXkpOwogICAgICAgIGF3YWl0IGFwcC5TdGFydEFzeW5jKCk7CgogICAgICAgIHZhciBjbGllbnQgPSBhcHAuR2V0VGVzdENsaWVudCgpOwogICAgICAgIGNsaWVudC5EZWZhdWx0UmVxdWVzdEhlYWRlcnMuQWRkKCJYLUFwaS1LZXkiLCBrZXkpOwogICAgICAgIHZhciByZXNwb25zZSA9IGF3YWl0IGNsaWVudC5HZXRBc3luYygiL2FwaS9hYm91dCIpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXNwb25zZS5TdGF0dXNDb2RlLCBJcy5FcXVhbFRvKEh0dHBTdGF0dXNDb2RlLk9LKSwKICAgICAgICAgICAgIlZhbGlkIFgtQXBpLUtleSBoZWFkZXIgbXVzdCBiZSBhY2NlcHRlZCAoSFRUUCAyMDApLiIpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgQXBpS2V5TWlkZGxld2FyZV9NaXNzaW5nS2V5X1JldHVybnM0MDEoKQogICAgewogICAgICAgIC8vIE1pc3NpbmcgWC1BcGktS2V5IGhlYWRlciDihpIgNDAxIFVuYXV0aG9yaXplZC4KICAgICAgICBhd2FpdCB1c2luZyB2YXIgYXBwID0gQnVpbGRUZXN0QXBwKGNvbmZpZ3VyZWRBcGlLZXk6ICJjb25maWd1cmVkLWtleSIpOwogICAgICAgIGF3YWl0IGFwcC5TdGFydEFzeW5jKCk7CgogICAgICAgIHZhciBjbGllbnQgPSBhcHAuR2V0VGVzdENsaWVudCgpOwogICAgICAgIC8vIE5vIFgtQXBpLUtleSBoZWFkZXIgYXR0YWNoZWQuCiAgICAgICAgdmFyIHJlc3BvbnNlID0gYXdhaXQgY2xpZW50LkdldEFzeW5jKCIvYXBpL2Fib3V0Iik7CgogICAgICAgIEFzc2VydC5UaGF0KChpbnQpcmVzcG9uc2UuU3RhdHVzQ29kZSwgSXMuRXF1YWxUbyg0MDEpLAogICAgICAgICAgICAiTWlzc2luZyBYLUFwaS1LZXkgaGVhZGVyIG11c3QgcHJvZHVjZSA0MDEgVW5hdXRob3JpemVkLiIpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgQXBpS2V5TWlkZGxld2FyZV9JbnZhbGlkS2V5X1JldHVybnM0MDEoKQogICAgewogICAgICAgIC8vIFdyb25nIFgtQXBpLUtleSB2YWx1ZSDihpIgNDAxIFVuYXV0aG9yaXplZC4KICAgICAgICBhd2FpdCB1c2luZyB2YXIgYXBwID0gQnVpbGRUZXN0QXBwKGNvbmZpZ3VyZWRBcGlLZXk6ICJjb3JyZWN0LWtleSIpOwogICAgICAgIGF3YWl0IGFwcC5TdGFydEFzeW5jKCk7CgogICAgICAgIHZhciBjbGllbnQgPSBhcHAuR2V0VGVzdENsaWVudCgpOwogICAgICAgIGNsaWVudC5EZWZhdWx0UmVxdWVzdEhlYWRlcnMuQWRkKCJYLUFwaS1LZXkiLCAid3Jvbmcta2V5Iik7CiAgICAgICAgdmFyIHJlc3BvbnNlID0gYXdhaXQgY2xpZW50LkdldEFzeW5jKCIvYXBpL2Fib3V0Iik7CgogICAgICAgIEFzc2VydC5UaGF0KChpbnQpcmVzcG9uc2UuU3RhdHVzQ29kZSwgSXMuRXF1YWxUbyg0MDEpLAogICAgICAgICAgICAiSW52YWxpZCBYLUFwaS1LZXkgdmFsdWUgbXVzdCBwcm9kdWNlIDQwMSBVbmF1dGhvcml6ZWQuIik7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgYXN5bmMgVGFzayBBcGlLZXlNaWRkbGV3YXJlX05vbkFwaVJvdXRlX05vdEdhdGVkKCkKICAgIHsKICAgICAgICAvLyBSb3V0ZXMgb3V0c2lkZSAvYXBpLyogbXVzdCBub3QgYmUgZ2F0ZWQgKEFwaUtleU1pZGRsZXdhcmUgb25seSB3aXJlcyBvbiAvYXBpLyopLgogICAgICAgIGF3YWl0IHVzaW5nIHZhciBhcHAgPSBCdWlsZFRlc3RBcHAoY29uZmlndXJlZEFwaUtleTogImtleSIpOwogICAgICAgIGF3YWl0IGFwcC5TdGFydEFzeW5jKCk7CgogICAgICAgIHZhciBjbGllbnQgPSBhcHAuR2V0VGVzdENsaWVudCgpOwogICAgICAgIC8vIE5vIGtleSBoZWFkZXIsIGJ1dCB0aGlzIGlzIGEgbm9uLS9hcGkvIHJvdXRlLgogICAgICAgIHZhciByZXNwb25zZSA9IGF3YWl0IGNsaWVudC5HZXRBc3luYygiL2hlYWx0aCIpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXNwb25zZS5TdGF0dXNDb2RlLCBJcy5FcXVhbFRvKEh0dHBTdGF0dXNDb2RlLk9LKSwKICAgICAgICAgICAgIk5vbi0vYXBpLyogcm91dGVzIG11c3Qgbm90IGJlIGJsb2NrZWQgYnkgQXBpS2V5TWlkZGxld2FyZS4iKTsKICAgIH0KCiAgICAvLyDilIDilIAgUDItMTogR29hbEZhY3RvcnkgSUxvZ2dlciAobm8gRGVidWcuV3JpdGVMaW5lKSDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBbVGVzdF0KICAgIHB1YmxpYyBhc3luYyBUYXNrIEdvYWxGYWN0b3J5X01pc3NpbmdCbHVlcHJpbnRSZXBvX0xvZ3NXYXJuaW5nTm90RGVidWdPdXRwdXQoKQogICAgewogICAgICAgIC8vIFdoZW4gSUJsdWVwcmludFJlcG9zaXRvcnkgaXMgbnVsbCwgR29hbEZhY3RvcnkgbXVzdCBlbWl0IGEgc3RydWN0dXJlZAogICAgICAgIC8vIElMb2dnZXIuTG9nV2FybmluZyAobm90IERlYnVnLldyaXRlTGluZSkgYW5kIHJldHVybiBudWxsLgogICAgICAgIC8vIFdlIHZlcmlmeSBieTogKGEpIHJldHVybiB2YWx1ZSBpcyBudWxsLCAoYikgdGhlIFRlc3RMb2dnZXIgY2FwdHVyZXMgYSB3YXJuaW5nLgogICAgICAgIHZhciBsb2dnZXIgPSBuZXcgVGVzdExvZ2dlcjxHb2FsRmFjdG9yeT4oKTsKICAgICAgICB2YXIgZmFjdG9yeSA9IG5ldyBHb2FsRmFjdG9yeSgKICAgICAgICAgICAgaXRlbVJlZ2lzdHJ5OiBudWxsLAogICAgICAgICAgICBibHVlcHJpbnRSZXBvc2l0b3J5OiBudWxsLAogICAgICAgICAgICBsb2dnZXI6IGxvZ2dlcik7CgogICAgICAgIHZhciByZXN1bHQgPSBhd2FpdCBmYWN0b3J5LkNyZWF0ZUFzeW5jKCJCdWlsZDpob3VzZSIsIG51bGwsIENhbmNlbGxhdGlvblRva2VuLk5vbmUpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQsIElzLk51bGwsCiAgICAgICAgICAgICJDcmVhdGVBc3luYyB3aXRoIG1pc3NpbmcgYmx1ZXByaW50IHJlcG9zaXRvcnkgbXVzdCByZXR1cm4gbnVsbC4iKTsKICAgICAgICBBc3NlcnQuVGhhdChsb2dnZXIuSGFzV2FybmluZygiSUJsdWVwcmludFJlcG9zaXRvcnkiKSwgSXMuVHJ1ZSwKICAgICAgICAgICAgIkEgTG9nV2FybmluZyBtZW50aW9uaW5nICdJQmx1ZXByaW50UmVwb3NpdG9yeScgbXVzdCBiZSBlbWl0dGVkIChub3QgRGVidWcuV3JpdGVMaW5lKS4iKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyBhc3luYyBUYXNrIEdvYWxGYWN0b3J5X0l0ZW1Ob3RGb3VuZF9Mb2dzV2FybmluZ1dpdGhJdGVtSWQoKQogICAgewogICAgICAgIC8vIFdoZW4gaXRlbSBub3QgaW4gcmVnaXN0cnkgYW5kIG5vdCBhIGJ1aWx0LWluIGJsb2NrLCBhIHdhcm5pbmcgbXVzdCBiZSBlbWl0dGVkLgogICAgICAgIHZhciBsb2dnZXIgPSBuZXcgVGVzdExvZ2dlcjxHb2FsRmFjdG9yeT4oKTsKICAgICAgICB2YXIgZmFjdG9yeSA9IG5ldyBHb2FsRmFjdG9yeSgKICAgICAgICAgICAgaXRlbVJlZ2lzdHJ5OiBudWxsLAogICAgICAgICAgICBibHVlcHJpbnRSZXBvc2l0b3J5OiBudWxsLAogICAgICAgICAgICBsb2dnZXI6IGxvZ2dlcik7CgogICAgICAgIHZhciByZXN1bHQgPSBhd2FpdCBmYWN0b3J5LkNyZWF0ZUFzeW5jKCJHYXRoZXJJdGVtOnVub2J0YWluaXVtX29yZSIsIG51bGwsCiAgICAgICAgICAgIENhbmNlbGxhdGlvblRva2VuLk5vbmUpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQsIElzLk51bGwsCiAgICAgICAgICAgICJDcmVhdGVBc3luYyB3aXRoIHVua25vd24gaXRlbSBtdXN0IHJldHVybiBudWxsLiIpOwogICAgICAgIEFzc2VydC5UaGF0KAogICAgICAgICAgICBsb2dnZXIuRW50cmllcy5FeGlzdHMoZSA9PiBlLkxldmVsID09IExvZ0xldmVsLldhcm5pbmcgJiYKICAgICAgICAgICAgICAgIGUuTWVzc2FnZS5Db250YWlucygidW5vYnRhaW5pdW1fb3JlIikpLAogICAgICAgICAgICBJcy5UcnVlLAogICAgICAgICAgICAiTG9nV2FybmluZyBtdXN0IGluY2x1ZGUgdGhlIHVua25vd24gaXRlbSBJRCBmb3IgZGlhZ25vc3RpY3MuIik7CiAgICB9Cn0K
+namespace MemorySmith.Agent.Tests;
+
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NUnit.Framework;
+using Agent.Planning;
+
+/// <summary>
+/// Sprint 32 tests:
+///   P1-2 — ApiKeyMiddleware rejection path (happy, missing key, invalid key)
+///   P1-1 — WebSocket handshake auth gate (connection without secret rejected)
+///   P2-1 — GoalFactory uses ILogger instead of Debug.WriteLine
+/// </summary>
+[TestFixture]
+public class Sprint32Tests
+{
+    // ── P1-2: ApiKeyMiddleware rejection path ─────────────────────────────────
+    //
+    // We use an in-process TestServer (Microsoft.AspNetCore.TestHost) to exercise
+    // the middleware pipeline without a real HTTP server. The TestServer wires up a
+    // minimal ASP.NET Core pipeline: ApiKeyMiddleware on /api/* routes, a plain
+    // response handler for the endpoint, and config from an in-memory dictionary.
+
+    private static WebApplication BuildTestApp(string? configuredApiKey)
+    {
+        var builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+
+        // Inject the API key into configuration (same path ApiKeyMiddleware reads).
+        var cfg = new Dictionary<string, string?>();
+        if (configuredApiKey is not null)
+            cfg["Agent:ApiKey"] = configuredApiKey;
+        builder.Configuration.AddInMemoryCollection(cfg);
+
+        builder.Services.AddLogging(lb => lb.SetMinimumLevel(LogLevel.None));
+
+        var app = builder.Build();
+
+        // Mirror the production pipeline: gate /api/* routes behind ApiKeyMiddleware.
+        app.UseWhen(
+            ctx => ctx.Request.Path.StartsWithSegments("/api"),
+            branch => branch.UseMiddleware<WebUI.Blazor.ApiKeyMiddleware>());
+
+        app.MapGet("/api/about", () => Results.Ok(new { version = "test" }));
+        app.MapGet("/health", () => Results.Ok("ok"));
+
+        return app;
+    }
+
+    [Test]
+    public async Task ApiKeyMiddleware_NoKeyConfigured_AllowsRequest()
+    {
+        // When no API key is configured, middleware must pass all requests through
+        // (dev/localhost convenience mode).
+        await using var app = BuildTestApp(configuredApiKey: null);
+        await app.StartAsync();
+
+        var client = app.GetTestClient();
+        var response = await client.GetAsync("/api/about");
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK),
+            "No ApiKey configured → middleware must pass all requests (dev mode).");
+    }
+
+    [Test]
+    public async Task ApiKeyMiddleware_ValidKey_AllowsRequest()
+    {
+        // Happy path: correct X-Api-Key header → request proceeds.
+        const string key = "test-secret-key-42";
+        await using var app = BuildTestApp(configuredApiKey: key);
+        await app.StartAsync();
+
+        var client = app.GetTestClient();
+        client.DefaultRequestHeaders.Add("X-Api-Key", key);
+        var response = await client.GetAsync("/api/about");
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK),
+            "Valid X-Api-Key header must be accepted (HTTP 200).");
+    }
+
+    [Test]
+    public async Task ApiKeyMiddleware_MissingKey_Returns401()
+    {
+        // Missing X-Api-Key header → 401 Unauthorized.
+        await using var app = BuildTestApp(configuredApiKey: "configured-key");
+        await app.StartAsync();
+
+        var client = app.GetTestClient();
+        // No X-Api-Key header attached.
+        var response = await client.GetAsync("/api/about");
+
+        Assert.That((int)response.StatusCode, Is.EqualTo(401),
+            "Missing X-Api-Key header must produce 401 Unauthorized.");
+    }
+
+    [Test]
+    public async Task ApiKeyMiddleware_InvalidKey_Returns401()
+    {
+        // Wrong X-Api-Key value → 401 Unauthorized.
+        await using var app = BuildTestApp(configuredApiKey: "correct-key");
+        await app.StartAsync();
+
+        var client = app.GetTestClient();
+        client.DefaultRequestHeaders.Add("X-Api-Key", "wrong-key");
+        var response = await client.GetAsync("/api/about");
+
+        Assert.That((int)response.StatusCode, Is.EqualTo(401),
+            "Invalid X-Api-Key value must produce 401 Unauthorized.");
+    }
+
+    [Test]
+    public async Task ApiKeyMiddleware_NonApiRoute_NotGated()
+    {
+        // Routes outside /api/* must not be gated (ApiKeyMiddleware only wires on /api/*).
+        await using var app = BuildTestApp(configuredApiKey: "key");
+        await app.StartAsync();
+
+        var client = app.GetTestClient();
+        // No key header, but this is a non-/api/ route.
+        var response = await client.GetAsync("/health");
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK),
+            "Non-/api/* routes must not be blocked by ApiKeyMiddleware.");
+    }
+
+    // ── P2-1: GoalFactory ILogger (no Debug.WriteLine) ────────────────────────
+
+    [Test]
+    public async Task GoalFactory_MissingBlueprintRepo_LogsWarningNotDebugOutput()
+    {
+        // When IBlueprintRepository is null, GoalFactory must emit a structured
+        // ILogger.LogWarning (not Debug.WriteLine) and return null.
+        // We verify by: (a) return value is null, (b) the TestLogger captures a warning.
+        var logger = new TestLogger<GoalFactory>();
+        var factory = new GoalFactory(
+            itemRegistry: null,
+            blueprintRepository: null,
+            logger: logger);
+
+        var result = await factory.CreateAsync("Build:house", null, CancellationToken.None);
+
+        Assert.That(result, Is.Null,
+            "CreateAsync with missing blueprint repository must return null.");
+        Assert.That(logger.HasWarning("IBlueprintRepository"), Is.True,
+            "A LogWarning mentioning 'IBlueprintRepository' must be emitted (not Debug.WriteLine).");
+    }
+
+    [Test]
+    public async Task GoalFactory_ItemNotFound_LogsWarningWithItemId()
+    {
+        // When item not in registry and not a built-in block, a warning must be emitted.
+        var logger = new TestLogger<GoalFactory>();
+        var factory = new GoalFactory(
+            itemRegistry: null,
+            blueprintRepository: null,
+            logger: logger);
+
+        var result = await factory.CreateAsync("GatherItem:unobtainium_ore", null,
+            CancellationToken.None);
+
+        Assert.That(result, Is.Null,
+            "CreateAsync with unknown item must return null.");
+        Assert.That(
+            logger.Entries.Exists(e => e.Level == LogLevel.Warning &&
+                e.Message.Contains("unobtainium_ore")),
+            Is.True,
+            "LogWarning must include the unknown item ID for diagnostics.");
+    }
+}
