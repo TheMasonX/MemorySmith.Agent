@@ -1,1 +1,43 @@
-bmFtZXNwYWNlIEFnZW50LldvcmxkLk1pbmVjcmFmdDsKCi8vLyA8c3VtbWFyeT4KLy8vIENvbmZpZ3VyYXRpb24gZm9yIE1pbmVjcmFmdEFkYXB0ZXIuCi8vLyBCaW5kIGZyb20gYXBwc2V0dGluZ3MuanNvbiBzZWN0aW9uICJBZ2VudDpNaW5lY3JhZnQiLgovLy8gPC9zdW1tYXJ5PgpwdWJsaWMgc2VhbGVkIHJlY29yZCBNaW5lY3JhZnRBZGFwdGVyQ29uZmlnCnsKICAgIC8vLyA8c3VtbWFyeT5XZWJTb2NrZXQgVVJMIHRoZSBhZGFwdGVyIGNvbm5lY3RzIHRvIChtYXRjaGVzIHRoZSBOb2RlLmpzIFdTIHNlcnZlciBwb3J0KS48L3N1bW1hcnk+CiAgICBwdWJsaWMgc3RyaW5nIFdlYlNvY2tldFVybCB7IGdldDsgaW5pdDsgfSA9ICJ3czovL2xvY2FsaG9zdDozMDAwIjsKCiAgICAvLy8gPHN1bW1hcnk+UG9ydCB0aGUgTm9kZS5qcyBXZWJTb2NrZXQgc2VydmVyIGxpc3RlbnMgb24uPC9zdW1tYXJ5PgogICAgcHVibGljIGludCBXZWJTb2NrZXRQb3J0IHsgZ2V0OyBpbml0OyB9ID0gMzAwMDsKCiAgICAvLy8gPHN1bW1hcnk+UGF0aCB0byB0aGUgTWluZWZsYXllckFkYXB0ZXIvaW5kZXguanMgc2NyaXB0LiBBdXRvLXN0YXJ0IGlzIHNraXBwZWQgaWYgZW1wdHkuPC9zdW1tYXJ5PgogICAgcHVibGljIHN0cmluZyBOb2RlU2NyaXB0UGF0aCB7IGdldDsgaW5pdDsgfSA9IHN0cmluZy5FbXB0eTsKCiAgICAvLy8gPHN1bW1hcnk+SWYgdHJ1ZSwgTWluZWNyYWZ0QWRhcHRlciBzcGF3bnMgdGhlIE5vZGUgcHJvY2VzcyBhdXRvbWF0aWNhbGx5IG9uIENvbm5lY3RBc3luYy48L3N1bW1hcnk+CiAgICBwdWJsaWMgYm9vbCBBdXRvU3RhcnROb2RlIHsgZ2V0OyBpbml0OyB9ID0gZmFsc2U7CgogICAgLy8vIDxzdW1tYXJ5Pk1pbmVjcmFmdCBzZXJ2ZXIgaG9zdCBmb3IgdGhlIE5vZGUuanMgYm90Ljwvc3VtbWFyeT4KICAgIHB1YmxpYyBzdHJpbmcgU2VydmVySG9zdCB7IGdldDsgaW5pdDsgfSA9ICJsb2NhbGhvc3QiOwoKICAgIC8vLyA8c3VtbWFyeT5NaW5lY3JhZnQgc2VydmVyIHBvcnQgZm9yIHRoZSBOb2RlLmpzIGJvdC48L3N1bW1hcnk+CiAgICBwdWJsaWMgaW50IFNlcnZlclBvcnQgeyBnZXQ7IGluaXQ7IH0gPSAyNTU2NTsKCiAgICAvLy8gPHN1bW1hcnk+Qm90IHVzZXJuYW1lLjwvc3VtbWFyeT4KICAgIHB1YmxpYyBzdHJpbmcgQm90VXNlcm5hbWUgeyBnZXQ7IGluaXQ7IH0gPSAiQWdlbnRCb3QiOwoKICAgIC8vLyA8c3VtbWFyeT5NaWxsaXNlY29uZHMgdG8gd2FpdCBmb3IgdGhlIE5vZGUgV2ViU29ja2V0IHNlcnZlciB0byBzdGFydCBiZWZvcmUgZ2l2aW5nIHVwLjwvc3VtbWFyeT4KICAgIHB1YmxpYyBpbnQgTm9kZVN0YXJ0VGltZW91dE1zIHsgZ2V0OyBpbml0OyB9ID0gMTBfMDAwOwoKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBTcHJpbnQgMzIgU0VDLTAyOiBzaGFyZWQgc2VjcmV0IHNlbnQgYnkgdGhlIEMjIGFnZW50IGluIHRoZSBXZWJTb2NrZXQgaGFuZHNoYWtlLgogICAgLy8vIENvbmZpZ3VyZSB2aWEgZW52IHZhciA8Yz5BZ2VudF9fTWluZWNyYWZ0X19BZGFwdGVyU2VjcmV0PC9jPiBvcgogICAgLy8vIGFwcHNldHRpbmdzIHNlY3Rpb24gPGM+QWdlbnQ6TWluZWNyYWZ0OkFkYXB0ZXJTZWNyZXQ8L2M+LgogICAgLy8vCiAgICAvLy8gV2hlbiBudWxsIG9yIGVtcHR5LCBubyBzZWNyZXQgaXMgc2VudCBhbmQgdGhlIE5vZGUuanMgc2VydmVyIG11c3QgYWxzbyBoYXZlCiAgICAvLy8gPGM+V1NfVE9LRU48L2M+IHVuc2V0IGZvciB0aGUgY29ubmVjdGlvbiB0byBiZSBhY2NlcHRlZCAoZGV2L2xvY2FsaG9zdCBtb2RlKS4KICAgIC8vLyBOZXZlciBjb21taXQgYSByZWFsIHNlY3JldCB2YWx1ZSDigJQgYWx3YXlzIHVzZSBlbnZpcm9ubWVudCB2YXJpYWJsZXMuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHVibGljIHN0cmluZz8gQWRhcHRlclNlY3JldCB7IGdldDsgaW5pdDsgfSA9IG51bGw7Cn0K
+namespace Agent.World.Minecraft;
+
+/// <summary>
+/// Configuration for MinecraftAdapter.
+/// Bind from appsettings.json section "Agent:Minecraft".
+/// </summary>
+public sealed record MinecraftAdapterConfig
+{
+    /// <summary>WebSocket URL the adapter connects to (matches the Node.js WS server port).</summary>
+    public string WebSocketUrl { get; init; } = "ws://localhost:3000";
+
+    /// <summary>Port the Node.js WebSocket server listens on.</summary>
+    public int WebSocketPort { get; init; } = 3000;
+
+    /// <summary>Path to the MineflayerAdapter/index.js script. Auto-start is skipped if empty.</summary>
+    public string NodeScriptPath { get; init; } = string.Empty;
+
+    /// <summary>If true, MinecraftAdapter spawns the Node process automatically on ConnectAsync.</summary>
+    public bool AutoStartNode { get; init; } = false;
+
+    /// <summary>Minecraft server host for the Node.js bot.</summary>
+    public string ServerHost { get; init; } = "localhost";
+
+    /// <summary>Minecraft server port for the Node.js bot.</summary>
+    public int ServerPort { get; init; } = 25565;
+
+    /// <summary>Bot username.</summary>
+    public string BotUsername { get; init; } = "AgentBot";
+
+    /// <summary>Milliseconds to wait for the Node WebSocket server to start before giving up.</summary>
+    public int NodeStartTimeoutMs { get; init; } = 10_000;
+
+    /// <summary>
+    /// Sprint 32 SEC-02: shared secret sent by the C# agent in the WebSocket handshake.
+    /// Configure via env var <c>Agent__Minecraft__AdapterSecret</c> or
+    /// appsettings section <c>Agent:Minecraft:AdapterSecret</c>.
+    ///
+    /// When null or empty, no secret is sent and the Node.js server must also have
+    /// <c>WS_TOKEN</c> unset for the connection to be accepted (dev/localhost mode).
+    /// Never commit a real secret value — always use environment variables.
+    /// </summary>
+    public string? AdapterSecret { get; init; } = null;
+}
