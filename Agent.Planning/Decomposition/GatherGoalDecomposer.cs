@@ -1,1 +1,59 @@
-bmFtZXNwYWNlIEFnZW50LlBsYW5uaW5nOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuUGxhbm5pbmcuR29hbHM7CgovLy8gPHN1bW1hcnk+Ci8vLyBEZWNvbXBvc2VzIGdhdGhlci10eXBlIGdvYWxzICg8c2VlIGNyZWY9IkdhdGhlcldvb2RHb2FsIi8+LCA8c2VlIGNyZWY9IklJdGVtU3BlY0dvYWwiLz4pLgovLy8gQWRhcHRzIGVhY2ggZ29hbCB2YXJpYW50IHRvIDxzZWUgY3JlZj0iSHRuVGFza0xpYnJhcnkuRGVjb21wb3NlR2F0aGVySXRlbSIvPi4KLy8vCi8vLyBTcHJpbnQgMjYgUDAtQjogPHNlZSBjcmVmPSJJSXRlbVNwZWNHb2FsIi8+IGNhdGNoLWFsbCBhcm0gbm93IHBhc3NlcwovLy8gPGM+aXNnLlRhcmdldENvdW50PC9jPiBpbnN0ZWFkIG9mIDxjPkFycmF5LkVtcHR5Jmx0O3N0cmluZyZndDsoKTwvYz4uCi8vLyBQcmV2aW91c2x5IGFueSA8c2VlIGNyZWY9IklJdGVtU3BlY0dvYWwiLz4gaW1wbGVtZW50b3IgdGhhdCB3YXNuJ3QKLy8vIDxzZWUgY3JlZj0iR2VuZXJpY0dhdGhlckdvYWwiLz4gb3IgPHNlZSBjcmVmPSJHYXRoZXJXb29kR29hbCIvPiB3b3VsZCBzaWxlbnRseQovLy8gcmVjZWl2ZSB0aGUgbGlicmFyeSdzIGRlZmF1bHQgY291bnQgKDEwKSBpbnN0ZWFkIG9mIHRoZSByZXF1ZXN0ZWQgcXVhbnRpdHkuCi8vLyBUaGlzIGlzIG5vdyBzYWZlIGJlY2F1c2UgPHNlZSBjcmVmPSJJSXRlbVNwZWNHb2FsIi8+IGRlY2xhcmVzCi8vLyA8Yz5pbnQgVGFyZ2V0Q291bnQgPSZndDsgMTs8L2M+IGFzIGEgZGVmYXVsdCBpbnRlcmZhY2UgbWV0aG9kIChESU0pLCBzbyBhbGwKLy8vIGltcGxlbWVudG9ycyBwcm92aWRlIGEgY291bnQuCi8vLwovLy8gU3ByaW50IDI3IFAwLUQ6IHRoZSByZWR1bmRhbnQgPHNlZSBjcmVmPSJHZW5lcmljR2F0aGVyR29hbCIvPiBhcm0gaGFzIGJlZW4gcmVtb3ZlZC4KLy8vIFNpbmNlIDxzZWUgY3JlZj0iR2VuZXJpY0dhdGhlckdvYWwiLz4gaW1wbGVtZW50cyA8c2VlIGNyZWY9IklJdGVtU3BlY0dvYWwiLz4sIHRoZQovLy8gPHNlZSBjcmVmPSJJSXRlbVNwZWNHb2FsIi8+IGFybSBjYXRjaGVzIGl0IGNvcnJlY3RseSB2aWEgY2xhc3MtbWVtYmVyLXdpbnMtb3Zlci1ESU0KLy8vIHNlbWFudGljcy4gVGhlIDxzZWUgY3JlZj0iQ2FuSGFuZGxlIi8+IHByZWRpY2F0ZSBpcyBzaW1wbGlmaWVkIGFjY29yZGluZ2x5LgovLy8gPC9zdW1tYXJ5PgpwdWJsaWMgc2VhbGVkIGNsYXNzIEdhdGhlckdvYWxEZWNvbXBvc2VyKEh0blRhc2tMaWJyYXJ5IHRhc2tMaWJyYXJ5KSA6IElHb2FsRGVjb21wb3Nlcgp7CiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gSXRlbVNwZWMgZm9yIG9hayBsb2dzLCB1c2VkIGFzIHRoZSBmYWxsYmFjayBmb3IgbGVnYWN5IDxzZWUgY3JlZj0iR2F0aGVyV29vZEdvYWwiLz4uCiAgICAvLy8gTWlycm9ycyB0aGUgcHJpdmF0ZSBPYWtMb2dTcGVjIGluIDxzZWUgY3JlZj0iSHRuVGFza0xpYnJhcnkiLz4uCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHJpdmF0ZSBzdGF0aWMgcmVhZG9ubHkgSXRlbVNwZWMgT2FrTG9nU3BlYyA9IG5ldygpCiAgICB7CiAgICAgICAgSXRlbUlkICAgICAgICAgID0gIm9ha19sb2ciLAogICAgICAgIERpc3BsYXlOYW1lICAgICA9ICJPYWsgTG9nIiwKICAgICAgICBTb3VyY2VCbG9ja3MgICAgPSBbIm9ha19sb2ciLCAiYmlyY2hfbG9nIiwgInNwcnVjZV9sb2ciLAogICAgICAgICAgICAgICAgICAgICAgICAgICAiZGFya19vYWtfbG9nIiwgImp1bmdsZV9sb2ciLCAiYWNhY2lhX2xvZyIsICJjaGVycnlfbG9nIl0sCiAgICAgICAgUmVxdWlyZXNTbWVsdGluZyA9IGZhbHNlLAogICAgICAgIE1pbkhhcnZlc3RMZXZlbCAgPSAwLAogICAgfTsKCiAgICBwdWJsaWMgYm9vbCBDYW5IYW5kbGUoSUdvYWwgZ29hbCkgPT4KICAgICAgICBnb2FsIGlzIEdhdGhlcldvb2RHb2FsIG9yIElJdGVtU3BlY0dvYWw7CgogICAgcHVibGljIEFjdGlvblBsYW4gRGVjb21wb3NlKElHb2FsIGdvYWwsIFdvcmxkU3RhdGUgc3RhdGUpCiAgICB7CiAgICAgICAgdmFyIChzcGVjLCBwYXJhbWV0ZXJzKSA9IGdvYWwgc3dpdGNoCiAgICAgICAgewogICAgICAgICAgICBHYXRoZXJXb29kR29hbCBnICAgICA9PiAoT2FrTG9nU3BlYywgbmV3W10geyBnLlRhcmdldENvdW50LlRvU3RyaW5nKCkgfSksCiAgICAgICAgICAgIC8vIFNwcmludCAyNiBQMC1COiBJSXRlbVNwZWNHb2FsIG5vdyBoYXMgVGFyZ2V0Q291bnQgYXMgYSBESU0gKGRlZmF1bHQ9MSkuCiAgICAgICAgICAgIC8vIENhdGNoZXMgR2VuZXJpY0dhdGhlckdvYWwgKGNsYXNzIG1lbWJlciB3aW5zIG92ZXIgRElNKSwgU3R1Ykl0ZW1TcGVjR29hbCBpbgogICAgICAgICAgICAvLyB0ZXN0cywgYW5kIGFueSBmdXR1cmUgSUl0ZW1TcGVjR29hbCBpbXBsZW1lbnRvci4KICAgICAgICAgICAgSUl0ZW1TcGVjR29hbCBpc2cgICAgPT4gKGlzZy5TcGVjLCBuZXdbXSB7IGlzZy5UYXJnZXRDb3VudC5Ub1N0cmluZygpIH0pLAogICAgICAgICAgICBfICAgICAgICAgICAgICAgICAgICA9PiB0aHJvdyBuZXcgSW52YWxpZE9wZXJhdGlvbkV4Y2VwdGlvbigKICAgICAgICAgICAgICAgICQiR2F0aGVyR29hbERlY29tcG9zZXIgY2Fubm90IGhhbmRsZSB7Z29hbC5HZXRUeXBlKCkuTmFtZX0iKQogICAgICAgIH07CgogICAgICAgIHZhciBhY3Rpb25zID0gdGFza0xpYnJhcnkuRGVjb21wb3NlR2F0aGVySXRlbShzcGVjLCBwYXJhbWV0ZXJzLCBzdGF0ZSk7CiAgICAgICAgcmV0dXJuIG5ldyBBY3Rpb25QbGFuKGdvYWwuTmFtZSwgZ29hbC5QaGFzZXMsIGFjdGlvbnMpOwogICAgfQp9Cg==
+namespace Agent.Planning;
+
+using Agent.Core;
+using Agent.Planning.Goals;
+
+/// <summary>
+/// Decomposes gather-type goals (<see cref="GatherWoodGoal"/>, <see cref="IItemSpecGoal"/>).
+/// Adapts each goal variant to <see cref="HtnTaskLibrary.DecomposeGatherItem"/>.
+///
+/// Sprint 26 P0-B: <see cref="IItemSpecGoal"/> catch-all arm now passes
+/// <c>isg.TargetCount</c> instead of <c>Array.Empty&lt;string&gt;()</c>.
+/// Previously any <see cref="IItemSpecGoal"/> implementor that wasn't
+/// <see cref="GenericGatherGoal"/> or <see cref="GatherWoodGoal"/> would silently
+/// receive the library's default count (10) instead of the requested quantity.
+/// This is now safe because <see cref="IItemSpecGoal"/> declares
+/// <c>int TargetCount =&gt; 1;</c> as a default interface method (DIM), so all
+/// implementors provide a count.
+///
+/// Sprint 27 P0-D: the redundant <see cref="GenericGatherGoal"/> arm has been removed.
+/// Since <see cref="GenericGatherGoal"/> implements <see cref="IItemSpecGoal"/>, the
+/// <see cref="IItemSpecGoal"/> arm catches it correctly via class-member-wins-over-DIM
+/// semantics. The <see cref="CanHandle"/> predicate is simplified accordingly.
+/// </summary>
+public sealed class GatherGoalDecomposer(HtnTaskLibrary taskLibrary) : IGoalDecomposer
+{
+    /// <summary>
+    /// ItemSpec for oak logs, used as the fallback for legacy <see cref="GatherWoodGoal"/>.
+    /// Mirrors the private OakLogSpec in <see cref="HtnTaskLibrary"/>.
+    /// </summary>
+    private static readonly ItemSpec OakLogSpec = new()
+    {
+        ItemId          = "oak_log",
+        DisplayName     = "Oak Log",
+        SourceBlocks    = ["oak_log", "birch_log", "spruce_log",
+                           "dark_oak_log", "jungle_log", "acacia_log", "cherry_log"],
+        RequiresSmelting = false,
+        MinHarvestLevel  = 0,
+    };
+
+    public bool CanHandle(IGoal goal) =>
+        goal is GatherWoodGoal or IItemSpecGoal;
+
+    public ActionPlan Decompose(IGoal goal, WorldState state)
+    {
+        var (spec, parameters) = goal switch
+        {
+            GatherWoodGoal g     => (OakLogSpec, new[] { g.TargetCount.ToString() }),
+            // Sprint 26 P0-B: IItemSpecGoal now has TargetCount as a DIM (default = 1).
+            // Catches GenericGatherGoal (class member wins over DIM), StubItemSpecGoal in
+            // tests, and any future IItemSpecGoal implementor.
+            IItemSpecGoal isg    => (isg.Spec, new[] { isg.TargetCount.ToString() }),
+            _                     => throw new InvalidOperationException(
+                $"GatherGoalDecomposer cannot handle {goal.GetType().Name}")
+        };
+
+        var actions = taskLibrary.DecomposeGatherItem(spec, parameters, state);
+        return new ActionPlan(goal.Name, goal.Phases, actions);
+    }
+}
