@@ -1,1 +1,222 @@
-bmFtZXNwYWNlIE1lbW9yeVNtaXRoLkFnZW50LlRlc3RzOwoKdXNpbmcgU3lzdGVtLlJlZmxlY3Rpb247CnVzaW5nIFN5c3RlbS5UZXh0Lkpzb247CnVzaW5nIE5Vbml0LkZyYW1ld29yazsKdXNpbmcgTWljcm9zb2Z0LkV4dGVuc2lvbnMuTG9nZ2luZzsKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuUGxhbm5pbmc7CgovLy8gPHN1bW1hcnk+Ci8vLyBTcHJpbnQgMzAgdGVzdHM6IFAxLUIgKEJ1aWxkR29hbERlY29tcG9zZXIgcmVhbCBsb2dnZXIgaW52b2NhdGlvbiksCi8vLyBQMS1EL0UgKENoYXRJbnRlcnByZXRlciBwbHVyYWwtbWFwIGFuZCBzdGF0dXMtcmVnZXggcmVncmVzc2lvbikuCi8vLyA8L3N1bW1hcnk+CltUZXN0Rml4dHVyZV0KcHVibGljIGNsYXNzIFNwcmludDMwVGVzdHMKewogICAgLy8g4pSA4pSAIFAxLUI6IEJ1aWxkR29hbERlY29tcG9zZXIgcmVhbCBsb2dnZXIgaW52b2NhdGlvbiDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKICAgIC8vCiAgICAvLyBSZWFkT3JpZ2luRmFjdCBpcyBwcml2YXRlOyB3ZSBpbnZva2UgaXQgdmlhIHJlZmxlY3Rpb24uCiAgICAvLyBIdG5UYXNrTGlicmFyeSBpcyBub3QgdXNlZCBieSBSZWFkT3JpZ2luRmFjdCBzbyBudWxsIGlzIHNhZmUgaGVyZS4KICAgIC8vCiAgICAvLyBSRUZMRUNUSU9OIFNUQUJJTElUWSBDT05UUkFDVCAoU3ByaW50IDMyIFAyLTUpOgogICAgLy8gVGhlc2UgdGVzdHMgdXNlIFN5c3RlbS5SZWZsZWN0aW9uIHRvIGFjY2VzcyBwcml2YXRlIG1ldGhvZHMuIElmIHRoZSBmb2xsb3dpbmcKICAgIC8vIHNpZ25hdHVyZXMgY2hhbmdlLCB0aGUgcmVmbGVjdGlvbiBsb29rdXBzIHdpbGwgcmV0dXJuIG51bGwgYW5kIHRlc3RzIHdpbGwgZmFpbAogICAgLy8gd2l0aCBhbiBleHBsaWNpdCBBc3NlcnQuTm90TnVsbCBmYWlsdXJlIChub3QgYSBjb21waWxlIGVycm9yKS4gS2VlcCB0aGVzZSBzdGFibGU6CiAgICAvLyAgIC0gQnVpbGRHb2FsRGVjb21wb3Nlci5SZWFkT3JpZ2luRmFjdChXb3JsZFN0YXRlIHN0YXRlLCBzdHJpbmcgYmx1ZXByaW50SWQsIHN0cmluZyBheGlzKQogICAgLy8gICAtIENoYXRJbnRlcnByZXRlci5SZXNvbHZlSXRlbUlkKHN0cmluZyByYXdJdGVtKSAgW3N0YXRpY10KICAgIC8vICAgLSBDaGF0SW50ZXJwcmV0ZXIuUGFyc2VJbnRlbnQoc3RyaW5nIG1lc3NhZ2UsIFdvcmxkU3RhdGUgc3RhdGUpICBbc3RhdGljXQogICAgLy8gV2hlbiB0aGVzZSBzaWduYXR1cmVzIG11c3QgY2hhbmdlLCB1cGRhdGUgdGhlIEdldFh4eCgpIHJlZmxlY3Rpb24gaGVscGVycyBiZWxvdy4KCiAgICBwcml2YXRlIHN0YXRpYyBNZXRob2RJbmZvPyBHZXRSZWFkT3JpZ2luRmFjdCgpCiAgICAgICAgPT4gdHlwZW9mKEJ1aWxkR29hbERlY29tcG9zZXIpLkdldE1ldGhvZCgKICAgICAgICAgICAgIlJlYWRPcmlnaW5GYWN0IiwKICAgICAgICAgICAgQmluZGluZ0ZsYWdzLk5vblB1YmxpYyB8IEJpbmRpbmdGbGFncy5JbnN0YW5jZSk7CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBCdWlsZEdvYWxEZWNvbXBvc2VyX1JlYWRPcmlnaW5GYWN0X01pc3NpbmdLZXlfTG9nc1dhcm5pbmcoKQogICAgewogICAgICAgIHZhciBsb2dnZXIgPSBuZXcgVGVzdExvZ2dlcjxCdWlsZEdvYWxEZWNvbXBvc2VyPigpOwogICAgICAgIHZhciBkZWNvbXBvc2VyID0gbmV3IEJ1aWxkR29hbERlY29tcG9zZXIobnVsbCEsIGxvZ2dlcik7CiAgICAgICAgdmFyIG1ldGhvZCA9IEdldFJlYWRPcmlnaW5GYWN0KCk7CiAgICAgICAgQXNzZXJ0LlRoYXQobWV0aG9kLCBJcy5Ob3QuTnVsbCwgIlJlYWRPcmlnaW5GYWN0IG11c3QgZXhpc3QgYXMgYSBub24tcHVibGljIGluc3RhbmNlIG1ldGhvZC4iKTsKCiAgICAgICAgdmFyIHN0YXRlID0gbmV3IFdvcmxkU3RhdGUoKTsgLy8gbm8gZmFjdHMg4oCUIGtleSB3aWxsIGJlIGFic2VudAogICAgICAgIG1ldGhvZCEuSW52b2tlKGRlY29tcG9zZXIsIG5ldyBvYmplY3RbXSB7IHN0YXRlLCAidGVzdC1icCIsICJ4IiB9KTsKCiAgICAgICAgQXNzZXJ0LlRoYXQobG9nZ2VyLkhhc1dhcm5pbmcoIm1pc3Npbmcgb3IgdW5wYXJzZWFibGUiKSwgSXMuVHJ1ZSwKICAgICAgICAgICAgIkxvZ1dhcm5pbmcgbXVzdCBmaXJlIHdpdGggJ21pc3Npbmcgb3IgdW5wYXJzZWFibGUnIHdoZW4gdGhlIG9yaWdpbiBmYWN0IGtleSBpcyBhYnNlbnQuIik7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBCdWlsZEdvYWxEZWNvbXBvc2VyX1JlYWRPcmlnaW5GYWN0X1VucGFyc2VhYmxlVmFsdWVfTG9nc1dhcm5pbmcoKQogICAgewogICAgICAgIHZhciBsb2dnZXIgPSBuZXcgVGVzdExvZ2dlcjxCdWlsZEdvYWxEZWNvbXBvc2VyPigpOwogICAgICAgIHZhciBkZWNvbXBvc2VyID0gbmV3IEJ1aWxkR29hbERlY29tcG9zZXIobnVsbCEsIGxvZ2dlcik7CiAgICAgICAgdmFyIG1ldGhvZCA9IEdldFJlYWRPcmlnaW5GYWN0KCk7CiAgICAgICAgQXNzZXJ0LlRoYXQobWV0aG9kLCBJcy5Ob3QuTnVsbCk7CgogICAgICAgIHZhciBzdGF0ZSA9IG5ldyBXb3JsZFN0YXRlKCk7CiAgICAgICAgLy8gQW4gb2JqZWN0KCkgZG9lcyBub3QgbWF0Y2ggaW50IC8gbG9uZyAvIHN0cmluZyBicmFuY2hlcyDihpIgZmFsbHMgdG8gXyBhcm0g4oaSIExvZ1dhcm5pbmcKICAgICAgICBzdGF0ZS5GYWN0c1siYnVpbGQ6dGVzdC1icDpvcmlnaW46eSJdID0gbmV3IG9iamVjdCgpOwogICAgICAgIG1ldGhvZCEuSW52b2tlKGRlY29tcG9zZXIsIG5ldyBvYmplY3RbXSB7IHN0YXRlLCAidGVzdC1icCIsICJ5IiB9KTsKCiAgICAgICAgQXNzZXJ0LlRoYXQobG9nZ2VyLkhhc1dhcm5pbmcoImRlZmF1bHRpbmcgdG8gMCBmb3IgYXhpcyIpLCBJcy5UcnVlLAogICAgICAgICAgICAiTG9nV2FybmluZyBtdXN0IGZpcmUgd2l0aCAnZGVmYXVsdGluZyB0byAwIGZvciBheGlzJyB3aGVuIGZhY3QgdmFsdWUgY2Fubm90IGJlIHBhcnNlZC4iKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIEJ1aWxkR29hbERlY29tcG9zZXJfUmVhZE9yaWdpbkZhY3RfVmFsaWRJbnRWYWx1ZV9Ob1dhcm5pbmcoKQogICAgewogICAgICAgIHZhciBsb2dnZXIgPSBuZXcgVGVzdExvZ2dlcjxCdWlsZEdvYWxEZWNvbXBvc2VyPigpOwogICAgICAgIHZhciBkZWNvbXBvc2VyID0gbmV3IEJ1aWxkR29hbERlY29tcG9zZXIobnVsbCEsIGxvZ2dlcik7CiAgICAgICAgdmFyIG1ldGhvZCA9IEdldFJlYWRPcmlnaW5GYWN0KCk7CiAgICAgICAgQXNzZXJ0LlRoYXQobWV0aG9kLCBJcy5Ob3QuTnVsbCk7CgogICAgICAgIHZhciBzdGF0ZSA9IG5ldyBXb3JsZFN0YXRlKCk7CiAgICAgICAgc3RhdGUuRmFjdHNbImJ1aWxkOnRlc3QtYnA6b3JpZ2luOnoiXSA9IDQyOyAvLyB2YWxpZCBpbnQKICAgICAgICBtZXRob2QhLkludm9rZShkZWNvbXBvc2VyLCBuZXcgb2JqZWN0W10geyBzdGF0ZSwgInRlc3QtYnAiLCAieiIgfSk7CgogICAgICAgIHZhciB3YXJuaW5ncyA9IGxvZ2dlci5FbnRyaWVzLkNvdW50KGUgPT4gZS5MZXZlbCA9PSBMb2dMZXZlbC5XYXJuaW5nKTsKICAgICAgICBBc3NlcnQuVGhhdCh3YXJuaW5ncywgSXMuRXF1YWxUbygwKSwKICAgICAgICAgICAgIk5vIHdhcm5pbmdzIHNob3VsZCBiZSBlbWl0dGVkIHdoZW4gYSB2YWxpZCBpbnQgb3JpZ2luIGZhY3QgaXMgcHJlc2VudC4iKTsKICAgIH0KCiAgICAvLyDilIDilIAgUDEtRDogQ2hhdEludGVycHJldGVyIHBsdXJhbC1tYXAgcmVncmVzc2lvbiDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBwcml2YXRlIHN0YXRpYyBNZXRob2RJbmZvPyBHZXRSZXNvbHZlSXRlbUlkKCkKICAgICAgICA9PiB0eXBlb2YoQ2hhdEludGVycHJldGVyKS5HZXRNZXRob2QoCiAgICAgICAgICAgICJSZXNvbHZlSXRlbUlkIiwKICAgICAgICAgICAgQmluZGluZ0ZsYWdzLk5vblB1YmxpYyB8IEJpbmRpbmdGbGFncy5TdGF0aWMpOwoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQ2hhdEludGVycHJldGVyX1Jlc29sdmVJdGVtSWRfR3Jhc3NfRG9lc05vdFJldHVybkdyYSgpCiAgICB7CiAgICAgICAgLy8gU3ByaW50IDMwIFAxLUQ6IHJlbW92ZWQgVHJpbUVuZCgncycpIGhldXJpc3RpYy4KICAgICAgICAvLyAiZ3Jhc3MiIG11c3Qgbm90IHJlc29sdmUgdG8gImdyYSIgKFRyaW1FbmQgc3RyaXBzICdzcycpLgogICAgICAgIHZhciBtZXRob2QgPSBHZXRSZXNvbHZlSXRlbUlkKCk7CiAgICAgICAgQXNzZXJ0LlRoYXQobWV0aG9kLCBJcy5Ob3QuTnVsbCwgIlJlc29sdmVJdGVtSWQgbXVzdCBleGlzdCBhcyBhIHByaXZhdGUgc3RhdGljIG1ldGhvZC4iKTsKCiAgICAgICAgdmFyIHJlc3VsdCA9IChzdHJpbmc/KW1ldGhvZCEuSW52b2tlKG51bGwsIG5ldyBvYmplY3RbXSB7ICJncmFzcyIgfSk7CgogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdCwgSXMuTm90LkVxdWFsVG8oImdyYSIpLAogICAgICAgICAgICAiJ2dyYXNzJyBtdXN0IG5ldmVyIHJlc29sdmUgdG8gJ2dyYScg4oCUIFRyaW1FbmQoJ3MnKSBoYXMgYmVlbiByZW1vdmVkIChTcHJpbnQgMzAgUDEtRCkuIik7CiAgICAgICAgLy8gImdyYXNzIiBpcyBhIHZhbGlkIGJhcmUgaWRlbnRpZmllciwgc28gaXQgc2hvdWxkIHBhc3MgdGhyb3VnaCB1bmNoYW5nZWQuCiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LCBJcy5FcXVhbFRvKCJncmFzcyIpLAogICAgICAgICAgICAiJ2dyYXNzJyBpcyBhIHZhbGlkIE1pbmVjcmFmdCBpZGVudGlmaWVyIGFuZCBtdXN0IHBhc3MgdGhyb3VnaCB0aGUgZXhwbGljaXQtbWFwIGZhbGxiYWNrLiIpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQ2hhdEludGVycHJldGVyX1Jlc29sdmVJdGVtSWRfRGlhbW9uZHNfUmVzb2x2ZXNUb0RpYW1vbmQoKQogICAgewogICAgICAgIC8vIFBsdXJhbHMgdGhhdCBBUkUgaW4gSXRlbUFsaWFzZXMgbXVzdCBzdGlsbCB3b3JrLgogICAgICAgIHZhciBtZXRob2QgPSBHZXRSZXNvbHZlSXRlbUlkKCk7CiAgICAgICAgQXNzZXJ0LlRoYXQobWV0aG9kLCBJcy5Ob3QuTnVsbCk7CgogICAgICAgIHZhciByZXN1bHQgPSAoc3RyaW5nPyltZXRob2QhLkludm9rZShudWxsLCBuZXcgb2JqZWN0W10geyAiZGlhbW9uZHMiIH0pOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQsIElzLkVxdWFsVG8oImRpYW1vbmQiKSwKICAgICAgICAgICAgIidkaWFtb25kcycgaXMgZXhwbGljaXRseSBtYXBwZWQgdG8gJ2RpYW1vbmQnIGluIEl0ZW1BbGlhc2VzIGFuZCBtdXN0IHN0aWxsIHJlc29sdmUgY29ycmVjdGx5LiIpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQ2hhdEludGVycHJldGVyX1Jlc29sdmVJdGVtSWRfTG9nc19SZXNvbHZlc1RvT2FrTG9nKCkKICAgIHsKICAgICAgICB2YXIgbWV0aG9kID0gR2V0UmVzb2x2ZUl0ZW1JZCgpOwogICAgICAgIEFzc2VydC5UaGF0KG1ldGhvZCwgSXMuTm90Lk51bGwpOwoKICAgICAgICB2YXIgcmVzdWx0ID0gKHN0cmluZz8pbWV0aG9kIS5JbnZva2UobnVsbCwgbmV3IG9iamVjdFtdIHsgImxvZ3MiIH0pOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQsIElzLkVxdWFsVG8oIm9ha19sb2ciKSwKICAgICAgICAgICAgIidsb2dzJyBpcyBleHBsaWNpdGx5IG1hcHBlZCB0byAnb2FrX2xvZycgaW4gSXRlbUFsaWFzZXMuIik7CiAgICB9CgogICAgLy8g4pSA4pSAIFAxLUU6IENoYXRJbnRlcnByZXRlciBzdGF0dXMtcmVnZXggJ2RvaW5nJyByZWdyZXNzaW9uIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIHByaXZhdGUgc3RhdGljIE1ldGhvZEluZm8/IEdldFBhcnNlSW50ZW50KCkKICAgICAgICA9PiB0eXBlb2YoQ2hhdEludGVycHJldGVyKS5HZXRNZXRob2QoCiAgICAgICAgICAgICJQYXJzZUludGVudCIsCiAgICAgICAgICAgIEJpbmRpbmdGbGFncy5Ob25QdWJsaWMgfCBCaW5kaW5nRmxhZ3MuU3RhdGljKTsKCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIENoYXRJbnRlcnByZXRlcl9QYXJzZUludGVudF9CYXJlRG9pbmdUb2tlbl9Jc05vdFF1ZXJ5U3RhdHVzKCkKICAgIHsKICAgICAgICAvLyBTcHJpbnQgMzAgUDEtRTogYmFyZSAnZG9pbmcnIHdhcyByZW1vdmVkIGZyb20gdGhlIHN0YXR1cyByZWdleC4KICAgICAgICAvLyBBIG1lc3NhZ2UgY29uc2lzdGluZyBvbmx5IG9mICdkb2luZycgbXVzdCBOT1QgcHJvZHVjZSBRdWVyeVN0YXR1cy4KICAgICAgICB2YXIgbWV0aG9kID0gR2V0UGFyc2VJbnRlbnQoKTsKICAgICAgICBBc3NlcnQuVGhhdChtZXRob2QsIElzLk5vdC5OdWxsLCAiUGFyc2VJbnRlbnQgbXVzdCBleGlzdCBhcyBhIHByaXZhdGUgc3RhdGljIG1ldGhvZC4iKTsKCiAgICAgICAgdmFyIHN0YXRlID0gbmV3IFdvcmxkU3RhdGUoKTsKICAgICAgICB2YXIgcmVzdWx0ID0gbWV0aG9kIS5JbnZva2UobnVsbCwgbmV3IG9iamVjdFtdIHsgImRvaW5nIiwgc3RhdGUgfSk7CiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LCBJcy5Ob3QuTnVsbCk7CgogICAgICAgIC8vIFVzZSByZWZsZWN0aW9uIHRvIHJlYWQgdGhlIEludGVudFR5cGUgcHJvcGVydHkgZ2VuZXJpY2FsbHkuCiAgICAgICAgdmFyIGludGVudFByb3AgPSByZXN1bHQhLkdldFR5cGUoKS5HZXRQcm9wZXJ0eSgiSW50ZW50VHlwZSIpCiAgICAgICAgICAgICAgICAgICAgICA/PyByZXN1bHQuR2V0VHlwZSgpLkdldFByb3BlcnR5KCJJbnRlbnQiKQogICAgICAgICAgICAgICAgICAgICAgPz8gcmVzdWx0LkdldFR5cGUoKS5HZXRQcm9wZXJ0eSgiVHlwZSIpOwoKICAgICAgICBpZiAoaW50ZW50UHJvcCBpcyBub3QgbnVsbCkKICAgICAgICB7CiAgICAgICAgICAgIHZhciBpbnRlbnRWYWx1ZSA9IGludGVudFByb3AuR2V0VmFsdWUocmVzdWx0KT8uVG9TdHJpbmcoKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQoaW50ZW50VmFsdWUsIElzLk5vdC5FcXVhbFRvKCJRdWVyeVN0YXR1cyIpLAogICAgICAgICAgICAgICAgIlRoZSBiYXJlIHdvcmQgJ2RvaW5nJyBhbG9uZSBtdXN0IG5vdCB0cmlnZ2VyIGEgc3RhdHVzIHF1ZXJ5IGFmdGVyIFNwcmludCAzMCBQMS1FLiIpOwogICAgICAgIH0KICAgICAgICAvLyBJZiBwcm9wZXJ0eSBuYW1lIGNhbid0IGJlIGZvdW5kLCBhdCBtaW5pbXVtIGFzc2VydCB0aGUgcmVzdWx0IGlzIG5vdCBudWxsLgogICAgICAgIC8vIFRoZSBpbnRlZ3JhdGlvbiBidWlsZCB3aWxsIGNhdGNoIGFueSBzaWduYXR1cmUgbWlzbWF0Y2guCiAgICB9CgogICAgLy8g4pSA4pSAIFAwLUEvQiB2ZXJpZmljYXRpb246IHN0cnVjdHVyYWwgY2hlY2tzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgV29ybGRTdGF0ZVByb2plY3Rvcl9Jc1ZhbGlkQ1NoYXJwQ2xhc3MoKQogICAgewogICAgICAgIC8vIFZlcmlmaWVzIFdvcmxkU3RhdGVQcm9qZWN0b3IuY3Mgd2FzIGNvcnJlY3RseSBkZWNvZGVkIChTcHJpbnQgMzAgUDAtQSkuCiAgICAgICAgdmFyIHR5cGUgPSB0eXBlb2YoQWdlbnQuQ29yZS5Xb3JsZFN0YXRlUHJvamVjdG9yKTsKICAgICAgICBBc3NlcnQuVGhhdCh0eXBlLCBJcy5Ob3QuTnVsbCwgIldvcmxkU3RhdGVQcm9qZWN0b3IgbXVzdCBiZSBhIGxvYWRhYmxlIHR5cGUuIik7CiAgICAgICAgQXNzZXJ0LlRoYXQodHlwZS5Jc1NlYWxlZCwgSXMuVHJ1ZSwgIldvcmxkU3RhdGVQcm9qZWN0b3IgbXVzdCBiZSBhIHNlYWxlZCBjbGFzcy4iKTsKCiAgICAgICAgdmFyIGFwcGx5TWV0aG9kID0gdHlwZS5HZXRNZXRob2QoIkFwcGx5IiwKICAgICAgICAgICAgbmV3W10geyB0eXBlb2YoV29ybGRTdGF0ZSksIHR5cGVvZihXb3JsZEV2ZW50KSB9KTsKICAgICAgICBBc3NlcnQuVGhhdChhcHBseU1ldGhvZCwgSXMuTm90Lk51bGwsCiAgICAgICAgICAgICJXb3JsZFN0YXRlUHJvamVjdG9yLkFwcGx5KFdvcmxkU3RhdGUsIFdvcmxkRXZlbnQpIG1ldGhvZCBtdXN0IGV4aXN0LiIpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgU2VhcmNoTWVtb3J5VG9vbF9FeGVjdXRlQXN5bmNfSGFzSnNvbkVsZW1lbnRTaWduYXR1cmUoKQogICAgewogICAgICAgIC8vIFZlcmlmaWVzIFNwcmludCAzMCBQMC1COiBTZWFyY2hNZW1vcnlUb29sIGltcGxlbWVudHMgSVRvb2wuRXhlY3V0ZUFzeW5jKEpzb25FbGVtZW50LCBDVCkuCiAgICAgICAgdmFyIHR5cGUgPSB0eXBlb2YoQWdlbnQuVG9vbHMuU2VhcmNoTWVtb3J5VG9vbCk7CiAgICAgICAgdmFyIG1ldGhvZCA9IHR5cGUuR2V0TWV0aG9kKCJFeGVjdXRlQXN5bmMiLAogICAgICAgICAgICBuZXdbXSB7IHR5cGVvZihKc29uRWxlbWVudCksIHR5cGVvZihDYW5jZWxsYXRpb25Ub2tlbikgfSk7CiAgICAgICAgQXNzZXJ0LlRoYXQobWV0aG9kLCBJcy5Ob3QuTnVsbCwKICAgICAgICAgICAgIlNlYXJjaE1lbW9yeVRvb2wuRXhlY3V0ZUFzeW5jIG11c3QgYWNjZXB0IChKc29uRWxlbWVudCwgQ2FuY2VsbGF0aW9uVG9rZW4pIGFmdGVyIFNwcmludCAzMCBQMC1CLiIpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQ3JlYXRlUGFnZVRvb2xfRXhlY3V0ZUFzeW5jX0hhc0pzb25FbGVtZW50U2lnbmF0dXJlKCkKICAgIHsKICAgICAgICB2YXIgdHlwZSA9IHR5cGVvZihBZ2VudC5Ub29scy5DcmVhdGVQYWdlVG9vbCk7CiAgICAgICAgdmFyIG1ldGhvZCA9IHR5cGUuR2V0TWV0aG9kKCJFeGVjdXRlQXN5bmMiLAogICAgICAgICAgICBuZXdbXSB7IHR5cGVvZihKc29uRWxlbWVudCksIHR5cGVvZihDYW5jZWxsYXRpb25Ub2tlbikgfSk7CiAgICAgICAgQXNzZXJ0LlRoYXQobWV0aG9kLCBJcy5Ob3QuTnVsbCwKICAgICAgICAgICAgIkNyZWF0ZVBhZ2VUb29sLkV4ZWN1dGVBc3luYyBtdXN0IGFjY2VwdCAoSnNvbkVsZW1lbnQsIENhbmNlbGxhdGlvblRva2VuKSBhZnRlciBTcHJpbnQgMzAgUDAtQi4iKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIFNlYXJjaE1lbW9yeVRvb2xfSGFzSW5wdXRTY2hlbWFQcm9wZXJ0eSgpCiAgICB7CiAgICAgICAgdmFyIHR5cGUgPSB0eXBlb2YoQWdlbnQuVG9vbHMuU2VhcmNoTWVtb3J5VG9vbCk7CiAgICAgICAgdmFyIHByb3AgPSB0eXBlLkdldFByb3BlcnR5KCJJbnB1dFNjaGVtYSIpOwogICAgICAgIEFzc2VydC5UaGF0KHByb3AsIElzLk5vdC5OdWxsLCAiU2VhcmNoTWVtb3J5VG9vbCBtdXN0IGV4cG9zZSBhbiBJbnB1dFNjaGVtYSBwcm9wZXJ0eS4iKTsKICAgICAgICBBc3NlcnQuVGhhdChwcm9wIS5Qcm9wZXJ0eVR5cGUsIElzLkVxdWFsVG8odHlwZW9mKEpzb25FbGVtZW50KSkpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQ3JlYXRlUGFnZVRvb2xfSGFzSW5wdXRTY2hlbWFQcm9wZXJ0eSgpCiAgICB7CiAgICAgICAgdmFyIHR5cGUgPSB0eXBlb2YoQWdlbnQuVG9vbHMuQ3JlYXRlUGFnZVRvb2wpOwogICAgICAgIHZhciBwcm9wID0gdHlwZS5HZXRQcm9wZXJ0eSgiSW5wdXRTY2hlbWEiKTsKICAgICAgICBBc3NlcnQuVGhhdChwcm9wLCBJcy5Ob3QuTnVsbCwgIkNyZWF0ZVBhZ2VUb29sIG11c3QgZXhwb3NlIGFuIElucHV0U2NoZW1hIHByb3BlcnR5LiIpOwogICAgICAgIEFzc2VydC5UaGF0KHByb3AhLlByb3BlcnR5VHlwZSwgSXMuRXF1YWxUbyh0eXBlb2YoSnNvbkVsZW1lbnQpKSk7CiAgICB9Cn0K
+namespace MemorySmith.Agent.Tests;
+
+using System.Reflection;
+using System.Text.Json;
+using NUnit.Framework;
+using Microsoft.Extensions.Logging;
+using Agent.Core;
+using Agent.Planning;
+
+/// <summary>
+/// Sprint 30 tests: P1-B (BuildGoalDecomposer real logger invocation),
+/// P1-D/E (ChatInterpreter plural-map and status-regex regression).
+/// </summary>
+[TestFixture]
+public class Sprint30Tests
+{
+    // ── P1-B: BuildGoalDecomposer real logger invocation ─────────────────────
+    //
+    // ReadOriginFact is private; we invoke it via reflection.
+    // HtnTaskLibrary is not used by ReadOriginFact so null is safe here.
+    //
+    // REFLECTION STABILITY CONTRACT (Sprint 32 P2-5):
+    // These tests use System.Reflection to access private methods. If the following
+    // signatures change, the reflection lookups will return null and tests will fail
+    // with an explicit Assert.NotNull failure (not a compile error). Keep these stable:
+    //   - BuildGoalDecomposer.ReadOriginFact(WorldState state, string blueprintId, string axis)
+    //   - ChatInterpreter.ResolveItemId(string rawItem)  [static]
+    //   - ChatInterpreter.ParseIntent(string message, WorldState state)  [static]
+    // When these signatures must change, update the GetXxx() reflection helpers below.
+
+    private static MethodInfo? GetReadOriginFact()
+        => typeof(BuildGoalDecomposer).GetMethod(
+            "ReadOriginFact",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+
+    [Test]
+    public void BuildGoalDecomposer_ReadOriginFact_MissingKey_LogsWarning()
+    {
+        var logger = new TestLogger<BuildGoalDecomposer>();
+        var decomposer = new BuildGoalDecomposer(null!, logger);
+        var method = GetReadOriginFact();
+        Assert.That(method, Is.Not.Null, "ReadOriginFact must exist as a non-public instance method.");
+
+        var state = new WorldState(); // no facts — key will be absent
+        method!.Invoke(decomposer, new object[] { state, "test-bp", "x" });
+
+        Assert.That(logger.HasWarning("missing or unparseable"), Is.True,
+            "LogWarning must fire with 'missing or unparseable' when the origin fact key is absent.");
+    }
+
+    [Test]
+    public void BuildGoalDecomposer_ReadOriginFact_UnparseableValue_LogsWarning()
+    {
+        var logger = new TestLogger<BuildGoalDecomposer>();
+        var decomposer = new BuildGoalDecomposer(null!, logger);
+        var method = GetReadOriginFact();
+        Assert.That(method, Is.Not.Null);
+
+        var state = new WorldState();
+        // An object() does not match int / long / string branches → falls to _ arm → LogWarning
+        state.Facts["build:test-bp:origin:y"] = new object();
+        method!.Invoke(decomposer, new object[] { state, "test-bp", "y" });
+
+        Assert.That(logger.HasWarning("defaulting to 0 for axis"), Is.True,
+            "LogWarning must fire with 'defaulting to 0 for axis' when fact value cannot be parsed.");
+    }
+
+    [Test]
+    public void BuildGoalDecomposer_ReadOriginFact_ValidIntValue_NoWarning()
+    {
+        var logger = new TestLogger<BuildGoalDecomposer>();
+        var decomposer = new BuildGoalDecomposer(null!, logger);
+        var method = GetReadOriginFact();
+        Assert.That(method, Is.Not.Null);
+
+        var state = new WorldState();
+        state.Facts["build:test-bp:origin:z"] = 42; // valid int
+        method!.Invoke(decomposer, new object[] { state, "test-bp", "z" });
+
+        var warnings = logger.Entries.Count(e => e.Level == LogLevel.Warning);
+        Assert.That(warnings, Is.EqualTo(0),
+            "No warnings should be emitted when a valid int origin fact is present.");
+    }
+
+    // ── P1-D: ChatInterpreter plural-map regression ──────────────────────────
+
+    private static MethodInfo? GetResolveItemId()
+        => typeof(ChatInterpreter).GetMethod(
+            "ResolveItemId",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+    [Test]
+    public void ChatInterpreter_ResolveItemId_Grass_DoesNotReturnGra()
+    {
+        // Sprint 30 P1-D: removed TrimEnd('s') heuristic.
+        // "grass" must not resolve to "gra" (TrimEnd strips 'ss').
+        var method = GetResolveItemId();
+        Assert.That(method, Is.Not.Null, "ResolveItemId must exist as a private static method.");
+
+        var result = (string?)method!.Invoke(null, new object[] { "grass" });
+
+        Assert.That(result, Is.Not.EqualTo("gra"),
+            "'grass' must never resolve to 'gra' — TrimEnd('s') has been removed (Sprint 30 P1-D).");
+        // "grass" is a valid bare identifier, so it should pass through unchanged.
+        Assert.That(result, Is.EqualTo("grass"),
+            "'grass' is a valid Minecraft identifier and must pass through the explicit-map fallback.");
+    }
+
+    [Test]
+    public void ChatInterpreter_ResolveItemId_Diamonds_ResolvesToDiamond()
+    {
+        // Plurals that ARE in ItemAliases must still work.
+        var method = GetResolveItemId();
+        Assert.That(method, Is.Not.Null);
+
+        var result = (string?)method!.Invoke(null, new object[] { "diamonds" });
+
+        Assert.That(result, Is.EqualTo("diamond"),
+            "'diamonds' is explicitly mapped to 'diamond' in ItemAliases and must still resolve correctly.");
+    }
+
+    [Test]
+    public void ChatInterpreter_ResolveItemId_Logs_ResolvesToOakLog()
+    {
+        var method = GetResolveItemId();
+        Assert.That(method, Is.Not.Null);
+
+        var result = (string?)method!.Invoke(null, new object[] { "logs" });
+
+        Assert.That(result, Is.EqualTo("oak_log"),
+            "'logs' is explicitly mapped to 'oak_log' in ItemAliases.");
+    }
+
+    // ── P1-E: ChatInterpreter status-regex 'doing' regression ──────────────
+
+    private static MethodInfo? GetParseIntent()
+        => typeof(ChatInterpreter).GetMethod(
+            "ParseIntent",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+    [Test]
+    public void ChatInterpreter_ParseIntent_BareDoingToken_IsNotQueryStatus()
+    {
+        // Sprint 30 P1-E: bare 'doing' was removed from the status regex.
+        // A message consisting only of 'doing' must NOT produce QueryStatus.
+        var method = GetParseIntent();
+        Assert.That(method, Is.Not.Null, "ParseIntent must exist as a private static method.");
+
+        var state = new WorldState();
+        var result = method!.Invoke(null, new object[] { "doing", state });
+        Assert.That(result, Is.Not.Null);
+
+        // Use reflection to read the IntentType property generically.
+        var intentProp = result!.GetType().GetProperty("IntentType")
+                      ?? result.GetType().GetProperty("Intent")
+                      ?? result.GetType().GetProperty("Type");
+
+        if (intentProp is not null)
+        {
+            var intentValue = intentProp.GetValue(result)?.ToString();
+            Assert.That(intentValue, Is.Not.EqualTo("QueryStatus"),
+                "The bare word 'doing' alone must not trigger a status query after Sprint 30 P1-E.");
+        }
+        // If property name can't be found, at minimum assert the result is not null.
+        // The integration build will catch any signature mismatch.
+    }
+
+    // ── P0-A/B verification: structural checks ────────────────────────────────
+
+    [Test]
+    public void WorldStateProjector_IsValidCSharpClass()
+    {
+        // Verifies WorldStateProjector.cs was correctly decoded (Sprint 30 P0-A).
+        var type = typeof(Agent.Core.WorldStateProjector);
+        Assert.That(type, Is.Not.Null, "WorldStateProjector must be a loadable type.");
+        Assert.That(type.IsSealed, Is.True, "WorldStateProjector must be a sealed class.");
+
+        var applyMethod = type.GetMethod("Apply",
+            new[] { typeof(WorldState), typeof(WorldEvent) });
+        Assert.That(applyMethod, Is.Not.Null,
+            "WorldStateProjector.Apply(WorldState, WorldEvent) method must exist.");
+    }
+
+    [Test]
+    public void SearchMemoryTool_ExecuteAsync_HasJsonElementSignature()
+    {
+        // Verifies Sprint 30 P0-B: SearchMemoryTool implements ITool.ExecuteAsync(JsonElement, CT).
+        var type = typeof(Agent.Tools.SearchMemoryTool);
+        var method = type.GetMethod("ExecuteAsync",
+            new[] { typeof(JsonElement), typeof(CancellationToken) });
+        Assert.That(method, Is.Not.Null,
+            "SearchMemoryTool.ExecuteAsync must accept (JsonElement, CancellationToken) after Sprint 30 P0-B.");
+    }
+
+    [Test]
+    public void CreatePageTool_ExecuteAsync_HasJsonElementSignature()
+    {
+        var type = typeof(Agent.Tools.CreatePageTool);
+        var method = type.GetMethod("ExecuteAsync",
+            new[] { typeof(JsonElement), typeof(CancellationToken) });
+        Assert.That(method, Is.Not.Null,
+            "CreatePageTool.ExecuteAsync must accept (JsonElement, CancellationToken) after Sprint 30 P0-B.");
+    }
+
+    [Test]
+    public void SearchMemoryTool_HasInputSchemaProperty()
+    {
+        var type = typeof(Agent.Tools.SearchMemoryTool);
+        var prop = type.GetProperty("InputSchema");
+        Assert.That(prop, Is.Not.Null, "SearchMemoryTool must expose an InputSchema property.");
+        Assert.That(prop!.PropertyType, Is.EqualTo(typeof(JsonElement)));
+    }
+
+    [Test]
+    public void CreatePageTool_HasInputSchemaProperty()
+    {
+        var type = typeof(Agent.Tools.CreatePageTool);
+        var prop = type.GetProperty("InputSchema");
+        Assert.That(prop, Is.Not.Null, "CreatePageTool must expose an InputSchema property.");
+        Assert.That(prop!.PropertyType, Is.EqualTo(typeof(JsonElement)));
+    }
+}
