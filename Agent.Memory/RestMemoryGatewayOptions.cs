@@ -1,1 +1,51 @@
-bmFtZXNwYWNlIEFnZW50Lk1lbW9yeTsKCi8vLyA8c3VtbWFyeT4KLy8vIENvbmZpZ3VyYXRpb24gZm9yIFJlc3RNZW1vcnlHYXRld2F5IGFuZCBNZW1vcnlTbWl0aEl0ZW1SZWdpc3RyeS4KLy8vIEJpbmQgZnJvbSBhcHBzZXR0aW5ncy5qc29uIHNlY3Rpb24gIkFnZW50Ok1lbW9yeSIuCi8vLyA8L3N1bW1hcnk+CnB1YmxpYyBzZWFsZWQgcmVjb3JkIFJlc3RNZW1vcnlHYXRld2F5T3B0aW9ucwp7CiAgICAvLy8gPHN1bW1hcnk+QmFzZSBVUkwgb2YgdGhlIE1lbW9yeVNtaXRoIGluc3RhbmNlIChlLmcuIGh0dHA6Ly9sb2NhbGhvc3Q6NTAwMCkuPC9zdW1tYXJ5PgogICAgcHVibGljIHN0cmluZyBCYXNlVXJsIHsgZ2V0OyBpbml0OyB9ID0gImh0dHA6Ly9sb2NhbGhvc3Q6NTAwMCI7CgogICAgLy8vIDxzdW1tYXJ5Pk9wdGlvbmFsIEFQSSBrZXkgc2VudCBhcyBYLUFwaS1LZXkgaGVhZGVyLjwvc3VtbWFyeT4KICAgIHB1YmxpYyBzdHJpbmc/IEFwaUtleSB7IGdldDsgaW5pdDsgfQoKICAgIC8vLyA8c3VtbWFyeT5IVFRQIHJlcXVlc3QgdGltZW91dCBpbiBzZWNvbmRzLjwvc3VtbWFyeT4KICAgIHB1YmxpYyBpbnQgVGltZW91dFNlY29uZHMgeyBnZXQ7IGluaXQ7IH0gPSAzMDsKCiAgICAvLy8gPHN1bW1hcnk+RGVmYXVsdCBtaW5pbXVtIHJvbGUgZm9yIHBhZ2VzIGNyZWF0ZWQgYnkgdGhlIGFnZW50Ljwvc3VtbWFyeT4KICAgIHB1YmxpYyBzdHJpbmcgRGVmYXVsdFBhZ2VSb2xlIHsgZ2V0OyBpbml0OyB9ID0gIkFub255bW91cyI7CgogICAgLy8vIDxzdW1tYXJ5PlRUTCBmb3IgTWVtb3J5U21pdGhJdGVtUmVnaXN0cnkgaW4tbWVtb3J5IGNhY2hlLCBpbiBzZWNvbmRzLjwvc3VtbWFyeT4KICAgIHB1YmxpYyBpbnQgSXRlbUNhY2hlVHRsU2Vjb25kcyB7IGdldDsgaW5pdDsgfSA9IDYwOwoKICAgIC8vIOKUgOKUgCBXb3JsZCBLQiAoU3ByaW50IDIyKSDilIDilIAKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBCYXNlIFVSTCBvZiB0aGUgd29ybGQtc3BlY2lmaWMgTWVtb3J5U21pdGggaW5zdGFuY2UuCiAgICAvLy8gPHBhcmE+CiAgICAvLy8gPHN0cm9uZz5TcHJpbnQgMjMgQi0xIE1JR1JBVElPTiBOT1RFOjwvc3Ryb25nPiBEZWZhdWx0IGNoYW5nZWQgZnJvbQogICAgLy8vIDxjPiJodHRwOi8vMTI3LjAuMC4xOjY4NjkiPC9jPiB0byA8c2VlIGxhbmd3b3JkPSJudWxsIi8+LiBJZiB5b3UgcmVsaWVkIG9uCiAgICAvLy8gdGhlIGltcGxpY2l0IGxvY2FsaG9zdCBkZWZhdWx0LCBzZXQgPGM+V29ybGRLYlVybDwvYz4gZXhwbGljaXRseSBpbgogICAgLy8vIDxjPmFwcHNldHRpbmdzLmpzb248L2M+IChwYXRoIDxjPkFnZW50Ok1lbW9yeTpXb3JsZEtiVXJsPC9jPikuCiAgICAvLy8gPC9wYXJhPgogICAgLy8vIDxwYXJhPgogICAgLy8vIFdoZW4gPHNlZSBsYW5nd29yZD0ibnVsbCIvPiBvciBlbXB0eSwgdGhlIGFnZW50IEtCICg8c2VlIGNyZWY9IkJhc2VVcmwiLz4pCiAgICAvLy8gaXMgdXNlZCBmb3Igd29ybGQgb2JzZXJ2YXRpb25zIGFuZCBhIHN0YXJ0dXAgd2FybmluZyBpcyBsb2dnZWQgc28gdGhlCiAgICAvLy8gbWlzY29uZmlndXJhdGlvbiBpcyB2aXNpYmxlLgogICAgLy8vIDwvcGFyYT4KICAgIC8vLyA8cGFyYT4KICAgIC8vLyBTZWUgPGM+RGF0YS9QYWdlcy9HdWlkZXMvd29ybGQta2ItZGVwbG95bWVudC5tZDwvYz4gZm9yIHNldHVwIGluc3RydWN0aW9ucwogICAgLy8vIChwcm92aXNpb25pbmcgYSBzZWNvbmQgTWVtb3J5U21pdGggaW5zdGFuY2Ugb24gYSBkaWZmZXJlbnQgcG9ydCwgc2NoZW1hCiAgICAvLy8gbm90ZXMsIGFuZCByZWNvbW1lbmRlZCByZXRlbnRpb24pLgogICAgLy8vIDwvcGFyYT4KICAgIC8vLyA8L3N1bW1hcnk+CiAgICBwdWJsaWMgc3RyaW5nPyBXb3JsZEtiVXJsIHsgZ2V0OyBpbml0OyB9CgogICAgLy8vIDxzdW1tYXJ5Pk9wdGlvbmFsIEFQSSBrZXkgZm9yIHRoZSB3b3JsZCBLQiBpbnN0YW5jZS48L3N1bW1hcnk+CiAgICBwdWJsaWMgc3RyaW5nPyBXb3JsZEFwaUtleSB7IGdldDsgaW5pdDsgfQoKICAgIC8vLyA8c3VtbWFyeT5IVFRQIHJlcXVlc3QgdGltZW91dCBpbiBzZWNvbmRzIGZvciB3b3JsZCBLQiBjYWxscy4gRGVmYXVsdDogMzAuPC9zdW1tYXJ5PgogICAgcHVibGljIGludCBXb3JsZFRpbWVvdXRTZWNvbmRzIHsgZ2V0OyBpbml0OyB9ID0gMzA7Cn0K
+namespace Agent.Memory;
+
+/// <summary>
+/// Configuration for RestMemoryGateway and MemorySmithItemRegistry.
+/// Bind from appsettings.json section "Agent:Memory".
+/// </summary>
+public sealed record RestMemoryGatewayOptions
+{
+    /// <summary>Base URL of the MemorySmith instance (e.g. http://localhost:5000).</summary>
+    public string BaseUrl { get; init; } = "http://localhost:5000";
+
+    /// <summary>Optional API key sent as X-Api-Key header.</summary>
+    public string? ApiKey { get; init; }
+
+    /// <summary>HTTP request timeout in seconds.</summary>
+    public int TimeoutSeconds { get; init; } = 30;
+
+    /// <summary>Default minimum role for pages created by the agent.</summary>
+    public string DefaultPageRole { get; init; } = "Anonymous";
+
+    /// <summary>TTL for MemorySmithItemRegistry in-memory cache, in seconds.</summary>
+    public int ItemCacheTtlSeconds { get; init; } = 60;
+
+    // ── World KB (Sprint 22) ──
+    /// <summary>
+    /// Base URL of the world-specific MemorySmith instance.
+    /// <para>
+    /// <strong>Sprint 23 B-1 MIGRATION NOTE:</strong> Default changed from
+    /// <c>"http://127.0.0.1:6869"</c> to <see langword="null"/>. If you relied on
+    /// the implicit localhost default, set <c>WorldKbUrl</c> explicitly in
+    /// <c>appsettings.json</c> (path <c>Agent:Memory:WorldKbUrl</c>).
+    /// </para>
+    /// <para>
+    /// When <see langword="null"/> or empty, the agent KB (<see cref="BaseUrl"/>)
+    /// is used for world observations and a startup warning is logged so the
+    /// misconfiguration is visible.
+    /// </para>
+    /// <para>
+    /// See <c>Data/Pages/Guides/world-kb-deployment.md</c> for setup instructions
+    /// (provisioning a second MemorySmith instance on a different port, schema
+    /// notes, and recommended retention).
+    /// </para>
+    /// </summary>
+    public string? WorldKbUrl { get; init; }
+
+    /// <summary>Optional API key for the world KB instance.</summary>
+    public string? WorldApiKey { get; init; }
+
+    /// <summary>HTTP request timeout in seconds for world KB calls. Default: 30.</summary>
+    public int WorldTimeoutSeconds { get; init; } = 30;
+}
