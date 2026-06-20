@@ -1,1 +1,107 @@
-bmFtZXNwYWNlIEFnZW50LlBsYW5uaW5nOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuUGxhbm5pbmcuR29hbHM7CnVzaW5nIE1pY3Jvc29mdC5FeHRlbnNpb25zLkxvZ2dpbmc7CgovLy8gPHN1bW1hcnk+Ci8vLyBIeWJyaWQgSFROIHBsYW5uZXIgaW1wbGVtZW50YXRpb24uCi8vLwovLy8gU3ByaW50IDI3IFAwLUQ6IHR5cGUtc3dpdGNoIGJyYW5jaGVzIGZvciA8c2VlIGNyZWY9IklJdGVtU3BlY0dvYWwiLz4sCi8vLyA8c2VlIGNyZWY9IkJ1aWxkR29hbCIvPiwgYW5kIDxzZWUgY3JlZj0iQ3JhZnRJdGVtR29hbCIvPiBoYXZlIGJlZW4gcmVtb3ZlZC4KLy8vIFRob3NlIGFyZSBub3cgaGFuZGxlZCBieSByZWdpc3RlcmVkIDxzZWUgY3JlZj0iSUdvYWxEZWNvbXBvc2VyIi8+IGltcGxlbWVudGF0aW9ucwovLy8gKDxzZWUgY3JlZj0iR2F0aGVyR29hbERlY29tcG9zZXIiLz4sIDxzZWUgY3JlZj0iQnVpbGRHb2FsRGVjb21wb3NlciIvPiwKLy8vIDxzZWUgY3JlZj0iQ3JhZnRJdGVtR29hbERlY29tcG9zZXIiLz4pIHRocm91Z2ggdGhlIDxzZWUgY3JlZj0iUGxhbm5lclJvdXRlciIvPgovLy8gd2hpY2ggY2hlY2tzIHRoZSA8c2VlIGNyZWY9IkRlY29tcG9zZXJSZWdpc3RyeSIvPiBmaXJzdC4KLy8vCi8vLyA8c2VlIGNyZWY9Ikh0blBsYW5uZXIiLz4gaXMgbm93IGEgcHVyZSBmYWxsYmFjayB0aGF0IGhhbmRsZXMgZ29hbHMgYnk6Ci8vLyAgIDEuIERpcmVjdCB0YXNrLWxpYnJhcnkgbmFtZSBtYXRjaC4KLy8vICAgMi4gUGhhc2UtYnktcGhhc2UgZGVjb21wb3NpdGlvbi4KLy8vICAgMy4gVGhyb3cgaWYgbm8gYWN0aW9ucyByZXN1bHQgKGNhbGxlciBmYWxscyBiYWNrIHRvIExMTSkuCi8vLwovLy8gSW4gcHJvZHVjdGlvbiB0aGUgYWdlbnQgbG9vcCB1c2VzIDxzZWUgY3JlZj0iSVBsYW5uZXIiLz4g4oaSIDxzZWUgY3JlZj0iUGxhbm5lclJvdXRlciIvPgovLy8gd2hpY2ggcm91dGVzIHR5cGVkIGdvYWxzIHRvIHRoZWlyIGRlY29tcG9zZXJzIGJlZm9yZSByZWFjaGluZyA8c2VlIGNyZWY9Ikh0blBsYW5uZXIiLz4uCi8vLyA8c2VlIGNyZWY9Ikh0blBsYW5uZXIiLz4gdGhlcmVmb3JlIG9ubHkgcmVjZWl2ZXMgZ29hbHMgd2l0aCBubyByZWdpc3RlcmVkIGRlY29tcG9zZXIuCi8vLyA8L3N1bW1hcnk+CnB1YmxpYyBzZWFsZWQgY2xhc3MgSHRuUGxhbm5lcihIdG5UYXNrTGlicmFyeSBsaWJyYXJ5LCBJTG9nZ2VyPEh0blBsYW5uZXI+PyBsb2dnZXIgPSBudWxsKSA6IElQbGFubmVyCnsKICAgIHByaXZhdGUgcmVhZG9ubHkgSUxvZ2dlcjxIdG5QbGFubmVyPiBfbG9nZ2VyID0gbG9nZ2VyID8/CiAgICAgICAgTWljcm9zb2Z0LkV4dGVuc2lvbnMuTG9nZ2luZy5BYnN0cmFjdGlvbnMuTnVsbExvZ2dlcjxIdG5QbGFubmVyPi5JbnN0YW5jZTsKCiAgICAvLyDilIDilIAgUGxhbkFzeW5jIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAogICAgcHVibGljIFRhc2s8SVBsYW4+IFBsYW5Bc3luYygKICAgICAgICBJR29hbCBnb2FsLCBXb3JsZFN0YXRlIHN0YXRlLCBDYW5jZWxsYXRpb25Ub2tlbiBjYW5jZWxsYXRpb25Ub2tlbiA9IGRlZmF1bHQpCiAgICB7CiAgICAgICAgdmFyIGFjdGlvbnMgPSBuZXcgTGlzdDxBY3Rpb25EYXRhPigpOwoKICAgICAgICAvLyAxLiBEaXJlY3QgdGFzay1saWJyYXJ5IGRlY29tcG9zaXRpb24gYnkgZ29hbCBuYW1lLgogICAgICAgIGlmIChsaWJyYXJ5Lkhhc1Rhc2soZ29hbC5OYW1lKSkKICAgICAgICB7CiAgICAgICAgICAgIGFjdGlvbnMuQWRkUmFuZ2UobGlicmFyeS5EZWNvbXBvc2UoZ29hbC5OYW1lLCBbXSwgc3RhdGUpKTsKICAgICAgICB9CiAgICAgICAgZWxzZQogICAgICAgIHsKICAgICAgICAgICAgLy8gMi4gUGhhc2UtYnktcGhhc2UgZGVjb21wb3NpdGlvbiAocHVyZSBIVE4gZmFsbGJhY2spLgogICAgICAgICAgICAvLyBBbGwgdHlwZWQgZ29hbCBicmFuY2hlcyAoSUl0ZW1TcGVjR29hbCwgQnVpbGRHb2FsLCBDcmFmdEl0ZW1Hb2FsKSBoYXZlIGJlZW4KICAgICAgICAgICAgLy8gbW92ZWQgdG8gcmVnaXN0ZXJlZCBJR29hbERlY29tcG9zZXIgaW1wbGVtZW50YXRpb25zIGFuZCBhcmUgaW50ZXJjZXB0ZWQgYnkKICAgICAgICAgICAgLy8gUGxhbm5lclJvdXRlciBiZWZvcmUgcmVhY2hpbmcgdGhpcyBtZXRob2QuCiAgICAgICAgICAgIGZvcmVhY2ggKHZhciBwaGFzZSBpbiBnb2FsLlBoYXNlcykKICAgICAgICAgICAgICAgIGlmIChsaWJyYXJ5Lkhhc1Rhc2socGhhc2UpKQogICAgICAgICAgICAgICAgICAgIGFjdGlvbnMuQWRkUmFuZ2UobGlicmFyeS5EZWNvbXBvc2UocGhhc2UsIFtdLCBzdGF0ZSkpOwogICAgICAgIH0KCiAgICAgICAgaWYgKGFjdGlvbnMuQ291bnQgPT0gMCkKICAgICAgICAgICAgdGhyb3cgbmV3IEludmFsaWRPcGVyYXRpb25FeGNlcHRpb24oCiAgICAgICAgICAgICAgICAkIkh0blBsYW5uZXIgY291bGQgbm90IGRlY29tcG9zZSBnb2FsICd7Z29hbC5OYW1lfScgIiArCiAgICAgICAgICAgICAgICAkIihwaGFzZXM6IFt7c3RyaW5nLkpvaW4oIiwgIiwgZ29hbC5QaGFzZXMpfV0pLiAiICsKICAgICAgICAgICAgICAgICJObyBtYXRjaGluZyB0YXNrIG1ldGhvZHMgZm91bmQuIExMTSBmYWxsYmFjayBub3QgeWV0IGltcGxlbWVudGVkIChQaGFzZSA0KS4iKTsKCiAgICAgICAgcmV0dXJuIFRhc2suRnJvbVJlc3VsdDxJUGxhbj4obmV3IEFjdGlvblBsYW4oZ29hbC5OYW1lLCBnb2FsLlBoYXNlcy5Ub0FycmF5KCksIGFjdGlvbnMpKTsKICAgIH0KCiAgICBwcml2YXRlIHN0YXRpYyByZWFkb25seSBzdHJpbmdbXSBQcmVzZXJ2ZWRDb250ZXh0UHJlZml4ZXMgPQogICAgICAgIFsiU2VhcmNoTWVtb3J5OiIsICJDcmFmdEl0ZW06IiwgIkZpbmRGbGF0QXJlYToiLCAiQnVpbGQ6IiwgIk1vdmVUbzoiXTsKCiAgICAvLyDilIDilIAgUmVwbGFuQXN5bmMg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACiAgICBwdWJsaWMgYXN5bmMgVGFzazxJUGxhbj8+IFJlcGxhbkFzeW5jKAogICAgICAgIElQbGFuIGN1cnJlbnRQbGFuLCBXb3JsZFN0YXRlIHN0YXRlLCBzdHJpbmcgZmFpbHVyZVJlYXNvbiwKICAgICAgICBDYW5jZWxsYXRpb25Ub2tlbiBjYW5jZWxsYXRpb25Ub2tlbiA9IGRlZmF1bHQsIElHb2FsPyBvcmlnaW5hbEdvYWwgPSBudWxsKQogICAgewogICAgICAgIC8vIFNwcmludCAzMiBQMi0yOiB0aHJlYWQgZmFpbHVyZVJlYXNvbiB0byBsb2cgc28gaXQgaXMgdmlzaWJsZSBpbiB0ZWxlbWV0cnkuCiAgICAgICAgLy8gVHdvIGluZGVwZW5kZW50IGF1ZGl0cyAoU3ByaW50IDI1IGRlZXAtY29kZS1hdWRpdCArIFNwcmludCAzMiByZWZpbmVtZW50LWF1ZGl0KQogICAgICAgIC8vIGJvdGggZmxhZ2dlZCB0aGlzIHBhcmFtZXRlciBhcyBhY2NlcHRlZCBidXQgdW51c2VkLiBBZGFwdGl2ZSByZXBsYW5uaW5nIHRoYXQKICAgICAgICAvLyBhY3RzIG9uIHRoZSByZWFzb24gKGUuZy4gY2hvb3NlIGFsdGVybmF0aXZlIGRlY29tcG9zZXIpIGlzIGZ1dHVyZSBzY29wZS4KICAgICAgICBpZiAoIXN0cmluZy5Jc051bGxPcldoaXRlU3BhY2UoZmFpbHVyZVJlYXNvbikpCiAgICAgICAgICAgIF9sb2dnZXIuTG9nSW5mb3JtYXRpb24oCiAgICAgICAgICAgICAgICAiUmVwbGFuQXN5bmMgdHJpZ2dlcmVkIGZvciBnb2FsICd7R29hbE5hbWV9JyB3aXRoIHJlYXNvbjoge0ZhaWx1cmVSZWFzb259IiwKICAgICAgICAgICAgICAgIGN1cnJlbnRQbGFuLkdvYWxOYW1lLCBmYWlsdXJlUmVhc29uKTsKCiAgICAgICAgdmFyIHByZXNlcnZlZENvbnRleHQgPSBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+KCk7CiAgICAgICAgZm9yZWFjaCAodmFyIGFjdGlvbiBpbiBjdXJyZW50UGxhbi5BY3Rpb25zKQogICAgICAgICAgICBmb3JlYWNoICh2YXIgKGtleSwgdmFsdWUpIGluIGFjdGlvbi5Db250ZXh0KQogICAgICAgICAgICAgICAgaWYgKEFycmF5LkV4aXN0cyhQcmVzZXJ2ZWRDb250ZXh0UHJlZml4ZXMsCiAgICAgICAgICAgICAgICAgICAgICAgIHByZWZpeCA9PiBrZXkuU3RhcnRzV2l0aChwcmVmaXgsIFN0cmluZ0NvbXBhcmlzb24uT3JkaW5hbCkpKQogICAgICAgICAgICAgICAgICAgIHByZXNlcnZlZENvbnRleHQuVHJ5QWRkKGtleSwgdmFsdWUpOwoKICAgICAgICB2YXIgZ29hbCA9IG5ldyBTaW1wbGVHb2FsKAogICAgICAgICAgICBjdXJyZW50UGxhbi5Hb2FsTmFtZSwgIiIsCiAgICAgICAgICAgIFsuLiBjdXJyZW50UGxhbi5QaGFzZXNdLAogICAgICAgICAgICBfID0+IGZhbHNlKTsKCiAgICAgICAgdHJ5CiAgICAgICAgewogICAgICAgICAgICB2YXIgbmV3UGxhbiA9IGF3YWl0IFBsYW5Bc3luYyhnb2FsLCBzdGF0ZSwgY2FuY2VsbGF0aW9uVG9rZW4pOwoKICAgICAgICAgICAgaWYgKHByZXNlcnZlZENvbnRleHQuQ291bnQgPiAwKQogICAgICAgICAgICAgICAgZm9yZWFjaCAodmFyIG5ld0FjdGlvbiBpbiAobmV3UGxhbiBhcyBBY3Rpb25QbGFuKT8uQWN0aW9ucyA/PyBuZXdQbGFuLkFjdGlvbnMpCiAgICAgICAgICAgICAgICAgICAgZm9yZWFjaCAodmFyIChrZXksIHZhbHVlKSBpbiBwcmVzZXJ2ZWRDb250ZXh0KQogICAgICAgICAgICAgICAgICAgICAgICBuZXdBY3Rpb24uQ29udGV4dC5UcnlBZGQoa2V5LCB2YWx1ZSk7CgogICAgICAgICAgICByZXR1cm4gbmV3UGxhbjsKICAgICAgICB9CiAgICAgICAgY2F0Y2gKICAgICAgICB7CiAgICAgICAgICAgIHJldHVybiBudWxsOwogICAgICAgIH0KICAgIH0KfQo=
+namespace Agent.Planning;
+
+using Agent.Core;
+using Agent.Planning.Goals;
+using Microsoft.Extensions.Logging;
+
+/// <summary>
+/// Hybrid HTN planner implementation.
+///
+/// Sprint 27 P0-D: type-switch branches for <see cref="IItemSpecGoal"/>,
+/// <see cref="BuildGoal"/>, and <see cref="CraftItemGoal"/> have been removed.
+/// Those are now handled by registered <see cref="IGoalDecomposer"/> implementations
+/// (<see cref="GatherGoalDecomposer"/>, <see cref="BuildGoalDecomposer"/>,
+/// <see cref="CraftItemGoalDecomposer"/>) through the <see cref="PlannerRouter"/>
+/// which checks the <see cref="DecomposerRegistry"/> first.
+///
+/// <see cref="HtnPlanner"/> is now a pure fallback that handles goals by:
+///   1. Direct task-library name match.
+///   2. Phase-by-phase decomposition.
+///   3. Throw if no actions result (caller falls back to LLM).
+///
+/// In production the agent loop uses <see cref="IPlanner"/> → <see cref="PlannerRouter"/>
+/// which routes typed goals to their decomposers before reaching <see cref="HtnPlanner"/>.
+/// <see cref="HtnPlanner"/> therefore only receives goals with no registered decomposer.
+/// </summary>
+public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logger = null) : IPlanner
+{
+    private readonly ILogger<HtnPlanner> _logger = logger ??
+        Microsoft.Extensions.Logging.Abstractions.NullLogger<HtnPlanner>.Instance;
+
+    // ── PlanAsync ─────────────────────────────────────────────────────────────
+    public Task<IPlan> PlanAsync(
+        IGoal goal, WorldState state, CancellationToken cancellationToken = default)
+    {
+        var actions = new List<ActionData>();
+
+        // 1. Direct task-library decomposition by goal name.
+        if (library.HasTask(goal.Name))
+        {
+            actions.AddRange(library.Decompose(goal.Name, [], state));
+        }
+        else
+        {
+            // 2. Phase-by-phase decomposition (pure HTN fallback).
+            // All typed goal branches (IItemSpecGoal, BuildGoal, CraftItemGoal) have been
+            // moved to registered IGoalDecomposer implementations and are intercepted by
+            // PlannerRouter before reaching this method.
+            foreach (var phase in goal.Phases)
+                if (library.HasTask(phase))
+                    actions.AddRange(library.Decompose(phase, [], state));
+        }
+
+        if (actions.Count == 0)
+            throw new InvalidOperationException(
+                $"HtnPlanner could not decompose goal '{goal.Name}' " +
+                $"(phases: [{string.Join(", ", goal.Phases)}]). " +
+                "No matching task methods found. LLM fallback not yet implemented (Phase 4).");
+
+        return Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases.ToArray(), actions));
+    }
+
+    private static readonly string[] PreservedContextPrefixes =
+        ["SearchMemory:", "CraftItem:", "FindFlatArea:", "Build:", "MoveTo:"];
+
+    // ── ReplanAsync ───────────────────────────────────────────────────────────
+    public async Task<IPlan?> ReplanAsync(
+        IPlan currentPlan, WorldState state, string failureReason,
+        CancellationToken cancellationToken = default, IGoal? originalGoal = null)
+    {
+        // Sprint 32 P2-2: thread failureReason to log so it is visible in telemetry.
+        // Two independent audits (Sprint 25 deep-code-audit + Sprint 32 refinement-audit)
+        // both flagged this parameter as accepted but unused. Adaptive replanning that
+        // acts on the reason (e.g. choose alternative decomposer) is future scope.
+        if (!string.IsNullOrWhiteSpace(failureReason))
+            _logger.LogInformation(
+                "ReplanAsync triggered for goal '{GoalName}' with reason: {FailureReason}",
+                currentPlan.GoalName, failureReason);
+
+        var preservedContext = new Dictionary<string, object?>();
+        foreach (var action in currentPlan.Actions)
+            foreach (var (key, value) in action.Context)
+                if (Array.Exists(PreservedContextPrefixes,
+                        prefix => key.StartsWith(prefix, StringComparison.Ordinal)))
+                    preservedContext.TryAdd(key, value);
+
+        var goal = new SimpleGoal(
+            currentPlan.GoalName, "",
+            [.. currentPlan.Phases],
+            _ => false);
+
+        try
+        {
+            var newPlan = await PlanAsync(goal, state, cancellationToken);
+
+            if (preservedContext.Count > 0)
+                foreach (var newAction in (newPlan as ActionPlan)?.Actions ?? newPlan.Actions)
+                    foreach (var (key, value) in preservedContext)
+                        newAction.Context.TryAdd(key, value);
+
+            return newPlan;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+}
