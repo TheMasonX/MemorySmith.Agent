@@ -1,1 +1,154 @@
-bmFtZXNwYWNlIEFnZW50LldvcmxkLk1pbmVjcmFmdDsKCnVzaW5nIEFnZW50LkNvcmU7CnVzaW5nIFN5c3RlbS5EaWFnbm9zdGljczsKdXNpbmcgU3lzdGVtLk5ldC5Tb2NrZXRzOwoKLy8vIDxzdW1tYXJ5PgovLy8gSVdvcmxkQWRhcHRlciBpbXBsZW1lbnRhdGlvbiBmb3IgTWluZWNyYWZ0IHZpYSBOb2RlLmpzL01pbmVmbGF5ZXIuCi8vLwovLy8gQ29ubmVjdGlvbiBmbG93OgovLy8gICAxLiBJZiBBdXRvU3RhcnROb2RlIGlzIHRydWUsIHNwYXduIE1pbmVmbGF5ZXJBZGFwdGVyL2luZGV4LmpzIGFzIGEgc3VicHJvY2Vzcy4KLy8vICAgMi4gUG9sbCB1bnRpbCB0aGUgV2ViU29ja2V0IHNlcnZlciBwb3J0IGlzIG9wZW4gKE5vZGUuanMgc3RhcnR1cCkuCi8vLyAgIDMuIENvbm5lY3QgV2ViU29ja2V0QnJpZGdlIHRvIHRoZSBXUyBzZXJ2ZXIuCi8vLyAgIDQuIE9uIGJvdC5vbmNlKCdzcGF3bicpLCBOb2RlIHNlbmRzIHsiZXZlbnQiOiJzcGF3biIsLi4ufSDigJQgYWdlbnQgaXMgbGl2ZS4KLy8vCi8vLyBDIyDihpIgTm9kZSBjb21tYW5kOiAgeyJhY3Rpb24iOiJtb3ZlIiwieCI6MTAsInkiOjY0LCJ6IjoyMH0KLy8vIE5vZGUg4oaSIEMjIGV2ZW50OiAgICB7ImV2ZW50IjoiYmxvY2tNaW5lZCIsImJsb2NrIjoic3RvbmUiLCJjb3VudCI6M30KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCBjbGFzcyBNaW5lY3JhZnRBZGFwdGVyKE1pbmVjcmFmdEFkYXB0ZXJDb25maWcgY29uZmlnKSA6IElXb3JsZEFkYXB0ZXIsIElEaXNwb3NhYmxlCnsKICAgIHByaXZhdGUgV2ViU29ja2V0QnJpZGdlPyBfYnJpZGdlOwogICAgcHJpdmF0ZSBQcm9jZXNzPyBfbm9kZVByb2Nlc3M7CgogICAgcHVibGljIGJvb2wgSXNDb25uZWN0ZWQgPT4gX2JyaWRnZT8uSXNPcGVuID8/IGZhbHNlOwoKICAgIHB1YmxpYyBhc3luYyBUYXNrIENvbm5lY3RBc3luYyhDYW5jZWxsYXRpb25Ub2tlbiBjYW5jZWxsYXRpb25Ub2tlbiA9IGRlZmF1bHQpCiAgICB7CiAgICAgICAgaWYgKGNvbmZpZy5BdXRvU3RhcnROb2RlICYmICFzdHJpbmcuSXNOdWxsT3JXaGl0ZVNwYWNlKGNvbmZpZy5Ob2RlU2NyaXB0UGF0aCkpCiAgICAgICAgICAgIGF3YWl0IFN0YXJ0Tm9kZVByb2Nlc3NBc3luYyhjYW5jZWxsYXRpb25Ub2tlbik7CgogICAgICAgIF9icmlkZ2UgPSBuZXcgV2ViU29ja2V0QnJpZGdlKGNvbmZpZy5XZWJTb2NrZXRVcmwpOwogICAgICAgIC8vIFNwcmludCAzMiBTRUMtMDI6IHBhc3MgQWRhcHRlclNlY3JldCBzbyB0aGUgYnJpZGdlIHNlbmRzIHRoZSBoYW5kc2hha2UuCiAgICAgICAgLy8gU2VjcmV0IGlzIG5vdCBsb2dnZWQgYnkgV2ViU29ja2V0QnJpZGdlLkNvbm5lY3RBc3luYy4KICAgICAgICBhd2FpdCBfYnJpZGdlLkNvbm5lY3RBc3luYyhjYW5jZWxsYXRpb25Ub2tlbiwgY29uZmlnLkFkYXB0ZXJTZWNyZXQpOwogICAgfQoKICAgIHB1YmxpYyBhc3luYyBUYXNrIERpc2Nvbm5lY3RBc3luYyhDYW5jZWxsYXRpb25Ub2tlbiBjYW5jZWxsYXRpb25Ub2tlbiA9IGRlZmF1bHQpCiAgICB7CiAgICAgICAgaWYgKF9icmlkZ2UgaXMgbm90IG51bGwpCiAgICAgICAgICAgIGF3YWl0IF9icmlkZ2UuQ2xvc2VBc3luYyhjYW5jZWxsYXRpb25Ub2tlbik7CgogICAgICAgIGlmIChfbm9kZVByb2Nlc3MgaXMgbm90IHsgSGFzRXhpdGVkOiBmYWxzZSB9KQogICAgICAgICAgICByZXR1cm47CgogICAgICAgIC8vIDEuIFNlbmQgU0lHVEVSTSBmb3IgZ3JhY2VmdWwgc2h1dGRvd24uCiAgICAgICAgLy8gICAgLk5FVCdzIFByb2Nlc3MuS2lsbCgpIHNlbmRzIFNJR0tJTEwgb24gTGludXgsIHNvIHdlIHVzZSBraWxsIC1URVJNCiAgICAgICAgLy8gICAgdG8gZ2l2ZSB0aGUgTm9kZSBwcm9jZXNzIGEgY2hhbmNlIHRvIGZsdXNoIHN0YXRlIGFuZCBleGl0IGNsZWFubHkuCiAgICAgICAgdHJ5CiAgICAgICAgewogICAgICAgICAgICB2YXIgcGlkID0gX25vZGVQcm9jZXNzLklkOwogICAgICAgICAgICB1c2luZyB2YXIga2lsbFByb2MgPSBuZXcgUHJvY2VzcwogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICBTdGFydEluZm8gPSBuZXcgUHJvY2Vzc1N0YXJ0SW5mbygia2lsbCIsICQiLVRFUk0ge3BpZH0iKQogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgIFVzZVNoZWxsRXhlY3V0ZSA9IGZhbHNlLAogICAgICAgICAgICAgICAgICAgIFJlZGlyZWN0U3RhbmRhcmRPdXRwdXQgPSB0cnVlLAogICAgICAgICAgICAgICAgICAgIFJlZGlyZWN0U3RhbmRhcmRFcnJvciA9IHRydWUsCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH07CiAgICAgICAgICAgIGtpbGxQcm9jLlN0YXJ0KCk7CiAgICAgICAgICAgIGtpbGxQcm9jLldhaXRGb3JFeGl0KDEwMDApOwogICAgICAgIH0KICAgICAgICBjYXRjaAogICAgICAgIHsKICAgICAgICAgICAgLy8gU3dhbGxvdyDigJQgcHJvY2VzcyBtYXkgaGF2ZSBhbHJlYWR5IGV4aXRlZCBvciBraWxsIG1heSBub3QgYmUgYXZhaWxhYmxlLgogICAgICAgIH0KCiAgICAgICAgLy8gMi4gV2FpdCB1cCB0byA1IHNlY29uZHMgZm9yIHRoZSBwcm9jZXNzIHRvIGV4aXQgZ3JhY2VmdWxseS4KICAgICAgICB0cnkKICAgICAgICB7CiAgICAgICAgICAgIF9ub2RlUHJvY2Vzcy5XYWl0Rm9yRXhpdCg1MDAwKTsKICAgICAgICB9CiAgICAgICAgY2F0Y2ggKFN5c3RlbUV4Y2VwdGlvbikKICAgICAgICB7CiAgICAgICAgICAgIC8vIEd1YXJkIGFnYWluc3QgV2FpdEZvckV4aXQgdGhyb3dpbmcgb24gYW4gaW52YWxpZCBoYW5kbGUuCiAgICAgICAgfQoKICAgICAgICAvLyAzLiBJZiBzdGlsbCBhbGl2ZSBhZnRlciB0aGUgZ3JhY2UgcGVyaW9kLCBmb3JjZS1raWxsIHRoZSBlbnRpcmUgdHJlZS4KICAgICAgICBpZiAoIV9ub2RlUHJvY2Vzcy5IYXNFeGl0ZWQpCiAgICAgICAgewogICAgICAgICAgICB0cnkKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgX25vZGVQcm9jZXNzLktpbGwoZW50aXJlUHJvY2Vzc1RyZWU6IHRydWUpOwogICAgICAgICAgICAgICAgYXdhaXQgX25vZGVQcm9jZXNzLldhaXRGb3JFeGl0QXN5bmMoY2FuY2VsbGF0aW9uVG9rZW4pOwogICAgICAgICAgICB9CiAgICAgICAgICAgIGNhdGNoIChJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uKQogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAvLyBQcm9jZXNzIGFscmVhZHkgZXhpdGVkIGJldHdlZW4gdGhlIGNoZWNrIGFuZCB0aGUga2lsbC4KICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KCiAgICBwdWJsaWMgVGFzayBTZW5kQWN0aW9uQXN5bmMoQWN0aW9uRGF0YSBhY3Rpb24sIENhbmNlbGxhdGlvblRva2VuIGNhbmNlbGxhdGlvblRva2VuID0gZGVmYXVsdCkKICAgIHsKICAgICAgICBpZiAoX2JyaWRnZSBpcyBudWxsIHx8ICFfYnJpZGdlLklzT3BlbikKICAgICAgICAgICAgdGhyb3cgbmV3IEludmFsaWRPcGVyYXRpb25FeGNlcHRpb24oIk1pbmVjcmFmdCBhZGFwdGVyIGlzIG5vdCBjb25uZWN0ZWQuIik7CgogICAgICAgIHJldHVybiBfYnJpZGdlLlNlbmRBc3luYyhhY3Rpb24sIGNhbmNlbGxhdGlvblRva2VuKTsKICAgIH0KCiAgICBwdWJsaWMgSUFzeW5jRW51bWVyYWJsZTxXb3JsZEV2ZW50PiBSZWNlaXZlRXZlbnRzQXN5bmMoQ2FuY2VsbGF0aW9uVG9rZW4gY2FuY2VsbGF0aW9uVG9rZW4gPSBkZWZhdWx0KQogICAgewogICAgICAgIGlmIChfYnJpZGdlIGlzIG51bGwpCiAgICAgICAgICAgIHRocm93IG5ldyBJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uKCJNaW5lY3JhZnQgYWRhcHRlciBpcyBub3QgY29ubmVjdGVkLiIpOwoKICAgICAgICByZXR1cm4gX2JyaWRnZS5SZWNlaXZlQXN5bmMoY2FuY2VsbGF0aW9uVG9rZW4pOwogICAgfQoKICAgIC8vIOKUgOKUgCBQcml2YXRlIGhlbHBlcnMg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgcHJpdmF0ZSBhc3luYyBUYXNrIFN0YXJ0Tm9kZVByb2Nlc3NBc3luYyhDYW5jZWxsYXRpb25Ub2tlbiBjYW5jZWxsYXRpb25Ub2tlbikKICAgIHsKICAgICAgICB2YXIgcHNpID0gbmV3IFByb2Nlc3NTdGFydEluZm8oIm5vZGUiLCBjb25maWcuTm9kZVNjcmlwdFBhdGgpCiAgICAgICAgewogICAgICAgICAgICBVc2VTaGVsbEV4ZWN1dGUgPSBmYWxzZSwKICAgICAgICAgICAgUmVkaXJlY3RTdGFuZGFyZE91dHB1dCA9IHRydWUsCiAgICAgICAgICAgIFJlZGlyZWN0U3RhbmRhcmRFcnJvciA9IHRydWUsCiAgICAgICAgfTsKICAgICAgICBwc2kuRW52aXJvbm1lbnRWYXJpYWJsZXNbIldTX1BPUlQiXSAgICAgID0gY29uZmlnLldlYlNvY2tldFBvcnQuVG9TdHJpbmcoKTsKICAgICAgICBwc2kuRW52aXJvbm1lbnRWYXJpYWJsZXNbIk1DX0hPU1QiXSAgICAgICA9IGNvbmZpZy5TZXJ2ZXJIb3N0OwogICAgICAgIHBzaS5FbnZpcm9ubWVudFZhcmlhYmxlc1siTUNfUE9SVCJdICAgICAgID0gY29uZmlnLlNlcnZlclBvcnQuVG9TdHJpbmcoKTsKICAgICAgICBwc2kuRW52aXJvbm1lbnRWYXJpYWJsZXNbIk1DX1VTRVJOQU1FIl0gICA9IGNvbmZpZy5Cb3RVc2VybmFtZTsKCiAgICAgICAgX25vZGVQcm9jZXNzID0gUHJvY2Vzcy5TdGFydChwc2kpCiAgICAgICAgICAgID8/IHRocm93IG5ldyBJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uKCQiRmFpbGVkIHRvIHN0YXJ0IE5vZGUgcHJvY2Vzczoge2NvbmZpZy5Ob2RlU2NyaXB0UGF0aH0iKTsKCiAgICAgICAgYXdhaXQgV2FpdEZvclBvcnRBc3luYyhjb25maWcuV2ViU29ja2V0UG9ydCwgY29uZmlnLk5vZGVTdGFydFRpbWVvdXRNcywgY2FuY2VsbGF0aW9uVG9rZW4pOwogICAgfQoKICAgIHByaXZhdGUgc3RhdGljIGFzeW5jIFRhc2sgV2FpdEZvclBvcnRBc3luYyhpbnQgcG9ydCwgaW50IHRpbWVvdXRNcywgQ2FuY2VsbGF0aW9uVG9rZW4gY3QpCiAgICB7CiAgICAgICAgdmFyIGRlYWRsaW5lID0gU3RvcHdhdGNoLkdldFRpbWVzdGFtcCgpICsgKGxvbmcpKHRpbWVvdXRNcyAvIDEwMDAuMCAqIFN0b3B3YXRjaC5GcmVxdWVuY3kpOwogICAgICAgIHdoaWxlIChTdG9wd2F0Y2guR2V0VGltZXN0YW1wKCkgPCBkZWFkbGluZSAmJiAhY3QuSXNDYW5jZWxsYXRpb25SZXF1ZXN0ZWQpCiAgICAgICAgewogICAgICAgICAgICB0cnkKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgdXNpbmcgdmFyIHRjcCA9IG5ldyBUY3BDbGllbnQoKTsKICAgICAgICAgICAgICAgIGF3YWl0IHRjcC5Db25uZWN0QXN5bmMoIjEyNy4wLjAuMSIsIHBvcnQsIGN0KTsKICAgICAgICAgICAgICAgIHJldHVybjsgLy8gcG9ydCBpcyBvcGVuCiAgICAgICAgICAgIH0KICAgICAgICAgICAgY2F0Y2gKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgYXdhaXQgVGFzay5EZWxheSgyMDAsIGN0KTsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgICAgICB0aHJvdyBuZXcgVGltZW91dEV4Y2VwdGlvbigkIk5vZGUuanMgV1Mgc2VydmVyIGRpZCBub3Qgb3BlbiBwb3J0IHtwb3J0fSB3aXRoaW4ge3RpbWVvdXRNc31tcy4iKTsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBEaXNwb3NlKCkKICAgIHsKICAgICAgICBfYnJpZGdlPy5EaXNwb3NlKCk7CiAgICAgICAgX25vZGVQcm9jZXNzPy5EaXNwb3NlKCk7CiAgICB9Cn0K
+namespace Agent.World.Minecraft;
+
+using Agent.Core;
+using System.Diagnostics;
+using System.Net.Sockets;
+
+/// <summary>
+/// IWorldAdapter implementation for Minecraft via Node.js/Mineflayer.
+///
+/// Connection flow:
+///   1. If AutoStartNode is true, spawn MineflayerAdapter/index.js as a subprocess.
+///   2. Poll until the WebSocket server port is open (Node.js startup).
+///   3. Connect WebSocketBridge to the WS server.
+///   4. On bot.once('spawn'), Node sends {"event":"spawn",...} — agent is live.
+///
+/// C# → Node command:  {"action":"move","x":10,"y":64,"z":20}
+/// Node → C# event:    {"event":"blockMined","block":"stone","count":3}
+/// </summary>
+public sealed class MinecraftAdapter(MinecraftAdapterConfig config) : IWorldAdapter, IDisposable
+{
+    private WebSocketBridge? _bridge;
+    private Process? _nodeProcess;
+
+    public bool IsConnected => _bridge?.IsOpen ?? false;
+
+    public async Task ConnectAsync(CancellationToken cancellationToken = default)
+    {
+        if (config.AutoStartNode && !string.IsNullOrWhiteSpace(config.NodeScriptPath))
+            await StartNodeProcessAsync(cancellationToken);
+
+        _bridge = new WebSocketBridge(config.WebSocketUrl);
+        // Sprint 32 SEC-02: pass AdapterSecret so the bridge sends the handshake.
+        // Secret is not logged by WebSocketBridge.ConnectAsync.
+        await _bridge.ConnectAsync(cancellationToken, config.AdapterSecret);
+    }
+
+    public async Task DisconnectAsync(CancellationToken cancellationToken = default)
+    {
+        if (_bridge is not null)
+            await _bridge.CloseAsync(cancellationToken);
+
+        if (_nodeProcess is not { HasExited: false })
+            return;
+
+        // 1. Send SIGTERM for graceful shutdown.
+        //    .NET's Process.Kill() sends SIGKILL on Linux, so we use kill -TERM
+        //    to give the Node process a chance to flush state and exit cleanly.
+        try
+        {
+            var pid = _nodeProcess.Id;
+            using var killProc = new Process
+            {
+                StartInfo = new ProcessStartInfo("kill", $"-TERM {pid}")
+                {
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                }
+            };
+            killProc.Start();
+            killProc.WaitForExit(1000);
+        }
+        catch
+        {
+            // Swallow — process may have already exited or kill may not be available.
+        }
+
+        // 2. Wait up to 5 seconds for the process to exit gracefully.
+        try
+        {
+            _nodeProcess.WaitForExit(5000);
+        }
+        catch (SystemException)
+        {
+            // Guard against WaitForExit throwing on an invalid handle.
+        }
+
+        // 3. If still alive after the grace period, force-kill the entire tree.
+        if (!_nodeProcess.HasExited)
+        {
+            try
+            {
+                _nodeProcess.Kill(entireProcessTree: true);
+                await _nodeProcess.WaitForExitAsync(cancellationToken);
+            }
+            catch (InvalidOperationException)
+            {
+                // Process already exited between the check and the kill.
+            }
+        }
+    }
+
+    public Task SendActionAsync(ActionData action, CancellationToken cancellationToken = default)
+    {
+        if (_bridge is null || !_bridge.IsOpen)
+            throw new InvalidOperationException("Minecraft adapter is not connected.");
+
+        return _bridge.SendAsync(action, cancellationToken);
+    }
+
+    public IAsyncEnumerable<WorldEvent> ReceiveEventsAsync(CancellationToken cancellationToken = default)
+    {
+        if (_bridge is null)
+            throw new InvalidOperationException("Minecraft adapter is not connected.");
+
+        return _bridge.ReceiveAsync(cancellationToken);
+    }
+
+    // ── Private helpers ──────────────────────────────
+
+    private async Task StartNodeProcessAsync(CancellationToken cancellationToken)
+    {
+        var psi = new ProcessStartInfo("node", config.NodeScriptPath)
+        {
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
+        psi.EnvironmentVariables["WS_PORT"]      = config.WebSocketPort.ToString();
+        psi.EnvironmentVariables["MC_HOST"]       = config.ServerHost;
+        psi.EnvironmentVariables["MC_PORT"]       = config.ServerPort.ToString();
+        psi.EnvironmentVariables["MC_USERNAME"]   = config.BotUsername;
+
+        _nodeProcess = Process.Start(psi)
+            ?? throw new InvalidOperationException($"Failed to start Node process: {config.NodeScriptPath}");
+
+        await WaitForPortAsync(config.WebSocketPort, config.NodeStartTimeoutMs, cancellationToken);
+    }
+
+    private static async Task WaitForPortAsync(int port, int timeoutMs, CancellationToken ct)
+    {
+        var deadline = Stopwatch.GetTimestamp() + (long)(timeoutMs / 1000.0 * Stopwatch.Frequency);
+        while (Stopwatch.GetTimestamp() < deadline && !ct.IsCancellationRequested)
+        {
+            try
+            {
+                using var tcp = new TcpClient();
+                await tcp.ConnectAsync("127.0.0.1", port, ct);
+                return; // port is open
+            }
+            catch
+            {
+                await Task.Delay(200, ct);
+            }
+        }
+        throw new TimeoutException($"Node.js WS server did not open port {port} within {timeoutMs}ms.");
+    }
+
+    public void Dispose()
+    {
+        _bridge?.Dispose();
+        _nodeProcess?.Dispose();
+    }
+}
