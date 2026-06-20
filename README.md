@@ -1,1 +1,174 @@
-IyBNZW1vcnlTbWl0aC5BZ2VudAoKWyFbQ0ldKGh0dHBzOi8vZ2l0aHViLmNvbS9UaGVNYXNvblgvTWVtb3J5U21pdGguQWdlbnQvYWN0aW9ucy93b3JrZmxvd3MvY2kueW1sL2JhZGdlLnN2ZyldKGh0dHBzOi8vZ2l0aHViLmNvbS9UaGVNYXNvblgvTWVtb3J5U21pdGguQWdlbnQvYWN0aW9ucykKCkEgbW9kdWxhciBhdXRvbm9tb3VzIGFnZW50IGZyYW1ld29yayB0aGF0IHRyZWF0cyBNaW5lY3JhZnQgYXMgYSAqd29ybGQgYWRhcHRlciogYW5kIHVzZXMgdGhlIFtNZW1vcnlTbWl0aF0oaHR0cHM6Ly9naXRodWIuY29tL1RoZU1hc29uWC9NZW1vcnlTbWl0aCkgd2lraSBhcyBsb25nLXRlcm0gbWVtb3J5LgoKKip2MC4yNy4wKiog4oCUIFNwcmludCAyNyBjb21wbGV0ZSDigJQgMjQwKyB0ZXN0cywgQ0kgZ3JlZW4KCi0tLQoKIyMgRmVhdHVyZXMKCi0gKipIVE4gUGxhbm5lcioqIOKAlCBoaWVyYXJjaGljYWwgdGFzayBkZWNvbXBvc2l0aW9uIHdpdGggcGx1Z2dhYmxlIGBJR29hbERlY29tcG9zZXJgIHJlZ2lzdHJ5IChCdWlsZCwgR2F0aGVyLCBDcmFmdCwgU3Vydml2ZU5pZ2h0IGRlY29tcG9zZXJzICsgUGxhbm5lclJvdXRlciBhcyBJUGxhbm5lcikKLSAqKkR1YWwgTWVtb3J5IEdhdGV3YXkqKiDigJQgQWdlbnQgS0IgKGNvZGViYXNlKSArIFdvcmxkIEtCICh3b3JsZCBvYnNlcnZhdGlvbnMpIGFzIHNlcGFyYXRlIE1lbW9yeVNtaXRoIGluc3RhbmNlczsgdG9vbCByb3V0aW5nIGlzIGF1dG9tYXRpYwotICoqSW4tZ2FtZSBDaGF0IEludGVycHJldGF0aW9uKiog4oCUIENyYWZ0UmVnZXggZmFzdC1wYXRoICsgTExNIGZhbGxiYWNrIChPbGxhbWEpIHdpdGggMTBzIHRpbWVvdXQsIHJhdGUgbGltaXRpbmcsIGFuZCB0cnVuY2F0aW9uIHJlY292ZXJ5Ci0gKipSZXBsYW4gR292ZXJub3IqKiDigJQgc3RhbGwgZGV0ZWN0aW9uIHZpYSBwbGFuLWZpbmdlcnByaW50ICsgaW52ZW50b3J5LWRlbHRhOyBBQ1RJVkUvU1RBTExFRCBzdGF0ZXM7IDYwcyBhdXRvLXJlY292ZXJ5Ci0gKipEYW1hZ2UgSW50ZXJydXB0Kiog4oCUIHJlYWwtdGltZSBkYW1hZ2UgcmVzcG9uc2U7IGF0b21pYyBxdWV1ZSBjbGVhciArIEdldFN0YXR1czsgcGVyLWdvYWwgdGhyZXNob2xkIG92ZXJyaWRlczsgM3MgY29vbGRvd24KLSAqKkFnZW50IEpvdXJuYWwqKiDigJQgYm91bmRlZCAxMDAwLWVudHJ5IHJpbmcgYnVmZmVyLCAxMSBldmVudCB0eXBlcywgcXVlcnlhYmxlIHZpYSBSRVNUCi0gKipXb3JsZCBNb2RlbCoqIOKAlCBvYnNlcnZlL3ByZWRpY3QvcmVjb25jaWxlL3VuY2VydGFpbnR5IGZvciA5IHRvb2xzOyBydW5uaW5nIGRldmlhdGlvbiBzY29yaW5nCi0gKipTZXJpbG9nIExvZ2dpbmcqKiDigJQgc3RydWN0dXJlZCBKU09OICsgaHVtYW4tcmVhZGFibGUgdGV4dDsgbXMgcHJlY2lzaW9uOyBKUyBhZGFwdGVyIGZpbGUgbG9nZ2VyCi0gKipUb29sIFZhbGlkYXRpb24qKiDigJQgSlNPTiBTY2hlbWEgKHR5cGUvcmVxdWlyZWQvcHJvcGVydGllcykgY2hlY2tlZCBiZWZvcmUgZXZlcnkgdG9vbCBleGVjdXRpb24KLSAqKkludmVudG9yeSBGcmVzaG5lc3MgR2F0ZSoqIOKAlCBgSXNJbnZlbnRvcnlTdGFsZWAgcHJldmVudHMgZmFsc2UgZ29hbCBjb21wbGV0aW9uIGFmdGVyIGAvY2xlYXJgCi0gKipJVGltZVByb3ZpZGVyIGFic3RyYWN0aW9uKiog4oCUIGluamVjdGFibGUgdGltZSBwcm92aWRlciBmb3IgZGV0ZXJtaW5pc3RpYyB0ZXN0aW5nIG9mIGNvb2xkb3ducyBhbmQgaW50ZXJ2YWxzCgotLS0KCiMjIEFyY2hpdGVjdHVyZQoKVGhyZWUgYm91bmRlZCBjb250ZXh0cywgZGVlcC1tb2R1bGUgZGVzaWduIChBRFIgRC0wMDM6IGRldGVybWluaXN0aWMgZmlyc3QsIExMTSBpcyBvcHQtaW4pOgoKfCBDb250ZXh0IHwgUHJvamVjdHMgfAp8LS0tfC0tLXwKfCAqKkFnZW50IENvcmUqKiB8IGBBZ2VudC5Db3JlYCwgYEFnZW50LlBsYW5uaW5nYCwgYEFnZW50LlBlcnNvbmFsaXR5YCwgYEFnZW50LlRvb2xzYCB8CnwgKipLbm93bGVkZ2UqKiB8IFtNZW1vcnlTbWl0aF0oaHR0cHM6Ly9naXRodWIuY29tL1RoZU1hc29uWC9NZW1vcnlTbWl0aCkgKGV4dGVybmFsIHdpa2kgZW5naW5lLCB4MiBpbnN0YW5jZXMpIHwKfCAqKldvcmxkKiogfCBgQWdlbnQuV29ybGQuTWluZWNyYWZ0YCArIGBNaW5lZmxheWVyQWRhcHRlci9gIChOb2RlLmpzL01pbmVmbGF5ZXIpIHwKClN1cHBvcnRpbmc6IGBBZ2VudC5WaXNpb25gLCBgQWdlbnQuQ29uc3RydWN0aW9uYCwgYFdlYlVJLkJsYXpvcmAgKFJFU1QgQVBJICsgU2lnbmFsUiksIGBNZW1vcnlTbWl0aC5BZ2VudC5UZXN0c2AKCmBgYApNZW1vcnlTbWl0aC5BZ2VudC5zbG54ICAgICMgVlMgMjAyMiAvIGRvdG5ldCBDTEkgKC5zbG54IGZvcm1hdCkKYGBgCgpSZXF1aXJlcyAqKi5ORVQgMTAgU0RLKiogYW5kICoqTm9kZS5qcyAyMisqKi4KCi0tLQoKIyMgUXVpY2sgU3RhcnQKCiMjIyBSRVNUIEFQSSBvbmx5IChubyBNaW5lY3JhZnQpCgpgYGBiYXNoCmdpdCBjbG9uZSBodHRwczovL2dpdGh1Yi5jb20vVGhlTWFzb25YL01lbW9yeVNtaXRoLkFnZW50CmNkIE1lbW9yeVNtaXRoLkFnZW50CmRvdG5ldCByZXN0b3JlIE1lbW9yeVNtaXRoLkFnZW50LnNsbngKZG90bmV0IGJ1aWxkICAgTWVtb3J5U21pdGguQWdlbnQuc2xueCAtLWNvbmZpZ3VyYXRpb24gUmVsZWFzZQpkb3RuZXQgcnVuICAgICAtLXByb2plY3QgV2ViVUkuQmxhem9yCmBgYAoKVmlzaXQgYGh0dHA6Ly9sb2NhbGhvc3Q6NTAwMC9hcGkvYWJvdXRgIGZvciB2ZXJzaW9uIGluZm8gb3IgYC9hcGkvYWdlbnQvc3RhdHVzYCB0byBjaGVjayBzdGF0ZS4KCiMjIyBXaXRoIE1pbmVjcmFmdCArIE1lbW9yeVNtaXRoCgoxLiBTdGFydCBbTWVtb3J5U21pdGhdKGh0dHBzOi8vZ2l0aHViLmNvbS9UaGVNYXNvblgvTWVtb3J5U21pdGgpIG9uIGBodHRwOi8vbG9jYWxob3N0OjUwMDFgIChBZ2VudCBLQikKMi4gT3B0aW9uYWxseSBzdGFydCBhIHNlY29uZCBNZW1vcnlTbWl0aCBvbiBgaHR0cDovL2xvY2FsaG9zdDo2ODY5YCAoV29ybGQgS0IpCjMuIFN0YXJ0IGEgTWluZWNyYWZ0IHNlcnZlciBvbiBgbG9jYWxob3N0OjI1NTY1YAo0LiBDb25maWd1cmUgYFdlYlVJLkJsYXpvci9hcHBzZXR0aW5ncy5qc29uYDoKCmBgYGpzb24KewogICJBZ2VudCI6IHsKICAgICJFbmFibGVkIjogdHJ1ZSwKICAgICJNZW1vcnkiOiB7ICJCYXNlVXJsIjogImh0dHA6Ly9sb2NhbGhvc3Q6NTAwMSIgfSwKICAgICJXb3JsZEtiIjogeyAiV29ybGRLYlVybCI6ICJodHRwOi8vbG9jYWxob3N0OjY4NjkiIH0sCiAgICAiTWluZWNyYWZ0IjogewogICAgICAiQXV0b1N0YXJ0Tm9kZSI6IHRydWUsCiAgICAgICJOb2RlU2NyaXB0UGF0aCI6ICIuLi9NaW5lZmxheWVyQWRhcHRlci9pbmRleC5qcyIsCiAgICAgICJTZXJ2ZXJIb3N0IjogImxvY2FsaG9zdCIsCiAgICAgICJTZXJ2ZXJQb3J0IjogMjU1NjUsCiAgICAgICJCb3RVc2VybmFtZSI6ICJBZ2VudEJvdCIKICAgIH0KICB9Cn0KYGBgCgo1LiBJbnN0YWxsIE5vZGUuanMgZGVwZW5kZW5jaWVzIGFuZCBydW46CgpgYGBiYXNoCmNkIE1pbmVmbGF5ZXJBZGFwdGVyICYmIG5wbSBpbnN0YWxsCmNkIC4uICYmIGRvdG5ldCBydW4gLS1wcm9qZWN0IFdlYlVJLkJsYXpvcgpgYGAKCiMjIyBTZW5kIGEgZ29hbAoKYGBgYmFzaAojIEdhdGhlciAzMiBvYWsgbG9ncwpjdXJsIC1YIFBPU1QgaHR0cDovL2xvY2FsaG9zdDo1MDAwL2FwaS9hZ2VudC9wbGFuIFwKICAtSCAiQ29udGVudC1UeXBlOiBhcHBsaWNhdGlvbi9qc29uIiBcCiAgLWQgJ3siZ29hbE5hbWUiOiJHYXRoZXJJdGVtIiwicGFyYW1ldGVycyI6eyJpdGVtIjoib2FrX2xvZyIsImNvdW50IjozMn19JwoKIyBPciBzZW5kIGEgcmF3IHRvb2wgY29tbWFuZApjdXJsIC1YIFBPU1QgaHR0cDovL2xvY2FsaG9zdDo1MDAwL2FwaS9hZ2VudC9jb21tYW5kIFwKICAtSCAiQ29udGVudC1UeXBlOiBhcHBsaWNhdGlvbi9qc29uIiBcCiAgLWQgJ3siY29tbWFuZCI6IkdldFN0YXR1cyJ9JwpgYGAKCiMjIyBJbi1nYW1lIGNoYXQKCk9uY2UgdGhlIGJvdCBpcyBpbi1nYW1lLCBzcGVhayB0byBpdCBpbiBNaW5lY3JhZnQgY2hhdDoKCmBgYApnYXRoZXIgMzIgb2FrIGxvZ3MKY3JhZnQgYW4gaXJvbiBwaWNrYXhlCmJ1aWxkIGEgc21hbGwgaG91c2UKc3RvcApzdGF0dXMKYGBgCgotLS0KCiMjIFRlc3RzCgpgYGBiYXNoCmRvdG5ldCB0ZXN0IE1lbW9yeVNtaXRoLkFnZW50LnNsbnggLS1jb25maWd1cmF0aW9uIFJlbGVhc2UKYGBgCgpFeHBlY3RlZDogKioyNDArIHBhc3NlZCwgMCBmYWlsZWQqKiAoMTAgQ1VEQS9PTk5YIHNraXBzIGFyZSBleHBlY3RlZCBpbiBub24tR1BVIGVudmlyb25tZW50cykuCgotLS0KCiMjIFdpa2kKClRoaXMgcmVwbyBpcyBzZWxmLWRvY3VtZW50aW5nIOKAlCBgRGF0YS9QYWdlcy9gIGNvbnRhaW5zIHdpa2kgcGFnZXMgc2VydmVkIGJ5IHRoZSBjby1kZXBsb3llZCBNZW1vcnlTbWl0aCBpbnN0YW5jZS4gU3RhcnQgd2l0aCBbaG9tZV0oRGF0YS9QYWdlcy9ob21lLm1kKToKCioqUmVmZXJlbmNlOioqCi0gW0FyY2hpdGVjdHVyZV0oRGF0YS9QYWdlcy9hcmNoaXRlY3R1cmUubWQpCi0gW1BsYW5uZXJdKERhdGEvUGFnZXMvcGxhbm5lci5tZCkKLSBbVG9vbCBSZWdpc3RyeV0oRGF0YS9QYWdlcy90b29sLXJlZ2lzdHJ5Lm1kKQotIFtNZW1vcnldKERhdGEvUGFnZXMvbWVtb3J5Lm1kKQotIFtDaGF0IFN5c3RlbV0oRGF0YS9QYWdlcy9jaGF0LXN5c3RlbS5tZCkKLSBbUm9hZG1hcF0oRGF0YS9QYWdlcy9yb2FkbWFwLm1kKQoKKipHdWlkZXM6KioKLSBbR2V0dGluZyBTdGFydGVkXShEYXRhL1BhZ2VzL2d1aWRlcy9nZXR0aW5nLXN0YXJ0ZWQubWQpCi0gW0FQSSBSZWZlcmVuY2VdKERhdGEvUGFnZXMvZ3VpZGVzL2FwaS1yZWZlcmVuY2UubWQpCi0gW0xvZ2dpbmddKERhdGEvUGFnZXMvZ3VpZGVzL2xvZ2dpbmcubWQpCi0gW1Ryb3VibGVzaG9vdGluZ10oRGF0YS9QYWdlcy9ndWlkZXMvdHJvdWJsZXNob290aW5nLm1kKQotIFtXb3JsZCBLQiBTZXR1cF0oRGF0YS9QYWdlcy9ndWlkZXMvd29ybGQta2IubWQpCi0gW1JlcGxhbiBHb3Zlcm5vcl0oRGF0YS9QYWdlcy9ndWlkZXMvcmVwbGFuLWdvdmVybm9yLm1kKQotIFtEYW1hZ2UgSW50ZXJydXB0XShEYXRhL1BhZ2VzL2d1aWRlcy9kYW1hZ2UtaW50ZXJydXB0Lm1kKQotIFtBZ2VudCBKb3VybmFsXShEYXRhL1BhZ2VzL2d1aWRlcy9hZ2VudC1qb3VybmFsLm1kKQotIFtXb3JsZCBNb2RlbF0oRGF0YS9QYWdlcy9ndWlkZXMvd29ybGQtbW9kZWwubWQpCgotLS0KCiMjIFJvYWRtYXAKCnwgUGhhc2UgLyBTcHJpbnQgfCBTY29wZSB8IFN0YXR1cyB8CnwtLS18LS0tfC0tLXwKfCBQaGFzZSAwIOKAlCBTa2VsZXRvbiB8IEludGVyZmFjZXMsIHdpa2ksIENJIHwg4pyFIERvbmUgfAp8IFBoYXNlIDEg4oCUIENvcmUgTVZQIHwgV2ViU29ja2V0IGJyaWRnZSwgbW92ZW1lbnQgdG9vbHMsIEJsYXpvciBVSSB8IOKchSBEb25lIHwKfCBQaGFzZSAyIOKAlCBNZW1vcnkgKyBMTE0gfCBNZW1vcnlTbWl0aCBnYXRld2F5LCBPbGxhbWEsIGNoYXQgfCDinIUgRG9uZSB8CnwgUGhhc2UgMyDigJQgUGxhbm5lciB8IEhUTi9HT0FQLCBwcmVkZWZpbmVkIHRhc2tzLCBibHVlcHJpbnRzIHwg4pyFIERvbmUgfAp8IFNwcmludHMgNS0yNyB8IFRvb2wgc2FmZXR5LCBqb3VybmFsLCB3b3JsZCBtb2RlbCwgbG9nZ2luZywgZ292ZXJub3JzLCBkYW1hZ2UgaW50ZXJydXB0LCBXb3JsZCBLQiwgcGxhbm5lciByb3V0aW5nLCBJVGltZVByb3ZpZGVyIHwg4pyFIERvbmUgfAp8IFBoYXNlIDQg4oCUIFZpc2lvbiB8IFNwYXRpYWwgYW5hbHlzaXMsIGFlc3RoZXRpYyBjcml0aXF1ZSB8IOKsnCBQbGFubmVkIHwKfCBQaGFzZSA1IOKAlCBBZHZhbmNlZCB8IE11bHRpLWFnZW50LCB2ZWN0b3Igc2VhcmNoLCBDSS9DRCB8IOKsnCBQbGFubmVkIHwKClNlZSBbcm9hZG1hcC5tZF0oRGF0YS9QYWdlcy9yb2FkbWFwLm1kKSBmb3IgdGhlIGZ1bGwgc3ByaW50LWJ5LXNwcmludCBoaXN0b3J5LgoKLS0tCgojIyBMaWNlbnNlCgpNSVQK
+# MemorySmith.Agent
+
+[![CI](https://github.com/TheMasonX/MemorySmith.Agent/actions/workflows/ci.yml/badge.svg)](https://github.com/TheMasonX/MemorySmith.Agent/actions)
+
+A modular autonomous agent framework that treats Minecraft as a *world adapter* and uses the [MemorySmith](https://github.com/TheMasonX/MemorySmith) wiki as long-term memory.
+
+**v0.28.0** — Sprint 33 complete — 276+ tests
+
+---
+
+## Features
+
+- **HTN Planner** — hierarchical task decomposition with pluggable `IGoalDecomposer` registry (Build, Gather, Craft, SurviveNight decomposers + PlannerRouter as IPlanner)
+- **Dual Memory Gateway** — Agent KB (codebase) + World KB (world observations) as separate MemorySmith instances; tool routing is automatic
+- **In-game Chat Interpretation** — CraftRegex fast-path + LLM fallback (Ollama) with 10s timeout, rate limiting, and truncation recovery
+- **Replan Governor** — stall detection via plan-fingerprint + inventory-delta; ACTIVE/STALLED states; 60s auto-recovery
+- **Damage Interrupt** — real-time damage response; atomic queue clear + GetStatus; per-goal threshold overrides; 3s cooldown
+- **Agent Journal** — bounded 1000-entry ring buffer, 11 event types, queryable via REST
+- **World Model** — observe/predict/reconcile/uncertainty for 9 tools; running deviation scoring
+- **Serilog Logging** — structured JSON + human-readable text; ms precision; JS adapter file logger
+- **Tool Validation** — JSON Schema (type/required/properties) checked before every tool execution
+- **Inventory Freshness Gate** — `IsInventoryStale` prevents false goal completion after `/clear`
+- **ITimeProvider abstraction** — injectable time provider for deterministic testing of cooldowns and intervals
+
+---
+
+## Architecture
+
+Three bounded contexts, deep-module design (ADR D-003: deterministic first, LLM is opt-in):
+
+| Context | Projects |
+|---|---|
+| **Agent Core** | `Agent.Core`, `Agent.Planning`, `Agent.Personality`, `Agent.Tools` |
+| **Knowledge** | [MemorySmith](https://github.com/TheMasonX/MemorySmith) (external wiki engine, x2 instances) |
+| **World** | `Agent.World.Minecraft` + `MineflayerAdapter/` (Node.js/Mineflayer) |
+
+Supporting: `Agent.Vision`, `Agent.Construction`, `WebUI.Blazor` (REST API + SignalR), `MemorySmith.Agent.Tests`
+
+```
+MemorySmith.Agent.slnx    # VS 2022 / dotnet CLI (.slnx format)
+```
+
+Requires **.NET 10 SDK** and **Node.js 22+**.
+
+---
+
+## Quick Start
+
+### REST API only (no Minecraft)
+
+```bash
+git clone https://github.com/TheMasonX/MemorySmith.Agent
+cd MemorySmith.Agent
+dotnet restore MemorySmith.Agent.slnx
+dotnet build   MemorySmith.Agent.slnx --configuration Release
+dotnet run     --project WebUI.Blazor
+```
+
+Visit `http://localhost:5000/api/about` for version info or `/api/agent/status` to check state.
+
+### With Minecraft + MemorySmith
+
+1. Start [MemorySmith](https://github.com/TheMasonX/MemorySmith) on `http://localhost:5001` (Agent KB)
+2. Optionally start a second MemorySmith on `http://localhost:6869` (World KB)
+3. Start a Minecraft server on `localhost:25565`
+4. Configure `WebUI.Blazor/appsettings.json`:
+
+```json
+{
+  "Agent": {
+    "Enabled": true,
+    "Memory": { "BaseUrl": "http://localhost:5001" },
+    "WorldKb": { "WorldKbUrl": "http://localhost:6869" },
+    "Minecraft": {
+      "AutoStartNode": true,
+      "NodeScriptPath": "../MineflayerAdapter/index.js",
+      "ServerHost": "localhost",
+      "ServerPort": 25565,
+      "BotUsername": "AgentBot"
+    }
+  }
+}
+```
+
+5. Install Node.js dependencies and run:
+
+```bash
+cd MineflayerAdapter && npm install
+cd .. && dotnet run --project WebUI.Blazor
+```
+
+### Send a goal
+
+```bash
+# Gather 32 oak logs
+curl -X POST http://localhost:5000/api/agent/plan \
+  -H "Content-Type: application/json" \
+  -d '{"goalName":"GatherItem","parameters":{"item":"oak_log","count":32}}'
+
+# Or send a raw tool command
+curl -X POST http://localhost:5000/api/agent/command \
+  -H "Content-Type: application/json" \
+  -d '{"command":"GetStatus"}'
+```
+
+### In-game chat
+
+Once the bot is in-game, speak to it in Minecraft chat:
+
+```
+gather 32 oak logs
+craft an iron pickaxe
+build a small house
+stop
+status
+```
+
+---
+
+## Tests
+
+```bash
+dotnet test MemorySmith.Agent.slnx --configuration Release
+```
+
+Expected: **276+ passed, 0 failed** (10 CUDA/ONNX skips are expected in non-GPU environments).
+
+---
+
+## Wiki
+
+This repo is self-documenting — `Data/Pages/` contains wiki pages served by the co-deployed MemorySmith instance. Start with [home](Data/Pages/home.md):
+
+**Reference:**
+- [Architecture](Data/Pages/architecture.md)
+- [Planner](Data/Pages/planner.md)
+- [Tool Registry](Data/Pages/tool-registry.md)
+- [Memory](Data/Pages/memory.md)
+- [Chat System](Data/Pages/chat-system.md)
+- [Roadmap](Data/Pages/roadmap.md)
+
+**Guides:**
+- [Getting Started](Data/Pages/guides/getting-started.md)
+- [API Reference](Data/Pages/guides/api-reference.md)
+- [Logging](Data/Pages/guides/logging.md)
+- [Troubleshooting](Data/Pages/guides/troubleshooting.md)
+- [World KB Setup](Data/Pages/guides/world-kb.md)
+- [Replan Governor](Data/Pages/guides/replan-governor.md)
+- [Damage Interrupt](Data/Pages/guides/damage-interrupt.md)
+- [Agent Journal](Data/Pages/guides/agent-journal.md)
+- [World Model](Data/Pages/guides/world-model.md)
+
+---
+
+## Roadmap
+
+| Phase / Sprint | Scope | Status |
+|---|---|---|
+| Phase 0 — Skeleton | Interfaces, wiki, CI | ✅ Done |
+| Phase 1 — Core MVP | WebSocket bridge, movement tools, Blazor UI | ✅ Done |
+| Phase 2 — Memory + LLM | MemorySmith gateway, Ollama, chat | ✅ Done |
+| Phase 3 — Planner | HTN/GOAP, predefined tasks, blueprints | ✅ Done |
+| Sprints 5-27 | Tool safety, journal, world model, logging, governors, damage interrupt, World KB, planner routing, ITimeProvider | ✅ Done |
+| Sprints 28-33 | Action lifecycle, SEC-01/02 auth, base64 sweep, build restore, DI logger wiring, Program.cs restore | ✅ Done |
+| Phase 4 — Vision | Spatial analysis, aesthetic critique | ⬜ Planned |
+| Phase 5 — Advanced | Multi-agent, vector search, CI/CD | ⬜ Planned |
+
+See [roadmap.md](Data/Pages/roadmap.md) for the full sprint-by-sprint history.
+
+---
+
+## License
+
+MIT
