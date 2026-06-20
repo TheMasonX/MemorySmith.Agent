@@ -1,1 +1,31 @@
-bmFtZXNwYWNlIEFnZW50LkNvcmU7CgovLy8gPHN1bW1hcnk+Ci8vLyBTcHJpbnQgMjUgUDAtRDogTGlmZWN5Y2xlIHN0YXRlcyBmb3IgYSBkaXNwYXRjaGVkIGFjdGlvbi4KLy8vCi8vLyBUcmFja3MgdGhlIHByb2dyZXNzaW9uIGZyb20gZGlzcGF0Y2ggdGhyb3VnaCBjb21wbGV0aW9uIG9yIGZhaWx1cmUsCi8vLyBjbG9zaW5nIHRoZSAiZGlzcGF0Y2hlZCAhPSBkb25lIiBnYXAgaWRlbnRpZmllZCBieSBib3RoIGV4dGVybmFsIGF1ZGl0cy4KLy8vCi8vLyBTdGF0ZSB0cmFuc2l0aW9uczoKLy8vICAgRGlzcGF0Y2hlZCDihpIgQWNrbm93bGVkZ2VkIOKGkiBDb21wbGV0ZWQKLy8vICAgRGlzcGF0Y2hlZCDihpIgQWNrbm93bGVkZ2VkIOKGkiBGYWlsZWQKLy8vICAgRGlzcGF0Y2hlZCDihpIgVGltZWRPdXQgKG5vIHJlc3BvbnNlIHdpdGhpbiB0aW1lb3V0IHdpbmRvdykKLy8vICAgRGlzcGF0Y2hlZCDihpIgRmFpbGVkICh0b29sIHJldHVybmVkIGZhaWx1cmUgcmVzdWx0KQovLy8gPC9zdW1tYXJ5PgpwdWJsaWMgZW51bSBBY3Rpb25MaWZlY3ljbGUKewogICAgLy8vIDxzdW1tYXJ5PkFjdGlvbiBzZW50IHRvIHRoZSBhZGFwdGVyOyBubyByZXNwb25zZSB5ZXQuPC9zdW1tYXJ5PgogICAgRGlzcGF0Y2hlZCwKCiAgICAvLy8gPHN1bW1hcnk+QWRhcHRlciBhY2tub3dsZWRnZWQgcmVjZWlwdCAocmVzZXJ2ZWQgZm9yIGZ1dHVyZSB3aXJlLWxldmVsIEFDSykuPC9zdW1tYXJ5PgogICAgQWNrbm93bGVkZ2VkLAoKICAgIC8vLyA8c3VtbWFyeT5BZGFwdGVyIHJlcG9ydGVkIHN1Y2Nlc3NmdWwgY29tcGxldGlvbiB2aWEgcmVzdWx0IGV2ZW50Ljwvc3VtbWFyeT4KICAgIENvbXBsZXRlZCwKCiAgICAvLy8gPHN1bW1hcnk+QWN0aW9uIGZhaWxlZCAodG9vbCBlcnJvciwgYWRhcHRlciBlcnJvciwgb3IgZXhjZXB0aW9uKS48L3N1bW1hcnk+CiAgICBGYWlsZWQsCgogICAgLy8vIDxzdW1tYXJ5Pk5vIHJlc3BvbnNlIHJlY2VpdmVkIHdpdGhpbiB0aGUgdGltZW91dCB3aW5kb3cgKGRlZmF1bHQgMzBzKS48L3N1bW1hcnk+CiAgICBUaW1lZE91dCwKfQo=
+namespace Agent.Core;
+
+/// <summary>
+/// Sprint 25 P0-D: Lifecycle states for a dispatched action.
+///
+/// Tracks the progression from dispatch through completion or failure,
+/// closing the "dispatched != done" gap identified by both external audits.
+///
+/// State transitions:
+///   Dispatched → Acknowledged → Completed
+///   Dispatched → Acknowledged → Failed
+///   Dispatched → TimedOut (no response within timeout window)
+///   Dispatched → Failed (tool returned failure result)
+/// </summary>
+public enum ActionLifecycle
+{
+    /// <summary>Action sent to the adapter; no response yet.</summary>
+    Dispatched,
+
+    /// <summary>Adapter acknowledged receipt (reserved for future wire-level ACK).</summary>
+    Acknowledged,
+
+    /// <summary>Adapter reported successful completion via result event.</summary>
+    Completed,
+
+    /// <summary>Action failed (tool error, adapter error, or exception).</summary>
+    Failed,
+
+    /// <summary>No response received within the timeout window (default 30s).</summary>
+    TimedOut,
+}
