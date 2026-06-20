@@ -1,1 +1,28 @@
-bmFtZXNwYWNlIEFnZW50LlBsYW5uaW5nOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuUGxhbm5pbmcuR29hbHM7CgovLy8gPHN1bW1hcnk+Ci8vLyBEZWNvbXBvc2VzIGEgPHNlZSBjcmVmPSJDcmFmdEl0ZW1Hb2FsIi8+IGludG8gdGhlIGNyYWZ0aW5nIGFjdGlvbiBzZXF1ZW5jZQovLy8gcHJvZHVjZWQgYnkgPHNlZSBjcmVmPSJIdG5UYXNrTGlicmFyeS5EZWNvbXBvc2VDcmFmdEl0ZW0iLz4uCi8vLwovLy8gU3ByaW50IDI3IFAwLUQ6IGV4dHJhY3RlZCBmcm9tIHRoZSBoYXJkY29kZWQgYnJhbmNoIDQgaW4gPHNlZSBjcmVmPSJIdG5QbGFubmVyIi8+Ci8vLyAoU3ByaW50IDEzKS4gUmVnaXN0ZXJpbmcgdGhpcyBkZWNvbXBvc2VyIHJvdXRlcyBhbGwgQ3JhZnRJdGVtR29hbCBwbGFubmluZwovLy8gdGhyb3VnaCA8c2VlIGNyZWY9IkRlY29tcG9zZXJSZWdpc3RyeSIvPiDihpIgPHNlZSBjcmVmPSJQbGFubmVyUm91dGVyIi8+IGluc3RlYWQKLy8vIG9mIHRoZSB0eXBlLXN3aXRjaCBpbnNpZGUgPHNlZSBjcmVmPSJIdG5QbGFubmVyIi8+LCBtYWtpbmcgPHNlZSBjcmVmPSJIdG5QbGFubmVyIi8+Ci8vLyBhIHB1cmUgcGhhc2UtYnktcGhhc2UgZmFsbGJhY2sgd2l0aCBubyBnb2FsLXR5cGUga25vd2xlZGdlLgovLy8gPC9zdW1tYXJ5PgpwdWJsaWMgc2VhbGVkIGNsYXNzIENyYWZ0SXRlbUdvYWxEZWNvbXBvc2VyKEh0blRhc2tMaWJyYXJ5IHRhc2tMaWJyYXJ5KSA6IElHb2FsRGVjb21wb3Nlcgp7CiAgICAvLy8gPGluaGVyaXRkb2MgLz4KICAgIHB1YmxpYyBib29sIENhbkhhbmRsZShJR29hbCBnb2FsKSA9PiBnb2FsIGlzIENyYWZ0SXRlbUdvYWw7CgogICAgLy8vIDxpbmhlcml0ZG9jIC8+CiAgICBwdWJsaWMgQWN0aW9uUGxhbiBEZWNvbXBvc2UoSUdvYWwgZ29hbCwgV29ybGRTdGF0ZSBzdGF0ZSkKICAgIHsKICAgICAgICB2YXIgY2lnID0gKENyYWZ0SXRlbUdvYWwpZ29hbDsKICAgICAgICB2YXIgYWN0aW9ucyA9IHRhc2tMaWJyYXJ5LkRlY29tcG9zZUNyYWZ0SXRlbShjaWcuSXRlbUlkLCBjaWcuQ291bnQsIHN0YXRlKTsKICAgICAgICByZXR1cm4gbmV3IEFjdGlvblBsYW4oZ29hbC5OYW1lLCBnb2FsLlBoYXNlcy5Ub0FycmF5KCksIGFjdGlvbnMpOwogICAgfQp9Cg==
+namespace Agent.Planning;
+
+using Agent.Core;
+using Agent.Planning.Goals;
+
+/// <summary>
+/// Decomposes a <see cref="CraftItemGoal"/> into the crafting action sequence
+/// produced by <see cref="HtnTaskLibrary.DecomposeCraftItem"/>.
+///
+/// Sprint 27 P0-D: extracted from the hardcoded branch 4 in <see cref="HtnPlanner"/>
+/// (Sprint 13). Registering this decomposer routes all CraftItemGoal planning
+/// through <see cref="DecomposerRegistry"/> → <see cref="PlannerRouter"/> instead
+/// of the type-switch inside <see cref="HtnPlanner"/>, making <see cref="HtnPlanner"/>
+/// a pure phase-by-phase fallback with no goal-type knowledge.
+/// </summary>
+public sealed class CraftItemGoalDecomposer(HtnTaskLibrary taskLibrary) : IGoalDecomposer
+{
+    /// <inheritdoc />
+    public bool CanHandle(IGoal goal) => goal is CraftItemGoal;
+
+    /// <inheritdoc />
+    public ActionPlan Decompose(IGoal goal, WorldState state)
+    {
+        var cig = (CraftItemGoal)goal;
+        var actions = taskLibrary.DecomposeCraftItem(cig.ItemId, cig.Count, state);
+        return new ActionPlan(goal.Name, goal.Phases.ToArray(), actions);
+    }
+}
