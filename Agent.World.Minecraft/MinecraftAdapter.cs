@@ -120,6 +120,11 @@ public sealed class MinecraftAdapter(MinecraftAdapterConfig config) : IWorldAdap
         psi.EnvironmentVariables["MC_HOST"]       = config.ServerHost;
         psi.EnvironmentVariables["MC_PORT"]       = config.ServerPort.ToString();
         psi.EnvironmentVariables["MC_USERNAME"]   = config.BotUsername;
+        // Sprint 32 SEC-02 (BLK-S32-02): inject WS_TOKEN so the Node.js adapter validates
+        // the shared secret. Only inject when AdapterSecret is configured; when null/empty,
+        // leave WS_TOKEN unset so the adapter runs in open dev mode (WS_TOKEN = null in JS).
+        if (!string.IsNullOrEmpty(config.AdapterSecret))
+            psi.EnvironmentVariables["WS_TOKEN"] = config.AdapterSecret;
 
         _nodeProcess = Process.Start(psi)
             ?? throw new InvalidOperationException($"Failed to start Node process: {config.NodeScriptPath}");
