@@ -273,7 +273,7 @@ public sealed class Sprint21BlockNotFoundFactTests
 
         // State where oak_log was not found
         var state = new WorldState();
-        state = state.With(b => b.SetFact("event:BlockNotFound:Block", "oak_log"));
+        state = state.With(b => b.SetFact("event:BlockNotFound:Block", "oak_log", FactSource.Observed))  // Sprint 33 P1-3;
 
         var spec = new ItemSpec
         {
