@@ -1,5 +1,6 @@
 namespace MemorySmith.Agent.Tests;
 
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -169,8 +170,9 @@ public class Sprint32Tests
 
         Assert.That(result, Is.Null,
             "CreateAsync with unknown item must return null.");
+        // IReadOnlyList<T> does not have Exists(); use LINQ Any() instead.
         Assert.That(
-            logger.Entries.Exists(e => e.Level == LogLevel.Warning &&
+            logger.Entries.Any(e => e.Level == LogLevel.Warning &&
                 e.Message.Contains("unobtainium_ore")),
             Is.True,
             "LogWarning must include the unknown item ID for diagnostics.");
