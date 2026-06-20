@@ -28,7 +28,7 @@ IPlan                   — ordered action sequence from planner
 IMemoryGateway          — MemorySmith search/read/write
 ITool                   — MCP tool (Name, Description, InputSchema, Execute)
 IWorldAdapter           — world comms (Connect, SendAction, ReceiveEvents)
-IPlanner                — HTN plan generation, replanning
+IPlanner                — HTN plan generation, replanning (Sprint 28: ReplanAsync accepts optional originalGoal)
 IAgentJournal           — append-only bounded event ring (1000 entries, 11 event types)
 IWorldModel             — observe/predict/reconcile/uncertainty for world state
 IGoalDecomposer         — pluggable goal decomposition (CanHandle + Decompose)
@@ -81,6 +81,20 @@ Tool routing (Sprint 23):
 **Inventory Freshness (Sprint 21–22):** `WorldState.IsInventoryStale` is set on `SetGoal` and cleared when `ApplyStatus` processes a `GetStatus` result. `GenericGatherGoal.IsComplete` and `CraftItemGoal.IsComplete` return false when stale, preventing false completion after admin `/clear`.
 
 **Tool Validation (Sprint 5):** `ToolDispatcher.CallAsync` checks all args against `ITool.InputSchema` (type/required/properties) before execution. Unknown tool names are rejected at the `/api/agent/command` endpoint.
+
+## Agent Journal Semantics
+
+The `AgentJournal` (implementing `IAgentJournal`) is a **bounded diagnostic buffer**, not a durable event store.
+
+Key properties:
+- Maximum 1000 entries (bounded `ConcurrentQueue` with best-effort trim under concurrency — see Sprint 6 council B1/B2 fixes)
+- In-process memory only — entries do not survive process restart
+- Entries are diagnostic: they help operators understand recent agent decisions but must not be used for business logic or auditing
+- 11 event types: `GoalSet`, `GoalCancel`, `PlanCreated`, `ActionDispatched`, `ActionCompleted`, `ActionFailed`, `ReplanTriggered`, `AgentStarted`, `AgentStopped`, plus validation/execution events from `ToolDispatcher`
+
+For **persistent memory** (learning, world observations, agent KB), use the MemorySmith REST API via `IMemoryGateway`.
+
+This section closes Deep Code Audit Finding 4 from Sprint 25 external audit (Sprint 28 P1-C).
 
 ## Design Principles
 
