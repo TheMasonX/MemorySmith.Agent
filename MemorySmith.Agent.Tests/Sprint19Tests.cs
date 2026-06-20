@@ -52,7 +52,7 @@ public sealed class Sprint19Tests
         };
         // Simulate a previous BlockNotFound event for "dirt"
         var state = new WorldState().With(b =>
-            b.SetFact("event:BlockNotFound:Block", "dirt"));
+            b.SetFact("event:BlockNotFound:Block", "dirt", FactSource.Observed))  // Sprint 33 P1-3;
 
         var actions = lib.DecomposeGatherItem(spec, ["10"], state);
 
@@ -75,7 +75,7 @@ public sealed class Sprint19Tests
         };
         // BlockNotFound for a DIFFERENT block (stone, not dirt)
         var state = new WorldState().With(b =>
-            b.SetFact("event:BlockNotFound:Block", "stone"));
+            b.SetFact("event:BlockNotFound:Block", "stone", FactSource.Observed))  // Sprint 33 P1-3;
 
         var actions = lib.DecomposeGatherItem(spec, ["10"], state);
 
