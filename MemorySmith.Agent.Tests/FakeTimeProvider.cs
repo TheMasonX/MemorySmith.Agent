@@ -1,1 +1,37 @@
-bmFtZXNwYWNlIE1lbW9yeVNtaXRoLkFnZW50LlRlc3RzOwoKdXNpbmcgQWdlbnQuQ29yZTsKCi8vLyA8c3VtbWFyeT4KLy8vIFRlc3Qtb25seSA8c2VlIGNyZWY9IklUaW1lUHJvdmlkZXIiLz4gdGhhdCByZXR1cm5zIGEgY29udHJvbGxhYmxlIHRpbWUgdmFsdWUuCi8vLwovLy8gU3ByaW50IDI3IFAwLUM6IGVuYWJsZXMgZGV0ZXJtaW5pc3RpYyB0aW1pbmcgdGVzdHMgZm9yIGRhbWFnZS1pbnRlcnJ1cHQgY29vbGRvd24sCi8vLyByZXBsYW4gaW50ZXJ2YWwsIGFuZCBzdGFsbCBkZXRlY3Rpb24gd2l0aG91dCByZWx5aW5nIG9uIDxjPlRhc2suRGVsYXk8L2M+LgovLy8KLy8vIFVzYWdlOgovLy8gPGNvZGU+Ci8vLyB2YXIgY2xvY2sgPSBuZXcgRmFrZVRpbWVQcm92aWRlcihEYXRlVGltZU9mZnNldC5VdGNOb3cpOwovLy8gdmFyIHNlcnZpY2UgPSBBZ2VudEJhY2tncm91bmRTZXJ2aWNlVGVzdEhlbHBlci5CdWlsZE1pbmltYWwoYWRhcHRlciwgam91cm5hbCwgY2xvY2spOwovLy8gLy8gYWR2YW5jZSB0aW1lIHBhc3QgY29vbGRvd24KLy8vIGNsb2NrLkFkdmFuY2UoVGltZVNwYW4uRnJvbVNlY29uZHMoNSkpOwovLy8gPC9jb2RlPgovLy8gPC9zdW1tYXJ5PgpwdWJsaWMgc2VhbGVkIGNsYXNzIEZha2VUaW1lUHJvdmlkZXIgOiBJVGltZVByb3ZpZGVyCnsKICAgIHByaXZhdGUgRGF0ZVRpbWVPZmZzZXQgX2N1cnJlbnQ7CgogICAgLy8vIDxzdW1tYXJ5PkluaXRpYWxpc2VzIHRoZSBjbG9jayBhdCA8cGFyYW1yZWYgbmFtZT0ic3RhcnRUaW1lIi8+Ljwvc3VtbWFyeT4KICAgIHB1YmxpYyBGYWtlVGltZVByb3ZpZGVyKERhdGVUaW1lT2Zmc2V0IHN0YXJ0VGltZSkgPT4gX2N1cnJlbnQgPSBzdGFydFRpbWU7CgogICAgLy8vIDxzdW1tYXJ5PkluaXRpYWxpc2VzIHRoZSBjbG9jayBhdCA8Yz5EYXRlVGltZU9mZnNldC5VdGNOb3c8L2M+Ljwvc3VtbWFyeT4KICAgIHB1YmxpYyBGYWtlVGltZVByb3ZpZGVyKCkgOiB0aGlzKERhdGVUaW1lT2Zmc2V0LlV0Y05vdykgeyB9CgogICAgLy8vIDxpbmhlcml0ZG9jIC8+CiAgICBwdWJsaWMgRGF0ZVRpbWVPZmZzZXQgVXRjTm93ID0+IF9jdXJyZW50OwoKICAgIC8vLyA8c3VtbWFyeT5Nb3ZlcyB0aGUgY2xvY2sgZm9yd2FyZCBieSA8cGFyYW1yZWYgbmFtZT0iZHVyYXRpb24iLz4uPC9zdW1tYXJ5PgogICAgcHVibGljIHZvaWQgQWR2YW5jZShUaW1lU3BhbiBkdXJhdGlvbikgPT4gX2N1cnJlbnQgPSBfY3VycmVudC5BZGQoZHVyYXRpb24pOwoKICAgIC8vLyA8c3VtbWFyeT5TZXRzIHRoZSBjbG9jayB0byBhbiBhYnNvbHV0ZSB2YWx1ZS48L3N1bW1hcnk+CiAgICBwdWJsaWMgdm9pZCBTZXQoRGF0ZVRpbWVPZmZzZXQgdmFsdWUpID0+IF9jdXJyZW50ID0gdmFsdWU7Cn0K
+namespace MemorySmith.Agent.Tests;
+
+using Agent.Core;
+
+/// <summary>
+/// Test-only <see cref="ITimeProvider"/> that returns a controllable time value.
+///
+/// Sprint 27 P0-C: enables deterministic timing tests for damage-interrupt cooldown,
+/// replan interval, and stall detection without relying on <c>Task.Delay</c>.
+///
+/// Usage:
+/// <code>
+/// var clock = new FakeTimeProvider(DateTimeOffset.UtcNow);
+/// var service = AgentBackgroundServiceTestHelper.BuildMinimal(adapter, journal, clock);
+/// // advance time past cooldown
+/// clock.Advance(TimeSpan.FromSeconds(5));
+/// </code>
+/// </summary>
+public sealed class FakeTimeProvider : ITimeProvider
+{
+    private DateTimeOffset _current;
+
+    /// <summary>Initialises the clock at <paramref name="startTime"/>.</summary>
+    public FakeTimeProvider(DateTimeOffset startTime) => _current = startTime;
+
+    /// <summary>Initialises the clock at <c>DateTimeOffset.UtcNow</c>.</summary>
+    public FakeTimeProvider() : this(DateTimeOffset.UtcNow) { }
+
+    /// <inheritdoc />
+    public DateTimeOffset UtcNow => _current;
+
+    /// <summary>Moves the clock forward by <paramref name="duration"/>.</summary>
+    public void Advance(TimeSpan duration) => _current = _current.Add(duration);
+
+    /// <summary>Sets the clock to an absolute value.</summary>
+    public void Set(DateTimeOffset value) => _current = value;
+}
