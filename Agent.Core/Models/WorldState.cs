@@ -1,1 +1,125 @@
-bmFtZXNwYWNlIEFnZW50LkNvcmU7CgovLy8gPHN1bW1hcnk+Ci8vLyBTbmFwc2hvdCBvZiB0aGUgYWdlbnQncyBrbm93biB3b3JsZCBhdCBhIHBvaW50IGluIHRpbWUuCi8vLyBVcGRhdGVkIGJ5IGluY29taW5nIFdvcmxkRXZlbnRzIGZyb20gdGhlIGFkYXB0ZXIuIFRoZSBwbGFubmVyIHJlYWRzIHRoaXMKLy8vIHRvIGV2YWx1YXRlIGdvYWwgY29tcGxldGlvbiBhbmQgY2hvb3NlIG5leHQgYWN0aW9ucy4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHJlY29yZCBXb3JsZFN0YXRlCnsKICAgIC8vLyA8c3VtbWFyeT5NYXhpbXVtIG51bWJlciBvZiBzdHJ1Y3R1cmVkIGZhY3RzIHJldGFpbmVkIGJlZm9yZSBvbGRlc3QgZW50cmllcyBhcmUgdHJpbW1lZC48L3N1bW1hcnk+CiAgICBwdWJsaWMgY29uc3QgaW50IE1heEZhY3RzID0gMTAwMDsKCiAgICBwdWJsaWMgc3RyaW5nIEFnZW50SWQgeyBnZXQ7IGluaXQ7IH0gPSBzdHJpbmcuRW1wdHk7CiAgICBwdWJsaWMgUG9zaXRpb24gUG9zaXRpb24geyBnZXQ7IGluaXQ7IH0gPSBuZXcoKTsKICAgIHB1YmxpYyBpbnQgSGVhbHRoIHsgZ2V0OyBpbml0OyB9ID0gMjA7CiAgICBwdWJsaWMgaW50IEZvb2QgeyBnZXQ7IGluaXQ7IH0gPSAyMDsKICAgIHB1YmxpYyBEaWN0aW9uYXJ5PHN0cmluZywgaW50PiBJbnZlbnRvcnkgeyBnZXQ7IGluaXQ7IH0gPSBbXTsKICAgIC8vLyA8c3VtbWFyeT5MZWdhY3kgZmxhdCBmYWN0IG1hcC4gUHJlZmVyIDxzZWUgY3JlZj0iU3RydWN0dXJlZEZhY3RzIi8+IGZvciBuZXcgY29kZS48L3N1bW1hcnk+CiAgICBwdWJsaWMgRGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+IEZhY3RzIHsgZ2V0OyBpbml0OyB9ID0gW107CiAgICAvLy8gPHN1bW1hcnk+VGltZS1vcmRlcmVkIGxpc3Qgb2YgZmFjdHMgd2l0aCBwcm92ZW5hbmNlIG1ldGFkYXRhLiBPbGRlc3QgZmlyc3QuPC9zdW1tYXJ5PgogICAgcHVibGljIElSZWFkT25seUxpc3Q8RmFjdD4gU3RydWN0dXJlZEZhY3RzIHsgZ2V0OyBpbml0OyB9ID0gW107CiAgICBwdWJsaWMgRGF0ZVRpbWVPZmZzZXQgVXBkYXRlZEF0IHsgZ2V0OyBpbml0OyB9ID0gRGF0ZVRpbWVPZmZzZXQuVXRjTm93OwoKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBTcHJpbnQgMjEgUDAtQTogdHJ1ZSB3aGVuIGludmVudG9yeSB3YXMgbWFya2VkIHBvdGVudGlhbGx5IHN0YWxlIGJ5CiAgICAvLy8gPHNlZSBjcmVmPSJXZWJVSS5CbGF6b3IuQWdlbnRCYWNrZ3JvdW5kU2VydmljZS5TZXRHb2FsIi8+LgogICAgLy8vIENsZWFyZWQgYnkgPHNlZSBjcmVmPSJXb3JsZFN0YXRlUHJvamVjdG9yIi8+IHdoZW4gYSBmcmVzaCA8Yz5TdGF0dXNFdmVudDwvYz4gYXJyaXZlcy4KICAgIC8vLyA8c2VlIGNyZWY9IkFnZW50LlBsYW5uaW5nLkdvYWxzLkdlbmVyaWNHYXRoZXJHb2FsLklzQ29tcGxldGUiLz4gcmV0dXJucyBmYWxzZSB3aGlsZQogICAgLy8vIHRoaXMgZmxhZyBpcyBzZXQsIHByZXZlbnRpbmcgZmFsc2UtY29tcGxldGlvbiBhZnRlciBhZG1pbiA8Yz4vY2xlYXI8L2M+LgogICAgLy8vIDwvc3VtbWFyeT4KICAgIHB1YmxpYyBib29sIElzSW52ZW50b3J5U3RhbGUgeyBnZXQ7IGluaXQ7IH0gPSBmYWxzZTsKCiAgICBwdWJsaWMgV29ybGRTdGF0ZSBXaXRoKEFjdGlvbjxXb3JsZFN0YXRlLkJ1aWxkZXI+IGNvbmZpZ3VyZSkKICAgIHsKICAgICAgICB2YXIgYiA9IG5ldyBCdWlsZGVyKHRoaXMpOwogICAgICAgIGNvbmZpZ3VyZShiKTsKICAgICAgICByZXR1cm4gYi5CdWlsZCgpOwogICAgfQoKICAgIHB1YmxpYyBzZWFsZWQgY2xhc3MgQnVpbGRlcihXb3JsZFN0YXRlIHNvdXJjZSkKICAgIHsKICAgICAgICBwcml2YXRlIFdvcmxkU3RhdGUgX3N0YXRlID0gc291cmNlOwoKICAgICAgICBwdWJsaWMgQnVpbGRlciBTZXRIZWFsdGgoaW50IGhwKSB7IF9zdGF0ZSA9IF9zdGF0ZSB3aXRoIHsgSGVhbHRoID0gaHAgfTsgcmV0dXJuIHRoaXM7IH0KICAgICAgICBwdWJsaWMgQnVpbGRlciBTZXRGb29kKGludCBmb29kKSB7IF9zdGF0ZSA9IF9zdGF0ZSB3aXRoIHsgRm9vZCA9IGZvb2QgfTsgcmV0dXJuIHRoaXM7IH0KICAgICAgICBwdWJsaWMgQnVpbGRlciBTZXRQb3NpdGlvbihQb3NpdGlvbiBwKSB7IF9zdGF0ZSA9IF9zdGF0ZSB3aXRoIHsgUG9zaXRpb24gPSBwIH07IHJldHVybiB0aGlzOyB9CgogICAgICAgIC8vLyA8c3VtbWFyeT4KICAgICAgICAvLy8gU2V0cyBhIGZhY3QgaW4gdGhlIGxlZ2FjeSA8c2VlIGNyZWY9IldvcmxkU3RhdGUuRmFjdHMiLz4gZGljdGlvbmFyeSBvbmx5LgogICAgICAgIC8vLyBGb3IgcHJvdmVuYW5jZS10cmFja2VkIGZhY3RzIHVzZSA8c2VlIGNyZWY9IlNldEZhY3Qoc3RyaW5nLHN0cmluZyxGYWN0U291cmNlKSIvPi4KICAgICAgICAvLy8KICAgICAgICAvLy8gVXNlIDxzZWUgY3JlZj0iU2V0RmFjdChzdHJpbmcsc3RyaW5nLEZhY3RTb3VyY2UpIi8+IG9yIGFzc2lnbiB0bwogICAgICAgIC8vLyA8c2VlIGNyZWY9IldvcmxkU3RhdGUuRmFjdHMiLz4gZGlyZWN0bHkgZm9yIG5ldyBjb2RlLiBUaGUgbGVnYWN5IHdyaXRlLXBhdGgKICAgICAgICAvLy8gaXMgbm90IHVzZWQgaW4gcHJvZHVjdGlvbjsgdGhpcyBtZXRob2QgZXhpc3RzIG9ubHkgZm9yIHRlc3QgY29udmVuaWVuY2UgYW5kCiAgICAgICAgLy8vIGJhY2t3YXJkIGNvbXBhdGliaWxpdHkuCiAgICAgICAgLy8vIDwvc3VtbWFyeT4KICAgICAgICBbT2Jzb2xldGUoIlVzZSBTZXRGYWN0KHN0cmluZywgc3RyaW5nLCBGYWN0U291cmNlKSBvciBXb3JsZFN0YXRlLkZhY3RzIGRpcmVjdGx5LiAiICsKICAgICAgICAgICAgICAgICAgIlRoaXMgd3JpdGUtcGF0aCBpcyBub3QgdXNlZCBpbiBwcm9kdWN0aW9uIGFuZCBleGlzdHMgb25seSBmb3IgYmFja3dhcmQgIiArCiAgICAgICAgICAgICAgICAgICJjb21wYXRpYmlsaXR5LiBTZWUgV29ybGRTdGF0ZS5TdHJ1Y3R1cmVkRmFjdHMgZm9yIHByb3ZlbmFuY2UtdHJhY2tlZCBmYWN0cy4iKV0KICAgICAgICBwdWJsaWMgQnVpbGRlciBTZXRGYWN0KHN0cmluZyBrZXksIG9iamVjdD8gdmFsdWUpCiAgICAgICAgewogICAgICAgICAgICB2YXIgZmFjdHMgPSBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+KF9zdGF0ZS5GYWN0cykgeyBba2V5XSA9IHZhbHVlIH07CiAgICAgICAgICAgIF9zdGF0ZSA9IF9zdGF0ZSB3aXRoIHsgRmFjdHMgPSBmYWN0cywgVXBkYXRlZEF0ID0gRGF0ZVRpbWVPZmZzZXQuVXRjTm93IH07CiAgICAgICAgICAgIHJldHVybiB0aGlzOwogICAgICAgIH0KCiAgICAgICAgLy8vIDxzdW1tYXJ5PgogICAgICAgIC8vLyBTZXRzIGEgZmFjdCB3aXRoIHByb3ZlbmFuY2UgbWV0YWRhdGEuIFVwZGF0ZXMgYm90aCA8c2VlIGNyZWY9IldvcmxkU3RhdGUuRmFjdHMiLz4KICAgICAgICAvLy8gKGFzIGEgc3RyaW5nIHZhbHVlKSBhbmQgPHNlZSBjcmVmPSJXb3JsZFN0YXRlLlN0cnVjdHVyZWRGYWN0cyIvPi4KICAgICAgICAvLy8gVHJpbXMgb2xkZXN0IGVudHJpZXMgd2hlbiB0aGUgY291bnQgZXhjZWVkcyA8c2VlIGNyZWY9IldvcmxkU3RhdGUuTWF4RmFjdHMiLz4uCiAgICAgICAgLy8vIDwvc3VtbWFyeT4KICAgICAgICBwdWJsaWMgQnVpbGRlciBTZXRGYWN0KHN0cmluZyBrZXksIHN0cmluZyB2YWx1ZSwgRmFjdFNvdXJjZSBzb3VyY2UpCiAgICAgICAgewogICAgICAgICAgICB2YXIgZmFjdHMgPSBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+KF9zdGF0ZS5GYWN0cykgeyBba2V5XSA9IHZhbHVlIH07CiAgICAgICAgICAgIHZhciBzdHJ1Y3R1cmVkID0gbmV3IExpc3Q8RmFjdD4oX3N0YXRlLlN0cnVjdHVyZWRGYWN0cykKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgbmV3IEZhY3Qoa2V5LCB2YWx1ZSwgc291cmNlLCBEYXRlVGltZU9mZnNldC5VdGNOb3cpLAogICAgICAgICAgICB9OwogICAgICAgICAgICB3aGlsZSAoc3RydWN0dXJlZC5Db3VudCA+IE1heEZhY3RzKQogICAgICAgICAgICAgICAgc3RydWN0dXJlZC5SZW1vdmVBdCgwKTsKICAgICAgICAgICAgX3N0YXRlID0gX3N0YXRlIHdpdGggeyBGYWN0cyA9IGZhY3RzLCBTdHJ1Y3R1cmVkRmFjdHMgPSBzdHJ1Y3R1cmVkLCBVcGRhdGVkQXQgPSBEYXRlVGltZU9mZnNldC5VdGNOb3cgfTsKICAgICAgICAgICAgcmV0dXJuIHRoaXM7CiAgICAgICAgfQoKICAgICAgICAvLy8gPHN1bW1hcnk+CiAgICAgICAgLy8vIFJlcGxhY2VzIHRoZSBlbnRpcmUgaW52ZW50b3J5IHdpdGggdGhlIHN1cHBsaWVkIHNuYXBzaG90LgogICAgICAgIC8vLyBVc2VkIHdoZW4gYSBmdWxsIHN0YXR1cyBldmVudCBhcnJpdmVzIGZyb20gdGhlIHdvcmxkIGFkYXB0ZXIuCiAgICAgICAgLy8vIDwvc3VtbWFyeT4KICAgICAgICBwdWJsaWMgQnVpbGRlciBTZXRJbnZlbnRvcnkoSVJlYWRPbmx5RGljdGlvbmFyeTxzdHJpbmcsIGludD4gc25hcHNob3QpCiAgICAgICAgewogICAgICAgICAgICBfc3RhdGUgPSBfc3RhdGUgd2l0aCB7IEludmVudG9yeSA9IG5ldyBEaWN0aW9uYXJ5PHN0cmluZywgaW50PihzbmFwc2hvdCkgfTsKICAgICAgICAgICAgcmV0dXJuIHRoaXM7CiAgICAgICAgfQoKICAgICAgICAvLy8gPHN1bW1hcnk+CiAgICAgICAgLy8vIEluY3JlbWVudHMgKG9yIGRlY3JlbWVudHMpIGEgc2luZ2xlIGludmVudG9yeSBpdGVtIGJ5IDxwYXJhbXJlZiBuYW1lPSJkZWx0YSIvPi4KICAgICAgICAvLy8gUmVtb3ZlcyB0aGUgZW50cnkgd2hlbiB0aGUgY291bnQgZHJvcHMgdG8gemVybyBvciBiZWxvdy4KICAgICAgICAvLy8gPC9zdW1tYXJ5PgogICAgICAgIHB1YmxpYyBCdWlsZGVyIEFkZEludmVudG9yeUl0ZW0oc3RyaW5nIGl0ZW0sIGludCBkZWx0YSA9IDEpCiAgICAgICAgewogICAgICAgICAgICB2YXIgaW52ID0gbmV3IERpY3Rpb25hcnk8c3RyaW5nLCBpbnQ+KF9zdGF0ZS5JbnZlbnRvcnkpOwogICAgICAgICAgICBpbnYuVHJ5R2V0VmFsdWUoaXRlbSwgb3V0IHZhciBjdXIpOwogICAgICAgICAgICB2YXIgbmV4dCA9IGN1ciArIGRlbHRhOwogICAgICAgICAgICBpZiAobmV4dCA8PSAwKSBpbnYuUmVtb3ZlKGl0ZW0pOwogICAgICAgICAgICBlbHNlICAgICAgICAgICBpbnZbaXRlbV0gPSBuZXh0OwogICAgICAgICAgICBfc3RhdGUgPSBfc3RhdGUgd2l0aCB7IEludmVudG9yeSA9IGludiB9OwogICAgICAgICAgICByZXR1cm4gdGhpczsKICAgICAgICB9CgogICAgICAgIC8vLyA8c3VtbWFyeT4KICAgICAgICAvLy8gU3ByaW50IDIxIFAwLUE6IG1hcmtzIHRoZSBpbnZlbnRvcnkgYXMgcG90ZW50aWFsbHkgc3RhbGUgKHRydWUpIG9yIGNvbmZpcm1lZAogICAgICAgIC8vLyBmcmVzaCAoZmFsc2UpLiBTZXQgdG8gdHJ1ZSBieSBBZ2VudEJhY2tncm91bmRTZXJ2aWNlLlNldEdvYWw7IGNsZWFyZWQgYnkKICAgICAgICAvLy8gV29ybGRTdGF0ZVByb2plY3RvciB3aGVuIGEgU3RhdHVzRXZlbnQgYXJyaXZlcyBmcm9tIEdldFN0YXR1cy4KICAgICAgICAvLy8gPC9zdW1tYXJ5PgogICAgICAgIHB1YmxpYyBCdWlsZGVyIFNldEludmVudG9yeVN0YWxlKGJvb2wgc3RhbGUpCiAgICAgICAgewogICAgICAgICAgICBfc3RhdGUgPSBfc3RhdGUgd2l0aCB7IElzSW52ZW50b3J5U3RhbGUgPSBzdGFsZSB9OwogICAgICAgICAgICByZXR1cm4gdGhpczsKICAgICAgICB9CgogICAgICAgIHB1YmxpYyBXb3JsZFN0YXRlIEJ1aWxkKCkgPT4gX3N0YXRlIHdpdGggeyBVcGRhdGVkQXQgPSBEYXRlVGltZU9mZnNldC5VdGNOb3cgfTsKICAgIH0KfQoKcHVibGljIHJlY29yZCBQb3NpdGlvbihpbnQgWCA9IDAsIGludCBZID0gNjQsIGludCBaID0gMCk7Cg==
+namespace Agent.Core;
+
+/// <summary>
+/// Snapshot of the agent's known world at a point in time.
+/// Updated by incoming WorldEvents from the adapter. The planner reads this
+/// to evaluate goal completion and choose next actions.
+/// </summary>
+public record WorldState
+{
+    /// <summary>Maximum number of structured facts retained before oldest entries are trimmed.</summary>
+    public const int MaxFacts = 1000;
+
+    public string AgentId { get; init; } = string.Empty;
+    public Position Position { get; init; } = new();
+    public int Health { get; init; } = 20;
+    public int Food { get; init; } = 20;
+    public Dictionary<string, int> Inventory { get; init; } = [];
+    /// <summary>Legacy flat fact map. Prefer <see cref="StructuredFacts"/> for new code.</summary>
+    public Dictionary<string, object?> Facts { get; init; } = [];
+    /// <summary>Time-ordered list of facts with provenance metadata. Oldest first.</summary>
+    public IReadOnlyList<Fact> StructuredFacts { get; init; } = [];
+    public DateTimeOffset UpdatedAt { get; init; } = DateTimeOffset.UtcNow;
+
+    /// <summary>
+    /// Sprint 21 P0-A: true when inventory was marked potentially stale by
+    /// <see cref="WebUI.Blazor.AgentBackgroundService.SetGoal"/>.
+    /// Cleared by <see cref="WorldStateProjector"/> when a fresh <c>StatusEvent</c> arrives.
+    /// <see cref="Agent.Planning.Goals.GenericGatherGoal.IsComplete"/> returns false while
+    /// this flag is set, preventing false-completion after admin <c>/clear</c>.
+    /// </summary>
+    public bool IsInventoryStale { get; init; } = false;
+
+    public WorldState With(Action<WorldState.Builder> configure)
+    {
+        var b = new Builder(this);
+        configure(b);
+        return b.Build();
+    }
+
+    public sealed class Builder(WorldState source)
+    {
+        private WorldState _state = source;
+
+        public Builder SetHealth(int hp) { _state = _state with { Health = hp }; return this; }
+        public Builder SetFood(int food) { _state = _state with { Food = food }; return this; }
+        public Builder SetPosition(Position p) { _state = _state with { Position = p }; return this; }
+
+        /// <summary>
+        /// Sets a fact in the legacy <see cref="WorldState.Facts"/> dictionary only.
+        /// For provenance-tracked facts use <see cref="SetFact(string,string,FactSource)"/>.
+        ///
+        /// Use <see cref="SetFact(string,string,FactSource)"/> or assign to
+        /// <see cref="WorldState.Facts"/> directly for new code. The legacy write-path
+        /// is not used in production; this method exists only for test convenience and
+        /// backward compatibility.
+        /// </summary>
+        [Obsolete("Use SetFact(string, string, FactSource) or WorldState.Facts directly. " +
+                  "This write-path is not used in production and exists only for backward " +
+                  "compatibility. See WorldState.StructuredFacts for provenance-tracked facts.")]
+        public Builder SetFact(string key, object? value)
+        {
+            var facts = new Dictionary<string, object?>(_state.Facts) { [key] = value };
+            _state = _state with { Facts = facts, UpdatedAt = DateTimeOffset.UtcNow };
+            return this;
+        }
+
+        /// <summary>
+        /// Sets a fact with provenance metadata. Updates both <see cref="WorldState.Facts"/>
+        /// (as a string value) and <see cref="WorldState.StructuredFacts"/>.
+        /// Trims oldest entries when the count exceeds <see cref="WorldState.MaxFacts"/>.
+        /// </summary>
+        public Builder SetFact(string key, string value, FactSource source)
+        {
+            var facts = new Dictionary<string, object?>(_state.Facts) { [key] = value };
+            var structured = new List<Fact>(_state.StructuredFacts)
+            {
+                new Fact(key, value, source, DateTimeOffset.UtcNow),
+            };
+            while (structured.Count > MaxFacts)
+                structured.RemoveAt(0);
+            _state = _state with { Facts = facts, StructuredFacts = structured, UpdatedAt = DateTimeOffset.UtcNow };
+            return this;
+        }
+
+        /// <summary>
+        /// Replaces the entire inventory with the supplied snapshot.
+        /// Used when a full status event arrives from the world adapter.
+        /// </summary>
+        public Builder SetInventory(IReadOnlyDictionary<string, int> snapshot)
+        {
+            _state = _state with { Inventory = new Dictionary<string, int>(snapshot) };
+            return this;
+        }
+
+        /// <summary>
+        /// Increments (or decrements) a single inventory item by <paramref name="delta"/>.
+        /// Removes the entry when the count drops to zero or below.
+        /// </summary>
+        public Builder AddInventoryItem(string item, int delta = 1)
+        {
+            var inv = new Dictionary<string, int>(_state.Inventory);
+            inv.TryGetValue(item, out var cur);
+            var next = cur + delta;
+            if (next <= 0) inv.Remove(item);
+            else           inv[item] = next;
+            _state = _state with { Inventory = inv };
+            return this;
+        }
+
+        /// <summary>
+        /// Sprint 21 P0-A: marks the inventory as potentially stale (true) or confirmed
+        /// fresh (false). Set to true by AgentBackgroundService.SetGoal; cleared by
+        /// WorldStateProjector when a StatusEvent arrives from GetStatus.
+        /// </summary>
+        public Builder SetInventoryStale(bool stale)
+        {
+            _state = _state with { IsInventoryStale = stale };
+            return this;
+        }
+
+        public WorldState Build() => _state with { UpdatedAt = DateTimeOffset.UtcNow };
+    }
+}
+
+public record Position(int X = 0, int Y = 64, int Z = 0);
