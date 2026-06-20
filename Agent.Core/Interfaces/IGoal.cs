@@ -1,1 +1,46 @@
-bmFtZXNwYWNlIEFnZW50LkNvcmU7CgovLy8gPHN1bW1hcnk+Ci8vLyBBIGhpZ2gtbGV2ZWwgYWdlbnQgb2JqZWN0aXZlLiBHb2FscyBhcmUgZXZhbHVhdGVkIGVhY2ggcmVhc29uaW5nIGN5Y2xlLgovLy8gV2hlbiBJc0NvbXBsZXRlIHJldHVybnMgdHJ1ZSB0aGUgYWdlbnQgaWRsZXM7IHdoZW4gSGFzRmFpbGVkIHJldHVybnMgdHJ1ZQovLy8gdGhlIHBsYW5uZXIgaXMgYXNrZWQgdG8gcmVwbGFuIG9yIHRoZSB1c2VyIGlzIGFsZXJ0ZWQuCi8vLyA8L3N1bW1hcnk+CnB1YmxpYyBpbnRlcmZhY2UgSUdvYWwKewogICAgc3RyaW5nIE5hbWUgeyBnZXQ7IH0KICAgIHN0cmluZyBEZXNjcmlwdGlvbiB7IGdldDsgfQogICAgc3RyaW5nW10gUGhhc2VzIHsgZ2V0OyB9CgogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIE51bGxhYmxlIGZhaWx1cmUgcmVhc29uLiA8c2VlIGxhbmd3b3JkPSJudWxsIi8+IG1lYW5zIHRoZSBnb2FsIGhhc24ndAogICAgLy8vIGZhaWxlZCB5ZXQgb3Igbm8gcmVhc29uIHdhcyByZWNvcmRlZC4gU2V0IGJ5IHRoZSBhZ2VudCBzZXJ2aWNlIHdoZW4KICAgIC8vLyA8c2VlIGNyZWY9Ikhhc0ZhaWxlZCIvPiByZXR1cm5zIDxzZWUgbGFuZ3dvcmQ9InRydWUiLz4uCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgc3RyaW5nPyBGYWlsdXJlUmVhc29uIHsgZ2V0OyBzZXQ7IH0KCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gT3B0aW9uYWwgcGVyLWdvYWwgb3ZlcnJpZGUgZm9yIHRoZSBkYW1hZ2UgaW50ZXJydXB0IHRocmVzaG9sZCAoaW4gSFApLgogICAgLy8vIDxwYXJhPgogICAgLy8vIDxzZWUgbGFuZ3dvcmQ9Im51bGwiLz4gKGRlZmF1bHQpIG1lYW5zIHVzZSB0aGUgc3lzdGVtLXdpZGUgZGVmYXVsdCBvZiA2IEhQIOKAlAogICAgLy8vIHRoZSBhZ2VudCBpbnRlcnJ1cHRzIHRoZSBjdXJyZW50IHBsYW4gYW5kIHJlLWV2YWx1YXRlcyB3aGVuIGhlYWx0aCBkcm9wcyBieQogICAgLy8vIHRoaXMgYW1vdW50IG9yIG1vcmUgaW4gYSBzaW5nbGUgZGFtYWdlIGV2ZW50LgogICAgLy8vIDwvcGFyYT4KICAgIC8vLyA8cGFyYT4KICAgIC8vLyA8Yz4wPC9jPiBtZWFucyBuZXZlciBpbnRlcnJ1cHQgdGhpcyBnb2FsIG9uIGRhbWFnZS4gUmVzZXJ2ZWQgZm9yIGZ1dHVyZSBjb21iYXQKICAgIC8vLyBnb2FscyB3aGVyZSB0aGUgZ29hbCBpdHNlbGYgbWFuYWdlcyBkYW1hZ2UgcmVzcG9uc2UgYW5kIGFuIGludGVycnVwdCB3b3VsZAogICAgLy8vIGFib3J0IHRoZSBjb21iYXQgcGxhbiBtaWQtc3dpbmcuCiAgICAvLy8gPC9wYXJhPgogICAgLy8vIDxwYXJhPgogICAgLy8vIEFueSBvdGhlciBwb3NpdGl2ZSB2YWx1ZSBzZXRzIGEgZ29hbC1zcGVjaWZpYyB0aHJlc2hvbGQgKGUuZy4sIGEgZnJhZ2lsZQogICAgLy8vIGV4cGxvcmF0aW9uIGdvYWwgbWlnaHQgdXNlIDMgSFAgdG8gYmFpbCBvdXQgZWFybGllcikuCiAgICAvLy8gPC9wYXJhPgogICAgLy8vIDxwYXJhPgogICAgLy8vIEFkZGVkIGluIFNwcmludCAyMyAoQi0yIHJlc29sdXRpb24pIHRvIHN1cHBvcnQgY29udGV4dC1hd2FyZSBkYW1hZ2UgaW50ZXJydXB0CiAgICAvLy8gcG9saWN5IHdpdGhvdXQgZm9yY2luZyBldmVyeSBleGlzdGluZyBnb2FsIHRvIG9wdCBpbi4KICAgIC8vLyA8L3BhcmE+CiAgICAvLy8gPC9zdW1tYXJ5PgogICAgaW50PyBEYW1hZ2VJbnRlcnJ1cHRUaHJlc2hvbGRIcCA9PiBudWxsOwoKICAgIGJvb2wgSXNDb21wbGV0ZShXb3JsZFN0YXRlIHN0YXRlKTsKICAgIGJvb2wgSGFzRmFpbGVkKFdvcmxkU3RhdGUgc3RhdGUpOwp9Cg==
+namespace Agent.Core;
+
+/// <summary>
+/// A high-level agent objective. Goals are evaluated each reasoning cycle.
+/// When IsComplete returns true the agent idles; when HasFailed returns true
+/// the planner is asked to replan or the user is alerted.
+/// </summary>
+public interface IGoal
+{
+    string Name { get; }
+    string Description { get; }
+    string[] Phases { get; }
+
+    /// <summary>
+    /// Nullable failure reason. <see langword="null"/> means the goal hasn't
+    /// failed yet or no reason was recorded. Set by the agent service when
+    /// <see cref="HasFailed"/> returns <see langword="true"/>.
+    /// </summary>
+    string? FailureReason { get; set; }
+
+    /// <summary>
+    /// Optional per-goal override for the damage interrupt threshold (in HP).
+    /// <para>
+    /// <see langword="null"/> (default) means use the system-wide default of 6 HP —
+    /// the agent interrupts the current plan and re-evaluates when health drops by
+    /// this amount or more in a single damage event.
+    /// </para>
+    /// <para>
+    /// <c>0</c> means never interrupt this goal on damage. Reserved for future combat
+    /// goals where the goal itself manages damage response and an interrupt would
+    /// abort the combat plan mid-swing.
+    /// </para>
+    /// <para>
+    /// Any other positive value sets a goal-specific threshold (e.g., a fragile
+    /// exploration goal might use 3 HP to bail out earlier).
+    /// </para>
+    /// <para>
+    /// Added in Sprint 23 (B-2 resolution) to support context-aware damage interrupt
+    /// policy without forcing every existing goal to opt in.
+    /// </para>
+    /// </summary>
+    int? DamageInterruptThresholdHp => null;
+
+    bool IsComplete(WorldState state);
+    bool HasFailed(WorldState state);
+}
