@@ -1,5 +1,5 @@
 // MemorySmith.Agent — Web UI & Agent Host
-// v0.28.0  Sprint 30 — Base64 decode + ITool compliance + security
+// v0.28.0  Sprint 33 — Build verify, DI logger wiring, base64 sweep, Rule E-2
 
 using Agent.Construction;
 using Agent.Core;
@@ -35,8 +35,31 @@ builder.Host.UseSerilog((context, services, loggerConfig) =>
             outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {SourceContext}: {Message:lj} {Properties:j}{NewLine}{Exception}");
 });
 
+
 // ── Options ───────────────────────────────────────────────────────────────────────────
-var factory = sp.GetRequiredService<IHttpClientFactory>();
+builder.Services.Configure<RestMemoryGatewayOptions>(
+    builder.Configuration.GetSection("Agent:Memory"));
+builder.Services.Configure<MinecraftAdapterConfig>(
+    builder.Configuration.GetSection("Agent:Minecraft"));
+
+var agentEnabled = builder.Configuration.GetValue<bool>("Agent:Enabled");
+
+if (agentEnabled)
+{
+    builder.Services.AddSingleton<IWorldAdapter>(sp =>
+        new MinecraftAdapter(sp.GetRequiredService<IOptions<MinecraftAdapterConfig>>().Value));
+
+    builder.Services.AddHttpClient("memorysmith", (sp, http) =>
+    {
+        var opts = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
+        http.BaseAddress = new Uri(opts.BaseUrl);
+        http.Timeout     = TimeSpan.FromSeconds(opts.TimeoutSeconds);
+        if (!string.IsNullOrEmpty(opts.ApiKey))
+            http.DefaultRequestHeaders.Add("X-Api-Key", opts.ApiKey);
+    });
+    builder.Services.AddSingleton<IMemoryGateway>(sp =>
+    {
+        var factory = sp.GetRequiredService<IHttpClientFactory>();
         var opts    = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
         return new RestMemoryGateway(factory.CreateClient("memorysmith"), opts);
     });
@@ -80,7 +103,8 @@ var factory = sp.GetRequiredService<IHttpClientFactory>();
 
     builder.Services.AddSingleton<GoalFactory>(sp => new GoalFactory(
         sp.GetRequiredService<IItemRegistry>(),
-        sp.GetRequiredService<IBlueprintRepository>()));
+        sp.GetRequiredService<IBlueprintRepository>(),
+        sp.GetRequiredService<ILogger<GoalFactory>>())); // Sprint 33 DEF-S32-A
     builder.Services.AddSingleton<IGoalFactory>(sp => sp.GetRequiredService<GoalFactory>());
 
     builder.Services.AddSingleton<ChatHistory>();
@@ -145,7 +169,9 @@ var factory = sp.GetRequiredService<IHttpClientFactory>();
 
     builder.Services.AddSingleton<HtnTaskLibrary>();
     builder.Services.AddSingleton<HtnPlanner>(sp =>
-        new HtnPlanner(sp.GetRequiredService<HtnTaskLibrary>()));
+        new HtnPlanner(
+            sp.GetRequiredService<HtnTaskLibrary>(),
+            sp.GetRequiredService<ILogger<HtnPlanner>>())); // Sprint 33 DEF-S32-G
     builder.Services.AddSingleton<IPlanner>(sp =>
         sp.GetRequiredService<PlannerRouter>());  // Sprint 27 P0-D: route through decomposer registry first
 
@@ -235,6 +261,16 @@ if (agentEnabled)
             "in agent KB. Set WorldKbUrl in Agent:Memory:WorldKbUrl to enable world KB separation. " +
             "See Data/Pages/Guides/world-kb-deployment.md");
     }
+
+    // Sprint 33 DEF-S32-H: log when AdapterSecret is null so misconfiguration is visible.
+    // When null, no handshake is sent; if WS_TOKEN is set externally the connection will fail.
+    if (string.IsNullOrEmpty(mcCfg.AdapterSecret))
+    {
+        app.Logger.LogDebug(
+            "MinecraftAdapter: AdapterSecret is not configured (null/empty). No WebSocket handshake " +
+            "will be sent on connect. If WS_TOKEN is set in the Node.js environment the connection " +
+            "will be rejected. Set Agent:Minecraft:AdapterSecret to enable auth.");
+    }
 }
 
 if (agentEnabled)
@@ -246,7 +282,7 @@ app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
 {
     Name    = "MemorySmith.Agent",
     Version = "0.28.0",
-    Phase   = "Sprint 30 — Base64 decode, ITool compliance, SEC-01 middleware",
+    Phase   = "Sprint 33 — Build verify, DI logger wiring, base64 sweep, Rule E-2",
     License = "MIT",
     Repository  = "https://github.com/TheMasonX/MemorySmith.Agent",
     Dashboard   = "/",
