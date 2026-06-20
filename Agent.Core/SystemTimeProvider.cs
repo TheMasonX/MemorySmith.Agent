@@ -1,1 +1,17 @@
-bmFtZXNwYWNlIEFnZW50LkNvcmU7CgovLy8gPHN1bW1hcnk+Ci8vLyBQcm9kdWN0aW9uIDxzZWUgY3JlZj0iSVRpbWVQcm92aWRlciIvPiB0aGF0IGRlbGVnYXRlcyB0byA8c2VlIGNyZWY9IkRhdGVUaW1lT2Zmc2V0LlV0Y05vdyIvPi4KLy8vIFJlZ2lzdGVyZWQgYXMgYSBzaW5nbGV0b24gaW4gREk7IHVzZSA8c2VlIGNyZWY9Ikluc3RhbmNlIi8+IHdoZW4gY29uc3RydWN0aW5nIG91dHNpZGUgREkKLy8vIChlLmcuIGluIHRlc3RzIHRoYXQgZG8gbm90IG5lZWQgdGltZSBjb250cm9sKS4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCBjbGFzcyBTeXN0ZW1UaW1lUHJvdmlkZXIgOiBJVGltZVByb3ZpZGVyCnsKICAgIC8vLyA8c3VtbWFyeT5TaGFyZWQgc2luZ2xldG9uIOKAlCBzYWZlIHRvIHVzZSBhcyBhIG5vLW9wIGRlZmF1bHQuPC9zdW1tYXJ5PgogICAgcHVibGljIHN0YXRpYyByZWFkb25seSBTeXN0ZW1UaW1lUHJvdmlkZXIgSW5zdGFuY2UgPSBuZXcoKTsKCiAgICBwcml2YXRlIFN5c3RlbVRpbWVQcm92aWRlcigpIHsgfQoKICAgIC8vLyA8aW5oZXJpdGRvYyAvPgogICAgcHVibGljIERhdGVUaW1lT2Zmc2V0IFV0Y05vdyA9PiBEYXRlVGltZU9mZnNldC5VdGNOb3c7Cn0K
+namespace Agent.Core;
+
+/// <summary>
+/// Production <see cref="ITimeProvider"/> that delegates to <see cref="DateTimeOffset.UtcNow"/>.
+/// Registered as a singleton in DI; use <see cref="Instance"/> when constructing outside DI
+/// (e.g. in tests that do not need time control).
+/// </summary>
+public sealed class SystemTimeProvider : ITimeProvider
+{
+    /// <summary>Shared singleton — safe to use as a no-op default.</summary>
+    public static readonly SystemTimeProvider Instance = new();
+
+    private SystemTimeProvider() { }
+
+    /// <inheritdoc />
+    public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
+}

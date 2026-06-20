@@ -1,1 +1,307 @@
-dXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuVG9vbHM7CnVzaW5nIFN5c3RlbS5UZXh0Lkpzb247CgpuYW1lc3BhY2UgTWVtb3J5U21pdGguQWdlbnQuVGVzdHM7CgovLy8gPHN1bW1hcnk+Ci8vLyBUZXN0cyB0aGF0IGVhY2ggdG9vbCBjb3JyZWN0bHkgc2hhcGVzIHRoZSBBY3Rpb25EYXRhIGRpc3BhdGNoZWQgdG8gTW9ja1dvcmxkQWRhcHRlci4KLy8vIFByZXZpb3VzbHkgdW50ZXN0ZWQgKEZpbmRpbmcgNyDigJQgemVybyBwZXItdG9vbCB0ZXN0cykuCi8vLyBUaGlzIGlzIHRoZSAiaW50ZXJmYWNlIGlzIHRoZSB0ZXN0IHN1cmZhY2UiIHByaW5jaXBsZTogdmVyaWZ5IHdoYXQgY3Jvc3NlcyB0aGUgc2VhbS4KLy8vIDwvc3VtbWFyeT4KW1Rlc3RGaXh0dXJlXQpwdWJsaWMgY2xhc3MgVG9vbERpc3BhdGNoVGVzdHMKewogICAgcHJpdmF0ZSBNb2NrV29ybGRBZGFwdGVyIF9hZGFwdGVyID0gbnVsbCE7CgogICAgW1NldFVwXQogICAgcHVibGljIHZvaWQgU2V0VXAoKSA9PiBfYWRhcHRlciA9IG5ldyBNb2NrV29ybGRBZGFwdGVyKCk7CgogICAgLy8g4pSA4pSAIEhlbHBlciDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBwcml2YXRlIHN0YXRpYyBKc29uRWxlbWVudCBBcmdzKHN0cmluZyBqc29uKSA9PgogICAgICAgIEpzb25Eb2N1bWVudC5QYXJzZShqc29uKS5Sb290RWxlbWVudDsKCiAgICAvLyDilIDilIAgTW92ZVRvVG9vbCDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBbVGVzdF0KICAgIHB1YmxpYyBhc3luYyBUYXNrIE1vdmVUb1Rvb2xfU2VuZHNDb3JyZWN0QWN0aW9uRGF0YSgpCiAgICB7CiAgICAgICAgdmFyIHRvb2wgICA9IG5ldyBNb3ZlVG9Ub29sKF9hZGFwdGVyKTsKICAgICAgICB2YXIgcmVzdWx0ID0gYXdhaXQgdG9vbC5FeGVjdXRlQXN5bmMoQXJncygie1wieFwiOjEwLFwieVwiOjY0LFwielwiOi0yMH0iKSk7CgogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5TdWNjZXNzLCBJcy5UcnVlKTsKICAgICAgICBBc3NlcnQuVGhhdChfYWRhcHRlci5TZW50QWN0aW9ucywgSGFzLkNvdW50LkVxdWFsVG8oMSkpOwogICAgICAgIHZhciBhY3Rpb24gPSBfYWRhcHRlci5TZW50QWN0aW9uc1swXTsKICAgICAgICBBc3NlcnQuVGhhdChhY3Rpb24uVG9vbCwgSXMuRXF1YWxUbygibW92ZSIpKTsKICAgICAgICBBc3NlcnQuVGhhdChhY3Rpb24uQXJndW1lbnRzWyJ4Il0sIElzLkVxdWFsVG8oMTApKTsKICAgICAgICBBc3NlcnQuVGhhdChhY3Rpb24uQXJndW1lbnRzWyJ5Il0sIElzLkVxdWFsVG8oNjQpKTsKICAgICAgICBBc3NlcnQuVGhhdChhY3Rpb24uQXJndW1lbnRzWyJ6Il0sIElzLkVxdWFsVG8oLTIwKSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgYXN5bmMgVGFzayBNb3ZlVG9Ub29sX01pc3NpbmdDb29yZHNfUmV0dXJuc0ZhaWx1cmUoKQogICAgewogICAgICAgIHZhciB0b29sICAgPSBuZXcgTW92ZVRvVG9vbChfYWRhcHRlcik7CiAgICAgICAgdmFyIHJlc3VsdCA9IGF3YWl0IHRvb2wuRXhlY3V0ZUFzeW5jKEFyZ3MoIntcInhcIjoxMH0iKSk7ICAvLyBtaXNzaW5nIHksIHoKCiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LlN1Y2Nlc3MsIElzLkZhbHNlKTsKICAgICAgICBBc3NlcnQuVGhhdChfYWRhcHRlci5TZW50QWN0aW9ucywgSXMuRW1wdHkpOwogICAgfQoKICAgIC8vIOKUgOKUgCBNaW5lQmxvY2tUb29sIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgTWluZUJsb2NrVG9vbF9TZW5kc0NvcnJlY3RBY3Rpb25EYXRhKCkKICAgIHsKICAgICAgICB2YXIgdG9vbCAgID0gbmV3IE1pbmVCbG9ja1Rvb2woX2FkYXB0ZXIpOwogICAgICAgIHZhciByZXN1bHQgPSBhd2FpdCB0b29sLkV4ZWN1dGVBc3luYyhBcmdzKCJ7XCJibG9ja1wiOlwibWluZWNyYWZ0Om9ha19sb2dcIixcImNvdW50XCI6NX0iKSk7CgogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5TdWNjZXNzLCBJcy5UcnVlKTsKICAgICAgICB2YXIgYWN0aW9uID0gX2FkYXB0ZXIuU2VudEFjdGlvbnNbMF07CiAgICAgICAgQXNzZXJ0LlRoYXQoYWN0aW9uLlRvb2wsICAgICAgICAgICAgICBJcy5FcXVhbFRvKCJtaW5lIikpOwogICAgICAgIEFzc2VydC5UaGF0KGFjdGlvbi5Bcmd1bWVudHNbImJsb2NrIl0sIElzLkVxdWFsVG8oIm1pbmVjcmFmdDpvYWtfbG9nIikpOwogICAgICAgIEFzc2VydC5UaGF0KGFjdGlvbi5Bcmd1bWVudHNbImNvdW50Il0sIElzLkVxdWFsVG8oNSkpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgTWluZUJsb2NrVG9vbF9NaXNzaW5nQmxvY2tfUmV0dXJuc0ZhaWx1cmUoKQogICAgewogICAgICAgIHZhciB0b29sICAgPSBuZXcgTWluZUJsb2NrVG9vbChfYWRhcHRlcik7CiAgICAgICAgdmFyIHJlc3VsdCA9IGF3YWl0IHRvb2wuRXhlY3V0ZUFzeW5jKEFyZ3MoIntcImNvdW50XCI6M30iKSk7CgogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5TdWNjZXNzLCBJcy5GYWxzZSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoX2FkYXB0ZXIuU2VudEFjdGlvbnMsIElzLkVtcHR5KTsKICAgIH0KCiAgICAvLyDilIDilIAgR2V0U3RhdHVzVG9vbCAvICJTdGF0dXMiIGFsaWFzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAogICAgLy8gU3ByaW50IDI1IFAwLUI6IFN0YXR1c1Rvb2wuY3MgZGVsZXRlZC4gR2V0U3RhdHVzVG9vbCBpcyByZWdpc3RlcmVkIHVuZGVyCiAgICAvLyBib3RoICJHZXRTdGF0dXMiIGFuZCAiU3RhdHVzIiBuYW1lcyB2aWEgVG9vbERpc3BhdGNoZXIuUmVnaXN0ZXIobmFtZSwgdG9vbCkuCgogICAgW1Rlc3RdCiAgICBwdWJsaWMgYXN5bmMgVGFzayBTdGF0dXNBbGlhc19TZW5kc1N0YXR1c0FjdGlvbigpCiAgICB7CiAgICAgICAgLy8gU3ByaW50IDI1IFAwLUI6IFN0YXR1c1Rvb2wgZGVsZXRlZC4gIlN0YXR1cyIgaXMgbm93IGFuIGFsaWFzIGZvciBHZXRTdGF0dXNUb29sLgogICAgICAgIHZhciBkaXNwYXRjaGVyID0gbmV3IFRvb2xEaXNwYXRjaGVyKCk7CiAgICAgICAgdmFyIHN0YXR1c1Rvb2wgPSBuZXcgR2V0U3RhdHVzVG9vbChfYWRhcHRlcik7CiAgICAgICAgZGlzcGF0Y2hlci5SZWdpc3RlcihzdGF0dXNUb29sKTsKICAgICAgICBkaXNwYXRjaGVyLlJlZ2lzdGVyKCJTdGF0dXMiLCBzdGF0dXNUb29sKTsKCiAgICAgICAgdmFyIHJlc3VsdCA9IGF3YWl0IGRpc3BhdGNoZXIuQ2FsbEFzeW5jKCJTdGF0dXMiLCBBcmdzKCJ7fSIpKTsKCiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LlN1Y2Nlc3MsIElzLlRydWUpOwogICAgICAgIEFzc2VydC5UaGF0KF9hZGFwdGVyLlNlbnRBY3Rpb25zWzBdLlRvb2wsIElzLkVxdWFsVG8oInN0YXR1cyIpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyBhc3luYyBUYXNrIEdldFN0YXR1c1Rvb2xfU2VuZHNTdGF0dXNBY3Rpb24oKQogICAgewogICAgICAgIHZhciB0b29sICAgPSBuZXcgR2V0U3RhdHVzVG9vbChfYWRhcHRlcik7CiAgICAgICAgdmFyIHJlc3VsdCA9IGF3YWl0IHRvb2wuRXhlY3V0ZUFzeW5jKEFyZ3MoInt9IikpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuU3VjY2VzcywgSXMuVHJ1ZSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoX2FkYXB0ZXIuU2VudEFjdGlvbnNbMF0uVG9vbCwgSXMuRXF1YWxUbygic3RhdHVzIikpOwogICAgfQoKICAgIC8vIOKUgOKUgCBXYW5kZXJUb29sIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgV2FuZGVyVG9vbF9EZWZhdWx0UGFyYW1zX1NlbmRzV2FuZGVyQWN0aW9uKCkKICAgIHsKICAgICAgICB2YXIgdG9vbCAgID0gbmV3IFdhbmRlclRvb2woX2FkYXB0ZXIpOwogICAgICAgIHZhciByZXN1bHQgPSBhd2FpdCB0b29sLkV4ZWN1dGVBc3luYyhBcmdzKCJ7fSIpKTsKCiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LlN1Y2Nlc3MsIElzLlRydWUpOwogICAgICAgIHZhciBhY3Rpb24gPSBfYWRhcHRlci5TZW50QWN0aW9uc1swXTsKICAgICAgICBBc3NlcnQuVGhhdChhY3Rpb24uVG9vbCwgSXMuRXF1YWxUbygid2FuZGVyIikpOwogICAgICAgIEFzc2VydC5UaGF0KGFjdGlvbi5Bcmd1bWVudHNbInJhZGl1cyJdLCAgICAgICAgICAgICBJcy5FcXVhbFRvKDIwKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoYWN0aW9uLkFyZ3VtZW50c1sibWF4RGlzdGFuY2VGcm9tU3Bhd24iXSwgSXMuRXF1YWxUbygxMDApKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyBhc3luYyBUYXNrIFdhbmRlclRvb2xfQ3VzdG9tUmFkaXVzX1Bhc3Nlc1Rocm91Z2goKQogICAgewogICAgICAgIHZhciB0b29sICAgPSBuZXcgV2FuZGVyVG9vbChfYWRhcHRlcik7CiAgICAgICAgdmFyIHJlc3VsdCA9IGF3YWl0IHRvb2wuRXhlY3V0ZUFzeW5jKEFyZ3MoIntcInJhZGl1c1wiOjUwLFwibWF4RGlzdGFuY2VGcm9tU3Bhd25cIjozMDB9IikpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuU3VjY2VzcywgSXMuVHJ1ZSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoX2FkYXB0ZXIuU2VudEFjdGlvbnNbMF0uQXJndW1lbnRzWyJyYWRpdXMiXSwgSXMuRXF1YWxUbyg1MCkpOwogICAgICAgIEFzc2VydC5UaGF0KF9hZGFwdGVyLlNlbnRBY3Rpb25zWzBdLkFyZ3VtZW50c1sibWF4RGlzdGFuY2VGcm9tU3Bhd24iXSwgSXMuRXF1YWxUbygzMDApKTsKICAgIH0KCiAgICAvLyDilIDilIAgUGxhY2VCbG9ja1Rvb2wg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgW1Rlc3RdCiAgICBwdWJsaWMgYXN5bmMgVGFzayBQbGFjZUJsb2NrVG9vbF9TZW5kc1BsYWNlQWN0aW9uKCkKICAgIHsKICAgICAgICB2YXIgdG9vbCAgID0gbmV3IFBsYWNlQmxvY2tUb29sKF9hZGFwdGVyKTsKICAgICAgICB2YXIgcmVzdWx0ID0gYXdhaXQgdG9vbC5FeGVjdXRlQXN5bmMoCiAgICAgICAgICAgIEFyZ3MoIntcInhcIjo1LFwieVwiOjY1LFwielwiOjEwLFwibWF0ZXJpYWxcIjpcImNvYmJsZXN0b25lXCJ9IikpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuU3VjY2VzcywgSXMuVHJ1ZSk7CiAgICAgICAgdmFyIGFjdGlvbiA9IF9hZGFwdGVyLlNlbnRBY3Rpb25zWzBdOwogICAgICAgIEFzc2VydC5UaGF0KGFjdGlvbi5Ub29sLCAgICAgICAgICAgICAgICAgIElzLkVxdWFsVG8oInBsYWNlIikpOwogICAgICAgIEFzc2VydC5UaGF0KGFjdGlvbi5Bcmd1bWVudHNbIngiXSwgICAgICAgICBJcy5FcXVhbFRvKDUpKTsKICAgICAgICBBc3NlcnQuVGhhdChhY3Rpb24uQXJndW1lbnRzWyJ5Il0sICAgICAgICAgSXMuRXF1YWxUbyg2NSkpOwogICAgICAgIEFzc2VydC5UaGF0KGFjdGlvbi5Bcmd1bWVudHNbInoiXSwgICAgICAgICBJcy5FcXVhbFRvKDEwKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoYWN0aW9uLkFyZ3VtZW50c1sibWF0ZXJpYWwiXSwgIElzLkVxdWFsVG8oImNvYmJsZXN0b25lIikpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgUGxhY2VCbG9ja1Rvb2xfTWlzc2luZ01hdGVyaWFsX1JldHVybnNGYWlsdXJlKCkKICAgIHsKICAgICAgICB2YXIgdG9vbCAgID0gbmV3IFBsYWNlQmxvY2tUb29sKF9hZGFwdGVyKTsKICAgICAgICB2YXIgcmVzdWx0ID0gYXdhaXQgdG9vbC5FeGVjdXRlQXN5bmMoQXJncygie1wieFwiOjAsXCJ5XCI6NjQsXCJ6XCI6MH0iKSk7CgogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5TdWNjZXNzLCBJcy5GYWxzZSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoX2FkYXB0ZXIuU2VudEFjdGlvbnMsIElzLkVtcHR5KTsKICAgIH0KCiAgICAvLyDilIDilIAgU2VhcmNoTWVtb3J5VG9vbCDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBbVGVzdF0KICAgIHB1YmxpYyBhc3luYyBUYXNrIFNlYXJjaE1lbW9yeVRvb2xfUmV0dXJuc1Jlc3VsdHNGcm9tR2F0ZXdheSgpCiAgICB7CiAgICAgICAgdmFyIGdhdGV3YXkgPSBuZXcgTW9ja01lbW9yeUdhdGV3YXkoKTsKICAgICAgICBnYXRld2F5LkFkZFNlYXJjaFJlc3VsdCgib2FrIGxvZyIsIG5ldyBTZWFyY2hSZXN1bHQoInRyZWUtcGFnZSIsIDAuOSwgIm9hayB0cmVlcyBhdCBzcGF3biIpKTsKCiAgICAgICAgdmFyIHRvb2wgICA9IG5ldyBTZWFyY2hNZW1vcnlUb29sKGdhdGV3YXkpOwogICAgICAgIHZhciByZXN1bHQgPSBhd2FpdCB0b29sLkV4ZWN1dGVBc3luYyhBcmdzKCJ7XCJxdWVyeVwiOlwib2FrIGxvZ1wifSIpKTsKCiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LlN1Y2Nlc3MsIElzLlRydWUpOwogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5EYXRhLCBJcy5Ob3QuTnVsbCk7CiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkRhdGEhLkNvbnRhaW5zS2V5KCJyZXN1bHRzIiksIElzLlRydWUpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgU2VhcmNoTWVtb3J5VG9vbF9Xcml0ZXNCZXN0UGFnZUlkVG9EYXRhKCkKICAgIHsKICAgICAgICB2YXIgZ2F0ZXdheSA9IG5ldyBNb2NrTWVtb3J5R2F0ZXdheSgpOwogICAgICAgIGdhdGV3YXkuQWRkU2VhcmNoUmVzdWx0KCJ0cmVlcyIsIG5ldyBTZWFyY2hSZXN1bHQoImZvcmVzdC1wYWdlIiwgMC44NSwgImZvcmVzdCBiaW9tZSIpKTsKCiAgICAgICAgdmFyIHRvb2wgICA9IG5ldyBTZWFyY2hNZW1vcnlUb29sKGdhdGV3YXkpOwogICAgICAgIHZhciByZXN1bHQgPSBhd2FpdCB0b29sLkV4ZWN1dGVBc3luYyhBcmdzKCJ7XCJxdWVyeVwiOlwidHJlZXNcIn0iKSk7CgogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5EYXRhIS5Db250YWluc0tleSgiYmVzdFBhZ2VJZCIpLCBJcy5UcnVlKTsKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuRGF0YVsiYmVzdFBhZ2VJZCJdPy5Ub1N0cmluZygpLCBJcy5FcXVhbFRvKCJmb3Jlc3QtcGFnZSIpKTsKICAgIH0KCiAgICAvLyDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAKICAgIC8vIFNwcmludCA1IOKAlCBTY2hlbWEgVmFsaWRhdGlvbiB2aWEgVG9vbERpc3BhdGNoZXIKICAgIC8vIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgRGlzcGF0Y2hlcl9WYWxpZE1vdmVUb19EaXNwYXRjaGVzKCkKICAgIHsKICAgICAgICB2YXIgZGlzcGF0Y2hlciA9IG5ldyBUb29sRGlzcGF0Y2hlcigpOwogICAgICAgIGRpc3BhdGNoZXIuUmVnaXN0ZXIobmV3IE1vdmVUb1Rvb2woX2FkYXB0ZXIpKTsKCiAgICAgICAgdmFyIHJlc3VsdCA9IGF3YWl0IGRpc3BhdGNoZXIuQ2FsbEFzeW5jKCJNb3ZlVG8iLCBBcmdzKCJ7XCJ4XCI6MTAsXCJ5XCI6NjQsXCJ6XCI6LTIwfSIpKTsKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuU3VjY2VzcywgSXMuVHJ1ZSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgYXN5bmMgVGFzayBEaXNwYXRjaGVyX01pc3NpbmdSZXF1aXJlZF9SZXR1cm5zRmFpbHVyZVdpdGhNZXNzYWdlKCkKICAgIHsKICAgICAgICB2YXIgZGlzcGF0Y2hlciA9IG5ldyBUb29sRGlzcGF0Y2hlcigpOwogICAgICAgIGRpc3BhdGNoZXIuUmVnaXN0ZXIobmV3IE1vdmVUb1Rvb2woX2FkYXB0ZXIpKTsKCiAgICAgICAgdmFyIHJlc3VsdCA9IGF3YWl0IGRpc3BhdGNoZXIuQ2FsbEFzeW5jKCJNb3ZlVG8iLCBBcmdzKCJ7XCJ4XCI6MTB9IikpOwogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5TdWNjZXNzLCBJcy5GYWxzZSk7CiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0Lk1lc3NhZ2UsIERvZXMuQ29udGFpbigiU2NoZW1hIHZhbGlkYXRpb24gZmFpbGVkIikpOwogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5NZXNzYWdlLCBEb2VzLkNvbnRhaW4oIid5JyIpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyBhc3luYyBUYXNrIERpc3BhdGNoZXJfVW5rbm93blByb3BlcnR5X1JldHVybnNGYWlsdXJlKCkKICAgIHsKICAgICAgICB2YXIgZGlzcGF0Y2hlciA9IG5ldyBUb29sRGlzcGF0Y2hlcigpOwogICAgICAgIGRpc3BhdGNoZXIuUmVnaXN0ZXIobmV3IE1vdmVUb1Rvb2woX2FkYXB0ZXIpKTsKCiAgICAgICAgLy8gImNvbG91ciIgaXMgbm90IGRlY2xhcmVkIGluIE1vdmVUbydzIHNjaGVtYQogICAgICAgIHZhciByZXN1bHQgPSBhd2FpdCBkaXNwYXRjaGVyLkNhbGxBc3luYygiTW92ZVRvIiwKICAgICAgICAgICAgQXJncygie1wieFwiOjEwLFwieVwiOjY0LFwielwiOi0yMCxcImNvbG91clwiOlwiYmx1ZVwifSIpKTsKCiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LlN1Y2Nlc3MsIElzLkZhbHNlKTsKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuTWVzc2FnZSwgRG9lcy5Db250YWluKCInY29sb3VyJyIpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyBhc3luYyBUYXNrIERpc3BhdGNoZXJfV3JvbmdUeXBlX1JldHVybnNGYWlsdXJlKCkKICAgIHsKICAgICAgICB2YXIgZGlzcGF0Y2hlciA9IG5ldyBUb29sRGlzcGF0Y2hlcigpOwogICAgICAgIGRpc3BhdGNoZXIuUmVnaXN0ZXIobmV3IE1vdmVUb1Rvb2woX2FkYXB0ZXIpKTsKCiAgICAgICAgLy8geCBtdXN0IGJlIGludGVnZXIsIGJ1dCAibm9ydGgiIGlzIGEgc3RyaW5nCiAgICAgICAgdmFyIHJlc3VsdCA9IGF3YWl0IGRpc3BhdGNoZXIuQ2FsbEFzeW5jKCJNb3ZlVG8iLAogICAgICAgICAgICBBcmdzKCJ7XCJ4XCI6XCJub3J0aFwiLFwieVwiOjY0LFwielwiOi0yMH0iKSk7CgogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5TdWNjZXNzLCBJcy5GYWxzZSk7CiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0Lk1lc3NhZ2UsIERvZXMuQ29udGFpbigiJ3gnIikpOwogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5NZXNzYWdlLCBEb2VzLkNvbnRhaW4oImludGVnZXIiKSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgYXN5bmMgVGFzayBEaXNwYXRjaGVyX05vbk9iamVjdF9SZXR1cm5zRmFpbHVyZSgpCiAgICB7CiAgICAgICAgdmFyIGRpc3BhdGNoZXIgPSBuZXcgVG9vbERpc3BhdGNoZXIoKTsKICAgICAgICBkaXNwYXRjaGVyLlJlZ2lzdGVyKG5ldyBNb3ZlVG9Ub29sKF9hZGFwdGVyKSk7CgogICAgICAgIC8vICJub3J0aCIg4oCUIGEgc3RyaW5nLCBub3QgYW4gb2JqZWN0CiAgICAgICAgdmFyIHJlc3VsdCA9IGF3YWl0IGRpc3BhdGNoZXIuQ2FsbEFzeW5jKCJNb3ZlVG8iLCBBcmdzKCJcIm5vcnRoXCIiKSk7CgogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5TdWNjZXNzLCBJcy5GYWxzZSk7CiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0Lk1lc3NhZ2UsIERvZXMuQ29udGFpbigiSlNPTiBvYmplY3QiKSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgYXN5bmMgVGFzayBEaXNwYXRjaGVyX1Vua25vd25Ub29sX1JldHVybnNGYWlsdXJlKCkKICAgIHsKICAgICAgICB2YXIgZGlzcGF0Y2hlciA9IG5ldyBUb29sRGlzcGF0Y2hlcigpOwoKICAgICAgICB2YXIgcmVzdWx0ID0gYXdhaXQgZGlzcGF0Y2hlci5DYWxsQXN5bmMoIkRvU29tZXRoaW5nRGFuZ2Vyb3VzIiwgQXJncygie30iKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LlN1Y2Nlc3MsIElzLkZhbHNlKTsKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuTWVzc2FnZSwgRG9lcy5Db250YWluKCJub3QgcmVnaXN0ZXJlZCIpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyBhc3luYyBUYXNrIERpc3BhdGNoZXJfQWxsUmVnaXN0ZXJlZFRvb2xzX1ZhbGlkYXRlV2l0aG91dEVycm9yKCkKICAgIHsKICAgICAgICAvLyBTYW5pdHkgdGVzdDogZXZlcnkgcmVnaXN0ZXJlZCB0b29sJ3Mgc2NoZW1hIG1hdGNoZXMgaXRzIGV4cGVjdGVkIGFyZ3VtZW50cwogICAgICAgIHZhciBkaXNwYXRjaGVyID0gbmV3IFRvb2xEaXNwYXRjaGVyKCk7CiAgICAgICAgZGlzcGF0Y2hlci5SZWdpc3RlcihuZXcgTW92ZVRvVG9vbChfYWRhcHRlcikpOwogICAgICAgIGRpc3BhdGNoZXIuUmVnaXN0ZXIobmV3IE1pbmVCbG9ja1Rvb2woX2FkYXB0ZXIpKTsKICAgICAgICBkaXNwYXRjaGVyLlJlZ2lzdGVyKG5ldyBQbGFjZUJsb2NrVG9vbChfYWRhcHRlcikpOwogICAgICAgIC8vIFNwcmludCAyNSBQMC1COiBTdGF0dXNUb29sIGRlbGV0ZWQuIFJlZ2lzdGVyIEdldFN0YXR1c1Rvb2wgKyAiU3RhdHVzIiBhbGlhcy4KICAgICAgICB2YXIgc3RhdHVzVG9vbCA9IG5ldyBHZXRTdGF0dXNUb29sKF9hZGFwdGVyKTsKICAgICAgICBkaXNwYXRjaGVyLlJlZ2lzdGVyKHN0YXR1c1Rvb2wpOwogICAgICAgIGRpc3BhdGNoZXIuUmVnaXN0ZXIoIlN0YXR1cyIsIHN0YXR1c1Rvb2wpOwogICAgICAgIGRpc3BhdGNoZXIuUmVnaXN0ZXIobmV3IFdhbmRlclRvb2woX2FkYXB0ZXIpKTsKICAgICAgICBkaXNwYXRjaGVyLlJlZ2lzdGVyKG5ldyBDcmFmdEl0ZW1Ub29sKF9hZGFwdGVyKSk7CiAgICAgICAgZGlzcGF0Y2hlci5SZWdpc3RlcihuZXcgRnVybmFjZVRvb2woX2FkYXB0ZXIpKTsKICAgICAgICBkaXNwYXRjaGVyLlJlZ2lzdGVyKG5ldyBGaW5kRmxhdEFyZWFUb29sKF9hZGFwdGVyKSk7CiAgICAgICAgZGlzcGF0Y2hlci5SZWdpc3RlcihuZXcgQ2hhdFRvb2woX2FkYXB0ZXIpKTsKCiAgICAgICAgLy8gVmFsaWQgYXJncyBmb3IgZWFjaCB0b29sIOKAlCAiU3RhdHVzIiBpcyB0aGUgYmFja3dhcmQtY29tcGF0IGFsaWFzIGZvciBHZXRTdGF0dXNUb29sLgogICAgICAgIHZhciBjYXNlcyA9IG5ldyAoc3RyaW5nIE5hbWUsIHN0cmluZyBBcmdzKVtdCiAgICAgICAgewogICAgICAgICAgICAoIk1vdmVUbyIsICAgICAgIntcInhcIjoxMCxcInlcIjo2NCxcInpcIjotMjB9IiksCiAgICAgICAgICAgICgiTWluZUJsb2NrIiwgICAie1wiYmxvY2tcIjpcIm9ha19sb2dcIn0iKSwKICAgICAgICAgICAgKCJQbGFjZUJsb2NrIiwgICJ7XCJ4XCI6MCxcInlcIjo2NCxcInpcIjowLFwibWF0ZXJpYWxcIjpcImNvYmJsZXN0b25lXCJ9IiksCiAgICAgICAgICAgICgiU3RhdHVzIiwgICAgICAie30iKSwKICAgICAgICAgICAgKCJHZXRTdGF0dXMiLCAgICJ7fSIpLAogICAgICAgICAgICAoIldhbmRlciIsICAgICAgIntcInJhZGl1c1wiOjMwfSIpLAogICAgICAgICAgICAoIkNyYWZ0SXRlbSIsICAgIntcIml0ZW1cIjpcInN0aWNrXCJ9IiksCiAgICAgICAgICAgICgiU21lbHRJdGVtIiwgICAie1wiaXRlbVwiOlwiaXJvbl9vcmVcIn0iKSwKICAgICAgICAgICAgKCJGaW5kRmxhdEFyZWEiLCJ7fSIpLAogICAgICAgICAgICAoIkNoYXQiLCAgICAgICAgIntcIm1lc3NhZ2VcIjpcImhlbGxvXCJ9IiksCiAgICAgICAgfTsKCiAgICAgICAgZm9yZWFjaCAodmFyIChuYW1lLCBhcmdzSnNvbikgaW4gY2FzZXMpCiAgICAgICAgewogICAgICAgICAgICB2YXIgcmVzdWx0ID0gYXdhaXQgZGlzcGF0Y2hlci5DYWxsQXN5bmMobmFtZSwgQXJncyhhcmdzSnNvbikpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuU3VjY2VzcywgSXMuVHJ1ZSwKICAgICAgICAgICAgICAgICQiVG9vbCAne25hbWV9JyB3aXRoIGFyZ3Mge2FyZ3NKc29ufSBzaG91bGQgc3VjY2VlZCBidXQgZ290OiB7cmVzdWx0Lk1lc3NhZ2V9Iik7CiAgICAgICAgfQogICAgfQp9Cg==
+using Agent.Core;
+using Agent.Tools;
+using System.Text.Json;
+
+namespace MemorySmith.Agent.Tests;
+
+/// <summary>
+/// Tests that each tool correctly shapes the ActionData dispatched to MockWorldAdapter.
+/// Previously untested (Finding 7 — zero per-tool tests).
+/// This is the "interface is the test surface" principle: verify what crosses the seam.
+/// </summary>
+[TestFixture]
+public class ToolDispatchTests
+{
+    private MockWorldAdapter _adapter = null!;
+
+    [SetUp]
+    public void SetUp() => _adapter = new MockWorldAdapter();
+
+    // ── Helper ────────────────────────────────────────────────────────────────
+
+    private static JsonElement Args(string json) =>
+        JsonDocument.Parse(json).RootElement;
+
+    // ── MoveToTool ────────────────────────────────────────────────────────────
+
+    [Test]
+    public async Task MoveToTool_SendsCorrectActionData()
+    {
+        var tool   = new MoveToTool(_adapter);
+        var result = await tool.ExecuteAsync(Args("{\"x\":10,\"y\":64,\"z\":-20}"));
+
+        Assert.That(result.Success, Is.True);
+        Assert.That(_adapter.SentActions, Has.Count.EqualTo(1));
+        var action = _adapter.SentActions[0];
+        Assert.That(action.Tool, Is.EqualTo("move"));
+        Assert.That(action.Arguments["x"], Is.EqualTo(10));
+        Assert.That(action.Arguments["y"], Is.EqualTo(64));
+        Assert.That(action.Arguments["z"], Is.EqualTo(-20));
+    }
+
+    [Test]
+    public async Task MoveToTool_MissingCoords_ReturnsFailure()
+    {
+        var tool   = new MoveToTool(_adapter);
+        var result = await tool.ExecuteAsync(Args("{\"x\":10}"));  // missing y, z
+
+        Assert.That(result.Success, Is.False);
+        Assert.That(_adapter.SentActions, Is.Empty);
+    }
+
+    // ── MineBlockTool ─────────────────────────────────────────────────────────
+
+    [Test]
+    public async Task MineBlockTool_SendsCorrectActionData()
+    {
+        var tool   = new MineBlockTool(_adapter);
+        var result = await tool.ExecuteAsync(Args("{\"block\":\"minecraft:oak_log\",\"count\":5}"));
+
+        Assert.That(result.Success, Is.True);
+        var action = _adapter.SentActions[0];
+        Assert.That(action.Tool,              Is.EqualTo("mine"));
+        Assert.That(action.Arguments["block"], Is.EqualTo("minecraft:oak_log"));
+        Assert.That(action.Arguments["count"], Is.EqualTo(5));
+    }
+
+    [Test]
+    public async Task MineBlockTool_MissingBlock_ReturnsFailure()
+    {
+        var tool   = new MineBlockTool(_adapter);
+        var result = await tool.ExecuteAsync(Args("{\"count\":3}"));
+
+        Assert.That(result.Success, Is.False);
+        Assert.That(_adapter.SentActions, Is.Empty);
+    }
+
+    // ── GetStatusTool / "Status" alias ────────────────────────────────────────
+    // Sprint 25 P0-B: StatusTool.cs deleted. GetStatusTool is registered under
+    // both "GetStatus" and "Status" names via ToolDispatcher.Register(name, tool).
+
+    [Test]
+    public async Task StatusAlias_SendsStatusAction()
+    {
+        // Sprint 25 P0-B: StatusTool deleted. "Status" is now an alias for GetStatusTool.
+        var dispatcher = new ToolDispatcher();
+        var statusTool = new GetStatusTool(_adapter);
+        dispatcher.Register(statusTool);
+        dispatcher.Register("Status", statusTool);
+
+        var result = await dispatcher.CallAsync("Status", Args("{}"));
+
+        Assert.That(result.Success, Is.True);
+        Assert.That(_adapter.SentActions[0].Tool, Is.EqualTo("status"));
+    }
+
+    [Test]
+    public async Task GetStatusTool_SendsStatusAction()
+    {
+        var tool   = new GetStatusTool(_adapter);
+        var result = await tool.ExecuteAsync(Args("{}"));
+
+        Assert.That(result.Success, Is.True);
+        Assert.That(_adapter.SentActions[0].Tool, Is.EqualTo("status"));
+    }
+
+    // ── WanderTool ────────────────────────────────────────────────────────────
+
+    [Test]
+    public async Task WanderTool_DefaultParams_SendsWanderAction()
+    {
+        var tool   = new WanderTool(_adapter);
+        var result = await tool.ExecuteAsync(Args("{}"));
+
+        Assert.That(result.Success, Is.True);
+        var action = _adapter.SentActions[0];
+        Assert.That(action.Tool, Is.EqualTo("wander"));
+        Assert.That(action.Arguments["radius"],             Is.EqualTo(20));
+        Assert.That(action.Arguments["maxDistanceFromSpawn"], Is.EqualTo(100));
+    }
+
+    [Test]
+    public async Task WanderTool_CustomRadius_PassesThrough()
+    {
+        var tool   = new WanderTool(_adapter);
+        var result = await tool.ExecuteAsync(Args("{\"radius\":50,\"maxDistanceFromSpawn\":300}"));
+
+        Assert.That(result.Success, Is.True);
+        Assert.That(_adapter.SentActions[0].Arguments["radius"], Is.EqualTo(50));
+        Assert.That(_adapter.SentActions[0].Arguments["maxDistanceFromSpawn"], Is.EqualTo(300));
+    }
+
+    // ── PlaceBlockTool ────────────────────────────────────────────────────────
+
+    [Test]
+    public async Task PlaceBlockTool_SendsPlaceAction()
+    {
+        var tool   = new PlaceBlockTool(_adapter);
+        var result = await tool.ExecuteAsync(
+            Args("{\"x\":5,\"y\":65,\"z\":10,\"material\":\"cobblestone\"}"));
+
+        Assert.That(result.Success, Is.True);
+        var action = _adapter.SentActions[0];
+        Assert.That(action.Tool,                  Is.EqualTo("place"));
+        Assert.That(action.Arguments["x"],         Is.EqualTo(5));
+        Assert.That(action.Arguments["y"],         Is.EqualTo(65));
+        Assert.That(action.Arguments["z"],         Is.EqualTo(10));
+        Assert.That(action.Arguments["material"],  Is.EqualTo("cobblestone"));
+    }
+
+    [Test]
+    public async Task PlaceBlockTool_MissingMaterial_ReturnsFailure()
+    {
+        var tool   = new PlaceBlockTool(_adapter);
+        var result = await tool.ExecuteAsync(Args("{\"x\":0,\"y\":64,\"z\":0}"));
+
+        Assert.That(result.Success, Is.False);
+        Assert.That(_adapter.SentActions, Is.Empty);
+    }
+
+    // ── SearchMemoryTool ──────────────────────────────────────────────────────
+
+    [Test]
+    public async Task SearchMemoryTool_ReturnsResultsFromGateway()
+    {
+        var gateway = new MockMemoryGateway();
+        gateway.AddSearchResult("oak log", new SearchResult("tree-page", 0.9, "oak trees at spawn"));
+
+        var tool   = new SearchMemoryTool(gateway);
+        var result = await tool.ExecuteAsync(Args("{\"query\":\"oak log\"}"));
+
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Data, Is.Not.Null);
+        Assert.That(result.Data!.ContainsKey("results"), Is.True);
+    }
+
+    [Test]
+    public async Task SearchMemoryTool_WritesBestPageIdToData()
+    {
+        var gateway = new MockMemoryGateway();
+        gateway.AddSearchResult("trees", new SearchResult("forest-page", 0.85, "forest biome"));
+
+        var tool   = new SearchMemoryTool(gateway);
+        var result = await tool.ExecuteAsync(Args("{\"query\":\"trees\"}"));
+
+        Assert.That(result.Data!.ContainsKey("bestPageId"), Is.True);
+        Assert.That(result.Data["bestPageId"]?.ToString(), Is.EqualTo("forest-page"));
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Sprint 5 — Schema Validation via ToolDispatcher
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    [Test]
+    public async Task Dispatcher_ValidMoveTo_Dispatches()
+    {
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new MoveToTool(_adapter));
+
+        var result = await dispatcher.CallAsync("MoveTo", Args("{\"x\":10,\"y\":64,\"z\":-20}"));
+        Assert.That(result.Success, Is.True);
+    }
+
+    [Test]
+    public async Task Dispatcher_MissingRequired_ReturnsFailureWithMessage()
+    {
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new MoveToTool(_adapter));
+
+        var result = await dispatcher.CallAsync("MoveTo", Args("{\"x\":10}"));
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Message, Does.Contain("Schema validation failed"));
+        Assert.That(result.Message, Does.Contain("'y'"));
+    }
+
+    [Test]
+    public async Task Dispatcher_UnknownProperty_ReturnsFailure()
+    {
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new MoveToTool(_adapter));
+
+        // "colour" is not declared in MoveTo's schema
+        var result = await dispatcher.CallAsync("MoveTo",
+            Args("{\"x\":10,\"y\":64,\"z\":-20,\"colour\":\"blue\"}"));
+
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Message, Does.Contain("'colour'"));
+    }
+
+    [Test]
+    public async Task Dispatcher_WrongType_ReturnsFailure()
+    {
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new MoveToTool(_adapter));
+
+        // x must be integer, but "north" is a string
+        var result = await dispatcher.CallAsync("MoveTo",
+            Args("{\"x\":\"north\",\"y\":64,\"z\":-20}"));
+
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Message, Does.Contain("'x'"));
+        Assert.That(result.Message, Does.Contain("integer"));
+    }
+
+    [Test]
+    public async Task Dispatcher_NonObject_ReturnsFailure()
+    {
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new MoveToTool(_adapter));
+
+        // "north" — a string, not an object
+        var result = await dispatcher.CallAsync("MoveTo", Args("\"north\""));
+
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Message, Does.Contain("JSON object"));
+    }
+
+    [Test]
+    public async Task Dispatcher_UnknownTool_ReturnsFailure()
+    {
+        var dispatcher = new ToolDispatcher();
+
+        var result = await dispatcher.CallAsync("DoSomethingDangerous", Args("{}"));
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Message, Does.Contain("not registered"));
+    }
+
+    [Test]
+    public async Task Dispatcher_AllRegisteredTools_ValidateWithoutError()
+    {
+        // Sanity test: every registered tool's schema matches its expected arguments
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new MoveToTool(_adapter));
+        dispatcher.Register(new MineBlockTool(_adapter));
+        dispatcher.Register(new PlaceBlockTool(_adapter));
+        // Sprint 25 P0-B: StatusTool deleted. Register GetStatusTool + "Status" alias.
+        var statusTool = new GetStatusTool(_adapter);
+        dispatcher.Register(statusTool);
+        dispatcher.Register("Status", statusTool);
+        dispatcher.Register(new WanderTool(_adapter));
+        dispatcher.Register(new CraftItemTool(_adapter));
+        dispatcher.Register(new FurnaceTool(_adapter));
+        dispatcher.Register(new FindFlatAreaTool(_adapter));
+        dispatcher.Register(new ChatTool(_adapter));
+
+        // Valid args for each tool — "Status" is the backward-compat alias for GetStatusTool.
+        var cases = new (string Name, string Args)[]
+        {
+            ("MoveTo",      "{\"x\":10,\"y\":64,\"z\":-20}"),
+            ("MineBlock",   "{\"block\":\"oak_log\"}"),
+            ("PlaceBlock",  "{\"x\":0,\"y\":64,\"z\":0,\"material\":\"cobblestone\"}"),
+            ("Status",      "{}"),
+            ("GetStatus",   "{}"),
+            ("Wander",      "{\"radius\":30}"),
+            ("CraftItem",   "{\"item\":\"stick\"}"),
+            ("SmeltItem",   "{\"item\":\"iron_ore\"}"),
+            ("FindFlatArea","{}"),
+            ("Chat",        "{\"message\":\"hello\"}"),
+        };
+
+        foreach (var (name, argsJson) in cases)
+        {
+            var result = await dispatcher.CallAsync(name, Args(argsJson));
+            Assert.That(result.Success, Is.True,
+                $"Tool '{name}' with args {argsJson} should succeed but got: {result.Message}");
+        }
+    }
+}

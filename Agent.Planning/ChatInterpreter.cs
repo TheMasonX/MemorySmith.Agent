@@ -1,1 +1,347 @@
-bmFtZXNwYWNlIEFnZW50LlBsYW5uaW5nOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuUGxhbm5pbmcuTGxtOwp1c2luZyBTeXN0ZW0uVGV4dC5SZWd1bGFyRXhwcmVzc2lvbnM7CgovLy8gPHN1bW1hcnk+Ci8vLyBEZXRlcm1pbmlzdGljLCBwYXR0ZXJuLW1hdGNoaW5nIDxzZWUgY3JlZj0iSUNoYXRJbnRlcnByZXRlciIvPi4gTm8gbmV0d29yayBjYWxscy4KLy8vCi8vLyBVc2VkIHN0YW5kYWxvbmUgd2hlbiBMTE0gaXMgZGlzYWJsZWQgb3IgdW5hdmFpbGFibGUsIGFuZCBhcyB0aGUgZmFsbGJhY2sgaW5zaWRlCi8vLyA8c2VlIGNyZWY9IkxsbUNoYXRJbnRlcnByZXRlciIvPiB3aGVuIHRoZSByYXRlIGxpbWl0IGlzIGV4Y2VlZGVkIG9yIE9sbGFtYSBpcyBkb3duLgovLy8KLy8vIERpcmVjdGVkLWF0LWJvdCBoZXVyaXN0aWNzIChhbnkgb25lIHN1ZmZpY2llbnQpOgovLy8gICAtIFNvbG8gcGxheTogPGM+b25saW5lUGxheWVycyAmbHQ7PSAxPC9jPgovLy8gICAtIEJvdCBuYW1lIGFwcGVhcnMgYXMgd2hvbGUgd29yZCBpbiBtZXNzYWdlIChjYXNlLWluc2Vuc2l0aXZlKQovLy8gICAtIEJvdCBzcG9rZSB3aXRoaW4gdGhlIGNvbnZlcnNhdGlvbiB3aW5kb3cgKDxzZWUgY3JlZj0iQ2hhdE9wdGlvbnMuQ29udmVyc2F0aW9uV2luZG93U2Vjb25kcyIvPikKLy8vICAgLSBQbGF5ZXIgaXMgd2l0aGluIDxzZWUgY3JlZj0iUHJveGltaXR5QWRkcmVzc0Jsb2NrcyIvPiBibG9ja3Mgb2YgdGhlIGJvdAovLy8KLy8vIFNwcmludCAxMTogYWRkZWQgQ3JhZnRSZWdleCDigJQgImNyYWZ0L2ZvcmdlL3NtZWx0ICZsdDtpdGVtJmd0OyIgaXMgbm93IHJvdXRlZAovLy8gZGV0ZXJtaW5pc3RpY2FsbHksIG5ldmVyIHRvdWNoaW5nIHRoZSBMTE0uIEZpeGVzIHRoZSBjYXNlIHdoZXJlICJjcmFmdCBhbiBpcm9uCi8vLyBwaWNrYXhlIiB3YXMgZm9yd2FyZGVkIHRvIE9sbGFtYSB3aGljaCBjb3VsZCBoYW5nIGluZGVmaW5pdGVseS4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCBjbGFzcyBDaGF0SW50ZXJwcmV0ZXIoQ2hhdE9wdGlvbnMgb3B0aW9ucykgOiBJQ2hhdEludGVycHJldGVyCnsKICAgIHByaXZhdGUgRGF0ZVRpbWVPZmZzZXQgX2xhc3RCb3RTcG9rZSA9IERhdGVUaW1lT2Zmc2V0Lk1pblZhbHVlOwoKICAgIC8vIOKUgOKUgCBJQ2hhdEludGVycHJldGVyIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIHB1YmxpYyBUYXNrPENoYXRJbnRlcnByZXRhdGlvbj4gSW50ZXJwcmV0QXN5bmMoCiAgICAgICAgc3RyaW5nIHVzZXJuYW1lLCBzdHJpbmcgbWVzc2FnZSwgc3RyaW5nIGJvdE5hbWUsCiAgICAgICAgaW50IG9ubGluZVBsYXllcnMsIFBvc2l0aW9uIGJvdFBvc2l0aW9uLCBQb3NpdGlvbj8gcGxheWVyUG9zaXRpb24sCiAgICAgICAgV29ybGRTdGF0ZSBzdGF0ZSwgQ2FuY2VsbGF0aW9uVG9rZW4gY3QgPSBkZWZhdWx0KQogICAgewogICAgICAgIHZhciBlZmZlY3RpdmUgPSBtZXNzYWdlLkxlbmd0aCA+IG9wdGlvbnMuTWF4TWVzc2FnZUxlbmd0aAogICAgICAgICAgICA/IG1lc3NhZ2VbLi5vcHRpb25zLk1heE1lc3NhZ2VMZW5ndGhdCiAgICAgICAgICAgIDogbWVzc2FnZTsKCiAgICAgICAgaWYgKCFJc0RpcmVjdGVkQXRCb3QoZWZmZWN0aXZlLCBib3ROYW1lLCBvbmxpbmVQbGF5ZXJzLCBib3RQb3NpdGlvbiwgcGxheWVyUG9zaXRpb24pKQogICAgICAgICAgICByZXR1cm4gVGFzay5Gcm9tUmVzdWx0KG5ldyBDaGF0SW50ZXJwcmV0YXRpb24oQ2hhdEludGVudFR5cGUuTm90QWRkcmVzc2VkKSk7CgogICAgICAgIHZhciBzdHJpcHBlZCA9IFN0cmlwQm90TmFtZShlZmZlY3RpdmUuVHJpbSgpLCBib3ROYW1lKTsKICAgICAgICByZXR1cm4gVGFzay5Gcm9tUmVzdWx0KFBhcnNlSW50ZW50KHN0cmlwcGVkLCBzdGF0ZSkpOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIFJlY29yZEJvdFNwb2tlKCkgPT4gX2xhc3RCb3RTcG9rZSA9IERhdGVUaW1lT2Zmc2V0LlV0Y05vdzsKCiAgICAvLyDilIDilIAgSXRlbSAvIGJsdWVwcmludCAvIGNyYWZ0IGFsaWFzZXMg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgcHJpdmF0ZSBzdGF0aWMgcmVhZG9ubHkgRGljdGlvbmFyeTxzdHJpbmcsIHN0cmluZz4gSXRlbUFsaWFzZXMgPQogICAgICAgIG5ldyhTdHJpbmdDb21wYXJlci5PcmRpbmFsSWdub3JlQ2FzZSkKICAgIHsKICAgICAgICBbIndvb2QiXSAgICAgICA9ICJvYWtfbG9nIiwgIFsibG9nIl0gICAgICAgICAgPSAib2FrX2xvZyIsICAgWyJsb2dzIl0gICAgICA9ICJvYWtfbG9nIiwKICAgICAgICBbIm9hayJdICAgICAgICA9ICJvYWtfbG9nIiwgIFsib2FrIGxvZyJdICAgICAgID0gIm9ha19sb2ciLCAgWyJvYWsgbG9ncyJdICA9ICJvYWtfbG9nIiwKICAgICAgICBbImJpcmNoIl0gICAgICA9ICJiaXJjaF9sb2ciLCBbInNwcnVjZSJdICAgICAgID0gInNwcnVjZV9sb2ciLAogICAgICAgIFsiY29iYmxlIl0gICAgID0gImNvYmJsZXN0b25lIiwgWyJjb2JibGVzdG9uZSJdID0gImNvYmJsZXN0b25lIiwKICAgICAgICAvLyBTcHJpbnQgMTk6ICJzdG9uZSIgcmVzb2x2ZXMgdG8gInN0b25lIiDigJQgR29hbEZhY3RvcnkgbWFwcyB5aWVsZCAoY29iYmxlc3RvbmUpCiAgICAgICAgWyJzdG9uZSJdICAgICAgPSAic3RvbmUiLAogICAgICAgIFsiaXJvbiJdICAgICAgID0gImlyb25fb3JlIiwgWyJpcm9uIG9yZSJdICAgICAgPSAiaXJvbl9vcmUiLAogICAgICAgIFsiZ29sZCJdICAgICAgID0gImdvbGRfb3JlIiwgWyJnb2xkIG9yZSJdICAgICAgPSAiZ29sZF9vcmUiLAogICAgICAgIFsiY29hbCJdICAgICAgID0gImNvYWxfb3JlIiwgWyJjb2FsIG9yZSJdICAgICAgPSAiY29hbF9vcmUiLAogICAgICAgIFsiZGlhbW9uZCJdICAgID0gImRpYW1vbmQiLCAgWyJkaWFtb25kcyJdICAgICAgPSAiZGlhbW9uZCIsCiAgICAgICAgWyJzYW5kIl0gICAgICAgPSAic2FuZCIsICAgICBbImdyYXZlbCJdICAgICAgICA9ICJncmF2ZWwiLCAgIFsiZGlydCJdICAgICAgPSAiZGlydCIsCiAgICAgICAgWyJwbGFua3MiXSAgICAgPSAib2FrX3BsYW5rcyIsIFsicGxhbmsiXSAgICAgICA9ICJvYWtfcGxhbmtzIiwgWyJvYWsgcGxhbmtzIl0gPSAib2FrX3BsYW5rcyIsCiAgICAgICAgWyJnbGFzcyJdICAgICAgPSAiZ2xhc3MiLCAgICBbImdsYXNzIHBhbmUiXSAgICA9ICJnbGFzc19wYW5lIiwKICAgIH07CgogICAgcHJpdmF0ZSBzdGF0aWMgcmVhZG9ubHkgRGljdGlvbmFyeTxzdHJpbmcsIHN0cmluZz4gQmx1ZXByaW50QWxpYXNlcyA9CiAgICAgICAgbmV3KFN0cmluZ0NvbXBhcmVyLk9yZGluYWxJZ25vcmVDYXNlKQogICAgewogICAgICAgIFsiaG91c2UiXSA9ICJzbWFsbC1ob3VzZSIsIFsic21hbGwgaG91c2UiXSA9ICJzbWFsbC1ob3VzZSIsCiAgICAgICAgWyJzaGVsdGVyIl0gPSAic21hbGwtaG91c2UiLCBbImhvbWUiXSA9ICJzbWFsbC1ob3VzZSIsCiAgICAgICAgWyJzbWFsbC1ob3VzZSJdID0gInNtYWxsLWhvdXNlIiwKICAgIH07CgogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIE11bHRpLXdvcmQgY3JhZnQgaXRlbSBhbGlhc2VzLiBTaW5nbGUtd29yZCBpdGVtcyBhcmUgYXV0by1jb252ZXJ0ZWQgdG8KICAgIC8vLyB1bmRlcnNjb3JlIGZvcm0gYnkgPHNlZSBjcmVmPSJSZXNvbHZlQ3JhZnRJZCIvPiB3aXRob3V0IGFuIGV4cGxpY2l0IGVudHJ5LgogICAgLy8vIDwvc3VtbWFyeT4KICAgIHByaXZhdGUgc3RhdGljIHJlYWRvbmx5IERpY3Rpb25hcnk8c3RyaW5nLCBzdHJpbmc+IENyYWZ0QWxpYXNlcyA9CiAgICAgICAgbmV3KFN0cmluZ0NvbXBhcmVyLk9yZGluYWxJZ25vcmVDYXNlKQogICAgewogICAgICAgIC8vIFBpY2theGVzCiAgICAgICAgWyJ3b29kZW4gcGlja2F4ZSJdICA9ICJ3b29kZW5fcGlja2F4ZSIsICBbIndvb2QgcGlja2F4ZSJdICAgID0gIndvb2Rlbl9waWNrYXhlIiwKICAgICAgICBbInN0b25lIHBpY2theGUiXSAgID0gInN0b25lX3BpY2theGUiLAogICAgICAgIFsiaXJvbiBwaWNrYXhlIl0gICAgPSAiaXJvbl9waWNrYXhlIiwKICAgICAgICBbImdvbGRlbiBwaWNrYXhlIl0gID0gImdvbGRlbl9waWNrYXhlIiwgIFsiZ29sZCBwaWNrYXhlIl0gICAgPSAiZ29sZGVuX3BpY2theGUiLAogICAgICAgIFsiZGlhbW9uZCBwaWNrYXhlIl0gPSAiZGlhbW9uZF9waWNrYXhlIiwKICAgICAgICAvLyBBeGVzCiAgICAgICAgWyJ3b29kZW4gYXhlIl0gICAgICA9ICJ3b29kZW5fYXhlIiwgICAgICBbIndvb2QgYXhlIl0gICAgICAgID0gIndvb2Rlbl9heGUiLAogICAgICAgIFsic3RvbmUgYXhlIl0gICAgICAgPSAic3RvbmVfYXhlIiwKICAgICAgICBbImlyb24gYXhlIl0gICAgICAgID0gImlyb25fYXhlIiwKICAgICAgICAvLyBTaG92ZWxzCiAgICAgICAgWyJ3b29kZW4gc2hvdmVsIl0gICA9ICJ3b29kZW5fc2hvdmVsIiwgICBbIndvb2Qgc2hvdmVsIl0gICAgID0gIndvb2Rlbl9zaG92ZWwiLAogICAgICAgIFsic3RvbmUgc2hvdmVsIl0gICAgPSAic3RvbmVfc2hvdmVsIiwKICAgICAgICBbImlyb24gc2hvdmVsIl0gICAgID0gImlyb25fc2hvdmVsIiwKICAgICAgICAvLyBTd29yZHMKICAgICAgICBbIndvb2RlbiBzd29yZCJdICAgID0gIndvb2Rlbl9zd29yZCIsICAgIFsid29vZCBzd29yZCJdICAgICAgPSAid29vZGVuX3N3b3JkIiwKICAgICAgICBbInN0b25lIHN3b3JkIl0gICAgID0gInN0b25lX3N3b3JkIiwKICAgICAgICBbImlyb24gc3dvcmQiXSAgICAgID0gImlyb25fc3dvcmQiLAogICAgICAgIC8vIEFybW91cgogICAgICAgIFsiaXJvbiBoZWxtZXQiXSAgICAgPSAiaXJvbl9oZWxtZXQiLAogICAgICAgIFsiaXJvbiBjaGVzdHBsYXRlIl0gPSAiaXJvbl9jaGVzdHBsYXRlIiwKICAgICAgICBbImlyb24gbGVnZ2luZ3MiXSAgID0gImlyb25fbGVnZ2luZ3MiLAogICAgICAgIFsiaXJvbiBib290cyJdICAgICAgPSAiaXJvbl9ib290cyIsCiAgICAgICAgLy8gQmxvY2tzCiAgICAgICAgWyJjcmFmdGluZyB0YWJsZSJdICA9ICJjcmFmdGluZ190YWJsZSIsCiAgICAgICAgWyJvYWsgcGxhbmtzIl0gICAgICA9ICJvYWtfcGxhbmtzIiwKICAgICAgICBbIm9hayBzbGFiIl0gICAgICAgID0gIm9ha19zbGFiIiwgICAgICAgIFsib2FrIHNsYWJzIl0gICAgICAgPSAib2FrX3NsYWIiLAogICAgICAgIFsib2FrIHN0YWlycyJdICAgICAgPSAib2FrX3N0YWlycyIsCiAgICAgICAgWyJvYWsgZG9vciJdICAgICAgICA9ICJvYWtfZG9vciIsICAgICAgICBbIm9hayBkb29ycyJdICAgICAgID0gIm9ha19kb29yIiwKICAgICAgICBbIm9hayBmZW5jZSJdICAgICAgID0gIm9ha19mZW5jZSIsICAgICAgIFsib2FrIGZlbmNlcyJdICAgICAgPSAib2FrX2ZlbmNlIiwKICAgICAgICBbIm9hayBmZW5jZSBnYXRlIl0gID0gIm9ha19mZW5jZV9nYXRlIiwKICAgICAgICBbInN0b25lIGJyaWNrcyJdICAgID0gInN0b25lX2JyaWNrcyIsCiAgICAgICAgLy8gTWlzYyBpdGVtcwogICAgICAgIFsiaXJvbiBpbmdvdCJdICAgICAgPSAiaXJvbl9pbmdvdCIsICAgICAgWyJpcm9uIGluZ290cyJdICAgICA9ICJpcm9uX2luZ290IiwKICAgICAgICBbImdvbGQgaW5nb3QiXSAgICAgID0gImdvbGRfaW5nb3QiLCAgICAgIFsiZ29sZCBpbmdvdHMiXSAgICAgPSAiZ29sZF9pbmdvdCIsCiAgICAgICAgWyJnbGFzcyBwYW5lIl0gICAgICA9ICJnbGFzc19wYW5lIiwgICAgICBbImdsYXNzIHBhbmVzIl0gICAgID0gImdsYXNzX3BhbmUiLAogICAgICAgIFsiZ2xhc3MgYm90dGxlIl0gICAgPSAiZ2xhc3NfYm90dGxlIiwKICAgICAgICBbImJvb2tzaGVsZiJdICAgICAgID0gImJvb2tzaGVsZiIsCiAgICAgICAgWyJjaGVzdCJdICAgICAgICAgICA9ICJjaGVzdCIsCiAgICAgICAgWyJzdGljayJdICAgICAgICAgICA9ICJzdGljayIsICAgICAgICAgICBbInN0aWNrcyJdICAgICAgICAgID0gInN0aWNrIiwKICAgICAgICBbInRvcmNoIl0gICAgICAgICAgID0gInRvcmNoIiwgICAgICAgICAgIFsidG9yY2hlcyJdICAgICAgICAgPSAidG9yY2giLAogICAgICAgIFsiYm93bCJdICAgICAgICAgICAgPSAiYm93bCIsCiAgICAgICAgWyJidWNrZXQiXSAgICAgICAgICA9ICJidWNrZXQiLAogICAgICAgIFsiY29tcGFzcyJdICAgICAgICAgPSAiY29tcGFzcyIsCiAgICAgICAgWyJjbG9jayJdICAgICAgICAgICA9ICJjbG9jayIsCiAgICB9OwoKICAgIC8vIOKUgOKUgCBSZWdleGVzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIC8vIEFsbG93IHplcm8gb3IgbW9yZSBmaWxsZXIgd29yZHMgKG1lLCBzb21lLCBtb3JlLCBhLCBhbiwgdGhlLCB1cykgYmVmb3JlIGNvdW50CiAgICAvLyBhbmQgYmVmb3JlIHRoZSBpdGVtIG5hbWUuIFVzaW5nICogaW5zdGVhZCBvZiA/IGhhbmRsZXMgImdldCBtZSBzb21lIHdvb2QiIGFuZAogICAgLy8gImdldCBtZSAzMiBjb2JibGUiIGNvcnJlY3RseSDigJQgIm1lIiBpcyBza2lwcGVkIGFzIGEgZmlsbGVyLgogICAgcHJpdmF0ZSBzdGF0aWMgcmVhZG9ubHkgUmVnZXggR2F0aGVyUmVnZXggPSBuZXcoCiAgICAgICAgQCJcYihnZXR8Z2F0aGVyfGNvbGxlY3R8bWluZXxmaW5kfGJyaW5nfGZldGNoKVxiXHMrIiArCiAgICAgICAgQCIoPzooPzptZXx1c3xzb21lfG1vcmV8YXxhbnx0aGUpXHMrKSoiICsKICAgICAgICBAIig/Oig/PGNvdW50PlxkKylccyspPyIgKwogICAgICAgIEAiKD86KD86bWV8dXN8c29tZXxtb3JlfGF8YW58dGhlKVxzKykqIiArCiAgICAgICAgQCIoPzxpdGVtPlthLXpfXVthLXpfIF17MSwyNH0pIiwKICAgICAgICBSZWdleE9wdGlvbnMuSWdub3JlQ2FzZSB8IFJlZ2V4T3B0aW9ucy5Db21waWxlZCk7CgogICAgLy8gQWxsb3cgemVybyBvciBtb3JlIGZpbGxlciB3b3JkcyBiZWZvcmUgdGhlIGJsdWVwcmludCBuYW1lLiBVc2luZyAqIGluc3RlYWQgb2YgPwogICAgLy8gaGFuZGxlcyAiYnVpbGQgbWUgYSBzaGVsdGVyIiDihpIgZmlsbGVycyBjb25zdW1lZCA9IFsibWUiLCAiYSJdLCBibHVlcHJpbnQgPSAic2hlbHRlciIuCiAgICBwcml2YXRlIHN0YXRpYyByZWFkb25seSBSZWdleCBCdWlsZFJlZ2V4ID0gbmV3KAogICAgICAgIEAiXGIoYnVpbGR8Y29uc3RydWN0fG1ha2UpXGJccysiICsKICAgICAgICBAIig/Oig/Om1lfHVzfGF8dGhlfGFuKVxzKykqIiArCiAgICAgICAgQCIoPzxibHVlcHJpbnQ+W2Etel9dW2Etel9cLSBdezEsMzB9KSIsCiAgICAgICAgUmVnZXhPcHRpb25zLklnbm9yZUNhc2UgfCBSZWdleE9wdGlvbnMuQ29tcGlsZWQpOwoKICAgIHByaXZhdGUgc3RhdGljIHJlYWRvbmx5IFJlZ2V4IEdvVG9SZWdleCA9IG5ldygKICAgICAgICBAIlxiZ29ccyt0b1xzKyg/PHg+LT9cZCspXHMrKD88eT4tP1xkKylccysoPzx6Pi0/XGQrKVxiIiwKICAgICAgICBSZWdleE9wdGlvbnMuSWdub3JlQ2FzZSB8IFJlZ2V4T3B0aW9ucy5Db21waWxlZCk7CgogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIFNwcmludCAxMTogZGV0ZXJtaW5pc3RpYyByb3V0aW5nIGZvciBjcmFmdCAvIGZvcmdlIC8gc21lbHQgY29tbWFuZHMuCiAgICAvLy8gImNyYWZ0IiBhbmQgImZvcmdlIiBhcmUgbm90IGluIDxzZWUgY3JlZj0iR2F0aGVyUmVnZXgiLz4gb3IgPHNlZSBjcmVmPSJCdWlsZFJlZ2V4Ii8+CiAgICAvLy8gc28gdGhlcmUgaXMgbm8gYW1iaWd1aXR5LiAic21lbHQiIG1hcHMgdG8gdGhlIENyYWZ0SXRlbSBnb2FsOyB0aGUgSFROIHBsYW5uZXIKICAgIC8vLyByb3V0ZXMgaXQgdG8gdGhlIGZ1cm5hY2UgdmlhIHRoZSBzbWVsdGluZyBjaGFpbi4KICAgIC8vLwogICAgLy8vIEV4YW1wbGVzIG1hdGNoZWQ6ICJjcmFmdCBhbiBpcm9uIHBpY2theGUiLCAiZm9yZ2UgMiBpcm9uIHN3b3JkcyIsCiAgICAvLy8gInNtZWx0IGlyb24gb3JlIiwgImNyYWZ0IG1lIGEgY3JhZnRpbmcgdGFibGUiLgogICAgLy8vIDwvc3VtbWFyeT4KICAgIHByaXZhdGUgc3RhdGljIHJlYWRvbmx5IFJlZ2V4IENyYWZ0UmVnZXggPSBuZXcoCiAgICAgICAgQCJcYihjcmFmdHxmb3JnZXxzbWVsdClcYlxzKyIgKwogICAgICAgIEAiKD86KD86bWV8dXN8YXxhbnx0aGV8c29tZSlccyspKiIgKwogICAgICAgIEAiKD86KD88Y291bnQ+XGQrKVxzKyk/IiArCiAgICAgICAgQCIoPzooPzptZXx1c3xhfGFufHRoZXxzb21lKVxzKykqIiArCiAgICAgICAgQCIoPzxpdGVtPlthLXpfXVthLXpfIF17MSwzNX0pIiwKICAgICAgICBSZWdleE9wdGlvbnMuSWdub3JlQ2FzZSB8IFJlZ2V4T3B0aW9ucy5Db21waWxlZCk7CgogICAgLy8g4pSA4pSAIEludGVudCBwYXJzaW5nIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIHByaXZhdGUgc3RhdGljIENoYXRJbnRlcnByZXRhdGlvbiBQYXJzZUludGVudChzdHJpbmcgbWVzc2FnZSwgV29ybGRTdGF0ZSBzdGF0ZSkKICAgIHsKICAgICAgICBpZiAoUmVnZXguSXNNYXRjaChtZXNzYWdlLCBAIlxiKHN0b3B8Y2FuY2VsfGVub3VnaHxxdWl0fGFib3J0fG5ldmVybWluZHxuZXZlciBtaW5kKVxiIiwKICAgICAgICAgICAgUmVnZXhPcHRpb25zLklnbm9yZUNhc2UpKQogICAgICAgICAgICByZXR1cm4gbmV3IENoYXRJbnRlcnByZXRhdGlvbihDaGF0SW50ZW50VHlwZS5DYW5jZWxHb2FsLAogICAgICAgICAgICAgICAgUmVzcG9uc2U6ICJPaywgc3RvcHBpbmcuIik7CgogICAgICAgIC8vIFNwcmludCAzMCBQMS1FOiByZW1vdmVkIGJhcmUgXGJkb2luZ1xiIHRva2VuIOKAlCBpdCBtYXRjaGVkIGFueSBzZW50ZW5jZQogICAgICAgIC8vIGNvbnRhaW5pbmcgImRvaW5nIiAoZS5nLiAid2hhdCBhcmUgeW91IGRvaW5nIHdpdGggdGhhdCB3b29kIikgYXMgYSBzdGF0dXMgcXVlcnkuCiAgICAgICAgLy8gVGhlIGNvbXBvdW5kIHBhdHRlcm5zICJ3aGF0Lj9yZSB5b3UgZG9pbmciIGFuZCAid2hhdCBhcmUgeW91IGRvaW5nIiBhbHJlYWR5IGNvdmVyCiAgICAgICAgLy8gYWxsIGxlZ2l0aW1hdGUgc3RhdHVzIHF1ZXJpZXMgdGhhdCBjb250YWluICJkb2luZyIuCiAgICAgICAgaWYgKFJlZ2V4LklzTWF0Y2gobWVzc2FnZSwgQCJcYihzdGF0dXN8d2hhdC4/cmUgeW91IGRvaW5nfHdoYXQgYXJlIHlvdSBkb2luZ3xyZXBvcnQpXGIiLAogICAgICAgICAgICBSZWdleE9wdGlvbnMuSWdub3JlQ2FzZSkpCiAgICAgICAgewogICAgICAgICAgICB2YXIgZ29hbCA9IHN0YXRlLkZhY3RzLlRyeUdldFZhbHVlKCJjdXJyZW50R29hbCIsIG91dCB2YXIgY2cpICYmIGNnIGlzIHN0cmluZyBzCiAgICAgICAgICAgICAgICA/ICQiV29ya2luZyBvbjoge3N9LiIgOiAiSWRsZS4iOwogICAgICAgICAgICByZXR1cm4gbmV3IENoYXRJbnRlcnByZXRhdGlvbihDaGF0SW50ZW50VHlwZS5RdWVyeVN0YXR1cywKICAgICAgICAgICAgICAgIFJlc3BvbnNlOiAkIntnb2FsfSBIUDoge3N0YXRlLkhlYWx0aH0vMjAsIEZvb2Q6IHtzdGF0ZS5Gb29kfS8yMC4iKTsKICAgICAgICB9CgogICAgICAgIGlmIChSZWdleC5Jc01hdGNoKG1lc3NhZ2UsIEAiXGIoaGVscHxjb21tYW5kc3x3aGF0IGNhbiB5b3UgZG98dXNhZ2UpXGIiLAogICAgICAgICAgICBSZWdleE9wdGlvbnMuSWdub3JlQ2FzZSkpCiAgICAgICAgICAgIHJldHVybiBuZXcgQ2hhdEludGVycHJldGF0aW9uKENoYXRJbnRlbnRUeXBlLlF1ZXJ5SGVscCwKICAgICAgICAgICAgICAgIFJlc3BvbnNlOiAiQ29tbWFuZHM6ICdnZXQvbWluZSA8aXRlbT4gW25dJywgJ2NyYWZ0IDxpdGVtPicsICdidWlsZCA8Ymx1ZXByaW50PicsICIgKwogICAgICAgICAgICAgICAgICAgICAgICAgICInZ28gdG8gWCBZIFonLCAnY29tZSBoZXJlJywgJ3N0b3AnLCAnc3RhdHVzJywgJ2hlbHAnIik7CgogICAgICAgIGlmIChSZWdleC5Jc01hdGNoKG1lc3NhZ2UsIEAiXGIoY29tZSBoZXJlfGNvbWUgdG8gbWV8Zm9sbG93IG1lfGZvbGxvdylcYiIsCiAgICAgICAgICAgIFJlZ2V4T3B0aW9ucy5JZ25vcmVDYXNlKSkKICAgICAgICAgICAgcmV0dXJuIG5ldyBDaGF0SW50ZXJwcmV0YXRpb24oQ2hhdEludGVudFR5cGUuTmF2aWdhdGVUbywKICAgICAgICAgICAgICAgIEdvYWxQYXJhbWV0ZXJzOiBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+IHsgWyJ0YXJnZXQiXSA9ICJwbGF5ZXIiIH0sCiAgICAgICAgICAgICAgICBSZXNwb25zZTogIk9uIG15IHdheSEiKTsKCiAgICAgICAgdmFyIGdvVG8gPSBHb1RvUmVnZXguTWF0Y2gobWVzc2FnZSk7CiAgICAgICAgaWYgKGdvVG8uU3VjY2VzcykKICAgICAgICB7CiAgICAgICAgICAgIHZhciB4ID0gaW50LlBhcnNlKGdvVG8uR3JvdXBzWyJ4Il0uVmFsdWUpOwogICAgICAgICAgICB2YXIgeSA9IGludC5QYXJzZShnb1RvLkdyb3Vwc1sieSJdLlZhbHVlKTsKICAgICAgICAgICAgdmFyIHogPSBpbnQuUGFyc2UoZ29Uby5Hcm91cHNbInoiXS5WYWx1ZSk7CiAgICAgICAgICAgIHJldHVybiBuZXcgQ2hhdEludGVycHJldGF0aW9uKENoYXRJbnRlbnRUeXBlLk5hdmlnYXRlVG8sCiAgICAgICAgICAgICAgICBHb2FsTmFtZTogIk1vdmVUbyIsCiAgICAgICAgICAgICAgICBHb2FsUGFyYW1ldGVyczogbmV3IERpY3Rpb25hcnk8c3RyaW5nLCBvYmplY3Q/PiB7IFsieCJdID0geCwgWyJ5Il0gPSB5LCBbInoiXSA9IHogfSwKICAgICAgICAgICAgICAgIFJlc3BvbnNlOiAkIkhlYWRpbmcgdG8gKHt4fSx7eX0se3p9KS4iKTsKICAgICAgICB9CgogICAgICAgIHZhciBidWlsZCA9IEJ1aWxkUmVnZXguTWF0Y2gobWVzc2FnZSk7CiAgICAgICAgaWYgKGJ1aWxkLlN1Y2Nlc3MpCiAgICAgICAgewogICAgICAgICAgICB2YXIgYnBJZCA9IFJlc29sdmVCbHVlcHJpbnRJZChidWlsZC5Hcm91cHNbImJsdWVwcmludCJdLlZhbHVlLlRyaW0oKSk7CiAgICAgICAgICAgIGlmIChicElkIGlzIG5vdCBudWxsKQogICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDaGF0SW50ZXJwcmV0YXRpb24oQ2hhdEludGVudFR5cGUuQ3JlYXRlR29hbCwKICAgICAgICAgICAgICAgICAgICBHb2FsTmFtZTogJCJCdWlsZDp7YnBJZH0iLAogICAgICAgICAgICAgICAgICAgIFJlc3BvbnNlOiAkIlN0YXJ0aW5nIHRvIGJ1aWxkIHticElkLlJlcGxhY2UoJy0nLCAnICcpfS4iKTsKICAgICAgICB9CgogICAgICAgIHZhciBnYXRoZXIgPSBHYXRoZXJSZWdleC5NYXRjaChtZXNzYWdlKTsKICAgICAgICBpZiAoZ2F0aGVyLlN1Y2Nlc3MpCiAgICAgICAgewogICAgICAgICAgICB2YXIgaXRlbUlkID0gUmVzb2x2ZUl0ZW1JZChnYXRoZXIuR3JvdXBzWyJpdGVtIl0uVmFsdWUuVHJpbSgpKTsKICAgICAgICAgICAgaWYgKGl0ZW1JZCBpcyBub3QgbnVsbCkKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgdmFyIGNvdW50ID0gaW50LlRyeVBhcnNlKGdhdGhlci5Hcm91cHNbImNvdW50Il0uVmFsdWUsIG91dCB2YXIgYykgPyBjIDogMTA7CiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENoYXRJbnRlcnByZXRhdGlvbihDaGF0SW50ZW50VHlwZS5DcmVhdGVHb2FsLAogICAgICAgICAgICAgICAgICAgIEdvYWxOYW1lOiAkIkdhdGhlckl0ZW06e2l0ZW1JZH0iLAogICAgICAgICAgICAgICAgICAgIEdvYWxQYXJhbWV0ZXJzOiBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+IHsgWyJjb3VudCJdID0gY291bnQgfSwKICAgICAgICAgICAgICAgICAgICBSZXNwb25zZTogJCJHYXRoZXJpbmcge2NvdW50fXgge2l0ZW1JZC5SZXBsYWNlKCdfJywgJyAnKX0uIik7CiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgIC8vIFNwcmludCAxMTogZGV0ZXJtaW5pc3RpYyBjcmFmdCByb3V0aW5nIOKAlCBuZXZlciBmb3J3YXJkIHRvIExMTS4KICAgICAgICB2YXIgY3JhZnQgPSBDcmFmdFJlZ2V4Lk1hdGNoKG1lc3NhZ2UpOwogICAgICAgIGlmIChjcmFmdC5TdWNjZXNzKQogICAgICAgIHsKICAgICAgICAgICAgdmFyIGNyYWZ0SWQgPSBSZXNvbHZlQ3JhZnRJZChjcmFmdC5Hcm91cHNbIml0ZW0iXS5WYWx1ZS5UcmltKCkpOwogICAgICAgICAgICBpZiAoY3JhZnRJZCBpcyBub3QgbnVsbCkKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgdmFyIGNvdW50ID0gaW50LlRyeVBhcnNlKGNyYWZ0Lkdyb3Vwc1siY291bnQiXS5WYWx1ZSwgb3V0IHZhciBjKSA/IGMgOiAxOwogICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDaGF0SW50ZXJwcmV0YXRpb24oQ2hhdEludGVudFR5cGUuQ3JlYXRlR29hbCwKICAgICAgICAgICAgICAgICAgICBHb2FsTmFtZTogJCJDcmFmdEl0ZW06e2NyYWZ0SWR9IiwKICAgICAgICAgICAgICAgICAgICBHb2FsUGFyYW1ldGVyczogbmV3IERpY3Rpb25hcnk8c3RyaW5nLCBvYmplY3Q/PiB7IFsiY291bnQiXSA9IGNvdW50IH0sCiAgICAgICAgICAgICAgICAgICAgUmVzcG9uc2U6ICQiQ3JhZnRpbmcge2NvdW50fXgge2NyYWZ0SWQuUmVwbGFjZSgnXycsICcgJyl9LiIpOwogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICByZXR1cm4gbmV3IENoYXRJbnRlcnByZXRhdGlvbihDaGF0SW50ZW50VHlwZS5Vbmtub3duLAogICAgICAgICAgICBSZXNwb25zZTogIkRpZG4ndCBjYXRjaCB0aGF0LiBTYXkgJ2hlbHAnIGZvciBjb21tYW5kcy4iKTsKICAgIH0KCiAgICAvLyDilIDilIAgSGV1cmlzdGljcyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICAvLyBQcm94aW1pdHkgaW4gYmxvY2tzIHdpdGhpbiB3aGljaCBhbGwgY2hhdCBpcyB0cmVhdGVkIGFzIGFkZHJlc3NlZCBhdCB0aGUgYm90LgogICAgcHJpdmF0ZSBjb25zdCBpbnQgUHJveGltaXR5QWRkcmVzc0Jsb2NrcyA9IDMyOwoKICAgIHByaXZhdGUgYm9vbCBJc0RpcmVjdGVkQXRCb3QoCiAgICAgICAgc3RyaW5nIG1lc3NhZ2UsIHN0cmluZyBib3ROYW1lLCBpbnQgb25saW5lUGxheWVycywKICAgICAgICBQb3NpdGlvbiBib3RQb3NpdGlvbiwgUG9zaXRpb24/IHBsYXllclBvc2l0aW9uKQogICAgewogICAgICAgIGlmIChvbmxpbmVQbGF5ZXJzIDw9IDEpIHJldHVybiB0cnVlOwogICAgICAgIC8vIFdob2xlLXdvcmQgbmFtZSBtYXRjaCBhbnl3aGVyZSBpbiBtZXNzYWdlIHNvIHRoYXQKICAgICAgICAvLyAiaGVsbG8gTGVvIiBhbmQgIkxlbywgY29tZSBoZXJlIiBib3RoIGFkZHJlc3MgdGhlIGJvdCBjb3JyZWN0bHkuCiAgICAgICAgaWYgKENvbnRhaW5zQm90TmFtZShtZXNzYWdlLCBib3ROYW1lKSkgcmV0dXJuIHRydWU7CiAgICAgICAgLy8gQm90IHNwb2tlIHJlY2VudGx5IOKAlCBjb250aW51ZSB0aGUgY29udmVyc2F0aW9uIHRocmVhZC4KICAgICAgICB2YXIgd2luZG93ID0gVGltZVNwYW4uRnJvbVNlY29uZHMob3B0aW9ucy5Db252ZXJzYXRpb25XaW5kb3dTZWNvbmRzKTsKICAgICAgICBpZiAoRGF0ZVRpbWVPZmZzZXQuVXRjTm93IC0gX2xhc3RCb3RTcG9rZSA8IHdpbmRvdykgcmV0dXJuIHRydWU7CiAgICAgICAgLy8gUGxheWVyIGlzIHdpdGhpbiBwcm94aW1pdHkgcmFuZ2Ug4oCUIHRyZWF0IGFzIGEgbG9jYWwgY29udmVyc2F0aW9uLgogICAgICAgIGlmIChwbGF5ZXJQb3NpdGlvbiBpcyBub3QgbnVsbCkKICAgICAgICB7CiAgICAgICAgICAgIHZhciBkeCA9IGJvdFBvc2l0aW9uLlggLSBwbGF5ZXJQb3NpdGlvbi5YOwogICAgICAgICAgICB2YXIgZHkgPSBib3RQb3NpdGlvbi5ZIC0gcGxheWVyUG9zaXRpb24uWTsKICAgICAgICAgICAgdmFyIGR6ID0gYm90UG9zaXRpb24uWiAtIHBsYXllclBvc2l0aW9uLlo7CiAgICAgICAgICAgIHZhciBkaXN0U3EgPSBkeCAqIGR4ICsgZHkgKiBkeSArIGR6ICogZHo7CiAgICAgICAgICAgIGlmIChkaXN0U3EgPD0gUHJveGltaXR5QWRkcmVzc0Jsb2NrcyAqIFByb3hpbWl0eUFkZHJlc3NCbG9ja3MpIHJldHVybiB0cnVlOwogICAgICAgIH0KICAgICAgICByZXR1cm4gZmFsc2U7CiAgICB9CgogICAgLy8gQ2FjaGVkIHBlci1pbnN0YW5jZSDigJQgYm90TmFtZSBpcyBmaXhlZCBhdCBzdGFydHVwOyBubyBuZWVkIHRvIHJlY29tcGlsZSBldmVyeSBjYWxsLgogICAgcHJpdmF0ZSBSZWdleD8gX2JvdE5hbWVSZWdleDsKCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gUmV0dXJucyB0cnVlIHdoZW4gPHBhcmFtcmVmIG5hbWU9Im1lc3NhZ2UiLz4gY29udGFpbnMgPHBhcmFtcmVmIG5hbWU9ImJvdE5hbWUiLz4KICAgIC8vLyBhcyBhIHdob2xlIHdvcmQgKG5vdCBwYXJ0IG9mIGEgbG9uZ2VyIHdvcmQgb3IgdXNlcm5hbWUpLiBDYXNlLWluc2Vuc2l0aXZlLgogICAgLy8vIE1hdGNoZXMgImhlbGxvIExlbyIsICJMZW8gY29tZSBoZXJlIiwgIkxlbywiIGJ1dCBOT1QgIkxlb3BvbGQiIG9yICJMZW9fYm90Ii4KICAgIC8vLyBSZWdleCBpcyBjb21waWxlZCBvbmNlIHBlciBpbnRlcnByZXRlciBpbnN0YW5jZSBmb3IgcGVyZm9ybWFuY2UuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHJpdmF0ZSBib29sIENvbnRhaW5zQm90TmFtZShzdHJpbmcgbWVzc2FnZSwgc3RyaW5nIGJvdE5hbWUpCiAgICB7CiAgICAgICAgX2JvdE5hbWVSZWdleCA/Pz0gbmV3IFJlZ2V4KAogICAgICAgICAgICAkQCIoPzwhW2EtekEtWjAtOV9dKXtSZWdleC5Fc2NhcGUoYm90TmFtZSl9KD8hW2EtekEtWjAtOV9dKSIsCiAgICAgICAgICAgIFJlZ2V4T3B0aW9ucy5JZ25vcmVDYXNlIHwgUmVnZXhPcHRpb25zLkNvbXBpbGVkKTsKICAgICAgICByZXR1cm4gX2JvdE5hbWVSZWdleC5Jc01hdGNoKG1lc3NhZ2UpOwogICAgfQoKICAgIHByaXZhdGUgc3RhdGljIHN0cmluZyBTdHJpcEJvdE5hbWUoc3RyaW5nIG1lc3NhZ2UsIHN0cmluZyBib3ROYW1lKQogICAgewogICAgICAgIGlmICghbWVzc2FnZS5TdGFydHNXaXRoKGJvdE5hbWUsIFN0cmluZ0NvbXBhcmlzb24uT3JkaW5hbElnbm9yZUNhc2UpKSByZXR1cm4gbWVzc2FnZTsKICAgICAgICB2YXIgYWZ0ZXIgPSBtZXNzYWdlW2JvdE5hbWUuTGVuZ3RoLi5dLlRyaW1TdGFydCgnLCcsICc6JywgJyAnKTsKICAgICAgICByZXR1cm4gYWZ0ZXIuTGVuZ3RoID4gMCA/IGFmdGVyIDogbWVzc2FnZTsKICAgIH0KCiAgICBwcml2YXRlIHN0YXRpYyBzdHJpbmc/IFJlc29sdmVJdGVtSWQoc3RyaW5nIHJhdykKICAgIHsKICAgICAgICAvLyBTcHJpbnQgMzAgUDEtRDogY29uc3RyYWluZWQgcGx1cmFsIG1hcCDigJQgZXhwbGljaXQgZW50cmllcyBpbiBJdGVtQWxpYXNlcwogICAgICAgIC8vIGNvdmVyIGFsbCBrbm93biBwbHVyYWxzIChsb2dzLCBkaWFtb25kcywgZXRjLikuIFRoZSBmb3JtZXIgVHJpbUVuZCgncycpCiAgICAgICAgLy8gaGV1cmlzdGljIHdhcyByZW1vdmVkOyBpdCBjb3VsZCBzdHJpcCB2YWxpZCBsZXR0ZXJzIChlLmcuICJncmFzcyIgLT4gImdyYSIpLgogICAgICAgIGlmIChJdGVtQWxpYXNlcy5UcnlHZXRWYWx1ZShyYXcsIG91dCB2YXIgaWQpKSByZXR1cm4gaWQ7CiAgICAgICAgdmFyIHVuZGVyc2NvcmVkID0gcmF3LlJlcGxhY2UoJyAnLCAnXycpLlRvTG93ZXJJbnZhcmlhbnQoKTsKICAgICAgICBpZiAoSXRlbUFsaWFzZXMuVHJ5R2V0VmFsdWUodW5kZXJzY29yZWQsIG91dCBpZCkpIHJldHVybiBpZDsKICAgICAgICBpZiAoUmVnZXguSXNNYXRjaChyYXcsIEAiXlthLXpdW2EtejAtOV9dKiQiKSkgcmV0dXJuIHJhdzsKICAgICAgICByZXR1cm4gbnVsbDsKICAgIH0KCiAgICBwcml2YXRlIHN0YXRpYyBzdHJpbmc/IFJlc29sdmVCbHVlcHJpbnRJZChzdHJpbmcgcmF3KQogICAgewogICAgICAgIGlmIChCbHVlcHJpbnRBbGlhc2VzLlRyeUdldFZhbHVlKHJhdywgb3V0IHZhciBpZCkpIHJldHVybiBpZDsKICAgICAgICB2YXIgaHlwaCA9IHJhdy5SZXBsYWNlKCcgJywgJy0nKS5Ub0xvd2VySW52YXJpYW50KCk7CiAgICAgICAgaWYgKEJsdWVwcmludEFsaWFzZXMuVHJ5R2V0VmFsdWUoaHlwaCwgb3V0IGlkKSkgcmV0dXJuIGlkOwogICAgICAgIGlmIChSZWdleC5Jc01hdGNoKHJhdywgQCJeW2Etel1bYS16MC05XC1dKiQiKSkgcmV0dXJuIHJhdzsKICAgICAgICByZXR1cm4gbnVsbDsKICAgIH0KCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gUmVzb2x2ZXMgYSByYXcgY3JhZnQgaXRlbSBzdHJpbmcgdG8gYSBNaW5lY3JhZnQgaXRlbSBJRC4KICAgIC8vLyBDaGVja3MgPHNlZSBjcmVmPSJDcmFmdEFsaWFzZXMiLz4gZmlyc3QgKGhhbmRsZXMgbXVsdGktd29yZCBpdGVtcyBsaWtlICJpcm9uIHBpY2theGUiKSwKICAgIC8vLyB0aGVuIGNvbnZlcnRzIHNwYWNlcyB0byB1bmRlcnNjb3JlcyBhbmQgYWNjZXB0cyBhbnkgbG93ZXJjYXNlIGlkZW50aWZpZXIuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHJpdmF0ZSBzdGF0aWMgc3RyaW5nPyBSZXNvbHZlQ3JhZnRJZChzdHJpbmcgcmF3KQogICAgewogICAgICAgIGlmIChDcmFmdEFsaWFzZXMuVHJ5R2V0VmFsdWUocmF3LCBvdXQgdmFyIGlkKSkgcmV0dXJuIGlkOwogICAgICAgIHZhciB1bmRlcnNjb3JlZCA9IHJhdy5SZXBsYWNlKCcgJywgJ18nKS5Ub0xvd2VySW52YXJpYW50KCk7CiAgICAgICAgaWYgKENyYWZ0QWxpYXNlcy5UcnlHZXRWYWx1ZSh1bmRlcnNjb3JlZCwgb3V0IGlkKSkgcmV0dXJuIGlkOwogICAgICAgIC8vIEFjY2VwdCBhbnkgc3RyaW5nIHRoYXQgbG9va3MgbGlrZSBhIHZhbGlkIE1pbmVjcmFmdCBpdGVtIElELgogICAgICAgIGlmIChSZWdleC5Jc01hdGNoKHVuZGVyc2NvcmVkLCBAIl5bYS16XVthLXowLTlfXSokIikpIHJldHVybiB1bmRlcnNjb3JlZDsKICAgICAgICByZXR1cm4gbnVsbDsKICAgIH0KfQo=
+namespace Agent.Planning;
+
+using Agent.Core;
+using Agent.Planning.Llm;
+using System.Text.RegularExpressions;
+
+/// <summary>
+/// Deterministic, pattern-matching <see cref="IChatInterpreter"/>. No network calls.
+///
+/// Used standalone when LLM is disabled or unavailable, and as the fallback inside
+/// <see cref="LlmChatInterpreter"/> when the rate limit is exceeded or Ollama is down.
+///
+/// Directed-at-bot heuristics (any one sufficient):
+///   - Solo play: <c>onlinePlayers &lt;= 1</c>
+///   - Bot name appears as whole word in message (case-insensitive)
+///   - Bot spoke within the conversation window (<see cref="ChatOptions.ConversationWindowSeconds"/>)
+///   - Player is within <see cref="ProximityAddressBlocks"/> blocks of the bot
+///
+/// Sprint 11: added CraftRegex — "craft/forge/smelt &lt;item&gt;" is now routed
+/// deterministically, never touching the LLM. Fixes the case where "craft an iron
+/// pickaxe" was forwarded to Ollama which could hang indefinitely.
+/// </summary>
+public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
+{
+    private DateTimeOffset _lastBotSpoke = DateTimeOffset.MinValue;
+
+    // ── IChatInterpreter ──────────────────────────────────────────────────────
+
+    public Task<ChatInterpretation> InterpretAsync(
+        string username, string message, string botName,
+        int onlinePlayers, Position botPosition, Position? playerPosition,
+        WorldState state, CancellationToken ct = default)
+    {
+        var effective = message.Length > options.MaxMessageLength
+            ? message[..options.MaxMessageLength]
+            : message;
+
+        if (!IsDirectedAtBot(effective, botName, onlinePlayers, botPosition, playerPosition))
+            return Task.FromResult(new ChatInterpretation(ChatIntentType.NotAddressed));
+
+        var stripped = StripBotName(effective.Trim(), botName);
+        return Task.FromResult(ParseIntent(stripped, state));
+    }
+
+    public void RecordBotSpoke() => _lastBotSpoke = DateTimeOffset.UtcNow;
+
+    // ── Item / blueprint / craft aliases ──────────────────────────────────────
+
+    private static readonly Dictionary<string, string> ItemAliases =
+        new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["wood"]       = "oak_log",  ["log"]          = "oak_log",   ["logs"]      = "oak_log",
+        ["oak"]        = "oak_log",  ["oak log"]       = "oak_log",  ["oak logs"]  = "oak_log",
+        ["birch"]      = "birch_log", ["spruce"]       = "spruce_log",
+        ["cobble"]     = "cobblestone", ["cobblestone"] = "cobblestone",
+        // Sprint 19: "stone" resolves to "stone" — GoalFactory maps yield (cobblestone)
+        ["stone"]      = "stone",
+        ["iron"]       = "iron_ore", ["iron ore"]      = "iron_ore",
+        ["gold"]       = "gold_ore", ["gold ore"]      = "gold_ore",
+        ["coal"]       = "coal_ore", ["coal ore"]      = "coal_ore",
+        ["diamond"]    = "diamond",  ["diamonds"]      = "diamond",
+        ["sand"]       = "sand",     ["gravel"]        = "gravel",   ["dirt"]      = "dirt",
+        ["planks"]     = "oak_planks", ["plank"]       = "oak_planks", ["oak planks"] = "oak_planks",
+        ["glass"]      = "glass",    ["glass pane"]    = "glass_pane",
+    };
+
+    private static readonly Dictionary<string, string> BlueprintAliases =
+        new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["house"] = "small-house", ["small house"] = "small-house",
+        ["shelter"] = "small-house", ["home"] = "small-house",
+        ["small-house"] = "small-house",
+    };
+
+    /// <summary>
+    /// Multi-word craft item aliases. Single-word items are auto-converted to
+    /// underscore form by <see cref="ResolveCraftId"/> without an explicit entry.
+    /// </summary>
+    private static readonly Dictionary<string, string> CraftAliases =
+        new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Pickaxes
+        ["wooden pickaxe"]  = "wooden_pickaxe",  ["wood pickaxe"]    = "wooden_pickaxe",
+        ["stone pickaxe"]   = "stone_pickaxe",
+        ["iron pickaxe"]    = "iron_pickaxe",
+        ["golden pickaxe"]  = "golden_pickaxe",  ["gold pickaxe"]    = "golden_pickaxe",
+        ["diamond pickaxe"] = "diamond_pickaxe",
+        // Axes
+        ["wooden axe"]      = "wooden_axe",      ["wood axe"]        = "wooden_axe",
+        ["stone axe"]       = "stone_axe",
+        ["iron axe"]        = "iron_axe",
+        // Shovels
+        ["wooden shovel"]   = "wooden_shovel",   ["wood shovel"]     = "wooden_shovel",
+        ["stone shovel"]    = "stone_shovel",
+        ["iron shovel"]     = "iron_shovel",
+        // Swords
+        ["wooden sword"]    = "wooden_sword",    ["wood sword"]      = "wooden_sword",
+        ["stone sword"]     = "stone_sword",
+        ["iron sword"]      = "iron_sword",
+        // Armour
+        ["iron helmet"]     = "iron_helmet",
+        ["iron chestplate"] = "iron_chestplate",
+        ["iron leggings"]   = "iron_leggings",
+        ["iron boots"]      = "iron_boots",
+        // Blocks
+        ["crafting table"]  = "crafting_table",
+        ["oak planks"]      = "oak_planks",
+        ["oak slab"]        = "oak_slab",        ["oak slabs"]       = "oak_slab",
+        ["oak stairs"]      = "oak_stairs",
+        ["oak door"]        = "oak_door",        ["oak doors"]       = "oak_door",
+        ["oak fence"]       = "oak_fence",       ["oak fences"]      = "oak_fence",
+        ["oak fence gate"]  = "oak_fence_gate",
+        ["stone bricks"]    = "stone_bricks",
+        // Misc items
+        ["iron ingot"]      = "iron_ingot",      ["iron ingots"]     = "iron_ingot",
+        ["gold ingot"]      = "gold_ingot",      ["gold ingots"]     = "gold_ingot",
+        ["glass pane"]      = "glass_pane",      ["glass panes"]     = "glass_pane",
+        ["glass bottle"]    = "glass_bottle",
+        ["bookshelf"]       = "bookshelf",
+        ["chest"]           = "chest",
+        ["stick"]           = "stick",           ["sticks"]          = "stick",
+        ["torch"]           = "torch",           ["torches"]         = "torch",
+        ["bowl"]            = "bowl",
+        ["bucket"]          = "bucket",
+        ["compass"]         = "compass",
+        ["clock"]           = "clock",
+    };
+
+    // ── Regexes ────────────────────────────────────────────────────────────────
+
+    // Allow zero or more filler words (me, some, more, a, an, the, us) before count
+    // and before the item name. Using * instead of ? handles "get me some wood" and
+    // "get me 32 cobble" correctly — "me" is skipped as a filler.
+    private static readonly Regex GatherRegex = new(
+        @"\b(get|gather|collect|mine|find|bring|fetch)\b\s+" +
+        @"(?:(?:me|us|some|more|a|an|the)\s+)*" +
+        @"(?:(?<count>\d+)\s+)?" +
+        @"(?:(?:me|us|some|more|a|an|the)\s+)*" +
+        @"(?<item>[a-z_][a-z_ ]{1,24})",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    // Allow zero or more filler words before the blueprint name. Using * instead of ?
+    // handles "build me a shelter" → fillers consumed = ["me", "a"], blueprint = "shelter".
+    private static readonly Regex BuildRegex = new(
+        @"\b(build|construct|make)\b\s+" +
+        @"(?:(?:me|us|a|the|an)\s+)*" +
+        @"(?<blueprint>[a-z_][a-z_\- ]{1,30})",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static readonly Regex GoToRegex = new(
+        @"\bgo\s+to\s+(?<x>-?\d+)\s+(?<y>-?\d+)\s+(?<z>-?\d+)\b",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    /// <summary>
+    /// Sprint 11: deterministic routing for craft / forge / smelt commands.
+    /// "craft" and "forge" are not in <see cref="GatherRegex"/> or <see cref="BuildRegex"/>
+    /// so there is no ambiguity. "smelt" maps to the CraftItem goal; the HTN planner
+    /// routes it to the furnace via the smelting chain.
+    ///
+    /// Examples matched: "craft an iron pickaxe", "forge 2 iron swords",
+    /// "smelt iron ore", "craft me a crafting table".
+    /// </summary>
+    private static readonly Regex CraftRegex = new(
+        @"\b(craft|forge|smelt)\b\s+" +
+        @"(?:(?:me|us|a|an|the|some)\s+)*" +
+        @"(?:(?<count>\d+)\s+)?" +
+        @"(?:(?:me|us|a|an|the|some)\s+)*" +
+        @"(?<item>[a-z_][a-z_ ]{1,35})",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    // ── Intent parsing ─────────────────────────────────────────────────────────
+
+    private static ChatInterpretation ParseIntent(string message, WorldState state)
+    {
+        if (Regex.IsMatch(message, @"\b(stop|cancel|enough|quit|abort|nevermind|never mind)\b",
+            RegexOptions.IgnoreCase))
+            return new ChatInterpretation(ChatIntentType.CancelGoal,
+                Response: "Ok, stopping.");
+
+        // Sprint 30 P1-E: removed bare \bdoing\b token — it matched any sentence
+        // containing "doing" (e.g. "what are you doing with that wood") as a status query.
+        // The compound patterns "what.?re you doing" and "what are you doing" already cover
+        // all legitimate status queries that contain "doing".
+        if (Regex.IsMatch(message, @"\b(status|what.?re you doing|what are you doing|report)\b",
+            RegexOptions.IgnoreCase))
+        {
+            var goal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s
+                ? $"Working on: {s}." : "Idle.";
+            return new ChatInterpretation(ChatIntentType.QueryStatus,
+                Response: $"{goal} HP: {state.Health}/20, Food: {state.Food}/20.");
+        }
+
+        if (Regex.IsMatch(message, @"\b(help|commands|what can you do|usage)\b",
+            RegexOptions.IgnoreCase))
+            return new ChatInterpretation(ChatIntentType.QueryHelp,
+                Response: "Commands: 'get/mine <item> [n]', 'craft <item>', 'build <blueprint>', " +
+                          "'go to X Y Z', 'come here', 'stop', 'status', 'help'");
+
+        if (Regex.IsMatch(message, @"\b(come here|come to me|follow me|follow)\b",
+            RegexOptions.IgnoreCase))
+            return new ChatInterpretation(ChatIntentType.NavigateTo,
+                GoalParameters: new Dictionary<string, object?> { ["target"] = "player" },
+                Response: "On my way!");
+
+        var goTo = GoToRegex.Match(message);
+        if (goTo.Success)
+        {
+            var x = int.Parse(goTo.Groups["x"].Value);
+            var y = int.Parse(goTo.Groups["y"].Value);
+            var z = int.Parse(goTo.Groups["z"].Value);
+            return new ChatInterpretation(ChatIntentType.NavigateTo,
+                GoalName: "MoveTo",
+                GoalParameters: new Dictionary<string, object?> { ["x"] = x, ["y"] = y, ["z"] = z },
+                Response: $"Heading to ({x},{y},{z}).");
+        }
+
+        var build = BuildRegex.Match(message);
+        if (build.Success)
+        {
+            var bpId = ResolveBlueprintId(build.Groups["blueprint"].Value.Trim());
+            if (bpId is not null)
+                return new ChatInterpretation(ChatIntentType.CreateGoal,
+                    GoalName: $"Build:{bpId}",
+                    Response: $"Starting to build {bpId.Replace('-', ' ')}.");
+        }
+
+        var gather = GatherRegex.Match(message);
+        if (gather.Success)
+        {
+            var itemId = ResolveItemId(gather.Groups["item"].Value.Trim());
+            if (itemId is not null)
+            {
+                var count = int.TryParse(gather.Groups["count"].Value, out var c) ? c : 10;
+                return new ChatInterpretation(ChatIntentType.CreateGoal,
+                    GoalName: $"GatherItem:{itemId}",
+                    GoalParameters: new Dictionary<string, object?> { ["count"] = count },
+                    Response: $"Gathering {count}x {itemId.Replace('_', ' ')}.");
+            }
+        }
+
+        // Sprint 11: deterministic craft routing — never forward to LLM.
+        var craft = CraftRegex.Match(message);
+        if (craft.Success)
+        {
+            var craftId = ResolveCraftId(craft.Groups["item"].Value.Trim());
+            if (craftId is not null)
+            {
+                var count = int.TryParse(craft.Groups["count"].Value, out var c) ? c : 1;
+                return new ChatInterpretation(ChatIntentType.CreateGoal,
+                    GoalName: $"CraftItem:{craftId}",
+                    GoalParameters: new Dictionary<string, object?> { ["count"] = count },
+                    Response: $"Crafting {count}x {craftId.Replace('_', ' ')}.");
+            }
+        }
+
+        return new ChatInterpretation(ChatIntentType.Unknown,
+            Response: "Didn't catch that. Say 'help' for commands.");
+    }
+
+    // ── Heuristics ─────────────────────────────────────────────────────────────
+
+    // Proximity in blocks within which all chat is treated as addressed at the bot.
+    private const int ProximityAddressBlocks = 32;
+
+    private bool IsDirectedAtBot(
+        string message, string botName, int onlinePlayers,
+        Position botPosition, Position? playerPosition)
+    {
+        if (onlinePlayers <= 1) return true;
+        // Whole-word name match anywhere in message so that
+        // "hello Leo" and "Leo, come here" both address the bot correctly.
+        if (ContainsBotName(message, botName)) return true;
+        // Bot spoke recently — continue the conversation thread.
+        var window = TimeSpan.FromSeconds(options.ConversationWindowSeconds);
+        if (DateTimeOffset.UtcNow - _lastBotSpoke < window) return true;
+        // Player is within proximity range — treat as a local conversation.
+        if (playerPosition is not null)
+        {
+            var dx = botPosition.X - playerPosition.X;
+            var dy = botPosition.Y - playerPosition.Y;
+            var dz = botPosition.Z - playerPosition.Z;
+            var distSq = dx * dx + dy * dy + dz * dz;
+            if (distSq <= ProximityAddressBlocks * ProximityAddressBlocks) return true;
+        }
+        return false;
+    }
+
+    // Cached per-instance — botName is fixed at startup; no need to recompile every call.
+    private Regex? _botNameRegex;
+
+    /// <summary>
+    /// Returns true when <paramref name="message"/> contains <paramref name="botName"/>
+    /// as a whole word (not part of a longer word or username). Case-insensitive.
+    /// Matches "hello Leo", "Leo come here", "Leo," but NOT "Leopold" or "Leo_bot".
+    /// Regex is compiled once per interpreter instance for performance.
+    /// </summary>
+    private bool ContainsBotName(string message, string botName)
+    {
+        _botNameRegex ??= new Regex(
+            $@"(?<![a-zA-Z0-9_]){Regex.Escape(botName)}(?![a-zA-Z0-9_])",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        return _botNameRegex.IsMatch(message);
+    }
+
+    private static string StripBotName(string message, string botName)
+    {
+        if (!message.StartsWith(botName, StringComparison.OrdinalIgnoreCase)) return message;
+        var after = message[botName.Length..].TrimStart(',', ':', ' ');
+        return after.Length > 0 ? after : message;
+    }
+
+    private static string? ResolveItemId(string raw)
+    {
+        // Sprint 30 P1-D: constrained plural map — explicit entries in ItemAliases
+        // cover all known plurals (logs, diamonds, etc.). The former TrimEnd('s')
+        // heuristic was removed; it could strip valid letters (e.g. "grass" -> "gra").
+        if (ItemAliases.TryGetValue(raw, out var id)) return id;
+        var underscored = raw.Replace(' ', '_').ToLowerInvariant();
+        if (ItemAliases.TryGetValue(underscored, out id)) return id;
+        if (Regex.IsMatch(raw, @"^[a-z][a-z0-9_]*$")) return raw;
+        return null;
+    }
+
+    private static string? ResolveBlueprintId(string raw)
+    {
+        if (BlueprintAliases.TryGetValue(raw, out var id)) return id;
+        var hyph = raw.Replace(' ', '-').ToLowerInvariant();
+        if (BlueprintAliases.TryGetValue(hyph, out id)) return id;
+        if (Regex.IsMatch(raw, @"^[a-z][a-z0-9\-]*$")) return raw;
+        return null;
+    }
+
+    /// <summary>
+    /// Resolves a raw craft item string to a Minecraft item ID.
+    /// Checks <see cref="CraftAliases"/> first (handles multi-word items like "iron pickaxe"),
+    /// then converts spaces to underscores and accepts any lowercase identifier.
+    /// </summary>
+    private static string? ResolveCraftId(string raw)
+    {
+        if (CraftAliases.TryGetValue(raw, out var id)) return id;
+        var underscored = raw.Replace(' ', '_').ToLowerInvariant();
+        if (CraftAliases.TryGetValue(underscored, out id)) return id;
+        // Accept any string that looks like a valid Minecraft item ID.
+        if (Regex.IsMatch(underscored, @"^[a-z][a-z0-9_]*$")) return underscored;
+        return null;
+    }
+}

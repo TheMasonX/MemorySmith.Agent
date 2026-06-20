@@ -1,1 +1,393 @@
-dXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuVG9vbHM7CnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucy5Db25jdXJyZW50Owp1c2luZyBTeXN0ZW0uVGV4dC5Kc29uOwoKbmFtZXNwYWNlIE1lbW9yeVNtaXRoLkFnZW50LlRlc3RzOwoKLy8vIDxzdW1tYXJ5PgovLy8gU3ByaW50IDI1IOKAlCBUb29sIEJvdW5kYXJ5IEhhcmRlbmluZyArIEFjdGlvbiBMaWZlY3ljbGUKLy8vCi8vLyBUZXN0cyBjb3ZlcmluZzoKLy8vICAgUDAtQTogRmluZEZsYXRBcmVhVG9vbCBjb25zdGFudCB1bmlmaWNhdGlvbiArIHNhZmUgaW50ZWdlciBwYXJzaW5nCi8vLyAgIFAwLUI6IFN0YXR1c1Rvb2wgZGVkdXBsaWNhdGlvbiAoYm90aCBuYW1lcyByZXNvbHZlIHRvIEdldFN0YXR1c1Rvb2wpCi8vLyAgIFAwLUM6IFRvb2xEaXNwYXRjaGVyIGV4Y2VwdGlvbiB3cmFwcGluZyArIGludGVnZXIgdmFsaWRhdGlvbiBmaXgKLy8vICAgUDAtRDogUGVuZGluZ0FjdGlvbiBsaWZlY3ljbGUsIHRpbWVvdXQgc3dlZXAsIGNvbmN1cnJlbnQgdHJhY2tpbmcKLy8vICAgUDEtQTogV29ybGRNb2RlbCBkZWZlbnNpdmUgY29weSAoY29uc3RydWN0b3IgKyBPYnNlcnZlKQovLy8gPC9zdW1tYXJ5PgpbVGVzdEZpeHR1cmVdCnB1YmxpYyBzZWFsZWQgY2xhc3MgU3ByaW50MjVUZXN0cwp7CiAgICBwcml2YXRlIE1vY2tXb3JsZEFkYXB0ZXIgX2FkYXB0ZXIgPSBudWxsITsKCiAgICBbU2V0VXBdCiAgICBwdWJsaWMgdm9pZCBTZXRVcCgpID0+IF9hZGFwdGVyID0gbmV3IE1vY2tXb3JsZEFkYXB0ZXIoKTsKCiAgICBwcml2YXRlIHN0YXRpYyBKc29uRWxlbWVudCBBcmdzKHN0cmluZyBqc29uKSA9PgogICAgICAgIEpzb25Eb2N1bWVudC5QYXJzZShqc29uKS5Sb290RWxlbWVudDsKCiAgICAvLyDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAKICAgIC8vIFAwLUE6IEZpbmRGbGF0QXJlYVRvb2wgY29uc3RhbnQgdW5pZmljYXRpb24KICAgIC8vIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgRmluZEZsYXRBcmVhRGVmYXVsdHNfTWF0Y2hKc0FkYXB0ZXIoKQogICAgewogICAgICAgIC8vIEpTIGFkYXB0ZXIgdXNlcyBGTEFUX0FSRUFfU0NBTl9SQURJVVM9MzIsIEZMQVRfQVJFQV9NSU5fU0laRT0yNS4KICAgICAgICAvLyBDIyB0b29sIG11c3Qgc2VuZCBtYXRjaGluZyBkZWZhdWx0cyB3aGVuIG5vIGFyZ3VtZW50cyBhcmUgcHJvdmlkZWQuCiAgICAgICAgdmFyIHRvb2wgPSBuZXcgRmluZEZsYXRBcmVhVG9vbChfYWRhcHRlcik7CiAgICAgICAgdmFyIHJlc3VsdCA9IGF3YWl0IHRvb2wuRXhlY3V0ZUFzeW5jKEFyZ3MoInt9IikpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuU3VjY2VzcywgSXMuVHJ1ZSk7CiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0Lk1lc3NhZ2UsIERvZXMuQ29udGFpbigicmFkaXVzPTMyIikpOwogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5NZXNzYWdlLCBEb2VzLkNvbnRhaW4oIm1pbkZsYXRBcmVhPTI1IikpOwoKICAgICAgICB2YXIgYWN0aW9uID0gX2FkYXB0ZXIuU2VudEFjdGlvbnNbMF07CiAgICAgICAgQXNzZXJ0LlRoYXQoYWN0aW9uLkFyZ3VtZW50c1sicmFkaXVzIl0sIElzLkVxdWFsVG8oMzIpKTsKICAgICAgICBBc3NlcnQuVGhhdChhY3Rpb24uQXJndW1lbnRzWyJtaW5GbGF0QXJlYSJdLCBJcy5FcXVhbFRvKDI1KSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgYXN5bmMgVGFzayBGaW5kRmxhdEFyZWFfU2NpZW50aWZpY05vdGF0aW9uX0ZhbGxzQmFja1RvRGVmYXVsdCgpCiAgICB7CiAgICAgICAgLy8gU2NpZW50aWZpYyBub3RhdGlvbiBsaWtlIDFlNSBzaG91bGQgZmFsbCBiYWNrIHRvIGRlZmF1bHQgKDMyKQogICAgICAgIC8vIGluc3RlYWQgb2YgdGhyb3dpbmcgYW4gZXhjZXB0aW9uIHZpYSBHZXRJbnQzMigpLgogICAgICAgIHZhciB0b29sID0gbmV3IEZpbmRGbGF0QXJlYVRvb2woX2FkYXB0ZXIpOwogICAgICAgIHZhciByZXN1bHQgPSBhd2FpdCB0b29sLkV4ZWN1dGVBc3luYyhBcmdzKCJ7XCJyYWRpdXNcIjoxZTV9IikpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuU3VjY2VzcywgSXMuVHJ1ZSk7CiAgICAgICAgLy8gMWU1ID0gMTAwMDAwIHdoaWNoIElTIGEgdmFsaWQgaW50ZWdlciB2aWEgVHJ5R2V0SW50MzIsIHNvIGl0IHNob3VsZCBwYXJzZS4KICAgICAgICAvLyBBY3R1YWxseTogMWU1IGluIEpTT04gaXMgYSB2YWxpZCBOdW1iZXIsIGFuZCBUcnlHZXRJbnQzMiBoYW5kbGVzIGl0LgogICAgICAgIC8vIFRoZSBrZXkgcG9pbnQgaXMgaXQgZG9lc24ndCBjcmFzaC4gTGV0J3MganVzdCB2ZXJpZnkgc3VjY2Vzcy4KICAgICAgICBBc3NlcnQuVGhhdChfYWRhcHRlci5TZW50QWN0aW9ucywgSGFzLkNvdW50LkVxdWFsVG8oMSkpOwogICAgfQoKICAgIC8vIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAogICAgLy8gUDAtQjogU3RhdHVzVG9vbCBkZWR1cGxpY2F0aW9uCiAgICAvLyDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAKCiAgICBbVGVzdF0KICAgIHB1YmxpYyBhc3luYyBUYXNrIFRvb2xEaXNwYXRjaGVyX1N0YXR1c0FsaWFzX0Rpc3BhdGNoZXNTYW1lQ2xhc3MoKQogICAgewogICAgICAgIC8vIEJvdGggIkdldFN0YXR1cyIgYW5kICJTdGF0dXMiIHNob3VsZCByZXNvbHZlIHRvIHRoZSBzYW1lIEdldFN0YXR1c1Rvb2wgaW5zdGFuY2UuCiAgICAgICAgdmFyIHN0YXR1c1Rvb2wgPSBuZXcgR2V0U3RhdHVzVG9vbChfYWRhcHRlcik7CiAgICAgICAgdmFyIGRpc3BhdGNoZXIgPSBuZXcgVG9vbERpc3BhdGNoZXIoKTsKICAgICAgICBkaXNwYXRjaGVyLlJlZ2lzdGVyKHN0YXR1c1Rvb2wpOwogICAgICAgIGRpc3BhdGNoZXIuUmVnaXN0ZXIoIlN0YXR1cyIsIHN0YXR1c1Rvb2wpOwoKICAgICAgICB2YXIgcmVzdWx0MSA9IGF3YWl0IGRpc3BhdGNoZXIuQ2FsbEFzeW5jKCJHZXRTdGF0dXMiLCBBcmdzKCJ7fSIpKTsKICAgICAgICB2YXIgcmVzdWx0MiA9IGF3YWl0IGRpc3BhdGNoZXIuQ2FsbEFzeW5jKCJTdGF0dXMiLCBBcmdzKCJ7fSIpKTsKCiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0MS5TdWNjZXNzLCBJcy5UcnVlLCAiR2V0U3RhdHVzIHNob3VsZCBzdWNjZWVkIik7CiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0Mi5TdWNjZXNzLCBJcy5UcnVlLCAiU3RhdHVzIGFsaWFzIHNob3VsZCBzdWNjZWVkIik7CiAgICAgICAgQXNzZXJ0LlRoYXQoX2FkYXB0ZXIuU2VudEFjdGlvbnMsIEhhcy5Db3VudC5FcXVhbFRvKDIpKTsKICAgICAgICBBc3NlcnQuVGhhdChfYWRhcHRlci5TZW50QWN0aW9uc1swXS5Ub29sLCBJcy5FcXVhbFRvKCJzdGF0dXMiKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoX2FkYXB0ZXIuU2VudEFjdGlvbnNbMV0uVG9vbCwgSXMuRXF1YWxUbygic3RhdHVzIikpOwoKICAgICAgICAvLyBCb3RoIHNob3VsZCByZXNvbHZlIHRvIHRoZSBzYW1lIHRvb2wgaW5zdGFuY2UKICAgICAgICBBc3NlcnQuVGhhdChkaXNwYXRjaGVyLkdldCgiR2V0U3RhdHVzIiksIElzLlNhbWVBcyhkaXNwYXRjaGVyLkdldCgiU3RhdHVzIikpKTsKICAgIH0KCiAgICAvLyDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAKICAgIC8vIFAwLUM6IFRvb2xEaXNwYXRjaGVyIGV4Y2VwdGlvbiB3cmFwcGluZyArIGludGVnZXIgdmFsaWRhdGlvbiBmaXgKICAgIC8vIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgQ2FsbEFzeW5jX1Rvb2xUaHJvd3NfUmV0dXJuc0ZhaWx1cmVSZXN1bHQoKQogICAgewogICAgICAgIC8vIEEgdG9vbCB0aGF0IHRocm93cyBzaG91bGQgcHJvZHVjZSBhIFRvb2xSZXN1bHQoZmFsc2UsIC4uLikgbm90IHByb3BhZ2F0ZS4KICAgICAgICB2YXIgdGhyb3dpbmdUb29sID0gbmV3IFRocm93aW5nVG9vbCgpOwogICAgICAgIHZhciBqb3VybmFsID0gbmV3IFRlc3RKb3VybmFsKCk7CiAgICAgICAgdmFyIGRpc3BhdGNoZXIgPSBuZXcgVG9vbERpc3BhdGNoZXIoam91cm5hbCk7CiAgICAgICAgZGlzcGF0Y2hlci5SZWdpc3Rlcih0aHJvd2luZ1Rvb2wpOwoKICAgICAgICB2YXIgcmVzdWx0ID0gYXdhaXQgZGlzcGF0Y2hlci5DYWxsQXN5bmMoIkV4cGxvZGUiLCBBcmdzKCJ7fSIpKTsKCiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LlN1Y2Nlc3MsIElzLkZhbHNlKTsKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuTWVzc2FnZSwgRG9lcy5Db250YWluKCJFeHBsb2RlIikpOwogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5NZXNzYWdlLCBEb2VzLkNvbnRhaW4oInRocmV3IikpOwogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5NZXNzYWdlLCBEb2VzLkNvbnRhaW4oIkthYm9vbSIpKTsKICAgICAgICAvLyBKb3VybmFsIHNob3VsZCByZWNvcmQgdGhlIGZhaWx1cmUKICAgICAgICBBc3NlcnQuVGhhdChqb3VybmFsLkVudHJpZXMsIEhhcy5Db3VudC5HcmVhdGVyVGhhbigwKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoam91cm5hbC5FbnRyaWVzLkxhc3QoKS5UeXBlLCBJcy5FcXVhbFRvKEpvdXJuYWxFbnRyeVR5cGUuQWN0aW9uRmFpbGVkKSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBWYWxpZGF0ZVNjaGVtYV9TY2llbnRpZmljTm90YXRpb25fUmVqZWN0ZWRBc05vbkludGVnZXIoKQogICAgewogICAgICAgIC8vIDFlNSBsb29rcyBsaWtlIGEgbnVtYmVyIGJ1dCBpcyBOT1QgYSB2YWxpZCAzMi1iaXQgaW50ZWdlciBpbiBKU09OLgogICAgICAgIC8vIFdhaXQg4oCUIGFjdHVhbGx5IDFlNSBJUyAxMDAwMDAsIHdoaWNoIGZpdHMgaW4gSW50MzIuIFRyeUdldEludDMyIHN1Y2NlZWRzLgogICAgICAgIC8vIExldCdzIHRlc3QgMWUyMCBpbnN0ZWFkLCB3aGljaCBvdmVyZmxvd3MgSW50MzIuCiAgICAgICAgdmFyIHNjaGVtYSA9IEpzb25Eb2N1bWVudC5QYXJzZSgiIiIKICAgICAgICAgICAgeyJ0eXBlIjoib2JqZWN0IiwicHJvcGVydGllcyI6eyJyYWRpdXMiOnsidHlwZSI6ImludGVnZXIifX0sInJlcXVpcmVkIjpbXX0KICAgICAgICAgICAgIiIiKS5Sb290RWxlbWVudDsKCiAgICAgICAgdmFyIGFyZ3MgPSBKc29uRG9jdW1lbnQuUGFyc2UoIntcInJhZGl1c1wiOjFlMjB9IikuUm9vdEVsZW1lbnQ7CiAgICAgICAgdmFyIGVycm9yID0gVG9vbERpc3BhdGNoZXIuVmFsaWRhdGVBZ2FpbnN0U2NoZW1hKGFyZ3MsIHNjaGVtYSk7CgogICAgICAgIEFzc2VydC5UaGF0KGVycm9yLCBJcy5Ob3QuTnVsbCwgIjFlMjAgc2hvdWxkIGJlIHJlamVjdGVkIGFzIG5vbi1pbnRlZ2VyIChvdmVyZmxvd3MgSW50MzIpIik7CiAgICAgICAgQXNzZXJ0LlRoYXQoZXJyb3IsIERvZXMuQ29udGFpbigiaW50ZWdlciIpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIFZhbGlkYXRlU2NoZW1hX0RlY2ltYWxJbkludGVnZXJfUmVqZWN0ZWQoKQogICAgewogICAgICAgIC8vIDEuNSBpcyBhIG51bWJlciBidXQgbm90IGFuIGludGVnZXIuCiAgICAgICAgdmFyIHNjaGVtYSA9IEpzb25Eb2N1bWVudC5QYXJzZSgiIiIKICAgICAgICAgICAgeyJ0eXBlIjoib2JqZWN0IiwicHJvcGVydGllcyI6eyJjb3VudCI6eyJ0eXBlIjoiaW50ZWdlciJ9fSwicmVxdWlyZWQiOltdfQogICAgICAgICAgICAiIiIpLlJvb3RFbGVtZW50OwoKICAgICAgICB2YXIgYXJncyA9IEpzb25Eb2N1bWVudC5QYXJzZSgie1wiY291bnRcIjoxLjV9IikuUm9vdEVsZW1lbnQ7CiAgICAgICAgdmFyIGVycm9yID0gVG9vbERpc3BhdGNoZXIuVmFsaWRhdGVBZ2FpbnN0U2NoZW1hKGFyZ3MsIHNjaGVtYSk7CgogICAgICAgIEFzc2VydC5UaGF0KGVycm9yLCBJcy5Ob3QuTnVsbCwgIjEuNSBzaG91bGQgYmUgcmVqZWN0ZWQgZm9yIGludGVnZXIgZmllbGQiKTsKICAgICAgICBBc3NlcnQuVGhhdChlcnJvciwgRG9lcy5Db250YWluKCJpbnRlZ2VyIikpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgVmFsaWRhdGVTY2hlbWFfVmFsaWRJbnRlZ2VyX0FjY2VwdGVkKCkKICAgIHsKICAgICAgICAvLyBOb3JtYWwgaW50ZWdlciBzaG91bGQgcGFzcyB2YWxpZGF0aW9uLgogICAgICAgIHZhciBzY2hlbWEgPSBKc29uRG9jdW1lbnQuUGFyc2UoIiIiCiAgICAgICAgICAgIHsidHlwZSI6Im9iamVjdCIsInByb3BlcnRpZXMiOnsiY291bnQiOnsidHlwZSI6ImludGVnZXIifX0sInJlcXVpcmVkIjpbXX0KICAgICAgICAgICAgIiIiKS5Sb290RWxlbWVudDsKCiAgICAgICAgdmFyIGFyZ3MgPSBKc29uRG9jdW1lbnQuUGFyc2UoIntcImNvdW50XCI6NDJ9IikuUm9vdEVsZW1lbnQ7CiAgICAgICAgdmFyIGVycm9yID0gVG9vbERpc3BhdGNoZXIuVmFsaWRhdGVBZ2FpbnN0U2NoZW1hKGFyZ3MsIHNjaGVtYSk7CgogICAgICAgIEFzc2VydC5UaGF0KGVycm9yLCBJcy5OdWxsLCAiNDIgc2hvdWxkIGJlIGFjY2VwdGVkIGFzIGludGVnZXIiKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyBhc3luYyBUYXNrIENhbGxBc3luY19Ub29sVGhyb3dzT3BlcmF0aW9uQ2FuY2VsZWRfUHJvcGFnYXRlcygpCiAgICB7CiAgICAgICAgLy8gT3BlcmF0aW9uQ2FuY2VsZWRFeGNlcHRpb24gc2hvdWxkIE5PVCBiZSBjYXVnaHQg4oCUIGl0IG11c3QgcHJvcGFnYXRlCiAgICAgICAgLy8gc28gdGhlIGNhbGxlcidzIGNhbmNlbGxhdGlvbiB0b2tlbiBpcyByZXNwZWN0ZWQuCiAgICAgICAgdmFyIGNhbmNlbFRvb2wgPSBuZXcgQ2FuY2VsaW5nVG9vbCgpOwogICAgICAgIHZhciBkaXNwYXRjaGVyID0gbmV3IFRvb2xEaXNwYXRjaGVyKCk7CiAgICAgICAgZGlzcGF0Y2hlci5SZWdpc3RlcihjYW5jZWxUb29sKTsKCiAgICAgICAgQXNzZXJ0LlRocm93c0FzeW5jPE9wZXJhdGlvbkNhbmNlbGVkRXhjZXB0aW9uPihhc3luYyAoKSA9PgogICAgICAgICAgICBhd2FpdCBkaXNwYXRjaGVyLkNhbGxBc3luYygiQ2FuY2VsIiwgQXJncygie30iKSkpOwogICAgfQoKICAgIC8vIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAogICAgLy8gUDAtRDogUGVuZGluZ0FjdGlvbiBsaWZlY3ljbGUKICAgIC8vIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgUGVuZGluZ0FjdGlvbl9MaWZlY3ljbGVUcmFuc2l0aW9uX0Rpc3BhdGNoZWRUb0NvbXBsZXRlZCgpCiAgICB7CiAgICAgICAgdmFyIGlkID0gR3VpZC5OZXdHdWlkKCk7CiAgICAgICAgdmFyIHBhID0gbmV3IFBlbmRpbmdBY3Rpb24oaWQsICJNaW5lQmxvY2siLCBEYXRlVGltZU9mZnNldC5VdGNOb3csIEFjdGlvbkxpZmVjeWNsZS5EaXNwYXRjaGVkKTsKCiAgICAgICAgQXNzZXJ0LlRoYXQocGEuU3RhdGUsIElzLkVxdWFsVG8oQWN0aW9uTGlmZWN5Y2xlLkRpc3BhdGNoZWQpKTsKCiAgICAgICAgdmFyIGNvbXBsZXRlZCA9IHBhLldpdGhTdGF0ZShBY3Rpb25MaWZlY3ljbGUuQ29tcGxldGVkKTsKICAgICAgICBBc3NlcnQuVGhhdChjb21wbGV0ZWQuU3RhdGUsIElzLkVxdWFsVG8oQWN0aW9uTGlmZWN5Y2xlLkNvbXBsZXRlZCkpOwogICAgICAgIEFzc2VydC5UaGF0KGNvbXBsZXRlZC5Db3JyZWxhdGlvbklkLCBJcy5FcXVhbFRvKGlkKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoY29tcGxldGVkLlRvb2xOYW1lLCBJcy5FcXVhbFRvKCJNaW5lQmxvY2siKSk7CgogICAgICAgIC8vIE9yaWdpbmFsIHNob3VsZCBiZSB1bmNoYW5nZWQgKGltbXV0YWJsZSByZWNvcmQpCiAgICAgICAgQXNzZXJ0LlRoYXQocGEuU3RhdGUsIElzLkVxdWFsVG8oQWN0aW9uTGlmZWN5Y2xlLkRpc3BhdGNoZWQpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIFBlbmRpbmdBY3Rpb25fVGltZW91dF9NYXJrZWRUaW1lZE91dCgpCiAgICB7CiAgICAgICAgdmFyIGlkID0gR3VpZC5OZXdHdWlkKCk7CiAgICAgICAgdmFyIHBhID0gbmV3IFBlbmRpbmdBY3Rpb24oaWQsICJNb3ZlVG8iLAogICAgICAgICAgICBEYXRlVGltZU9mZnNldC5VdGNOb3cuQWRkU2Vjb25kcygtNjApLCAvLyBkaXNwYXRjaGVkIDYwcyBhZ28KICAgICAgICAgICAgQWN0aW9uTGlmZWN5Y2xlLkRpc3BhdGNoZWQpOwoKICAgICAgICB2YXIgdGltZWRPdXQgPSBwYS5XaXRoU3RhdGUoQWN0aW9uTGlmZWN5Y2xlLlRpbWVkT3V0KTsKICAgICAgICBBc3NlcnQuVGhhdCh0aW1lZE91dC5TdGF0ZSwgSXMuRXF1YWxUbyhBY3Rpb25MaWZlY3ljbGUuVGltZWRPdXQpKTsKICAgICAgICBBc3NlcnQuVGhhdCh0aW1lZE91dC5EaXNwYXRjaGVkQXQsIElzLkxlc3NUaGFuKERhdGVUaW1lT2Zmc2V0LlV0Y05vdy5BZGRTZWNvbmRzKC0zMCkpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIFBlbmRpbmdBY3Rpb25fQ29uY3VycmVudERpc3BhdGNoX0luZGVwZW5kZW50VHJhY2tpbmcoKQogICAgewogICAgICAgIC8vIFR3byBhY3Rpb25zIGRpc3BhdGNoZWQgc2ltdWx0YW5lb3VzbHkgc2hvdWxkIGJlIHRyYWNrZWQgaW5kZXBlbmRlbnRseS4KICAgICAgICB2YXIgZGljdCA9IG5ldyBDb25jdXJyZW50RGljdGlvbmFyeTxHdWlkLCBQZW5kaW5nQWN0aW9uPigpOwoKICAgICAgICB2YXIgaWQxID0gR3VpZC5OZXdHdWlkKCk7CiAgICAgICAgdmFyIGlkMiA9IEd1aWQuTmV3R3VpZCgpOwogICAgICAgIHZhciBwYTEgPSBuZXcgUGVuZGluZ0FjdGlvbihpZDEsICJNaW5lQmxvY2siLCBEYXRlVGltZU9mZnNldC5VdGNOb3csIEFjdGlvbkxpZmVjeWNsZS5EaXNwYXRjaGVkKTsKICAgICAgICB2YXIgcGEyID0gbmV3IFBlbmRpbmdBY3Rpb24oaWQyLCAiTW92ZVRvIiwgRGF0ZVRpbWVPZmZzZXQuVXRjTm93LCBBY3Rpb25MaWZlY3ljbGUuRGlzcGF0Y2hlZCk7CgogICAgICAgIGRpY3RbaWQxXSA9IHBhMTsKICAgICAgICBkaWN0W2lkMl0gPSBwYTI7CgogICAgICAgIC8vIENvbXBsZXRlIG9uZSwgZmFpbCB0aGUgb3RoZXIKICAgICAgICBkaWN0W2lkMV0gPSBwYTEuV2l0aFN0YXRlKEFjdGlvbkxpZmVjeWNsZS5Db21wbGV0ZWQpOwogICAgICAgIGRpY3RbaWQyXSA9IHBhMi5XaXRoU3RhdGUoQWN0aW9uTGlmZWN5Y2xlLkZhaWxlZCk7CgogICAgICAgIEFzc2VydC5UaGF0KGRpY3RbaWQxXS5TdGF0ZSwgSXMuRXF1YWxUbyhBY3Rpb25MaWZlY3ljbGUuQ29tcGxldGVkKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoZGljdFtpZDJdLlN0YXRlLCBJcy5FcXVhbFRvKEFjdGlvbkxpZmVjeWNsZS5GYWlsZWQpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIFBlbmRpbmdBY3Rpb25fU3RhbGVEaXNwYXRjaF9JZGVudGlmaWVkQnlUaW1lc3RhbXAoKQogICAgewogICAgICAgIC8vIFZlcmlmeSB0aGF0IGEgc3RhbGUgUGVuZGluZ0FjdGlvbiBjYW4gYmUgaWRlbnRpZmllZCBieSB0aW1lc3RhbXAgY29tcGFyaXNvbi4KICAgICAgICB2YXIgY3V0b2ZmID0gRGF0ZVRpbWVPZmZzZXQuVXRjTm93LkFkZFNlY29uZHMoLTMwKTsKICAgICAgICB2YXIgc3RhbGUgPSBuZXcgUGVuZGluZ0FjdGlvbihHdWlkLk5ld0d1aWQoKSwgIldhbmRlciIsCiAgICAgICAgICAgIERhdGVUaW1lT2Zmc2V0LlV0Y05vdy5BZGRTZWNvbmRzKC00NSksIC8vIDQ1cyBhZ28KICAgICAgICAgICAgQWN0aW9uTGlmZWN5Y2xlLkRpc3BhdGNoZWQpOwogICAgICAgIHZhciBmcmVzaCA9IG5ldyBQZW5kaW5nQWN0aW9uKEd1aWQuTmV3R3VpZCgpLCAiTWluZUJsb2NrIiwKICAgICAgICAgICAgRGF0ZVRpbWVPZmZzZXQuVXRjTm93LkFkZFNlY29uZHMoLTEwKSwgLy8gMTBzIGFnbwogICAgICAgICAgICBBY3Rpb25MaWZlY3ljbGUuRGlzcGF0Y2hlZCk7CgogICAgICAgIEFzc2VydC5UaGF0KHN0YWxlLkRpc3BhdGNoZWRBdCA8IGN1dG9mZiwgSXMuVHJ1ZSwgIjQ1cy1vbGQgYWN0aW9uIHNob3VsZCBiZSBzdGFsZSIpOwogICAgICAgIEFzc2VydC5UaGF0KGZyZXNoLkRpc3BhdGNoZWRBdCA8IGN1dG9mZiwgSXMuRmFsc2UsICIxMHMtb2xkIGFjdGlvbiBzaG91bGQgbm90IGJlIHN0YWxlIik7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBQZW5kaW5nQWN0aW9uX0R1cGxpY2F0ZVRyYW5zaXRpb25fSGFuZGxlZEdyYWNlZnVsbHkoKQogICAgewogICAgICAgIC8vIFRyYW5zaXRpb25pbmcgdGhlIHNhbWUgUGVuZGluZ0FjdGlvbiB0d2ljZSB0byB0aGUgc2FtZSBzdGF0ZSBzaG91bGQgd29yay4KICAgICAgICB2YXIgZGljdCA9IG5ldyBDb25jdXJyZW50RGljdGlvbmFyeTxHdWlkLCBQZW5kaW5nQWN0aW9uPigpOwogICAgICAgIHZhciBpZCA9IEd1aWQuTmV3R3VpZCgpOwogICAgICAgIHZhciBwYSA9IG5ldyBQZW5kaW5nQWN0aW9uKGlkLCAiTWluZUJsb2NrIiwgRGF0ZVRpbWVPZmZzZXQuVXRjTm93LCBBY3Rpb25MaWZlY3ljbGUuRGlzcGF0Y2hlZCk7CiAgICAgICAgZGljdFtpZF0gPSBwYTsKCiAgICAgICAgLy8gRmlyc3QgdHJhbnNpdGlvbgogICAgICAgIGRpY3RbaWRdID0gcGEuV2l0aFN0YXRlKEFjdGlvbkxpZmVjeWNsZS5Db21wbGV0ZWQpOwogICAgICAgIC8vIFNlY29uZCB0cmFuc2l0aW9uIChkdXBsaWNhdGUg4oCUIG1hbGZvcm1lZCBhZGFwdGVyIHNlbmRzIHNhbWUgY29ycmVsYXRpb25JZCB0d2ljZSkKICAgICAgICBkaWN0W2lkXSA9IGRpY3RbaWRdLldpdGhTdGF0ZShBY3Rpb25MaWZlY3ljbGUuQ29tcGxldGVkKTsKCiAgICAgICAgQXNzZXJ0LlRoYXQoZGljdFtpZF0uU3RhdGUsIElzLkVxdWFsVG8oQWN0aW9uTGlmZWN5Y2xlLkNvbXBsZXRlZCkpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQWN0aW9uTGlmZWN5Y2xlX0FsbFN0YXRlc0V4aXN0KCkKICAgIHsKICAgICAgICAvLyBWZXJpZnkgYWxsIGV4cGVjdGVkIGVudW0gdmFsdWVzIGV4aXN0LgogICAgICAgIEFzc2VydC5UaGF0KEVudW0uR2V0VmFsdWVzPEFjdGlvbkxpZmVjeWNsZT4oKSwgSGFzLkxlbmd0aC5FcXVhbFRvKDUpKTsKICAgICAgICBBc3NlcnQuVGhhdChFbnVtLklzRGVmaW5lZChBY3Rpb25MaWZlY3ljbGUuRGlzcGF0Y2hlZCksIElzLlRydWUpOwogICAgICAgIEFzc2VydC5UaGF0KEVudW0uSXNEZWZpbmVkKEFjdGlvbkxpZmVjeWNsZS5BY2tub3dsZWRnZWQpLCBJcy5UcnVlKTsKICAgICAgICBBc3NlcnQuVGhhdChFbnVtLklzRGVmaW5lZChBY3Rpb25MaWZlY3ljbGUuQ29tcGxldGVkKSwgSXMuVHJ1ZSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoRW51bS5Jc0RlZmluZWQoQWN0aW9uTGlmZWN5Y2xlLkZhaWxlZCksIElzLlRydWUpOwogICAgICAgIEFzc2VydC5UaGF0KEVudW0uSXNEZWZpbmVkKEFjdGlvbkxpZmVjeWNsZS5UaW1lZE91dCksIElzLlRydWUpOwogICAgfQoKICAgIC8vIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAogICAgLy8gUDEtQTogV29ybGRNb2RlbCBkZWZlbnNpdmUgY29weQogICAgLy8g4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBXb3JsZE1vZGVsX0NvbnN0cnVjdG9yX1NlcGFyYXRlSW5zdGFuY2VzKCkKICAgIHsKICAgICAgICAvLyBfb2JzZXJ2ZWQuSW52ZW50b3J5IGFuZCBfYmVsaWVmLkludmVudG9yeSBzaG91bGQgYmUgc2VwYXJhdGUgZGljdGlvbmFyeSBpbnN0YW5jZXMuCiAgICAgICAgdmFyIG1vZGVsID0gbmV3IFdvcmxkTW9kZWwoKTsKCiAgICAgICAgdmFyIG9ic2VydmVkSW52ID0gbW9kZWwuT2JzZXJ2ZWQuSW52ZW50b3J5OwogICAgICAgIHZhciBiZWxpZWZJbnYgPSBtb2RlbC5CZWxpZWYuSW52ZW50b3J5OwoKICAgICAgICBBc3NlcnQuVGhhdChSZWZlcmVuY2VFcXVhbHMob2JzZXJ2ZWRJbnYsIGJlbGllZkludiksIElzLkZhbHNlLAogICAgICAgICAgICAiT2JzZXJ2ZWQgYW5kIEJlbGllZiBpbnZlbnRvcmllcyBtdXN0IGJlIHNlcGFyYXRlIGRpY3Rpb25hcnkgaW5zdGFuY2VzICIgKwogICAgICAgICAgICAidG8gcHJldmVudCBzaGFyZWQgbXV0YWJsZSBzdGF0ZSBjb3JydXB0aW9uLiIpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgV29ybGRNb2RlbF9PYnNlcnZlX0RvZXNOb3RBbGlhc0ludmVudG9yeSgpCiAgICB7CiAgICAgICAgdmFyIG1vZGVsID0gbmV3IFdvcmxkTW9kZWwoKTsKCiAgICAgICAgLy8gQ3JlYXRlIGFuIG9ic2VydmF0aW9uIHdpdGggYSBtdXRhYmxlIGludmVudG9yeQogICAgICAgIHZhciBzb3VyY2VJbnZlbnRvcnkgPSBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIGludD4geyBbIm9ha19sb2ciXSA9IDEwIH07CiAgICAgICAgdmFyIG9ic2VydmF0aW9uID0gbmV3IE9ic2VydmF0aW9uU3RhdGUoCiAgICAgICAgICAgIEhlYWx0aDogMjAsIEZvb2Q6IDIwLAogICAgICAgICAgICBQb3NpdGlvbjogbmV3IFBvc2l0aW9uKDEwMCwgNjQsIDIwMCksCiAgICAgICAgICAgIEludmVudG9yeTogc291cmNlSW52ZW50b3J5LAogICAgICAgICAgICBSZWNlbnRPYnNlcnZhdGlvbnM6IFtdLAogICAgICAgICAgICBUaW1lc3RhbXA6IERhdGVUaW1lT2Zmc2V0LlV0Y05vdyk7CgogICAgICAgIG1vZGVsLk9ic2VydmUob2JzZXJ2YXRpb24pOwoKICAgICAgICAvLyBNdXRhdGUgdGhlIHNvdXJjZSBpbnZlbnRvcnkgQUZURVIgb2JzZXJ2ZQogICAgICAgIHNvdXJjZUludmVudG9yeVsib2FrX2xvZyJdID0gOTk5OwogICAgICAgIHNvdXJjZUludmVudG9yeVsiZGlhbW9uZCJdID0gNTA7CgogICAgICAgIC8vIEJlbGllZiBzaG91bGQgTk9UIGJlIGFmZmVjdGVkIGJ5IHBvc3QtT2JzZXJ2ZSBtdXRhdGlvbnMgdG8gdGhlIHNvdXJjZSBkaWN0CiAgICAgICAgQXNzZXJ0LlRoYXQobW9kZWwuQmVsaWVmLkludmVudG9yeVsib2FrX2xvZyJdLCBJcy5FcXVhbFRvKDEwKSwKICAgICAgICAgICAgIkJlbGllZiBpbnZlbnRvcnkgc2hvdWxkIG5vdCBjaGFuZ2Ugd2hlbiBzb3VyY2UgZGljdCBpcyBtdXRhdGVkIGFmdGVyIE9ic2VydmUiKTsKICAgICAgICBBc3NlcnQuVGhhdChtb2RlbC5CZWxpZWYuSW52ZW50b3J5LkNvbnRhaW5zS2V5KCJkaWFtb25kIiksIElzLkZhbHNlLAogICAgICAgICAgICAiTmV3IGtleXMgYWRkZWQgdG8gc291cmNlIGRpY3QgYWZ0ZXIgT2JzZXJ2ZSBzaG91bGQgbm90IGFwcGVhciBpbiBiZWxpZWYiKTsKICAgIH0KCiAgICAvLyDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAKICAgIC8vIFAwLUM6IFRvb2xEaXNwYXRjaGVyIGpvdXJuYWwgaW50ZWdyYXRpb24KICAgIC8vIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgRGlzcGF0Y2hlcl9XaXRoSm91cm5hbF9Mb2dzU3VjY2Vzc0FuZEZhaWx1cmUoKQogICAgewogICAgICAgIHZhciBqb3VybmFsID0gbmV3IFRlc3RKb3VybmFsKCk7CiAgICAgICAgdmFyIGRpc3BhdGNoZXIgPSBuZXcgVG9vbERpc3BhdGNoZXIoam91cm5hbCk7CiAgICAgICAgZGlzcGF0Y2hlci5SZWdpc3RlcihuZXcgR2V0U3RhdHVzVG9vbChfYWRhcHRlcikpOwoKICAgICAgICAvLyBTdWNjZXNzZnVsIGNhbGwKICAgICAgICBhd2FpdCBkaXNwYXRjaGVyLkNhbGxBc3luYygiR2V0U3RhdHVzIiwgQXJncygie30iKSk7CgogICAgICAgIEFzc2VydC5UaGF0KGpvdXJuYWwuRW50cmllcywgSGFzLkNvdW50LkdyZWF0ZXJUaGFuT3JFcXVhbFRvKDEpKTsKICAgICAgICBBc3NlcnQuVGhhdChqb3VybmFsLkVudHJpZXMuQW55KGUgPT4gZS5UeXBlID09IEpvdXJuYWxFbnRyeVR5cGUuQWN0aW9uQ29tcGxldGVkKSwgSXMuVHJ1ZSk7CgogICAgICAgIC8vIFVua25vd24gdG9vbCBjYWxsIChmYWlsdXJlKQogICAgICAgIGF3YWl0IGRpc3BhdGNoZXIuQ2FsbEFzeW5jKCJOb25FeGlzdGVudCIsIEFyZ3MoInt9IikpOwoKICAgICAgICBBc3NlcnQuVGhhdChqb3VybmFsLkVudHJpZXMuQW55KGUgPT4gZS5UeXBlID09IEpvdXJuYWxFbnRyeVR5cGUuQWN0aW9uRmFpbGVkKSwgSXMuVHJ1ZSk7CiAgICB9Cn0KCi8vIOKUgOKUgCBUZXN0IGhlbHBlcnMg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgovLy8gPHN1bW1hcnk+Ci8vLyBUb29sIHRoYXQgdGhyb3dzIGFuIGV4Y2VwdGlvbiBvbiBFeGVjdXRlQXN5bmMg4oCUIHVzZWQgdG8gdmVyaWZ5Ci8vLyBTcHJpbnQgMjUgUDAtQyBleGNlcHRpb24gd3JhcHBpbmcgaW4gVG9vbERpc3BhdGNoZXIuQ2FsbEFzeW5jLgovLy8gPC9zdW1tYXJ5PgpmaWxlIHNlYWxlZCBjbGFzcyBUaHJvd2luZ1Rvb2wgOiBJVG9vbAp7CiAgICBwdWJsaWMgc3RyaW5nIE5hbWUgPT4gIkV4cGxvZGUiOwogICAgcHVibGljIHN0cmluZyBEZXNjcmlwdGlvbiA9PiAiQWx3YXlzIHRocm93cyI7CiAgICBwdWJsaWMgSnNvbkVsZW1lbnQgSW5wdXRTY2hlbWEgPT4gSnNvbkRvY3VtZW50LlBhcnNlKCJ7fSIpLlJvb3RFbGVtZW50OwogICAgcHVibGljIFRhc2s8VG9vbFJlc3VsdD4gRXhlY3V0ZUFzeW5jKEpzb25FbGVtZW50IGFyZ3VtZW50cywgQ2FuY2VsbGF0aW9uVG9rZW4gY3QgPSBkZWZhdWx0KQogICAgICAgID0+IHRocm93IG5ldyBJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uKCJLYWJvb20hIFRvb2wgZXhwbG9kZWQuIik7Cn0KCi8vLyA8c3VtbWFyeT4KLy8vIFRvb2wgdGhhdCB0aHJvd3MgT3BlcmF0aW9uQ2FuY2VsZWRFeGNlcHRpb24g4oCUIHZlcmlmaWVzIHRoYXQgY2FuY2VsbGF0aW9uCi8vLyBwcm9wYWdhdGVzIHRocm91Z2ggVG9vbERpc3BhdGNoZXIgcmF0aGVyIHRoYW4gYmVpbmcgY2F1Z2h0LgovLy8gPC9zdW1tYXJ5PgpmaWxlIHNlYWxlZCBjbGFzcyBDYW5jZWxpbmdUb29sIDogSVRvb2wKewogICAgcHVibGljIHN0cmluZyBOYW1lID0+ICJDYW5jZWwiOwogICAgcHVibGljIHN0cmluZyBEZXNjcmlwdGlvbiA9PiAiQWx3YXlzIGNhbmNlbHMiOwogICAgcHVibGljIEpzb25FbGVtZW50IElucHV0U2NoZW1hID0+IEpzb25Eb2N1bWVudC5QYXJzZSgie30iKS5Sb290RWxlbWVudDsKICAgIHB1YmxpYyBUYXNrPFRvb2xSZXN1bHQ+IEV4ZWN1dGVBc3luYyhKc29uRWxlbWVudCBhcmd1bWVudHMsIENhbmNlbGxhdGlvblRva2VuIGN0ID0gZGVmYXVsdCkKICAgICAgICA9PiB0aHJvdyBuZXcgT3BlcmF0aW9uQ2FuY2VsZWRFeGNlcHRpb24oIk9wZXJhdGlvbiB3YXMgY2FuY2VsZWQiKTsKfQoKLy8vIDxzdW1tYXJ5PgovLy8gSW4tbWVtb3J5IElBZ2VudEpvdXJuYWwgZm9yIHRlc3QgYXNzZXJ0aW9ucy4KLy8vIDwvc3VtbWFyeT4KZmlsZSBzZWFsZWQgY2xhc3MgVGVzdEpvdXJuYWwgOiBJQWdlbnRKb3VybmFsCnsKICAgIHByaXZhdGUgcmVhZG9ubHkgTGlzdDxKb3VybmFsRW50cnk+IF9lbnRyaWVzID0gW107CgogICAgcHVibGljIExpc3Q8Sm91cm5hbEVudHJ5PiBFbnRyaWVzID0+IF9lbnRyaWVzOwogICAgcHVibGljIGludCBDb3VudCA9PiBfZW50cmllcy5Db3VudDsKICAgIHB1YmxpYyBJUmVhZE9ubHlMaXN0PEpvdXJuYWxFbnRyeT4gQWxsID0+IFsuLiBfZW50cmllcy5PcmRlckJ5RGVzY2VuZGluZyhlID0+IGUuVGltZXN0YW1wKV07CiAgICBwdWJsaWMgdm9pZCBMb2coSm91cm5hbEVudHJ5IGVudHJ5KSA9PiBfZW50cmllcy5BZGQoZW50cnkpOwogICAgcHVibGljIElSZWFkT25seUxpc3Q8Sm91cm5hbEVudHJ5PiBSZWNlbnQoaW50IGNvdW50KSA9PgogICAgICAgIF9lbnRyaWVzLk9yZGVyQnlEZXNjZW5kaW5nKGUgPT4gZS5UaW1lc3RhbXApLlRha2UoY291bnQpLlRvTGlzdCgpOwogICAgcHVibGljIElSZWFkT25seUxpc3Q8Sm91cm5hbEVudHJ5PiBRdWVyeShKb3VybmFsRW50cnlUeXBlPyB0eXBlID0gbnVsbCwKICAgICAgICBEYXRlVGltZU9mZnNldD8gZnJvbSA9IG51bGwsIERhdGVUaW1lT2Zmc2V0PyB0byA9IG51bGwpID0+CiAgICAgICAgX2VudHJpZXMuV2hlcmUoZSA9PgogICAgICAgICAgICAodHlwZSBpcyBudWxsIHx8IGUuVHlwZSA9PSB0eXBlKSAmJgogICAgICAgICAgICAoZnJvbSBpcyBudWxsIHx8IGUuVGltZXN0YW1wID49IGZyb20pICYmCiAgICAgICAgICAgICh0byBpcyBudWxsIHx8IGUuVGltZXN0YW1wIDw9IHRvKSkKICAgICAgICAuT3JkZXJCeURlc2NlbmRpbmcoZSA9PiBlLlRpbWVzdGFtcCkuVG9MaXN0KCk7CiAgICBwdWJsaWMgdm9pZCBDbGVhcigpID0+IF9lbnRyaWVzLkNsZWFyKCk7Cn0K
+using Agent.Core;
+using Agent.Tools;
+using System.Collections.Concurrent;
+using System.Text.Json;
+
+namespace MemorySmith.Agent.Tests;
+
+/// <summary>
+/// Sprint 25 — Tool Boundary Hardening + Action Lifecycle
+///
+/// Tests covering:
+///   P0-A: FindFlatAreaTool constant unification + safe integer parsing
+///   P0-B: StatusTool deduplication (both names resolve to GetStatusTool)
+///   P0-C: ToolDispatcher exception wrapping + integer validation fix
+///   P0-D: PendingAction lifecycle, timeout sweep, concurrent tracking
+///   P1-A: WorldModel defensive copy (constructor + Observe)
+/// </summary>
+[TestFixture]
+public sealed class Sprint25Tests
+{
+    private MockWorldAdapter _adapter = null!;
+
+    [SetUp]
+    public void SetUp() => _adapter = new MockWorldAdapter();
+
+    private static JsonElement Args(string json) =>
+        JsonDocument.Parse(json).RootElement;
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // P0-A: FindFlatAreaTool constant unification
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    [Test]
+    public async Task FindFlatAreaDefaults_MatchJsAdapter()
+    {
+        // JS adapter uses FLAT_AREA_SCAN_RADIUS=32, FLAT_AREA_MIN_SIZE=25.
+        // C# tool must send matching defaults when no arguments are provided.
+        var tool = new FindFlatAreaTool(_adapter);
+        var result = await tool.ExecuteAsync(Args("{}"));
+
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Message, Does.Contain("radius=32"));
+        Assert.That(result.Message, Does.Contain("minFlatArea=25"));
+
+        var action = _adapter.SentActions[0];
+        Assert.That(action.Arguments["radius"], Is.EqualTo(32));
+        Assert.That(action.Arguments["minFlatArea"], Is.EqualTo(25));
+    }
+
+    [Test]
+    public async Task FindFlatArea_ScientificNotation_FallsBackToDefault()
+    {
+        // Scientific notation like 1e5 should fall back to default (32)
+        // instead of throwing an exception via GetInt32().
+        var tool = new FindFlatAreaTool(_adapter);
+        var result = await tool.ExecuteAsync(Args("{\"radius\":1e5}"));
+
+        Assert.That(result.Success, Is.True);
+        // 1e5 = 100000 which IS a valid integer via TryGetInt32, so it should parse.
+        // Actually: 1e5 in JSON is a valid Number, and TryGetInt32 handles it.
+        // The key point is it doesn't crash. Let's just verify success.
+        Assert.That(_adapter.SentActions, Has.Count.EqualTo(1));
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // P0-B: StatusTool deduplication
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    [Test]
+    public async Task ToolDispatcher_StatusAlias_DispatchesSameClass()
+    {
+        // Both "GetStatus" and "Status" should resolve to the same GetStatusTool instance.
+        var statusTool = new GetStatusTool(_adapter);
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(statusTool);
+        dispatcher.Register("Status", statusTool);
+
+        var result1 = await dispatcher.CallAsync("GetStatus", Args("{}"));
+        var result2 = await dispatcher.CallAsync("Status", Args("{}"));
+
+        Assert.That(result1.Success, Is.True, "GetStatus should succeed");
+        Assert.That(result2.Success, Is.True, "Status alias should succeed");
+        Assert.That(_adapter.SentActions, Has.Count.EqualTo(2));
+        Assert.That(_adapter.SentActions[0].Tool, Is.EqualTo("status"));
+        Assert.That(_adapter.SentActions[1].Tool, Is.EqualTo("status"));
+
+        // Both should resolve to the same tool instance
+        Assert.That(dispatcher.Get("GetStatus"), Is.SameAs(dispatcher.Get("Status")));
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // P0-C: ToolDispatcher exception wrapping + integer validation fix
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    [Test]
+    public async Task CallAsync_ToolThrows_ReturnsFailureResult()
+    {
+        // A tool that throws should produce a ToolResult(false, ...) not propagate.
+        var throwingTool = new ThrowingTool();
+        var journal = new TestJournal();
+        var dispatcher = new ToolDispatcher(journal);
+        dispatcher.Register(throwingTool);
+
+        var result = await dispatcher.CallAsync("Explode", Args("{}"));
+
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Message, Does.Contain("Explode"));
+        Assert.That(result.Message, Does.Contain("threw"));
+        Assert.That(result.Message, Does.Contain("Kaboom"));
+        // Journal should record the failure
+        Assert.That(journal.Entries, Has.Count.GreaterThan(0));
+        Assert.That(journal.Entries.Last().Type, Is.EqualTo(JournalEntryType.ActionFailed));
+    }
+
+    [Test]
+    public void ValidateSchema_ScientificNotation_RejectedAsNonInteger()
+    {
+        // 1e5 looks like a number but is NOT a valid 32-bit integer in JSON.
+        // Wait — actually 1e5 IS 100000, which fits in Int32. TryGetInt32 succeeds.
+        // Let's test 1e20 instead, which overflows Int32.
+        var schema = JsonDocument.Parse("""
+            {"type":"object","properties":{"radius":{"type":"integer"}},"required":[]}
+            """).RootElement;
+
+        var args = JsonDocument.Parse("{\"radius\":1e20}").RootElement;
+        var error = ToolDispatcher.ValidateAgainstSchema(args, schema);
+
+        Assert.That(error, Is.Not.Null, "1e20 should be rejected as non-integer (overflows Int32)");
+        Assert.That(error, Does.Contain("integer"));
+    }
+
+    [Test]
+    public void ValidateSchema_DecimalInInteger_Rejected()
+    {
+        // 1.5 is a number but not an integer.
+        var schema = JsonDocument.Parse("""
+            {"type":"object","properties":{"count":{"type":"integer"}},"required":[]}
+            """).RootElement;
+
+        var args = JsonDocument.Parse("{\"count\":1.5}").RootElement;
+        var error = ToolDispatcher.ValidateAgainstSchema(args, schema);
+
+        Assert.That(error, Is.Not.Null, "1.5 should be rejected for integer field");
+        Assert.That(error, Does.Contain("integer"));
+    }
+
+    [Test]
+    public void ValidateSchema_ValidInteger_Accepted()
+    {
+        // Normal integer should pass validation.
+        var schema = JsonDocument.Parse("""
+            {"type":"object","properties":{"count":{"type":"integer"}},"required":[]}
+            """).RootElement;
+
+        var args = JsonDocument.Parse("{\"count\":42}").RootElement;
+        var error = ToolDispatcher.ValidateAgainstSchema(args, schema);
+
+        Assert.That(error, Is.Null, "42 should be accepted as integer");
+    }
+
+    [Test]
+    public async Task CallAsync_ToolThrowsOperationCanceled_Propagates()
+    {
+        // OperationCanceledException should NOT be caught — it must propagate
+        // so the caller's cancellation token is respected.
+        var cancelTool = new CancelingTool();
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(cancelTool);
+
+        Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await dispatcher.CallAsync("Cancel", Args("{}")));
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // P0-D: PendingAction lifecycle
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    [Test]
+    public void PendingAction_LifecycleTransition_DispatchedToCompleted()
+    {
+        var id = Guid.NewGuid();
+        var pa = new PendingAction(id, "MineBlock", DateTimeOffset.UtcNow, ActionLifecycle.Dispatched);
+
+        Assert.That(pa.State, Is.EqualTo(ActionLifecycle.Dispatched));
+
+        var completed = pa.WithState(ActionLifecycle.Completed);
+        Assert.That(completed.State, Is.EqualTo(ActionLifecycle.Completed));
+        Assert.That(completed.CorrelationId, Is.EqualTo(id));
+        Assert.That(completed.ToolName, Is.EqualTo("MineBlock"));
+
+        // Original should be unchanged (immutable record)
+        Assert.That(pa.State, Is.EqualTo(ActionLifecycle.Dispatched));
+    }
+
+    [Test]
+    public void PendingAction_Timeout_MarkedTimedOut()
+    {
+        var id = Guid.NewGuid();
+        var pa = new PendingAction(id, "MoveTo",
+            DateTimeOffset.UtcNow.AddSeconds(-60), // dispatched 60s ago
+            ActionLifecycle.Dispatched);
+
+        var timedOut = pa.WithState(ActionLifecycle.TimedOut);
+        Assert.That(timedOut.State, Is.EqualTo(ActionLifecycle.TimedOut));
+        Assert.That(timedOut.DispatchedAt, Is.LessThan(DateTimeOffset.UtcNow.AddSeconds(-30)));
+    }
+
+    [Test]
+    public void PendingAction_ConcurrentDispatch_IndependentTracking()
+    {
+        // Two actions dispatched simultaneously should be tracked independently.
+        var dict = new ConcurrentDictionary<Guid, PendingAction>();
+
+        var id1 = Guid.NewGuid();
+        var id2 = Guid.NewGuid();
+        var pa1 = new PendingAction(id1, "MineBlock", DateTimeOffset.UtcNow, ActionLifecycle.Dispatched);
+        var pa2 = new PendingAction(id2, "MoveTo", DateTimeOffset.UtcNow, ActionLifecycle.Dispatched);
+
+        dict[id1] = pa1;
+        dict[id2] = pa2;
+
+        // Complete one, fail the other
+        dict[id1] = pa1.WithState(ActionLifecycle.Completed);
+        dict[id2] = pa2.WithState(ActionLifecycle.Failed);
+
+        Assert.That(dict[id1].State, Is.EqualTo(ActionLifecycle.Completed));
+        Assert.That(dict[id2].State, Is.EqualTo(ActionLifecycle.Failed));
+    }
+
+    [Test]
+    public void PendingAction_StaleDispatch_IdentifiedByTimestamp()
+    {
+        // Verify that a stale PendingAction can be identified by timestamp comparison.
+        var cutoff = DateTimeOffset.UtcNow.AddSeconds(-30);
+        var stale = new PendingAction(Guid.NewGuid(), "Wander",
+            DateTimeOffset.UtcNow.AddSeconds(-45), // 45s ago
+            ActionLifecycle.Dispatched);
+        var fresh = new PendingAction(Guid.NewGuid(), "MineBlock",
+            DateTimeOffset.UtcNow.AddSeconds(-10), // 10s ago
+            ActionLifecycle.Dispatched);
+
+        Assert.That(stale.DispatchedAt < cutoff, Is.True, "45s-old action should be stale");
+        Assert.That(fresh.DispatchedAt < cutoff, Is.False, "10s-old action should not be stale");
+    }
+
+    [Test]
+    public void PendingAction_DuplicateTransition_HandledGracefully()
+    {
+        // Transitioning the same PendingAction twice to the same state should work.
+        var dict = new ConcurrentDictionary<Guid, PendingAction>();
+        var id = Guid.NewGuid();
+        var pa = new PendingAction(id, "MineBlock", DateTimeOffset.UtcNow, ActionLifecycle.Dispatched);
+        dict[id] = pa;
+
+        // First transition
+        dict[id] = pa.WithState(ActionLifecycle.Completed);
+        // Second transition (duplicate — malformed adapter sends same correlationId twice)
+        dict[id] = dict[id].WithState(ActionLifecycle.Completed);
+
+        Assert.That(dict[id].State, Is.EqualTo(ActionLifecycle.Completed));
+    }
+
+    [Test]
+    public void ActionLifecycle_AllStatesExist()
+    {
+        // Verify all expected enum values exist.
+        Assert.That(Enum.GetValues<ActionLifecycle>(), Has.Length.EqualTo(5));
+        Assert.That(Enum.IsDefined(ActionLifecycle.Dispatched), Is.True);
+        Assert.That(Enum.IsDefined(ActionLifecycle.Acknowledged), Is.True);
+        Assert.That(Enum.IsDefined(ActionLifecycle.Completed), Is.True);
+        Assert.That(Enum.IsDefined(ActionLifecycle.Failed), Is.True);
+        Assert.That(Enum.IsDefined(ActionLifecycle.TimedOut), Is.True);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // P1-A: WorldModel defensive copy
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    [Test]
+    public void WorldModel_Constructor_SeparateInstances()
+    {
+        // _observed.Inventory and _belief.Inventory should be separate dictionary instances.
+        var model = new WorldModel();
+
+        var observedInv = model.Observed.Inventory;
+        var beliefInv = model.Belief.Inventory;
+
+        Assert.That(ReferenceEquals(observedInv, beliefInv), Is.False,
+            "Observed and Belief inventories must be separate dictionary instances " +
+            "to prevent shared mutable state corruption.");
+    }
+
+    [Test]
+    public void WorldModel_Observe_DoesNotAliasInventory()
+    {
+        var model = new WorldModel();
+
+        // Create an observation with a mutable inventory
+        var sourceInventory = new Dictionary<string, int> { ["oak_log"] = 10 };
+        var observation = new ObservationState(
+            Health: 20, Food: 20,
+            Position: new Position(100, 64, 200),
+            Inventory: sourceInventory,
+            RecentObservations: [],
+            Timestamp: DateTimeOffset.UtcNow);
+
+        model.Observe(observation);
+
+        // Mutate the source inventory AFTER observe
+        sourceInventory["oak_log"] = 999;
+        sourceInventory["diamond"] = 50;
+
+        // Belief should NOT be affected by post-Observe mutations to the source dict
+        Assert.That(model.Belief.Inventory["oak_log"], Is.EqualTo(10),
+            "Belief inventory should not change when source dict is mutated after Observe");
+        Assert.That(model.Belief.Inventory.ContainsKey("diamond"), Is.False,
+            "New keys added to source dict after Observe should not appear in belief");
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // P0-C: ToolDispatcher journal integration
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    [Test]
+    public async Task Dispatcher_WithJournal_LogsSuccessAndFailure()
+    {
+        var journal = new TestJournal();
+        var dispatcher = new ToolDispatcher(journal);
+        dispatcher.Register(new GetStatusTool(_adapter));
+
+        // Successful call
+        await dispatcher.CallAsync("GetStatus", Args("{}"));
+
+        Assert.That(journal.Entries, Has.Count.GreaterThanOrEqualTo(1));
+        Assert.That(journal.Entries.Any(e => e.Type == JournalEntryType.ActionCompleted), Is.True);
+
+        // Unknown tool call (failure)
+        await dispatcher.CallAsync("NonExistent", Args("{}"));
+
+        Assert.That(journal.Entries.Any(e => e.Type == JournalEntryType.ActionFailed), Is.True);
+    }
+}
+
+// ── Test helpers ──────────────────────────────────────────────────────────────
+
+/// <summary>
+/// Tool that throws an exception on ExecuteAsync — used to verify
+/// Sprint 25 P0-C exception wrapping in ToolDispatcher.CallAsync.
+/// </summary>
+file sealed class ThrowingTool : ITool
+{
+    public string Name => "Explode";
+    public string Description => "Always throws";
+    public JsonElement InputSchema => JsonDocument.Parse("{}").RootElement;
+    public Task<ToolResult> ExecuteAsync(JsonElement arguments, CancellationToken ct = default)
+        => throw new InvalidOperationException("Kaboom! Tool exploded.");
+}
+
+/// <summary>
+/// Tool that throws OperationCanceledException — verifies that cancellation
+/// propagates through ToolDispatcher rather than being caught.
+/// </summary>
+file sealed class CancelingTool : ITool
+{
+    public string Name => "Cancel";
+    public string Description => "Always cancels";
+    public JsonElement InputSchema => JsonDocument.Parse("{}").RootElement;
+    public Task<ToolResult> ExecuteAsync(JsonElement arguments, CancellationToken ct = default)
+        => throw new OperationCanceledException("Operation was canceled");
+}
+
+/// <summary>
+/// In-memory IAgentJournal for test assertions.
+/// </summary>
+file sealed class TestJournal : IAgentJournal
+{
+    private readonly List<JournalEntry> _entries = [];
+
+    public List<JournalEntry> Entries => _entries;
+    public int Count => _entries.Count;
+    public IReadOnlyList<JournalEntry> All => [.. _entries.OrderByDescending(e => e.Timestamp)];
+    public void Log(JournalEntry entry) => _entries.Add(entry);
+    public IReadOnlyList<JournalEntry> Recent(int count) =>
+        _entries.OrderByDescending(e => e.Timestamp).Take(count).ToList();
+    public IReadOnlyList<JournalEntry> Query(JournalEntryType? type = null,
+        DateTimeOffset? from = null, DateTimeOffset? to = null) =>
+        _entries.Where(e =>
+            (type is null || e.Type == type) &&
+            (from is null || e.Timestamp >= from) &&
+            (to is null || e.Timestamp <= to))
+        .OrderByDescending(e => e.Timestamp).ToList();
+    public void Clear() => _entries.Clear();
+}

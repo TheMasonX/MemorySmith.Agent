@@ -1,1 +1,53 @@
-bmFtZXNwYWNlIEFnZW50LlRvb2xzOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuTWVtb3J5Owp1c2luZyBTeXN0ZW0uVGV4dC5Kc29uOwoKLy8vIDxzdW1tYXJ5PgovLy8gQ3JlYXRlcyBvciB1cGRhdGVzIGEgcGFnZSBpbiB0aGUgd29ybGQga25vd2xlZGdlIGJhc2UgdG8gcmVjb3JkIGluLXdvcmxkCi8vLyBvYnNlcnZhdGlvbnMsIGJsb2NrIGRpc2NvdmVyaWVzLCBvciBleHBsb3JhdGlvbiBub3Rlcy4KLy8vIDxwYXJhPgovLy8gU3ByaW50IDIzIFAwLUI6IHJvdXRlZCB0byB0aGUgd29ybGQta2V5ZWQgPHNlZSBjcmVmPSJJTWVtb3J5R2F0ZXdheSIvPi4KLy8vIFdvcmxkIG9ic2VydmF0aW9ucyBhcmUgc3RvcmVkIHNlcGFyYXRlbHkgZnJvbSBhZ2VudCBjb2RlYmFzZSBkb2N1bWVudGF0aW9uLAovLy8ga2VlcGluZyB0aGUgYWdlbnQgS0IgY2xlYW4gZm9yIHNwcmludCBkb2NzLCBkZXNpZ24gbm90ZXMsIGFuZCBjb2RlLWxldmVsCi8vLyByZWZlcmVuY2VzIHdoaWxlIHdvcmxkIGRhdGEgYWNjdW11bGF0ZXMgaW4gaXRzIG93biBNZW1vcnlTbWl0aCBpbnN0YW5jZS4KLy8vIDwvcGFyYT4KLy8vIFNwcmludCAzMCBQMC1COiByZXdyaXR0ZW4gRXhlY3V0ZUFzeW5jIHRvIEpzb25FbGVtZW50IHNpZ25hdHVyZSBmb3IgSVRvb2wgY29tcGxpYW5jZS4KLy8vIEFjdGlvbkRhdGEtYmFzZWQgc2lnbmF0dXJlIHdhcyByZXN0b3JlZCB3aGVuIGZpbGUgd2FzIGRlY29kZWQgaW4gU3ByaW50IDI4Ci8vLyBidXQgdGhlIGludGVyZmFjZSBoYWQgYWxyZWFkeSBjaGFuZ2VkIGluIFNwcmludCA1LgovLy8gPC9zdW1tYXJ5PgpwdWJsaWMgc2VhbGVkIGNsYXNzIENyZWF0ZVBhZ2VUb29sIDogSVRvb2wKewogICAgcHJpdmF0ZSByZWFkb25seSBJTWVtb3J5R2F0ZXdheSBfbWVtb3J5OwoKICAgIHB1YmxpYyBDcmVhdGVQYWdlVG9vbChJTWVtb3J5R2F0ZXdheSBtZW1vcnkpID0+IF9tZW1vcnkgPSBtZW1vcnk7CgogICAgcHVibGljIHN0cmluZyBOYW1lID0+ICJDcmVhdGVQYWdlIjsKCiAgICBwdWJsaWMgc3RyaW5nIERlc2NyaXB0aW9uID0+ICJDcmVhdGVzIG9yIHVwZGF0ZXMgYSBwYWdlIGluIHRoZSB3b3JsZCBrbm93bGVkZ2UgYmFzZSB0byByZWNvcmQgaW4td29ybGQgb2JzZXJ2YXRpb25zLCBibG9jayBkaXNjb3Zlcmllcywgb3IgZXhwbG9yYXRpb24gbm90ZXMuIFJvdXRlcyB0byB0aGUgd29ybGQgS0IgaW5zdGFuY2UgKHNlZSBXb3JsZEtiVXJsIGluIGFwcHNldHRpbmdzKS4gVXNlIENyZWF0ZVBhZ2UgZm9yIHdvcmxkIGRhdGE7IHVzZSBHZXRQYWdlIGZvciBhZ2VudCBrbm93bGVkZ2UgYmFzZSByZXRyaWV2YWwuIjsKCiAgICBwdWJsaWMgSnNvbkVsZW1lbnQgSW5wdXRTY2hlbWEgPT4gSnNvbkRvY3VtZW50LlBhcnNlKCIiIgogICAgICAgIHsKICAgICAgICAgICJ0eXBlIjogIm9iamVjdCIsCiAgICAgICAgICAicHJvcGVydGllcyI6IHsKICAgICAgICAgICAgInRpdGxlIjogeyAidHlwZSI6ICJzdHJpbmciLCAiZGVzY3JpcHRpb24iOiAiVGhlIHBhZ2UgdGl0bGUiIH0sCiAgICAgICAgICAgICJib2R5IjogIHsgInR5cGUiOiAic3RyaW5nIiwgImRlc2NyaXB0aW9uIjogIlRoZSBwYWdlIGNvbnRlbnQgaW4gbWFya2Rvd24iIH0sCiAgICAgICAgICAgICJ0eXBlIjogIHsgInR5cGUiOiAic3RyaW5nIiwgImRlc2NyaXB0aW9uIjogIk9wdGlvbmFsIHBhZ2UgdHlwZSAoZS5nLiAnb2JzZXJ2YXRpb24nLCAnbm90ZScpIiB9CiAgICAgICAgICB9LAogICAgICAgICAgInJlcXVpcmVkIjogWyJ0aXRsZSIsICJib2R5Il0KICAgICAgICB9CiAgICAgICAgIiIiKS5Sb290RWxlbWVudDsKCiAgICBwdWJsaWMgYXN5bmMgVGFzazxUb29sUmVzdWx0PiBFeGVjdXRlQXN5bmMoSnNvbkVsZW1lbnQgYXJndW1lbnRzLCBDYW5jZWxsYXRpb25Ub2tlbiBjdCA9IGRlZmF1bHQpCiAgICB7CiAgICAgICAgdmFyIHRpdGxlID0gYXJndW1lbnRzLlRyeUdldFByb3BlcnR5KCJ0aXRsZSIsIG91dCB2YXIgdCkgPyB0LkdldFN0cmluZygpCiAgICAgICAgICAgICAgICAgICAgOiB0aHJvdyBuZXcgQXJndW1lbnRFeGNlcHRpb24oIkNyZWF0ZVBhZ2UgcmVxdWlyZXMgJ3RpdGxlJyBwYXJhbWV0ZXIuIik7CiAgICAgICAgdmFyIGJvZHkgID0gYXJndW1lbnRzLlRyeUdldFByb3BlcnR5KCJib2R5IiwgIG91dCB2YXIgYikgPyBiLkdldFN0cmluZygpCiAgICAgICAgICAgICAgICAgICAgOiB0aHJvdyBuZXcgQXJndW1lbnRFeGNlcHRpb24oIkNyZWF0ZVBhZ2UgcmVxdWlyZXMgJ2JvZHknIHBhcmFtZXRlci4iKTsKICAgICAgICB2YXIgdHlwZSAgPSBhcmd1bWVudHMuVHJ5R2V0UHJvcGVydHkoInR5cGUiLCAgb3V0IHZhciB0eSkgPyB0eS5HZXRTdHJpbmcoKSA6IG51bGw7CgogICAgICAgIHZhciBwYWdlID0gYXdhaXQgX21lbW9yeS5DcmVhdGVQYWdlQXN5bmModGl0bGUhLCBib2R5ISwgdHlwZSwgY3QpLkNvbmZpZ3VyZUF3YWl0KGZhbHNlKTsKICAgICAgICByZXR1cm4gVG9vbFJlc3VsdC5PayhuZXcgeyBwYWdlIH0pOwogICAgfQp9Cg==
+namespace Agent.Tools;
+
+using Agent.Core;
+using Agent.Memory;
+using System.Text.Json;
+
+/// <summary>
+/// Creates or updates a page in the world knowledge base to record in-world
+/// observations, block discoveries, or exploration notes.
+/// <para>
+/// Sprint 23 P0-B: routed to the world-keyed <see cref="IMemoryGateway"/>.
+/// World observations are stored separately from agent codebase documentation,
+/// keeping the agent KB clean for sprint docs, design notes, and code-level
+/// references while world data accumulates in its own MemorySmith instance.
+/// </para>
+/// Sprint 30 P0-B: rewritten ExecuteAsync to JsonElement signature for ITool compliance.
+/// ActionData-based signature was restored when file was decoded in Sprint 28
+/// but the interface had already changed in Sprint 5.
+/// </summary>
+public sealed class CreatePageTool : ITool
+{
+    private readonly IMemoryGateway _memory;
+
+    public CreatePageTool(IMemoryGateway memory) => _memory = memory;
+
+    public string Name => "CreatePage";
+
+    public string Description => "Creates or updates a page in the world knowledge base to record in-world observations, block discoveries, or exploration notes. Routes to the world KB instance (see WorldKbUrl in appsettings). Use CreatePage for world data; use GetPage for agent knowledge base retrieval.";
+
+    public JsonElement InputSchema => JsonDocument.Parse("""
+        {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string", "description": "The page title" },
+            "body":  { "type": "string", "description": "The page content in markdown" },
+            "type":  { "type": "string", "description": "Optional page type (e.g. 'observation', 'note')" }
+          },
+          "required": ["title", "body"]
+        }
+        """).RootElement;
+
+    public async Task<ToolResult> ExecuteAsync(JsonElement arguments, CancellationToken ct = default)
+    {
+        var title = arguments.TryGetProperty("title", out var t) ? t.GetString()
+                    : throw new ArgumentException("CreatePage requires 'title' parameter.");
+        var body  = arguments.TryGetProperty("body",  out var b) ? b.GetString()
+                    : throw new ArgumentException("CreatePage requires 'body' parameter.");
+        var type  = arguments.TryGetProperty("type",  out var ty) ? ty.GetString() : null;
+
+        var page = await _memory.CreatePageAsync(title!, body!, type, ct).ConfigureAwait(false);
+        return ToolResult.Ok(new { page });
+    }
+}

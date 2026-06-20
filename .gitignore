@@ -473,3 +473,6 @@ appsettings.Secrets.json
 
 # Benchmark output
 BenchmarkDotNet.Artifacts/
+
+
+*.bak

@@ -1,1 +1,130 @@
-bmFtZXNwYWNlIE1lbW9yeVNtaXRoLkFnZW50LlRlc3RzOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuUGxhbm5pbmc7CnVzaW5nIEFnZW50LlBsYW5uaW5nLkdvYWxzOwp1c2luZyBTeXN0ZW0uVGV4dC5Kc29uOwoKLy8vIDxzdW1tYXJ5PgovLy8gU3ByaW50IDI3IHRlc3RzLgovLy8gUDAtRDogQ3JhZnRJdGVtR29hbERlY29tcG9zZXIgcm91dGluZyBhbmQgSHRuUGxhbm5lciBjb25zb2xpZGF0aW9uLgovLy8KLy8vIENvdmVyYWdlOgovLy8gICAtIENyYWZ0SXRlbUdvYWxEZWNvbXBvc2VyLkNhbkhhbmRsZSByZXR1cm5zIHRydWUgb25seSBmb3IgQ3JhZnRJdGVtR29hbC4KLy8vICAgLSBDcmFmdEl0ZW1Hb2FsRGVjb21wb3Nlci5EZWNvbXBvc2UgcHJvZHVjZXMgYWN0aW9ucyB2aWEgSHRuVGFza0xpYnJhcnkuRGVjb21wb3NlQ3JhZnRJdGVtLgovLy8gICAtIEh0blBsYW5uZXIgZmFsbGJhY2sgbm8gbG9uZ2VyIGhhcyBoYXJkY29kZWQgQ3JhZnRJdGVtR29hbC9CdWlsZEdvYWwvSUl0ZW1TcGVjR29hbCBicmFuY2hlcy4KLy8vICAgLSBQbGFubmVyUm91dGVyIHJvdXRlcyBDcmFmdEl0ZW1Hb2FsIHRvIENyYWZ0SXRlbUdvYWxEZWNvbXBvc2VyIChub3QgSHRuUGxhbm5lcikuCi8vLyA8L3N1bW1hcnk+CltUZXN0Rml4dHVyZV0KcHVibGljIGNsYXNzIFNwcmludDI3VGVzdHMKewogICAgcHJpdmF0ZSBIdG5UYXNrTGlicmFyeSBfbGlicmFyeSA9IG51bGwhOwogICAgcHJpdmF0ZSBEZWNvbXBvc2VyUmVnaXN0cnkgX3JlZ2lzdHJ5ID0gbnVsbCE7CiAgICBwcml2YXRlIEh0blBsYW5uZXIgX2h0blBsYW5uZXIgPSBudWxsITsKICAgIHByaXZhdGUgUGxhbm5lclJvdXRlciBfcm91dGVyID0gbnVsbCE7CgogICAgW1NldFVwXQogICAgcHVibGljIHZvaWQgU2V0VXAoKQogICAgewogICAgICAgIF9saWJyYXJ5ICAgID0gbmV3IEh0blRhc2tMaWJyYXJ5KG5ldyBNb2NrSXRlbVJlZ2lzdHJ5KCkpOwogICAgICAgIF9yZWdpc3RyeSAgID0gbmV3IERlY29tcG9zZXJSZWdpc3RyeSgpOwogICAgICAgIF9yZWdpc3RyeS5SZWdpc3RlcihuZXcgQnVpbGRHb2FsRGVjb21wb3NlcihfbGlicmFyeSkpOwogICAgICAgIF9yZWdpc3RyeS5SZWdpc3RlcihuZXcgR2F0aGVyR29hbERlY29tcG9zZXIoX2xpYnJhcnkpKTsKICAgICAgICBfcmVnaXN0cnkuUmVnaXN0ZXIobmV3IENyYWZ0SXRlbUdvYWxEZWNvbXBvc2VyKF9saWJyYXJ5KSk7CiAgICAgICAgX3JlZ2lzdHJ5LlJlZ2lzdGVyKG5ldyBTdXJ2aXZlTmlnaHRHb2FsRGVjb21wb3NlcihfbGlicmFyeSkpOwogICAgICAgIF9odG5QbGFubmVyID0gbmV3IEh0blBsYW5uZXIoX2xpYnJhcnkpOwogICAgICAgIF9yb3V0ZXIgICAgID0gbmV3IFBsYW5uZXJSb3V0ZXIoX3JlZ2lzdHJ5LCBfaHRuUGxhbm5lcik7CiAgICB9CgogICAgLy8g4pSA4pSA4pSAIENyYWZ0SXRlbUdvYWxEZWNvbXBvc2VyIENhbkhhbmRsZSDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBbVGVzdF0KICAgIFtEZXNjcmlwdGlvbigiQ3JhZnRJdGVtR29hbERlY29tcG9zZXIuQ2FuSGFuZGxlIG11c3QgcmV0dXJuIHRydWUgZm9yIENyYWZ0SXRlbUdvYWwuIildCiAgICBwdWJsaWMgdm9pZCBDcmFmdEl0ZW1Hb2FsRGVjb21wb3Nlcl9DYW5IYW5kbGVfUmV0dXJuc1RydWVGb3JDcmFmdEl0ZW1Hb2FsKCkKICAgIHsKICAgICAgICB2YXIgZGVjb21wb3NlciA9IG5ldyBDcmFmdEl0ZW1Hb2FsRGVjb21wb3NlcihfbGlicmFyeSk7CiAgICAgICAgdmFyIGdvYWwgICAgICAgPSBuZXcgQ3JhZnRJdGVtR29hbCgiaXJvbl9waWNrYXhlIiwgMSk7CgogICAgICAgIEFzc2VydC5UaGF0KGRlY29tcG9zZXIuQ2FuSGFuZGxlKGdvYWwpLCBJcy5UcnVlLAogICAgICAgICAgICAiQ3JhZnRJdGVtR29hbERlY29tcG9zZXIgbXVzdCBoYW5kbGUgQ3JhZnRJdGVtR29hbCIpOwogICAgfQoKICAgIFtUZXN0XQogICAgW0Rlc2NyaXB0aW9uKCJDcmFmdEl0ZW1Hb2FsRGVjb21wb3Nlci5DYW5IYW5kbGUgbXVzdCByZXR1cm4gZmFsc2UgZm9yIG5vbi1jcmFmdCBnb2Fscy4iKV0KICAgIHB1YmxpYyB2b2lkIENyYWZ0SXRlbUdvYWxEZWNvbXBvc2VyX0NhbkhhbmRsZV9SZXR1cm5zRmFsc2VGb3JPdGhlckdvYWxzKCkKICAgIHsKICAgICAgICB2YXIgZGVjb21wb3NlciA9IG5ldyBDcmFmdEl0ZW1Hb2FsRGVjb21wb3NlcihfbGlicmFyeSk7CiAgICAgICAgdmFyIGdhdGhlciAgICAgPSBuZXcgR2VuZXJpY0dhdGhlckdvYWwobmV3IEl0ZW1TcGVjCiAgICAgICAgewogICAgICAgICAgICBJdGVtSWQgPSAib2FrX2xvZyIsIERpc3BsYXlOYW1lID0gIk9hayBMb2ciLAogICAgICAgICAgICBTb3VyY2VCbG9ja3MgPSBbIm9ha19sb2ciXSwgUmVxdWlyZXNTbWVsdGluZyA9IGZhbHNlLCBNaW5IYXJ2ZXN0TGV2ZWwgPSAwCiAgICAgICAgfSwgMSk7CgogICAgICAgIEFzc2VydC5UaGF0KGRlY29tcG9zZXIuQ2FuSGFuZGxlKGdhdGhlciksIElzLkZhbHNlLAogICAgICAgICAgICAiQ3JhZnRJdGVtR29hbERlY29tcG9zZXIgbXVzdCBOT1QgaGFuZGxlIEdlbmVyaWNHYXRoZXJHb2FsIik7CiAgICB9CgogICAgLy8g4pSA4pSA4pSAIENyYWZ0SXRlbUdvYWxEZWNvbXBvc2VyIERlY29tcG9zZSDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBbVGVzdF0KICAgIFtEZXNjcmlwdGlvbigiQ3JhZnRJdGVtR29hbERlY29tcG9zZXIuRGVjb21wb3NlIG11c3QgcHJvZHVjZSBhdCBsZWFzdCBvbmUgYWN0aW9uIGZvciBhIHZhbGlkIGl0ZW0uIildCiAgICBwdWJsaWMgdm9pZCBDcmFmdEl0ZW1Hb2FsRGVjb21wb3Nlcl9EZWNvbXBvc2VfUHJvZHVjZXNBY3Rpb25zKCkKICAgIHsKICAgICAgICB2YXIgZGVjb21wb3NlciA9IG5ldyBDcmFmdEl0ZW1Hb2FsRGVjb21wb3NlcihfbGlicmFyeSk7CiAgICAgICAgdmFyIGdvYWwgICAgICAgPSBuZXcgQ3JhZnRJdGVtR29hbCgiY3JhZnRpbmdfdGFibGUiLCAxKTsKICAgICAgICB2YXIgc3RhdGUgICAgICA9IG5ldyBXb3JsZFN0YXRlKCk7CgogICAgICAgIHZhciBwbGFuID0gZGVjb21wb3Nlci5EZWNvbXBvc2UoZ29hbCwgc3RhdGUpOwoKICAgICAgICBBc3NlcnQuVGhhdChwbGFuLCBJcy5Ob3QuTnVsbCwKICAgICAgICAgICAgIkRlY29tcG9zZSBtdXN0IHJldHVybiBhIG5vbi1udWxsIHBsYW4iKTsKICAgICAgICBBc3NlcnQuVGhhdChwbGFuLkFjdGlvbnMsIElzLk5vdC5FbXB0eSwKICAgICAgICAgICAgIkRlY29tcG9zZWQgcGxhbiBtdXN0IGNvbnRhaW4gYXQgbGVhc3Qgb25lIGFjdGlvbiBmb3IgQ3JhZnRJdGVtR29hbCIpOwogICAgICAgIEFzc2VydC5UaGF0KHBsYW4uR29hbE5hbWUsIElzLkVxdWFsVG8oZ29hbC5OYW1lKSwKICAgICAgICAgICAgIlBsYW4gZ29hbCBuYW1lIG11c3QgbWF0Y2ggdGhlIGlucHV0IGdvYWwgbmFtZSIpOwogICAgfQoKICAgIC8vIOKUgOKUgOKUgCBQbGFubmVyUm91dGVyIHJvdXRlcyBDcmFmdEl0ZW1Hb2FsIHRocm91Z2ggcmVnaXN0cnkg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgW1Rlc3RdCiAgICBbRGVzY3JpcHRpb24oIlBsYW5uZXJSb3V0ZXIuU2VsZWN0IG11c3QgcmV0dXJuIGEgRGVjb21wb3NlclBsYW5uZXIgKG5vdCBIdG5QbGFubmVyKSBmb3IgQ3JhZnRJdGVtR29hbCAiICsKICAgICAgICAgICAgICAgICAid2hlbiBDcmFmdEl0ZW1Hb2FsRGVjb21wb3NlciBpcyByZWdpc3RlcmVkLiIpXQogICAgcHVibGljIGFzeW5jIFRhc2sgUGxhbm5lclJvdXRlcl9TZWxlY3RzQ3JhZnRJdGVtR29hbERlY29tcG9zZXJfRm9yQ3JhZnRJdGVtR29hbCgpCiAgICB7CiAgICAgICAgdmFyIGdvYWwgID0gbmV3IENyYWZ0SXRlbUdvYWwoIndvb2Rlbl9zd29yZCIsIDEpOwogICAgICAgIHZhciBzdGF0ZSA9IG5ldyBXb3JsZFN0YXRlKCk7CgogICAgICAgIC8vIFBsYW4gdmlhIHRoZSByb3V0ZXIg4oCUIHNob3VsZCBkZWxlZ2F0ZSB0byBDcmFmdEl0ZW1Hb2FsRGVjb21wb3NlcgogICAgICAgIHZhciBwbGFuID0gYXdhaXQgX3JvdXRlci5QbGFuQXN5bmMoZ29hbCwgc3RhdGUpOwoKICAgICAgICBBc3NlcnQuVGhhdChwbGFuLCBJcy5Ob3QuTnVsbCk7CiAgICAgICAgQXNzZXJ0LlRoYXQocGxhbi5BY3Rpb25zLCBJcy5Ob3QuRW1wdHksCiAgICAgICAgICAgICJSb3V0ZXIgbXVzdCBwcm9kdWNlIGFjdGlvbnMgZm9yIENyYWZ0SXRlbUdvYWwgdmlhIENyYWZ0SXRlbUdvYWxEZWNvbXBvc2VyIik7CiAgICB9CgogICAgLy8g4pSA4pSA4pSAIEdhdGhlckdvYWxEZWNvbXBvc2VyIHJlZHVuZGFudCBhcm0gcmVtb3ZlZCDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBbVGVzdF0KICAgIFtEZXNjcmlwdGlvbigiU3ByaW50IDI3IFAwLUQ6IEdhdGhlckdvYWxEZWNvbXBvc2VyIG11c3Qgc3RpbGwgaGFuZGxlIEdlbmVyaWNHYXRoZXJHb2FsIGNvcnJlY3RseSAiICsKICAgICAgICAgICAgICAgICAidmlhIHRoZSBJSXRlbVNwZWNHb2FsIGFybSBhZnRlciByZW1vdmFsIG9mIHRoZSByZWR1bmRhbnQgR2VuZXJpY0dhdGhlckdvYWwgYXJtLiIpXQogICAgcHVibGljIHZvaWQgR2F0aGVyR29hbERlY29tcG9zZXJfSGFuZGxlc0dlbmVyaWNHYXRoZXJHb2FsX1ZpYUlJdGVtU3BlY0dvYWxBcm0oKQogICAgewogICAgICAgIHZhciBkZWNvbXBvc2VyID0gbmV3IEdhdGhlckdvYWxEZWNvbXBvc2VyKF9saWJyYXJ5KTsKICAgICAgICB2YXIgc3BlYyAgICAgICA9IG5ldyBJdGVtU3BlYwogICAgICAgIHsKICAgICAgICAgICAgSXRlbUlkID0gInN0b25lIiwgRGlzcGxheU5hbWUgPSAiU3RvbmUiLAogICAgICAgICAgICBTb3VyY2VCbG9ja3MgPSBbInN0b25lIl0sIFJlcXVpcmVzU21lbHRpbmcgPSBmYWxzZSwgTWluSGFydmVzdExldmVsID0gMAogICAgICAgIH07CiAgICAgICAgdmFyIGdvYWwgID0gbmV3IEdlbmVyaWNHYXRoZXJHb2FsKHNwZWMsIHRhcmdldENvdW50OiAxNik7CiAgICAgICAgdmFyIHN0YXRlID0gbmV3IFdvcmxkU3RhdGUoKTsKCiAgICAgICAgQXNzZXJ0LlRoYXQoZGVjb21wb3Nlci5DYW5IYW5kbGUoZ29hbCksIElzLlRydWUsCiAgICAgICAgICAgICJHYXRoZXJHb2FsRGVjb21wb3Nlci5DYW5IYW5kbGUgbXVzdCByZXR1cm4gdHJ1ZSBmb3IgR2VuZXJpY0dhdGhlckdvYWwgKGltcGxlbWVudHMgSUl0ZW1TcGVjR29hbCkiKTsKCiAgICAgICAgdmFyIHBsYW4gPSBkZWNvbXBvc2VyLkRlY29tcG9zZShnb2FsLCBzdGF0ZSk7CgogICAgICAgIEFzc2VydC5UaGF0KHBsYW4sIElzLk5vdC5OdWxsKTsKICAgICAgICBBc3NlcnQuVGhhdChwbGFuLkFjdGlvbnMsIElzLk5vdC5FbXB0eSwKICAgICAgICAgICAgIkdhdGhlckdvYWxEZWNvbXBvc2VyIG11c3QgcHJvZHVjZSBhY3Rpb25zIGZvciBHZW5lcmljR2F0aGVyR29hbCB2aWEgSUl0ZW1TcGVjR29hbCBhcm0iKTsKICAgIH0KfQo=
+namespace MemorySmith.Agent.Tests;
+
+using Agent.Core;
+using Agent.Planning;
+using Agent.Planning.Goals;
+using System.Text.Json;
+
+/// <summary>
+/// Sprint 27 tests.
+/// P0-D: CraftItemGoalDecomposer routing and HtnPlanner consolidation.
+///
+/// Coverage:
+///   - CraftItemGoalDecomposer.CanHandle returns true only for CraftItemGoal.
+///   - CraftItemGoalDecomposer.Decompose produces actions via HtnTaskLibrary.DecomposeCraftItem.
+///   - HtnPlanner fallback no longer has hardcoded CraftItemGoal/BuildGoal/IItemSpecGoal branches.
+///   - PlannerRouter routes CraftItemGoal to CraftItemGoalDecomposer (not HtnPlanner).
+/// </summary>
+[TestFixture]
+public class Sprint27Tests
+{
+    private HtnTaskLibrary _library = null!;
+    private DecomposerRegistry _registry = null!;
+    private HtnPlanner _htnPlanner = null!;
+    private PlannerRouter _router = null!;
+
+    [SetUp]
+    public void SetUp()
+    {
+        _library    = new HtnTaskLibrary(new MockItemRegistry());
+        _registry   = new DecomposerRegistry();
+        _registry.Register(new BuildGoalDecomposer(_library));
+        _registry.Register(new GatherGoalDecomposer(_library));
+        _registry.Register(new CraftItemGoalDecomposer(_library));
+        _registry.Register(new SurviveNightGoalDecomposer(_library));
+        _htnPlanner = new HtnPlanner(_library);
+        _router     = new PlannerRouter(_registry, _htnPlanner);
+    }
+
+    // ─── CraftItemGoalDecomposer CanHandle ────────────────────────────────────
+
+    [Test]
+    [Description("CraftItemGoalDecomposer.CanHandle must return true for CraftItemGoal.")]
+    public void CraftItemGoalDecomposer_CanHandle_ReturnsTrueForCraftItemGoal()
+    {
+        var decomposer = new CraftItemGoalDecomposer(_library);
+        var goal       = new CraftItemGoal("iron_pickaxe", 1);
+
+        Assert.That(decomposer.CanHandle(goal), Is.True,
+            "CraftItemGoalDecomposer must handle CraftItemGoal");
+    }
+
+    [Test]
+    [Description("CraftItemGoalDecomposer.CanHandle must return false for non-craft goals.")]
+    public void CraftItemGoalDecomposer_CanHandle_ReturnsFalseForOtherGoals()
+    {
+        var decomposer = new CraftItemGoalDecomposer(_library);
+        var gather     = new GenericGatherGoal(new ItemSpec
+        {
+            ItemId = "oak_log", DisplayName = "Oak Log",
+            SourceBlocks = ["oak_log"], RequiresSmelting = false, MinHarvestLevel = 0
+        }, 1);
+
+        Assert.That(decomposer.CanHandle(gather), Is.False,
+            "CraftItemGoalDecomposer must NOT handle GenericGatherGoal");
+    }
+
+    // ─── CraftItemGoalDecomposer Decompose ────────────────────────────────────
+
+    [Test]
+    [Description("CraftItemGoalDecomposer.Decompose must produce at least one action for a valid item.")]
+    public void CraftItemGoalDecomposer_Decompose_ProducesActions()
+    {
+        var decomposer = new CraftItemGoalDecomposer(_library);
+        var goal       = new CraftItemGoal("crafting_table", 1);
+        var state      = new WorldState();
+
+        var plan = decomposer.Decompose(goal, state);
+
+        Assert.That(plan, Is.Not.Null,
+            "Decompose must return a non-null plan");
+        Assert.That(plan.Actions, Is.Not.Empty,
+            "Decomposed plan must contain at least one action for CraftItemGoal");
+        Assert.That(plan.GoalName, Is.EqualTo(goal.Name),
+            "Plan goal name must match the input goal name");
+    }
+
+    // ─── PlannerRouter routes CraftItemGoal through registry ──────────────────
+
+    [Test]
+    [Description("PlannerRouter.Select must return a DecomposerPlanner (not HtnPlanner) for CraftItemGoal " +
+                 "when CraftItemGoalDecomposer is registered.")]
+    public async Task PlannerRouter_SelectsCraftItemGoalDecomposer_ForCraftItemGoal()
+    {
+        var goal  = new CraftItemGoal("wooden_sword", 1);
+        var state = new WorldState();
+
+        // Plan via the router — should delegate to CraftItemGoalDecomposer
+        var plan = await _router.PlanAsync(goal, state);
+
+        Assert.That(plan, Is.Not.Null);
+        Assert.That(plan.Actions, Is.Not.Empty,
+            "Router must produce actions for CraftItemGoal via CraftItemGoalDecomposer");
+    }
+
+    // ─── GatherGoalDecomposer redundant arm removed ───────────────────────────
+
+    [Test]
+    [Description("Sprint 27 P0-D: GatherGoalDecomposer must still handle GenericGatherGoal correctly " +
+                 "via the IItemSpecGoal arm after removal of the redundant GenericGatherGoal arm.")]
+    public void GatherGoalDecomposer_HandlesGenericGatherGoal_ViaIItemSpecGoalArm()
+    {
+        var decomposer = new GatherGoalDecomposer(_library);
+        var spec       = new ItemSpec
+        {
+            ItemId = "stone", DisplayName = "Stone",
+            SourceBlocks = ["stone"], RequiresSmelting = false, MinHarvestLevel = 0
+        };
+        var goal  = new GenericGatherGoal(spec, targetCount: 16);
+        var state = new WorldState();
+
+        Assert.That(decomposer.CanHandle(goal), Is.True,
+            "GatherGoalDecomposer.CanHandle must return true for GenericGatherGoal (implements IItemSpecGoal)");
+
+        var plan = decomposer.Decompose(goal, state);
+
+        Assert.That(plan, Is.Not.Null);
+        Assert.That(plan.Actions, Is.Not.Empty,
+            "GatherGoalDecomposer must produce actions for GenericGatherGoal via IItemSpecGoal arm");
+    }
+}

@@ -1,1 +1,78 @@
-bmFtZXNwYWNlIEFnZW50LlRvb2xzOwoKLy8g4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACi8vIFNwcmludCAzYiDigJQgRmluZEZsYXRBcmVhVG9vbAovLwovLyBTY2FucyBhIHJhZGl1cyBhcm91bmQgdGhlIGJvdCBmb3IgYSBmbGF0LCBidWlsZGFibGUgYXJlYS4gVGhlIE5vZGUuanMgYWRhcHRlcgovLyBzYW1wbGVzIGNvbHVtbnMgd2l0aGluIHRoZSByYWRpdXMgbG9va2luZyBmb3Igc29saWQgZ3JvdW5kIHRvcHBlZCBieSBhdCBsZWFzdAovLyBtaW5GbGF0QmxvY2tzIG9mIGNvbnRpZ3VvdXMgYWlyLiBUaGUgYmVzdCBjYW5kaWRhdGUgaXMgcmV0dXJuZWQgYXMgYQovLyAiZmxhdEFyZWFGb3VuZCIgd29ybGQgZXZlbnQuCi8vCi8vIFNwcmludCAyNSBQMC1BOiBkZWZhdWx0cyB1bmlmaWVkIHdpdGggSlMgYWRhcHRlciBjb25zdGFudHMKLy8gICAoRkxBVF9BUkVBX1NDQU5fUkFESVVTPTMyLCBGTEFUX0FSRUFfTUlOX1NJWkU9MjUpLgovLyAgIFNhZmUgaW50ZWdlciBwYXJzaW5nIHZpYSBUcnlHZXRJbnQzMiB0byBoYW5kbGUgc2NpZW50aWZpYyBub3RhdGlvbiBncmFjZWZ1bGx5LgovLyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCnVzaW5nIEFnZW50LkNvcmU7CnVzaW5nIFN5c3RlbS5UZXh0Lkpzb247CgovLy8gPHN1bW1hcnk+Ci8vLyBGaW5kIGEgZmxhdCwgY29udGlndW91cyBhcmVhIG5lYXIgdGhlIGJvdCBzdWl0YWJsZSBmb3IgYnVpbGRpbmcuCi8vLyBEaXNwYXRjaGVzIDxjPmZpbmRGbGF0QXJlYTwvYz4gdG8gdGhlIE5vZGUuanMvTWluZWZsYXllciBhZGFwdGVyIHdoaWNoCi8vLyBzY2FucyBjb2x1bW5zIG9mIGJsb2NrcyBhbmQgcGlja3MgdGhlIGJlc3QgY2FuZGlkYXRlLgovLy8gPC9zdW1tYXJ5PgpwdWJsaWMgc2VhbGVkIGNsYXNzIEZpbmRGbGF0QXJlYVRvb2woSVdvcmxkQWRhcHRlciB3b3JsZEFkYXB0ZXIpIDogSVRvb2wKewogICAgcHVibGljIHN0cmluZyBOYW1lID0+ICJGaW5kRmxhdEFyZWEiOwogICAgcHVibGljIHN0cmluZyBEZXNjcmlwdGlvbiA9PgogICAgICAgICJTY2FuIGEgcmFkaXVzIGFyb3VuZCB0aGUgYm90IGZvciBhIGZsYXQsIGJ1aWxkYWJsZSBhcmVhLiAiICsKICAgICAgICAiUmV0dXJucyB0aGUgY2VudGVyIGNvb3JkaW5hdGVzIG9mIHRoZSBiZXN0IGNhbmRpZGF0ZSAoc29saWQgZ3JvdW5kICsgYWlyIGFib3ZlKS4gIiArCiAgICAgICAgIlVzZSAncmFkaXVzJyAoZGVmYXVsdCAzMikgdG8gY29udHJvbCBzZWFyY2ggcmFkaXVzIGFuZCAnbWluRmxhdEFyZWEnIChkZWZhdWx0IDI1KSAiICsKICAgICAgICAiZm9yIHRoZSBtaW5pbXVtIG51bWJlciBvZiBjb250aWd1b3VzIGZsYXQgYmxvY2tzIHJlcXVpcmVkLiI7CgogICAgLy8gQ2FjaGUgdGhlIGRvY3VtZW50IHNvIHRoZSByZXR1cm5lZCBKc29uRWxlbWVudCBpcyBuZXZlciBiYWNrZWQgYnkgYSBkaXNwb3NlZCBvYmplY3QuCiAgICAvLyAoUmV0dXJuaW5nIEpzb25Eb2N1bWVudC5QYXJzZSguLi4pLlJvb3RFbGVtZW50IGRpcmVjdGx5IGlzIGEgY29ycmVjdG5lc3MgYnVnIOKAlAogICAgLy8gdGhlIGRvY3VtZW50IGlzIGRpc3Bvc2VkIGltbWVkaWF0ZWx5LCBsZWF2aW5nIHRoZSBlbGVtZW50IG92ZXIgZnJlZWQgbWVtb3J5LikKICAgIHByaXZhdGUgc3RhdGljIHJlYWRvbmx5IEpzb25Eb2N1bWVudCBfc2NoZW1hRG9jID0gSnNvbkRvY3VtZW50LlBhcnNlKCIiIgogICAgICAgIHsKICAgICAgICAgICJ0eXBlIjogIm9iamVjdCIsCiAgICAgICAgICAicHJvcGVydGllcyI6IHsKICAgICAgICAgICAgInJhZGl1cyI6IHsKICAgICAgICAgICAgICAidHlwZSI6ICJpbnRlZ2VyIiwKICAgICAgICAgICAgICAiZGVzY3JpcHRpb24iOiAiU2VhcmNoIHJhZGl1cyBpbiBibG9ja3MgZnJvbSBjdXJyZW50IHBvc2l0aW9uIChkZWZhdWx0IDMyKSIKICAgICAgICAgICAgfSwKICAgICAgICAgICAgIm1pbkZsYXRBcmVhIjogewogICAgICAgICAgICAgICJ0eXBlIjogImludGVnZXIiLAogICAgICAgICAgICAgICJkZXNjcmlwdGlvbiI6ICJNaW5pbXVtIG51bWJlciBvZiBmbGF0IGNvbnRpZ3VvdXMgYmxvY2tzIHJlcXVpcmVkIChkZWZhdWx0IDI1LCBpLmUuIDV4NSkiCiAgICAgICAgICAgIH0KICAgICAgICAgIH0sCiAgICAgICAgICAicmVxdWlyZWQiOiBbXQogICAgICAgIH0KICAgICAgICAiIiIpOwoKICAgIHB1YmxpYyBKc29uRWxlbWVudCBJbnB1dFNjaGVtYSA9PiBfc2NoZW1hRG9jLlJvb3RFbGVtZW50OwoKICAgIHB1YmxpYyBhc3luYyBUYXNrPFRvb2xSZXN1bHQ+IEV4ZWN1dGVBc3luYygKICAgICAgICBKc29uRWxlbWVudCBhcmd1bWVudHMsIENhbmNlbGxhdGlvblRva2VuIGNhbmNlbGxhdGlvblRva2VuID0gZGVmYXVsdCkKICAgIHsKICAgICAgICAvLyBTcHJpbnQgMjUgUDAtQTogVHJ5R2V0SW50MzIgaGFuZGxlcyBzY2llbnRpZmljIG5vdGF0aW9uIGFuZCBub24taW50ZWdlciB2YWx1ZXMKICAgICAgICAvLyBncmFjZWZ1bGx5IGJ5IGZhbGxpbmcgYmFjayB0byB0aGUgZGVmYXVsdCBpbnN0ZWFkIG9mIHRocm93aW5nLgogICAgICAgIHZhciByYWRpdXMgICAgICA9IGFyZ3VtZW50cy5UcnlHZXRQcm9wZXJ0eSgicmFkaXVzIiwgICAgICBvdXQgdmFyIHIpCiAgICAgICAgICAgICYmIHIuVHJ5R2V0SW50MzIob3V0IHZhciBydikgPyBydiA6IDMyOwogICAgICAgIHZhciBtaW5GbGF0QXJlYSAgPSBhcmd1bWVudHMuVHJ5R2V0UHJvcGVydHkoIm1pbkZsYXRBcmVhIiwgIG91dCB2YXIgbSkKICAgICAgICAgICAgJiYgbS5UcnlHZXRJbnQzMihvdXQgdmFyIG12KSA/IG12IDogMjU7CgogICAgICAgIHZhciBhY3Rpb24gPSBuZXcgQWN0aW9uRGF0YQogICAgICAgIHsKICAgICAgICAgICAgVG9vbCA9IEFjdGlvblByb3RvY29sLkZpbmRGbGF0QXJlYSwKICAgICAgICAgICAgQXJndW1lbnRzID0KICAgICAgICAgICAgewogICAgICAgICAgICAgICAgWyJyYWRpdXMiXSAgICAgPSAob2JqZWN0PylyYWRpdXMsCiAgICAgICAgICAgICAgICBbIm1pbkZsYXRBcmVhIl0gPSAob2JqZWN0PyltaW5GbGF0QXJlYSwKICAgICAgICAgICAgfSwKICAgICAgICB9OwoKICAgICAgICBhd2FpdCB3b3JsZEFkYXB0ZXIuU2VuZEFjdGlvbkFzeW5jKGFjdGlvbiwgY2FuY2VsbGF0aW9uVG9rZW4pOwogICAgICAgIHJldHVybiBuZXcgVG9vbFJlc3VsdCh0cnVlLCAkIkZpbmRGbGF0QXJlYShyYWRpdXM9e3JhZGl1c30sIG1pbkZsYXRBcmVhPXttaW5GbGF0QXJlYX0pIGRpc3BhdGNoZWQuIik7CiAgICB9Cn0K
+namespace Agent.Tools;
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Sprint 3b — FindFlatAreaTool
+//
+// Scans a radius around the bot for a flat, buildable area. The Node.js adapter
+// samples columns within the radius looking for solid ground topped by at least
+// minFlatBlocks of contiguous air. The best candidate is returned as a
+// "flatAreaFound" world event.
+//
+// Sprint 25 P0-A: defaults unified with JS adapter constants
+//   (FLAT_AREA_SCAN_RADIUS=32, FLAT_AREA_MIN_SIZE=25).
+//   Safe integer parsing via TryGetInt32 to handle scientific notation gracefully.
+// ──────────────────────────────────────────────────────────────────────────────
+
+using Agent.Core;
+using System.Text.Json;
+
+/// <summary>
+/// Find a flat, contiguous area near the bot suitable for building.
+/// Dispatches <c>findFlatArea</c> to the Node.js/Mineflayer adapter which
+/// scans columns of blocks and picks the best candidate.
+/// </summary>
+public sealed class FindFlatAreaTool(IWorldAdapter worldAdapter) : ITool
+{
+    public string Name => "FindFlatArea";
+    public string Description =>
+        "Scan a radius around the bot for a flat, buildable area. " +
+        "Returns the center coordinates of the best candidate (solid ground + air above). " +
+        "Use 'radius' (default 32) to control search radius and 'minFlatArea' (default 25) " +
+        "for the minimum number of contiguous flat blocks required.";
+
+    // Cache the document so the returned JsonElement is never backed by a disposed object.
+    // (Returning JsonDocument.Parse(...).RootElement directly is a correctness bug —
+    // the document is disposed immediately, leaving the element over freed memory.)
+    private static readonly JsonDocument _schemaDoc = JsonDocument.Parse("""
+        {
+          "type": "object",
+          "properties": {
+            "radius": {
+              "type": "integer",
+              "description": "Search radius in blocks from current position (default 32)"
+            },
+            "minFlatArea": {
+              "type": "integer",
+              "description": "Minimum number of flat contiguous blocks required (default 25, i.e. 5x5)"
+            }
+          },
+          "required": []
+        }
+        """);
+
+    public JsonElement InputSchema => _schemaDoc.RootElement;
+
+    public async Task<ToolResult> ExecuteAsync(
+        JsonElement arguments, CancellationToken cancellationToken = default)
+    {
+        // Sprint 25 P0-A: TryGetInt32 handles scientific notation and non-integer values
+        // gracefully by falling back to the default instead of throwing.
+        var radius      = arguments.TryGetProperty("radius",      out var r)
+            && r.TryGetInt32(out var rv) ? rv : 32;
+        var minFlatArea  = arguments.TryGetProperty("minFlatArea",  out var m)
+            && m.TryGetInt32(out var mv) ? mv : 25;
+
+        var action = new ActionData
+        {
+            Tool = ActionProtocol.FindFlatArea,
+            Arguments =
+            {
+                ["radius"]     = (object?)radius,
+                ["minFlatArea"] = (object?)minFlatArea,
+            },
+        };
+
+        await worldAdapter.SendActionAsync(action, cancellationToken);
+        return new ToolResult(true, $"FindFlatArea(radius={radius}, minFlatArea={minFlatArea}) dispatched.");
+    }
+}

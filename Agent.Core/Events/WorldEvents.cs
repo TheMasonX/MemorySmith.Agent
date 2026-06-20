@@ -1,1 +1,117 @@
-bmFtZXNwYWNlIEFnZW50LkNvcmU7CgovLy8gPHN1bW1hcnk+Ci8vLyBUeXBlZCB3b3JsZCBldmVudCBoaWVyYXJjaHkg4oCUIHJlcGxhY2VzIHRoZSBsZWdhY3kKLy8vIDxjPldvcmxkRXZlbnQoc3RyaW5nLCBEaWN0aW9uYXJ5Jmx0O3N0cmluZywgb2JqZWN0PyZndDssIERhdGVUaW1lT2Zmc2V0KTwvYz4gcmVjb3JkLgovLy8KLy8vIFNwcmludCAzYTogRXZlcnkgZXZlbnQgZnJvbSB0aGUgd29ybGQgYWRhcHRlciBpcyBub3cgYSBzZWFsZWQgcmVjb3JkIHdpdGgKLy8vIG5hbWVkLCB0eXBlZCBwcm9wZXJ0aWVzIGluc3RlYWQgb2YgYW4gb3BhcXVlIHN0cmluZy1rZXllZCBkaWN0aW9uYXJ5LgovLy8gQ29uc3VtZXJzIHVzZSBwYXR0ZXJuIG1hdGNoaW5nIGluc3RlYWQgb2Ygc3RyaW5nIHN3aXRjaGVzIGFuZCBUcnlHZXRWYWx1ZSBjYWxscy4KLy8vCi8vLyBTcHJpbnQgMjMgUDAtQTogQWRkZWQgPHNlZSBjcmVmPSJEYW1hZ2VUYWtlbkV2ZW50Ii8+IOKAlCBhIHN5bnRoZXRpYyBldmVudCBjb21wdXRlZAovLy8gQyMtc2lkZSBmcm9tIGNvbnNlY3V0aXZlIEhlYWx0aEV2ZW50IGhlYWx0aC1kZWx0YSBjb21wYXJpc29ucy4gTm90IHJlY2VpdmVkIGZyb20KLy8vIHRoZSBOb2RlLmpzIHdpcmU7IGNyZWF0ZWQgYnkgQWdlbnRCYWNrZ3JvdW5kU2VydmljZSBhbmQgYXBwbGllZCB0aHJvdWdoIHRoZSBwcm9qZWN0b3IuCi8vLyA8L3N1bW1hcnk+CnB1YmxpYyBhYnN0cmFjdCByZWNvcmQgV29ybGRFdmVudChEYXRlVGltZU9mZnNldCBUaW1lc3RhbXApOwoKcHVibGljIHNlYWxlZCByZWNvcmQgU3Bhd25FdmVudChQb3NpdGlvbiBQb3MsIGludCBIZWFsdGgsIGludCBGb29kLCBEYXRlVGltZU9mZnNldCBUaW1lc3RhbXApCiAgICA6IFdvcmxkRXZlbnQoVGltZXN0YW1wKTsKCi8vLyA8c3VtbWFyeT4KLy8vIEVtaXR0ZWQgYnkgdGhlIE5vZGUuanMgYWRhcHRlciBvbiA8ZW0+YW55PC9lbT4gaGVhbHRoIGNoYW5nZSDigJQgZGFtYWdlIHRha2VuCi8vLyA8ZW0+YW5kPC9lbT4gaGVhbGluZyAoZWF0aW5nIGZvb2QsIHJlZ2VuZXJhdGlvbiwgbmF0dXJhbCBoZWFsaW5nKS4KLy8vIDxwYXJhPgovLy8gUm91dGVzIHRoYXQgb25seSBjYXJlIGFib3V0IGRhbWFnZSBzaG91bGQgc3Vic2NyaWJlIHRvCi8vLyA8c2VlIGNyZWY9IkRhbWFnZVRha2VuRXZlbnQiLz4gaW5zdGVhZCwgd2hpY2ggaXMgc3ludGhlc2l6ZWQgQyMtc2lkZSBmcm9tCi8vLyBjb25zZWN1dGl2ZSBIZWFsdGhFdmVudCBjb21wYXJpc29ucyBhbmQgb25seSBmaXJlcyB3aGVuIGhlYWx0aCBkcm9wcy4KLy8vIDwvcGFyYT4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCByZWNvcmQgSGVhbHRoRXZlbnQoaW50IEhlYWx0aCwgaW50IEZvb2QsIERhdGVUaW1lT2Zmc2V0IFRpbWVzdGFtcCkKICAgIDogV29ybGRFdmVudChUaW1lc3RhbXApOwoKLy8vIDxzdW1tYXJ5PgovLy8gU3ludGhlc2l6ZWQgQyMtc2lkZSAoYnkgQWdlbnRCYWNrZ3JvdW5kU2VydmljZSkgZnJvbSBjb25zZWN1dGl2ZQovLy8gPHNlZSBjcmVmPSJIZWFsdGhFdmVudCIvPiBjb21wYXJpc29ucyB3aGVuZXZlciB0aGUgbmV3IEhlYWx0aCBpcyBsb3dlciB0aGFuCi8vLyB0aGUgcHJldmlvdXMgSGVhbHRoLiBOT1QgcmVjZWl2ZWQgZnJvbSB0aGUgTm9kZS5qcyB3aXJlLgovLy8gPHBhcmE+Ci8vLyA8Yz5EZWx0YSA9IEhlYWx0aCAtIFByZXZpb3VzSGVhbHRoPC9jPiDigJQgYWx3YXlzIDxzdHJvbmc+bmVnYXRpdmU8L3N0cm9uZz4KLy8vIChtYWduaXR1ZGUgb2YgSFAgbG9zdCkuIEhlYWxpbmcvZWF0aW5nIGRvZXMgPGVtPm5vdDwvZW0+IHByb2R1Y2UgdGhpcyBldmVudC4KLy8vIDwvcGFyYT4KLy8vIDxwYXJhPgovLy8gU3ByaW50IDIzIFAwLUE6IGRyaXZlcyB0aGUgZGFtYWdlIGludGVycnVwdCBwYXRoLiBXaGVuIHxEZWx0YXwgbWVldHMgb3IKLy8vIGV4Y2VlZHMgdGhlIGFjdGl2ZSBnb2FsJ3MgPHNlZSBjcmVmPSJJR29hbC5EYW1hZ2VJbnRlcnJ1cHRUaHJlc2hvbGRIcCIvPgovLy8gKG9yIHN5c3RlbSBkZWZhdWx0IDYgSFAgd2hlbiBnb2FsIHJldHVybnMgbnVsbCksIHRoZSBhZ2VudCBhdG9taWNhbGx5IGNsZWFycwovLy8gdGhlIGFjdGlvbiBxdWV1ZSBhbmQgZW5xdWV1ZXMgYSBwcmlvcml0eSBHZXRTdGF0dXMuCi8vLyA8L3BhcmE+Ci8vLyA8L3N1bW1hcnk+CnB1YmxpYyBzZWFsZWQgcmVjb3JkIERhbWFnZVRha2VuRXZlbnQoCiAgICBpbnQgUHJldmlvdXNIZWFsdGgsCiAgICBpbnQgSGVhbHRoLAogICAgaW50IERlbHRhLAogICAgaW50IEZvb2QsCiAgICBEYXRlVGltZU9mZnNldCBUaW1lc3RhbXApCiAgICA6IFdvcmxkRXZlbnQoVGltZXN0YW1wKTsKCi8vLyA8c3VtbWFyeT5FbWl0dGVkIGZvciBib3RoICJtb3ZlIiBhbmQgIm1vdmVDb21wbGV0ZSIgd2lyZSBldmVudHMuPC9zdW1tYXJ5PgpwdWJsaWMgc2VhbGVkIHJlY29yZCBNb3ZlRXZlbnQoUG9zaXRpb24gUG9zLCBEYXRlVGltZU9mZnNldCBUaW1lc3RhbXApCiAgICA6IFdvcmxkRXZlbnQoVGltZXN0YW1wKTsKCnB1YmxpYyBzZWFsZWQgcmVjb3JkIEJsb2NrTWluZWRFdmVudChzdHJpbmcgQmxvY2ssIGludCBDb3VudCwgUG9zaXRpb24gUG9zLCBEYXRlVGltZU9mZnNldCBUaW1lc3RhbXApCiAgICA6IFdvcmxkRXZlbnQoVGltZXN0YW1wKTsKCnB1YmxpYyBzZWFsZWQgcmVjb3JkIENoYXRFdmVudCgKICAgIHN0cmluZyBVc2VybmFtZSwKICAgIHN0cmluZyBNZXNzYWdlLAogICAgaW50IE9ubGluZVBsYXllcnMsCiAgICBQb3NpdGlvbj8gUGxheWVyUG9zLAogICAgRGF0ZVRpbWVPZmZzZXQgVGltZXN0YW1wKSA6IFdvcmxkRXZlbnQoVGltZXN0YW1wKTsKCnB1YmxpYyBzZWFsZWQgcmVjb3JkIEVycm9yRXZlbnQoc3RyaW5nIEFjdGlvbiwgc3RyaW5nIE1lc3NhZ2UsIERhdGVUaW1lT2Zmc2V0IFRpbWVzdGFtcCkKICAgIDogV29ybGRFdmVudChUaW1lc3RhbXApOwoKLy8vIDxzdW1tYXJ5PgovLy8gRW1pdHRlZCB3aGVuIHRoZSBib3QgY2Fubm90IGZpbmQgYSByZXF1ZXN0ZWQgYmxvY2sgd2l0aGluIGl0cyBzZWFyY2ggcmFkaXVzLgovLy8gPGM+TWluZWRDb3VudDwvYz4gaXMgdGhlIG51bWJlciBvZiBibG9ja3Mgc3VjY2Vzc2Z1bGx5IG1pbmVkIGJlZm9yZSB0aGUgbWlzcy4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCByZWNvcmQgQmxvY2tOb3RGb3VuZEV2ZW50KHN0cmluZyBCbG9jaywgaW50IE1pbmVkQ291bnQsIERhdGVUaW1lT2Zmc2V0IFRpbWVzdGFtcCkKICAgIDogV29ybGRFdmVudChUaW1lc3RhbXApOwoKcHVibGljIHNlYWxlZCByZWNvcmQgQ3JhZnRDb21wbGV0ZUV2ZW50KHN0cmluZyBJdGVtLCBpbnQgQ291bnQsIERhdGVUaW1lT2Zmc2V0IFRpbWVzdGFtcCkKICAgIDogV29ybGRFdmVudChUaW1lc3RhbXApOwoKcHVibGljIHNlYWxlZCByZWNvcmQgU21lbHRDb21wbGV0ZUV2ZW50KAogICAgc3RyaW5nIElucHV0LCBzdHJpbmcgUmVzdWx0LCBpbnQgQ291bnQsIERhdGVUaW1lT2Zmc2V0IFRpbWVzdGFtcCkKICAgIDogV29ybGRFdmVudChUaW1lc3RhbXApOwoKcHVibGljIHNlYWxlZCByZWNvcmQgRGVhdGhFdmVudChQb3NpdGlvbiBQb3MsIERhdGVUaW1lT2Zmc2V0IFRpbWVzdGFtcCkKICAgIDogV29ybGRFdmVudChUaW1lc3RhbXApOwoKcHVibGljIHNlYWxlZCByZWNvcmQgU3RhdHVzRXZlbnQoCiAgICBQb3NpdGlvbiBQb3MsCiAgICBpbnQgSGVhbHRoLAogICAgaW50IEZvb2QsCiAgICBJUmVhZE9ubHlEaWN0aW9uYXJ5PHN0cmluZywgaW50PiBJbnZlbnRvcnksCiAgICBEYXRlVGltZU9mZnNldCBUaW1lc3RhbXApIDogV29ybGRFdmVudChUaW1lc3RhbXApOwoKcHVibGljIHNlYWxlZCByZWNvcmQgQmxvY2tQbGFjZWRFdmVudChpbnQgWCwgaW50IFksIGludCBaLCBzdHJpbmcgQmxvY2ssIERhdGVUaW1lT2Zmc2V0IFRpbWVzdGFtcCkKICAgIDogV29ybGRFdmVudChUaW1lc3RhbXApOwoKcHVibGljIHNlYWxlZCByZWNvcmQgV2FuZGVyQ29tcGxldGVFdmVudChQb3NpdGlvbiBQb3MsIGludCBUYXJnZXRYLCBpbnQgVGFyZ2V0WiwgRGF0ZVRpbWVPZmZzZXQgVGltZXN0YW1wKQogICAgOiBXb3JsZEV2ZW50KFRpbWVzdGFtcCk7CgpwdWJsaWMgc2VhbGVkIHJlY29yZCBXYW5kZXJGYWlsZWRFdmVudChzdHJpbmcgTWVzc2FnZSwgUG9zaXRpb24gUG9zLCBEYXRlVGltZU9mZnNldCBUaW1lc3RhbXApCiAgICA6IFdvcmxkRXZlbnQoVGltZXN0YW1wKTsKCnB1YmxpYyBzZWFsZWQgcmVjb3JkIEtpY2tlZEV2ZW50KHN0cmluZyBSZWFzb24sIERhdGVUaW1lT2Zmc2V0IFRpbWVzdGFtcCkKICAgIDogV29ybGRFdmVudChUaW1lc3RhbXApOwoKLy8vIDxzdW1tYXJ5PgovLy8gUmVzdWx0IG9mIGEgZmluZEZsYXRBcmVhIHRvb2wgZGlzcGF0Y2guIENvbnRhaW5zIHRoZSBiZXN0IGNhbmRpZGF0ZSdzIGNlbnRlcgovLy8gY29vcmRpbmF0ZXMsIHRvdGFsIGZsYXQgYXJlYSBpbiBibG9ja3MsIGFuZCBib3VuZGluZyBib3ggZXh0ZW50cy4KLy8vIDxjPkFyZWE8L2M+IGlzIDAgd2hlbiBubyBzdWl0YWJsZSBmbGF0IHJlZ2lvbiB3YXMgZm91bmQuCi8vLyA8L3N1bW1hcnk+CnB1YmxpYyBzZWFsZWQgcmVjb3JkIEZsYXRBcmVhRm91bmRFdmVudCgKICAgIGludCBYLCBpbnQgWSwgaW50IFosCiAgICBpbnQgQXJlYSwKICAgIGludCBNaW5YLCBpbnQgTWF4WCwgaW50IE1pblosIGludCBNYXhaLAogICAgRGF0ZVRpbWVPZmZzZXQgVGltZXN0YW1wKSA6IFdvcmxkRXZlbnQoVGltZXN0YW1wKTsK
+namespace Agent.Core;
+
+/// <summary>
+/// Typed world event hierarchy — replaces the legacy
+/// <c>WorldEvent(string, Dictionary&lt;string, object?&gt;, DateTimeOffset)</c> record.
+///
+/// Sprint 3a: Every event from the world adapter is now a sealed record with
+/// named, typed properties instead of an opaque string-keyed dictionary.
+/// Consumers use pattern matching instead of string switches and TryGetValue calls.
+///
+/// Sprint 23 P0-A: Added <see cref="DamageTakenEvent"/> — a synthetic event computed
+/// C#-side from consecutive HealthEvent health-delta comparisons. Not received from
+/// the Node.js wire; created by AgentBackgroundService and applied through the projector.
+/// </summary>
+public abstract record WorldEvent(DateTimeOffset Timestamp);
+
+public sealed record SpawnEvent(Position Pos, int Health, int Food, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+/// <summary>
+/// Emitted by the Node.js adapter on <em>any</em> health change — damage taken
+/// <em>and</em> healing (eating food, regeneration, natural healing).
+/// <para>
+/// Routes that only care about damage should subscribe to
+/// <see cref="DamageTakenEvent"/> instead, which is synthesized C#-side from
+/// consecutive HealthEvent comparisons and only fires when health drops.
+/// </para>
+/// </summary>
+public sealed record HealthEvent(int Health, int Food, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+/// <summary>
+/// Synthesized C#-side (by AgentBackgroundService) from consecutive
+/// <see cref="HealthEvent"/> comparisons whenever the new Health is lower than
+/// the previous Health. NOT received from the Node.js wire.
+/// <para>
+/// <c>Delta = Health - PreviousHealth</c> — always <strong>negative</strong>
+/// (magnitude of HP lost). Healing/eating does <em>not</em> produce this event.
+/// </para>
+/// <para>
+/// Sprint 23 P0-A: drives the damage interrupt path. When |Delta| meets or
+/// exceeds the active goal's <see cref="IGoal.DamageInterruptThresholdHp"/>
+/// (or system default 6 HP when goal returns null), the agent atomically clears
+/// the action queue and enqueues a priority GetStatus.
+/// </para>
+/// </summary>
+public sealed record DamageTakenEvent(
+    int PreviousHealth,
+    int Health,
+    int Delta,
+    int Food,
+    DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+/// <summary>Emitted for both "move" and "moveComplete" wire events.</summary>
+public sealed record MoveEvent(Position Pos, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+public sealed record BlockMinedEvent(string Block, int Count, Position Pos, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+public sealed record ChatEvent(
+    string Username,
+    string Message,
+    int OnlinePlayers,
+    Position? PlayerPos,
+    DateTimeOffset Timestamp) : WorldEvent(Timestamp);
+
+public sealed record ErrorEvent(string Action, string Message, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+/// <summary>
+/// Emitted when the bot cannot find a requested block within its search radius.
+/// <c>MinedCount</c> is the number of blocks successfully mined before the miss.
+/// </summary>
+public sealed record BlockNotFoundEvent(string Block, int MinedCount, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+public sealed record CraftCompleteEvent(string Item, int Count, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+public sealed record SmeltCompleteEvent(
+    string Input, string Result, int Count, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+public sealed record DeathEvent(Position Pos, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+public sealed record StatusEvent(
+    Position Pos,
+    int Health,
+    int Food,
+    IReadOnlyDictionary<string, int> Inventory,
+    DateTimeOffset Timestamp) : WorldEvent(Timestamp);
+
+public sealed record BlockPlacedEvent(int X, int Y, int Z, string Block, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+public sealed record WanderCompleteEvent(Position Pos, int TargetX, int TargetZ, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+public sealed record WanderFailedEvent(string Message, Position Pos, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+public sealed record KickedEvent(string Reason, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+/// <summary>
+/// Result of a findFlatArea tool dispatch. Contains the best candidate's center
+/// coordinates, total flat area in blocks, and bounding box extents.
+/// <c>Area</c> is 0 when no suitable flat region was found.
+/// </summary>
+public sealed record FlatAreaFoundEvent(
+    int X, int Y, int Z,
+    int Area,
+    int MinX, int MaxX, int MinZ, int MaxZ,
+    DateTimeOffset Timestamp) : WorldEvent(Timestamp);

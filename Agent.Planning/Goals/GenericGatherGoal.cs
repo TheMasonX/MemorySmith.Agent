@@ -1,1 +1,55 @@
-bmFtZXNwYWNlIEFnZW50LlBsYW5uaW5nLkdvYWxzOwoKdXNpbmcgQWdlbnQuQ29yZTsKCi8vLyA8c3VtbWFyeT4KLy8vIEdhdGhlcnMgYSB0YXJnZXQgbnVtYmVyIG9mIHVuaXRzIG9mIGFueSBpdGVtIGRlc2NyaWJlZCBieSBhbiA8c2VlIGNyZWY9Ikl0ZW1TcGVjIi8+LgovLy8gW3Jlc3Qgb2YgZXhpc3RpbmcgWE1MIGRvY10KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCBjbGFzcyBHZW5lcmljR2F0aGVyR29hbChJdGVtU3BlYyBpdGVtLCBpbnQgdGFyZ2V0Q291bnQpIDogSUdvYWwsIElJdGVtU3BlY0dvYWwKewogICAgcHVibGljIEl0ZW1TcGVjIFNwZWMgPT4gaXRlbTsKICAgIHB1YmxpYyBpbnQgVGFyZ2V0Q291bnQgPT4gdGFyZ2V0Q291bnQ7CiAgICBwdWJsaWMgc3RyaW5nIE5hbWUgPT4gJCJHYXRoZXI6e2l0ZW0uSXRlbUlkfSI7CiAgICBwdWJsaWMgc3RyaW5nIERlc2NyaXB0aW9uID0+ICQiR2F0aGVyIGF0IGxlYXN0IHt0YXJnZXRDb3VudH0ge2l0ZW0uRGlzcGxheU5hbWV9LiI7CiAgICBwdWJsaWMgc3RyaW5nW10gUGhhc2VzID0+IFsiRmluZFNvdXJjZSIsICJNaW5lIiwgIkNvbGxlY3QiXTsKICAgIHB1YmxpYyBzdHJpbmc/IEZhaWx1cmVSZWFzb24geyBnZXQ7IHNldDsgfQoKICAgIHB1YmxpYyBib29sIElzQ29tcGxldGUoV29ybGRTdGF0ZSBzdGF0ZSkKICAgIHsKICAgICAgICBpZiAoc3RhdGUuSXNJbnZlbnRvcnlTdGFsZSkKICAgICAgICAgICAgcmV0dXJuIGZhbHNlOwoKICAgICAgICBpZiAoaXRlbS5SZXF1aXJlc1NtZWx0aW5nKQogICAgICAgICAgICByZXR1cm4gc3RhdGUuSW52ZW50b3J5LkdldFZhbHVlT3JEZWZhdWx0KGl0ZW0uSXRlbUlkKSA+PSB0YXJnZXRDb3VudDsKCiAgICAgICAgaW50IHRvdGFsID0gMDsKICAgICAgICBmb3JlYWNoICh2YXIgYmxvY2sgaW4gaXRlbS5Tb3VyY2VCbG9ja3MpCiAgICAgICAgewogICAgICAgICAgICB2YXIgY29sb25JZHggPSBibG9jay5JbmRleE9mKCc6Jyk7CiAgICAgICAgICAgIHZhciBrZXkgPSBjb2xvbklkeCA+PSAwID8gYmxvY2tbKGNvbG9uSWR4ICsgMSkuLl0gOiBibG9jazsKICAgICAgICAgICAgdG90YWwgKz0gc3RhdGUuSW52ZW50b3J5LkdldFZhbHVlT3JEZWZhdWx0KGtleSk7CiAgICAgICAgfQogICAgICAgIHJldHVybiB0b3RhbCA+PSB0YXJnZXRDb3VudDsKICAgIH0KCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gUmV0dXJucyB0cnVlIHdoZW4gdGhlIHdvcmxkLXN0YXRlIGZhY3QKICAgIC8vLyA8Yz5nb2FsOkdhdGhlcjp7aXRlbUlkfTp7dGFyZ2V0Q291bnR9OmZhaWxlZDwvYz4gaXMgc2V0IHRvIDxjPnRydWU8L2M+LgogICAgLy8vCiAgICAvLy8gU3ByaW50IDI4IFAwLUM6IGtleSBpbmNsdWRlcyB0YXJnZXRDb3VudCB0byBwcmV2ZW50IGNyb3NzLWdvYWwgY29sbGlzaW9uCiAgICAvLy8gYmV0d2VlbiBnYXRoZXItTiBhbmQgZ2F0aGVyLU0gZm9yIHRoZSBzYW1lIGl0ZW0uCiAgICAvLy8KICAgIC8vLyBTcHJpbnQgMzAgUDItRCAoREVGLURPQy0xKTogdGhlIGZhY3Qga2V5IGZvcm1hdCBpcyBkb2N1bWVudGVkIGhlcmUgc28gY2FsbGVycwogICAgLy8vIGFkZGluZyBhIHdyaXRlIHNpdGUgY2FuIGZpbmQgdGhlIGV4cGVjdGVkIGZvcm1hdCB3aXRob3V0IGNoZWNraW5nIGNvbW1pdCBoaXN0b3J5LgogICAgLy8vIEtleSBmb3JtYXQ6IDxjPmdvYWw6R2F0aGVyOntpdGVtSWR9Ont0YXJnZXRDb3VudH06ZmFpbGVkPC9jPgogICAgLy8vCiAgICAvLy8gU3ByaW50IDMwIFAyLUIgKERFRi1ET0MtMyk6IHRoaXMgZmFjdCBpcyBPTkxZIFJFQUQgaW4gdGhlIGN1cnJlbnQgcHJvZHVjdGlvbiBwYXRoCiAgICAvLy8g4oCUIDxzZWUgY3JlZj0iQWdlbnRCYWNrZ3JvdW5kU2VydmljZSIvPiB0cmFja3MgZmFpbHVyZXMgdmlhIGEgY29uc2VjdXRpdmUtZmFpbHVyZQogICAgLy8vIGNvdW50ZXIsIG5vdCBhIHdvcmxkLXN0YXRlIGZhY3QuIDxzZWUgY3JlZj0iSGFzRmFpbGVkIi8+IGFsd2F5cyByZXR1cm5zIGZhbHNlCiAgICAvLy8gdW50aWwgYSB3cml0ZSBzaXRlIGlzIGFkZGVkIHVzaW5nIHRoZSBleGFjdCBrZXkgZm9ybWF0IGRvY3VtZW50ZWQgYWJvdmUuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgLy8gQ0hBTkdFRDogaW5jbHVkZSB0YXJnZXRDb3VudCBpbiBrZXkgdG8gcHJldmVudCBjcm9zcy1nb2FsIGNvbGxpc2lvbgogICAgcHVibGljIGJvb2wgSGFzRmFpbGVkKFdvcmxkU3RhdGUgc3RhdGUpID0+CiAgICAgICAgc3RhdGUuRmFjdHMuVHJ5R2V0VmFsdWUoJCJnb2FsOntOYW1lfTp7dGFyZ2V0Q291bnR9OmZhaWxlZCIsIG91dCB2YXIgdikgJiYgdiBpcyB0cnVlOwp9Cg==
+namespace Agent.Planning.Goals;
+
+using Agent.Core;
+
+/// <summary>
+/// Gathers a target number of units of any item described by an <see cref="ItemSpec"/>.
+/// [rest of existing XML doc]
+/// </summary>
+public sealed class GenericGatherGoal(ItemSpec item, int targetCount) : IGoal, IItemSpecGoal
+{
+    public ItemSpec Spec => item;
+    public int TargetCount => targetCount;
+    public string Name => $"Gather:{item.ItemId}";
+    public string Description => $"Gather at least {targetCount} {item.DisplayName}.";
+    public string[] Phases => ["FindSource", "Mine", "Collect"];
+    public string? FailureReason { get; set; }
+
+    public bool IsComplete(WorldState state)
+    {
+        if (state.IsInventoryStale)
+            return false;
+
+        if (item.RequiresSmelting)
+            return state.Inventory.GetValueOrDefault(item.ItemId) >= targetCount;
+
+        int total = 0;
+        foreach (var block in item.SourceBlocks)
+        {
+            var colonIdx = block.IndexOf(':');
+            var key = colonIdx >= 0 ? block[(colonIdx + 1)..] : block;
+            total += state.Inventory.GetValueOrDefault(key);
+        }
+        return total >= targetCount;
+    }
+
+    /// <summary>
+    /// Returns true when the world-state fact
+    /// <c>goal:Gather:{itemId}:{targetCount}:failed</c> is set to <c>true</c>.
+    ///
+    /// Sprint 28 P0-C: key includes targetCount to prevent cross-goal collision
+    /// between gather-N and gather-M for the same item.
+    ///
+    /// Sprint 30 P2-D (DEF-DOC-1): the fact key format is documented here so callers
+    /// adding a write site can find the expected format without checking commit history.
+    /// Key format: <c>goal:Gather:{itemId}:{targetCount}:failed</c>
+    ///
+    /// Sprint 30 P2-B (DEF-DOC-3): this fact is ONLY READ in the current production path
+    /// — <see cref="AgentBackgroundService"/> tracks failures via a consecutive-failure
+    /// counter, not a world-state fact. <see cref="HasFailed"/> always returns false
+    /// until a write site is added using the exact key format documented above.
+    /// </summary>
+    // CHANGED: include targetCount in key to prevent cross-goal collision
+    public bool HasFailed(WorldState state) =>
+        state.Facts.TryGetValue($"goal:{Name}:{targetCount}:failed", out var v) && v is true;
+}

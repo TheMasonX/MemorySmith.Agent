@@ -1,1 +1,309 @@
-dXNpbmcgU3lzdGVtOwp1c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYzsKdXNpbmcgU3lzdGVtLlRleHQuSnNvbjsKdXNpbmcgU3lzdGVtLlRocmVhZGluZzsKdXNpbmcgU3lzdGVtLlRocmVhZGluZy5UYXNrczsKCnVzaW5nIE5Vbml0LkZyYW1ld29yazsKCnVzaW5nIEFnZW50LkNvcmU7CnVzaW5nIEFnZW50LlRvb2xzOwoKbmFtZXNwYWNlIE1lbW9yeVNtaXRoLkFnZW50LlRlc3RzOwoKLy8g4pSA4pSAIEZpeHR1cmUgMTogSUdvYWwuRGFtYWdlSW50ZXJydXB0VGhyZXNob2xkSHAgZGVmYXVsdCBpbnRlcmZhY2UgaW1wbCDilIDilIDilIDilIDilIDilIDilIDilIDilIAKLy8gVmVyaWZpZXMgQi0yIHJlc29sdXRpb246IG51bGwgPSBzeXN0ZW0gZGVmYXVsdCwgMCA9IGNvbWJhdCAobmV2ZXIgaW50ZXJydXB0KS4KCltUZXN0Rml4dHVyZV0KcHVibGljIHNlYWxlZCBjbGFzcyBTcHJpbnQyM0RhbWFnZVRocmVzaG9sZFRlc3RzCnsKICAgIHByaXZhdGUgc2VhbGVkIGNsYXNzIERlZmF1bHRHb2FsIDogSUdvYWwKICAgIHsKICAgICAgICBwdWJsaWMgc3RyaW5nICAgTmFtZSAgICAgICAgPT4gIkRlZmF1bHQiOwogICAgICAgIHB1YmxpYyBzdHJpbmcgICBEZXNjcmlwdGlvbiA9PiAiR29hbCB0aGF0IG9wdHMgaW4gdG8gZGVmYXVsdCBkYW1hZ2UgaW50ZXJydXB0LiI7CiAgICAgICAgcHVibGljIHN0cmluZ1tdIFBoYXNlcyAgICAgID0+IFtdOwogICAgICAgIHB1YmxpYyBzdHJpbmc/ICBGYWlsdXJlUmVhc29uIHsgZ2V0OyBzZXQ7IH0KICAgICAgICAvLyBEZWxpYmVyYXRlbHkgZG9lcyBOT1Qgb3ZlcnJpZGUgRGFtYWdlSW50ZXJydXB0VGhyZXNob2xkSHAg4oCUIG11c3QgaW5oZXJpdCBudWxsLgogICAgICAgIHB1YmxpYyBib29sIElzQ29tcGxldGUoV29ybGRTdGF0ZSBzdGF0ZSkgPT4gZmFsc2U7CiAgICAgICAgcHVibGljIGJvb2wgSGFzRmFpbGVkKFdvcmxkU3RhdGUgc3RhdGUpICA9PiBmYWxzZTsKICAgIH0KCiAgICBwcml2YXRlIHNlYWxlZCBjbGFzcyBDb21iYXRHb2FsIDogSUdvYWwKICAgIHsKICAgICAgICBwdWJsaWMgc3RyaW5nICAgTmFtZSAgICAgICAgPT4gIkNvbWJhdCI7CiAgICAgICAgcHVibGljIHN0cmluZyAgIERlc2NyaXB0aW9uID0+ICJGdXR1cmUgY29tYmF0IGdvYWwg4oCUIHN1cHByZXNzZXMgZGFtYWdlIGludGVycnVwdC4iOwogICAgICAgIHB1YmxpYyBzdHJpbmdbXSBQaGFzZXMgICAgICA9PiBbXTsKICAgICAgICBwdWJsaWMgc3RyaW5nPyAgRmFpbHVyZVJlYXNvbiB7IGdldDsgc2V0OyB9CiAgICAgICAgcHVibGljIGludD8gICAgIERhbWFnZUludGVycnVwdFRocmVzaG9sZEhwID0+IDA7IC8vIDAgPSBuZXZlciBpbnRlcnJ1cHQKICAgICAgICBwdWJsaWMgYm9vbCBJc0NvbXBsZXRlKFdvcmxkU3RhdGUgc3RhdGUpID0+IGZhbHNlOwogICAgICAgIHB1YmxpYyBib29sIEhhc0ZhaWxlZChXb3JsZFN0YXRlIHN0YXRlKSAgPT4gZmFsc2U7CiAgICB9CgogICAgcHJpdmF0ZSBzZWFsZWQgY2xhc3MgRnJhZ2lsZUdvYWwgOiBJR29hbAogICAgewogICAgICAgIHB1YmxpYyBzdHJpbmcgICBOYW1lICAgICAgICA9PiAiRnJhZ2lsZSI7CiAgICAgICAgcHVibGljIHN0cmluZyAgIERlc2NyaXB0aW9uID0+ICJFeHBsb3JhdGlvbiBnb2FsIHRoYXQgaW50ZXJydXB0cyBhdCBhIGhpZ2hlciB0aHJlc2hvbGQuIjsKICAgICAgICBwdWJsaWMgc3RyaW5nW10gUGhhc2VzICAgICAgPT4gW107CiAgICAgICAgcHVibGljIHN0cmluZz8gIEZhaWx1cmVSZWFzb24geyBnZXQ7IHNldDsgfQogICAgICAgIHB1YmxpYyBpbnQ/ICAgICBEYW1hZ2VJbnRlcnJ1cHRUaHJlc2hvbGRIcCA9PiAxMDsgLy8gaW50ZXJydXB0IGF0IDEwIEhQICg1IGhlYXJ0cykKICAgICAgICBwdWJsaWMgYm9vbCBJc0NvbXBsZXRlKFdvcmxkU3RhdGUgc3RhdGUpID0+IGZhbHNlOwogICAgICAgIHB1YmxpYyBib29sIEhhc0ZhaWxlZChXb3JsZFN0YXRlIHN0YXRlKSAgPT4gZmFsc2U7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBEZWZhdWx0R29hbF9EYW1hZ2VJbnRlcnJ1cHRUaHJlc2hvbGRIcF9Jc051bGwoKQogICAgewogICAgICAgIElHb2FsIGdvYWwgPSBuZXcgRGVmYXVsdEdvYWwoKTsKICAgICAgICBBc3NlcnQuVGhhdChnb2FsLkRhbWFnZUludGVycnVwdFRocmVzaG9sZEhwLCBJcy5OdWxsLAogICAgICAgICAgICAiQSBnb2FsIHRoYXQgZG9lcyBub3Qgb3ZlcnJpZGUgRGFtYWdlSW50ZXJydXB0VGhyZXNob2xkSHAgbXVzdCByZXR1cm4gbnVsbCAiICsKICAgICAgICAgICAgInNvIHRoZSBzeXN0ZW0gZGVmYXVsdCAoNiBIUCkgYXBwbGllcy4iKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIENvbWJhdEdvYWxfRGFtYWdlSW50ZXJydXB0VGhyZXNob2xkSHBfSXNaZXJvKCkKICAgIHsKICAgICAgICBJR29hbCBnb2FsID0gbmV3IENvbWJhdEdvYWwoKTsKICAgICAgICBBc3NlcnQuVGhhdChnb2FsLkRhbWFnZUludGVycnVwdFRocmVzaG9sZEhwLCBJcy5FcXVhbFRvKDApLAogICAgICAgICAgICAiMCBzaWduYWxzICduZXZlciBpbnRlcnJ1cHQnIOKAlCByZXNlcnZlZCBmb3IgZnV0dXJlIGNvbWJhdCBnb2Fscy4iKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIEZyYWdpbGVHb2FsX0RhbWFnZUludGVycnVwdFRocmVzaG9sZEhwX1JldHVybnNDdXN0b21WYWx1ZSgpCiAgICB7CiAgICAgICAgSUdvYWwgZ29hbCA9IG5ldyBGcmFnaWxlR29hbCgpOwogICAgICAgIEFzc2VydC5UaGF0KGdvYWwuRGFtYWdlSW50ZXJydXB0VGhyZXNob2xkSHAsIElzLkVxdWFsVG8oMTApLAogICAgICAgICAgICAiQSBnb2FsIGNhbiBkZWNsYXJlIGEgaGlnaGVyLXRoYW4tZGVmYXVsdCB0aHJlc2hvbGQgZm9yIGVhcmxpZXIgaW50ZXJydXB0cy4iKTsKICAgIH0KfQoKLy8g4pSA4pSAIEZpeHR1cmUgMjogQWN0aW9uUXVldWUuQ2xlYXJBbmRFbnF1ZXVlIGF0b21pY2l0eSAoQi0zKSDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCltUZXN0Rml4dHVyZV0KcHVibGljIHNlYWxlZCBjbGFzcyBTcHJpbnQyM0FjdGlvblF1ZXVlQXRvbWljVGVzdHMKewogICAgcHJpdmF0ZSBzdGF0aWMgQWN0aW9uRGF0YSBBY3Rpb24oc3RyaW5nIHRvb2wpID0+IG5ldygpIHsgVG9vbCA9IHRvb2wgfTsKCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIENsZWFyQW5kRW5xdWV1ZV9DbGVhcnNFeGlzdGluZ0l0ZW1zX0FuZEVucXVldWVzTmV3KCkKICAgIHsKICAgICAgICB2YXIgcXVldWUgPSBuZXcgQWN0aW9uUXVldWUoKTsKICAgICAgICBxdWV1ZS5FbnF1ZXVlKEFjdGlvbigiTW92ZVRvIikpOwogICAgICAgIHF1ZXVlLkVucXVldWUoQWN0aW9uKCJNaW5lQmxvY2siKSk7CiAgICAgICAgcXVldWUuRW5xdWV1ZShBY3Rpb24oIlBsYWNlQmxvY2siKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQocXVldWUuQ291bnQsIElzLkVxdWFsVG8oMykpOwoKICAgICAgICBxdWV1ZS5DbGVhckFuZEVucXVldWUoQWN0aW9uKCJHZXRTdGF0dXMiKSk7CgogICAgICAgIEFzc2VydC5UaGF0KHF1ZXVlLkNvdW50LCBJcy5FcXVhbFRvKDEpKTsKICAgICAgICBBc3NlcnQuVGhhdChxdWV1ZS5QZWVrKCk/LlRvb2wsIElzLkVxdWFsVG8oIkdldFN0YXR1cyIpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIENsZWFyQW5kRW5xdWV1ZV9PbkVtcHR5UXVldWVfRW5xdWV1ZXNPbmUoKQogICAgewogICAgICAgIHZhciBxdWV1ZSA9IG5ldyBBY3Rpb25RdWV1ZSgpOwogICAgICAgIEFzc2VydC5UaGF0KHF1ZXVlLklzRW1wdHksIElzLlRydWUpOwoKICAgICAgICBxdWV1ZS5DbGVhckFuZEVucXVldWUoQWN0aW9uKCJHZXRTdGF0dXMiKSk7CgogICAgICAgIEFzc2VydC5UaGF0KHF1ZXVlLkNvdW50LCBJcy5FcXVhbFRvKDEpKTsKICAgICAgICBBc3NlcnQuVGhhdChxdWV1ZS5QZWVrKCk/LlRvb2wsIElzLkVxdWFsVG8oIkdldFN0YXR1cyIpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIENsZWFyQW5kRW5xdWV1ZV9BZnRlckNsZWFyX1ByaW9yaXR5QWN0aW9uUHJlc2VudCgpCiAgICB7CiAgICAgICAgdmFyIHF1ZXVlID0gbmV3IEFjdGlvblF1ZXVlKCk7CiAgICAgICAgZm9yICh2YXIgaSA9IDA7IGkgPCA1OyBpKyspCiAgICAgICAgICAgIHF1ZXVlLkVucXVldWUoQWN0aW9uKCJXYW5kZXIiKSk7CgogICAgICAgIHF1ZXVlLkNsZWFyQW5kRW5xdWV1ZShBY3Rpb24oIkdldFN0YXR1cyIpKTsKICAgICAgICAvLyBBZnRlciBjbGVhcitlbnF1ZXVlLCBvbmx5IEdldFN0YXR1cyByZW1haW5zLgogICAgICAgIHZhciBmb3VuZCA9IHF1ZXVlLkRlcXVldWUoKTsKICAgICAgICBBc3NlcnQuVGhhdChmb3VuZD8uVG9vbCwgSXMuRXF1YWxUbygiR2V0U3RhdHVzIikpOwogICAgICAgIEFzc2VydC5UaGF0KHF1ZXVlLklzRW1wdHksIElzLlRydWUsICJObyBvdGhlciBhY3Rpb25zIHNob3VsZCBzdXJ2aXZlIENsZWFyQW5kRW5xdWV1ZS4iKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyBhc3luYyBUYXNrIENsZWFyQW5kRW5xdWV1ZV9Db25jdXJyZW50RW5xdWV1ZV9Qcmlvcml0eUFjdGlvbkFsd2F5c1ByZXNlbnQoKQogICAgewogICAgICAgIC8vIFNwcmludCAyMyBCLTMgcmVncmVzc2lvbiB0ZXN0OiBjb25jdXJyZW50IEVucXVldWUgY2FsbHMgbXVzdCBub3QgcHVzaAogICAgICAgIC8vIEdldFN0YXR1cyBvdXQgb2YgdGhlIHF1ZXVlIGFmdGVyIENsZWFyQW5kRW5xdWV1ZS4KICAgICAgICB2YXIgcXVldWUgPSBuZXcgQWN0aW9uUXVldWUoKTsKICAgICAgICBmb3IgKHZhciBpID0gMDsgaSA8IDEwOyBpKyspCiAgICAgICAgICAgIHF1ZXVlLkVucXVldWUoQWN0aW9uKCJNb3ZlVG8iKSk7CgogICAgICAgIHVzaW5nIHZhciBzdGFydCA9IG5ldyBNYW51YWxSZXNldEV2ZW50U2xpbShmYWxzZSk7CgogICAgICAgIHZhciBlbnF1ZXVlVGFzayA9IFRhc2suUnVuKCgpID0+CiAgICAgICAgewogICAgICAgICAgICBzdGFydC5XYWl0KCk7CiAgICAgICAgICAgIGZvciAodmFyIGkgPSAwOyBpIDwgMTAwMDsgaSsrKQogICAgICAgICAgICAgICAgcXVldWUuRW5xdWV1ZShBY3Rpb24oIldhbmRlciIpKTsKICAgICAgICB9KTsKCiAgICAgICAgdmFyIGludGVycnVwdFRhc2sgPSBUYXNrLlJ1bigoKSA9PgogICAgICAgIHsKICAgICAgICAgICAgc3RhcnQuV2FpdCgpOwogICAgICAgICAgICBxdWV1ZS5DbGVhckFuZEVucXVldWUoQWN0aW9uKCJHZXRTdGF0dXMiKSk7CiAgICAgICAgfSk7CgogICAgICAgIHN0YXJ0LlNldCgpOwogICAgICAgIGF3YWl0IFRhc2suV2hlbkFsbChlbnF1ZXVlVGFzaywgaW50ZXJydXB0VGFzaykuQ29uZmlndXJlQXdhaXQoZmFsc2UpOwoKICAgICAgICAvLyBEcmFpbiBhbmQgbG9vayBmb3IgR2V0U3RhdHVzIOKAlCBpdCBtdXN0IGFwcGVhciBleGFjdGx5IG9uY2UgKG9yIG1vcmUgaWYKICAgICAgICAvLyBhIHNlY29uZCBDbGVhckFuZEVucXVldWUgZmlyZWQsIHdoaWNoIGNhbm5vdCBoYXBwZW4gaGVyZSkuCiAgICAgICAgdmFyIGdldFN0YXR1c0NvdW50ID0gMDsKICAgICAgICB3aGlsZSAocXVldWUuRGVxdWV1ZSgpIGlzIHsgfSBhY3Rpb24pCiAgICAgICAgICAgIGlmIChhY3Rpb24uVG9vbCA9PSAiR2V0U3RhdHVzIikgZ2V0U3RhdHVzQ291bnQrKzsKCiAgICAgICAgQXNzZXJ0LlRoYXQoZ2V0U3RhdHVzQ291bnQsIElzLkVxdWFsVG8oMSksCiAgICAgICAgICAgICJQcmlvcml0eSBHZXRTdGF0dXMgbXVzdCBzdXJ2aXZlIGNvbmN1cnJlbnQgRW5xdWV1ZSBhY3Rpdml0eSBhZnRlciBDbGVhckFuZEVucXVldWUuIik7CiAgICB9Cn0KCi8vIOKUgOKUgCBGaXh0dXJlIDM6IFdvcmxkIEtCIHRvb2wgcm91dGluZyAoUDAtQikg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACi8vIFZlcmlmaWVzIHRoYXQgU2VhcmNoTWVtb3J5VG9vbCBhbmQgQ3JlYXRlUGFnZVRvb2wgY2FsbCB0aGUgZ2F0ZXdheSB0aGV5IHdlcmUKLy8gY29uc3RydWN0ZWQgd2l0aCDigJQgYW5kIHRoYXQgR2V0UGFnZVRvb2wgY29udGludWVzIHRvIHVzZSB0aGUgYWdlbnQgZ2F0ZXdheS4KCltUZXN0Rml4dHVyZV0KcHVibGljIHNlYWxlZCBjbGFzcyBTcHJpbnQyM1dvcmxkS2JSb3V0aW5nVGVzdHMKewogICAgcHJpdmF0ZSBzZWFsZWQgY2xhc3MgUmVjb3JkaW5nR2F0ZXdheSA6IElNZW1vcnlHYXRld2F5CiAgICB7CiAgICAgICAgcHVibGljIGludCBTZWFyY2hDYWxscyAgICAgeyBnZXQ7IHByaXZhdGUgc2V0OyB9CiAgICAgICAgcHVibGljIGludCBDcmVhdGVQYWdlQ2FsbHMgeyBnZXQ7IHByaXZhdGUgc2V0OyB9CiAgICAgICAgcHVibGljIGludCBHZXRQYWdlQ2FsbHMgICAgeyBnZXQ7IHByaXZhdGUgc2V0OyB9CgogICAgICAgIHB1YmxpYyBUYXNrPElSZWFkT25seUxpc3Q8U2VhcmNoUmVzdWx0Pj4gU2VhcmNoQXN5bmMoc3RyaW5nIHF1ZXJ5LCBDYW5jZWxsYXRpb25Ub2tlbiBjdCA9IGRlZmF1bHQpCiAgICAgICAgewogICAgICAgICAgICBTZWFyY2hDYWxscysrOwogICAgICAgICAgICByZXR1cm4gVGFzay5Gcm9tUmVzdWx0PElSZWFkT25seUxpc3Q8U2VhcmNoUmVzdWx0Pj4oW10pOwogICAgICAgIH0KCiAgICAgICAgcHVibGljIFRhc2s8c3RyaW5nPz4gR2V0UGFnZUFzeW5jKHN0cmluZyBwYWdlSWQsIENhbmNlbGxhdGlvblRva2VuIGN0ID0gZGVmYXVsdCkKICAgICAgICB7CiAgICAgICAgICAgIEdldFBhZ2VDYWxscysrOwogICAgICAgICAgICByZXR1cm4gVGFzay5Gcm9tUmVzdWx0PHN0cmluZz8+KG51bGwpOwogICAgICAgIH0KCiAgICAgICAgcHVibGljIFRhc2s8c3RyaW5nPiBDcmVhdGVQYWdlQXN5bmMoc3RyaW5nIHRpdGxlLCBzdHJpbmcgY29udGVudCwgc3RyaW5nIHR5cGUsIENhbmNlbGxhdGlvblRva2VuIGN0ID0gZGVmYXVsdCkKICAgICAgICB7CiAgICAgICAgICAgIENyZWF0ZVBhZ2VDYWxscysrOwogICAgICAgICAgICByZXR1cm4gVGFzay5Gcm9tUmVzdWx0KCJwYWdlLXRlc3QtMDAxIik7CiAgICAgICAgfQoKICAgICAgICBwdWJsaWMgVGFzayBVcGRhdGVQYWdlQXN5bmMoc3RyaW5nIHBhZ2VJZCwgc3RyaW5nIGNvbnRlbnQsIENhbmNlbGxhdGlvblRva2VuIGN0ID0gZGVmYXVsdCkKICAgICAgICAgICAgPT4gVGFzay5Db21wbGV0ZWRUYXNrOwogICAgfQoKICAgIHByaXZhdGUgc3RhdGljIEpzb25FbGVtZW50IEpzb25BcmdzKHN0cmluZyBqc29uKSA9PgogICAgICAgIEpzb25Eb2N1bWVudC5QYXJzZShqc29uKS5Sb290RWxlbWVudDsKCiAgICBbVGVzdF0KICAgIHB1YmxpYyBhc3luYyBUYXNrIFNlYXJjaE1lbW9yeVRvb2xfQ2FsbHNXb3JsZEdhdGV3YXkoKQogICAgewogICAgICAgIHZhciB3b3JsZCA9IG5ldyBSZWNvcmRpbmdHYXRld2F5KCk7CiAgICAgICAgdmFyIHRvb2wgID0gbmV3IFNlYXJjaE1lbW9yeVRvb2wod29ybGQpOwogICAgICAgIHZhciBhcmdzICA9IEpzb25BcmdzKCJ7XCJxdWVyeVwiOlwiZGlhbW9uZCBvcmVcIn0iKTsKCiAgICAgICAgYXdhaXQgdG9vbC5FeGVjdXRlQXN5bmMoYXJncykuQ29uZmlndXJlQXdhaXQoZmFsc2UpOwoKICAgICAgICBBc3NlcnQuVGhhdCh3b3JsZC5TZWFyY2hDYWxscywgSXMuRXF1YWxUbygxKSwKICAgICAgICAgICAgIlNlYXJjaE1lbW9yeVRvb2wgbXVzdCBjYWxsIHRoZSBnYXRld2F5IGl0IHdhcyBjb25zdHJ1Y3RlZCB3aXRoICh3b3JsZCBnYXRld2F5IGluIHByb2R1Y3Rpb24pLiIpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgU2VhcmNoTWVtb3J5VG9vbF9Eb2VzTm90Q2FsbEFsdGVybmF0ZUdhdGV3YXkoKQogICAgewogICAgICAgIHZhciB3b3JsZCA9IG5ldyBSZWNvcmRpbmdHYXRld2F5KCk7CiAgICAgICAgdmFyIGFnZW50ID0gbmV3IFJlY29yZGluZ0dhdGV3YXkoKTsKICAgICAgICB2YXIgdG9vbCAgPSBuZXcgU2VhcmNoTWVtb3J5VG9vbCh3b3JsZCk7IC8vIHdvcmxkIGdhdGV3YXkgb25seQoKICAgICAgICBhd2FpdCB0b29sLkV4ZWN1dGVBc3luYyhKc29uQXJncygie1wicXVlcnlcIjpcIm9hayBsb2dcIn0iKSkuQ29uZmlndXJlQXdhaXQoZmFsc2UpOwoKICAgICAgICBBc3NlcnQuVGhhdCh3b3JsZC5TZWFyY2hDYWxscywgSXMuRXF1YWxUbygxKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoYWdlbnQuU2VhcmNoQ2FsbHMsIElzLkVxdWFsVG8oMCksCiAgICAgICAgICAgICJTZWFyY2hNZW1vcnlUb29sIG11c3Qgbm90IGNhbGwgdGhlIGFnZW50IGdhdGV3YXkgd2hlbiBjb25zdHJ1Y3RlZCB3aXRoIHRoZSB3b3JsZCBnYXRld2F5LiIpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgQ3JlYXRlUGFnZVRvb2xfQ2FsbHNXb3JsZEdhdGV3YXkoKQogICAgewogICAgICAgIHZhciB3b3JsZCA9IG5ldyBSZWNvcmRpbmdHYXRld2F5KCk7CiAgICAgICAgdmFyIHRvb2wgID0gbmV3IENyZWF0ZVBhZ2VUb29sKHdvcmxkKTsKICAgICAgICB2YXIgYXJncyAgPSBKc29uQXJncygie1widGl0bGVcIjpcIklyb24gdmVpbiBhdCAxMDAsNDAsLTIwMFwiLFwiY29udGVudFwiOlwiSXJvbiBvcmUgb2JzZXJ2ZWQuXCJ9Iik7CgogICAgICAgIGF3YWl0IHRvb2wuRXhlY3V0ZUFzeW5jKGFyZ3MpLkNvbmZpZ3VyZUF3YWl0KGZhbHNlKTsKCiAgICAgICAgQXNzZXJ0LlRoYXQod29ybGQuQ3JlYXRlUGFnZUNhbGxzLCBJcy5FcXVhbFRvKDEpLAogICAgICAgICAgICAiQ3JlYXRlUGFnZVRvb2wgbXVzdCBjYWxsIHRoZSBnYXRld2F5IGl0IHdhcyBjb25zdHJ1Y3RlZCB3aXRoICh3b3JsZCBnYXRld2F5IGluIHByb2R1Y3Rpb24pLiIpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgR2V0UGFnZVRvb2xfQ2FsbHNBZ2VudEdhdGV3YXkoKQogICAgewogICAgICAgIHZhciBhZ2VudCA9IG5ldyBSZWNvcmRpbmdHYXRld2F5KCk7CiAgICAgICAgdmFyIHRvb2wgID0gbmV3IEdldFBhZ2VUb29sKGFnZW50KTsKICAgICAgICB2YXIgYXJncyAgPSBKc29uQXJncygie1wicGFnZUlkXCI6XCJzcHJpbnQtMjMtbm90ZXNcIn0iKTsKCiAgICAgICAgYXdhaXQgdG9vbC5FeGVjdXRlQXN5bmMoYXJncykuQ29uZmlndXJlQXdhaXQoZmFsc2UpOwoKICAgICAgICBBc3NlcnQuVGhhdChhZ2VudC5HZXRQYWdlQ2FsbHMsIElzLkVxdWFsVG8oMSksCiAgICAgICAgICAgICJHZXRQYWdlVG9vbCBtdXN0IGNhbGwgdGhlIGFnZW50IGdhdGV3YXkgKGNvZGUgZG9jcywgc3ByaW50IG5vdGVzKS4iKTsKICAgIH0KfQoKLy8g4pSA4pSAIEZpeHR1cmUgNDogRGFtYWdlVGFrZW5FdmVudCByZWNvcmQgc2hhcGUgKEQtNCkg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgpbVGVzdEZpeHR1cmVdCnB1YmxpYyBzZWFsZWQgY2xhc3MgU3ByaW50MjNEYW1hZ2VUYWtlbkV2ZW50VGVzdHMKewogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBEYW1hZ2VUYWtlbkV2ZW50X0RlbHRhX0lzTmVnYXRpdmUoKQogICAgewogICAgICAgIHZhciBldiA9IG5ldyBEYW1hZ2VUYWtlbkV2ZW50KAogICAgICAgICAgICBQcmV2aW91c0hlYWx0aDogMjAsCiAgICAgICAgICAgIEhlYWx0aDogICAgICAgICAxNCwKICAgICAgICAgICAgRGVsdGE6ICAgICAgICAgLTYsCiAgICAgICAgICAgIEZvb2Q6ICAgICAgICAgIDIwLAogICAgICAgICAgICBUaW1lc3RhbXA6ICAgICBEYXRlVGltZU9mZnNldC5VdGNOb3cpOwoKICAgICAgICBBc3NlcnQuVGhhdChldi5EZWx0YSwgSXMuRXF1YWxUbygtNikpOwogICAgICAgIEFzc2VydC5UaGF0KGV2LkRlbHRhLCBJcy5MZXNzVGhhbigwKSwKICAgICAgICAgICAgIkRlbHRhIGlzIGFsd2F5cyBuZWdhdGl2ZSDigJQgaXQgcmVwcmVzZW50cyBIUCBsb3N0IChIZWFsdGggLSBQcmV2aW91c0hlYWx0aCkuIik7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBEYW1hZ2VUYWtlbkV2ZW50X0FsbEZpZWxkc19BY2Nlc3NpYmxlKCkKICAgIHsKICAgICAgICB2YXIgbm93ID0gRGF0ZVRpbWVPZmZzZXQuVXRjTm93OwogICAgICAgIHZhciBldiAgPSBuZXcgRGFtYWdlVGFrZW5FdmVudCgyMCwgMTQsIC02LCAxOCwgbm93KTsKCiAgICAgICAgQXNzZXJ0LlRoYXQoZXYuUHJldmlvdXNIZWFsdGgsIElzLkVxdWFsVG8oMjApKTsKICAgICAgICBBc3NlcnQuVGhhdChldi5IZWFsdGgsICAgICAgICAgSXMuRXF1YWxUbygxNCkpOwogICAgICAgIEFzc2VydC5UaGF0KGV2LkRlbHRhLCAgICAgICAgICBJcy5FcXVhbFRvKC02KSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoZXYuRm9vZCwgICAgICAgICAgIElzLkVxdWFsVG8oMTgpKTsKICAgICAgICBBc3NlcnQuVGhhdChldi5UaW1lc3RhbXAsICAgICAgSXMuRXF1YWxUbyhub3cpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIERhbWFnZVRha2VuRXZlbnRfVmFsdWVFcXVhbGl0eV9Bc1JlY29yZCgpCiAgICB7CiAgICAgICAgdmFyIG5vdyA9IERhdGVUaW1lT2Zmc2V0LlV0Y05vdzsKICAgICAgICB2YXIgYSAgID0gbmV3IERhbWFnZVRha2VuRXZlbnQoMjAsIDE0LCAtNiwgMTgsIG5vdyk7CiAgICAgICAgdmFyIGIgICA9IG5ldyBEYW1hZ2VUYWtlbkV2ZW50KDIwLCAxNCwgLTYsIDE4LCBub3cpOwoKICAgICAgICAvLyBSZWNvcmRzIGhhdmUgdmFsdWUgZXF1YWxpdHkuCiAgICAgICAgQXNzZXJ0LlRoYXQoYSwgSXMuRXF1YWxUbyhiKSwKICAgICAgICAgICAgIkRhbWFnZVRha2VuRXZlbnQgaXMgYSByZWNvcmQgYW5kIG11c3Qgc3VwcG9ydCB2YWx1ZSBlcXVhbGl0eS4iKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIERhbWFnZVRha2VuRXZlbnRfSW5oZXJpdHNXb3JsZEV2ZW50KCkKICAgIHsKICAgICAgICB2YXIgZXYgPSBuZXcgRGFtYWdlVGFrZW5FdmVudCgyMCwgMTQsIC02LCAxOCwgRGF0ZVRpbWVPZmZzZXQuVXRjTm93KTsKICAgICAgICBBc3NlcnQuVGhhdChldiwgSXMuSW5zdGFuY2VPZjxXb3JsZEV2ZW50PigpLAogICAgICAgICAgICAiRGFtYWdlVGFrZW5FdmVudCBtdXN0IGluaGVyaXQgV29ybGRFdmVudCBmb3IgY29ycmVjdCBldmVudCByb3V0aW5nLiIpOwogICAgfQp9Cg==
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+
+using NUnit.Framework;
+
+using Agent.Core;
+using Agent.Tools;
+
+namespace MemorySmith.Agent.Tests;
+
+// ── Fixture 1: IGoal.DamageInterruptThresholdHp default interface impl ─────────
+// Verifies B-2 resolution: null = system default, 0 = combat (never interrupt).
+
+[TestFixture]
+public sealed class Sprint23DamageThresholdTests
+{
+    private sealed class DefaultGoal : IGoal
+    {
+        public string   Name        => "Default";
+        public string   Description => "Goal that opts in to default damage interrupt.";
+        public string[] Phases      => [];
+        public string?  FailureReason { get; set; }
+        // Deliberately does NOT override DamageInterruptThresholdHp — must inherit null.
+        public bool IsComplete(WorldState state) => false;
+        public bool HasFailed(WorldState state)  => false;
+    }
+
+    private sealed class CombatGoal : IGoal
+    {
+        public string   Name        => "Combat";
+        public string   Description => "Future combat goal — suppresses damage interrupt.";
+        public string[] Phases      => [];
+        public string?  FailureReason { get; set; }
+        public int?     DamageInterruptThresholdHp => 0; // 0 = never interrupt
+        public bool IsComplete(WorldState state) => false;
+        public bool HasFailed(WorldState state)  => false;
+    }
+
+    private sealed class FragileGoal : IGoal
+    {
+        public string   Name        => "Fragile";
+        public string   Description => "Exploration goal that interrupts at a higher threshold.";
+        public string[] Phases      => [];
+        public string?  FailureReason { get; set; }
+        public int?     DamageInterruptThresholdHp => 10; // interrupt at 10 HP (5 hearts)
+        public bool IsComplete(WorldState state) => false;
+        public bool HasFailed(WorldState state)  => false;
+    }
+
+    [Test]
+    public void DefaultGoal_DamageInterruptThresholdHp_IsNull()
+    {
+        IGoal goal = new DefaultGoal();
+        Assert.That(goal.DamageInterruptThresholdHp, Is.Null,
+            "A goal that does not override DamageInterruptThresholdHp must return null " +
+            "so the system default (6 HP) applies.");
+    }
+
+    [Test]
+    public void CombatGoal_DamageInterruptThresholdHp_IsZero()
+    {
+        IGoal goal = new CombatGoal();
+        Assert.That(goal.DamageInterruptThresholdHp, Is.EqualTo(0),
+            "0 signals 'never interrupt' — reserved for future combat goals.");
+    }
+
+    [Test]
+    public void FragileGoal_DamageInterruptThresholdHp_ReturnsCustomValue()
+    {
+        IGoal goal = new FragileGoal();
+        Assert.That(goal.DamageInterruptThresholdHp, Is.EqualTo(10),
+            "A goal can declare a higher-than-default threshold for earlier interrupts.");
+    }
+}
+
+// ── Fixture 2: ActionQueue.ClearAndEnqueue atomicity (B-3) ────────────────────
+
+[TestFixture]
+public sealed class Sprint23ActionQueueAtomicTests
+{
+    private static ActionData Action(string tool) => new() { Tool = tool };
+
+    [Test]
+    public void ClearAndEnqueue_ClearsExistingItems_AndEnqueuesNew()
+    {
+        var queue = new ActionQueue();
+        queue.Enqueue(Action("MoveTo"));
+        queue.Enqueue(Action("MineBlock"));
+        queue.Enqueue(Action("PlaceBlock"));
+        Assert.That(queue.Count, Is.EqualTo(3));
+
+        queue.ClearAndEnqueue(Action("GetStatus"));
+
+        Assert.That(queue.Count, Is.EqualTo(1));
+        Assert.That(queue.Peek()?.Tool, Is.EqualTo("GetStatus"));
+    }
+
+    [Test]
+    public void ClearAndEnqueue_OnEmptyQueue_EnqueuesOne()
+    {
+        var queue = new ActionQueue();
+        Assert.That(queue.IsEmpty, Is.True);
+
+        queue.ClearAndEnqueue(Action("GetStatus"));
+
+        Assert.That(queue.Count, Is.EqualTo(1));
+        Assert.That(queue.Peek()?.Tool, Is.EqualTo("GetStatus"));
+    }
+
+    [Test]
+    public void ClearAndEnqueue_AfterClear_PriorityActionPresent()
+    {
+        var queue = new ActionQueue();
+        for (var i = 0; i < 5; i++)
+            queue.Enqueue(Action("Wander"));
+
+        queue.ClearAndEnqueue(Action("GetStatus"));
+        // After clear+enqueue, only GetStatus remains.
+        var found = queue.Dequeue();
+        Assert.That(found?.Tool, Is.EqualTo("GetStatus"));
+        Assert.That(queue.IsEmpty, Is.True, "No other actions should survive ClearAndEnqueue.");
+    }
+
+    [Test]
+    public async Task ClearAndEnqueue_ConcurrentEnqueue_PriorityActionAlwaysPresent()
+    {
+        // Sprint 23 B-3 regression test: concurrent Enqueue calls must not push
+        // GetStatus out of the queue after ClearAndEnqueue.
+        var queue = new ActionQueue();
+        for (var i = 0; i < 10; i++)
+            queue.Enqueue(Action("MoveTo"));
+
+        using var start = new ManualResetEventSlim(false);
+
+        var enqueueTask = Task.Run(() =>
+        {
+            start.Wait();
+            for (var i = 0; i < 1000; i++)
+                queue.Enqueue(Action("Wander"));
+        });
+
+        var interruptTask = Task.Run(() =>
+        {
+            start.Wait();
+            queue.ClearAndEnqueue(Action("GetStatus"));
+        });
+
+        start.Set();
+        await Task.WhenAll(enqueueTask, interruptTask).ConfigureAwait(false);
+
+        // Drain and look for GetStatus — it must appear exactly once (or more if
+        // a second ClearAndEnqueue fired, which cannot happen here).
+        var getStatusCount = 0;
+        while (queue.Dequeue() is { } action)
+            if (action.Tool == "GetStatus") getStatusCount++;
+
+        Assert.That(getStatusCount, Is.EqualTo(1),
+            "Priority GetStatus must survive concurrent Enqueue activity after ClearAndEnqueue.");
+    }
+}
+
+// ── Fixture 3: World KB tool routing (P0-B) ────────────────────────────────────
+// Verifies that SearchMemoryTool and CreatePageTool call the gateway they were
+// constructed with — and that GetPageTool continues to use the agent gateway.
+
+[TestFixture]
+public sealed class Sprint23WorldKbRoutingTests
+{
+    private sealed class RecordingGateway : IMemoryGateway
+    {
+        public int SearchCalls     { get; private set; }
+        public int CreatePageCalls { get; private set; }
+        public int GetPageCalls    { get; private set; }
+
+        public Task<IReadOnlyList<SearchResult>> SearchAsync(string query, CancellationToken ct = default)
+        {
+            SearchCalls++;
+            return Task.FromResult<IReadOnlyList<SearchResult>>([]);
+        }
+
+        public Task<string?> GetPageAsync(string pageId, CancellationToken ct = default)
+        {
+            GetPageCalls++;
+            return Task.FromResult<string?>(null);
+        }
+
+        public Task<string> CreatePageAsync(string title, string content, string type, CancellationToken ct = default)
+        {
+            CreatePageCalls++;
+            return Task.FromResult("page-test-001");
+        }
+
+        public Task UpdatePageAsync(string pageId, string content, CancellationToken ct = default)
+            => Task.CompletedTask;
+    }
+
+    private static JsonElement JsonArgs(string json) =>
+        JsonDocument.Parse(json).RootElement;
+
+    [Test]
+    public async Task SearchMemoryTool_CallsWorldGateway()
+    {
+        var world = new RecordingGateway();
+        var tool  = new SearchMemoryTool(world);
+        var args  = JsonArgs("{\"query\":\"diamond ore\"}");
+
+        await tool.ExecuteAsync(args).ConfigureAwait(false);
+
+        Assert.That(world.SearchCalls, Is.EqualTo(1),
+            "SearchMemoryTool must call the gateway it was constructed with (world gateway in production).");
+    }
+
+    [Test]
+    public async Task SearchMemoryTool_DoesNotCallAlternateGateway()
+    {
+        var world = new RecordingGateway();
+        var agent = new RecordingGateway();
+        var tool  = new SearchMemoryTool(world); // world gateway only
+
+        await tool.ExecuteAsync(JsonArgs("{\"query\":\"oak log\"}")).ConfigureAwait(false);
+
+        Assert.That(world.SearchCalls, Is.EqualTo(1));
+        Assert.That(agent.SearchCalls, Is.EqualTo(0),
+            "SearchMemoryTool must not call the agent gateway when constructed with the world gateway.");
+    }
+
+    [Test]
+    public async Task CreatePageTool_CallsWorldGateway()
+    {
+        var world = new RecordingGateway();
+        var tool  = new CreatePageTool(world);
+        var args  = JsonArgs("{\"title\":\"Iron vein at 100,40,-200\",\"content\":\"Iron ore observed.\"}");
+
+        await tool.ExecuteAsync(args).ConfigureAwait(false);
+
+        Assert.That(world.CreatePageCalls, Is.EqualTo(1),
+            "CreatePageTool must call the gateway it was constructed with (world gateway in production).");
+    }
+
+    [Test]
+    public async Task GetPageTool_CallsAgentGateway()
+    {
+        var agent = new RecordingGateway();
+        var tool  = new GetPageTool(agent);
+        var args  = JsonArgs("{\"pageId\":\"sprint-23-notes\"}");
+
+        await tool.ExecuteAsync(args).ConfigureAwait(false);
+
+        Assert.That(agent.GetPageCalls, Is.EqualTo(1),
+            "GetPageTool must call the agent gateway (code docs, sprint notes).");
+    }
+}
+
+// ── Fixture 4: DamageTakenEvent record shape (D-4) ───────────────────────────
+
+[TestFixture]
+public sealed class Sprint23DamageTakenEventTests
+{
+    [Test]
+    public void DamageTakenEvent_Delta_IsNegative()
+    {
+        var ev = new DamageTakenEvent(
+            PreviousHealth: 20,
+            Health:         14,
+            Delta:         -6,
+            Food:          20,
+            Timestamp:     DateTimeOffset.UtcNow);
+
+        Assert.That(ev.Delta, Is.EqualTo(-6));
+        Assert.That(ev.Delta, Is.LessThan(0),
+            "Delta is always negative — it represents HP lost (Health - PreviousHealth).");
+    }
+
+    [Test]
+    public void DamageTakenEvent_AllFields_Accessible()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var ev  = new DamageTakenEvent(20, 14, -6, 18, now);
+
+        Assert.That(ev.PreviousHealth, Is.EqualTo(20));
+        Assert.That(ev.Health,         Is.EqualTo(14));
+        Assert.That(ev.Delta,          Is.EqualTo(-6));
+        Assert.That(ev.Food,           Is.EqualTo(18));
+        Assert.That(ev.Timestamp,      Is.EqualTo(now));
+    }
+
+    [Test]
+    public void DamageTakenEvent_ValueEquality_AsRecord()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var a   = new DamageTakenEvent(20, 14, -6, 18, now);
+        var b   = new DamageTakenEvent(20, 14, -6, 18, now);
+
+        // Records have value equality.
+        Assert.That(a, Is.EqualTo(b),
+            "DamageTakenEvent is a record and must support value equality.");
+    }
+
+    [Test]
+    public void DamageTakenEvent_InheritsWorldEvent()
+    {
+        var ev = new DamageTakenEvent(20, 14, -6, 18, DateTimeOffset.UtcNow);
+        Assert.That(ev, Is.InstanceOf<WorldEvent>(),
+            "DamageTakenEvent must inherit WorldEvent for correct event routing.");
+    }
+}
