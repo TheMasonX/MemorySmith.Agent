@@ -1,1 +1,37 @@
-bmFtZXNwYWNlIEFnZW50LlRvb2xzOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuTWVtb3J5OwoKLy8vIDxzdW1tYXJ5PgovLy8gU2VhcmNoZXMgdGhlIHdvcmxkIGtub3dsZWRnZSBiYXNlIGZvciBzcGF0aWFsIG9ic2VydmF0aW9ucywgYmxvY2sgZGF0YSwKLy8vIGJpb21lIG5vdGVzLCBhbmQgaW4td29ybGQgZXhwbG9yYXRpb24gaGlzdG9yeS4KLy8vIDxwYXJhPgovLy8gU3ByaW50IDIzIFAwLUI6IHJvdXRlZCB0byB0aGUgd29ybGQta2V5ZWQgPHNlZSBjcmVmPSJJTWVtb3J5R2F0ZXdheSIvPiBzbwovLy8gd29ybGQgb2JzZXJ2YXRpb25zIChibG9jayBsb2NhdGlvbnMsIGV4cGxvcmF0aW9uIG5vdGVzKSBhcmUga2VwdCBzZXBhcmF0ZQovLy8gZnJvbSBhZ2VudCBjb2RlYmFzZSBrbm93bGVkZ2UuIFRoZSBnYXRld2F5IGluc3RhbmNlIGlzIHNlbGVjdGVkIGF0IERJCi8vLyBjb21wb3NpdGlvbiB0aW1lIGJ5IHJlc29sdmluZyB0aGUga2V5ZWQgc2luZ2xldG9uIHJlZ2lzdGVyZWQgdW5kZXIKLy8vIDxjPiJ3b3JsZCI8L2M+OyB3aGVuIHRoYXQga2V5IGlzIG5vdCBjb25maWd1cmVkIHRoZSB3aXJpbmcgZmFsbHMgYmFjayB0bwovLy8gdGhlIGFnZW50IEtCIGFuZCBsb2dzIGEgc3RhcnR1cCB3YXJuaW5nLgovLy8gPC9wYXJhPgovLy8gPC9zdW1tYXJ5PgpwdWJsaWMgc2VhbGVkIGNsYXNzIFNlYXJjaE1lbW9yeVRvb2wgOiBJVG9vbAp7CiAgICBwcml2YXRlIHJlYWRvbmx5IElNZW1vcnlHYXRld2F5IF9tZW1vcnk7CgogICAgcHVibGljIFNlYXJjaE1lbW9yeVRvb2woSU1lbW9yeUdhdGV3YXkgbWVtb3J5KSA9PiBfbWVtb3J5ID0gbWVtb3J5OwoKICAgIHB1YmxpYyBzdHJpbmcgTmFtZSA9PiAiU2VhcmNoTWVtb3J5IjsKCiAgICBwdWJsaWMgc3RyaW5nIERlc2NyaXB0aW9uID0+ICJTZWFyY2hlcyB0aGUgd29ybGQga25vd2xlZGdlIGJhc2UgZm9yIHNwYXRpYWwgb2JzZXJ2YXRpb25zLCBibG9jayBkYXRhLCBiaW9tZSBub3RlcywgYW5kIGluLXdvcmxkIGV4cGxvcmF0aW9uIGhpc3RvcnkuIFJvdXRlcyB0byB0aGUgd29ybGQgS0IgaW5zdGFuY2UgKHNlZSBXb3JsZEtiVXJsIGluIGFwcHNldHRpbmdzKS4gVXNlIEdldFBhZ2UgdG8gcmV0cmlldmUgYWdlbnQga25vd2xlZGdlIGJhc2UgZW50cmllcyBzdWNoIGFzIHNwcmludCBkb2NzIG9yIGNvZGUgZG9jdW1lbnRhdGlvbi4iOwoKICAgIHB1YmxpYyBhc3luYyBUYXNrPFRvb2xSZXN1bHQ+IEV4ZWN1dGVBc3luYyhBY3Rpb25EYXRhIGFjdGlvbiwgQ2FuY2VsbGF0aW9uVG9rZW4gY3QpCiAgICB7CiAgICAgICAgdmFyIHF1ZXJ5ID0gYWN0aW9uLkdldFN0cmluZygicXVlcnkiKQogICAgICAgICAgICAgICAgICAgID8/IHRocm93IG5ldyBBcmd1bWVudEV4Y2VwdGlvbigiU2VhcmNoTWVtb3J5IHJlcXVpcmVzICdxdWVyeScgcGFyYW1ldGVyLiIpOwogICAgICAgIHZhciBsaW1pdCA9IGFjdGlvbi5HZXRJbnQoImxpbWl0IikgPz8gMTA7CgogICAgICAgIHZhciByZXN1bHRzID0gYXdhaXQgX21lbW9yeS5TZWFyY2hBc3luYyhxdWVyeSwgbGltaXQsIGN0KS5Db25maWd1cmVBd2FpdChmYWxzZSk7CiAgICAgICAgcmV0dXJuIFRvb2xSZXN1bHQuT2sobmV3IHsgcmVzdWx0cyB9KTsKICAgIH0KfQo=
+namespace Agent.Tools;
+
+using Agent.Core;
+using Agent.Memory;
+
+/// <summary>
+/// Searches the world knowledge base for spatial observations, block data,
+/// biome notes, and in-world exploration history.
+/// <para>
+/// Sprint 23 P0-B: routed to the world-keyed <see cref="IMemoryGateway"/> so
+/// world observations (block locations, exploration notes) are kept separate
+/// from agent codebase knowledge. The gateway instance is selected at DI
+/// composition time by resolving the keyed singleton registered under
+/// <c>"world"</c>; when that key is not configured the wiring falls back to
+/// the agent KB and logs a startup warning.
+/// </para>
+/// </summary>
+public sealed class SearchMemoryTool : ITool
+{
+    private readonly IMemoryGateway _memory;
+
+    public SearchMemoryTool(IMemoryGateway memory) => _memory = memory;
+
+    public string Name => "SearchMemory";
+
+    public string Description => "Searches the world knowledge base for spatial observations, block data, biome notes, and in-world exploration history. Routes to the world KB instance (see WorldKbUrl in appsettings). Use GetPage to retrieve agent knowledge base entries such as sprint docs or code documentation.";
+
+    public async Task<ToolResult> ExecuteAsync(ActionData action, CancellationToken ct)
+    {
+        var query = action.GetString("query")
+                    ?? throw new ArgumentException("SearchMemory requires 'query' parameter.");
+        var limit = action.GetInt("limit") ?? 10;
+
+        var results = await _memory.SearchAsync(query, limit, ct).ConfigureAwait(false);
+        return ToolResult.Ok(new { results });
+    }
+}
