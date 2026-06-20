@@ -1,1 +1,72 @@
-bmFtZXNwYWNlIE1lbW9yeVNtaXRoLkFnZW50LlRlc3RzOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuUGxhbm5pbmc7CnVzaW5nIEFnZW50LlRvb2xzOwp1c2luZyBNaWNyb3NvZnQuRXh0ZW5zaW9ucy5Mb2dnaW5nLkFic3RyYWN0aW9uczsKCi8vLyA8c3VtbWFyeT4KLy8vIEZhY3RvcnkgZm9yIGNyZWF0aW5nIG1pbmltYWwgPHNlZSBjcmVmPSJXZWJVSS5CbGF6b3IuQWdlbnRCYWNrZ3JvdW5kU2VydmljZSIvPiBpbnN0YW5jZXMgaW4gdGVzdHMuCi8vLwovLy8gU3ByaW50IDI3IFAwLUE6IGNsb3NlcyBCTEstMSBmcm9tIHRoZSBTcHJpbnQgMjYgY291bmNpbCByZXZpZXcuCi8vLyBUaGUgY29uc3RydWN0b3IgcGFyYW1ldGVycyBhcmUgZGVyaXZlZCBmcm9tIHRoZSBBQ1RVQUwgY3VycmVudAovLy8gPHNlZSBjcmVmPSJXZWJVSS5CbGF6b3IuQWdlbnRCYWNrZ3JvdW5kU2VydmljZSIvPiBjb25zdHJ1Y3RvciDigJQgbm90IGZyb20gYSBzdGFsZQovLy8gaGFuZG9mZiB0ZW1wbGF0ZSDigJQgdG8gYXZvaWQgcGFyYW1ldGVyLW1pc21hdGNoIGNvbXBpbGUgZXJyb3JzIGluIENJLgovLy8KLy8vIEN1cnJlbnQgY29uc3RydWN0b3Igc2lnbmF0dXJlIChhcyBvZiBTcHJpbnQgMjcpOgovLy8gPGM+QWdlbnRCYWNrZ3JvdW5kU2VydmljZSgKLy8vICAgICBJV29ybGRBZGFwdGVyIHdvcmxkQWRhcHRlciwKLy8vICAgICBJVG9vbENhbGxlciAgIHRvb2xDYWxsZXIsCi8vLyAgICAgSUxvZ2dlciZsdDtBZ2VudEJhY2tncm91bmRTZXJ2aWNlJmd0OyBsb2dnZXIsCi8vLyAgICAgSVBsYW5uZXIgICAgICBwbGFubmVyLAovLy8gICAgIElIdWJDb250ZXh0Jmx0O0FnZW50SHViJmd0Oz8gaHViQ29udGV4dCA9IG51bGwsCi8vLyAgICAgR29hbEZhY3Rvcnk/ICBnb2FsRmFjdG9yeSA9IG51bGwsCi8vLyAgICAgSUNoYXRJbnRlcnByZXRlcj8gY2hhdEludGVycHJldGVyID0gbnVsbCwKLy8vICAgICBzdHJpbmcgYm90TmFtZSA9ICJBZ2VudEJvdCIsCi8vLyAgICAgaW50IG1heENvbnNlY3V0aXZlRmFpbHVyZXMgPSAzLAovLy8gICAgIElBZ2VudEpvdXJuYWw/IGpvdXJuYWwgPSBudWxsLAovLy8gICAgIFRpbWVTcGFuW10/IHJlY29ubmVjdERlbGF5cyA9IG51bGwsCi8vLyAgICAgSVJlcGxhbkdvdmVybm9yPyByZXBsYW5Hb3Zlcm5vciA9IG51bGwsCi8vLyAgICAgSVRpbWVQcm92aWRlcj8gdGltZVByb3ZpZGVyID0gbnVsbCk8L2M+Ci8vLyA8L3N1bW1hcnk+CnB1YmxpYyBzdGF0aWMgY2xhc3MgQWdlbnRCYWNrZ3JvdW5kU2VydmljZVRlc3RIZWxwZXIKewogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIENyZWF0ZXMgYSBtaW5pbWFsIDxzZWUgY3JlZj0iV2ViVUkuQmxhem9yLkFnZW50QmFja2dyb3VuZFNlcnZpY2UiLz4gc3VpdGFibGUgZm9yCiAgICAvLy8gaW50ZWdyYXRpb24gdGVzdHMuIEFsbCBvcHRpb25hbCBwYXJhbWV0ZXJzIHVzZSBzYWZlIG5vLW9wIGRlZmF1bHRzIHNvIHRlc3RzIHRoYXQKICAgIC8vLyBvbmx5IG5lZWQgdGhlIGV2ZW50LXByb2Nlc3NpbmcgbG9vcCBkbyBub3QgbmVlZCB0byBjb25maWd1cmUgcGxhbm5pbmcsIGNoYXQsIG9yIFNpZ25hbFIuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgLy8vIDxwYXJhbSBuYW1lPSJhZGFwdGVyIj5UaGUgbW9jayB3b3JsZCBhZGFwdGVyIHN1cHBseWluZyBldmVudHMgYW5kIGNhcHR1cmluZyBzZW50IGFjdGlvbnMuPC9wYXJhbT4KICAgIC8vLyA8cGFyYW0gbmFtZT0iam91cm5hbCI+VGhlIGpvdXJuYWwgaW1wbGVtZW50YXRpb24gKHVzZSA8c2VlIGNyZWY9Ik51bGxBZ2VudEpvdXJuYWwuSW5zdGFuY2UiLz4gZm9yIG5vLW9wKS48L3BhcmFtPgogICAgLy8vIDxwYXJhbSBuYW1lPSJ0aW1lUHJvdmlkZXIiPgogICAgLy8vIE9wdGlvbmFsIHRpbWUgcHJvdmlkZXIuIFBhc3MgYSA8c2VlIGNyZWY9IkZha2VUaW1lUHJvdmlkZXIiLz4gdG8gY29udHJvbCBjb29sZG93biB0aW1pbmcKICAgIC8vLyBkZXRlcm1pbmlzdGljYWxseS4gRGVmYXVsdHMgdG8gPHNlZSBjcmVmPSJTeXN0ZW1UaW1lUHJvdmlkZXIuSW5zdGFuY2UiLz4uCiAgICAvLy8gPC9wYXJhbT4KICAgIHB1YmxpYyBzdGF0aWMgV2ViVUkuQmxhem9yLkFnZW50QmFja2dyb3VuZFNlcnZpY2UgQnVpbGRNaW5pbWFsKAogICAgICAgIE1vY2tXb3JsZEFkYXB0ZXIgYWRhcHRlciwKICAgICAgICBJQWdlbnRKb3VybmFsIGpvdXJuYWwsCiAgICAgICAgSVRpbWVQcm92aWRlcj8gdGltZVByb3ZpZGVyID0gbnVsbCkKICAgICAgICA9PiBuZXcoCiAgICAgICAgICAgIGFkYXB0ZXIsCiAgICAgICAgICAgIG5ldyBUb29sRGlzcGF0Y2hlcigpLAogICAgICAgICAgICBOdWxsTG9nZ2VyPFdlYlVJLkJsYXpvci5BZ2VudEJhY2tncm91bmRTZXJ2aWNlPi5JbnN0YW5jZSwKICAgICAgICAgICAgbmV3IE1pbmltYWxOdWxsUGxhbm5lcigpLAogICAgICAgICAgICBqb3VybmFsOiBqb3VybmFsLAogICAgICAgICAgICB0aW1lUHJvdmlkZXI6IHRpbWVQcm92aWRlcik7Cn0KCi8vLyA8c3VtbWFyeT4KLy8vIDxzZWUgY3JlZj0iSVBsYW5uZXIiLz4gdGhhdCBhbHdheXMgcmV0dXJucyBhbiBlbXB0eSBwbGFuLgovLy8gVXNlZCBieSA8c2VlIGNyZWY9IkFnZW50QmFja2dyb3VuZFNlcnZpY2VUZXN0SGVscGVyIi8+IGZvciB0ZXN0cyB0aGF0IGV4ZXJjaXNlCi8vLyBldmVudCBwcm9jZXNzaW5nIChkYW1hZ2UgaW50ZXJydXB0LCBoZWFsdGggZ2F0ZSwgZXRjLikgcmF0aGVyIHRoYW4gcGxhbm5pbmcuCi8vLyA8L3N1bW1hcnk+CmZpbGUgc2VhbGVkIGNsYXNzIE1pbmltYWxOdWxsUGxhbm5lciA6IElQbGFubmVyCnsKICAgIHB1YmxpYyBUYXNrPElQbGFuPiBQbGFuQXN5bmMoSUdvYWwgZ29hbCwgV29ybGRTdGF0ZSBzdGF0ZSwKICAgICAgICBDYW5jZWxsYXRpb25Ub2tlbiBjdCA9IGRlZmF1bHQpCiAgICAgICAgPT4gVGFzay5Gcm9tUmVzdWx0PElQbGFuPihuZXcgQWN0aW9uUGxhbihnb2FsLk5hbWUsIGdvYWwuUGhhc2VzLlRvQXJyYXkoKSwgW10pKTsKCiAgICBwdWJsaWMgVGFzazxJUGxhbj8+IFJlcGxhbkFzeW5jKElQbGFuIGN1cnJlbnRQbGFuLCBXb3JsZFN0YXRlIHN0YXRlLAogICAgICAgIHN0cmluZyBmYWlsdXJlUmVhc29uLCBDYW5jZWxsYXRpb25Ub2tlbiBjdCA9IGRlZmF1bHQpCiAgICAgICAgPT4gVGFzay5Gcm9tUmVzdWx0PElQbGFuPz4obnVsbCk7Cn0K
+namespace MemorySmith.Agent.Tests;
+
+using Agent.Core;
+using Agent.Planning;
+using Agent.Tools;
+using Microsoft.Extensions.Logging.Abstractions;
+
+/// <summary>
+/// Factory for creating minimal <see cref="WebUI.Blazor.AgentBackgroundService"/> instances in tests.
+///
+/// Sprint 27 P0-A: closes BLK-1 from the Sprint 26 council review.
+/// The constructor parameters are derived from the ACTUAL current
+/// <see cref="WebUI.Blazor.AgentBackgroundService"/> constructor — not from a stale
+/// handoff template — to avoid parameter-mismatch compile errors in CI.
+///
+/// Current constructor signature (as of Sprint 27):
+/// <c>AgentBackgroundService(
+///     IWorldAdapter worldAdapter,
+///     IToolCaller   toolCaller,
+///     ILogger&lt;AgentBackgroundService&gt; logger,
+///     IPlanner      planner,
+///     IHubContext&lt;AgentHub&gt;? hubContext = null,
+///     GoalFactory?  goalFactory = null,
+///     IChatInterpreter? chatInterpreter = null,
+///     string botName = "AgentBot",
+///     int maxConsecutiveFailures = 3,
+///     IAgentJournal? journal = null,
+///     TimeSpan[]? reconnectDelays = null,
+///     IReplanGovernor? replanGovernor = null,
+///     ITimeProvider? timeProvider = null)</c>
+/// </summary>
+public static class AgentBackgroundServiceTestHelper
+{
+    /// <summary>
+    /// Creates a minimal <see cref="WebUI.Blazor.AgentBackgroundService"/> suitable for
+    /// integration tests. All optional parameters use safe no-op defaults so tests that
+    /// only need the event-processing loop do not need to configure planning, chat, or SignalR.
+    /// </summary>
+    /// <param name="adapter">The mock world adapter supplying events and capturing sent actions.</param>
+    /// <param name="journal">The journal implementation (use <see cref="NullAgentJournal.Instance"/> for no-op).</param>
+    /// <param name="timeProvider">
+    /// Optional time provider. Pass a <see cref="FakeTimeProvider"/> to control cooldown timing
+    /// deterministically. Defaults to <see cref="SystemTimeProvider.Instance"/>.
+    /// </param>
+    public static WebUI.Blazor.AgentBackgroundService BuildMinimal(
+        MockWorldAdapter adapter,
+        IAgentJournal journal,
+        ITimeProvider? timeProvider = null)
+        => new(
+            adapter,
+            new ToolDispatcher(),
+            NullLogger<WebUI.Blazor.AgentBackgroundService>.Instance,
+            new MinimalNullPlanner(),
+            journal: journal,
+            timeProvider: timeProvider);
+}
+
+/// <summary>
+/// <see cref="IPlanner"/> that always returns an empty plan.
+/// Used by <see cref="AgentBackgroundServiceTestHelper"/> for tests that exercise
+/// event processing (damage interrupt, health gate, etc.) rather than planning.
+/// </summary>
+file sealed class MinimalNullPlanner : IPlanner
+{
+    public Task<IPlan> PlanAsync(IGoal goal, WorldState state,
+        CancellationToken ct = default)
+        => Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases.ToArray(), []));
+
+    public Task<IPlan?> ReplanAsync(IPlan currentPlan, WorldState state,
+        string failureReason, CancellationToken ct = default, IGoal? originalGoal = null)
+        => Task.FromResult<IPlan?>(null);
+}
