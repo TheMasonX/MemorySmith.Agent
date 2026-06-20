@@ -1,1 +1,16 @@
-bmFtZXNwYWNlIEFnZW50LkNvcmU7CgovLy8gPHN1bW1hcnk+Ci8vLyBBYnN0cmFjdHMgd2FsbC1jbG9jayB0aW1lIGFjY2VzcyB0byBlbmFibGUgZGV0ZXJtaW5pc3RpYyB0ZXN0aW5nLgovLy8KLy8vIFNwcmludCAyNyBQMC1DOiByZXBsYWNlcyBkaXJlY3QgPGM+RGF0ZVRpbWVPZmZzZXQuVXRjTm93PC9jPiBjYWxscyBpbgovLy8gPHNlZSBjcmVmPSJXZWJVSS5CbGF6b3IuQWdlbnRCYWNrZ3JvdW5kU2VydmljZSIvPiBzbyB0aGF0IHRpbWluZy1zZW5zaXRpdmUKLy8vIHBhdGhzIChkYW1hZ2UtaW50ZXJydXB0IGNvb2xkb3duLCByZXBsYW4gaW50ZXJ2YWwsIHN0YWxsIGRldGVjdGlvbikgY2FuIGJlCi8vLyBkcml2ZW4gYnkgYSA8c2VlIGNyZWY9IkZha2VUaW1lUHJvdmlkZXIiLz4gaW4gdW5pdC9pbnRlZ3JhdGlvbiB0ZXN0cyByYXRoZXIKLy8vIHRoYW4gcmVxdWlyaW5nIDxjPlRhc2suRGVsYXk8L2M+IHdhaXRzLgovLy8gPC9zdW1tYXJ5PgpwdWJsaWMgaW50ZXJmYWNlIElUaW1lUHJvdmlkZXIKewogICAgLy8vIDxzdW1tYXJ5PlJldHVybnMgdGhlIGN1cnJlbnQgVVRDIHRpbWUuPC9zdW1tYXJ5PgogICAgRGF0ZVRpbWVPZmZzZXQgVXRjTm93IHsgZ2V0OyB9Cn0K
+namespace Agent.Core;
+
+/// <summary>
+/// Abstracts wall-clock time access to enable deterministic testing.
+///
+/// Sprint 27 P0-C: replaces direct <c>DateTimeOffset.UtcNow</c> calls in
+/// <see cref="WebUI.Blazor.AgentBackgroundService"/> so that timing-sensitive
+/// paths (damage-interrupt cooldown, replan interval, stall detection) can be
+/// driven by a <see cref="FakeTimeProvider"/> in unit/integration tests rather
+/// than requiring <c>Task.Delay</c> waits.
+/// </summary>
+public interface ITimeProvider
+{
+    /// <summary>Returns the current UTC time.</summary>
+    DateTimeOffset UtcNow { get; }
+}
