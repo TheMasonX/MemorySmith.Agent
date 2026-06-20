@@ -1,1 +1,446 @@
-Ly8gTWVtb3J5U21pdGguQWdlbnQg4oCUIFdlYiBVSSAmIEFnZW50IEhvc3QKLy8gdjAuMjguMCAgU3ByaW50IDMwIOKAlCBCYXNlNjQgZGVjb2RlICsgSVRvb2wgY29tcGxpYW5jZSArIHNlY3VyaXR5Cgp1c2luZyBBZ2VudC5Db25zdHJ1Y3Rpb247CnVzaW5nIEFnZW50LkNvcmU7CnVzaW5nIEFnZW50Lk1lbW9yeTsKdXNpbmcgQWdlbnQuUGxhbm5pbmc7CnVzaW5nIEFnZW50LlBsYW5uaW5nLkxsbTsKdXNpbmcgQWdlbnQuVG9vbHM7CnVzaW5nIEFnZW50LldvcmxkLk1pbmVjcmFmdDsKdXNpbmcgTWljcm9zb2Z0LkFzcE5ldENvcmUuU2lnbmFsUjsKdXNpbmcgTWljcm9zb2Z0LkV4dGVuc2lvbnMuT3B0aW9uczsKdXNpbmcgU2VyaWxvZzsKdXNpbmcgU2VyaWxvZy5FdmVudHM7CnVzaW5nIFdlYlVJLkJsYXpvcjsKCnZhciBidWlsZGVyID0gV2ViQXBwbGljYXRpb24uQ3JlYXRlQnVpbGRlcihhcmdzKTsKCmJ1aWxkZXIuSG9zdC5Vc2VTZXJpbG9nKChjb250ZXh0LCBzZXJ2aWNlcywgbG9nZ2VyQ29uZmlnKSA9Pgp7CiAgICBsb2dnZXJDb25maWcKICAgICAgICAuTWluaW11bUxldmVsLkluZm9ybWF0aW9uKCkKICAgICAgICAuTWluaW11bUxldmVsLk92ZXJyaWRlKCJNaWNyb3NvZnQiLCAgICAgICAgICAgICAgTG9nRXZlbnRMZXZlbC5XYXJuaW5nKQogICAgICAgIC5NaW5pbXVtTGV2ZWwuT3ZlcnJpZGUoIk1pY3Jvc29mdC5Bc3BOZXRDb3JlIiwgICBMb2dFdmVudExldmVsLldhcm5pbmcpCiAgICAgICAgLk1pbmltdW1MZXZlbC5PdmVycmlkZSgiU3lzdGVtLk5ldC5IdHRwIiwgICAgICAgIExvZ0V2ZW50TGV2ZWwuV2FybmluZykKICAgICAgICAuTWluaW11bUxldmVsLk92ZXJyaWRlKCJNaWNyb3NvZnQuRXh0ZW5zaW9ucy5IdHRwIiwgTG9nRXZlbnRMZXZlbC5XYXJuaW5nKQogICAgICAgIC5FbnJpY2guRnJvbUxvZ0NvbnRleHQoKQogICAgICAgIC5Xcml0ZVRvLkNvbnNvbGUob3V0cHV0VGVtcGxhdGU6ICJbe1RpbWVzdGFtcDpISDptbTpzc31dIHtNZXNzYWdlOmxqfXtOZXdMaW5lfXtFeGNlcHRpb259IikKICAgICAgICAuV3JpdGVUby5GaWxlKAogICAgICAgICAgICBwYXRoOiAibG9ncy9tZW1vcnlzbWl0aC1hZ2VudC0ubG9nIiwKICAgICAgICAgICAgcm9sbGluZ0ludGVydmFsOiBSb2xsaW5nSW50ZXJ2YWwuRGF5LAogICAgICAgICAgICByZXRhaW5lZEZpbGVDb3VudExpbWl0OiAxNCwKICAgICAgICAgICAgc2hhcmVkOiB0cnVlLAogICAgICAgICAgICByZXN0cmljdGVkVG9NaW5pbXVtTGV2ZWw6IExvZ0V2ZW50TGV2ZWwuRGVidWcsCiAgICAgICAgICAgIG91dHB1dFRlbXBsYXRlOiAiW3tUaW1lc3RhbXA6eXl5eS1NTS1kZCBISDptbTpzcy5mZmZ9IHtMZXZlbDp1M31dIHtTb3VyY2VDb250ZXh0fToge01lc3NhZ2U6bGp9IHtQcm9wZXJ0aWVzOmp9e05ld0xpbmV9e0V4Y2VwdGlvbn0iKTsKfSk7CgovLyDilIDilIAgT3B0aW9ucyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKdmFyIGZhY3RvcnkgPSBzcC5HZXRSZXF1aXJlZFNlcnZpY2U8SUh0dHBDbGllbnRGYWN0b3J5PigpOwogICAgICAgIHZhciBvcHRzICAgID0gc3AuR2V0UmVxdWlyZWRTZXJ2aWNlPElPcHRpb25zPFJlc3RNZW1vcnlHYXRld2F5T3B0aW9ucz4+KCkuVmFsdWU7CiAgICAgICAgcmV0dXJuIG5ldyBSZXN0TWVtb3J5R2F0ZXdheShmYWN0b3J5LkNyZWF0ZUNsaWVudCgibWVtb3J5c21pdGgiKSwgb3B0cyk7CiAgICB9KTsKCiAgICBidWlsZGVyLlNlcnZpY2VzLkFkZEh0dHBDbGllbnQoIm1lbW9yeXNtaXRoLXdvcmxkIiwgKHNwLCBodHRwKSA9PgogICAgewogICAgICAgIHZhciBvcHRzICAgICA9IHNwLkdldFJlcXVpcmVkU2VydmljZTxJT3B0aW9uczxSZXN0TWVtb3J5R2F0ZXdheU9wdGlvbnM+PigpLlZhbHVlOwogICAgICAgIHZhciB3b3JsZFVybCA9IHN0cmluZy5Jc051bGxPcldoaXRlU3BhY2Uob3B0cy5Xb3JsZEtiVXJsKSA/IG9wdHMuQmFzZVVybCA6IG9wdHMuV29ybGRLYlVybDsKICAgICAgICBodHRwLkJhc2VBZGRyZXNzID0gbmV3IFVyaSh3b3JsZFVybCk7CiAgICAgICAgaHR0cC5UaW1lb3V0ICAgICA9IFRpbWVTcGFuLkZyb21TZWNvbmRzKG9wdHMuV29ybGRUaW1lb3V0U2Vjb25kcyk7CiAgICAgICAgdmFyIGFwaUtleSAgID0gb3B0cy5Xb3JsZEFwaUtleSA/PyBvcHRzLkFwaUtleTsKICAgICAgICBpZiAoIXN0cmluZy5Jc051bGxPckVtcHR5KGFwaUtleSkpCiAgICAgICAgICAgIGh0dHAuRGVmYXVsdFJlcXVlc3RIZWFkZXJzLkFkZCgiWC1BcGktS2V5IiwgYXBpS2V5KTsKICAgIH0pOwogICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRLZXllZFNpbmdsZXRvbjxJTWVtb3J5R2F0ZXdheT4oIndvcmxkIiwgKHNwLCBfKSA9PgogICAgewogICAgICAgIHZhciBmYWN0b3J5ICA9IHNwLkdldFJlcXVpcmVkU2VydmljZTxJSHR0cENsaWVudEZhY3Rvcnk+KCk7CiAgICAgICAgdmFyIG9wdHMgICAgID0gc3AuR2V0UmVxdWlyZWRTZXJ2aWNlPElPcHRpb25zPFJlc3RNZW1vcnlHYXRld2F5T3B0aW9ucz4+KCkuVmFsdWU7CiAgICAgICAgdmFyIHdvcmxkVXJsID0gc3RyaW5nLklzTnVsbE9yV2hpdGVTcGFjZShvcHRzLldvcmxkS2JVcmwpID8gb3B0cy5CYXNlVXJsIDogb3B0cy5Xb3JsZEtiVXJsOwogICAgICAgIHZhciB3b3JsZE9wdHMgPSBvcHRzIHdpdGgKICAgICAgICB7CiAgICAgICAgICAgIEJhc2VVcmwgICAgICAgID0gd29ybGRVcmwsCiAgICAgICAgICAgIEFwaUtleSAgICAgICAgID0gb3B0cy5Xb3JsZEFwaUtleSA/PyBvcHRzLkFwaUtleSwKICAgICAgICAgICAgVGltZW91dFNlY29uZHMgPSBvcHRzLldvcmxkVGltZW91dFNlY29uZHMsCiAgICAgICAgfTsKICAgICAgICByZXR1cm4gbmV3IFJlc3RNZW1vcnlHYXRld2F5KGZhY3RvcnkuQ3JlYXRlQ2xpZW50KCJtZW1vcnlzbWl0aC13b3JsZCIpLCB3b3JsZE9wdHMpOwogICAgfSk7CgogICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRTaW5nbGV0b248SUl0ZW1SZWdpc3RyeT4oc3AgPT4KICAgICAgICBuZXcgTWVtb3J5U21pdGhJdGVtUmVnaXN0cnkoCiAgICAgICAgICAgIHNwLkdldFJlcXVpcmVkU2VydmljZTxJTWVtb3J5R2F0ZXdheT4oKSwKICAgICAgICAgICAgc3AuR2V0UmVxdWlyZWRTZXJ2aWNlPElPcHRpb25zPFJlc3RNZW1vcnlHYXRld2F5T3B0aW9ucz4+KCkuVmFsdWUpKTsKICAgIGJ1aWxkZXIuU2VydmljZXMuQWRkU2luZ2xldG9uPElCbHVlcHJpbnRSZXBvc2l0b3J5PihzcCA9PgogICAgICAgIG5ldyBNZW1vcnlTbWl0aEJsdWVwcmludFJlcG9zaXRvcnkoc3AuR2V0UmVxdWlyZWRTZXJ2aWNlPElNZW1vcnlHYXRld2F5PigpKSk7CgogICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRTaW5nbGV0b248SUtub3dsZWRnZVJlc29sdmVyPihzcCA9PgogICAgICAgIG5ldyBMb2NhbEtub3dsZWRnZVJlc29sdmVyKAogICAgICAgICAgICBzcC5HZXRSZXF1aXJlZFNlcnZpY2U8SUl0ZW1SZWdpc3RyeT4oKSwKICAgICAgICAgICAgc3AuR2V0UmVxdWlyZWRTZXJ2aWNlPElNZW1vcnlHYXRld2F5PigpLAogICAgICAgICAgICAoKSA9PiBzcC5HZXRTZXJ2aWNlPEFnZW50QmFja2dyb3VuZFNlcnZpY2U+KCk/LldvcmxkU3RhdGUpKTsKCiAgICBidWlsZGVyLlNlcnZpY2VzLkFkZFNpbmdsZXRvbjxHb2FsRmFjdG9yeT4oc3AgPT4gbmV3IEdvYWxGYWN0b3J5KAogICAgICAgIHNwLkdldFJlcXVpcmVkU2VydmljZTxJSXRlbVJlZ2lzdHJ5PigpLAogICAgICAgIHNwLkdldFJlcXVpcmVkU2VydmljZTxJQmx1ZXByaW50UmVwb3NpdG9yeT4oKSkpOwogICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRTaW5nbGV0b248SUdvYWxGYWN0b3J5PihzcCA9PiBzcC5HZXRSZXF1aXJlZFNlcnZpY2U8R29hbEZhY3Rvcnk+KCkpOwoKICAgIGJ1aWxkZXIuU2VydmljZXMuQWRkU2luZ2xldG9uPENoYXRIaXN0b3J5PigpOwoKICAgIHZhciBjaGF0T3B0cyA9IG5ldyBDaGF0T3B0aW9ucygpOwogICAgdmFyIGNoYXRTZWN0aW9uID0gYnVpbGRlci5Db25maWd1cmF0aW9uLkdldFNlY3Rpb24oIkFnZW50OkNoYXQiKTsKICAgIGNoYXRTZWN0aW9uLkJpbmQoY2hhdE9wdHMpOwogICAgdmFyIGxlZ2FjeU1vZGVsID0gY2hhdFNlY3Rpb25bIk1vZGVsIl07CiAgICBpZiAoIXN0cmluZy5Jc051bGxPcldoaXRlU3BhY2UobGVnYWN5TW9kZWwpICYmIHN0cmluZy5Jc051bGxPcldoaXRlU3BhY2UoY2hhdFNlY3Rpb25bIkxsbU1vZGVsIl0pKQogICAgICAgIGNoYXRPcHRzID0gY2hhdE9wdHMgd2l0aCB7IExsbU1vZGVsID0gbGVnYWN5TW9kZWwgfTsKICAgIGJ1aWxkZXIuU2VydmljZXMuQWRkU2luZ2xldG9uKGNoYXRPcHRzKTsKCiAgICBidWlsZGVyLlNlcnZpY2VzLkFkZEh0dHBDbGllbnQoImxtbSIsIGh0dHAgPT4KICAgIHsKICAgICAgICBodHRwLkJhc2VBZGRyZXNzID0gbmV3IFVyaShjaGF0T3B0cy5SZXNvbHZlZEJhc2VVcmwpOwogICAgICAgIGh0dHAuVGltZW91dCAgICAgPSBUaW1lU3Bhbi5Gcm9tU2Vjb25kcyhjaGF0T3B0cy5MbG1UaW1lb3V0U2Vjb25kcyArIDIpOwogICAgfSk7CiAgICBidWlsZGVyLlNlcnZpY2VzLkFkZFNpbmdsZXRvbjxJTGxtUHJvdmlkZXI+KHNwID0+CiAgICB7CiAgICAgICAgdmFyIGh0dHAgPSBzcC5HZXRSZXF1aXJlZFNlcnZpY2U8SUh0dHBDbGllbnRGYWN0b3J5PigpLkNyZWF0ZUNsaWVudCgibGxtIik7CiAgICAgICAgcmV0dXJuIExsbVByb3ZpZGVyRmFjdG9yeS5DcmVhdGUoaHR0cCwgY2hhdE9wdHMpOwogICAgfSk7CgogICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRTaW5nbGV0b248Q2hhdFJhdGVMaW1pdGVyPigpOwogICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRTaW5nbGV0b248Q2hhdEludGVycHJldGVyPigpOwogICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRTaW5nbGV0b248SUNoYXRJbnRlcnByZXRlcj4oc3AgPT4KICAgICAgICBuZXcgTGxtQ2hhdEludGVycHJldGVyKAogICAgICAgICAgICBzcC5HZXRSZXF1aXJlZFNlcnZpY2U8SUxsbVByb3ZpZGVyPigpLAogICAgICAgICAgICBzcC5HZXRSZXF1aXJlZFNlcnZpY2U8Q2hhdEludGVycHJldGVyPigpLAogICAgICAgICAgICBzcC5HZXRSZXF1aXJlZFNlcnZpY2U8Q2hhdFJhdGVMaW1pdGVyPigpLAogICAgICAgICAgICBjaGF0T3B0cywKICAgICAgICAgICAgc3AuR2V0UmVxdWlyZWRTZXJ2aWNlPENoYXRIaXN0b3J5PigpLAogICAgICAgICAgICBzcC5HZXRSZXF1aXJlZFNlcnZpY2U8SUxvZ2dlcjxMbG1DaGF0SW50ZXJwcmV0ZXI+PigpKSk7CgogICAgLy8g4pSA4pSAIFRvb2xzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAogICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRTaW5nbGV0b248SVRvb2xDYWxsZXI+KHNwID0+CiAgICB7CiAgICAgICAgdmFyIHdvcmxkICA9IHNwLkdldFJlcXVpcmVkU2VydmljZTxJV29ybGRBZGFwdGVyPigpOwogICAgICAgIHZhciBtZW1vcnkgPSBzcC5HZXRSZXF1aXJlZFNlcnZpY2U8SU1lbW9yeUdhdGV3YXk+KCk7CiAgICAgICAgLy8gU3ByaW50IDIzIFAwLUI6IFNlYXJjaE1lbW9yeSArIENyZWF0ZVBhZ2Ugcm91dGUgdG8gd29ybGQgS0I7IEdldFBhZ2UgdXNlcyBhZ2VudCBLQi4KICAgICAgICB2YXIgd29ybGRNZW1vcnkgPSBzcC5HZXRLZXllZFNlcnZpY2U8SU1lbW9yeUdhdGV3YXk+KCJ3b3JsZCIpID8/IG1lbW9yeTsKICAgICAgICB2YXIgam91cm5hbCA9IHNwLkdldFJlcXVpcmVkU2VydmljZTxJQWdlbnRKb3VybmFsPigpOwogICAgICAgIHZhciBkID0gbmV3IFRvb2xEaXNwYXRjaGVyKGpvdXJuYWwpOwogICAgICAgIGQuUmVnaXN0ZXIobmV3IE1vdmVUb1Rvb2wod29ybGQpKTsKICAgICAgICAvLyBTcHJpbnQgMjUgUDAtQjogU3RhdHVzVG9vbCBkZWxldGVkIChkdXBsaWNhdGUgb2YgR2V0U3RhdHVzVG9vbCkuCiAgICAgICAgLy8gR2V0U3RhdHVzVG9vbCBpcyByZWdpc3RlcmVkIHVuZGVyIGl0cyBjYW5vbmljYWwgbmFtZSAiR2V0U3RhdHVzIiBhbmQgYWxpYXNlZCBhcyAiU3RhdHVzIgogICAgICAgIC8vIGZvciBiYWNrd2FyZCBjb21wYXRpYmlsaXR5IHdpdGggcGxhbnMgYW5kIHJ1bnRpbWUgcGF0aHMgdGhhdCB1c2UgdGhlIG9sZCBuYW1lLgogICAgICAgIGQuUmVnaXN0ZXIobmV3IEdldFN0YXR1c1Rvb2wod29ybGQpKTsKICAgICAgICBkLlJlZ2lzdGVyKCJTdGF0dXMiLCBuZXcgR2V0U3RhdHVzVG9vbCh3b3JsZCkpOwogICAgICAgIGQuUmVnaXN0ZXIobmV3IE1pbmVCbG9ja1Rvb2wod29ybGQpKTsKICAgICAgICBkLlJlZ2lzdGVyKG5ldyBXYW5kZXJUb29sKHdvcmxkKSk7CiAgICAgICAgZC5SZWdpc3RlcihuZXcgUGxhY2VCbG9ja1Rvb2wod29ybGQpKTsKICAgICAgICBkLlJlZ2lzdGVyKG5ldyBTZWFyY2hNZW1vcnlUb29sKHdvcmxkTWVtb3J5KSk7IC8vIHdvcmxkIEtCCiAgICAgICAgZC5SZWdpc3RlcihuZXcgR2V0UGFnZVRvb2wobWVtb3J5KSk7ICAgICAgICAgICAvLyBhZ2VudCBLQgogICAgICAgIGQuUmVnaXN0ZXIobmV3IENyZWF0ZVBhZ2VUb29sKHdvcmxkTWVtb3J5KSk7ICAgLy8gd29ybGQgS0IKICAgICAgICBkLlJlZ2lzdGVyKG5ldyBDaGF0VG9vbCh3b3JsZCkpOwogICAgICAgIGQuUmVnaXN0ZXIobmV3IENyYWZ0SXRlbVRvb2wod29ybGQpKTsKICAgICAgICBkLlJlZ2lzdGVyKG5ldyBGdXJuYWNlVG9vbCh3b3JsZCkpOwogICAgICAgIGQuUmVnaXN0ZXIobmV3IEZpbmRGbGF0QXJlYVRvb2wod29ybGQpKTsKICAgICAgICByZXR1cm4gZDsKICAgIH0pOwoKICAgIGJ1aWxkZXIuU2VydmljZXMuQWRkU2luZ2xldG9uPEh0blRhc2tMaWJyYXJ5PigpOwogICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRTaW5nbGV0b248SHRuUGxhbm5lcj4oc3AgPT4KICAgICAgICBuZXcgSHRuUGxhbm5lcihzcC5HZXRSZXF1aXJlZFNlcnZpY2U8SHRuVGFza0xpYnJhcnk+KCkpKTsKICAgIGJ1aWxkZXIuU2VydmljZXMuQWRkU2luZ2xldG9uPElQbGFubmVyPihzcCA9PgogICAgICAgIHNwLkdldFJlcXVpcmVkU2VydmljZTxQbGFubmVyUm91dGVyPigpKTsgIC8vIFNwcmludCAyNyBQMC1EOiByb3V0ZSB0aHJvdWdoIGRlY29tcG9zZXIgcmVnaXN0cnkgZmlyc3QKCiAgICBidWlsZGVyLlNlcnZpY2VzLkFkZFNpbmdsZXRvbjxJV29ybGRNb2RlbD4obmV3IFdvcmxkTW9kZWwoKSk7CgogICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRTaW5nbGV0b248RGVjb21wb3NlclJlZ2lzdHJ5PihzcCA9PgogICAgewogICAgICAgIHZhciBsaWIgPSBzcC5HZXRSZXF1aXJlZFNlcnZpY2U8SHRuVGFza0xpYnJhcnk+KCk7CiAgICAgICAgdmFyIGxmICA9IHNwLkdldFJlcXVpcmVkU2VydmljZTxJTG9nZ2VyRmFjdG9yeT4oKTsgLy8gU3ByaW50IDMyIEJMSy0wMTogQnVpbGRHb2FsRGVjb21wb3NlciByZXF1aXJlcyBJTG9nZ2VyCiAgICAgICAgdmFyIHJlZyA9IG5ldyBEZWNvbXBvc2VyUmVnaXN0cnkoKTsKICAgICAgICByZWcuUmVnaXN0ZXIobmV3IEJ1aWxkR29hbERlY29tcG9zZXIobGliLCBsZi5DcmVhdGVMb2dnZXI8QnVpbGRHb2FsRGVjb21wb3Nlcj4oKSkpOwogICAgICAgIHJlZy5SZWdpc3RlcihuZXcgR2F0aGVyR29hbERlY29tcG9zZXIobGliKSk7CiAgICAgICAgcmVnLlJlZ2lzdGVyKG5ldyBTdXJ2aXZlTmlnaHRHb2FsRGVjb21wb3NlcihsaWIpKTsKICAgICAgICByZWcuUmVnaXN0ZXIobmV3IENyYWZ0SXRlbUdvYWxEZWNvbXBvc2VyKGxpYikpOyAvLyBTcHJpbnQgMjcgUDAtRAogICAgICAgIHJldHVybiByZWc7CiAgICB9KTsKICAgIGJ1aWxkZXIuU2VydmljZXMuQWRkU2luZ2xldG9uPFBsYW5uZXJSb3V0ZXI+KCk7CgogICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRTaW5nbGV0b248SUFnZW50Sm91cm5hbD4obmV3IEFnZW50Sm91cm5hbCgpKTsKCiAgICBidWlsZGVyLlNlcnZpY2VzLkFkZFNpbmdsZXRvbjxJUmVwbGFuR292ZXJub3IsIFJlcGxhbkdvdmVybm9yPigpOwoKICAgIC8vIFNwcmludCAyNyBQMC1DOiBpbmplY3RhYmxlIHRpbWUgcHJvdmlkZXIgZm9yIGRldGVybWluaXN0aWMgdGVzdGluZy4KICAgIGJ1aWxkZXIuU2VydmljZXMuQWRkU2luZ2xldG9uPElUaW1lUHJvdmlkZXI+KFN5c3RlbVRpbWVQcm92aWRlci5JbnN0YW5jZSk7CgogICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRTaWduYWxSKCk7CgogICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRTaW5nbGV0b248QWdlbnRCYWNrZ3JvdW5kU2VydmljZT4oc3AgPT4KICAgIHsKICAgICAgICB2YXIgY2ZnID0gc3AuR2V0UmVxdWlyZWRTZXJ2aWNlPElPcHRpb25zPE1pbmVjcmFmdEFkYXB0ZXJDb25maWc+PigpLlZhbHVlOwogICAgICAgIHJldHVybiBuZXcgQWdlbnRCYWNrZ3JvdW5kU2VydmljZSgKICAgICAgICAgICAgc3AuR2V0UmVxdWlyZWRTZXJ2aWNlPElXb3JsZEFkYXB0ZXI+KCksCiAgICAgICAgICAgIHNwLkdldFJlcXVpcmVkU2VydmljZTxJVG9vbENhbGxlcj4oKSwKICAgICAgICAgICAgc3AuR2V0UmVxdWlyZWRTZXJ2aWNlPElMb2dnZXI8QWdlbnRCYWNrZ3JvdW5kU2VydmljZT4+KCksCiAgICAgICAgICAgIHNwLkdldFJlcXVpcmVkU2VydmljZTxJUGxhbm5lcj4oKSwKICAgICAgICAgICAgaHViQ29udGV4dDogICAgICBzcC5HZXRSZXF1aXJlZFNlcnZpY2U8SUh1YkNvbnRleHQ8QWdlbnRIdWI+PigpLAogICAgICAgICAgICBnb2FsRmFjdG9yeTogICAgIHNwLkdldFJlcXVpcmVkU2VydmljZTxHb2FsRmFjdG9yeT4oKSwKICAgICAgICAgICAgY2hhdEludGVycHJldGVyOiBzcC5HZXRSZXF1aXJlZFNlcnZpY2U8SUNoYXRJbnRlcnByZXRlcj4oKSwKICAgICAgICAgICAgYm90TmFtZTogICAgICAgICBjZmcuQm90VXNlcm5hbWUsCiAgICAgICAgICAgIGpvdXJuYWw6ICAgICAgICAgc3AuR2V0UmVxdWlyZWRTZXJ2aWNlPElBZ2VudEpvdXJuYWw+KCksCiAgICAgICAgICAgIHJlcGxhbkdvdmVybm9yOiAgc3AuR2V0UmVxdWlyZWRTZXJ2aWNlPElSZXBsYW5Hb3Zlcm5vcj4oKSwKICAgICAgICAgICAgdGltZVByb3ZpZGVyOiAgICBzcC5HZXRSZXF1aXJlZFNlcnZpY2U8SVRpbWVQcm92aWRlcj4oKSk7ICAvLyBTcHJpbnQgMjcgUDAtQwogICAgfSk7CiAgICBidWlsZGVyLlNlcnZpY2VzLkFkZEhvc3RlZFNlcnZpY2Uoc3AgPT4gc3AuR2V0UmVxdWlyZWRTZXJ2aWNlPEFnZW50QmFja2dyb3VuZFNlcnZpY2U+KCkpOwp9CgppZiAoIWFnZW50RW5hYmxlZCkKewogICAgYnVpbGRlci5TZXJ2aWNlcy5BZGRTaW5nbGV0b248SUFnZW50Sm91cm5hbD4oTnVsbEFnZW50Sm91cm5hbC5JbnN0YW5jZSk7CiAgICBidWlsZGVyLlNlcnZpY2VzLkFkZFNpbmdsZXRvbjxJV29ybGRNb2RlbD4obmV3IFdvcmxkTW9kZWwoKSk7Cn0KCnZhciBhcHAgPSBidWlsZGVyLkJ1aWxkKCk7CmFwcC5Vc2VTZXJpbG9nUmVxdWVzdExvZ2dpbmcoKTsKYXBwLlVzZURlZmF1bHRGaWxlcygpOwphcHAuVXNlU3RhdGljRmlsZXMoKTsKCi8vIFNwcmludCAzMCBQMS1DIChTRUMtMDEpOiBnYXRlIGFsbCAvYXBpLyogcm91dGVzIGJlaGluZCBBcGlLZXlNaWRkbGV3YXJlLgovLyBDb25maWd1cmUgQWdlbnQ6QXBpS2V5IGluIGFwcHNldHRpbmdzLmpzb24gb3IgQWdlbnRfX0FwaUtleSBlbnYgdmFyLgphcHAuVXNlV2hlbigKICAgIGN0eCA9PiBjdHguUmVxdWVzdC5QYXRoLlN0YXJ0c1dpdGhTZWdtZW50cygiL2FwaSIpLAogICAgYnJhbmNoID0+IGJyYW5jaC5Vc2VNaWRkbGV3YXJlPEFwaUtleU1pZGRsZXdhcmU+KCkKKTsKCmlmIChhZ2VudEVuYWJsZWQpCnsKICAgIHZhciBvcHRzID0gYXBwLlNlcnZpY2VzLkdldFJlcXVpcmVkU2VydmljZTxDaGF0T3B0aW9ucz4oKTsKICAgIGFwcC5Mb2dnZXIuTG9nSW5mb3JtYXRpb24oCiAgICAgICAgIkNoYXQgTExNIGNvbmZpZzogZW5hYmxlZD17RW5hYmxlZH0sIHByb3ZpZGVyPXtQcm92aWRlcn0sIG1vZGVsPXtNb2RlbH0sIGJhc2VVcmw9e0Jhc2VVcmx9IiwKICAgICAgICBvcHRzLkxsbUVuYWJsZWQsIG9wdHMuTGxtUHJvdmlkZXIsIG9wdHMuTGxtTW9kZWwsIG9wdHMuUmVzb2x2ZWRCYXNlVXJsKTsKCiAgICB2YXIgbWNDZmcgID0gYXBwLlNlcnZpY2VzLkdldFJlcXVpcmVkU2VydmljZTxJT3B0aW9uczxNaW5lY3JhZnRBZGFwdGVyQ29uZmlnPj4oKS5WYWx1ZTsKICAgIHZhciBtZW1DZmcgPSBhcHAuU2VydmljZXMuR2V0UmVxdWlyZWRTZXJ2aWNlPElPcHRpb25zPFJlc3RNZW1vcnlHYXRld2F5T3B0aW9ucz4+KCkuVmFsdWU7CiAgICBhcHAuTG9nZ2VyLkxvZ0luZm9ybWF0aW9uKAogICAgICAgICI9PT0gQWdlbnQgY29uZmlnOiBib3Q9e0JvdH0gbWM9e0hvc3R9OntNY1BvcnR9IHwgIiArCiAgICAgICAgImxsbVRpbWVvdXQ9e0xsbVRpbWVvdXR9cyByYXRlQ29vbGRvd249e0Nvb2xkb3dufXMgbWF4UGVyTWluPXtNYXh9IHwgIiArCiAgICAgICAgIm1lbW9yeT17TWVtVXJsfSBhY3Rpb25UaW1lb3V0PTMwcyByZXBsYW5JbnRlcnZhbD0ycyA9PT0iLAogICAgICAgIG1jQ2ZnLkJvdFVzZXJuYW1lLCBtY0NmZy5TZXJ2ZXJIb3N0LCBtY0NmZy5TZXJ2ZXJQb3J0LAogICAgICAgIG9wdHMuTGxtVGltZW91dFNlY29uZHMsIG9wdHMuUGxheWVyQ29vbGRvd25TZWNvbmRzLCBvcHRzLkdsb2JhbFBlck1pbnV0ZU1heCwKICAgICAgICBtZW1DZmcuQmFzZVVybCk7CgogICAgLy8gU3ByaW50IDIzIEItMTogd2FybiB3aGVuIFdvcmxkS2JVcmwgaXMgbm90IGNvbmZpZ3VyZWQuCiAgICBpZiAoc3RyaW5nLklzTnVsbE9yV2hpdGVTcGFjZShtZW1DZmcuV29ybGRLYlVybCkpCiAgICB7CiAgICAgICAgYXBwLkxvZ2dlci5Mb2dXYXJuaW5nKAogICAgICAgICAgICAiV29ybGQgS0IgVVJMIGlzIG5vdCBjb25maWd1cmVkIChXb3JsZEtiVXJsIGlzIG51bGwpLiBXb3JsZCBvYnNlcnZhdGlvbnMgd2lsbCBiZSBzdG9yZWQgIiArCiAgICAgICAgICAgICJpbiBhZ2VudCBLQi4gU2V0IFdvcmxkS2JVcmwgaW4gQWdlbnQ6TWVtb3J5OldvcmxkS2JVcmwgdG8gZW5hYmxlIHdvcmxkIEtCIHNlcGFyYXRpb24uICIgKwogICAgICAgICAgICAiU2VlIERhdGEvUGFnZXMvR3VpZGVzL3dvcmxkLWtiLWRlcGxveW1lbnQubWQiKTsKICAgIH0KfQoKaWYgKGFnZW50RW5hYmxlZCkKICAgIGFwcC5NYXBIdWI8QWdlbnRIdWI+KCIvYWdlbnQtaHViIik7CgphcHAuTWFwR2V0KCIvIiwgKCkgPT4gIk1lbW9yeVNtaXRoLkFnZW50IGlzIHJ1bm5pbmcuIik7CgphcHAuTWFwR2V0KCIvYXBpL2Fib3V0IiwgKElHb2FsRmFjdG9yeT8gZmFjdG9yeSkgPT4gUmVzdWx0cy5PayhuZXcKewogICAgTmFtZSAgICA9ICJNZW1vcnlTbWl0aC5BZ2VudCIsCiAgICBWZXJzaW9uID0gIjAuMjguMCIsCiAgICBQaGFzZSAgID0gIlNwcmludCAzMCDigJQgQmFzZTY0IGRlY29kZSwgSVRvb2wgY29tcGxpYW5jZSwgU0VDLTAxIG1pZGRsZXdhcmUiLAogICAgTGljZW5zZSA9ICJNSVQiLAogICAgUmVwb3NpdG9yeSAgPSAiaHR0cHM6Ly9naXRodWIuY29tL1RoZU1hc29uWC9NZW1vcnlTbWl0aC5BZ2VudCIsCiAgICBEYXNoYm9hcmQgICA9ICIvIiwKICAgIFJlZ2lzdGVyZWRHb2FscyA9IGZhY3Rvcnk/LlJlZ2lzdGVyZWRHb2FscyA/PyBbXSwKfSkpOwoKYXBwLk1hcEdldCgiL2FwaS9hZ2VudC9zdGF0dXMiLCAoQWdlbnRCYWNrZ3JvdW5kU2VydmljZT8gYWdlbnQsIElXb3JsZE1vZGVsPyB3b3JsZE1vZGVsKSA9PgogICAgUmVzdWx0cy5PayhuZXcKICAgIHsKICAgICAgICBTdGF0dXMgICAgICAgICAgICAgID0gYWdlbnRFbmFibGVkID8gKGFnZW50Py5DdXJyZW50R29hbCAhPSBudWxsID8gImFjdGl2ZSIgOiAiaWRsZSIpIDogImRpc2FibGVkIiwKICAgICAgICBHb2FsICAgICAgICAgICAgICAgID0gYWdlbnQ/LkN1cnJlbnRHb2FsPy5OYW1lLAogICAgICAgIEdvYWxEZXNjcmlwdGlvbiAgICAgPSBhZ2VudD8uQ3VycmVudEdvYWw/LkRlc2NyaXB0aW9uLAogICAgICAgIEdvYWxQaGFzZXMgICAgICAgICAgPSBhZ2VudD8uQ3VycmVudEdvYWw/LlBoYXNlcywKICAgICAgICBIZWFsdGggICAgICAgICAgICAgID0gYWdlbnQ/LldvcmxkU3RhdGUuSGVhbHRoICA/PyAwLAogICAgICAgIEZvb2QgICAgICAgICAgICAgICAgPSBhZ2VudD8uV29ybGRTdGF0ZS5Gb29kICAgID8/IDAsCiAgICAgICAgUG9zaXRpb24gICAgICAgICAgICA9IGFnZW50Py5Xb3JsZFN0YXRlLlBvc2l0aW9uLAogICAgICAgIEludmVudG9yeSAgICAgICAgICAgPSBhZ2VudD8uV29ybGRTdGF0ZS5JbnZlbnRvcnksCiAgICAgICAgUXVldWVkQWN0aW9ucyAgICAgICA9IGFnZW50Py5HZXRQZW5kaW5nQWN0aW9ucygpLkNvdW50ID8/IDAsCiAgICAgICAgQ29uc2VjdXRpdmVGYWlsdXJlcyA9IGFnZW50Py5Db25zZWN1dGl2ZUZhaWx1cmVzID8/IDAsCiAgICAgICAgVW5jZXJ0YWludHkgICAgICAgICA9IHdvcmxkTW9kZWw/LlVuY2VydGFpbnR5ID8/IDAuMCwKICAgIH0pKTsKCmFwcC5NYXBHZXQoIi9hcGkvZ29hbHMiLCAoSUdvYWxGYWN0b3J5PyBmYWN0b3J5KSA9PgogICAgUmVzdWx0cy5PayhmYWN0b3J5Py5SZWdpc3RlcmVkR29hbHMgPz8gW10pKTsKCmFwcC5NYXBQb3N0KCIvYXBpL2FnZW50L3BsYW4iLCBhc3luYyAoUGxhblJlcXVlc3QgcmVxLCBBZ2VudEJhY2tncm91bmRTZXJ2aWNlPyBhZ2VudCwKICAgIElHb2FsRmFjdG9yeT8gZmFjdG9yeSwgSVBsYW5uZXI/IHBsYW5uZXIpID0+CnsKICAgIGlmIChhZ2VudCBpcyBudWxsIHx8IHBsYW5uZXIgaXMgbnVsbCB8fCBmYWN0b3J5IGlzIG51bGwpCiAgICAgICAgcmV0dXJuIFJlc3VsdHMuUHJvYmxlbSgiQWdlbnQgbm90IGVuYWJsZWQuIFNldCBBZ2VudDpFbmFibGVkPXRydWUuIik7CgogICAgdmFyIGdvYWwgPSBhd2FpdCBmYWN0b3J5LkNyZWF0ZUFzeW5jKHJlcS5Hb2FsTmFtZSwgcmVxLlBhcmFtZXRlcnMpOwogICAgaWYgKGdvYWwgaXMgbnVsbCkKICAgICAgICByZXR1cm4gUmVzdWx0cy5CYWRSZXF1ZXN0KG5ldwogICAgICAgIHsKICAgICAgICAgICAgRXJyb3IgICAgID0gJCJVbmtub3duIGdvYWwgJ3tyZXEuR29hbE5hbWV9Jy4iLAogICAgICAgICAgICBBdmFpbGFibGUgPSBmYWN0b3J5LlJlZ2lzdGVyZWRHb2FscywKICAgICAgICB9KTsKCiAgICB2YXIgcGxhbiA9IGF3YWl0IHBsYW5uZXIuUGxhbkFzeW5jKGdvYWwsIGFnZW50LldvcmxkU3RhdGUpOwogICAgYWdlbnQuU2V0R29hbChnb2FsKTsKICAgIHJldHVybiBSZXN1bHRzLk9rKG5ldwogICAgewogICAgICAgIEdvYWwgICAgICAgID0gZ29hbC5OYW1lLAogICAgICAgIERlc2NyaXB0aW9uID0gZ29hbC5EZXNjcmlwdGlvbiwKICAgICAgICBQaGFzZXMgICAgICA9IHBsYW4uUGhhc2VzLAogICAgICAgIEFjdGlvbkNvdW50ID0gcGxhbi5BY3Rpb25zLkNvdW50LAogICAgICAgIEFjdGlvbnMgICAgID0gcGxhbi5BY3Rpb25zLlRha2UoNSkuU2VsZWN0KGEgPT4gbmV3IHsgYS5Ub29sLCBhLkFyZ3VtZW50cyB9KSwKICAgIH0pOwp9KTsKCmFwcC5NYXBEZWxldGUoIi9hcGkvYWdlbnQvZ29hbCIsIChBZ2VudEJhY2tncm91bmRTZXJ2aWNlPyBhZ2VudCkgPT4KewogICAgaWYgKGFnZW50IGlzIG51bGwpIHJldHVybiBSZXN1bHRzLkJhZFJlcXVlc3QoIkFnZW50IG5vdCBlbmFibGVkLiIpOwogICAgYWdlbnQuQ2FuY2VsR29hbCgpOwogICAgcmV0dXJuIFJlc3VsdHMuT2sobmV3IHsgU3RhdHVzID0gImNhbmNlbGxlZCIgfSk7Cn0pOwoKYXBwLk1hcEdldCgiL2FwaS9hZ2VudC9xdWV1ZSIsIChBZ2VudEJhY2tncm91bmRTZXJ2aWNlPyBhZ2VudCkgPT4KewogICAgdmFyIGFjdGlvbnMgPSBhZ2VudD8uR2V0UGVuZGluZ0FjdGlvbnMoKSA/PyBbXTsKICAgIHJldHVybiBSZXN1bHRzLk9rKG5ldyB7IENvdW50ID0gYWN0aW9ucy5Db3VudCwgQWN0aW9ucyA9IGFjdGlvbnMuU2VsZWN0KGEgPT4gbmV3IHsgYS5Ub29sLCBBcmdzID0gYS5Bcmd1bWVudHMgfSkgfSk7Cn0pOwoKYXBwLk1hcFBvc3QoIi9hcGkvYWdlbnQvb3JpZ2luIiwgKE9yaWdpblJlcXVlc3QgcmVxLCBBZ2VudEJhY2tncm91bmRTZXJ2aWNlPyBhZ2VudCkgPT4KewogICAgaWYgKGFnZW50IGlzIG51bGwpIHJldHVybiBSZXN1bHRzLkJhZFJlcXVlc3QoIkFnZW50IG5vdCBlbmFibGVkLiIpOwogICAgYWdlbnQuU2V0QnVpbGRPcmlnaW4ocmVxLkJsdWVwcmludElkLCByZXEuWCwgcmVxLlksIHJlcS5aKTsKICAgIHJldHVybiBSZXN1bHRzLk9rKG5ldyB7IFN0YXR1cyA9ICJvcmlnaW4gc2V0IiwgcmVxLkJsdWVwcmludElkLCByZXEuWCwgcmVxLlksIHJlcS5aIH0pOwp9KTsKCmFwcC5NYXBQb3N0KCIvYXBpL2FnZW50L2NoYXQiLCAoQ2hhdFJlcXVlc3QgcmVxLCBBZ2VudEJhY2tncm91bmRTZXJ2aWNlPyBhZ2VudCkgPT4KewogICAgaWYgKGFnZW50IGlzIG51bGwpIHJldHVybiBSZXN1bHRzLkJhZFJlcXVlc3QoIkFnZW50IG5vdCBlbmFibGVkLiIpOwogICAgYWdlbnQuRW5xdWV1ZShuZXcgQWN0aW9uRGF0YSB7IFRvb2wgPSAiQ2hhdCIsIEFyZ3VtZW50cyA9IHsgWyJtZXNzYWdlIl0gPSByZXEuTWVzc2FnZSA/PyBzdHJpbmcuRW1wdHkgfSB9KTsKICAgIHJldHVybiBSZXN1bHRzLk9rKG5ldyB7IFN0YXR1cyA9ICJxdWV1ZWQiIH0pOwp9KTsKCmFwcC5NYXBHZXQoIi9hcGkvYmx1ZXByaW50cyIsICgpID0+IFJlc3VsdHMuT2sobmV3W10KICAgIHsgbmV3IHsgSWQgPSAic21hbGwtaG91c2UiLCBOYW1lID0gIlNtYWxsIFN1cnZpdmFsIEhvdXNlIiwgVGFncyA9IG5ld1tdIHsgImhvdXNlIiwgInN0YXJ0ZXIiIH0gfSB9KSk7CgphcHAuTWFwUG9zdCgiL2FwaS9hZ2VudC9jb25uZWN0IiwgKCkgPT4gUmVzdWx0cy5PayhuZXcgeyBTdGF0dXMgPSAiY29ubmVjdGVkIiB9KSk7CmFwcC5NYXBQb3N0KCIvYXBpL2FnZW50L3N0b3AiLCAgICAoKSA9PiBSZXN1bHRzLk9rKG5ldyB7IFN0YXR1cyA9ICJzdG9wcGVkIiB9KSk7CmFwcC5NYXBQb3N0KCIvYXBpL2FnZW50L2NvbW1hbmQiLCAoQ29tbWFuZFJlcXVlc3QgcmVxLCBBZ2VudEJhY2tncm91bmRTZXJ2aWNlPyBhZ2VudCwKICAgIElUb29sQ2FsbGVyPyB0b29scykgPT4KewogICAgaWYgKGFnZW50IGlzIG51bGwpIHJldHVybiBSZXN1bHRzLkJhZFJlcXVlc3QoIkFnZW50IG5vdCBlbmFibGVkLiIpOwogICAgaWYgKHRvb2xzIGlzIG5vdCBUb29sRGlzcGF0Y2hlciBkaXNwYXRjaGVyKQogICAgICAgIHJldHVybiBSZXN1bHRzLlByb2JsZW0oIlRvb2wgZGlzcGF0Y2hlciBub3QgYXZhaWxhYmxlLiIpOwogICAgaWYgKGRpc3BhdGNoZXIuR2V0KHJlcS5Db21tYW5kKSBpcyBudWxsKQogICAgICAgIHJldHVybiBSZXN1bHRzLkJhZFJlcXVlc3QobmV3IHsgRXJyb3IgPSAkIlVua25vd24gdG9vbCAne3JlcS5Db21tYW5kfScuIiwgUmVnaXN0ZXJlZCA9IGRpc3BhdGNoZXIuQWxsLlNlbGVjdCh0ID0+IHQuTmFtZSkgfSk7CiAgICBhZ2VudC5FbnF1ZXVlKG5ldyBBY3Rpb25EYXRhIHsgVG9vbCA9IHJlcS5Db21tYW5kIH0pOwogICAgcmV0dXJuIFJlc3VsdHMuT2sobmV3IHsgUmVjZWl2ZWQgPSByZXEuQ29tbWFuZCwgU3RhdHVzID0gInF1ZXVlZCIgfSk7Cn0pOwoKYXBwLk1hcEdldCgiL2FwaS9hZ2VudC9qb3VybmFsIiwgKAogICAgSUFnZW50Sm91cm5hbD8gam91cm5hbCwKICAgIGludCBsaW1pdCA9IDUwLAogICAgc3RyaW5nPyB0eXBlID0gbnVsbCkgPT4KewogICAgaWYgKGpvdXJuYWwgaXMgTnVsbEFnZW50Sm91cm5hbCBvciBudWxsKQogICAgICAgIHJldHVybiBSZXN1bHRzLk9rKG5ldyB7IGNvdW50ID0gMCwgcmV0dXJuZWQgPSAwLCBlbnRyaWVzID0gQXJyYXkuRW1wdHk8Sm91cm5hbEVudHJ5RHRvPigpIH0pOwoKICAgIEpvdXJuYWxFbnRyeVR5cGU/IHR5cGVGaWx0ZXIgPSBudWxsOwogICAgaWYgKHR5cGUgaXMgbm90IG51bGwgJiYgRW51bS5UcnlQYXJzZTxKb3VybmFsRW50cnlUeXBlPih0eXBlLCBpZ25vcmVDYXNlOiB0cnVlLCBvdXQgdmFyIHQpKQogICAgICAgIHR5cGVGaWx0ZXIgPSB0OwoKICAgIHZhciBlbnRyaWVzID0gam91cm5hbC5RdWVyeSh0eXBlRmlsdGVyKS5UYWtlKGxpbWl0KS5Ub0xpc3QoKTsKICAgIHZhciBkdG9zID0gZW50cmllcy5TZWxlY3QoZSA9PiBuZXcgSm91cm5hbEVudHJ5RHRvKAogICAgICAgIGUuVGltZXN0YW1wLlRvU3RyaW5nKCJPIiksCiAgICAgICAgZS5UeXBlLlRvU3RyaW5nKCksCiAgICAgICAgZS5TdW1tYXJ5LAogICAgICAgIChlLkRldGFpbHMgPz8gbmV3IERpY3Rpb25hcnk8c3RyaW5nLCBvYmplY3Q/PigpKQogICAgICAgICAgICAuVG9EaWN0aW9uYXJ5KGt2ID0+IGt2LktleSwga3YgPT4ga3YuVmFsdWU/LlRvU3RyaW5nKCkpCiAgICApKS5Ub0xpc3QoKTsKCiAgICByZXR1cm4gUmVzdWx0cy5PayhuZXcgeyBjb3VudCA9IGpvdXJuYWwuQ291bnQsIHJldHVybmVkID0gZHRvcy5Db3VudCwgZW50cmllcyA9IGR0b3MgfSk7Cn0pOwoKYXBwLk1hcEdldCgiL2FwaS9hZ2VudC93b3JsZG1vZGVsIiwgKElXb3JsZE1vZGVsPyBtb2RlbCwgYm9vbCBkZXRhaWwgPSB0cnVlKSA9Pgp7CiAgICBpZiAobW9kZWwgaXMgbnVsbCkKICAgICAgICByZXR1cm4gUmVzdWx0cy5PayhuZXcgeyBhdmFpbGFibGUgPSBmYWxzZSB9KTsKCiAgICBpZiAoIWRldGFpbCkKICAgIHsKICAgICAgICByZXR1cm4gUmVzdWx0cy5PayhuZXcKICAgICAgICB7CiAgICAgICAgICAgIGF2YWlsYWJsZSAgICAgID0gdHJ1ZSwKICAgICAgICAgICAgdW5jZXJ0YWludHkgICAgPSBtb2RlbC5VbmNlcnRhaW50eSwKICAgICAgICAgICAgcG9zaXRpb24gICAgICAgPSBtb2RlbC5CZWxpZWYuUG9zaXRpb24sCiAgICAgICAgICAgIGhlYWx0aCAgICAgICAgID0gbW9kZWwuQmVsaWVmLkhlYWx0aCwKICAgICAgICAgICAgZm9vZCAgICAgICAgICAgPSBtb2RlbC5CZWxpZWYuRm9vZCwKICAgICAgICAgICAgaW52ZW50b3J5Q291bnQgPSBtb2RlbC5CZWxpZWYuSW52ZW50b3J5LkNvdW50LAogICAgICAgIH0pOwogICAgfQoKICAgIHJldHVybiBSZXN1bHRzLk9rKG5ldwogICAgewogICAgICAgIGF2YWlsYWJsZSAgID0gdHJ1ZSwKICAgICAgICB1bmNlcnRhaW50eSA9IG1vZGVsLlVuY2VydGFpbnR5LAogICAgICAgIGJlbGllZiAgICAgID0gbW9kZWwuQmVsaWVmLAogICAgICAgIG9ic2VydmVkICAgID0gbW9kZWwuT2JzZXJ2ZWQsCiAgICB9KTsKfSk7CgphcHAuTWFwR2V0KCIvYXBpL2FnZW50L3Jlc29sdmUiLCBhc3luYyAoCiAgICBKS25vd2xlZGdlUmVzb2x2ZXI/IHJlc29sdmVyLAogICAgc3RyaW5nPyBxLAogICAgc3RyaW5nPyB0eXBlcyA9IG51bGwsCiAgICBmbG9hdCBjb25maWRlbmNlVGhyZXNob2xkID0gMC4wZiwKICAgIGludCB0b3BOID0gNSkgPT4KewogICAgaWYgKHJlc29sdmVyIGlzIG51bGwpCiAgICAgICAgcmV0dXJuIFJlc3VsdHMuUHJvYmxlbSgiS25vd2xlZGdlIHJlc29sdmVyIG5vdCBhdmFpbGFibGUuIFNldCBBZ2VudDpFbmFibGVkPXRydWUuIik7CgogICAgaWYgKHN0cmluZy5Jc051bGxPcldoaXRlU3BhY2UocSkpCiAgICAgICAgcmV0dXJuIFJlc3VsdHMuQmFkUmVxdWVzdChuZXcgeyBFcnJvciA9ICJxIHBhcmFtZXRlciBpcyByZXF1aXJlZC4iIH0pOwoKICAgIENhbmRpZGF0ZVR5cGVbXT8gdHlwZUZpbHRlciA9IG51bGw7CiAgICBpZiAoIXN0cmluZy5Jc051bGxPcldoaXRlU3BhY2UodHlwZXMpKQogICAgewogICAgICAgIHR5cGVGaWx0ZXIgPSB0eXBlcwogICAgICAgICAgICAuU3BsaXQoJywnLCBTdHJpbmdTcGxpdE9wdGlvbnMuUmVtb3ZlRW1wdHlFbnRyaWVzIHwgU3RyaW5nU3BsaXRPcHRpb25zLlRyaW1FbnRyaWVzKQogICAgICAgICAgICAuV2hlcmUodCA9PiBFbnVtLlRyeVBhcnNlPENhbmRpZGF0ZVR5cGU+KHQsIGlnbm9yZUNhc2U6IHRydWUsIG91dCBfKSkKICAgICAgICAgICAgLlNlbGVjdCh0ID0+IEVudW0uUGFyc2U8Q2FuZGlkYXRlVHlwZT4odCwgaWdub3JlQ2FzZTogdHJ1ZSkpCiAgICAgICAgICAgIC5Ub0FycmF5KCk7CiAgICB9CgogICAgdmFyIHF1ZXJ5ICA9IG5ldyBLbm93bGVkZ2VRdWVyeShxLCB0eXBlRmlsdGVyLCBjb25maWRlbmNlVGhyZXNob2xkLCBNYXRoLk1heCgxLCB0b3BOKSk7CiAgICB2YXIgcmVzdWx0ID0gYXdhaXQgcmVzb2x2ZXIuUmVzb2x2ZUFzeW5jKHF1ZXJ5KTsKCiAgICByZXR1cm4gUmVzdWx0cy5PayhuZXcKICAgIHsKICAgICAgICBxdWVyeSAgICAgICAgICA9IHEsCiAgICAgICAgY2FuZGlkYXRlQ291bnQgPSByZXN1bHQuQ2FuZGlkYXRlcy5Db3VudCwKICAgICAgICB3YXNBbWJpZ3VvdXMgICA9IHJlc3VsdC5XYXNBbWJpZ3VvdXMsCiAgICAgICAgYmVzdCAgICAgICAgICAgPSByZXN1bHQuQmVzdCBpcyB7IH0gYgogICAgICAgICAgICA/IG5ldyB7IGIuSWQsIGIuRGlzcGxheU5hbWUsIHR5cGUgPSBiLlR5cGUuVG9TdHJpbmcoKSwgYi5Db25maWRlbmNlLCBiLkRldGFpbCB9CiAgICAgICAgICAgIDogKG9iamVjdD8pbnVsbCwKICAgICAgICBjYW5kaWRhdGVzID0gcmVzdWx0LkNhbmRpZGF0ZXMuU2VsZWN0KGMgPT4gbmV3CiAgICAgICAgewogICAgICAgICAgICBjLklkLAogICAgICAgICAgICBjLkRpc3BsYXlOYW1lLAogICAgICAgICAgICB0eXBlICAgICAgID0gYy5UeXBlLlRvU3RyaW5nKCksCiAgICAgICAgICAgIGMuQ29uZmlkZW5jZSwKICAgICAgICAgICAgYy5EZXRhaWwsCiAgICAgICAgfSksCiAgICB9KTsKfSk7CgphcHAuUnVuKCk7CgpyZWNvcmQgQ29tbWFuZFJlcXVlc3Qoc3RyaW5nIENvbW1hbmQpOwpyZWNvcmQgUGxhblJlcXVlc3Qoc3RyaW5nIEdvYWxOYW1lLCBJUmVhZE9ubHlEaWN0aW9uYXJ5PHN0cmluZywgb2JqZWN0Pz4/IFBhcmFtZXRlcnMgPSBudWxsKTsKcmVjb3JkIE9yaWdpblJlcXVlc3Qoc3RyaW5nIEJsdWVwcmludElkLCBpbnQgWCwgaW50IFksIGludCBaKTsKcmVjb3JkIENoYXRSZXF1ZXN0KHN0cmluZz8gTWVzc2FnZSk7Cg==
+// MemorySmith.Agent — Web UI & Agent Host
+// v0.28.0  Sprint 30 — Base64 decode + ITool compliance + security
+
+using Agent.Construction;
+using Agent.Core;
+using Agent.Memory;
+using Agent.Planning;
+using Agent.Planning.Llm;
+using Agent.Tools;
+using Agent.World.Minecraft;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
+using Serilog;
+using Serilog.Events;
+using WebUI.Blazor;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, services, loggerConfig) =>
+{
+    loggerConfig
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft",              LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.AspNetCore",   LogEventLevel.Warning)
+        .MinimumLevel.Override("System.Net.Http",        LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.Extensions.Http", LogEventLevel.Warning)
+        .Enrich.FromLogContext()
+        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss}] {Message:lj}{NewLine}{Exception}")
+        .WriteTo.File(
+            path: "logs/memorysmith-agent-.log",
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 14,
+            shared: true,
+            restrictedToMinimumLevel: LogEventLevel.Debug,
+            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {SourceContext}: {Message:lj} {Properties:j}{NewLine}{Exception}");
+});
+
+// ── Options ───────────────────────────────────────────────────────────────────────────
+var factory = sp.GetRequiredService<IHttpClientFactory>();
+        var opts    = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
+        return new RestMemoryGateway(factory.CreateClient("memorysmith"), opts);
+    });
+
+    builder.Services.AddHttpClient("memorysmith-world", (sp, http) =>
+    {
+        var opts     = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
+        var worldUrl = string.IsNullOrWhiteSpace(opts.WorldKbUrl) ? opts.BaseUrl : opts.WorldKbUrl;
+        http.BaseAddress = new Uri(worldUrl);
+        http.Timeout     = TimeSpan.FromSeconds(opts.WorldTimeoutSeconds);
+        var apiKey   = opts.WorldApiKey ?? opts.ApiKey;
+        if (!string.IsNullOrEmpty(apiKey))
+            http.DefaultRequestHeaders.Add("X-Api-Key", apiKey);
+    });
+    builder.Services.AddKeyedSingleton<IMemoryGateway>("world", (sp, _) =>
+    {
+        var factory  = sp.GetRequiredService<IHttpClientFactory>();
+        var opts     = sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
+        var worldUrl = string.IsNullOrWhiteSpace(opts.WorldKbUrl) ? opts.BaseUrl : opts.WorldKbUrl;
+        var worldOpts = opts with
+        {
+            BaseUrl        = worldUrl,
+            ApiKey         = opts.WorldApiKey ?? opts.ApiKey,
+            TimeoutSeconds = opts.WorldTimeoutSeconds,
+        };
+        return new RestMemoryGateway(factory.CreateClient("memorysmith-world"), worldOpts);
+    });
+
+    builder.Services.AddSingleton<IItemRegistry>(sp =>
+        new MemorySmithItemRegistry(
+            sp.GetRequiredService<IMemoryGateway>(),
+            sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value));
+    builder.Services.AddSingleton<IBlueprintRepository>(sp =>
+        new MemorySmithBlueprintRepository(sp.GetRequiredService<IMemoryGateway>()));
+
+    builder.Services.AddSingleton<IKnowledgeResolver>(sp =>
+        new LocalKnowledgeResolver(
+            sp.GetRequiredService<IItemRegistry>(),
+            sp.GetRequiredService<IMemoryGateway>(),
+            () => sp.GetService<AgentBackgroundService>()?.WorldState));
+
+    builder.Services.AddSingleton<GoalFactory>(sp => new GoalFactory(
+        sp.GetRequiredService<IItemRegistry>(),
+        sp.GetRequiredService<IBlueprintRepository>()));
+    builder.Services.AddSingleton<IGoalFactory>(sp => sp.GetRequiredService<GoalFactory>());
+
+    builder.Services.AddSingleton<ChatHistory>();
+
+    var chatOpts = new ChatOptions();
+    var chatSection = builder.Configuration.GetSection("Agent:Chat");
+    chatSection.Bind(chatOpts);
+    var legacyModel = chatSection["Model"];
+    if (!string.IsNullOrWhiteSpace(legacyModel) && string.IsNullOrWhiteSpace(chatSection["LlmModel"]))
+        chatOpts = chatOpts with { LlmModel = legacyModel };
+    builder.Services.AddSingleton(chatOpts);
+
+    builder.Services.AddHttpClient("lmm", http =>
+    {
+        http.BaseAddress = new Uri(chatOpts.ResolvedBaseUrl);
+        http.Timeout     = TimeSpan.FromSeconds(chatOpts.LlmTimeoutSeconds + 2);
+    });
+    builder.Services.AddSingleton<ILlmProvider>(sp =>
+    {
+        var http = sp.GetRequiredService<IHttpClientFactory>().CreateClient("llm");
+        return LlmProviderFactory.Create(http, chatOpts);
+    });
+
+    builder.Services.AddSingleton<ChatRateLimiter>();
+    builder.Services.AddSingleton<ChatInterpreter>();
+    builder.Services.AddSingleton<IChatInterpreter>(sp =>
+        new LlmChatInterpreter(
+            sp.GetRequiredService<ILlmProvider>(),
+            sp.GetRequiredService<ChatInterpreter>(),
+            sp.GetRequiredService<ChatRateLimiter>(),
+            chatOpts,
+            sp.GetRequiredService<ChatHistory>(),
+            sp.GetRequiredService<ILogger<LlmChatInterpreter>>()));
+
+    // ── Tools ──────────────────────────────────────────────────────────────────────────────────
+    builder.Services.AddSingleton<IToolCaller>(sp =>
+    {
+        var world  = sp.GetRequiredService<IWorldAdapter>();
+        var memory = sp.GetRequiredService<IMemoryGateway>();
+        // Sprint 23 P0-B: SearchMemory + CreatePage route to world KB; GetPage uses agent KB.
+        var worldMemory = sp.GetKeyedService<IMemoryGateway>("world") ?? memory;
+        var journal = sp.GetRequiredService<IAgentJournal>();
+        var d = new ToolDispatcher(journal);
+        d.Register(new MoveToTool(world));
+        // Sprint 25 P0-B: StatusTool deleted (duplicate of GetStatusTool).
+        // GetStatusTool is registered under its canonical name "GetStatus" and aliased as "Status"
+        // for backward compatibility with plans and runtime paths that use the old name.
+        d.Register(new GetStatusTool(world));
+        d.Register("Status", new GetStatusTool(world));
+        d.Register(new MineBlockTool(world));
+        d.Register(new WanderTool(world));
+        d.Register(new PlaceBlockTool(world));
+        d.Register(new SearchMemoryTool(worldMemory)); // world KB
+        d.Register(new GetPageTool(memory));           // agent KB
+        d.Register(new CreatePageTool(worldMemory));   // world KB
+        d.Register(new ChatTool(world));
+        d.Register(new CraftItemTool(world));
+        d.Register(new FurnaceTool(world));
+        d.Register(new FindFlatAreaTool(world));
+        return d;
+    });
+
+    builder.Services.AddSingleton<HtnTaskLibrary>();
+    builder.Services.AddSingleton<HtnPlanner>(sp =>
+        new HtnPlanner(sp.GetRequiredService<HtnTaskLibrary>()));
+    builder.Services.AddSingleton<IPlanner>(sp =>
+        sp.GetRequiredService<PlannerRouter>());  // Sprint 27 P0-D: route through decomposer registry first
+
+    builder.Services.AddSingleton<IWorldModel>(new WorldModel());
+
+    builder.Services.AddSingleton<DecomposerRegistry>(sp =>
+    {
+        var lib = sp.GetRequiredService<HtnTaskLibrary>();
+        var lf  = sp.GetRequiredService<ILoggerFactory>(); // Sprint 32 BLK-01: BuildGoalDecomposer requires ILogger
+        var reg = new DecomposerRegistry();
+        reg.Register(new BuildGoalDecomposer(lib, lf.CreateLogger<BuildGoalDecomposer>()));
+        reg.Register(new GatherGoalDecomposer(lib));
+        reg.Register(new SurviveNightGoalDecomposer(lib));
+        reg.Register(new CraftItemGoalDecomposer(lib)); // Sprint 27 P0-D
+        return reg;
+    });
+    builder.Services.AddSingleton<PlannerRouter>();
+
+    builder.Services.AddSingleton<IAgentJournal>(new AgentJournal());
+
+    builder.Services.AddSingleton<IReplanGovernor, ReplanGovernor>();
+
+    // Sprint 27 P0-C: injectable time provider for deterministic testing.
+    builder.Services.AddSingleton<ITimeProvider>(SystemTimeProvider.Instance);
+
+    builder.Services.AddSignalR();
+
+    builder.Services.AddSingleton<AgentBackgroundService>(sp =>
+    {
+        var cfg = sp.GetRequiredService<IOptions<MinecraftAdapterConfig>>().Value;
+        return new AgentBackgroundService(
+            sp.GetRequiredService<IWorldAdapter>(),
+            sp.GetRequiredService<IToolCaller>(),
+            sp.GetRequiredService<ILogger<AgentBackgroundService>>(),
+            sp.GetRequiredService<IPlanner>(),
+            hubContext:      sp.GetRequiredService<IHubContext<AgentHub>>(),
+            goalFactory:     sp.GetRequiredService<GoalFactory>(),
+            chatInterpreter: sp.GetRequiredService<IChatInterpreter>(),
+            botName:         cfg.BotUsername,
+            journal:         sp.GetRequiredService<IAgentJournal>(),
+            replanGovernor:  sp.GetRequiredService<IReplanGovernor>(),
+            timeProvider:    sp.GetRequiredService<ITimeProvider>());  // Sprint 27 P0-C
+    });
+    builder.Services.AddHostedService(sp => sp.GetRequiredService<AgentBackgroundService>());
+}
+
+if (!agentEnabled)
+{
+    builder.Services.AddSingleton<IAgentJournal>(NullAgentJournal.Instance);
+    builder.Services.AddSingleton<IWorldModel>(new WorldModel());
+}
+
+var app = builder.Build();
+app.UseSerilogRequestLogging();
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+// Sprint 30 P1-C (SEC-01): gate all /api/* routes behind ApiKeyMiddleware.
+// Configure Agent:ApiKey in appsettings.json or Agent__ApiKey env var.
+app.UseWhen(
+    ctx => ctx.Request.Path.StartsWithSegments("/api"),
+    branch => branch.UseMiddleware<ApiKeyMiddleware>()
+);
+
+if (agentEnabled)
+{
+    var opts = app.Services.GetRequiredService<ChatOptions>();
+    app.Logger.LogInformation(
+        "Chat LLM config: enabled={Enabled}, provider={Provider}, model={Model}, baseUrl={BaseUrl}",
+        opts.LlmEnabled, opts.LlmProvider, opts.LlmModel, opts.ResolvedBaseUrl);
+
+    var mcCfg  = app.Services.GetRequiredService<IOptions<MinecraftAdapterConfig>>().Value;
+    var memCfg = app.Services.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value;
+    app.Logger.LogInformation(
+        "=== Agent config: bot={Bot} mc={Host}:{McPort} | " +
+        "llmTimeout={LlmTimeout}s rateCooldown={Cooldown}s maxPerMin={Max} | " +
+        "memory={MemUrl} actionTimeout=30s replanInterval=2s ===",
+        mcCfg.BotUsername, mcCfg.ServerHost, mcCfg.ServerPort,
+        opts.LlmTimeoutSeconds, opts.PlayerCooldownSeconds, opts.GlobalPerMinuteMax,
+        memCfg.BaseUrl);
+
+    // Sprint 23 B-1: warn when WorldKbUrl is not configured.
+    if (string.IsNullOrWhiteSpace(memCfg.WorldKbUrl))
+    {
+        app.Logger.LogWarning(
+            "World KB URL is not configured (WorldKbUrl is null). World observations will be stored " +
+            "in agent KB. Set WorldKbUrl in Agent:Memory:WorldKbUrl to enable world KB separation. " +
+            "See Data/Pages/Guides/world-kb-deployment.md");
+    }
+}
+
+if (agentEnabled)
+    app.MapHub<AgentHub>("/agent-hub");
+
+app.MapGet("/", () => "MemorySmith.Agent is running.");
+
+app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
+{
+    Name    = "MemorySmith.Agent",
+    Version = "0.28.0",
+    Phase   = "Sprint 30 — Base64 decode, ITool compliance, SEC-01 middleware",
+    License = "MIT",
+    Repository  = "https://github.com/TheMasonX/MemorySmith.Agent",
+    Dashboard   = "/",
+    RegisteredGoals = factory?.RegisteredGoals ?? [],
+}));
+
+app.MapGet("/api/agent/status", (AgentBackgroundService? agent, IWorldModel? worldModel) =>
+    Results.Ok(new
+    {
+        Status              = agentEnabled ? (agent?.CurrentGoal != null ? "active" : "idle") : "disabled",
+        Goal                = agent?.CurrentGoal?.Name,
+        GoalDescription     = agent?.CurrentGoal?.Description,
+        GoalPhases          = agent?.CurrentGoal?.Phases,
+        Health              = agent?.WorldState.Health  ?? 0,
+        Food                = agent?.WorldState.Food    ?? 0,
+        Position            = agent?.WorldState.Position,
+        Inventory           = agent?.WorldState.Inventory,
+        QueuedActions       = agent?.GetPendingActions().Count ?? 0,
+        ConsecutiveFailures = agent?.ConsecutiveFailures ?? 0,
+        Uncertainty         = worldModel?.Uncertainty ?? 0.0,
+    }));
+
+app.MapGet("/api/goals", (IGoalFactory? factory) =>
+    Results.Ok(factory?.RegisteredGoals ?? []));
+
+app.MapPost("/api/agent/plan", async (PlanRequest req, AgentBackgroundService? agent,
+    IGoalFactory? factory, IPlanner? planner) =>
+{
+    if (agent is null || planner is null || factory is null)
+        return Results.Problem("Agent not enabled. Set Agent:Enabled=true.");
+
+    var goal = await factory.CreateAsync(req.GoalName, req.Parameters);
+    if (goal is null)
+        return Results.BadRequest(new
+        {
+            Error     = $"Unknown goal '{req.GoalName}'.",
+            Available = factory.RegisteredGoals,
+        });
+
+    var plan = await planner.PlanAsync(goal, agent.WorldState);
+    agent.SetGoal(goal);
+    return Results.Ok(new
+    {
+        Goal        = goal.Name,
+        Description = goal.Description,
+        Phases      = plan.Phases,
+        ActionCount = plan.Actions.Count,
+        Actions     = plan.Actions.Take(5).Select(a => new { a.Tool, a.Arguments }),
+    });
+});
+
+app.MapDelete("/api/agent/goal", (AgentBackgroundService? agent) =>
+{
+    if (agent is null) return Results.BadRequest("Agent not enabled.");
+    agent.CancelGoal();
+    return Results.Ok(new { Status = "cancelled" });
+});
+
+app.MapGet("/api/agent/queue", (AgentBackgroundService? agent) =>
+{
+    var actions = agent?.GetPendingActions() ?? [];
+    return Results.Ok(new { Count = actions.Count, Actions = actions.Select(a => new { a.Tool, Args = a.Arguments }) });
+});
+
+app.MapPost("/api/agent/origin", (OriginRequest req, AgentBackgroundService? agent) =>
+{
+    if (agent is null) return Results.BadRequest("Agent not enabled.");
+    agent.SetBuildOrigin(req.BlueprintId, req.X, req.Y, req.Z);
+    return Results.Ok(new { Status = "origin set", req.BlueprintId, req.X, req.Y, req.Z });
+});
+
+app.MapPost("/api/agent/chat", (ChatRequest req, AgentBackgroundService? agent) =>
+{
+    if (agent is null) return Results.BadRequest("Agent not enabled.");
+    agent.Enqueue(new ActionData { Tool = "Chat", Arguments = { ["message"] = req.Message ?? string.Empty } });
+    return Results.Ok(new { Status = "queued" });
+});
+
+app.MapGet("/api/blueprints", () => Results.Ok(new[]
+    { new { Id = "small-house", Name = "Small Survival House", Tags = new[] { "house", "starter" } } }));
+
+app.MapPost("/api/agent/connect", () => Results.Ok(new { Status = "connected" }));
+app.MapPost("/api/agent/stop",    () => Results.Ok(new { Status = "stopped" }));
+app.MapPost("/api/agent/command", (CommandRequest req, AgentBackgroundService? agent,
+    IToolCaller? tools) =>
+{
+    if (agent is null) return Results.BadRequest("Agent not enabled.");
+    if (tools is not ToolDispatcher dispatcher)
+        return Results.Problem("Tool dispatcher not available.");
+    if (dispatcher.Get(req.Command) is null)
+        return Results.BadRequest(new { Error = $"Unknown tool '{req.Command}'.", Registered = dispatcher.All.Select(t => t.Name) });
+    agent.Enqueue(new ActionData { Tool = req.Command });
+    return Results.Ok(new { Received = req.Command, Status = "queued" });
+});
+
+app.MapGet("/api/agent/journal", (
+    IAgentJournal? journal,
+    int limit = 50,
+    string? type = null) =>
+{
+    if (journal is NullAgentJournal or null)
+        return Results.Ok(new { count = 0, returned = 0, entries = Array.Empty<JournalEntryDto>() });
+
+    JournalEntryType? typeFilter = null;
+    if (type is not null && Enum.TryParse<JournalEntryType>(type, ignoreCase: true, out var t))
+        typeFilter = t;
+
+    var entries = journal.Query(typeFilter).Take(limit).ToList();
+    var dtos = entries.Select(e => new JournalEntryDto(
+        e.Timestamp.ToString("O"),
+        e.Type.ToString(),
+        e.Summary,
+        (e.Details ?? new Dictionary<string, object?>())
+            .ToDictionary(kv => kv.Key, kv => kv.Value?.ToString())
+    )).ToList();
+
+    return Results.Ok(new { count = journal.Count, returned = dtos.Count, entries = dtos });
+});
+
+app.MapGet("/api/agent/worldmodel", (IWorldModel? model, bool detail = true) =>
+{
+    if (model is null)
+        return Results.Ok(new { available = false });
+
+    if (!detail)
+    {
+        return Results.Ok(new
+        {
+            available      = true,
+            uncertainty    = model.Uncertainty,
+            position       = model.Belief.Position,
+            health         = model.Belief.Health,
+            food           = model.Belief.Food,
+            inventoryCount = model.Belief.Inventory.Count,
+        });
+    }
+
+    return Results.Ok(new
+    {
+        available   = true,
+        uncertainty = model.Uncertainty,
+        belief      = model.Belief,
+        observed    = model.Observed,
+    });
+});
+
+app.MapGet("/api/agent/resolve", async (
+    JKnowledgeResolver? resolver,
+    string? q,
+    string? types = null,
+    float confidenceThreshold = 0.0f,
+    int topN = 5) =>
+{
+    if (resolver is null)
+        return Results.Problem("Knowledge resolver not available. Set Agent:Enabled=true.");
+
+    if (string.IsNullOrWhiteSpace(q))
+        return Results.BadRequest(new { Error = "q parameter is required." });
+
+    CandidateType[]? typeFilter = null;
+    if (!string.IsNullOrWhiteSpace(types))
+    {
+        typeFilter = types
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(t => Enum.TryParse<CandidateType>(t, ignoreCase: true, out _))
+            .Select(t => Enum.Parse<CandidateType>(t, ignoreCase: true))
+            .ToArray();
+    }
+
+    var query  = new KnowledgeQuery(q, typeFilter, confidenceThreshold, Math.Max(1, topN));
+    var result = await resolver.ResolveAsync(query);
+
+    return Results.Ok(new
+    {
+        query          = q,
+        candidateCount = result.Candidates.Count,
+        wasAmbiguous   = result.WasAmbiguous,
+        best           = result.Best is { } b
+            ? new { b.Id, b.DisplayName, type = b.Type.ToString(), b.Confidence, b.Detail }
+            : (object?)null,
+        candidates = result.Candidates.Select(c => new
+        {
+            c.Id,
+            c.DisplayName,
+            type       = c.Type.ToString(),
+            c.Confidence,
+            c.Detail,
+        }),
+    });
+});
+
+app.Run();
+
+record CommandRequest(string Command);
+record PlanRequest(string GoalName, IReadOnlyDictionary<string, object?>? Parameters = null);
+record OriginRequest(string BlueprintId, int X, int Y, int Z);
+record ChatRequest(string? Message);
