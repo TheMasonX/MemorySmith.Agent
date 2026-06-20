@@ -81,7 +81,7 @@ public class WorldStateBuilderTests
     public void SetFact_SetAndGet_RoundTrips()
     {
         var state   = new WorldState();
-        var updated = state.With(b => b.SetFact("biome", "forest"));
+        var updated = state.With(b => b.SetFact("biome", "forest", FactSource.Observed)); // Sprint 33 P1-3: migrated from deprecated 2-arg SetFact
         Assert.That(updated.Facts["biome"]?.ToString(), Is.EqualTo("forest"));
     }
 
@@ -89,8 +89,8 @@ public class WorldStateBuilderTests
     public void SetFact_OverwriteExisting_UpdatesValue()
     {
         var state  = new WorldState();
-        var step1  = state.With(b => b.SetFact("biome", "forest"));
-        var step2  = step1.With(b => b.SetFact("biome", "desert"));
+        var step1  = state.With(b => b.SetFact("biome", "forest", FactSource.Observed));  // Sprint 33 P1-3
+        var step2  = step1.With(b => b.SetFact("biome", "desert", FactSource.Observed));  // Sprint 33 P1-3
         Assert.That(step2.Facts["biome"]?.ToString(), Is.EqualTo("desert"));
     }
 
