@@ -1,1 +1,24 @@
-bmFtZXNwYWNlIEFnZW50LkNvcmU7CgovLy8gPHN1bW1hcnk+Ci8vLyBTcHJpbnQgMjUgUDAtRDogVHJhY2tzIHRoZSBsaWZlY3ljbGUgb2YgYSBkaXNwYXRjaGVkIGFjdGlvbiBmcm9tIGRpc3BhdGNoCi8vLyB0aHJvdWdoIGFja25vd2xlZGdtZW50L2NvbXBsZXRpb24vZmFpbHVyZS90aW1lb3V0LgovLy8KLy8vIFJlcGxhY2VzIHRoZSBpbXBsaWNpdCAiZGlzcGF0Y2hlZCA9IGRvbmUiIGFzc3VtcHRpb24gaWRlbnRpZmllZCBieSBib3RoCi8vLyBleHRlcm5hbCBhdWRpdHMgYXMgdGhlICMxIHJlbGlhYmlsaXR5IGdhcC4gRWFjaCBkaXNwYXRjaGVkIGFjdGlvbiBub3cgaGFzCi8vLyBhIHVuaXF1ZSA8c2VlIGNyZWY9IkNvcnJlbGF0aW9uSWQiLz4gZWNob2VkIGJ5IHRoZSBOb2RlLmpzIGFkYXB0ZXIgaW4gaXRzCi8vLyByZXN1bHQgZXZlbnQsIGVuYWJsaW5nIGVuZC10by1lbmQgbGlmZWN5Y2xlIHRyYWNraW5nLgovLy8gPC9zdW1tYXJ5PgpwdWJsaWMgc2VhbGVkIHJlY29yZCBQZW5kaW5nQWN0aW9uKAogICAgR3VpZCBDb3JyZWxhdGlvbklkLAogICAgc3RyaW5nIFRvb2xOYW1lLAogICAgRGF0ZVRpbWVPZmZzZXQgRGlzcGF0Y2hlZEF0LAogICAgQWN0aW9uTGlmZWN5Y2xlIFN0YXRlKQp7CiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gVHJhbnNpdGlvbnMgdGhpcyBwZW5kaW5nIGFjdGlvbiB0byBhIG5ldyBsaWZlY3ljbGUgc3RhdGUuCiAgICAvLy8gUmV0dXJucyBhIG5ldyByZWNvcmQgKHJlY29yZHMgYXJlIGltbXV0YWJsZSkuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHVibGljIFBlbmRpbmdBY3Rpb24gV2l0aFN0YXRlKEFjdGlvbkxpZmVjeWNsZSBuZXdTdGF0ZSkgPT4KICAgICAgICB0aGlzIHdpdGggeyBTdGF0ZSA9IG5ld1N0YXRlIH07Cn0K
+namespace Agent.Core;
+
+/// <summary>
+/// Sprint 25 P0-D: Tracks the lifecycle of a dispatched action from dispatch
+/// through acknowledgment/completion/failure/timeout.
+///
+/// Replaces the implicit "dispatched = done" assumption identified by both
+/// external audits as the #1 reliability gap. Each dispatched action now has
+/// a unique <see cref="CorrelationId"/> echoed by the Node.js adapter in its
+/// result event, enabling end-to-end lifecycle tracking.
+/// </summary>
+public sealed record PendingAction(
+    Guid CorrelationId,
+    string ToolName,
+    DateTimeOffset DispatchedAt,
+    ActionLifecycle State)
+{
+    /// <summary>
+    /// Transitions this pending action to a new lifecycle state.
+    /// Returns a new record (records are immutable).
+    /// </summary>
+    public PendingAction WithState(ActionLifecycle newState) =>
+        this with { State = newState };
+}
