@@ -24,6 +24,11 @@
 
   <ItemGroup>
     <Using Include="NUnit.Framework" />
+    <Using Include="global::Agent.Core" />
+    <Using Include="global::Agent.Construction" />
+    <Using Include="global::Agent.Planning" />
+    <Using Include="global::Agent.Planning.Goals" />
+    <Using Include="global::Agent.Tools" />
   </ItemGroup>
 
   <ItemGroup>

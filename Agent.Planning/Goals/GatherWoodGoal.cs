@@ -25,7 +25,14 @@ public sealed class GatherWoodGoal(int targetCount = 10) : IGoal
         GetWoodCount(state) >= targetCount;
 
     public bool HasFailed(WorldState state) =>
-        state.Facts.TryGetValue("goal:GatherWood:failed", out var v) && v is true;
+        state.Facts.TryGetValue("goal:GatherWood:failed", out var v) && IsTruthy(v);
+
+    private static bool IsTruthy(object? value) => value switch
+    {
+        bool b => b,
+        string s when bool.TryParse(s, out var parsed) => parsed,
+        _ => false,
+    };
 
     public int TargetCount => targetCount;
 

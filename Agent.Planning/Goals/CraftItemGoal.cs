@@ -46,5 +46,12 @@ public sealed class CraftItemGoal(string itemId, int count = 1) : IGoal
 
     /// <inheritdoc/>
     public bool HasFailed(WorldState state) =>
-        state.Facts.TryGetValue($"goal:CraftItem:{itemId}:failed", out var v) && v is true;
+        state.Facts.TryGetValue($"goal:CraftItem:{itemId}:failed", out var v) && IsTruthy(v);
+
+    private static bool IsTruthy(object? value) => value switch
+    {
+        bool b => b,
+        string s when bool.TryParse(s, out var parsed) => parsed,
+        _ => false,
+    };
 }

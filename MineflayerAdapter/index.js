@@ -219,7 +219,7 @@ wss.on('connection', (ws) => {
     // Sprint 18: emergency stop bypasses the command queue — execute immediately.
     // This ensures "leo stop" actually stops in-progress mining/pathfinding
     // rather than being queued behind the current action.
-    if (msg.action === 'stop') {
+    if (msg.action === 'stop' || msg.action === 'StopNow' || msg.action === 'EmergencyStop') {
       handleStop();
       return;
     }

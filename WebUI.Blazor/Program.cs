@@ -430,7 +430,7 @@ app.MapGet("/api/agent/worldmodel", (IWorldModel? model, bool detail = true) =>
 });
 
 app.MapGet("/api/agent/resolve", async (
-    JKnowledgeResolver? resolver,
+    IKnowledgeResolver? resolver,
     string? q,
     string? types = null,
     float confidenceThreshold = 0.0f,

@@ -1,8 +1,9 @@
 namespace MemorySmith.Agent.Tests;
 
-using Agent.Core;
-using Agent.Planning;
-using Agent.Planning.Goals;
+using global::Agent.Core;
+using global::Agent.Planning;
+using global::Agent.Planning.Goals;
+using Microsoft.Extensions.Logging.Abstractions;
 using System.Text.Json;
 
 /// <summary>
@@ -26,9 +27,9 @@ public class Sprint27Tests
     [SetUp]
     public void SetUp()
     {
-        _library    = new HtnTaskLibrary(new MockItemRegistry());
+        _library    = new HtnTaskLibrary();
         _registry   = new DecomposerRegistry();
-        _registry.Register(new BuildGoalDecomposer(_library));
+        _registry.Register(new BuildGoalDecomposer(_library, NullLogger<BuildGoalDecomposer>.Instance));
         _registry.Register(new GatherGoalDecomposer(_library));
         _registry.Register(new CraftItemGoalDecomposer(_library));
         _registry.Register(new SurviveNightGoalDecomposer(_library));

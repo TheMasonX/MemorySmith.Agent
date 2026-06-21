@@ -1,8 +1,8 @@
 namespace MemorySmith.Agent.Tests;
 
-using Agent.Core;
-using Agent.Planning;
-using Agent.Tools;
+using global::Agent.Core;
+using global::Agent.Planning;
+using global::Agent.Tools;
 using Microsoft.Extensions.Logging.Abstractions;
 
 /// <summary>

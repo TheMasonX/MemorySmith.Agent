@@ -3,6 +3,7 @@ namespace Agent.Planning;
 using Agent.Core;
 using Agent.Planning.Goals;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 /// <summary>
 /// Hybrid HTN planner implementation.
@@ -34,17 +35,40 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
     {
         var actions = new List<ActionData>();
 
-        // 1. Direct task-library decomposition by goal name.
-        if (library.HasTask(goal.Name))
+        if (goal is BuildGoal buildGoal)
+        {
+            var originX = ReadOriginFact(state, buildGoal.Blueprint.Id, "x");
+            var originY = ReadOriginFact(state, buildGoal.Blueprint.Id, "y");
+            var originZ = ReadOriginFact(state, buildGoal.Blueprint.Id, "z");
+
+            actions.AddRange(library.DecomposeBuild(
+                buildGoal.Blueprint,
+                buildGoal.Blocks,
+                originX,
+                originY,
+                originZ,
+                state));
+        }
+        else if (goal is CraftItemGoal craftGoal)
+        {
+            actions.AddRange(library.DecomposeCraftItem(craftGoal.ItemId, craftGoal.Count, state));
+        }
+        else if (goal is IItemSpecGoal itemSpecGoal)
+        {
+            actions.AddRange(library.DecomposeGatherItem(
+                itemSpecGoal.Spec,
+                [itemSpecGoal.TargetCount.ToString()],
+                state));
+        }
+        else if (library.HasTask(goal.Name))
         {
             actions.AddRange(library.Decompose(goal.Name, [], state));
         }
         else
         {
             // 2. Phase-by-phase decomposition (pure HTN fallback).
-            // All typed goal branches (IItemSpecGoal, BuildGoal, CraftItemGoal) have been
-            // moved to registered IGoalDecomposer implementations and are intercepted by
-            // PlannerRouter before reaching this method.
+            // Typed goals now decompose directly above for compatibility with the
+            // older tests and direct callers that still invoke HtnPlanner directly.
             foreach (var phase in goal.Phases)
                 if (library.HasTask(phase))
                     actions.AddRange(library.Decompose(phase, [], state));
@@ -61,6 +85,21 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
 
     private static readonly string[] PreservedContextPrefixes =
         ["SearchMemory:", "CraftItem:", "FindFlatArea:", "Build:", "MoveTo:"];
+
+    private static int ReadOriginFact(WorldState state, string blueprintId, string axis)
+    {
+        var key = $"build:{blueprintId}:origin:{axis}";
+        if (!state.Facts.TryGetValue(key, out var v))
+            return 0;
+
+        return v switch
+        {
+            int i => i,
+            long l when l >= int.MinValue && l <= int.MaxValue => (int)l,
+            string s when int.TryParse(s, out var parsed) => parsed,
+            _ => 0,
+        };
+    }
 
     // ── ReplanAsync ───────────────────────────────────────────────────────────
     public async Task<IPlan?> ReplanAsync(

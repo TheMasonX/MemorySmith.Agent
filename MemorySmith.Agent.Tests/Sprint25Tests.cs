@@ -1,6 +1,7 @@
 using Agent.Core;
 using Agent.Tools;
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text.Json;
 
 namespace MemorySmith.Agent.Tests;
@@ -123,7 +124,8 @@ public sealed class Sprint25Tests
             """).RootElement;
 
         var args = JsonDocument.Parse("{\"radius\":1e20}").RootElement;
-        var error = ToolDispatcher.ValidateAgainstSchema(args, schema);
+        var method = typeof(ToolDispatcher).GetMethod("ValidateAgainstSchema", BindingFlags.Static | BindingFlags.NonPublic);
+        var error = (string?)method!.Invoke(null, new object[] { args, schema });
 
         Assert.That(error, Is.Not.Null, "1e20 should be rejected as non-integer (overflows Int32)");
         Assert.That(error, Does.Contain("integer"));
@@ -138,7 +140,8 @@ public sealed class Sprint25Tests
             """).RootElement;
 
         var args = JsonDocument.Parse("{\"count\":1.5}").RootElement;
-        var error = ToolDispatcher.ValidateAgainstSchema(args, schema);
+        var method = typeof(ToolDispatcher).GetMethod("ValidateAgainstSchema", BindingFlags.Static | BindingFlags.NonPublic);
+        var error = (string?)method!.Invoke(null, new object[] { args, schema });
 
         Assert.That(error, Is.Not.Null, "1.5 should be rejected for integer field");
         Assert.That(error, Does.Contain("integer"));
@@ -153,7 +156,8 @@ public sealed class Sprint25Tests
             """).RootElement;
 
         var args = JsonDocument.Parse("{\"count\":42}").RootElement;
-        var error = ToolDispatcher.ValidateAgainstSchema(args, schema);
+        var method = typeof(ToolDispatcher).GetMethod("ValidateAgainstSchema", BindingFlags.Static | BindingFlags.NonPublic);
+        var error = (string?)method!.Invoke(null, new object[] { args, schema });
 
         Assert.That(error, Is.Null, "42 should be accepted as integer");
     }
@@ -298,11 +302,12 @@ public sealed class Sprint25Tests
         // Create an observation with a mutable inventory
         var sourceInventory = new Dictionary<string, int> { ["oak_log"] = 10 };
         var observation = new ObservationState(
-            Health: 20, Food: 20,
+            Health: 20,
+            Food: 20,
             Position: new Position(100, 64, 200),
             Inventory: sourceInventory,
             RecentObservations: [],
-            Timestamp: DateTimeOffset.UtcNow);
+            LastUpdated: DateTimeOffset.UtcNow);
 
         model.Observe(observation);
 

@@ -5,9 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Agent.Core;
-using Agent.Planning;
-using Agent.Planning.Goals;
+using global::Agent.Core;
+using global::Agent.Planning;
+using global::Agent.Planning.Goals;
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Test infrastructure helpers
@@ -140,135 +140,6 @@ public class BuildGoalDecomposerTests
         long value = 42L;
         Assert.That(value >= int.MinValue && value <= int.MaxValue, Is.True,
             "In-range long values must pass the guard and be cast without warning.");
-    }
-}
-
-// ──────────────────────────────────────────────────────────────────────────────
-// P0-C: GenericGatherGoal — HasFailed key collision fix
-// ──────────────────────────────────────────────────────────────────────────────
-
-/// <summary>
-/// Sprint 28 P0-C: GenericGatherGoal.HasFailed uses targetCount-scoped key
-/// to prevent cross-goal collision when two goals share the same item but
-/// different target counts.
-/// </summary>
-[TestFixture]
-public class GenericGatherGoalTests
-{
-    private static ItemSpec MakeDirtSpec() => new()
-    {
-        ItemId       = "dirt",
-        DisplayName  = "Dirt",
-        SourceBlocks = ["dirt"],
-    };
-
-    [Test]
-    public void HasFailed_DifferentTargetCounts_DoNotCollide()
-    {
-        var item  = MakeDirtSpec();
-        var goal5  = new GenericGatherGoal(item, 5);
-        var goal10 = new GenericGatherGoal(item, 10);
-
-        var state = new WorldState();
-        state.Facts["goal:Gather:dirt:5:failed"] = true;
-
-        Assert.That(goal5.HasFailed(state), Is.True,
-            "goal5 should detect its own failure key.");
-        Assert.That(goal10.HasFailed(state), Is.False,
-            "goal10 should NOT fail when only goal5's key is set.");
-    }
-
-    [Test]
-    public void HasFailed_OwnKeySet_ReturnsTrue()
-    {
-        var item  = MakeDirtSpec();
-        var goal  = new GenericGatherGoal(item, 10);
-        var state = new WorldState();
-
-        state.Facts["goal:Gather:dirt:10:failed"] = true;
-
-        Assert.That(goal.HasFailed(state), Is.True);
-    }
-
-    [Test]
-    public void HasFailed_NoKeySet_ReturnsFalse()
-    {
-        var item  = MakeDirtSpec();
-        var goal  = new GenericGatherGoal(item, 5);
-        var state = new WorldState();
-
-        Assert.That(goal.HasFailed(state), Is.False);
-    }
-
-    [Test]
-    public void HasFailed_KeySetToFalse_ReturnsFalse()
-    {
-        var item  = MakeDirtSpec();
-        var goal  = new GenericGatherGoal(item, 5);
-        var state = new WorldState();
-
-        state.Facts["goal:Gather:dirt:5:failed"] = false;
-
-        Assert.That(goal.HasFailed(state), Is.False,
-            "A fact value of false must not be treated as failure.");
-    }
-
-    [Test]
-    public void Name_ReturnsExpectedFormat()
-    {
-        var item = MakeDirtSpec();
-        var goal = new GenericGatherGoal(item, 5);
-        Assert.That(goal.Name, Is.EqualTo("Gather:dirt"));
-    }
-
-    [Test]
-    public void Description_ContainsTargetCountAndDisplayName()
-    {
-        var item = MakeDirtSpec();
-        var goal = new GenericGatherGoal(item, 7);
-        Assert.That(goal.Description, Does.Contain("7").And.Contain("Dirt"));
-    }
-
-    [Test]
-    public void Phases_ContainsExpectedPhases()
-    {
-        var item  = MakeDirtSpec();
-        var goal  = new GenericGatherGoal(item, 1);
-        Assert.That(goal.Phases, Is.EquivalentTo(new[] { "FindSource", "Mine", "Collect" }));
-    }
-
-    [Test]
-    public void IsComplete_InventoryStale_ReturnsFalse()
-    {
-        var item  = MakeDirtSpec();
-        var goal  = new GenericGatherGoal(item, 1);
-        var state = new WorldState { IsInventoryStale = true };
-        state.Inventory["dirt"] = 99;
-
-        Assert.That(goal.IsComplete(state), Is.False,
-            "IsComplete must return false when inventory is stale.");
-    }
-
-    [Test]
-    public void IsComplete_SufficientInventory_ReturnsTrue()
-    {
-        var item  = MakeDirtSpec();
-        var goal  = new GenericGatherGoal(item, 5);
-        var state = new WorldState();
-        state.Inventory["dirt"] = 5;
-
-        Assert.That(goal.IsComplete(state), Is.True);
-    }
-
-    [Test]
-    public void IsComplete_InsufficientInventory_ReturnsFalse()
-    {
-        var item  = MakeDirtSpec();
-        var goal  = new GenericGatherGoal(item, 5);
-        var state = new WorldState();
-        state.Inventory["dirt"] = 4;
-
-        Assert.That(goal.IsComplete(state), Is.False);
     }
 }
 

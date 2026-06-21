@@ -1,8 +1,8 @@
 namespace MemorySmith.Agent.Tests;
 
-using Agent.Core;
-using Agent.Planning;
-using Agent.Planning.Goals;
+using global::Agent.Core;
+using global::Agent.Planning;
+using global::Agent.Planning.Goals;
 using System.Text.Json;
 
 /// <summary>
@@ -21,7 +21,7 @@ public class Sprint26Tests
 
     private static WorldState EmptyState() => new();
 
-    private static HtnTaskLibrary MakeLibrary() => new(new MockItemRegistry());
+    private static HtnTaskLibrary MakeLibrary() => new();
 
     private static JsonElement JsonArgs(string json) =>
         JsonDocument.Parse(json).RootElement;
@@ -156,7 +156,7 @@ public class Sprint26Tests
     public async Task TryInterruptOnDamage_LargeHealthDrop_SendsEmergencyStop()
     {
         var adapter = new MockWorldAdapter();
-        var journal = new NullAgentJournal();
+        var journal = NullAgentJournal.Instance;
         var service = AgentBackgroundServiceTestHelper.BuildMinimal(adapter, journal);
 
         await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
@@ -166,10 +166,8 @@ public class Sprint26Tests
             service.SetGoal(new SimpleGoal("Mine", "Mine blocks", ["mine"], _ => false));
 
             // Push two HealthEvents: 20 HP → 10 HP (delta = -10, abs 10 > threshold 6)
-            adapter.PushEvent(new HealthEvent(Health: 20f, Food: 20f,
-                Position: new Position(0, 64, 0), Timestamp: DateTimeOffset.UtcNow));
-            adapter.PushEvent(new HealthEvent(Health: 10f, Food: 20f,
-                Position: new Position(0, 64, 0), Timestamp: DateTimeOffset.UtcNow));
+            adapter.PushEvent(new HealthEvent(20, 20, DateTimeOffset.UtcNow));
+            adapter.PushEvent(new HealthEvent(10, 20, DateTimeOffset.UtcNow));
 
             // Give the event loop time to process (50ms — generous, loop polls at 10ms)
             await Task.Delay(150).ConfigureAwait(false);
@@ -193,7 +191,7 @@ public class Sprint26Tests
     public async Task TryInterruptOnDamage_SmallHealthDrop_NoEmergencyStop()
     {
         var adapter = new MockWorldAdapter();
-        var journal = new NullAgentJournal();
+        var journal = NullAgentJournal.Instance;
         var service = AgentBackgroundServiceTestHelper.BuildMinimal(adapter, journal);
 
         await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
@@ -202,8 +200,8 @@ public class Sprint26Tests
             service.SetGoal(new SimpleGoal("Mine", "Mine blocks", ["mine"], _ => false));
 
             // 20 → 18 HP (delta = -2, abs 2 < threshold 6)
-            adapter.PushEvent(new HealthEvent(20f, 20f, new Position(0,64,0), DateTimeOffset.UtcNow));
-            adapter.PushEvent(new HealthEvent(18f, 20f, new Position(0,64,0), DateTimeOffset.UtcNow));
+            adapter.PushEvent(new HealthEvent(20, 20, DateTimeOffset.UtcNow));
+            adapter.PushEvent(new HealthEvent(18, 20, DateTimeOffset.UtcNow));
 
             await Task.Delay(150).ConfigureAwait(false);
 
@@ -226,7 +224,7 @@ public class Sprint26Tests
     public async Task TryInterruptOnDamage_TwoRapidHits_CooldownSuppressesSecond()
     {
         var adapter = new MockWorldAdapter();
-        var journal = new NullAgentJournal();
+        var journal = NullAgentJournal.Instance;
         var service = AgentBackgroundServiceTestHelper.BuildMinimal(adapter, journal);
 
         await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
@@ -237,9 +235,9 @@ public class Sprint26Tests
             // Hit 1: 20 → 10 HP (delta = -10, triggers interrupt at time T)
             // Hit 2: 10 → 1 HP  (delta = -9, also > threshold — but within cooldown window)
             // Both events pushed synchronously → both processed within milliseconds → second suppressed
-            adapter.PushEvent(new HealthEvent(20f, 20f, new Position(0,64,0), DateTimeOffset.UtcNow));
-            adapter.PushEvent(new HealthEvent(10f, 20f, new Position(0,64,0), DateTimeOffset.UtcNow));
-            adapter.PushEvent(new HealthEvent(1f,  20f, new Position(0,64,0), DateTimeOffset.UtcNow));
+            adapter.PushEvent(new HealthEvent(20, 20, DateTimeOffset.UtcNow));
+            adapter.PushEvent(new HealthEvent(10, 20, DateTimeOffset.UtcNow));
+            adapter.PushEvent(new HealthEvent(1, 20, DateTimeOffset.UtcNow));
 
             await Task.Delay(200).ConfigureAwait(false);
 
@@ -262,7 +260,7 @@ public class Sprint26Tests
     public async Task TryInterruptOnDamage_ZeroThresholdGoal_NeverInterrupts()
     {
         var adapter = new MockWorldAdapter();
-        var journal = new NullAgentJournal();
+        var journal = NullAgentJournal.Instance;
         var service = AgentBackgroundServiceTestHelper.BuildMinimal(adapter, journal);
 
         await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
@@ -272,8 +270,8 @@ public class Sprint26Tests
             service.SetGoal(new ZeroInterruptGoal());
 
             // Massive damage: 20 → 1 HP (abs delta = 19, way above any sane threshold)
-            adapter.PushEvent(new HealthEvent(20f, 20f, new Position(0,64,0), DateTimeOffset.UtcNow));
-            adapter.PushEvent(new HealthEvent(1f,  20f, new Position(0,64,0), DateTimeOffset.UtcNow));
+            adapter.PushEvent(new HealthEvent(20, 20, DateTimeOffset.UtcNow));
+            adapter.PushEvent(new HealthEvent(1, 20, DateTimeOffset.UtcNow));
 
             await Task.Delay(150).ConfigureAwait(false);
 
@@ -296,7 +294,7 @@ public class Sprint26Tests
     public async Task TryInterruptOnDamage_FirstHealthEvent_NoPreviousHealth_NoInterrupt()
     {
         var adapter = new MockWorldAdapter();
-        var journal = new NullAgentJournal();
+        var journal = NullAgentJournal.Instance;
         var service = AgentBackgroundServiceTestHelper.BuildMinimal(adapter, journal);
 
         await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
@@ -305,7 +303,7 @@ public class Sprint26Tests
             service.SetGoal(new SimpleGoal("Mine", "Mine blocks", ["mine"], _ => false));
 
             // Only one health event — no previous health to compare against
-            adapter.PushEvent(new HealthEvent(1f, 20f, new Position(0,64,0), DateTimeOffset.UtcNow));
+            adapter.PushEvent(new HealthEvent(1, 20, DateTimeOffset.UtcNow));
 
             await Task.Delay(150).ConfigureAwait(false);
 

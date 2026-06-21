@@ -46,18 +46,13 @@ public sealed class BuildGoalDecomposer(HtnTaskLibrary taskLibrary, ILogger<Buil
             return 0;
         }
 
-        return v switch
-        {
-            int i                                          => i,
-            long l when l >= int.MinValue && l <= int.MaxValue => (int)l,
-            string s when int.TryParse(s, out var parsed) => parsed,
-            _ =>
-            (
-                logger.LogWarning(
-                    "Build origin fact unparseable; defaulting to 0 for axis {Axis}. Value={Value}",
-                    axis, v),
-                0
-            ).Item2,
-        };
+        if (v is int i) return i;
+        if (v is long l && l >= int.MinValue && l <= int.MaxValue) return (int)l;
+        if (v is string s && int.TryParse(s, out var parsed)) return parsed;
+
+        logger.LogWarning(
+            "Build origin fact unparseable; defaulting to 0 for axis {Axis}. Value={Value}",
+            axis, v);
+        return 0;
     }
 }

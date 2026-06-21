@@ -50,6 +50,18 @@ public sealed class GenericGatherGoal(ItemSpec item, int targetCount) : IGoal, I
     /// until a write site is added using the exact key format documented above.
     /// </summary>
     // CHANGED: include targetCount in key to prevent cross-goal collision
-    public bool HasFailed(WorldState state) =>
-        state.Facts.TryGetValue($"goal:{Name}:{targetCount}:failed", out var v) && v is true;
+    public bool HasFailed(WorldState state)
+    {
+        var targetCountKey = $"goal:{Name}:{targetCount}:failed";
+        var legacyKey = $"goal:{Name}:failed";
+        return (state.Facts.TryGetValue(targetCountKey, out var targetCountValue) && IsTruthy(targetCountValue)) ||
+               (state.Facts.TryGetValue(legacyKey, out var legacyValue) && IsTruthy(legacyValue));
+    }
+
+    private static bool IsTruthy(object? value) => value switch
+    {
+        bool b => b,
+        string s when bool.TryParse(s, out var parsed) => parsed,
+        _ => false,
+    };
 }

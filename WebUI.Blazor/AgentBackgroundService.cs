@@ -77,6 +77,8 @@ public sealed class AgentBackgroundService(
     /// </summary>
     private const int DamageInterruptCooldownSeconds = 3;
 
+    private const string EmergencyStopActionName = "StopNow";
+
     /// <summary>
     /// Sprint 23 P1-B: minimum seconds between passive health-critical GetStatus enqueues.
     /// Distinct from <see cref="DamageInterruptCooldownSeconds"/>: this gate applies to the
@@ -225,9 +227,9 @@ public sealed class AgentBackgroundService(
     {
         _worldState = _worldState.With(b =>
         {
-            b.SetFact($"build:{blueprintId}:origin:x", x);
-            b.SetFact($"build:{blueprintId}:origin:y", y);
-            b.SetFact($"build:{blueprintId}:origin:z", z);
+            b.SetFact($"build:{blueprintId}:origin:x", x.ToString(), FactSource.Observed);
+            b.SetFact($"build:{blueprintId}:origin:y", y.ToString(), FactSource.Observed);
+            b.SetFact($"build:{blueprintId}:origin:z", z.ToString(), FactSource.Observed);
         });
         logger.LogInformation("Build origin set for '{Blueprint}': ({X},{Y},{Z})", blueprintId, x, y, z);
     }
@@ -477,11 +479,12 @@ public sealed class AgentBackgroundService(
             return;
         }
 
-        if (damage.Health >= threshold)
+        var damageMagnitude = Math.Abs(damage.Delta);
+        if (damageMagnitude < threshold)
         {
             logger.LogDebug(
-                "[damage] health {Health}/20 at or above threshold {Threshold} — interrupt not triggered",
-                damage.Health, threshold);
+                "[damage] health drop magnitude {Magnitude} below threshold {Threshold} — interrupt not triggered",
+                damageMagnitude, threshold);
             return;
         }
 
@@ -584,7 +587,7 @@ public sealed class AgentBackgroundService(
 
             case ChatIntentType.QueryStatus:
                 _worldState = _worldState.With(b =>
-                    b.SetFact("currentGoal", _currentGoal?.Name ?? "idle"));
+                    b.SetFact("currentGoal", _currentGoal?.Name ?? "idle", FactSource.Observed));
                 break;
 
             case ChatIntentType.CreateGoal when interpretation.GoalName is not null:
@@ -852,6 +855,7 @@ public sealed class AgentBackgroundService(
                 {
                     if (_pendingActions.Count > 0) _pendingActions.RemoveAt(0);
                 }
+                Guid correlationId = Guid.Empty;
                 try
                 {
                     var argsJson = JsonSerializer.Serialize(action.Arguments);
@@ -863,7 +867,7 @@ public sealed class AgentBackgroundService(
                         ct, timeoutCts.Token);
 
                     // Sprint 25 P0-D: generate correlationId for action lifecycle tracking.
-                    var correlationId = Guid.NewGuid();
+                    correlationId = Guid.NewGuid();
                     action.Context["correlationId"] = correlationId.ToString();
                     var pending = new PendingAction(correlationId, action.Tool,
                         _timeProvider.UtcNow, ActionLifecycle.Dispatched);
@@ -912,7 +916,10 @@ public sealed class AgentBackgroundService(
                         {
                             var progressFactKey = BuildFactKeys.BuildProgressIndex(
                                 bpId?.ToString() ?? string.Empty);
-                            _worldState = _worldState.With(b => b.SetFact(progressFactKey, bpIdx));
+                            _worldState = _worldState.With(b => b.SetFact(
+                                progressFactKey,
+                                bpIdx?.ToString() ?? string.Empty,
+                                FactSource.Observed));
                             logger.LogDebug("[build] checkpoint: {Blueprint} block {Index} placed",
                                 bpId, bpIdx);
                         }
@@ -1157,8 +1164,8 @@ public sealed class AgentBackgroundService(
         try
         {
             _ = worldAdapter.SendActionAsync(
-                new ActionData { Tool = "stop" }, CancellationToken.None);
-            logger.LogInformation("[stop] emergency stop dispatched to adapter");
+                new ActionData { Tool = EmergencyStopActionName }, CancellationToken.None);
+            logger.LogInformation("[stop] emergency stop dispatched to adapter via {Action}", EmergencyStopActionName);
         }
         catch (Exception ex)
         {

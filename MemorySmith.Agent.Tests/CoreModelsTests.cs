@@ -25,7 +25,7 @@ public class CoreModelsTests
     public void WorldState_With_UpdatesFact()
     {
         var state = new WorldState();
-        var updated = state.With(b => b.SetFact("biome", "forest"));
+        var updated = state.With(b => b.SetFact("biome", "forest", FactSource.Observed));
         Assert.That(updated.Facts["biome"]?.ToString(), Is.EqualTo("forest"));
     }
 

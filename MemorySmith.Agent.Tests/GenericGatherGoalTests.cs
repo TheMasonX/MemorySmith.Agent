@@ -224,7 +224,7 @@ public class GenericGatherGoalTests
     {
         var goal  = new GenericGatherGoal(OakLogSpec(), 10);
         var state = new WorldState()
-            .With(b => b.SetFact("goal:Gather:oak_log:failed", true));
+            .With(b => b.SetFact("goal:Gather:oak_log:failed", true.ToString(), FactSource.Observed));
         Assert.That(goal.HasFailed(state), Is.True);
     }
 
@@ -233,7 +233,7 @@ public class GenericGatherGoalTests
     {
         var goal  = new GenericGatherGoal(OakLogSpec(), 10);
         var state = new WorldState()
-            .With(b => b.SetFact("goal:Gather:oak_log:failed", false));
+            .With(b => b.SetFact("goal:Gather:oak_log:failed", false.ToString(), FactSource.Observed));
         Assert.That(goal.HasFailed(state), Is.False);
     }
 
@@ -246,7 +246,7 @@ public class GenericGatherGoalTests
 
         // Only oak_log is marked failed
         var state = new WorldState()
-            .With(b => b.SetFact("goal:Gather:oak_log:failed", true));
+            .With(b => b.SetFact("goal:Gather:oak_log:failed", true.ToString(), FactSource.Observed));
 
         Assert.That(oakGoal.HasFailed(state),  Is.True);
         Assert.That(ironGoal.HasFailed(state), Is.False);

@@ -1,6 +1,6 @@
 namespace MemorySmith.Agent.Tests;
 
-using Agent.Core;
+using global::Agent.Core;
 
 /// <summary>
 /// Test-only <see cref="ITimeProvider"/> that returns a controllable time value.

@@ -49,9 +49,16 @@ public sealed class BuildGoal(Blueprint blueprint, IReadOnlyList<PlacementBlock>
 
     /// <inheritdoc/>
     public bool IsComplete(WorldState state) =>
-        state.Facts.TryGetValue($"goal:Build:{blueprint.Id}:complete", out var v) && v is true;
+        state.Facts.TryGetValue($"goal:Build:{blueprint.Id}:complete", out var v) && IsTruthy(v);
 
     /// <inheritdoc/>
     public bool HasFailed(WorldState state) =>
-        state.Facts.TryGetValue($"goal:Build:{blueprint.Id}:failed", out var v) && v is true;
+        state.Facts.TryGetValue($"goal:Build:{blueprint.Id}:failed", out var v) && IsTruthy(v);
+
+    private static bool IsTruthy(object? value) => value switch
+    {
+        bool b => b,
+        string s when bool.TryParse(s, out var parsed) => parsed,
+        _ => false,
+    };
 }

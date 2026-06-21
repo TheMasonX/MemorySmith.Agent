@@ -4,8 +4,8 @@ using System.Reflection;
 using System.Text.Json;
 using NUnit.Framework;
 using Microsoft.Extensions.Logging;
-using Agent.Core;
-using Agent.Planning;
+using global::Agent.Core;
+using global::Agent.Planning;
 
 /// <summary>
 /// Sprint 30 tests: P1-B (BuildGoalDecomposer real logger invocation),
@@ -171,7 +171,7 @@ public class Sprint30Tests
     public void WorldStateProjector_IsValidCSharpClass()
     {
         // Verifies WorldStateProjector.cs was correctly decoded (Sprint 30 P0-A).
-        var type = typeof(Agent.Core.WorldStateProjector);
+        var type = typeof(global::Agent.Core.WorldStateProjector);
         Assert.That(type, Is.Not.Null, "WorldStateProjector must be a loadable type.");
         Assert.That(type.IsSealed, Is.True, "WorldStateProjector must be a sealed class.");
 
@@ -185,7 +185,7 @@ public class Sprint30Tests
     public void SearchMemoryTool_ExecuteAsync_HasJsonElementSignature()
     {
         // Verifies Sprint 30 P0-B: SearchMemoryTool implements ITool.ExecuteAsync(JsonElement, CT).
-        var type = typeof(Agent.Tools.SearchMemoryTool);
+        var type = typeof(global::Agent.Tools.SearchMemoryTool);
         var method = type.GetMethod("ExecuteAsync",
             new[] { typeof(JsonElement), typeof(CancellationToken) });
         Assert.That(method, Is.Not.Null,
@@ -195,7 +195,7 @@ public class Sprint30Tests
     [Test]
     public void CreatePageTool_ExecuteAsync_HasJsonElementSignature()
     {
-        var type = typeof(Agent.Tools.CreatePageTool);
+        var type = typeof(global::Agent.Tools.CreatePageTool);
         var method = type.GetMethod("ExecuteAsync",
             new[] { typeof(JsonElement), typeof(CancellationToken) });
         Assert.That(method, Is.Not.Null,
@@ -205,7 +205,7 @@ public class Sprint30Tests
     [Test]
     public void SearchMemoryTool_HasInputSchemaProperty()
     {
-        var type = typeof(Agent.Tools.SearchMemoryTool);
+        var type = typeof(global::Agent.Tools.SearchMemoryTool);
         var prop = type.GetProperty("InputSchema");
         Assert.That(prop, Is.Not.Null, "SearchMemoryTool must expose an InputSchema property.");
         Assert.That(prop!.PropertyType, Is.EqualTo(typeof(JsonElement)));
@@ -214,7 +214,7 @@ public class Sprint30Tests
     [Test]
     public void CreatePageTool_HasInputSchemaProperty()
     {
-        var type = typeof(Agent.Tools.CreatePageTool);
+        var type = typeof(global::Agent.Tools.CreatePageTool);
         var prop = type.GetProperty("InputSchema");
         Assert.That(prop, Is.Not.Null, "CreatePageTool must expose an InputSchema property.");
         Assert.That(prop!.PropertyType, Is.EqualTo(typeof(JsonElement)));

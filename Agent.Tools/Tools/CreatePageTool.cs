@@ -1,7 +1,6 @@
 namespace Agent.Tools;
 
 using Agent.Core;
-using Agent.Memory;
 using System.Text.Json;
 
 /// <summary>
@@ -32,10 +31,11 @@ public sealed class CreatePageTool : ITool
           "type": "object",
           "properties": {
             "title": { "type": "string", "description": "The page title" },
-            "body":  { "type": "string", "description": "The page content in markdown" },
-            "type":  { "type": "string", "description": "Optional page type (e.g. 'observation', 'note')" }
+            "body": { "type": "string", "description": "The page content in markdown" },
+            "content": { "type": "string", "description": "Alias for body content in markdown" },
+            "type": { "type": "string", "description": "Optional page type (e.g. 'observation', 'note')" }
           },
-          "required": ["title", "body"]
+          "required": ["title"]
         }
         """).RootElement;
 
@@ -43,11 +43,17 @@ public sealed class CreatePageTool : ITool
     {
         var title = arguments.TryGetProperty("title", out var t) ? t.GetString()
                     : throw new ArgumentException("CreatePage requires 'title' parameter.");
-        var body  = arguments.TryGetProperty("body",  out var b) ? b.GetString()
-                    : throw new ArgumentException("CreatePage requires 'body' parameter.");
-        var type  = arguments.TryGetProperty("type",  out var ty) ? ty.GetString() : null;
+        var body = arguments.TryGetProperty("body", out var b) && b.ValueKind != JsonValueKind.Null
+            ? b.GetString()
+            : arguments.TryGetProperty("content", out var c) && c.ValueKind != JsonValueKind.Null
+                ? c.GetString()
+                : throw new ArgumentException("CreatePage requires 'body' or 'content' parameter.");
+        var type  = arguments.TryGetProperty("type",  out var ty) ? ty.GetString() ?? string.Empty : string.Empty;
 
         var page = await _memory.CreatePageAsync(title!, body!, type, ct).ConfigureAwait(false);
-        return ToolResult.Ok(new { page });
+        return new ToolResult(
+            true,
+            $"Page '{title}' created or updated.",
+            new Dictionary<string, object?> { ["page"] = page });
     }
 }

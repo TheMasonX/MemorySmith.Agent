@@ -58,7 +58,7 @@ public sealed class HtnTaskLibraryExtraTests
     public void DecomposeBuild_Checkpoint_IntFact_SkipsCorrectBlocks()
     {
         var progressKey = BuildFactKeys.BuildProgressIndex("test");
-        var state = new WorldState().With(b => b.SetFact(progressKey, (object?)1)); // int
+        var state = new WorldState().With(b => b.SetFact(progressKey, 1.ToString(), FactSource.Observed)); // int
         var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, 0, 64, 0, state);
         Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1),
             "Checkpoint=1 means blocks 0 and 1 were placed; only block 2 remains.");
@@ -69,7 +69,7 @@ public sealed class HtnTaskLibraryExtraTests
     public void DecomposeBuild_Checkpoint_LongFact_SkipsCorrectBlocks()
     {
         var progressKey = BuildFactKeys.BuildProgressIndex("test");
-        var state = new WorldState().With(b => b.SetFact(progressKey, (object?)1L)); // long
+        var state = new WorldState().With(b => b.SetFact(progressKey, 1L.ToString(), FactSource.Observed)); // long
         var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, 0, 64, 0, state);
         Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1));
     }
@@ -79,7 +79,7 @@ public sealed class HtnTaskLibraryExtraTests
     public void DecomposeBuild_Checkpoint_DoubleFact_SkipsCorrectBlocks()
     {
         var progressKey = BuildFactKeys.BuildProgressIndex("test");
-        var state = new WorldState().With(b => b.SetFact(progressKey, (object?)1.0)); // double
+        var state = new WorldState().With(b => b.SetFact(progressKey, 1.0.ToString(), FactSource.Observed)); // double
         var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, 0, 64, 0, state);
         Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1));
     }
@@ -89,7 +89,7 @@ public sealed class HtnTaskLibraryExtraTests
     public void DecomposeBuild_Checkpoint_StringFact_SkipsCorrectBlocks()
     {
         var progressKey = BuildFactKeys.BuildProgressIndex("test");
-        var state = new WorldState().With(b => b.SetFact(progressKey, (object?)"1")); // string
+        var state = new WorldState().With(b => b.SetFact(progressKey, "1", FactSource.Observed)); // string
         var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, 0, 64, 0, state);
         Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1));
     }
@@ -158,9 +158,9 @@ public sealed class HtnTaskLibraryExtraTests
     {
         var state = new WorldState().With(b =>
         {
-            b.SetFact(BuildFactKeys.AutoOriginX, 10);
-            b.SetFact(BuildFactKeys.AutoOriginY, 64);
-            b.SetFact(BuildFactKeys.AutoOriginZ, 10);
+            b.SetFact(BuildFactKeys.AutoOriginX, 10.ToString(), FactSource.Observed);
+            b.SetFact(BuildFactKeys.AutoOriginY, 64.ToString(), FactSource.Observed);
+            b.SetFact(BuildFactKeys.AutoOriginZ, 10.ToString(), FactSource.Observed);
         });
 
         var actions = _library.DecomposeBuild(

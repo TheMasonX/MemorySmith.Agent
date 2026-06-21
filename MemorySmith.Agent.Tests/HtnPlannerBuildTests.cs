@@ -79,9 +79,9 @@ public sealed class HtnPlannerBuildTests
     {
         var state = new WorldState().With(b =>
         {
-            b.SetFact("build:offset-test:origin:x", 100);
-            b.SetFact("build:offset-test:origin:y", 64);
-            b.SetFact("build:offset-test:origin:z", 200);
+            b.SetFact("build:offset-test:origin:x", 100.ToString(), FactSource.Observed);
+            b.SetFact("build:offset-test:origin:y", 64.ToString(), FactSource.Observed);
+            b.SetFact("build:offset-test:origin:z", 200.ToString(), FactSource.Observed);
         });
 
         var plan   = await MakePlan(SmallFloor, state, "offset-test");
@@ -101,9 +101,9 @@ public sealed class HtnPlannerBuildTests
     {
         var state = new WorldState().With(b =>
         {
-            b.SetFact("build:y-test:origin:x", 0);
-            b.SetFact("build:y-test:origin:y", 64);
-            b.SetFact("build:y-test:origin:z", 0);
+            b.SetFact("build:y-test:origin:x", 0.ToString(), FactSource.Observed);
+            b.SetFact("build:y-test:origin:y", 64.ToString(), FactSource.Observed);
+            b.SetFact("build:y-test:origin:z", 0.ToString(), FactSource.Observed);
         });
 
         var plan  = await MakePlan(SmallFloor, state, "y-test");
@@ -202,9 +202,9 @@ public sealed class HtnPlannerBuildTests
     private static WorldState WithAutoOrigin(WorldState state) =>
         state.With(b =>
         {
-            b.SetFact(BuildFactKeys.AutoOriginX, 0);
-            b.SetFact(BuildFactKeys.AutoOriginY, 64);
-            b.SetFact(BuildFactKeys.AutoOriginZ, 0);
+            b.SetFact(BuildFactKeys.AutoOriginX, 0.ToString(), FactSource.Observed);
+            b.SetFact(BuildFactKeys.AutoOriginY, 64.ToString(), FactSource.Observed);
+            b.SetFact(BuildFactKeys.AutoOriginZ, 0.ToString(), FactSource.Observed);
         });
 
     private static int CountTool(IPlan plan, string toolName) =>
