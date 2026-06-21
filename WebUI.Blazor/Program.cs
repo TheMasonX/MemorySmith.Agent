@@ -49,6 +49,15 @@ builder.Host.UseSerilog((context, services, loggerConfig) =>
 
 
 // ── Options ───────────────────────────────────────────────────────────────────────────
+
+// Map MEMORYSMITH_API_KEY env var → Agent:Memory:ApiKey so the RestMemoryGateway
+// sends the correct X-Api-Key header to the MemorySmith API server.
+var memorysmithApiKey = Environment.GetEnvironmentVariable("MEMORYSMITH_API_KEY");
+if (!string.IsNullOrEmpty(memorysmithApiKey))
+{
+    builder.Configuration["Agent:Memory:ApiKey"] = memorysmithApiKey;
+}
+
 builder.Services.Configure<RestMemoryGatewayOptions>(
     builder.Configuration.GetSection("Agent:Memory"));
 builder.Services.Configure<MinecraftAdapterConfig>(

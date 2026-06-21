@@ -23,10 +23,14 @@ public class Sprint30Tests
     // These tests use System.Reflection to access private methods. If the following
     // signatures change, the reflection lookups will return null and tests will fail
     // with an explicit Assert.NotNull failure (not a compile error). Keep these stable:
-    //   - BuildGoalDecomposer.ReadOriginFact(WorldState state, string blueprintId, string axis)
+    //   - BuildGoalDecomposer.ReadOriginFact(WorldState, string, string, out bool)
     //   - ChatInterpreter.ResolveItemId(string rawItem)  [static]
     //   - ChatInterpreter.ParseIntent(string message, WorldState state)  [static]
     // When these signatures must change, update the GetXxx() reflection helpers below.
+    //
+    // Sprint 35: signature changed from 3-param to 4-param (added out bool found).
+    // Missing-key no longer logs a warning — auto-detect FindFlatArea is the expected
+    // fallback. Reflection tests must pass 4 elements in the args array for out param.
 
     private static MethodInfo? GetReadOriginFact()
         => typeof(BuildGoalDecomposer).GetMethod(
@@ -34,7 +38,7 @@ public class Sprint30Tests
             BindingFlags.NonPublic | BindingFlags.Instance);
 
     [Test]
-    public void BuildGoalDecomposer_ReadOriginFact_MissingKey_LogsWarning()
+    public void BuildGoalDecomposer_ReadOriginFact_MissingKey_NoWarning()
     {
         var logger = new TestLogger<BuildGoalDecomposer>();
         var decomposer = new BuildGoalDecomposer(null!, logger);
@@ -42,10 +46,13 @@ public class Sprint30Tests
         Assert.That(method, Is.Not.Null, "ReadOriginFact must exist as a non-public instance method.");
 
         var state = new WorldState(); // no facts — key will be absent
-        method!.Invoke(decomposer, new object[] { state, "test-bp", "x" });
+        var args = new object[] { state, "test-bp", "x", false }; // out bool placeholder
+        method!.Invoke(decomposer, args);
 
-        Assert.That(logger.HasWarning("missing or unparseable"), Is.True,
-            "LogWarning must fire with 'missing or unparseable' when the origin fact key is absent.");
+        // Sprint 35: missing key no longer logs a warning — auto-detect is the fallback.
+        var warnings = logger.Entries.Count(e => e.Level == LogLevel.Warning);
+        Assert.That(warnings, Is.EqualTo(0),
+            "No warnings should be emitted when origin fact is absent (auto-detect fallback).");
     }
 
     [Test]
@@ -59,7 +66,8 @@ public class Sprint30Tests
         var state = new WorldState();
         // An object() does not match int / long / string branches → falls to _ arm → LogWarning
         state.Facts["build:test-bp:origin:y"] = new object();
-        method!.Invoke(decomposer, new object[] { state, "test-bp", "y" });
+        var args = new object[] { state, "test-bp", "y", false }; // out bool placeholder
+        method!.Invoke(decomposer, args);
 
         Assert.That(logger.HasWarning("defaulting to 0 for axis"), Is.True,
             "LogWarning must fire with 'defaulting to 0 for axis' when fact value cannot be parsed.");
@@ -75,7 +83,8 @@ public class Sprint30Tests
 
         var state = new WorldState();
         state.Facts["build:test-bp:origin:z"] = 42; // valid int
-        method!.Invoke(decomposer, new object[] { state, "test-bp", "z" });
+        var args = new object[] { state, "test-bp", "z", false }; // out bool placeholder
+        method!.Invoke(decomposer, args);
 
         var warnings = logger.Entries.Count(e => e.Level == LogLevel.Warning);
         Assert.That(warnings, Is.EqualTo(0),

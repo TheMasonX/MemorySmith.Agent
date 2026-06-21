@@ -38,7 +38,7 @@ import { appendFileSync, mkdirSync, existsSync } from 'node:fs';
 const WS_PORT  = parseInt(process.env.WS_PORT   ?? '3000',  10);
 const MC_HOST  = process.env.MC_HOST   ?? 'localhost';
 const MC_PORT  = parseInt(process.env.MC_PORT   ?? '25565', 10);
-const MC_USER  = process.env.MC_USERNAME ?? 'AgentBot';
+const MC_USER  = process.env.MC_USERNAME ?? 'Leo';
 const MC_VER   = process.env.MC_VERSION;
 const WS_TOKEN = process.env.WS_TOKEN ?? null;
 
@@ -547,12 +547,57 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         maxSlope    = FLAT_AREA_MAX_SLOPE,
       } = args;
 
-      const botPosObj = botPos();
+      let botPosObj = botPos();
       const r       = Math.max(1, Math.min(radius, 64));
       const minArea = Math.max(1, Math.min(minFlatArea, 256));
 
       // Sprint 18: reset stop flag for this scan
       _stopRequested = false;
+
+      // Sprint 35: wait for chunks to load before scanning. The bot may have just
+      // moved to this area and blockAt() returns null for unloaded chunks, which
+      // produces an empty height map and a false "no flat area" result.
+      // Uses a custom wait that covers the full scan radius (not just the default
+      // 5x5 chunk window from bot.waitForChunksToLoad).
+      try {
+        const chunkRadius = Math.ceil(r / 16) + 1; // +1 for safety margin
+        const pos = bot.entity?.position ?? { x: 0, y: 0, z: 0 };
+        const chunkPosToCheck = new Set();
+        const centerCX = Math.floor(pos.x / 16);
+        const centerCZ = Math.floor(pos.z / 16);
+        for (let cx = centerCX - chunkRadius; cx <= centerCX + chunkRadius; cx++) {
+          for (let cz = centerCZ - chunkRadius; cz <= centerCZ + chunkRadius; cz++) {
+            const col = bot.world.getColumn(cx, cz);
+            if (!col) chunkPosToCheck.add(`${cx},${cz}`);
+          }
+        }
+        if (chunkPosToCheck.size > 0) {
+          await new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+              bot.world.off('chunkColumnLoad', waitForLoad);
+              reject(new Error(`Timeout waiting for ${chunkPosToCheck.size} chunks`));
+            }, 10000);
+            function waitForLoad(columnCorner) {
+              const cx = Math.floor(columnCorner.x / 16);
+              const cz = Math.floor(columnCorner.z / 16);
+              chunkPosToCheck.delete(`${cx},${cz}`);
+              if (chunkPosToCheck.size === 0) {
+                clearTimeout(timeout);
+                bot.world.off('chunkColumnLoad', waitForLoad);
+                resolve();
+              }
+            }
+            bot.world.on('chunkColumnLoad', waitForLoad);
+          });
+        }
+      } catch {
+        // If chunks time out, log and continue — scan will use whatever is loaded.
+        console.warn('[findFlatArea] chunk load wait timed out — scanning with loaded chunks only');
+        logStructured('warn', 'findFlatArea', 'chunk load timeout', { radius: r });
+      }
+
+      // Re-read position after chunk loading (bot may have settled)
+      botPosObj = botPos();
       const _scanStart = Date.now();
       logStructured('info', 'findFlatArea', 'start', { radius: r, minArea, botPos: botPosObj });
 
@@ -683,12 +728,15 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           ...bestCandidate, score: +bestScore.toFixed(1), columns: columnIdx, elapsedMs: scanElapsed,
         });
       } else {
+        const heightMapSize = heightMap.size;
         console.warn(
           `[findFlatArea] no qualifying flat area found ` +
-          `(min=${minArea}, maxSlope=${maxSlope}, radius=${r}, columns=${columnIdx})`
+          `(min=${minArea}, maxSlope=${maxSlope}, radius=${r}, ` +
+          `columns=${columnIdx}, heightMap=${heightMapSize})`
         );
         logStructured('warn', 'findFlatArea', 'no qualifying area', {
-          minArea, maxSlope, radius: r, columns: columnIdx, elapsedMs: Date.now() - _scanStart,
+          minArea, maxSlope, radius: r, columns: columnIdx,
+          heightMapSize, elapsedMs: Date.now() - _scanStart,
         });
         // Sprint 19: include searchedRadius so C# can distinguish "searched small area"
         // from "searched large area". DecomposeBuild uses this to expand radius on retry.

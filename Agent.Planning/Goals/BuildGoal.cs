@@ -19,27 +19,58 @@ using Agent.Core;
 ///
 /// HasFailed: world-state fact "goal:Build:{blueprintId}:failed" = true.
 ///
-/// Build origin is read from world-state facts at plan time:
-///   Facts["build:{blueprintId}:origin:x"] (default 0)
-///   Facts["build:{blueprintId}:origin:y"] (default 0)
-///   Facts["build:{blueprintId}:origin:z"] (default 0)
+/// Origin resolution priority (Sprint 35):
+///   1. Explicit origin passed via constructor (<see cref="OriginX"/>, <see cref="OriginY"/>,
+///      <see cref="OriginZ"/>) — e.g. from chat "build a house at 100 64 200".
+///   2. World-state facts: "build:{blueprintId}:origin:{axis}" — e.g. from REST API or prior run.
+///   3. Auto-detect: FindFlatArea action emitted to locate the nearest suitable flat spot.
 ///
-/// Introduced in TSK-0011 Phase 4b.
+/// Blueprints are "stamps" — they never store absolute positions. All coordinates
+/// are relative offsets applied on top of the resolved origin.
+///
+/// Introduced in TSK-0011 Phase 4b. Sprint 35: explicit origin support + auto-find fallback.
 /// </summary>
-public sealed class BuildGoal(Blueprint blueprint, IReadOnlyList<PlacementBlock> blocks) : IGoal
+public sealed class BuildGoal : IGoal
 {
     /// <summary>Blueprint metadata (id, name, materials, dimensions).</summary>
-    public Blueprint Blueprint => blueprint;
+    public Blueprint Blueprint { get; }
 
     /// <summary>Flat ordered list of blocks to place, relative to the build origin.</summary>
-    public IReadOnlyList<PlacementBlock> Blocks => blocks;
+    public IReadOnlyList<PlacementBlock> Blocks { get; }
+
+    /// <summary>Explicit world-coordinate origin from chat (e.g. "build a house at 100 64 200").</summary>
+    public int? OriginX { get; }
+    /// <summary>Explicit world-coordinate origin from chat.</summary>
+    public int? OriginY { get; }
+    /// <summary>Explicit world-coordinate origin from chat.</summary>
+    public int? OriginZ { get; }
+
+    /// <summary>True when the builder explicitly supplied a build origin.</summary>
+    public bool HasExplicitOrigin => OriginX.HasValue || OriginY.HasValue || OriginZ.HasValue;
 
     /// <inheritdoc/>
-    public string Name => $"Build:{blueprint.Id}";
+    public string Name { get; }
 
     /// <inheritdoc/>
-    public string Description =>
-        $"Build {blueprint.Name} ({blocks.Count} blocks, {blueprint.Dimensions.X}x{blueprint.Dimensions.Y}x{blueprint.Dimensions.Z}).";
+    public string Description { get; }
+
+    public BuildGoal(
+        Blueprint blueprint,
+        IReadOnlyList<PlacementBlock> blocks,
+        int? originX = null,
+        int? originY = null,
+        int? originZ = null)
+    {
+        Blueprint = blueprint;
+        Blocks = blocks;
+        Name = $"Build:{blueprint.Id}";
+        OriginX = originX;
+        OriginY = originY;
+        OriginZ = originZ;
+        Description = originX.HasValue
+            ? $"Build {blueprint.Name} ({blocks.Count} blocks) at ({originX},{originY},{originZ})."
+            : $"Build {blueprint.Name} ({blocks.Count} blocks, {blueprint.Dimensions.X}x{blueprint.Dimensions.Y}x{blueprint.Dimensions.Z}).";
+    }
 
     /// <inheritdoc/>
     public string[] Phases => ["GatherMaterials", "Build", "Verify"];
@@ -49,11 +80,11 @@ public sealed class BuildGoal(Blueprint blueprint, IReadOnlyList<PlacementBlock>
 
     /// <inheritdoc/>
     public bool IsComplete(WorldState state) =>
-        state.Facts.TryGetValue($"goal:Build:{blueprint.Id}:complete", out var v) && IsTruthy(v);
+        state.Facts.TryGetValue($"goal:Build:{Blueprint.Id}:complete", out var v) && IsTruthy(v);
 
     /// <inheritdoc/>
     public bool HasFailed(WorldState state) =>
-        state.Facts.TryGetValue($"goal:Build:{blueprint.Id}:failed", out var v) && IsTruthy(v);
+        state.Facts.TryGetValue($"goal:Build:{Blueprint.Id}:failed", out var v) && IsTruthy(v);
 
     private static bool IsTruthy(object? value) => value switch
     {

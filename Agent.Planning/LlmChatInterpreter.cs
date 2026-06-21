@@ -187,7 +187,23 @@ public sealed class LlmChatInterpreter(
                     break;
                 case "build":
                     var bp = GetStr(root, "blueprint");
-                    if (bp is not null) goalName = $"Build:{bp}";
+                    if (bp is not null)
+                    {
+                        goalName = $"Build:{bp}";
+                        // Sprint 35: pass optional coordinates from LLM
+                        var bx = GetInt(root, "x");
+                        var by = GetInt(root, "y");
+                        var bz = GetInt(root, "z");
+                        if (bx is not null && by is not null && bz is not null)
+                        {
+                            parameters = new Dictionary<string, object?>
+                            {
+                                ["originX"] = bx,
+                                ["originY"] = by,
+                                ["originZ"] = bz,
+                            };
+                        }
+                    }
                     break;
                 case "navigate":
                     var x = GetInt(root, "x");

@@ -114,7 +114,14 @@ public sealed class GoalFactory : IGoalFactory
             if (blueprint is null) return null;
 
             var (_, blocks) = BlueprintParser.Parse(blueprint.RawMarkdown);
-            return new BuildGoal(blueprint, blocks);
+
+            // Sprint 35: extract optional origin coordinates from chat parameters
+            // e.g. "build a house at 100 64 200" → originX=100, originY=64, originZ=200
+            var ox = GetInt(parameters, "originX", null);
+            var oy = GetInt(parameters, "originY", null);
+            var oz = GetInt(parameters, "originZ", null);
+
+            return new BuildGoal(blueprint, blocks, ox, oy, oz);
         }
 
         // ── CraftItem:{itemId} ────────────────────────────────────────────────
@@ -175,6 +182,18 @@ public sealed class GoalFactory : IGoalFactory
 
     private static int GetInt(
         IReadOnlyDictionary<string, object?>? p, string key, int defaultValue) =>
+        p?.TryGetValue(key, out var v) == true
+            ? v switch
+            {
+                int i                                         => i,
+                long l                                        => (int)l,
+                string s when int.TryParse(s, out var parsed) => parsed,
+                _                                             => defaultValue,
+            }
+            : defaultValue;
+
+    private static int? GetInt(
+        IReadOnlyDictionary<string, object?>? p, string key, int? defaultValue) =>
         p?.TryGetValue(key, out var v) == true
             ? v switch
             {

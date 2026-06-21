@@ -273,6 +273,13 @@ public sealed class AgentBackgroundService(
                 _journal?.Log(new JournalEntry(
                     _timeProvider.UtcNow, JournalEntryType.AgentStarted, "Agent connected"));
 
+                // Announce presence in Minecraft chat so players know the bot is online.
+                _queue.Enqueue(new ActionData
+                {
+                    Tool = "Chat",
+                    Arguments = { ["message"] = $"{botName} has connected to the server." }
+                });
+
                 await Task.WhenAll(
                     MonitorAndCancelOnFaultAsync(ProcessEventsAsync(connectionCts.Token), connectionCts),
                     DispatchActionsAsync(connectionCts.Token),

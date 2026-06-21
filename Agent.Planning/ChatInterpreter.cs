@@ -141,10 +141,12 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
 
     // Allow zero or more filler words before the blueprint name. Using * instead of ?
     // handles "build me a shelter" → fillers consumed = ["me", "a"], blueprint = "shelter".
+    // Sprint 35: optional "at X Y Z" suffix so "build a house at 100 64 200" captures coords.
     private static readonly Regex BuildRegex = new(
         @"\b(build|construct|make)\b\s+" +
         @"(?:(?:me|us|a|the|an)\s+)*" +
-        @"(?<blueprint>[a-z_][a-z_\- ]{1,30})",
+        @"(?<blueprint>[a-z_][a-z_\- ]{1,30})" +
+        @"(?:\s+at\s+(?<x>-?\d+)\s+(?<y>-?\d+)\s+(?<z>-?\d+))?",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     private static readonly Regex GoToRegex = new(
@@ -193,7 +195,7 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
         if (Regex.IsMatch(message, @"\b(help|commands|what can you do|usage)\b",
             RegexOptions.IgnoreCase))
             return new ChatInterpretation(ChatIntentType.QueryHelp,
-                Response: "Commands: 'get/mine <item> [n]', 'craft <item>', 'build <blueprint>', " +
+                Response: "Commands: 'get/mine <item> [n]', 'craft <item>', 'build <blueprint> [at X Y Z]', " +
                           "'go to X Y Z', 'come here', 'stop', 'status', 'help'");
 
         if (Regex.IsMatch(message, @"\b(come here|come to me|follow me|follow)\b",
@@ -219,9 +221,27 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
         {
             var bpId = ResolveBlueprintId(build.Groups["blueprint"].Value.Trim());
             if (bpId is not null)
+            {
+                // Sprint 35: optional "at X Y Z" coordinates
+                var hasCoords = build.Groups["x"].Success;
+                var pars = hasCoords
+                    ? new Dictionary<string, object?>
+                    {
+                        ["originX"] = int.Parse(build.Groups["x"].Value),
+                        ["originY"] = int.Parse(build.Groups["y"].Value),
+                        ["originZ"] = int.Parse(build.Groups["z"].Value),
+                    }
+                    : null;
+
+                var coordSuffix = hasCoords
+                    ? $" at ({build.Groups["x"]},{build.Groups["y"]},{build.Groups["z"]})"
+                    : "";
+
                 return new ChatInterpretation(ChatIntentType.CreateGoal,
                     GoalName: $"Build:{bpId}",
-                    Response: $"Starting to build {bpId.Replace('-', ' ')}.");
+                    GoalParameters: pars,
+                    Response: $"Starting to build {bpId.Replace('-', ' ')}{coordSuffix}.");
+            }
         }
 
         var gather = GatherRegex.Match(message);
