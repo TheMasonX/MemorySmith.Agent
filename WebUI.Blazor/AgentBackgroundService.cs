@@ -731,12 +731,35 @@ public sealed class AgentBackgroundService(
         {
             _gameErrors.Writer.TryWrite(errMsg);
             // Sprint 25 P0-D: error events indicate action failure — find and transition.
+            // Sprint 36: map Node.js wire action names to C# tool names for proper
+            // correlation. Node.js sends lowercase action names (e.g. "mine", "move")
+            // while the C# tool registry uses PascalCase (e.g. "MineBlock", "MoveTo").
             if (worldEvent is BlockNotFoundEvent)
                 FailCorrelatedActionByTool("MineBlock");
             else if (worldEvent is ErrorEvent errEv)
-                FailCorrelatedActionByTool(errEv.Action);
+                FailCorrelatedActionByTool(MapNodeActionToToolName(errEv.Action));
         }
     }
+
+    /// <summary>
+    /// Maps Node.js wire-protocol action names to C# tool names for action correlation.
+    /// Node.js sends lowercase action names in error events (e.g. "mine", "move"),
+    /// but the C# tool registry and PendingAction store PascalCase names (e.g. "MineBlock", "MoveTo").
+    /// </summary>
+    private static string MapNodeActionToToolName(string nodeAction) => nodeAction.ToLowerInvariant() switch
+    {
+        "mine"         => "MineBlock",
+        "move"         => "MoveTo",
+        "place"        => "PlaceBlock",
+        "wander"       => "Wander",
+        "chat"         => "Chat",
+        "findflatarea" => "FindFlatArea",
+        "craft"        => "CraftItem",
+        "smelt"        => "SmeltItem",
+        "getstatus"    => "GetStatus",
+        "status"       => "GetStatus",
+        _              => nodeAction, // fallback: pass through unchanged
+    };
 
     // ── Action dispatch ────────────────────────────────────────────────────────
 
@@ -858,6 +881,18 @@ public sealed class AgentBackgroundService(
             var action = _queue.Dequeue();
             if (action is not null)
             {
+                // Sprint 36: skip dispatching a MineBlock action when there is already
+                // one in-flight (Dispatched state). Under fire-and-forget dispatch, the
+                // C# planner replans every 2s and re-pushes the same MineBlock actions,
+                // flooding the Node.js command queue faster than the bot can dig.
+                // This prevents redundant commands while still allowing the in-flight
+                // action to report progress via blockMined events.
+                if (IsFireAndForgetTool(action.Tool) && HasPendingActionOfTool(action.Tool))
+                {
+                    logger.LogDebug("[dispatch] {Tool} skipped — already in-flight", action.Tool);
+                    continue;
+                }
+
                 _actionDispatchedThisCycle = true;
                 // Sprint 15 P1: record dispatch time for stall detection
                 _lastActionDispatchedAt = _timeProvider.UtcNow;
@@ -1075,6 +1110,24 @@ public sealed class AgentBackgroundService(
                 return; // only transition the first match
             }
         }
+    }
+
+    /// <summary>
+    /// Returns true when there is at least one PendingAction in Dispatched state
+    /// matching the given tool name. Used by the dispatch loop to skip redundant
+    /// MineBlock/GetStatus commands that are already in-flight on the Node.js side.
+    /// </summary>
+    private bool HasPendingActionOfTool(string toolName)
+    {
+        foreach (var kv in _correlatedActions)
+        {
+            if (kv.Value.State == ActionLifecycle.Dispatched &&
+                kv.Value.ToolName.Equals(toolName, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /// <summary>

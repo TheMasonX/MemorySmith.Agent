@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0019-plan-display-rle",
+  "key": "TSK-0019",
+  "title": "Plan Display RLE",
+  "description": "Any repeated actions like PlaceBlock should RLE compress and show the repeat count if more than one\n\u0060\u0060\u0060\n01:52:20] [plan] Build:small-house: 232 actions [SearchMemory \u2192 Wander \u2192 MineBlock \u2192 SearchMemory \u2192 Wander \u2192 MineBlock\u2192 SearchMemory \u2192 MineBlock \u2192 CraftItem \u2192 CraftItem \u2192 CraftItem \u2192 CraftItem \u2192 CraftItem \u2192 CraftItem \u2192 CraftItem \u2192 SearchMemory \u2192 MoveTo \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 PlaceBlock \u2192 (...continues...)   \u2192 PlaceBlock \u2192 GetStatus]\n\u0060\u0060\u0060",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T06:55:58.78791Z",
+  "updatedAtUtc": "2026-06-21T06:55:58.78791Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

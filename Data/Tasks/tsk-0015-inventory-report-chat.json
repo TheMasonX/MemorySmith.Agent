@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0015-inventory-report-chat",
+  "key": "TSK-0015",
+  "title": "Inventory Report Chat",
+  "description": "There needs to be a chat option to report the agent\u0027s current inventory",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T05:15:50.8770383Z",
+  "updatedAtUtc": "2026-06-21T05:15:50.8770383Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

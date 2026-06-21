@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0021-task-chat-updates",
+  "key": "TSK-0021",
+  "title": "Task Chat Updates",
+  "description": "I was originally thinking about how the build has a nice output that we should include in chat \u0060Build Small Survival House (215 blocks, 9x5x7). | inventory: [1x dandelion]\u0060, along with the actual resource requirements.\nBut this really should extend to the other tasks. For instance gather tasks should mention the relevant item so you know how many more it needs (if any).\n\nI think the task inventory data should only report items relevant to the task (e.g. resources or intermediates for the build, or the current count of a gather task item).",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T07:01:04.8826107Z",
+  "updatedAtUtc": "2026-06-21T07:01:04.8826107Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

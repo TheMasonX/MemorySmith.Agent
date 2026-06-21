@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0016-service-lifetime-management",
+  "key": "TSK-0016",
+  "title": "Service Lifetime Management",
+  "description": "Ollama and the mineflayer adapter both need lifetime managers to make sure they are launched. Ollama also may need some help making sure the right model is running (I think I had to manually call run). MineflayerAdapter manager probably needs a way to see if it has disconnected and needs reconnecting/restarting",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T05:19:19.9054149Z",
+  "updatedAtUtc": "2026-06-21T05:19:19.9054149Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

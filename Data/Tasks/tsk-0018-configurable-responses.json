@@ -1,0 +1,39 @@
+﻿{
+  "id": "tsk-0018-configurable-responses",
+  "key": "TSK-0018",
+  "title": "Configurable Responses",
+  "description": "All non-llm responses should be configurable. Wiki page to configure the sets of responses. All deterministic flavor text responses such as the task stopping, and thinking text must be configurable and support sets of responses, even if only one is supplied, to allow for easy variety",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [
+    {
+      "id": "a-63c765a648ef494b9c556eef4c4a3ca7",
+      "name": "TSK-0017 - Agent Greeting Upon Connection",
+      "kind": "task",
+      "uri": "task:tsk-0017-agent-greeting-upon-connection",
+      "addedAtUtc": "2026-06-21T06:49:40.4860968Z"
+    }
+  ],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T06:49:23.81498Z",
+  "updatedAtUtc": "2026-06-21T06:49:40.4860968Z",
+  "completedAtUtc": null,
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0018-configurable-responses.json"
+}

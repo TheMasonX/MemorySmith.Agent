@@ -436,7 +436,11 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           await bot.dig(fresh);
           mined++;
           pathFailures = 0;
-          sendEvent('blockMined', { block: shortName, count: mined, ...botPos(), correlationId });
+          // Sprint 36: send delta count (1 per dig) instead of cumulative mined counter.
+          // The C# ApplyBlockMined uses e.Count as an additive delta via AddInventoryItem.
+          // Sending cumulative count caused inventory ballooning (e.g. count=1, then 2, then 3
+          // was interpreted as +1, +2, +3 = 6 dirt instead of +1+1+1 = 3 dirt).
+          sendEvent('blockMined', { block: shortName, count: 1, ...botPos(), correlationId });
         } catch (e) {
           if (_stopRequested) { console.log(`[mine] aborted after dig error`); return; }
           console.warn(`[mine] dig failed: ${e.message}`);
@@ -559,8 +563,8 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       // produces an empty height map and a false "no flat area" result.
       // Uses a custom wait that covers the full scan radius (not just the default
       // 5x5 chunk window from bot.waitForChunksToLoad).
+      const chunkRadius = Math.ceil(r / 16) + 1; // +1 for safety margin — hoisted before try for diagnostic use
       try {
-        const chunkRadius = Math.ceil(r / 16) + 1; // +1 for safety margin
         const pos = bot.entity?.position ?? { x: 0, y: 0, z: 0 };
         const chunkPosToCheck = new Set();
         const centerCX = Math.floor(pos.x / 16);
@@ -729,14 +733,29 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         });
       } else {
         const heightMapSize = heightMap.size;
+        // Sprint 36: when heightMap is empty, the world may not be fully loaded.
+        // Log diagnostics: bot position, loaded chunk count, and a sample blockAt
+        // at the bot's feet to distinguish "chunks not loaded" from "no flat terrain".
+        const feetBlock = bot.blockAt(toVec3(botPosObj.x, botPosObj.y - 1, botPosObj.z));
+        const feetBlockName = feetBlock?.name ?? 'null';
+        const loadedChunkCount = [...Array(chunkRadius * 2 + 1).keys()].reduce((count, dx) => {
+          const cx = Math.floor(botPosObj.x / 16) + dx - chunkRadius;
+          return count + [...Array(chunkRadius * 2 + 1).keys()].filter(dz => {
+            const cz = Math.floor(botPosObj.z / 16) + dz - chunkRadius;
+            return !!bot.world.getColumn(cx, cz);
+          }).length;
+        }, 0);
         console.warn(
           `[findFlatArea] no qualifying flat area found ` +
           `(min=${minArea}, maxSlope=${maxSlope}, radius=${r}, ` +
-          `columns=${columnIdx}, heightMap=${heightMapSize})`
+          `columns=${columnIdx}, heightMap=${heightMapSize})` +
+          ` botPos=(${botPosObj.x},${botPosObj.y},${botPosObj.z})` +
+          ` feetBlock=${feetBlockName} loadedChunks=${loadedChunkCount}`
         );
         logStructured('warn', 'findFlatArea', 'no qualifying area', {
           minArea, maxSlope, radius: r, columns: columnIdx,
           heightMapSize, elapsedMs: Date.now() - _scanStart,
+          botPos: botPosObj, feetBlock: feetBlockName, loadedChunks: loadedChunkCount,
         });
         // Sprint 19: include searchedRadius so C# can distinguish "searched small area"
         // from "searched large area". DecomposeBuild uses this to expand radius on retry.

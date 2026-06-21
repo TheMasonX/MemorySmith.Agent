@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0020-build-task-resource-counts",
+  "key": "TSK-0020",
+  "title": "Build Task Resource Counts",
+  "description": "When a build task begins, it should include the resource counts required per block/item",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T06:57:18.4076246Z",
+  "updatedAtUtc": "2026-06-21T06:57:18.4076246Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}
