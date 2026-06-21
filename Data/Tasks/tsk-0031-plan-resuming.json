@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0031-plan-resuming",
+  "key": "TSK-0031",
+  "title": "Plan Resuming",
+  "description": "If the agent was in the middle of building a house and gets interrupted, they should finish the previous house, not start a new one",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T16:33:17.9133928Z",
+  "updatedAtUtc": "2026-06-21T16:33:17.9133928Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

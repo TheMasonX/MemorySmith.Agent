@@ -32,6 +32,7 @@ import mflPathfinder from 'mineflayer-pathfinder';
 const { pathfinder, Movements, goals: pfGoals } = mflPathfinder;
 import { WebSocketServer } from 'ws';
 import { appendFileSync, mkdirSync, existsSync } from 'node:fs';
+import { emitGameModeEvent } from './gameModeState.js';
 
 // ── Environment / connection ──────────────────────────────────────────────────
 
@@ -234,7 +235,10 @@ wss.on('connection', (ws) => {
 
   ws.on('error', (e) => console.error('[ws] socket error:', e.message));
 
-  if (bot?.entity) sendBotStatus();
+  if (bot?.entity) {
+    sendBotStatus();
+    emitGameModeEvent(bot, sendEvent, logStructured);
+  }
 });
 
 // ── Mineflayer bot ────────────────────────────────────────────────────────────
@@ -275,6 +279,7 @@ bot.once('spawn', () => {
   spawnPos = { x: bot.entity.position.x, y: bot.entity.position.y, z: bot.entity.position.z };
   console.log('[mc] bot spawned at', botPos());
   sendEvent('spawn', { ...botPos(), hp: bot.health, food: bot.food });
+  emitGameModeEvent(bot, sendEvent, logStructured);
 });
 
 bot.on('health', () => sendEvent('health', { hp: bot.health, food: bot.food }));
@@ -282,6 +287,7 @@ bot.on('move',   () => sendEvent('move',   botPos()));
 bot.on('death',  () => { console.warn('[mc] bot died'); sendEvent('death', botPos()); });
 bot.on('kicked', (reason) => { console.warn('[mc] kicked:', reason); sendEvent('kicked', { reason }); });
 bot.on('error',  (e)      => { console.error('[mc] error:', e.message); sendEvent('error', { message: e.message }); });
+bot.on('game', () => emitGameModeEvent(bot, sendEvent, logStructured));
 
 // ── Sprint 19: System message filtering ───────────────────────────────────────
 // Server-generated messages (teleport confirmations, join/leave, time set, etc.)

@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0032-fuzzy-search",
+  "key": "TSK-0032",
+  "title": "Fuzzy Search",
+  "description": "Fuzzy search for items or even keywords should be used, with high confidence items autoselected (~90%\u002B or somewhere like that, configurable), moderate items suggest the top 3 items (~75%\u002B), and lower is a failure and needs to be retried (possibly by the llm). I think using BM25 would improve this search drastically.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T17:15:56.5824193Z",
+  "updatedAtUtc": "2026-06-21T17:18:15.5203897Z",
+  "completedAtUtc": null,
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0032-fuzzy-search.json"
+}

@@ -60,7 +60,8 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
         ["coal"]       = "coal_ore", ["coal ore"]      = "coal_ore",
         ["diamond"]    = "diamond",  ["diamonds"]      = "diamond",
         ["sand"]       = "sand",     ["gravel"]        = "gravel",   ["dirt"]      = "dirt",
-        ["planks"]     = "oak_planks", ["plank"]       = "oak_planks", ["oak planks"] = "oak_planks",
+        ["planks"]     = "oak_planks", ["plank"]       = "oak_planks",
+        ["oak planks"] = "oak_planks", ["wood planks"] = "oak_planks", ["wood plank"] = "oak_planks",
         ["glass"]      = "glass",    ["glass pane"]    = "glass_pane",
     };
 
@@ -104,6 +105,8 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
         ["iron boots"]      = "iron_boots",
         // Blocks
         ["crafting table"]  = "crafting_table",
+        ["planks"]          = "oak_planks",   ["plank"]          = "oak_planks",
+        ["wood planks"]     = "oak_planks",   ["wood plank"]     = "oak_planks",
         ["oak planks"]      = "oak_planks",
         ["oak slab"]        = "oak_slab",        ["oak slabs"]       = "oak_slab",
         ["oak stairs"]      = "oak_stairs",
@@ -143,7 +146,7 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
     // handles "build me a shelter" → fillers consumed = ["me", "a"], blueprint = "shelter".
     // Sprint 35: optional "at X Y Z" suffix so "build a house at 100 64 200" captures coords.
     private static readonly Regex BuildRegex = new(
-        @"\b(build|construct|make)\b\s+" +
+        @"\b(build|construct)\b\s+" +
         @"(?:(?:me|us|a|the|an)\s+)*" +
         @"(?<blueprint>[a-z_][a-z_\- ]{1,30})" +
         @"(?:\s+at\s+(?<x>-?\d+)\s+(?<y>-?\d+)\s+(?<z>-?\d+))?",
@@ -163,7 +166,7 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
     /// "smelt iron ore", "craft me a crafting table".
     /// </summary>
     private static readonly Regex CraftRegex = new(
-        @"\b(craft|forge|smelt)\b\s+" +
+        @"\b(craft|forge|smelt|make)\b\s+" +
         @"(?:(?:me|us|a|an|the|some)\s+)*" +
         @"(?:(?<count>\d+)\s+)?" +
         @"(?:(?:me|us|a|an|the|some)\s+)*" +
@@ -196,20 +199,14 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
         // containing "doing" (e.g. "what are you doing with that wood") as a status query.
         // The compound patterns "what.?re you doing" and "what are you doing" already cover
         // all legitimate status queries that contain "doing".
-        // TSK-0015: status report now includes top inventory items.
+        // Status response shows goal, HP, and food only. Inventory is a separate command.
         if (Regex.IsMatch(message, @"\b(status|what.?re you doing|what are you doing|report)\b",
             RegexOptions.IgnoreCase))
         {
             var goal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s
                 ? $"Working on: {s}." : "Idle.";
-            var inv = state.Inventory.Count == 0
-                ? "empty"
-                : string.Join(", ", state.Inventory
-                    .OrderByDescending(kv => kv.Value)
-                    .Take(5)
-                    .Select(kv => $"{kv.Value}x {kv.Key}"));
             return new ChatInterpretation(ChatIntentType.QueryStatus,
-                Response: $"{goal} HP: {state.Health}/20, Food: {state.Food}/20. Inventory: {inv}.");
+                Response: $"{goal} HP: {state.Health}/20, Food: {state.Food}/20.");
         }
 
         if (Regex.IsMatch(message, @"\b(help|commands|what can you do|usage)\b",

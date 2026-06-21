@@ -16,7 +16,13 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "cmt-kick-rejoin-findings",
+      "author": "Agent Smith (Sprint 36)",
+      "body": "Kick detection + auto-rejoin gap observed 2026-06-21:\n\nMineflayerAdapter/index.js has NO `bot.on('end', ...)` handler. When the bot gets kicked (e.g. `multiplayer.disconnect.chat_validation_failed` from spamming chat), the adapters's 'kicked' event just logs and forwards to C#, then the process exits with no reconnection.\n\nLayers that need changes:\n1. JS (MineflayerAdapter/index.js): Add `bot.on('end', ...)` handler that calls tryReconnect() with exponential backoff. Recreate bot via createBot(). Also handle 'kicked' → end flow properly.\n2. C# bridge (WebSocketBridge.cs / MinecraftAdapter.cs): Add reconnect loop on WebSocket drop. Currently ConnectAsync is one-shot.\n3. Agent loop (AgentBackgroundService.cs): Handle mid-goal disconnection — restore goal state after reconnect.\n\nAlso observed: the 'kicked' event payload contains a NBT compound with a translate key — the server sends `multiplayer.disconnect.chat_validation_failed` when the bot's chat frequency triggers anti-spam. The C# KickedEvent currently stores `e.Reason` as the raw JSON — may need string extraction."
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,

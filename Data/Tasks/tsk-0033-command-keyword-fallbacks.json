@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0033-command-keyword-fallbacks",
+  "key": "TSK-0033",
+  "title": "Command Keyword Fallbacks",
+  "description": "Rather than exploring only one branch to fit the user message to chat, which is brittle if the user uses a Build keyword instead of a Gather keyword, the system should try rerouting down other sensible paths. Especially for overlapping semantics like build, mine, and craft where the user may interchange words",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T17:19:57.8392601Z",
+  "updatedAtUtc": "2026-06-21T17:19:57.8392601Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

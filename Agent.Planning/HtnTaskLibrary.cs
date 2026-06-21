@@ -341,17 +341,17 @@ public sealed class HtnTaskLibrary
             actions.Add(MakeAction("SearchMemory", ("query", $"flat area build location {blueprint.Name}")));
             actions.Add(MakeAction("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)));
 
-            var progressKey     = BuildFactKeys.BuildProgressIndex(blueprint.Name);
-            var checkpointIndex = 0;
-            if (TryGetIntFact(state, progressKey, out var lastPlaced))
-                checkpointIndex = lastPlaced + 1;
+            var creativeProgressKey     = BuildFactKeys.BuildProgressIndex(blueprint.Name);
+            var creativeCheckpointIndex = 0;
+            if (TryGetIntFact(state, creativeProgressKey, out var creativeLastPlaced))
+                creativeCheckpointIndex = creativeLastPlaced + 1;
 
-            var executor     = new BlueprintExecutor();
-            var blockActions = executor.Execute(blocks, originX, originY, originZ);
+            var creativeExecutor     = new BlueprintExecutor();
+            var creativeBlockActions = creativeExecutor.Execute(blocks, originX, originY, originZ);
 
-            for (int i = checkpointIndex; i < blockActions.Count; i++)
+            for (int i = creativeCheckpointIndex; i < creativeBlockActions.Count; i++)
             {
-                var placeAction = blockActions[i];
+                var placeAction = creativeBlockActions[i];
                 placeAction.Context[BuildFactKeys.PlaceBlockProgressBlueprintId] = blueprint.Name;
                 placeAction.Context[BuildFactKeys.PlaceBlockProgressBlockIndex]  = i;
                 actions.Add(placeAction);
@@ -514,20 +514,9 @@ public sealed class HtnTaskLibrary
         var toCraft = needed - have;
         if (toCraft <= 0) return;
 
-        // TSK-0020 fix: before crafting planks, ensure enough logs are available.
-        // 1 log = 4 planks; if inventory is short, mine logs first.
-        if (PlankToLogMap.TryGetValue(item, out var logType))
-        {
-            var logsNeeded = (toCraft + PlanksPerLog - 1) / PlanksPerLog; // ceiling division
-            var haveLogs = state.Inventory.GetValueOrDefault(logType);
-            var logsToMine = logsNeeded - haveLogs;
-            if (logsToMine > 0)
-            {
-                actions.Add(MakeAction("SearchMemory", ("query", $"{logType} nearby source tree")));
-                actions.Add(MakeAction("MineBlock", ("block", logType), ("count", (object?)logsToMine)));
-            }
-        }
-
+        // BuildGoal decomposition should stay on the crafting path for crafted
+        // prerequisites. It should not emit mining actions for those items;
+        // explicit craft goals remain responsible for any raw-material pre-gather.
         actions.Add(MakeAction("CraftItem", ("item", item), ("count", (object?)toCraft)));
     }
 

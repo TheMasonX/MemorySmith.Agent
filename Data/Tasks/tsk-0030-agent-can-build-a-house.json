@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0030-agent-can-build-a-house",
+  "key": "TSK-0030",
+  "title": "Agent Can Build A House",
+  "description": "Building a house is the MVP for the blueprint system. Ensure everything is in place for the decomposition of gathering wool for crafting a bed in survival. The house should be remembered as a safe place.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T16:16:50.3998861Z",
+  "updatedAtUtc": "2026-06-21T16:16:50.3998861Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

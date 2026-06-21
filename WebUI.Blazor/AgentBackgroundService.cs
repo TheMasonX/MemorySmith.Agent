@@ -599,6 +599,8 @@ public sealed class AgentBackgroundService(
             case ChatIntentType.QueryStatus:
                 _worldState = _worldState.With(b =>
                     b.SetFact("currentGoal", _currentGoal?.Name ?? "idle", FactSource.Observed));
+                if (pendingResponse is not null)
+                    logger.LogInformation("[chat] bot: {Response}", pendingResponse);
                 break;
 
             case ChatIntentType.CreateGoal when interpretation.GoalName is not null:
@@ -988,8 +990,11 @@ public sealed class AgentBackgroundService(
                         _journal?.Log(new JournalEntry(
                             _timeProvider.UtcNow, JournalEntryType.ActionFailed, action.Tool,
                             new Dictionary<string, object?> { ["error"] = result.Message ?? "" }));
-                        _consecutiveFailures++;
-                        _lastFailureReason ??= MapErrorToFailureReason(result.Message);
+                        if (!IsNonGoalFailureAction(action.Tool))
+                        {
+                            _consecutiveFailures++;
+                            _lastFailureReason ??= MapErrorToFailureReason(result.Message);
+                        }
                         // Sprint 25 P0-D: tool returned failure result — transition immediately.
                         TransitionCorrelatedAction(correlationId, ActionLifecycle.Failed);
                     }
@@ -1004,8 +1009,11 @@ public sealed class AgentBackgroundService(
                     _journal?.Log(new JournalEntry(
                         _timeProvider.UtcNow, JournalEntryType.ActionFailed, action.Tool,
                         new Dictionary<string, object?> { ["error"] = "timed out" }));
-                    _consecutiveFailures++;
-                    _lastFailureReason = FailureReason.ToolTimeout;
+                    if (!IsNonGoalFailureAction(action.Tool))
+                    {
+                        _consecutiveFailures++;
+                        _lastFailureReason = FailureReason.ToolTimeout;
+                    }
                     // Sprint 25 P0-D: timeout — transition to TimedOut.
                     TransitionCorrelatedAction(correlationId, ActionLifecycle.TimedOut);
                 }
@@ -1015,8 +1023,11 @@ public sealed class AgentBackgroundService(
                     _journal?.Log(new JournalEntry(
                         _timeProvider.UtcNow, JournalEntryType.ActionFailed, action.Tool,
                         new Dictionary<string, object?> { ["error"] = ex.Message }));
-                    _consecutiveFailures++;
-                    _lastFailureReason ??= FailureReason.Unknown;
+                    if (!IsNonGoalFailureAction(action.Tool))
+                    {
+                        _consecutiveFailures++;
+                        _lastFailureReason ??= FailureReason.Unknown;
+                    }
                     // Sprint 25 P0-D: exception — transition to Failed.
                     TransitionCorrelatedAction(correlationId, ActionLifecycle.Failed);
                 }
@@ -1268,17 +1279,15 @@ public sealed class AgentBackgroundService(
     /// </summary>
     private string SummarizeTaskRelevantInventory(IGoal goal)
     {
-        if (_worldState.Inventory.Count == 0) return "empty";
-
         if (goal is BuildGoal bg)
         {
             var parts = new List<string>();
-            foreach (var mat in bg.Blueprint.Materials)
+            foreach (var mat in bg.Blueprint.Materials.OrderByDescending(m => m.Quantity))
             {
                 var have = _worldState.Inventory.GetValueOrDefault(mat.Block);
                 parts.Add($"{mat.Block}: {have}/{mat.Quantity}");
             }
-            return string.Join(", ", parts);
+            return parts.Count > 0 ? string.Join(", ", parts) : "empty";
         }
 
         if (goal is IItemSpecGoal itemGoal)
@@ -1300,8 +1309,11 @@ public sealed class AgentBackgroundService(
             return $"{ciGoal.ItemId}: {have}/{ciGoal.Count}";
         }
 
-        return SummarizeInventory();
+        return _worldState.Inventory.Count == 0 ? "empty" : SummarizeInventory();
     }
+
+    private static bool IsNonGoalFailureAction(string toolName) =>
+        string.Equals(toolName, "Chat", StringComparison.OrdinalIgnoreCase);
 
     // ── Emergency stop ────────────────────────────────────────────────────────
 

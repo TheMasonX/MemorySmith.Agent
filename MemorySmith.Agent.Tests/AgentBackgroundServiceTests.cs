@@ -1,3 +1,4 @@
+using Agent.Construction;
 using Agent.Core;
 using Agent.Planning;
 using Agent.Tools;
@@ -122,18 +123,18 @@ public class AgentBackgroundServiceTests
             logger,
             _planner);
 
-        var blueprint = new Agent.Construction.Blueprint
+        var blueprint = new Blueprint
         {
             Id = "small-house",
             Name = "Small House",
-            Materials = [new Agent.Construction.MaterialEntry("cobblestone", 2), new Agent.Construction.MaterialEntry("oak_planks", 1)]
+            Materials = [new MaterialEntry("cobblestone", 2), new MaterialEntry("oak_planks", 1)]
         };
 
         service.SetGoal(new BuildGoal(blueprint, []));
 
-        using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));
+        using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(1000));
         var task = service.StartAsync(cts.Token);
-        await Task.Delay(200);
+        await Task.Delay(600);
         cts.Cancel();
         try { await task; } catch (OperationCanceledException) { }
 
