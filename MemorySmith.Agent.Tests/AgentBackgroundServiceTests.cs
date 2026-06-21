@@ -107,6 +107,45 @@ public class AgentBackgroundServiceTests
     }
 
     [Test]
+    public async Task PlanCreation_LogsTaskRelevantInventoryForBuildGoal()
+    {
+        var logger = new TestLogger<WebUI.Blazor.AgentBackgroundService>();
+        _planner.PlanToReturn = new ActionPlan(
+            "Build:small-house",
+            ["GatherMaterials", "Build", "Verify"],
+            [new ActionData { Tool = "NoOp" }]);
+        _dispatcher.Register(new NoOpTool("NoOp"));
+
+        var service = new WebUI.Blazor.AgentBackgroundService(
+            _adapter,
+            _dispatcher,
+            logger,
+            _planner);
+
+        var blueprint = new Agent.Construction.Blueprint
+        {
+            Id = "small-house",
+            Name = "Small House",
+            Materials = [new Agent.Construction.MaterialEntry("cobblestone", 2), new Agent.Construction.MaterialEntry("oak_planks", 1)]
+        };
+
+        service.SetGoal(new BuildGoal(blueprint, []));
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));
+        var task = service.StartAsync(cts.Token);
+        await Task.Delay(200);
+        cts.Cancel();
+        try { await task; } catch (OperationCanceledException) { }
+
+        Assert.That(
+            logger.Entries.Any(e => e.Message.Contains("[plan]")
+                && e.Message.Contains("cobblestone: 0/2")
+                && e.Message.Contains("oak_planks: 0/1")),
+            Is.True,
+            "Plan logging should report task-relevant inventory status for build goals.");
+    }
+
+    [Test]
     public async Task GoalComplete_ClearsGoal_AfterIsCompletePredicate()
     {
         // Arrange: goal is already complete from the start

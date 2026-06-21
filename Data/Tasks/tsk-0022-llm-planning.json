@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0022-llm-planning",
+  "key": "TSK-0022",
+  "title": "LLM Planning",
+  "description": "LLM needs to be able to create a plan with the steps it feels are required. It should also have access to it\u0027s own inventory. It needs \u0022tools\u0022 to be able to request the required info",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T07:10:20.0148528Z",
+  "updatedAtUtc": "2026-06-21T07:10:20.0148528Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

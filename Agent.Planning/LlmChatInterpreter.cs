@@ -135,6 +135,7 @@ public sealed class LlmChatInterpreter(
         "no" when players are talking to each other, not you.
         "conversation" when the player is just chatting (greetings, questions about you, casual talk).
         "clarify" when uncertain -- ask politely.
+        TSK-0015: "inventory" / "what do you have" -> use intent status and list inventory in response.
         Use Minecraft item IDs without namespace prefix (oak_log, cobblestone, iron_ore).
         """;
 

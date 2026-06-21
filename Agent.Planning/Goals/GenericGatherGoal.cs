@@ -17,6 +17,9 @@ public sealed class GenericGatherGoal(ItemSpec item, int targetCount) : IGoal, I
 
     public bool IsComplete(WorldState state)
     {
+        if (state.IsCreativeMode)
+            return true;
+
         if (state.IsInventoryStale)
             return false;
 

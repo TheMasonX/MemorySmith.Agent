@@ -218,6 +218,10 @@ public sealed class WebSocketBridge(string uri) : IDisposable
                     Food: GetInt(root, "food", 20),
                     Timestamp: now),
 
+                "gameMode" => new GameModeChangedEvent(
+                    Mode: GetString(root, "mode") ?? "unknown",
+                    Timestamp: now),
+
                 "move" or "moveComplete" => new MoveEvent(
                     Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
                     Timestamp: now),

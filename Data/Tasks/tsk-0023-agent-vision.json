@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0023-agent-vision",
+  "key": "TSK-0023",
+  "title": "Agent Vision",
+  "description": "Use an image-to-text converter (first plan is local CLIP conversion, but it should be agnostic) to take screenshots from the agent\u0027s point of view.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T07:12:48.3518363Z",
+  "updatedAtUtc": "2026-06-21T07:12:48.3518363Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

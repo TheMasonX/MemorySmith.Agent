@@ -32,6 +32,27 @@ public sealed class HtnTaskLibrary
     /// <summary>Vanilla: 1 stick + 1 coal -> 4 torches.</summary>
     private const int TorchesPerCraft = 4;
 
+    /// <summary>Vanilla: 1 log -> 4 planks.</summary>
+    private const int PlanksPerLog = 4;
+
+    /// <summary>
+    /// Maps plank item IDs to their source log item IDs for raw-material prerequisite
+    /// gathering before crafting. Used by <see cref="EmitCraftIfNeeded"/> to ensure
+    /// logs are mined before planks are crafted in the build crafting chain.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, string> PlankToLogMap =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["oak_planks"]       = "oak_log",
+        ["birch_planks"]     = "birch_log",
+        ["spruce_planks"]    = "spruce_log",
+        ["dark_oak_planks"]  = "dark_oak_log",
+        ["jungle_planks"]    = "jungle_log",
+        ["acacia_planks"]    = "acacia_log",
+        ["mangrove_planks"]  = "mangrove_log",
+        ["cherry_planks"]    = "cherry_log",
+    };
+
     /// <summary>Radius passed to FindFlatArea when DecomposeBuild has no origin set.</summary>
     private const int PreflightFlatAreaRadius = 30;
 
@@ -216,6 +237,22 @@ public sealed class HtnTaskLibrary
             }
         }
 
+        // ── Pre-gather logs for plank items ───────────────────────────────────
+        // TSK-0020: when the target item is planks, ensure enough logs are available.
+        // 1 log = 4 planks; mine logs first if inventory is short.
+        if (PlankToLogMap.TryGetValue(itemId, out var logType))
+        {
+            var logsNeeded = (count + PlanksPerLog - 1) / PlanksPerLog;
+            var haveLogs = state.Inventory.GetValueOrDefault(logType);
+            var logsToMine = logsNeeded - haveLogs;
+            if (logsToMine > 0)
+            {
+                actions.Add(MakeAction("SearchMemory", ("query", $"{logType} nearby source tree")));
+                actions.Add(MakeAction("MineBlock",
+                    ("block", logType), ("count", (object?)logsToMine)));
+            }
+        }
+
         // ── Ensure crafting table is available (Sprint 16: extracted helper) ──
         // Note: any MineBlock(oak_log) emitted here is for the TABLE PREREQUISITE,
         // not for the item being crafted. See AddCraftingTableIfNeeded for rationale.
@@ -297,51 +334,80 @@ public sealed class HtnTaskLibrary
 
         var actions = new List<ActionData>();
 
-        var materials = blueprint.Materials
-            .GroupBy(m => m.Block, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(g => g.Key, g => g.Sum(m => m.Quantity), StringComparer.OrdinalIgnoreCase);
-
-        foreach (var (block, quantity) in materials)
+        if (state.IsCreativeMode)
         {
-            if (!DirectMineBlocks.Contains(block)) continue;
-            var have   = state.Inventory.GetValueOrDefault(block);
-            var needed = quantity - have;
-            if (needed <= 0) continue;
-            actions.Add(MakeAction("SearchMemory", ("query", $"{block} nearby source location")));
-            actions.Add(MakeAction("Wander", ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)150)));
-            actions.Add(MakeAction("MineBlock", ("block", block), ("count", (object?)needed)));
-        }
+            // Creative mode grants the agent the requested materials up front, so skip
+            // mining, smelting, and crafting pre-gather actions entirely.
+            actions.Add(MakeAction("SearchMemory", ("query", $"flat area build location {blueprint.Name}")));
+            actions.Add(MakeAction("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)));
 
-        var torchEntry = materials.TryGetValue("torch", out var tq) ? (int?)tq : null;
-        if (torchEntry is not null)
-        {
-            var torchNeeded = torchEntry.Value - state.Inventory.GetValueOrDefault("torch");
-            if (torchNeeded > 0)
+            var progressKey     = BuildFactKeys.BuildProgressIndex(blueprint.Name);
+            var checkpointIndex = 0;
+            if (TryGetIntFact(state, progressKey, out var lastPlaced))
+                checkpointIndex = lastPlaced + 1;
+
+            var executor     = new BlueprintExecutor();
+            var blockActions = executor.Execute(blocks, originX, originY, originZ);
+
+            for (int i = checkpointIndex; i < blockActions.Count; i++)
             {
-                var coalNeeded = Math.Max(1, (torchNeeded + TorchesPerCraft - 1) / TorchesPerCraft);
-                var haveCoal   = state.Inventory.GetValueOrDefault("coal");
-                if (haveCoal < coalNeeded)
+                var placeAction = blockActions[i];
+                placeAction.Context[BuildFactKeys.PlaceBlockProgressBlueprintId] = blueprint.Name;
+                placeAction.Context[BuildFactKeys.PlaceBlockProgressBlockIndex]  = i;
+                actions.Add(placeAction);
+            }
+
+            actions.Add(MakeAction("GetStatus"));
+            return actions;
+        }
+        else
+        {
+            var materials = blueprint.Materials
+                .GroupBy(m => m.Block, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.Sum(m => m.Quantity), StringComparer.OrdinalIgnoreCase);
+
+            foreach (var (block, quantity) in materials)
+            {
+                if (!DirectMineBlocks.Contains(block)) continue;
+                var have   = state.Inventory.GetValueOrDefault(block);
+                var needed = quantity - have;
+                if (needed <= 0) continue;
+                actions.Add(MakeAction("SearchMemory", ("query", $"{block} nearby source location")));
+                actions.Add(MakeAction("Wander", ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)150)));
+                actions.Add(MakeAction("MineBlock", ("block", block), ("count", (object?)needed)));
+            }
+
+            var torchEntry = materials.TryGetValue("torch", out var tq) ? (int?)tq : null;
+            if (torchEntry is not null)
+            {
+                var torchNeeded = torchEntry.Value - state.Inventory.GetValueOrDefault("torch");
+                if (torchNeeded > 0)
                 {
-                    actions.Add(MakeAction("SearchMemory", ("query", "coal ore location nearby")));
-                    actions.Add(MakeAction("MineBlock", ("block", "coal_ore"), ("count", (object?)(coalNeeded - haveCoal))));
+                    var coalNeeded = Math.Max(1, (torchNeeded + TorchesPerCraft - 1) / TorchesPerCraft);
+                    var haveCoal   = state.Inventory.GetValueOrDefault("coal");
+                    if (haveCoal < coalNeeded)
+                    {
+                        actions.Add(MakeAction("SearchMemory", ("query", "coal ore location nearby")));
+                        actions.Add(MakeAction("MineBlock", ("block", "coal_ore"), ("count", (object?)(coalNeeded - haveCoal))));
+                    }
                 }
             }
-        }
 
-        if (materials.TryGetValue("iron_ingot", out var ironNeeded))
-        {
-            var haveIron = state.Inventory.GetValueOrDefault("iron_ingot");
-            var toSmelt  = ironNeeded - haveIron;
-            if (toSmelt > 0)
+            if (materials.TryGetValue("iron_ingot", out var ironNeeded))
             {
-                actions.Add(MakeAction("SearchMemory", ("query", "furnace iron ore location")));
-                actions.Add(MakeAction("MineBlock", ("block", "iron_ore"), ("count", (object?)toSmelt)));
-                actions.Add(MakeAction("SmeltItem", ("item", "iron_ore"), ("count", (object?)toSmelt), ("fuel", "coal")));
+                var haveIron = state.Inventory.GetValueOrDefault("iron_ingot");
+                var toSmelt  = ironNeeded - haveIron;
+                if (toSmelt > 0)
+                {
+                    actions.Add(MakeAction("SearchMemory", ("query", "furnace iron ore location")));
+                    actions.Add(MakeAction("MineBlock", ("block", "iron_ore"), ("count", (object?)toSmelt)));
+                    actions.Add(MakeAction("SmeltItem", ("item", "iron_ore"), ("count", (object?)toSmelt), ("fuel", "coal")));
+                }
             }
-        }
 
-        actions.AddRange(BuildCraftingChain(blueprint, materials, state,
-            hasTorch: torchEntry is not null, torchNeeded: torchEntry ?? 0));
+            actions.AddRange(BuildCraftingChain(blueprint, materials, state,
+                hasTorch: torchEntry is not null, torchNeeded: torchEntry ?? 0));
+        }
 
         actions.Add(MakeAction("SearchMemory", ("query", $"flat area build location {blueprint.Name}")));
         actions.Add(MakeAction("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)));
@@ -447,6 +513,21 @@ public sealed class HtnTaskLibrary
         var have    = state.Inventory.GetValueOrDefault(item);
         var toCraft = needed - have;
         if (toCraft <= 0) return;
+
+        // TSK-0020 fix: before crafting planks, ensure enough logs are available.
+        // 1 log = 4 planks; if inventory is short, mine logs first.
+        if (PlankToLogMap.TryGetValue(item, out var logType))
+        {
+            var logsNeeded = (toCraft + PlanksPerLog - 1) / PlanksPerLog; // ceiling division
+            var haveLogs = state.Inventory.GetValueOrDefault(logType);
+            var logsToMine = logsNeeded - haveLogs;
+            if (logsToMine > 0)
+            {
+                actions.Add(MakeAction("SearchMemory", ("query", $"{logType} nearby source tree")));
+                actions.Add(MakeAction("MineBlock", ("block", logType), ("count", (object?)logsToMine)));
+            }
+        }
+
         actions.Add(MakeAction("CraftItem", ("item", item), ("count", (object?)toCraft)));
     }
 
@@ -463,6 +544,11 @@ public sealed class HtnTaskLibrary
     /// away from resources it could mine locally. Default plan: SearchMemory → MineBlock
     /// → GetStatus (3 actions). Wander is inserted only when the WorldState indicates
     /// the bot failed to find the target block on a previous cycle.
+    ///
+    /// TSK-0021 enhancement: progressive wander radius — each consecutive BlockNotFound
+    /// for a source block increases the wander radius (40 → 80 → 120) so the bot
+    /// searches further on each retry. After 3 failures, all source variants are tried
+    /// with an expanded radius search.
     /// </summary>
     private static IReadOnlyList<ActionData> GatherItemDecompose(
         ItemSpec spec, string[] parameters, WorldState state)
@@ -473,14 +559,45 @@ public sealed class HtnTaskLibrary
             MakeAction("SearchMemory", ("query", $"{spec.ItemId} location nearby source")),
         };
 
-        // Include Wander only when the last BlockNotFound was for one of this item's
-        // source blocks. First gather attempt (no fact) → mine directly.
-        if (state.Facts.TryGetValue("event:BlockNotFound:Block", out var lastMissed)
-            && lastMissed is string missedBlock
-            && spec.SourceBlocks.Any(b =>
-                string.Equals(b, missedBlock, StringComparison.OrdinalIgnoreCase)))
+        // TSK-0021: progressive wander — check if any source block was recently not found
+        // and track the failure count to increase search radius.
+        var blockNotFound = false;
+        string? missedBlockType = null;
+        foreach (var block in spec.SourceBlocks)
         {
-            actions.Add(MakeAction("Wander", ("radius", (object?)40), ("maxDistanceFromSpawn", (object?)200)));
+            if (state.Facts.TryGetValue($"event:BlockNotFound:Block:{block}", out var _))
+            {
+                blockNotFound = true;
+                missedBlockType = block;
+                break;
+            }
+        }
+        // Fallback: check the generic BlockNotFound fact if per-block facts aren't set.
+        if (!blockNotFound
+            && state.Facts.TryGetValue("event:BlockNotFound:Block", out var lastMissed)
+            && lastMissed is string missedStr
+            && spec.SourceBlocks.Any(b =>
+                string.Equals(b, missedStr, StringComparison.OrdinalIgnoreCase)))
+        {
+            blockNotFound = true;
+            missedBlockType = missedStr;
+        }
+
+        if (blockNotFound)
+        {
+            // Determine failure count from the tracked fact, defaulting to 1.
+            var failCount = 1;
+            if (missedBlockType is not null
+                && state.Facts.TryGetValue($"event:BlockNotFound:Count:{missedBlockType}", out var fc)
+                && fc is string fcs && int.TryParse(fcs, out var parsed))
+            {
+                failCount = parsed;
+            }
+
+            // Progressive wander radius: 40 → 80 → 120 based on consecutive failures.
+            var wanderRadius = Math.Min(40 + (failCount - 1) * 40, 120);
+            var maxDist = Math.Min(100 + (failCount - 1) * 50, 300);
+            actions.Add(MakeAction("Wander", ("radius", (object?)wanderRadius), ("maxDistanceFromSpawn", (object?)maxDist)));
         }
 
         foreach (var block in spec.SourceBlocks)

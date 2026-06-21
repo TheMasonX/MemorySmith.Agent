@@ -179,24 +179,44 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
             return new ChatInterpretation(ChatIntentType.CancelGoal,
                 Response: "Ok, stopping.");
 
+        // TSK-0015: inventory report command — returns detailed inventory listing
+        if (Regex.IsMatch(message, @"\b(inventory|what do you have|what are you carrying|items)\b",
+            RegexOptions.IgnoreCase))
+        {
+            var inv = state.Inventory.Count == 0
+                ? "Inventory is empty."
+                : string.Join(", ", state.Inventory
+                    .OrderByDescending(kv => kv.Value)
+                    .Select(kv => $"{kv.Value}x {kv.Key}"));
+            return new ChatInterpretation(ChatIntentType.QueryStatus,
+                Response: $"Inventory: {inv}");
+        }
+
         // Sprint 30 P1-E: removed bare \bdoing\b token — it matched any sentence
         // containing "doing" (e.g. "what are you doing with that wood") as a status query.
         // The compound patterns "what.?re you doing" and "what are you doing" already cover
         // all legitimate status queries that contain "doing".
+        // TSK-0015: status report now includes top inventory items.
         if (Regex.IsMatch(message, @"\b(status|what.?re you doing|what are you doing|report)\b",
             RegexOptions.IgnoreCase))
         {
             var goal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s
                 ? $"Working on: {s}." : "Idle.";
+            var inv = state.Inventory.Count == 0
+                ? "empty"
+                : string.Join(", ", state.Inventory
+                    .OrderByDescending(kv => kv.Value)
+                    .Take(5)
+                    .Select(kv => $"{kv.Value}x {kv.Key}"));
             return new ChatInterpretation(ChatIntentType.QueryStatus,
-                Response: $"{goal} HP: {state.Health}/20, Food: {state.Food}/20.");
+                Response: $"{goal} HP: {state.Health}/20, Food: {state.Food}/20. Inventory: {inv}.");
         }
 
         if (Regex.IsMatch(message, @"\b(help|commands|what can you do|usage)\b",
             RegexOptions.IgnoreCase))
             return new ChatInterpretation(ChatIntentType.QueryHelp,
                 Response: "Commands: 'get/mine <item> [n]', 'craft <item>', 'build <blueprint> [at X Y Z]', " +
-                          "'go to X Y Z', 'come here', 'stop', 'status', 'help'");
+                          "'go to X Y Z', 'come here', 'stop', 'status', 'inventory', 'help'");
 
         if (Regex.IsMatch(message, @"\b(come here|come to me|follow me|follow)\b",
             RegexOptions.IgnoreCase))

@@ -1,5 +1,7 @@
 namespace Agent.Planning;
 
+using System.Text.Json;
+using Agent.Construction;
 using Agent.Core;
 using Agent.Planning.Goals;
 using Microsoft.Extensions.Logging;
@@ -41,13 +43,20 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
             var originY = ReadOriginFact(state, buildGoal.Blueprint.Id, "y");
             var originZ = ReadOriginFact(state, buildGoal.Blueprint.Id, "z");
 
-            actions.AddRange(library.DecomposeBuild(
-                buildGoal.Blueprint,
-                buildGoal.Blocks,
-                originX,
-                originY,
-                originZ,
-                state));
+            if (state.IsCreativeMode)
+            {
+                actions.AddRange(CreateCreativeBuildActions(buildGoal, state, originX, originY, originZ));
+            }
+            else
+            {
+                actions.AddRange(library.DecomposeBuild(
+                    buildGoal.Blueprint,
+                    buildGoal.Blocks,
+                    originX,
+                    originY,
+                    originZ,
+                    state));
+            }
         }
         else if (goal is CraftItemGoal craftGoal)
         {
@@ -86,6 +95,35 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
     private static readonly string[] PreservedContextPrefixes =
         ["SearchMemory:", "CraftItem:", "FindFlatArea:", "Build:", "MoveTo:"];
 
+    private static IReadOnlyList<ActionData> CreateCreativeBuildActions(
+        BuildGoal buildGoal, WorldState state, int originX, int originY, int originZ)
+    {
+        var actions = new List<ActionData>
+        {
+            MakeAction("SearchMemory", ("query", $"flat area build location {buildGoal.Blueprint.Name}")),
+            MakeAction("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)),
+        };
+
+        var progressKey = BuildFactKeys.BuildProgressIndex(buildGoal.Blueprint.Name);
+        var checkpointIndex = 0;
+        if (TryGetIntFactFromState(state, progressKey, out var lastPlaced))
+            checkpointIndex = lastPlaced + 1;
+
+        var executor = new BlueprintExecutor();
+        var blockActions = executor.Execute(buildGoal.Blocks, originX, originY, originZ);
+
+        for (var i = checkpointIndex; i < blockActions.Count; i++)
+        {
+            var placeAction = blockActions[i];
+            placeAction.Context[BuildFactKeys.PlaceBlockProgressBlueprintId] = buildGoal.Blueprint.Name;
+            placeAction.Context[BuildFactKeys.PlaceBlockProgressBlockIndex] = i;
+            actions.Add(placeAction);
+        }
+
+        actions.Add(MakeAction("GetStatus"));
+        return actions;
+    }
+
     private static int ReadOriginFact(WorldState state, string blueprintId, string axis)
     {
         var key = $"build:{blueprintId}:origin:{axis}";
@@ -98,6 +136,30 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
             long l when l >= int.MinValue && l <= int.MaxValue => (int)l,
             string s when int.TryParse(s, out var parsed) => parsed,
             _ => 0,
+        };
+    }
+
+    private static ActionData MakeAction(
+        string tool, params (string key, object? value)[] args)
+    {
+        var action = new ActionData { Tool = tool };
+        foreach (var (key, value) in args)
+            action.Arguments[key] = value;
+        return action;
+    }
+
+    private static bool TryGetIntFactFromState(WorldState state, string key, out int result)
+    {
+        result = 0;
+        if (!state.Facts.TryGetValue(key, out var v)) return false;
+        return v switch
+        {
+            int i => (result = i) != int.MinValue,
+            long l => (result = (int)l) != int.MinValue,
+            double d => (result = (int)d) != int.MinValue,
+            string s => int.TryParse(s, out result),
+            JsonElement je when je.ValueKind == JsonValueKind.Number => je.TryGetInt32(out result),
+            _ => false,
         };
     }
 

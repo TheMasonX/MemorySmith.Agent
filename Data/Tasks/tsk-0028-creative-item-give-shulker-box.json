@@ -1,0 +1,39 @@
+﻿{
+  "id": "tsk-0028-creative-item-give-shulker-box",
+  "key": "TSK-0028",
+  "title": "Creative Item Give Shulker Box",
+  "description": "A future improvement would be to spawn and fill shulker boxes when trying to give the agent more than they have room for",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [
+    {
+      "id": "a-e5203cfc5b0149058082a7981db8b36c",
+      "name": "TSK-0024 - Creative Mode Gather",
+      "kind": "task",
+      "uri": "task:tsk-0024-creative-mode-gather",
+      "addedAtUtc": "2026-06-21T07:57:34.6567394Z"
+    }
+  ],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T07:57:18.0873202Z",
+  "updatedAtUtc": "2026-06-21T07:57:34.6567394Z",
+  "completedAtUtc": null,
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0028-creative-item-give-shulker-box.json"
+}

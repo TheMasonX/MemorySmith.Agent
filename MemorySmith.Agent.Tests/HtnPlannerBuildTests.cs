@@ -137,6 +137,16 @@ public sealed class HtnPlannerBuildTests
     }
 
     [Test]
+    public async Task PlanAsync_BuildGoal_SkipsMining_WhenCreativeModeEnabled()
+    {
+        var state = new WorldState().With(b => b.SetFact("world:gamemode", "creative", FactSource.Observed));
+        var plan  = await MakePlan(SmallFloor, state);
+
+        Assert.That(CountTool(plan, "MineBlock"), Is.EqualTo(0),
+            "Creative mode should skip material gathering for build plans.");
+    }
+
+    [Test]
     public async Task PlanAsync_BuildGoal_DoesNotMine_NonMineableBlocks()
     {
         // oak_planks is crafted — should never emit a MineBlock("oak_planks") action.

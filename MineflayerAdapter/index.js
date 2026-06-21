@@ -315,12 +315,32 @@ function isSystemMessage(username, message) {
   return SYSTEM_MESSAGE_PATTERNS.some(re => re.test(message));
 }
 
+function normalizeGameMode(rawValue) {
+  const mode = (rawValue ?? '').trim().toLowerCase();
+  if (!mode) return null;
+  if (mode.includes('creative')) return 'creative';
+  if (mode.includes('survival')) return 'survival';
+  if (mode.includes('adventure')) return 'adventure';
+  if (mode.includes('spectator')) return 'spectator';
+  return null;
+}
+
 bot.on('chat', (username, message) => {
   if (username === bot.username) return;
 
   // Sprint 19: filter system messages before they reach the LLM pipeline
   if (isSystemMessage(username, message)) {
     logStructured('debug', 'chat', 'system message filtered', { username, message });
+
+    const gameModeMatch = message.match(/game mode to (.+)$/i);
+    if (gameModeMatch) {
+      const normalizedMode = normalizeGameMode(gameModeMatch[1]);
+      if (normalizedMode) {
+        sendEvent('gameMode', { mode: normalizedMode });
+        logStructured('info', 'chat', 'gamemode detected', { mode: normalizedMode });
+      }
+    }
+
     // If the bot was teleported, emit a position update so WorldState stays current
     const teleportMatch = message.match(/^Teleported\s+(\S+)\s+to\s+(\S+)/i);
     if (teleportMatch && teleportMatch[1].toLowerCase() === bot.username.toLowerCase()) {

@@ -67,9 +67,15 @@ public sealed class BuildGoal : IGoal
         OriginX = originX;
         OriginY = originY;
         OriginZ = originZ;
+        // TSK-0020: include material resource counts in the description.
+        var materialSummary = blueprint.Materials.Length > 0
+            ? " | " + string.Join(", ", blueprint.Materials
+                .OrderByDescending(m => m.Quantity)
+                .Select(m => $"{m.Block} x {m.Quantity}"))
+            : "";
         Description = originX.HasValue
-            ? $"Build {blueprint.Name} ({blocks.Count} blocks) at ({originX},{originY},{originZ})."
-            : $"Build {blueprint.Name} ({blocks.Count} blocks, {blueprint.Dimensions.X}x{blueprint.Dimensions.Y}x{blueprint.Dimensions.Z}).";
+            ? $"Build {blueprint.Name} ({blocks.Count} blocks) at ({originX},{originY},{originZ}).{materialSummary}"
+            : $"Build {blueprint.Name} ({blocks.Count} blocks, {blueprint.Dimensions.X}x{blueprint.Dimensions.Y}x{blueprint.Dimensions.Z}).{materialSummary}";
     }
 
     /// <inheritdoc/>

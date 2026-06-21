@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0029-console-command-tool",
+  "key": "TSK-0029",
+  "title": "Console Command Tool",
+  "description": "The agent needs to be able to run console commands. This needs to be opt-in, and each command should require validation (unless the user sets an \u0022allow all\u0022, or if the user sets auto-accept for that EXACT command, which is added to a list)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T07:59:44.5100592Z",
+  "updatedAtUtc": "2026-06-21T07:59:44.5100592Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

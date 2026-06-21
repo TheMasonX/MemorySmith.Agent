@@ -14,6 +14,7 @@ public record WorldState
     public Position Position { get; init; } = new();
     public int Health { get; init; } = 20;
     public int Food { get; init; } = 20;
+    public string? GameMode { get; init; }
     public Dictionary<string, int> Inventory { get; init; } = [];
     /// <summary>Legacy flat fact map. Prefer <see cref="StructuredFacts"/> for new code.</summary>
     public Dictionary<string, object?> Facts { get; init; } = [];
@@ -30,6 +31,9 @@ public record WorldState
     /// </summary>
     public bool IsInventoryStale { get; init; } = false;
 
+    public bool IsCreativeMode => MatchesCreativeMode(GameMode)
+        || (Facts.TryGetValue("world:gamemode", out var gm) && MatchesCreativeMode(Convert.ToString(gm)));
+
     public WorldState With(Action<WorldState.Builder> configure)
     {
         var b = new Builder(this);
@@ -44,6 +48,14 @@ public record WorldState
         public Builder SetHealth(int hp) { _state = _state with { Health = hp }; return this; }
         public Builder SetFood(int food) { _state = _state with { Food = food }; return this; }
         public Builder SetPosition(Position p) { _state = _state with { Position = p }; return this; }
+        public Builder SetGameMode(string? mode)
+        {
+            var facts = new Dictionary<string, object?>(_state.Facts);
+            if (!string.IsNullOrWhiteSpace(mode)) facts["world:gamemode"] = mode;
+            else facts.Remove("world:gamemode");
+            _state = _state with { GameMode = mode, Facts = facts, UpdatedAt = DateTimeOffset.UtcNow };
+            return this;
+        }
 
         /// <summary>
         /// Sets a fact in the legacy <see cref="WorldState.Facts"/> dictionary only.
@@ -60,7 +72,10 @@ public record WorldState
         public Builder SetFact(string key, object? value)
         {
             var facts = new Dictionary<string, object?>(_state.Facts) { [key] = value };
-            _state = _state with { Facts = facts, UpdatedAt = DateTimeOffset.UtcNow };
+            var gameMode = key.Equals("world:gamemode", StringComparison.OrdinalIgnoreCase)
+                ? Convert.ToString(value)
+                : _state.GameMode;
+            _state = _state with { Facts = facts, GameMode = gameMode, UpdatedAt = DateTimeOffset.UtcNow };
             return this;
         }
 
@@ -78,7 +93,10 @@ public record WorldState
             };
             while (structured.Count > MaxFacts)
                 structured.RemoveAt(0);
-            _state = _state with { Facts = facts, StructuredFacts = structured, UpdatedAt = DateTimeOffset.UtcNow };
+            var gameMode = key.Equals("world:gamemode", StringComparison.OrdinalIgnoreCase)
+                ? value
+                : _state.GameMode;
+            _state = _state with { Facts = facts, StructuredFacts = structured, GameMode = gameMode, UpdatedAt = DateTimeOffset.UtcNow };
             return this;
         }
 
@@ -120,6 +138,11 @@ public record WorldState
 
         public WorldState Build() => _state with { UpdatedAt = DateTimeOffset.UtcNow };
     }
+
+    private static bool MatchesCreativeMode(string? value) =>
+        !string.IsNullOrWhiteSpace(value) &&
+        (string.Equals(value.Trim(), "creative", StringComparison.OrdinalIgnoreCase) ||
+         string.Equals(value.Trim(), "creative mode", StringComparison.OrdinalIgnoreCase));
 }
 
 public record Position(int X = 0, int Y = 64, int Z = 0);

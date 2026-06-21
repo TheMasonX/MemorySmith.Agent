@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0026-agent-threat-response",
+  "key": "TSK-0026",
+  "title": "Agent Threat Response",
+  "description": "The agent needs to react to threats. Threat level analysis will be required to determine if the action is to attack, hide, flee, etc. This should take into account user gear and the enemy type, with weights applied for line of sight, distance, etc.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T07:48:40.1371163Z",
+  "updatedAtUtc": "2026-06-21T07:48:40.1371163Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

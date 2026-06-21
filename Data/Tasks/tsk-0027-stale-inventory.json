@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0027-stale-inventory",
+  "key": "TSK-0027",
+  "title": "Stale Inventory",
+  "description": "Leo correctly reported having two dandelions, then I cleared the inventory. After clearing, he still reported two dandelions.\nNote that there is no log of the inventory at the time, which should be fixed.\n\u0060\u0060\u0060\n[02:37:25] [chat] \u003CTheMasonX23\u003E leo inventory\n[02:37:25] [chat] \u003CTheMasonX23\u003E -\u003E QueryStatus\n[02:37:26] [action] Chat OK (0ms)\n[02:41:32] [chat] \u003CTheMasonX23\u003E Removed 2 item(s) from player Leo]\n[02:41:37] [chat] thinking indicator sent (\u0027*thinks*\u0027) - LLM response pending \u003E5s\n[02:41:37] [action] Chat OK (0ms)\n[02:42:09] [chat] \u003CTheMasonX23\u003E leo inventory\n[02:42:09] [chat] \u003CTheMasonX23\u003E -\u003E QueryStatus\n\u0060\u0060\u0060",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T07:51:22.681251Z",
+  "updatedAtUtc": "2026-06-21T07:51:22.681251Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

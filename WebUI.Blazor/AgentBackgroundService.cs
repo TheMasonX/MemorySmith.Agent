@@ -1,7 +1,9 @@
 namespace WebUI.Blazor;
 
+using Agent.Construction;
 using Agent.Core;
 using Agent.Planning;
+using Agent.Planning.Goals;
 using Agent.Tools;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
@@ -190,8 +192,10 @@ public sealed class AgentBackgroundService(
         lock (_pendingLock) _pendingActions.Clear();
         // Sprint 25 P0-D: clear correlation tracking for new goal.
         _correlatedActions.Clear();
+        // TSK-0021: report task-relevant inventory instead of generic top-5 summary.
+        var taskInv = SummarizeTaskRelevantInventory(goal);
         logger.LogInformation("[goal] set: {Goal} — {Description} | inventory: [{Inventory}]",
-            goal.Name, goal.Description, SummarizeInventory());
+            goal.Name, goal.Description, taskInv);
         _journal?.Log(new JournalEntry(
             _timeProvider.UtcNow, JournalEntryType.GoalSet, goal.Name,
             new Dictionary<string, object?> { ["description"] = goal.Description }));
@@ -669,7 +673,7 @@ public sealed class AgentBackgroundService(
         if (!_currentGoal.IsComplete(_worldState)) return;
 
         logger.LogInformation("[goal] completed: {Goal} | inventory: [{Inventory}]",
-            _currentGoal.Name, SummarizeInventory());
+            _currentGoal.Name, SummarizeTaskRelevantInventory(_currentGoal));
         _currentGoal = null;
         _consecutiveFailures = 0;
         _lastFailureReason = null;
@@ -721,6 +725,12 @@ public sealed class AgentBackgroundService(
         {
             errMsg = $"blockNotFound:{bnf.Block}";
             logger.LogWarning("No {Block} found in range — will count as failure.", bnf.Block);
+            // TSK-0021: track per-block failure count for progressive wander radius.
+            var countKey = $"event:BlockNotFound:Count:{bnf.Block}";
+            var prevCount = _worldState.Facts.TryGetValue(countKey, out var pc) && pc is int pci
+                ? pci : 0;
+            _worldState = _worldState.With(b =>
+                b.SetFact(countKey, (prevCount + 1).ToString(), FactSource.Observed));
         }
         else if (worldEvent is ErrorEvent err)
         {
@@ -783,7 +793,7 @@ public sealed class AgentBackgroundService(
              if (_currentGoal.IsComplete(_worldState))
                 {
                     logger.LogInformation("[goal] completed: {Goal} | inventory: [{Inventory}]",
-                        _currentGoal.Name, SummarizeInventory());
+                        _currentGoal.Name, SummarizeTaskRelevantInventory(_currentGoal));
                     _currentGoal = null; _consecutiveFailures = 0; planContext.Clear();
                     lock (_pendingLock) _pendingActions.Clear();
                     continue;
@@ -798,7 +808,7 @@ public sealed class AgentBackgroundService(
                     _journal?.Log(new JournalEntry(
                         _timeProvider.UtcNow, JournalEntryType.ReplanTriggered, _currentGoal.Name));
                     logger.LogWarning("[goal] failed: {Goal} (failures={FailureCount}, reason={Reason}) | inventory: [{Inventory}]",
-                        _currentGoal.Name, _consecutiveFailures, reason, SummarizeInventory());
+                        _currentGoal.Name, _consecutiveFailures, reason, SummarizeTaskRelevantInventory(_currentGoal));
                     _currentGoal = null; _consecutiveFailures = 0; _lastFailureReason = null;
                     planContext.Clear();
                     lock (_pendingLock) _pendingActions.Clear();
@@ -861,9 +871,11 @@ public sealed class AgentBackgroundService(
                     }
                     _lastReplanAt = _timeProvider.UtcNow; // Sprint 18: record plan time
                     // Sprint 19: log action sequence for tracing plan structure
-                    var displaySequence = string.Join(" → ", plan.Actions.Select(a => a.Tool));
-                    logger.LogInformation("[plan] {Goal}: {ActionCount} actions [{ActionSequence}]",
-                        _currentGoal.Name, plan.Actions.Count, displaySequence);
+                    // TSK-0019: RLE-compress consecutive repeated actions (e.g. PlaceBlock×63)
+                    var displaySequence = RleCompressActions(plan.Actions.Select(a => a.Tool));
+                    logger.LogInformation("[plan] {Goal}: {ActionCount} actions [{ActionSequence}] | inventory: [{Inventory}]",
+                        _currentGoal.Name, plan.Actions.Count, displaySequence,
+                        SummarizeTaskRelevantInventory(_currentGoal));
                     _journal?.Log(new JournalEntry(
                         _timeProvider.UtcNow, JournalEntryType.PlanCreated, _currentGoal.Name,
                         new Dictionary<string, object?> { ["actionCount"] = plan.Actions.Count }));
@@ -1206,6 +1218,91 @@ public sealed class AgentBackgroundService(
             .Select(kv => $"{kv.Value}x {kv.Key}"));
     }
 
+    // ── Plan display RLE (TSK-0019) ───────────────────────────────────────────
+
+    /// <summary>
+    /// Compresses consecutive repeated action names into "ActionName×N" format
+    /// for compact plan display. E.g. "PlaceBlock → PlaceBlock → PlaceBlock"
+    /// becomes "PlaceBlock×3".
+    /// </summary>
+    private static string RleCompressActions(IEnumerable<string> tools)
+    {
+        var sb = new System.Text.StringBuilder();
+        string? current = null;
+        int count = 0;
+        foreach (var tool in tools)
+        {
+            if (tool == current)
+            {
+                count++;
+            }
+            else
+            {
+                if (current is not null)
+                {
+                    if (sb.Length > 0) sb.Append(" → ");
+                    sb.Append(current);
+                    if (count > 1) sb.Append('×').Append(count);
+                }
+                current = tool;
+                count = 1;
+            }
+        }
+        if (current is not null)
+        {
+            if (sb.Length > 0) sb.Append(" → ");
+            sb.Append(current);
+            if (count > 1) sb.Append('×').Append(count);
+        }
+        return sb.ToString();
+    }
+
+    // ── Task-relevant inventory summary (TSK-0021) ────────────────────────────
+
+    /// <summary>
+    /// Returns an inventory summary focused on items relevant to the current goal.
+    /// For BuildGoal: shows how many of each blueprint material are already in inventory.
+    /// For GenericGatherGoal: shows current count of the target item.
+    /// For CraftItemGoal: shows the item being crafted and its prerequisites.
+    /// Fallback: uses the generic <see cref="SummarizeInventory"/>.
+    /// </summary>
+    private string SummarizeTaskRelevantInventory(IGoal goal)
+    {
+        if (_worldState.Inventory.Count == 0) return "empty";
+
+        if (goal is BuildGoal bg)
+        {
+            var parts = new List<string>();
+            foreach (var mat in bg.Blueprint.Materials)
+            {
+                var have = _worldState.Inventory.GetValueOrDefault(mat.Block);
+                parts.Add($"{mat.Block}: {have}/{mat.Quantity}");
+            }
+            return string.Join(", ", parts);
+        }
+
+        if (goal is IItemSpecGoal itemGoal)
+        {
+            var spec = itemGoal.Spec;
+            var total = 0;
+            foreach (var block in spec.SourceBlocks)
+            {
+                var colonIdx = block.IndexOf(':');
+                var key = colonIdx >= 0 ? block[(colonIdx + 1)..] : block;
+                total += _worldState.Inventory.GetValueOrDefault(key);
+            }
+            return $"{spec.ItemId}: {total}/{itemGoal.TargetCount}";
+        }
+
+        if (goal is CraftItemGoal ciGoal)
+        {
+            var have = _worldState.Inventory.GetValueOrDefault(ciGoal.ItemId);
+            return $"{ciGoal.ItemId}: {have}/{ciGoal.Count}";
+        }
+
+        return SummarizeInventory();
+    }
+
     // ── Emergency stop ────────────────────────────────────────────────────────
 
     /// <summary>
@@ -1383,7 +1480,7 @@ public sealed class AgentBackgroundService(
         try
         {
             // Sprint 19: refactored to use shared SummarizeInventory helper
-            var invSummary = SummarizeInventory();
+            var invSummary = SummarizeTaskRelevantInventory(_currentGoal);
 
             var prompt =
                 $"recover from runtime error while executing goal {_currentGoal.Name}: {errMsg}. " +

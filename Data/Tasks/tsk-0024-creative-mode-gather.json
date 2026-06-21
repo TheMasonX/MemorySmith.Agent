@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0024-creative-mode-gather",
+  "key": "TSK-0024",
+  "title": "Creative Mode Gather",
+  "description": "Gather in creative mode should grant the agent the item, as mining doesn\u0027t drop items.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T07:45:33.4771778Z",
+  "updatedAtUtc": "2026-06-21T07:45:33.4771778Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

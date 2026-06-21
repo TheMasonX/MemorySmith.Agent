@@ -168,6 +168,16 @@ public class GenericGatherGoalTests
         Assert.That(goal.IsComplete(state), Is.True);  // 1 + 2 = 3
     }
 
+    [Test]
+    public void IsComplete_CreativeMode_ReturnsTrueImmediately()
+    {
+        var goal  = new GenericGatherGoal(OakLogSpec(), 10);
+        var state = new WorldState().With(b => b.SetFact("world:gamemode", "creative", FactSource.Observed));
+
+        Assert.That(goal.IsComplete(state), Is.True,
+            "Creative mode should satisfy gather goals immediately without mining.");
+    }
+
     // ── IsComplete — smelting ─────────────────────────────────────────────────
 
     [Test]

@@ -32,6 +32,7 @@ public sealed class WorldStateProjector
     {
         SpawnEvent e => ApplySpawn(current, e),
         HealthEvent e => ApplyHealth(current, e),
+        GameModeChangedEvent e => ApplyGameModeChanged(current, e),
         DamageTakenEvent e => StoreFacts(current, e),  // Sprint 23: store facts only; health already updated via HealthEvent
         MoveEvent e => ApplyMove(current, e),
         BlockMinedEvent e => ApplyBlockMined(current, e),
@@ -53,6 +54,12 @@ public sealed class WorldStateProjector
     private static WorldState ApplyHealth(WorldState current, HealthEvent e)
     {
         var result = current with { Health = e.Health, Food = e.Food };
+        return StoreFacts(result, e);
+    }
+
+    private static WorldState ApplyGameModeChanged(WorldState current, GameModeChangedEvent e)
+    {
+        var result = current.With(b => b.SetGameMode(e.Mode));
         return StoreFacts(result, e);
     }
 
@@ -143,6 +150,9 @@ public sealed class WorldStateProjector
                     b.SetFact($"{prefix}Health", e.Health.ToString(), source);
                     b.SetFact($"{prefix}Food", e.Food.ToString(), source);
                 });
+                break;
+            case GameModeChangedEvent e:
+                result = result.With(b => b.SetFact($"{prefix}Mode", e.Mode, source));
                 break;
             case DamageTakenEvent e:
                 // Sprint 23 P0-A: store damage facts for planner access and diagnostics.

@@ -29,6 +29,9 @@ public sealed record SpawnEvent(Position Pos, int Health, int Food, DateTimeOffs
 public sealed record HealthEvent(int Health, int Food, DateTimeOffset Timestamp)
     : WorldEvent(Timestamp);
 
+public sealed record GameModeChangedEvent(string Mode, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
 /// <summary>
 /// Synthesized C#-side (by AgentBackgroundService) from consecutive
 /// <see cref="HealthEvent"/> comparisons whenever the new Health is lower than

@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0025-replan-and-continue-after-death",
+  "key": "TSK-0025",
+  "title": "Replan and Continue After Death",
+  "description": "The agent currently does nothing after death and should continue the task, with the requisite replanning",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T07:47:06.7292313Z",
+  "updatedAtUtc": "2026-06-21T07:47:06.7292313Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}
