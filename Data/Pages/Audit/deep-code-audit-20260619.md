@@ -1,1 +1,96 @@
-IyBFeHRlcm5hbCBBdWRpdDogRGVlcCBDb2RlIEF1ZGl0IFJlcG9ydAoqKk9yaWdpbmFsIGRvY3VtZW50IGRhdGUqKjogMjAyNi0wNi0xOSAgCioqRmlsZWQgdG8gcmVwbyoqOiAyMDI2LTA2LTE5IChTcHJpbnQgMjYgYXVkaXQgaW50YWtlKSAgCioqU291cmNlKio6IEluZGVwZW5kZW50IGV4dGVybmFsIGNvZGUgcmV2aWV3ZXIgKGFub255bW91cykgIAoqKlNjb3BlKio6IFBSICMxIChgc3ByaW50LTUtdG9vbC1zYWZldHlgKSDigJQgYXJjaGl0ZWN0dXJhbCBzZWFtcywgdHlwZSBzYWZldHksIG1vZHVsZSBjb2hlcmVuY2UKCi0tLQoKIyMgT3JpZ2luYWwgRmluZGluZ3Mgd2l0aCBDcm9zcy1WZXJpZmljYXRpb24gQW5ub3RhdGlvbnMKCiMjIyBGaW5kaW5nIDE6IFRvb2wgc2NoZW1hIHZhbGlkYXRpb24gdG9vIHBlcm1pc3NpdmUgZm9yIGludGVnZXJzCioqT3JpZ2luYWwgY29uZmlkZW5jZTogOTIlKiogIAoqKlZlcmlmaWNhdGlvbiBzdGF0dXM6IFJFU09MVkVEIChTcHJpbnQgMjUgUDAtQykqKgoKYFRvb2xEaXNwYXRjaGVyLlZhbGlkYXRlQWdhaW5zdFNjaGVtYWAgLyBgQ2hlY2tUeXBlYCBwcmV2aW91c2x5IHVzZWQgYEdldFJhd1RleHQoKS5Db250YWlucygnLicpYCB0byBkZXRlY3Qgbm9uLWludGVnZXJzLiBUaGlzIHdhcyBjb3JyZWN0bHkgaWRlbnRpZmllZCBhcyBmYWlsaW5nIGZvciBzY2llbnRpZmljIG5vdGF0aW9uIChgMWUyMGApLiBGaXhlZCBpbiBTcHJpbnQgMjUgUDAtQzogYENoZWNrVHlwZWAgbm93IHVzZXMgYCF2YWx1ZS5UcnlHZXRJbnQzMihvdXQgXylgIHdoaWNoIGNvcnJlY3RseSByZWplY3RzIGFsbCBub24taW50ZWdlciBKU09OIG51bWJlcnMuIENvZGUgdmVyaWZpZWQgYXQgY3VycmVudCBicmFuY2ggSEVBRCAoVG9vbERpc3BhdGNoZXIuY3MsIFNIQSBlN2VhMGE5MykuCgoqQW5ub3RhdGlvbjogRmluZGluZyB3YXMgYWNjdXJhdGUgcHJlLVNwcmludC0yNS4gTm93IGNsb3NlZC4qCgotLS0KCiMjIyBGaW5kaW5nIDI6IFRvb2xEaXNwYXRjaGVyIGFzc3VtZXMgdG9vbHMgZG8gbm90IHRocm93CioqT3JpZ2luYWwgY29uZmlkZW5jZTogODglKiogIAoqKlZlcmlmaWNhdGlvbiBzdGF0dXM6IFJFU09MVkVEIChTcHJpbnQgMjUgUDAtQykqKgoKYENhbGxBc3luY2Agbm93IHdyYXBzIGB0b29sLkV4ZWN1dGVBc3luYyguLi4pYCBpbiB0cnkvY2F0Y2guIGBPcGVyYXRpb25DYW5jZWxlZEV4Y2VwdGlvbmAgcmUtdGhyb3dzIChjb3JyZWN0KTsgYWxsIG90aGVyIGV4Y2VwdGlvbnMgYmVjb21lIGBUb29sUmVzdWx0KGZhbHNlLCAiVG9vbCAne25hbWV9JyB0aHJldzoge2V4Lk1lc3NhZ2V9IilgLiBKb3VybmFsIGVudHJ5IGFkZGVkIG9uIGV4Y2VwdGlvbi4gQ29kZSB2ZXJpZmllZCBhdCBicmFuY2ggSEVBRC4KCipBbm5vdGF0aW9uOiBGaW5kaW5nIHdhcyBhY2N1cmF0ZSBwcmUtU3ByaW50LTI1LiBOb3cgY2xvc2VkLioKCi0tLQoKIyMjIEZpbmRpbmcgMzogV29ybGRNb2RlbCBzdGF0ZSBhbGlhc2luZwoqKk9yaWdpbmFsIGNvbmZpZGVuY2U6IDg2JSoqICAKKipWZXJpZmljYXRpb24gc3RhdHVzOiBSRVNPTFZFRCAoU3ByaW50IDI1IFAxLUEpKioKCkNvbnN0cnVjdG9yIG5vdyBjcmVhdGVzIHNlcGFyYXRlIGBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIGludD4oKWAgaW5zdGFuY2VzIGZvciBgX29ic2VydmVkLkludmVudG9yeWAgYW5kIGBfYmVsaWVmLkludmVudG9yeWAuIGBPYnNlcnZlKClgIGRlZXAtY29waWVzOiBgbmV3IERpY3Rpb25hcnk8c3RyaW5nLCBpbnQ+KG9ic2VydmF0aW9uLkludmVudG9yeSlgLiBDb2RlIHZlcmlmaWVkIGF0IGJyYW5jaCBIRUFEIChXb3JsZE1vZGVsLmNzLCBTSEEgZTlhM2QwYWYpLiBUaGUgb2JzZXJ2YXRpb24gYW5kIGJlbGllZiBsYXllcnMgYXJlIG5vdyBpc29sYXRpb24tc2FmZSBhdCB0aGUgaW52ZW50b3J5IGJvdW5kYXJ5LgoKKkFubm90YXRpb246IEZpbmRpbmcgd2FzIGFjY3VyYXRlIHByZS1TcHJpbnQtMjUuIE5vdyBjbG9zZWQuKgoKUmVzaWR1YWwgbm90ZTogYE9ic2VydmF0aW9uU3RhdGUuUmVjZW50T2JzZXJ2YXRpb25zYCBpcyBhbiBgSVJlYWRPbmx5TGlzdDxGYWN0PmAgYnV0IHRoZSB1bmRlcmx5aW5nIGxpc3Qgb3JpZ2luIGlzIGNhbGxlci1jb250cm9sbGVkLiBGb3IgdGhlIGN1cnJlbnQgY29kZSBwYXRocyAoV29ybGRTdGF0ZVByb2plY3RvciDihpIgT2JzZXJ2ZSkgdGhpcyBpcyBzYWZlOyBpZiBmdXR1cmUgY2FsbGVycyBwYXNzIG11dGFibGUgbGlzdHMsIHRoZSBgVG9MaXN0KClgIGluIE9ic2VydmUgY3JlYXRlcyBhIGNvcHkgc28gaXQgcmVtYWlucyBzYWZlLiBGdWxsIGltbXV0YWJpbGl0eSAoY29weS1vbi13cml0ZSBhdCBwcm9qZWN0b3IgYm91bmRhcnkpIGlzIFNwcmludCAyNiBQMiBzY29wZS4KCi0tLQoKIyMjIEZpbmRpbmcgNDogSm91cm5hbCBhcHByb3hpbWF0ZWx5IGJvdW5kZWQgdW5kZXIgY29udGVudGlvbgoqKk9yaWdpbmFsIGNvbmZpZGVuY2U6IDcyJSoqICAKKipWZXJpZmljYXRpb24gc3RhdHVzOiBPUEVOIOKAlCBERUxJQkVSQVRFIERFU0lHTioqCgpgQWdlbnRKb3VybmFsYCB1c2VzIENvbmN1cnJlbnRRdWV1ZSB3aXRoIHNpbmdsZS1kZXF1ZXVlIHRyaW0gb24gYENvdW50ID4gTWF4RW50cmllc2AuIFRoZSBjb21tZW50IGV4cGxpY2l0bHkgbWFya3MgdGhpcyBhcyBiZXN0LWVmZm9ydC4gVGhlIEIxL0IyIGZpeCBmcm9tIFNwcmludCA2IHRpZ2h0ZW5lZCB0aGUgdHJpbSBmcm9tIGEgcmFjZS1wcm9uZSBDbGVhciB0byBhIHNpbmdsZS1kZXF1ZXVlLXVuZGVyLWxvY2stZXF1aXZhbGVudCBhcHByb2FjaCB1c2luZyBgSW50ZXJsb2NrZWQuRXhjaGFuZ2VgLiBUaGUgam91cm5hbCBpcyBhbiBvcGVyYXRpb25hbCBsb2csIG5vdCBhIHJlbGlhYmxlIGV2ZW50IHN0b3JlLiBUaGlzIGlzIGFuIGludGVudGlvbmFsIGFyY2hpdGVjdHVyZSBkZWNpc2lvbiBkZWZlcnJlZCBhcyAiSm91cm5hbCBzZW1hbnRpY3MiIChTcHJpbnQgMjYgUDEtQykuCgoqQW5ub3RhdGlvbjogRmluZGluZyBhY2N1cmF0ZWx5IGRlc2NyaWJlZCB0aGUgZGVzaWduIHRyYWRlb2ZmLiBTcHJpbnQgMjYgUDEtQyB3aWxsIGZvcm1hbGx5IHJlY29yZCB0aGUgZGVjaXNpb24uKgoKLS0tCgojIyMgRmluZGluZyA1OiBQbGFubmVyIHJvdXRpbmcgc3BsaXQgYWNyb3NzIHR3byBtb2R1bGVzCioqT3JpZ2luYWwgY29uZmlkZW5jZTogODElKiogIAoqKlZlcmlmaWNhdGlvbiBzdGF0dXM6IE9QRU4g4oCUIFNwcmludCAyNiBQMS1DIHRhcmdldCoqCgpgSHRuUGxhbm5lcmAgcmV0YWlucyBoYXJkY29kZWQgdHlwZS1zd2l0Y2ggZGVjb21wb3NpdGlvbiAoSUl0ZW1TcGVjR29hbCwgQnVpbGRHb2FsLCBDcmFmdEl0ZW1Hb2FsIGJyYW5jaGVzKS4gYFBsYW5uZXJSb3V0ZXJgIGFkZHMgdGhlIHJlZ2lzdHJ5IGxheWVyIG9uIHRvcC4gVHdvIHBsYWNlcyBvd24gZGVjb21wb3NpdGlvbiBsb2dpYy4gVGhlIHNwcmludC0yNiBwbGFuIGlzIHRvIHJvdXRlIEFMTCBkZWNvbXBvc2l0aW9uIHRocm91Z2ggYERlY29tcG9zZXJSZWdpc3RyeWAgYnkgY3JlYXRpbmcgYSBgQ3JhZnRJdGVtR29hbERlY29tcG9zZXJgIGFuZCBkZWxldGluZyB0aGUgaGFyZGNvZGVkIEh0blBsYW5uZXIgYnJhbmNoZXMuCgpBZGRpdGlvbmFsbHksIG5ldyBTcHJpbnQgMjYgaW52ZXN0aWdhdGlvbiBmaW5kaW5nOiBgSUl0ZW1TcGVjR29hbGAgaW50ZXJmYWNlIGxhY2tzIGBUYXJnZXRDb3VudGAsIHJlcXVpcmluZyBjYWxsZXJzIHRvIGNhc3QgdG8gYEdlbmVyaWNHYXRoZXJHb2FsYCB0byBhY2Nlc3MgY291bnQuIFRoaXMgcmVzdWx0cyBpbiBgR2F0aGVyR29hbERlY29tcG9zZXIuSUl0ZW1TcGVjR29hbGAgY2F0Y2gtYWxsIGFybSB1c2luZyBgQXJyYXkuRW1wdHk8c3RyaW5nPigpYCBpbnN0ZWFkIG9mIHRoZSBhY3R1YWwgdGFyZ2V0IGNvdW50LiBGaXg6IGFkZCBgaW50IFRhcmdldENvdW50ID0+IDE7YCBhcyBhIGRlZmF1bHQgaW50ZXJmYWNlIG1ldGhvZCB0byBgSUl0ZW1TcGVjR29hbGAuIFNlZSBTcHJpbnQgMjYgUDAtQi4KCi0tLQoKIyMjIEZpbmRpbmcgNjogTWluZWZsYXllciBjaGF0IGZpbHRlciBicml0dGxlCioqT3JpZ2luYWwgY29uZmlkZW5jZTogNjUlKiogIAoqKlZlcmlmaWNhdGlvbiBzdGF0dXM6IE9QRU4g4oCUIGRlZmVycmVkKioKCk5pbmUgU1lTVEVNX01FU1NBR0VfUEFUVEVSTlMgcmVnZXhlcyBwbHVzIHRoZSBlbmhhbmNlbWVudHMgaW4gU3ByaW50cyAyMOKAkzIxIChDbGVhcmVkIHRpZ2h0ZW5pbmcsIC9jbGVhciBhbHQsIC9naXZlIGFsdCkgYXJlIGluIHBsYWNlLiBUaGUgcmV2aWV3ZXIgaXMgY29ycmVjdCB0aGF0IHRoaXMgd2lsbCBuZWVkIG9uZ29pbmcgbWFpbnRlbmFuY2UuIEEgc3RydWN0dXJlZCBtZXNzYWdlIGNsYXNzaWZpZXIgaXMgdGhlIGxvbmctdGVybSBzb2x1dGlvbiBidXQgaXMgb3V0IG9mIFNwcmludCAyNiBzY29wZS4gRmlsZWQgYXMgYSBkZWZlcnJlZCByaXNrIChERUYtMiBpbiBTcHJpbnQgMjYgYmFja2xvZykuCgotLS0KCiMjIEFyY2hpdGVjdHVyZSBhbmQgQ29kZWJhc2UgSGVhbHRoIE9wcG9ydHVuaXRpZXMg4oCUIFN0YXR1cwoKfCBPcHBvcnR1bml0eSB8IFNwcmludCAyNiBTdGF0dXMgfAp8LS0tfC0tLXwKfCBBLiBTdHJvbmdseS10eXBlZCB0b29sIGV4ZWN1dGlvbiBhdCBzZWFtIHwgUDIg4oCUIGBUcnlHZXRJbnQzMmAgY2xvc2VzIHRoZSBudW1lcmljIGdhcDsgZnVsbCB0eXBlZCBkaXNwYXRjaCBpcyBmdXR1cmUgfAp8IEIuIFdvcmxkTW9kZWwgZnVsbCBpbW11dGFibGUgc25hcHNob3RzIHwgUDIg4oCUIFAxLUEgY2xvc2VzIHRoZSBhbGlhc2luZyBnYXA7IGNvcHktb24td3JpdGUgYXQgcHJvamVjdG9yIGJvdW5kYXJ5IGRlZmVycmVkIHwKfCBDLiBDb2xsYXBzZSBwbGFubmVyIHNlbGVjdGlvbiBpbnRvIG9uZSBwbGFjZSB8IFAxLUMg4oCUIFNwcmludCAyNiB0YXJnZXQgKENyYWZ0SXRlbUdvYWxEZWNvbXBvc2VyICsgcmVtb3ZlIEh0blBsYW5uZXIgYnJhbmNoZXMpIHwKfCBELiBKb3VybmFsIHNlbWFudGljcyBkZWNpc2lvbiB8IFAxLUMg4oCUIFNwcmludCAyNiB0YXJnZXQgKHJlY29yZCBkZWNpc2lvbiBpbiBhcmNoaXRlY3R1cmUubWQpIHwKCi0tLQoKIyMgT3BlbiBRdWVzdGlvbnMg4oCUIEFuc3dlcnMKCnwgUXVlc3Rpb24gfCBBbnN3ZXIgfAp8LS0tfC0tLXwKfCBTaG91bGQgdG9vbCBleGVjdXRpb24gYmUgYWxsb3dlZCB0byB0aHJvdz8gfCBObyDigJQgYFRvb2xSZXN1bHRgIGlzIHRoZSBvbmx5IGZhaWx1cmUgY2hhbm5lbC4gU3ByaW50IDI1IFAwLUMgZW5mb3JjZXMgdGhpcy4gfAp8IElzIFdvcmxkTW9kZWwgaW50ZW5kZWQgdG8gcHJlc2VydmUgaGlzdG9yaWNhbCBzbmFwc2hvdHMgaW1tdXRhYmx5PyB8IEN1cnJlbnQ6IGFsaWFzaW5nIGZpeGVkIGF0IE9ic2VydmUgYm91bmRhcnk7IGZ1bGwgaGlzdG9yaWNhbCBpbW11dGFiaWxpdHkgaXMgUDIuIHwKfCBTaG91bGQgUGxhbm5lclJvdXRlciBmdWxseSByZXBsYWNlIEh0blBsYW5uZXIgaGFyZGNvZGVkIGJyYW5jaGVzPyB8IFllcyDigJQgU3ByaW50IDI2IFAxLUMgdGFyZ2V0LiB8CnwgSXMgdGhlIGpvdXJuYWwgYSBib3VuZGVkIGJ1ZmZlciBvciBkdXJhYmxlIGV2ZW50IHN0b3JlPyB8IEJvdW5kZWQgZGlhZ25vc3RpYyBidWZmZXIuIFNwcmludCAyNiBQMS1DIHdpbGwgZG9jdW1lbnQgdGhpcyBleHBsaWNpdGx5LiB8CgotLS0KCiMjIFJlZmVyZW5jZXMKLSBTcHJpbnQgMjUgaGFuZG9mZjogYERhdGEvUGFnZXMvVGFza3MvYWdlbnQtaGFuZG9mZi1zcHJpbnQyNi5tZGAKLSBSZWxhdGVkIGV4ZWMgc3VtbWFyeTogYERhdGEvUGFnZXMvQXVkaXRzL2V4ZWMtc3VtbWFyeS1hdWRpdC0yMDI2MDYxOS5tZGAKLSBTcHJpbnQgMjYgY291bmNpbDogYERhdGEvUGFnZXMvY291bmNpbC9zcHJpbnQyNi1hdWRpdC1jb3VuY2lsLTIwMjYwNjE5Lm1kYAo=
+# External Audit: Deep Code Audit Report
+**Original document date**: 2026-06-19  
+**Filed to repo**: 2026-06-19 (Sprint 26 audit intake)  
+**Source**: Independent external code reviewer (anonymous)  
+**Scope**: PR #1 (`sprint-5-tool-safety`) — architectural seams, type safety, module coherence
+
+---
+
+## Original Findings with Cross-Verification Annotations
+
+### Finding 1: Tool schema validation too permissive for integers
+**Original confidence: 92%**  
+**Verification status: RESOLVED (Sprint 25 P0-C)**
+
+`ToolDispatcher.ValidateAgainstSchema` / `CheckType` previously used `GetRawText().Contains('.')` to detect non-integers. This was correctly identified as failing for scientific notation (`1e20`). Fixed in Sprint 25 P0-C: `CheckType` now uses `!value.TryGetInt32(out _)` which correctly rejects all non-integer JSON numbers. Code verified at current branch HEAD (ToolDispatcher.cs, SHA e7ea0a93).
+
+*Annotation: Finding was accurate pre-Sprint-25. Now closed.*
+
+---
+
+### Finding 2: ToolDispatcher assumes tools do not throw
+**Original confidence: 88%**  
+**Verification status: RESOLVED (Sprint 25 P0-C)**
+
+`CallAsync` now wraps `tool.ExecuteAsync(...)` in try/catch. `OperationCanceledException` re-throws (correct); all other exceptions become `ToolResult(false, "Tool '{name}' threw: {ex.Message}")`. Journal entry added on exception. Code verified at branch HEAD.
+
+*Annotation: Finding was accurate pre-Sprint-25. Now closed.*
+
+---
+
+### Finding 3: WorldModel state aliasing
+**Original confidence: 86%**  
+**Verification status: RESOLVED (Sprint 25 P1-A)**
+
+Constructor now creates separate `new Dictionary<string, int>()` instances for `_observed.Inventory` and `_belief.Inventory`. `Observe()` deep-copies: `new Dictionary<string, int>(observation.Inventory)`. Code verified at branch HEAD (WorldModel.cs, SHA e9a3d0af). The observation and belief layers are now isolation-safe at the inventory boundary.
+
+*Annotation: Finding was accurate pre-Sprint-25. Now closed.*
+
+Residual note: `ObservationState.RecentObservations` is an `IReadOnlyList<Fact>` but the underlying list origin is caller-controlled. For the current code paths (WorldStateProjector → Observe) this is safe; if future callers pass mutable lists, the `ToList()` in Observe creates a copy so it remains safe. Full immutability (copy-on-write at projector boundary) is Sprint 26 P2 scope.
+
+---
+
+### Finding 4: Journal approximately bounded under contention
+**Original confidence: 72%**  
+**Verification status: OPEN — DELIBERATE DESIGN**
+
+`AgentJournal` uses ConcurrentQueue with single-dequeue trim on `Count > MaxEntries`. The comment explicitly marks this as best-effort. The B1/B2 fix from Sprint 6 tightened the trim from a race-prone Clear to a single-dequeue-under-lock-equivalent approach using `Interlocked.Exchange`. The journal is an operational log, not a reliable event store. This is an intentional architecture decision deferred as "Journal semantics" (Sprint 26 P1-C).
+
+*Annotation: Finding accurately described the design tradeoff. Sprint 26 P1-C will formally record the decision.*
+
+---
+
+### Finding 5: Planner routing split across two modules
+**Original confidence: 81%**  
+**Verification status: OPEN — Sprint 26 P1-C target**
+
+`HtnPlanner` retains hardcoded type-switch decomposition (IItemSpecGoal, BuildGoal, CraftItemGoal branches). `PlannerRouter` adds the registry layer on top. Two places own decomposition logic. The sprint-26 plan is to route ALL decomposition through `DecomposerRegistry` by creating a `CraftItemGoalDecomposer` and deleting the hardcoded HtnPlanner branches.
+
+Additionally, new Sprint 26 investigation finding: `IItemSpecGoal` interface lacks `TargetCount`, requiring callers to cast to `GenericGatherGoal` to access count. This results in `GatherGoalDecomposer.IItemSpecGoal` catch-all arm using `Array.Empty<string>()` instead of the actual target count. Fix: add `int TargetCount => 1;` as a default interface method to `IItemSpecGoal`. See Sprint 26 P0-B.
+
+---
+
+### Finding 6: Mineflayer chat filter brittle
+**Original confidence: 65%**  
+**Verification status: OPEN — deferred**
+
+Nine SYSTEM_MESSAGE_PATTERNS regexes plus the enhancements in Sprints 20–21 (Cleared tightening, /clear alt, /give alt) are in place. The reviewer is correct that this will need ongoing maintenance. A structured message classifier is the long-term solution but is out of Sprint 26 scope. Filed as a deferred risk (DEF-2 in Sprint 26 backlog).
+
+---
+
+## Architecture and Codebase Health Opportunities — Status
+
+| Opportunity | Sprint 26 Status |
+|---|---|
+| A. Strongly-typed tool execution at seam | P2 — `TryGetInt32` closes the numeric gap; full typed dispatch is future |
+| B. WorldModel full immutable snapshots | P2 — P1-A closes the aliasing gap; copy-on-write at projector boundary deferred |
+| C. Collapse planner selection into one place | P1-C — Sprint 26 target (CraftItemGoalDecomposer + remove HtnPlanner branches) |
+| D. Journal semantics decision | P1-C — Sprint 26 target (record decision in architecture.md) |
+
+---
+
+## Open Questions — Answers
+
+| Question | Answer |
+|---|---|
+| Should tool execution be allowed to throw? | No — `ToolResult` is the only failure channel. Sprint 25 P0-C enforces this. |
+| Is WorldModel intended to preserve historical snapshots immutably? | Current: aliasing fixed at Observe boundary; full historical immutability is P2. |
+| Should PlannerRouter fully replace HtnPlanner hardcoded branches? | Yes — Sprint 26 P1-C target. |
+| Is the journal a bounded buffer or durable event store? | Bounded diagnostic buffer. Sprint 26 P1-C will document this explicitly. |
+
+---
+
+## References
+- Sprint 25 handoff: `Data/Pages/Tasks/agent-handoff-sprint26.md`
+- Related exec summary: `Data/Pages/Audits/exec-summary-audit-20260619.md`
+- Sprint 26 council: `Data/Pages/council/sprint26-audit-council-20260619.md`

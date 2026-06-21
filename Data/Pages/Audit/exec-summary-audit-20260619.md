@@ -1,1 +1,72 @@
-IyBFeHRlcm5hbCBBdWRpdDogRXhlY3V0aXZlIFN1bW1hcnkKKipPcmlnaW5hbCBkb2N1bWVudCBkYXRlKio6IDIwMjYtMDYtMTkgIAoqKkZpbGVkIHRvIHJlcG8qKjogMjAyNi0wNi0xOSAoU3ByaW50IDI2IGF1ZGl0IGludGFrZSkgIAoqKlNvdXJjZSoqOiBJbmRlcGVuZGVudCBleHRlcm5hbCByZXZpZXdlciAoYW5vbnltb3VzKSAgCioqU2NvcGUqKjogUFIgIzEgKGBzcHJpbnQtNS10b29sLXNhZmV0eWApLCBTcHJpbnQgMjUgc3RhdGUsIE1lbW9yeVNtaXRoLkFnZW50IG92ZXJhbGwgYXJjaGl0ZWN0dXJlCgotLS0KCiMjIE9yaWdpbmFsIEZpbmRpbmdzIHdpdGggQ3Jvc3MtVmVyaWZpY2F0aW9uIEFubm90YXRpb25zCgojIyMgRmluZGluZyBBOiBDSSBmYWlsdXJlIG9uIFBSIGhlYWQKKipPcmlnaW5hbCBjb25maWRlbmNlOiAwLjk1KiogIAoqKlZlcmlmaWNhdGlvbiBzdGF0dXM6IFJFU09MVkVEKioKClRoZSByZXZpZXdlciBvYnNlcnZlZCB0aGUgQ0kgZmFpbGluZyBhdCByZXZpZXcgdGltZS4gVGhpcyB3YXMgY2F1c2VkIGJ5IEJMSy0xIChDQVMgbG9vcCByYWNlIGluIGBBZ2VudEJhY2tncm91bmRTZXJ2aWNlLlRyYW5zaXRpb25Db3JyZWxhdGVkQWN0aW9uYCkgd2hpY2ggd2FzIGludHJvZHVjZWQgYXMgcGFydCBvZiBTcHJpbnQgMjUgUDAtRCBhbmQgZml4ZWQgbWlkLXNwcmludC4gVGhlIGZpbmFsIGJyYW5jaCBoZWFkIChkNTgzMmQ0KSBjb250YWlucyB0aGUgQ0FTLWxvb3AgVHJ5VXBkYXRlIGZpeCBhbmQgc3Vic2VxdWVudCBjb3VuY2lsL2hhbmRvZmYgY29tbWl0cy4gQ0kgaXMgZXhwZWN0ZWQgZ3JlZW4gb24gdGhhdCBoZWFkIHBlciB0aGUgU3ByaW50IDI1IGNvdW5jaWwgYXBwcm92YWwuCgoqQW5ub3RhdGlvbjogVGhpcyBmaW5kaW5nIHdhcyBhY2N1cmF0ZSBhdCB0aGUgdGltZSBvZiBvYnNlcnZhdGlvbiBidXQgaXMgc3RhbGUgcmVsYXRpdmUgdG8gdGhlIGJyYW5jaCdzIGN1cnJlbnQgc3RhdGUuIFZhbGlkIGFzIGEgcHJvY2VzcyBub3RlOiBpbXBsZW1lbnRhdGlvbiBjb21taXRzIHRlbXBvcmFyaWx5IGJyb2tlIENJLCB3aGljaCBpcyB0aGUgcGF0dGVybiBSdWxlIEUtMSBleGlzdHMgdG8gcHJldmVudC4qCgotLS0KCiMjIyBGaW5kaW5nIEI6IENvcmUgc3ByaW50LTUvNiBnb2FscyBzdWJzdGFudGlhbGx5IGRlbGl2ZXJlZAoqKk9yaWdpbmFsIGNvbmZpZGVuY2U6IDAuOTAqKiAgCioqVmVyaWZpY2F0aW9uIHN0YXR1czogQ09ORklSTUVEKioKClNvdXJjZSByZXZpZXcgb2YgdGhlIGJyYW5jaCBjb25maXJtczogdG9vbCB2YWxpZGF0aW9uIGJvdW5kYXJ5IChUb29sRGlzcGF0Y2hlci5WYWxpZGF0ZUFnYWluc3RTY2hlbWEpLCBib3VuZGVkIGpvdXJuYWwgKEFnZW50Sm91cm5hbCwgMTAwMCBlbnRyaWVzKSwgd29ybGQtbW9kZWwgb2JzZXJ2YXRpb24vYmVsaWVmL3ByZWRpY3Rpb24gc3BsaXQgKFdvcmxkTW9kZWwsIE9ic2VydmF0aW9uU3RhdGUsIEJlbGllZlN0YXRlLCBQcmVkaWN0aW9uU3RhdGUpLCBkZWNvbXBvc2VyIHJlZ2lzdHJ5IChEZWNvbXBvc2VyUmVnaXN0cnksIEJ1aWxkR29hbERlY29tcG9zZXIsIEdhdGhlckdvYWxEZWNvbXBvc2VyLCBTdXJ2aXZlTmlnaHRHb2FsRGVjb21wb3NlciksIGFuZCBkdWFsIG1lbW9yeSBnYXRld2F5IChhZ2VudE1lbW9yeSArIHdvcmxkTWVtb3J5IG5hbWVkIGNsaWVudHMpIGFyZSBhbGwgcHJlc2VudCBhbmQgaW1wbGVtZW50ZWQuCgotLS0KCiMjIyBGaW5kaW5nIEM6IExvbmctdGVybSBwbGFubmVyIHN0aWxsIGluY29tcGxldGUKKipPcmlnaW5hbCBjb25maWRlbmNlOiAwLjk3KiogIAoqKlZlcmlmaWNhdGlvbiBzdGF0dXM6IENPTkZJUk1FRCAoaGlnaCBjb25maWRlbmNlKSoqCgpgUGxhbm5lclJvdXRlcmAgc2VsZWN0cyBiZXR3ZWVuIHJlZ2lzdGVyZWQgZGVjb21wb3NlcnMgYW5kIEh0blBsYW5uZXIgZmFsbGJhY2sgb25seS4gR09BUCBhbmQgTExNLWFzc2lzdGVkIHJvdXRpbmcgYXJlIGRlY2xhcmVkIGFzIGBQbGFubmVySWRgIGVudW0gdmFsdWVzIGJ1dCBub3Qgd2lyZWQgaW50byBgUGxhbm5lclJvdXRlci5TZWxlY3RgLiBIdG5QbGFubmVyIHN0aWxsIGNvbnRhaW5zIGhhcmRjb2RlZCB0eXBlLXN3aXRjaCBsb2dpYyAoSUl0ZW1TcGVjR29hbCwgQnVpbGRHb2FsLCBDcmFmdEl0ZW1Hb2FsIGJyYW5jaGVzKSB0aGF0IGR1cGxpY2F0ZXMgZGVjb21wb3NlciByZXNwb25zaWJpbGl0eS4gVGhpcyBpcyB0aGUgU3ByaW50IDI2IFAxLUMgdGFyZ2V0LgoKLS0tCgojIyMgRmluZGluZyBEOiBEb2N1bWVudGF0aW9uIGRyaWZ0IChSRUFETUUgdmVyc2lvbiBsYWcpCioqT3JpZ2luYWwgY29uZmlkZW5jZTogMC43NSoqICAKKipWZXJpZmljYXRpb24gc3RhdHVzOiBDT05GSVJNRUQqKgoKUkVBRE1FIG9uIG1haW4gYnJhbmNoIHNob3dzIHYwLjIzLjAgLyBTcHJpbnQgMjMuIFNwcmludCAyNSBicmFuY2ggY2FycmllcyB2MC4yNS4wIGluIGAvYXBpL2Fib3V0YCBidXQgbm8gUkVBRE1FIHVwZGF0ZSBoYXMgYmVlbiBjb21taXR0ZWQuIFRoaXMgaXMgYSBrbm93biBjb3NtZXRpYyBpc3N1ZTsgdGhlIFBSIGhhcyBub3QgYmVlbiBtZXJnZWQgdG8gbWFpbiBzbyB0aGUgZGl2ZXJnZW5jZSBpcyBleHBlY3RlZCBkdXJpbmcgYWN0aXZlIGRldmVsb3BtZW50LiBUaGUgcmV2aWV3ZXIncyBjb25jZXJuIGFib3V0ICJzdGFsZSBkb2NzIGFzIGRlc2lnbiBsaWFiaWxpdHkiIGlzIHZhbGlkIGZvciBwb3N0LW1lcmdlIGNsZWFudXAuCgotLS0KCiMjIyBGaW5kaW5nIEU6IEJsdWVwcmludFJlcG9zaXRvcnkgbG9jYWwtZmlsZXN5c3RlbSBmYWxsYmFjayBwZXJmb3JtYW5jZSByaXNrCioqT3JpZ2luYWwgY29uZmlkZW5jZTogMC42MCoqICAKKipWZXJpZmljYXRpb24gc3RhdHVzOiBBQ0NFUFRFRCBBUyBLTk9XTiBSSVNLKioKClRoZSBsb2NhbC1maWxlc3lzdGVtIGJsdWVwcmludCBzY2FuIGR1cmluZyBzZWFyY2ggaXMgYW4gb2ZmbGluZS9kZXYgY29udmVuaWVuY2UgZmVhdHVyZS4gSXQgY3JlYXRlcyBhIHBvdGVudGlhbCBwZXJmIGNsaWZmIGlmIHRoZSBsb2NhbCBibHVlcHJpbnQgZGlyZWN0b3J5IGdyb3dzIGxhcmdlLiBUaGlzIGlzIGEgUDIgY29uY2VybiBmb3IgYSBmdXR1cmUgc3ByaW50IChjYXAgbG9jYWwgc2NhbiB0byBOIHJlc3VsdHMgb3IgcmVxdWlyZSBleHBsaWNpdCBlbmFibGUgZmxhZykuIE5vdCBhIGJsb2NrZXIgZm9yIFNwcmludCAyNi4KCi0tLQoKIyMjIEZpbmRpbmcgRjogUGxhbm5lciBhcmNoaXRlY3R1cmUgdHJhbnNpdGlvbmFsIChHT0FQL0xMTSBhcyBwbGFjZWhvbGRlciBlbnVtIHZhbHVlcykKKipPcmlnaW5hbCBjb25maWRlbmNlOiAwLjg1KiogIAoqKlZlcmlmaWNhdGlvbiBzdGF0dXM6IENPTkZJUk1FRCoqCgpBbGlnbnMgd2l0aCBGaW5kaW5nIEMuIFRoZSBvYnNlcnZhdGlvbiB0aGF0IHRoZSBjb2RlICJuYW1lcyBHT0FQIGFuZCBMTE0tYXNzaXN0ZWQgcm91dGluZyBidXQgdGhlIHNlbGVjdG9yIG9ubHkgY2hvb3NlcyBiZXR3ZWVuIGRlY29tcG9zZXIgYW5kIEhUTiBmYWxsYmFjayIgaXMgYWNjdXJhdGUuIFRoZSBkZXNpZ24gaXMgaW50ZW50aW9uYWxseSBzdGFnZWQsIG5vdCBhY2NpZGVudGFsbHkgaW5jb21wbGV0ZS4KCi0tLQoKIyMgQm90dG9tLUxpbmUgQXNzZXNzbWVudAoKVGhlIHJldmlld2VyJ3Mgb3ZlcmFsbCBjaGFyYWN0ZXJpc2F0aW9uIOKAlCBzdWJzdGFudGlhbGx5IGFoZWFkIG9mIHNwcmludC01LzYgZ29hbHMsIG1haW4gcmlzayBpcyBjb25zb2xpZGF0aW9uIHJhdGhlciB0aGFuIGFtYml0aW9uIOKAlCBpcyBhY2N1cmF0ZS4gVGhlIHNwZWNpZmljIGNhbGwtdG8tYWN0aW9uIChmaXggQ0ksIGNsb3NlIGRlZmVycmVkIHJlbGlhYmlsaXR5IGl0ZW1zLCB0aWdodGVuIHBsYW5uZXIgcm91dGluZyBiZWZvcmUgZXhwYW5kaW5nKSBtYXRjaGVzIFNwcmludCAyNiBwcmlvcml0aWVzIGV4YWN0bHkuCgoqKkZpbGVkIGNvbmZpZGVuY2UqKjogMC44NCAob3JpZ2luYWwpIOKAlCAqKlVwaGVsZCoqOiAwLjg2IHBvc3QtdmVyaWZpY2F0aW9uLgoKLS0tCgojIyBSZWZlcmVuY2VzCi0gU3ByaW50IDI1IGhhbmRvZmY6IGBEYXRhL1BhZ2VzL1Rhc2tzL2FnZW50LWhhbmRvZmYtc3ByaW50MjYubWRgCi0gU3ByaW50IDI1IGNvdW5jaWw6IGBEYXRhL1BhZ2VzL2NvdW5jaWwvc3ByaW50MjUtY291bmNpbC0yMDI2MDYxOS5tZGAKLSBSZWxhdGVkIGNvZGUgYXVkaXQ6IGBEYXRhL1BhZ2VzL0F1ZGl0cy9kZWVwLWNvZGUtYXVkaXQtMjAyNjA2MTkubWRgCg==
+# External Audit: Executive Summary
+**Original document date**: 2026-06-19  
+**Filed to repo**: 2026-06-19 (Sprint 26 audit intake)  
+**Source**: Independent external reviewer (anonymous)  
+**Scope**: PR #1 (`sprint-5-tool-safety`), Sprint 25 state, MemorySmith.Agent overall architecture
+
+---
+
+## Original Findings with Cross-Verification Annotations
+
+### Finding A: CI failure on PR head
+**Original confidence: 0.95**  
+**Verification status: RESOLVED**
+
+The reviewer observed the CI failing at review time. This was caused by BLK-1 (CAS loop race in `AgentBackgroundService.TransitionCorrelatedAction`) which was introduced as part of Sprint 25 P0-D and fixed mid-sprint. The final branch head (d5832d4) contains the CAS-loop TryUpdate fix and subsequent council/handoff commits. CI is expected green on that head per the Sprint 25 council approval.
+
+*Annotation: This finding was accurate at the time of observation but is stale relative to the branch's current state. Valid as a process note: implementation commits temporarily broke CI, which is the pattern Rule E-1 exists to prevent.*
+
+---
+
+### Finding B: Core sprint-5/6 goals substantially delivered
+**Original confidence: 0.90**  
+**Verification status: CONFIRMED**
+
+Source review of the branch confirms: tool validation boundary (ToolDispatcher.ValidateAgainstSchema), bounded journal (AgentJournal, 1000 entries), world-model observation/belief/prediction split (WorldModel, ObservationState, BeliefState, PredictionState), decomposer registry (DecomposerRegistry, BuildGoalDecomposer, GatherGoalDecomposer, SurviveNightGoalDecomposer), and dual memory gateway (agentMemory + worldMemory named clients) are all present and implemented.
+
+---
+
+### Finding C: Long-term planner still incomplete
+**Original confidence: 0.97**  
+**Verification status: CONFIRMED (high confidence)**
+
+`PlannerRouter` selects between registered decomposers and HtnPlanner fallback only. GOAP and LLM-assisted routing are declared as `PlannerId` enum values but not wired into `PlannerRouter.Select`. HtnPlanner still contains hardcoded type-switch logic (IItemSpecGoal, BuildGoal, CraftItemGoal branches) that duplicates decomposer responsibility. This is the Sprint 26 P1-C target.
+
+---
+
+### Finding D: Documentation drift (README version lag)
+**Original confidence: 0.75**  
+**Verification status: CONFIRMED**
+
+README on main branch shows v0.23.0 / Sprint 23. Sprint 25 branch carries v0.25.0 in `/api/about` but no README update has been committed. This is a known cosmetic issue; the PR has not been merged to main so the divergence is expected during active development. The reviewer's concern about "stale docs as design liability" is valid for post-merge cleanup.
+
+---
+
+### Finding E: BlueprintRepository local-filesystem fallback performance risk
+**Original confidence: 0.60**  
+**Verification status: ACCEPTED AS KNOWN RISK**
+
+The local-filesystem blueprint scan during search is an offline/dev convenience feature. It creates a potential perf cliff if the local blueprint directory grows large. This is a P2 concern for a future sprint (cap local scan to N results or require explicit enable flag). Not a blocker for Sprint 26.
+
+---
+
+### Finding F: Planner architecture transitional (GOAP/LLM as placeholder enum values)
+**Original confidence: 0.85**  
+**Verification status: CONFIRMED**
+
+Aligns with Finding C. The observation that the code "names GOAP and LLM-assisted routing but the selector only chooses between decomposer and HTN fallback" is accurate. The design is intentionally staged, not accidentally incomplete.
+
+---
+
+## Bottom-Line Assessment
+
+The reviewer's overall characterisation — substantially ahead of sprint-5/6 goals, main risk is consolidation rather than ambition — is accurate. The specific call-to-action (fix CI, close deferred reliability items, tighten planner routing before expanding) matches Sprint 26 priorities exactly.
+
+**Filed confidence**: 0.84 (original) — **Upheld**: 0.86 post-verification.
+
+---
+
+## References
+- Sprint 25 handoff: `Data/Pages/Tasks/agent-handoff-sprint26.md`
+- Sprint 25 council: `Data/Pages/council/sprint25-council-20260619.md`
+- Related code audit: `Data/Pages/Audits/deep-code-audit-20260619.md`

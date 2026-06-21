@@ -288,9 +288,16 @@ async function connectSignalR() {
       .build();
 
     // Sprint 4a: full state snapshot pushed after every event tick
+    // Sprint 4a: full state snapshot pushed after every event tick
+    // Keep both event names during migration — the broadcast service will
+    // eventually send SnapshotUpdated only (Sprint 5A).
     signalRConn.on('StatusUpdated', update => {
       signalRConnected = true;
       applyStatusUpdate(update);
+    });
+    signalRConn.on('SnapshotUpdated', snapshot => {
+      signalRConnected = true;
+      applyStatusUpdate(snapshot.status || snapshot);
     });
 
     // Sprint 4b: live chat messages (player & bot)
@@ -650,74 +657,9 @@ function escapeHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// ── SignalR (push updates) ────────────────────────────────────────────────────
-
-async function initSignalR() {
-  if (!signalR || typeof signalR.HubConnectionBuilder === 'undefined') {
-    console.warn('SignalR library not loaded; falling back to polling only.');
-    return;
-  }
-
-  signalRConn = new signalR.HubConnectionBuilder()
-    .withUrl('/agent-hub')
-    .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
-    .configureLogging(signalR.LogLevel.Warning)
-    .build();
-
-  signalRConn.on('StatusUpdate', (status) => {
-    lastStatus = status;
-    applyStatus(status);
-  });
-
-  signalRConn.on('ChatMessage', (msg) => {
-    addChatMsg(msg.type || 'msg', msg.who, msg.text);
-  });
-
-  signalRConn.on('GoalUpdate', (goalInfo) => {
-    if (goalInfo) {
-      document.getElementById('currentGoalBox').style.display   = '';
-      document.getElementById('noGoalBox').style.display = 'none';
-      document.getElementById('currentGoalName').textContent = goalInfo.name ?? '';
-      document.getElementById('currentGoalDesc').textContent = goalInfo.description ?? '';
-    } else {
-      document.getElementById('currentGoalBox').style.display   = 'none';
-      document.getElementById('noGoalBox').style.display = '';
-    }
-  });
-
-  signalRConn.onreconnecting(() => {
-    signalRConnected = false;
-    document.getElementById('statusLabel').textContent = 'Reconnecting…';
-    document.getElementById('statusDot').className = 'dot';
-  });
-
-  signalRConn.onreconnected(() => {
-    signalRConnected = true;
-    document.getElementById('statusLabel').textContent = 'Connected';
-    document.getElementById('statusDot').className = 'dot active';
-  });
-
-  signalRConn.onclose(() => {
-    signalRConnected = false;
-    document.getElementById('statusLabel').textContent = 'Offline (WS closed)';
-    document.getElementById('statusDot').className = 'dot';
-    // Trigger polling fallback
-    setTimeout(refreshStatus, 1000);
-  });
-
-  try {
-    await signalRConn.start();
-    signalRConnected = true;
-    console.log('SignalR connected.');
-  } catch (e) {
-    console.warn('SignalR start failed, relying on polling:', e.message);
-  }
-}
-
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 
 init();
-initSignalR();
 </script>
 </body>
 </html>

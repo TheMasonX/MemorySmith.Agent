@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
 using WebUI.Blazor;
+using WebUI.Blazor.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -138,6 +139,19 @@ if (agentEnabled)
         chatOpts = chatOpts with { LlmModel = legacyModel };
     builder.Services.AddSingleton(chatOpts);
 
+    // ── Chat I/O disk logging (opt-out) ────────────────────────────────────────
+    // Logs all inbound/outbound chat as JSON lines to logs/chat/chat-*.log.
+    // Disable via Agent:Chat:Logging:Enabled = false in appsettings.json.
+    var chatLoggingSection = chatSection.GetSection("Logging");
+    builder.Services.Configure<ChatLoggingOptions>(chatLoggingSection);
+    // Bind immediately so we can read the Enabled flag during DI setup.
+    var chatLoggingOpts = new ChatLoggingOptions();
+    chatLoggingSection.Bind(chatLoggingOpts);
+    if (chatLoggingOpts.Enabled)
+        builder.Services.AddSingleton<IChatLogger, FileChatLogger>();
+    else
+        builder.Services.AddSingleton<IChatLogger>(NullChatLogger.Instance);
+
     builder.Services.AddHttpClient("llm", http =>
     {
         http.BaseAddress = new Uri(chatOpts.ResolvedBaseUrl);
@@ -235,6 +249,7 @@ if (agentEnabled)
             hubContext:      sp.GetRequiredService<IHubContext<AgentHub>>(),
             goalFactory:     sp.GetRequiredService<GoalFactory>(),
             chatInterpreter: sp.GetRequiredService<IChatInterpreter>(),
+            chatLogger:      sp.GetRequiredService<IChatLogger>(),
             botName:         cfg.BotUsername,
             journal:         sp.GetRequiredService<IAgentJournal>(),
             replanGovernor:  sp.GetRequiredService<IReplanGovernor>(),

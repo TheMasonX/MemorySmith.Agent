@@ -1,1 +1,195 @@
-IyBSdW5uaW5nIHRoZSBBZ2VudAoKVGhpcyBndWlkZSB3YWxrcyB0aHJvdWdoIGdldHRpbmcgTWVtb3J5U21pdGguQWdlbnQgdXAgYW5kIHJ1bm5pbmcgYWdhaW5zdCBhIE1pbmVjcmFmdCBzZXJ2ZXIuIFRoZSBwcmltYXJ5IHBhdGggaXMgKipkaXJlY3QgaG9zdGluZyoqIOKAlCBydW5uaW5nIHRoZSAuTkVUIHByb2Nlc3MgYW5kIE5vZGUuanMgYWRhcHRlciBvbiB5b3VyIGxvY2FsIG1hY2hpbmUuIEEgc2Vjb25kYXJ5IERvY2tlciBwYXRoIGlzIGRvY3VtZW50ZWQgYXQgdGhlIGVuZCBmb3IgdXNlcnMgd2hvIHByZWZlciBjb250YWluZXIgaXNvbGF0aW9uLgoKIyMgUHJlcmVxdWlzaXRlcwoKRGlyZWN0IGhvc3RpbmcgKHJlY29tbWVuZGVkKSByZXF1aXJlczoKCi0gKiouTkVUIFNESyAxMC4wKiogb3IgbmV3ZXIg4oCUIGBkb3RuZXQgLS12ZXJzaW9uYCBzaG91bGQgcHJpbnQgYSBgMTAueGAgdmFsdWUKLSAqKk5vZGUuanMgMjAgTFRTIG9yIG5ld2VyKiog4oCUIHJlcXVpcmVkIGJ5IHRoZSBNaW5lZmxheWVyIGFkYXB0ZXIgKGBub2RlIC0tdmVyc2lvbmApCi0gKipBIHJlYWNoYWJsZSBNaW5lY3JhZnQgSmF2YSBFZGl0aW9uIHNlcnZlcioqIOKAlCAxLjIwKyByZWNvbW1lbmRlZDsgZWl0aGVyIGEgbG9jYWwgc2VydmVyIHlvdSBjb250cm9sIG9yIGEgcmVtb3RlIG9uZSB3aXRoIGBvbmxpbmUtbW9kZT1mYWxzZWAgaWYgeW91IGRvbid0IGhhdmUgYSBwYWlkIGFjY291bnQKLSAqKkEgcnVubmluZyBNZW1vcnlTbWl0aCBpbnN0YW5jZSoqIOKAlCB0aGUgYWdlbnQncyBtZW1vcnkgYmFja2VuZCwgZGVmYXVsdCBgaHR0cDovL2xvY2FsaG9zdDo1MDAwYAotICoqQSBydW5uaW5nIExMTSBlbmRwb2ludCoqIOKAlCBPbGxhbWEgb24gYGh0dHA6Ly9sb2NhbGhvc3Q6MTE0MzRgIGlzIHRoZSBkZWZhdWx0OyBhbnkgT3BlbkFJLWNvbXBhdGlibGUgY2hhdC1jb21wbGV0aW9ucyBlbmRwb2ludCBhbHNvIHdvcmtzCi0gKiooT3B0aW9uYWwpIEEgc2Vjb25kIE1lbW9yeVNtaXRoIGluc3RhbmNlKiogZm9yIFdvcmxkIEtCIHNlcGFyYXRpb24g4oCUIHNlZSBbd29ybGQta2ItZGVwbG95bWVudC5tZF0od29ybGQta2ItZGVwbG95bWVudC5tZCkKCiMjIFByaW1hcnkgUGF0aDogRGlyZWN0IEhvc3RpbmcKCiMjIyAxLiBDbG9uZSB0aGUgcmVwb3NpdG9yeQoKYGBgYmFzaApnaXQgY2xvbmUgaHR0cHM6Ly9naXRodWIuY29tL3lvdXItb3JnL01lbW9yeVNtaXRoLkFnZW50LmdpdApjZCBNZW1vcnlTbWl0aC5BZ2VudApgYGAKCiMjIyAyLiBDb25maWd1cmUgYXBwc2V0dGluZ3MuanNvbgoKRWRpdCBgV2ViVUkuQmxhem9yL2FwcHNldHRpbmdzLmpzb25gIChvciB1c2UgYGFwcHNldHRpbmdzLkRldmVsb3BtZW50Lmpzb25gIGZvciBhIGxvY2FsIG92ZXJyaWRlIHRoYXQgd29uJ3QgYmUgY29tbWl0dGVkKToKCmBgYGpzb25jCnsKICAiQWdlbnQiOiB7CiAgICAiRW5hYmxlZCI6IHRydWUsCiAgICAiTWluZWNyYWZ0IjogewogICAgICAiU2VydmVySG9zdCI6ICJsb2NhbGhvc3QiLAogICAgICAiU2VydmVyUG9ydCI6IDI1NTY1LAogICAgICAiQm90VXNlcm5hbWUiOiAiTWVtb3J5U21pdGhCb3QiCiAgICB9LAogICAgIkxsbSI6IHsKICAgICAgIkVuZHBvaW50IjogImh0dHA6Ly9sb2NhbGhvc3Q6MTE0MzQiLAogICAgICAiTW9kZWwiOiAibGxhbWEzLjE6OGIiLAogICAgICAiTGxtVGltZW91dFNlY29uZHMiOiA2MCwKICAgICAgIlBsYXllckNvb2xkb3duU2Vjb25kcyI6IDIsCiAgICAgICJHbG9iYWxQZXJNaW51dGVNYXgiOiAzMAogICAgfSwKICAgICJNZW1vcnkiOiB7CiAgICAgICJCYXNlVXJsIjogImh0dHA6Ly9sb2NhbGhvc3Q6NTAwMCIsCiAgICAgICJBcGlLZXkiOiBudWxsLAogICAgICAiVGltZW91dFNlY29uZHMiOiAzMCwKICAgICAgLy8gU3ByaW50IDIzOiBXb3JsZEtiVXJsIG5vdyBkZWZhdWx0cyB0byBudWxsLiBTZXQgZXhwbGljaXRseSB0byBlbmFibGUKICAgICAgLy8gd29ybGQgS0Igc2VwYXJhdGlvbi4gV2hlbiBudWxsLCB3b3JsZCBvYnNlcnZhdGlvbnMgbGFuZCBpbiB0aGUgYWdlbnQgS0IKICAgICAgLy8gKEJhc2VVcmwpIGFuZCBhIHN0YXJ0dXAgd2FybmluZyBpcyBsb2dnZWQuCiAgICAgICJXb3JsZEtiVXJsIjogImh0dHA6Ly9sb2NhbGhvc3Q6Njg2OSIsCiAgICAgICJXb3JsZEFwaUtleSI6IG51bGwsCiAgICAgICJXb3JsZFRpbWVvdXRTZWNvbmRzIjogMzAKICAgIH0sCiAgICAiUnVudGltZSI6IHsKICAgICAgIlJlcGxhbkludGVydmFsU2Vjb25kcyI6IDIsCiAgICAgICJBY3Rpb25UaW1lb3V0U2Vjb25kcyI6IDMwCiAgICB9CiAgfQp9CmBgYAoKS2V5IGZpZWxkczoKCi0gYE1pbmVjcmFmdC5TZXJ2ZXJIb3N0YCAvIGBTZXJ2ZXJQb3J0YCDigJQgeW91ciBNaW5lY3JhZnQgc2VydmVyJ3MgYWRkcmVzcwotIGBNaW5lY3JhZnQuQm90VXNlcm5hbWVgIOKAlCB0aGUgaW4tZ2FtZSB1c2VybmFtZSB0aGUgYWdlbnQgd2lsbCBqb2luIGFzCi0gYE1lbW9yeS5CYXNlVXJsYCDigJQgYWdlbnQga25vd2xlZGdlIGJhc2UgKHNwcmludCBkb2NzLCBkZXNpZ24gbm90ZXMsIGNvZGUgcmVmcykKLSBgTWVtb3J5LldvcmxkS2JVcmxgIOKAlCB3b3JsZCBrbm93bGVkZ2UgYmFzZSAoaW4tZ2FtZSBvYnNlcnZhdGlvbnMpOyBzZWUgW3dvcmxkLWtiLWRlcGxveW1lbnQubWRdKHdvcmxkLWtiLWRlcGxveW1lbnQubWQpCi0gYExsbS5FbmRwb2ludGAgLyBgTGxtLk1vZGVsYCDigJQgeW91ciBMTE0gYmFja2VuZAoKIyMjIDMuIEluc3RhbGwgTm9kZS5qcyBhZGFwdGVyIGRlcGVuZGVuY2llcwoKVGhlIGFnZW50IHRhbGtzIHRvIE1pbmVjcmFmdCB2aWEgYSBOb2RlLmpzIE1pbmVmbGF5ZXIgYWRhcHRlci4gSW5zdGFsbCBpdHMgZGVwZW5kZW5jaWVzIG9uY2U6CgpgYGBiYXNoCmNkIE1pbmVmbGF5ZXJBZGFwdGVyCm5wbSBpbnN0YWxsCmNkIC4uCmBgYAoKIyMjIDQuIFN0YXJ0IHRoZSBOb2RlLmpzIGFkYXB0ZXIKCkluIGEgdGVybWluYWwgZGVkaWNhdGVkIHRvIHRoZSBhZGFwdGVyOgoKYGBgYmFzaApjZCBNaW5lZmxheWVyQWRhcHRlcgpucG0gc3RhcnQKYGBgCgpUaGUgYWRhcHRlciBsaXN0ZW5zIG9uIGEgbG9jYWwgc29ja2V0IGZvciB0aGUgLk5FVCBwcm9jZXNzLiBMZWF2ZSB0aGlzIHRlcm1pbmFsIHJ1bm5pbmcuCgojIyMgNS4gU3RhcnQgdGhlIGFnZW50ICguTkVUIGhvc3QpCgpJbiBhIHNlcGFyYXRlIHRlcm1pbmFsOgoKYGBgYmFzaApjZCBXZWJVSS5CbGF6b3IKZG90bmV0IHJ1bgpgYGAKCllvdSBzaG91bGQgc2VlIFNlcmlsb2cgb3V0cHV0IHNpbWlsYXIgdG86CgpgYGAKPT09IEFnZW50IGNvbmZpZzogYm90PU1lbW9yeVNtaXRoQm90IG1jPWxvY2FsaG9zdDoyNTU2NSB8IGxsbVRpbWVvdXQ9NjBzIHJhdGVDb29sZG93bj0ycyBtYXhQZXJNaW49MzAgfCBtZW1vcnk9aHR0cDovL2xvY2FsaG9zdDo1MDAwIGFjdGlvblRpbWVvdXQ9MzBzIHJlcGxhbkludGVydmFsPTJzID09PQpgYGAKCklmIGBXb3JsZEtiVXJsYCBpcyB1bnNldCAoU3ByaW50IDIzIGRlZmF1bHQpLCB5b3Ugd2lsbCBhbHNvIHNlZToKCmBgYApXb3JsZCBLQiBVUkwgaXMgbm90IGNvbmZpZ3VyZWQgKFdvcmxkS2JVcmwgaXMgbnVsbCkuIFdvcmxkIG9ic2VydmF0aW9ucyB3aWxsIGJlIHN0b3JlZCBpbiBhZ2VudCBLQi4gU2V0IFdvcmxkS2JVcmwgaW4gQWdlbnQ6TWVtb3J5OldvcmxkS2JVcmwgdG8gZW5hYmxlIHdvcmxkIEtCIHNlcGFyYXRpb24uIFNlZSBEYXRhL1BhZ2VzL0d1aWRlcy93b3JsZC1rYi1kZXBsb3ltZW50Lm1kCmBgYAoKVGhpcyBpcyBpbmZvcm1hdGlvbmFsIOKAlCB0aGUgYWdlbnQgc3RpbGwgcnVuczsgb2JzZXJ2YXRpb25zIGp1c3Qgc2hhcmUgdGhlIGFnZW50IEtCIHVudGlsIHlvdSBjb25maWd1cmUgdGhlIHdvcmxkIEtCLgoKIyMjIDYuIE9wZW4gdGhlIFdlYlVJCgpCcm93c2UgdG8gYGh0dHBzOi8vbG9jYWxob3N0OjUwMDFgIChvciB3aGljaGV2ZXIgcG9ydCB0aGUgYGRvdG5ldCBydW5gIG91dHB1dCBsaXN0cykuIEZyb20gdGhlIGRhc2hib2FyZCB5b3UgY2FuOgoKLSBXYXRjaCBsaXZlIHdvcmxkIHN0YXRlLCBhY3Rpb24gcXVldWUsIGFuZCBldmVudCBzdHJlYW0KLSBTZXQgb3IgY2FuY2VsIGEgZ29hbCBmcm9tIHRoZSBnb2FsIHBpY2tlcgotIEluc3BlY3QgcmVjZW50IExMTSBwcm9tcHRzIGFuZCB0b29sIHJlc3VsdHMKCiMjIyA3LiBWZXJpZnkgdGhlIGJvdCBqb2luZWQKClN3aXRjaCB0byB5b3VyIE1pbmVjcmFmdCBjbGllbnQgYW5kIGxvb2sgZm9yIGBNZW1vcnlTbWl0aEJvdGAgKG9yIHdoYXRldmVyIGBCb3RVc2VybmFtZWAgeW91IHNldCkgaW4gdGhlIHBsYXllciBsaXN0LiBUcnkgYC90ZWxsIE1lbW9yeVNtaXRoQm90IGhlbGxvYCB0byBjb25maXJtIHRoZSBjaGF0IHBhdGggaXMgd2lyZWQuCgojIyMgTG9ncwoKQWxsIHN0cnVjdHVyZWQgbG9ncyBnbyB0byBgV2ViVUkuQmxhem9yL2xvZ3MvYCAoU2VyaWxvZyBmaWxlIHNpbmssIGFkZGVkIGluIFNwcmludCAxOSkuIERhaWx5LXJvbGxlZCBmaWxlcyBuYW1lZCBgYWdlbnQtWVlZWU1NREQubG9nYCBjYXB0dXJlIGZ1bGwgZGVidWcgb3V0cHV0IGV2ZW4gd2hlbiB0aGUgY29uc29sZSBpcyBjbG9zZWQuIFRhaWwgaW4gcmVhbCB0aW1lIHdpdGg6CgpgYGBiYXNoCnRhaWwgLWYgV2ViVUkuQmxhem9yL2xvZ3MvYWdlbnQtJChkYXRlICslWSVtJWQpLmxvZwpgYGAKCiMjIyBTdG9wcGluZwoKQ3RybCtDIGluIGVhY2ggdGVybWluYWwuIFRoZSBib3QgZGlzY29ubmVjdHMgY2xlYW5seSBvbiBzaHV0ZG93bi4KCiMjIFNlY29uZGFyeSBQYXRoOiBEb2NrZXIgU2V0dXAKCj4gKipOb3RlOioqIERpcmVjdCBob3N0aW5nIGlzIHRoZSByZWNvbW1lbmRlZCBwYXRoLiBJdCBjb21waWxlcyBmYXN0ZXIsIGF0dGFjaGVzIGEgZGVidWdnZXIgdHJpdmlhbGx5LCBhbmQgYXZvaWRzIHRoZSBKSVQtd2FybS11cCB0YXggY29udGFpbmVycyBwYXkgb24gY29sZCBzdGFydC4gVGhlIERvY2tlciBwYXRoIGJlbG93IGlzIGZvciB1c2VycyB3aG8gd2FudCBzdHJpY3QgaXNvbGF0aW9uLCByZXByb2R1Y2libGUgQ0kgcnVucywgb3Igd2hvIGFscmVhZHkgb3BlcmF0ZSBhIERvY2tlci1iYXNlZCBkZXBsb3kuCgojIyMgQWx0ZXJuYXRpdmU6IERvY2tlciBDb21wb3NlCgpBIGBkb2NrZXItY29tcG9zZS55bWxgIGF0IHRoZSByZXBvIHJvb3QgYnJpbmdzIHVwIHRoZSBhZ2VudCwgdGhlIE5vZGUuanMgYWRhcHRlciwgYW5kIGEgTWVtb3J5U21pdGggaW5zdGFuY2UgdG9nZXRoZXIuCgpgYGBiYXNoCiMgQnVpbGQgaW1hZ2VzIGFuZCBzdGFydCB0aGUgc3RhY2sKZG9ja2VyIGNvbXBvc2UgdXAgLS1idWlsZAoKIyBPciBydW4gZGV0YWNoZWQgYW5kIHRhaWwgbG9ncwpkb2NrZXIgY29tcG9zZSB1cCAtZApkb2NrZXIgY29tcG9zZSBsb2dzIC1mIGFnZW50CmBgYAoKQ29uZmlndXJhdGlvbiBpcyBsYXllcmVkIG92ZXIgdGhlIGluLWltYWdlIGBhcHBzZXR0aW5ncy5qc29uYCB2aWEgZW52aXJvbm1lbnQgdmFyaWFibGVzOgoKYGBgYmFzaApBR0VOVF9fTUlORUNSQUZUX19TRVJWRVJIT1NUPW1jLmV4YW1wbGUubmV0IFwKQUdFTlRfX01JTkVDUkFGVF9fU0VSVkVSUE9SVD0yNTU2NSBcCkFHRU5UX19NRU1PUllfX0JBU0VVUkw9aHR0cDovL21lbW9yeTo1MDAwIFwKQUdFTlRfX01FTU9SWV9fV09STERLQlVSTD1odHRwOi8vd29ybGQtbWVtb3J5OjY4NjkgXApkb2NrZXIgY29tcG9zZSB1cApgYGAKCkFTUC5ORVQgYmluZHMgaW5zaWRlIHRoZSBjb250YWluZXIgdG8gcG9ydCA4MDgwIGJ5IGRlZmF1bHQuIFRoZSBjb21wb3NlIGZpbGUgZm9yd2FyZHMgYDgwODAgLT4gODA4MGAgc28gdGhlIFdlYlVJIGlzIGF0IGBodHRwOi8vbG9jYWxob3N0OjgwODBgLgoKIyMjIEFsdGVybmF0aXZlOiBEb2NrZXIgKG1hbnVhbCkKCklmIHlvdSdkIHJhdGhlciB3aXJlIGNvbnRhaW5lcnMgeW91cnNlbGY6CgpgYGBiYXNoCmRvY2tlciBidWlsZCAtdCBtZW1vcnlzbWl0aC1hZ2VudCAtZiBXZWJVSS5CbGF6b3IvRG9ja2VyZmlsZSAuCmRvY2tlciBydW4gLS1ybSAtcCA4MDgwOjgwODAgXAogIC1lIEFHRU5UX19NSU5FQ1JBRlRfX1NFUlZFUkhPU1Q9aG9zdC5kb2NrZXIuaW50ZXJuYWwgXAogIC1lIEFHRU5UX19NRU1PUllfX0JBU0VVUkw9aHR0cDovL2hvc3QuZG9ja2VyLmludGVybmFsOjUwMDAgXAogIC1lIEFHRU5UX19NRU1PUllfX1dPUkxES0JVUkw9aHR0cDovL2hvc3QuZG9ja2VyLmludGVybmFsOjY4NjkgXAogIG1lbW9yeXNtaXRoLWFnZW50CmBgYAoKWW91IHdpbGwgc3RpbGwgbmVlZCBhIHNlcGFyYXRlbHkgcnVubmluZyBOb2RlLmpzIGFkYXB0ZXIgY29udGFpbmVyIChvciBsb2NhbCBwcm9jZXNzKSByZWFjaGFibGUgZnJvbSB0aGUgYWdlbnQgY29udGFpbmVyLgoKIyMgVHJvdWJsZXNob290aW5nCgotICoqQm90IG5ldmVyIGpvaW5zKiog4oCUIGNoZWNrIE1pbmVmbGF5ZXIgYWRhcHRlciBsb2dzOyB0aGUgLk5FVCBwcm9jZXNzIHRhbGtzIHRvIGl0IG92ZXIgYSBsb2NhbCBzb2NrZXQgYW5kIHNpbGVudGx5IHJldHJpZXMgb24gYWRhcHRlciByZXN0YXJ0Ci0gKipMTE0gdGltZW91dHMqKiDigJQgYnVtcCBgTGxtLkxsbVRpbWVvdXRTZWNvbmRzYDsgc21hbGwgbG9jYWwgbW9kZWxzIG9uIENQVSBjYW4gdGFrZSAzMCsgc2Vjb25kcyBwZXIgcmVzcG9uc2UKLSAqKiJXb3JsZCBLQiBVUkwgaXMgbm90IGNvbmZpZ3VyZWQiIHdhcm5pbmcqKiDigJQgZXhwZWN0ZWQgaWYgeW91IGhhdmVuJ3Qgc2V0IHVwIGEgc2Vjb25kIE1lbW9yeVNtaXRoIGluc3RhbmNlIHlldDsgc2VlIFt3b3JsZC1rYi1kZXBsb3ltZW50Lm1kXSh3b3JsZC1rYi1kZXBsb3ltZW50Lm1kKQotICoqVG9vbCBlcnJvcnMgYWZ0ZXIgZ29hbCBjaGFuZ2UqKiDigJQgdGhlIGFjdGlvbiBxdWV1ZSBpcyBjbGVhcmVkIG9uIGdvYWwgY2hhbmdlIChTcHJpbnQgMTIpIGFuZCBvbiBkYW1hZ2UgaW50ZXJydXB0IChTcHJpbnQgMjMpOyBlcnJvcnMgZnJvbSB0aGUgcHJldmlvdXMgcGxhbiBhcmUgZXhwZWN0ZWQgZHVyaW5nIHRoZSB0cmFuc2l0aW9uCgojIyBOZXh0IHN0ZXBzCgotIFJlYWQgW2ZlYXR1cmVzLXJlZmVyZW5jZS5tZF0oZmVhdHVyZXMtcmVmZXJlbmNlLm1kKSBmb3IgdGhlIGZ1bGwgbGlzdCBvZiBnb2FscywgdG9vbHMsIGFuZCBydW50aW1lIGtub2JzCi0gU2V0IHVwIHdvcmxkIEtCIHNlcGFyYXRpb24gd2l0aCBbd29ybGQta2ItZGVwbG95bWVudC5tZF0od29ybGQta2ItZGVwbG95bWVudC5tZCkKLSBCcm93c2UgYERhdGEvUGFnZXMvU3ByaW50TG9nL2AgZm9yIHBlci1zcHJpbnQgZGVzaWduIG5vdGVzCg==
+# Running the Agent
+
+This guide walks through getting MemorySmith.Agent up and running against a Minecraft server. The primary path is **direct hosting** — running the .NET process and Node.js adapter on your local machine. A secondary Docker path is documented at the end for users who prefer container isolation.
+
+## Prerequisites
+
+Direct hosting (recommended) requires:
+
+- **.NET SDK 10.0** or newer — `dotnet --version` should print a `10.x` value
+- **Node.js 20 LTS or newer** — required by the Mineflayer adapter (`node --version`)
+- **A reachable Minecraft Java Edition server** — 1.20+ recommended; either a local server you control or a remote one with `online-mode=false` if you don't have a paid account
+- **A running MemorySmith instance** — the agent's memory backend, default `http://localhost:5000`
+- **A running LLM endpoint** — Ollama on `http://localhost:11434` is the default; any OpenAI-compatible chat-completions endpoint also works
+- **(Optional) A second MemorySmith instance** for World KB separation — see [world-kb-deployment.md](world-kb-deployment.md)
+
+## Primary Path: Direct Hosting
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-org/MemorySmith.Agent.git
+cd MemorySmith.Agent
+```
+
+### 2. Configure appsettings.json
+
+Edit `WebUI.Blazor/appsettings.json` (or use `appsettings.Development.json` for a local override that won't be committed):
+
+```jsonc
+{
+  "Agent": {
+    "Enabled": true,
+    "Minecraft": {
+      "ServerHost": "localhost",
+      "ServerPort": 25565,
+      "BotUsername": "MemorySmithBot"
+    },
+    "Llm": {
+      "Endpoint": "http://localhost:11434",
+      "Model": "llama3.1:8b",
+      "LlmTimeoutSeconds": 60,
+      "PlayerCooldownSeconds": 2,
+      "GlobalPerMinuteMax": 30
+    },
+    "Memory": {
+      "BaseUrl": "http://localhost:5000",
+      "ApiKey": null,
+      "TimeoutSeconds": 30,
+      // Sprint 23: WorldKbUrl now defaults to null. Set explicitly to enable
+      // world KB separation. When null, world observations land in the agent KB
+      // (BaseUrl) and a startup warning is logged.
+      "WorldKbUrl": "http://localhost:6869",
+      "WorldApiKey": null,
+      "WorldTimeoutSeconds": 30
+    },
+    "Runtime": {
+      "ReplanIntervalSeconds": 2,
+      "ActionTimeoutSeconds": 30
+    }
+  }
+}
+```
+
+Key fields:
+
+- `Minecraft.ServerHost` / `ServerPort` — your Minecraft server's address
+- `Minecraft.BotUsername` — the in-game username the agent will join as
+- `Memory.BaseUrl` — agent knowledge base (sprint docs, design notes, code refs)
+- `Memory.WorldKbUrl` — world knowledge base (in-game observations); see [world-kb-deployment.md](world-kb-deployment.md)
+- `Llm.Endpoint` / `Llm.Model` — your LLM backend
+
+### 3. Install Node.js adapter dependencies
+
+The agent talks to Minecraft via a Node.js Mineflayer adapter. Install its dependencies once:
+
+```bash
+cd MineflayerAdapter
+npm install
+cd ..
+```
+
+### 4. Start the Node.js adapter
+
+In a terminal dedicated to the adapter:
+
+```bash
+cd MineflayerAdapter
+npm start
+```
+
+The adapter listens on a local socket for the .NET process. Leave this terminal running.
+
+### 5. Start the agent (.NET host)
+
+In a separate terminal:
+
+```bash
+cd WebUI.Blazor
+dotnet run
+```
+
+You should see Serilog output similar to:
+
+```
+=== Agent config: bot=MemorySmithBot mc=localhost:25565 | llmTimeout=60s rateCooldown=2s maxPerMin=30 | memory=http://localhost:5000 actionTimeout=30s replanInterval=2s ===
+```
+
+If `WorldKbUrl` is unset (Sprint 23 default), you will also see:
+
+```
+World KB URL is not configured (WorldKbUrl is null). World observations will be stored in agent KB. Set WorldKbUrl in Agent:Memory:WorldKbUrl to enable world KB separation. See Data/Pages/Guides/world-kb-deployment.md
+```
+
+This is informational — the agent still runs; observations just share the agent KB until you configure the world KB.
+
+### 6. Open the WebUI
+
+Browse to `https://localhost:5001` (or whichever port the `dotnet run` output lists). From the dashboard you can:
+
+- Watch live world state, action queue, and event stream
+- Set or cancel a goal from the goal picker
+- Inspect recent LLM prompts and tool results
+
+### 7. Verify the bot joined
+
+Switch to your Minecraft client and look for `MemorySmithBot` (or whatever `BotUsername` you set) in the player list. Try `/tell MemorySmithBot hello` to confirm the chat path is wired.
+
+### Logs
+
+All structured logs go to `WebUI.Blazor/logs/` (Serilog file sink, added in Sprint 19). Daily-rolled files named `agent-YYYYMMDD.log` capture full debug output even when the console is closed. Tail in real time with:
+
+```bash
+tail -f WebUI.Blazor/logs/agent-$(date +%Y%m%d).log
+```
+
+### Stopping
+
+Ctrl+C in each terminal. The bot disconnects cleanly on shutdown.
+
+## Secondary Path: Docker Setup
+
+> **Note:** Direct hosting is the recommended path. It compiles faster, attaches a debugger trivially, and avoids the JIT-warm-up tax containers pay on cold start. The Docker path below is for users who want strict isolation, reproducible CI runs, or who already operate a Docker-based deploy.
+
+### Alternative: Docker Compose
+
+A `docker-compose.yml` at the repo root brings up the agent, the Node.js adapter, and a MemorySmith instance together.
+
+```bash
+# Build images and start the stack
+docker compose up --build
+
+# Or run detached and tail logs
+docker compose up -d
+docker compose logs -f agent
+```
+
+Configuration is layered over the in-image `appsettings.json` via environment variables:
+
+```bash
+AGENT__MINECRAFT__SERVERHOST=mc.example.net \
+AGENT__MINECRAFT__SERVERPORT=25565 \
+AGENT__MEMORY__BASEURL=http://memory:5000 \
+AGENT__MEMORY__WORLDKBURL=http://world-memory:6869 \
+docker compose up
+```
+
+ASP.NET binds inside the container to port 8080 by default. The compose file forwards `8080 -> 8080` so the WebUI is at `http://localhost:8080`.
+
+### Alternative: Docker (manual)
+
+If you'd rather wire containers yourself:
+
+```bash
+docker build -t memorysmith-agent -f WebUI.Blazor/Dockerfile .
+docker run --rm -p 8080:8080 \
+  -e AGENT__MINECRAFT__SERVERHOST=host.docker.internal \
+  -e AGENT__MEMORY__BASEURL=http://host.docker.internal:5000 \
+  -e AGENT__MEMORY__WORLDKBURL=http://host.docker.internal:6869 \
+  memorysmith-agent
+```
+
+You will still need a separately running Node.js adapter container (or local process) reachable from the agent container.
+
+## Troubleshooting
+
+- **Bot never joins** — check Mineflayer adapter logs; the .NET process talks to it over a local socket and silently retries on adapter restart
+- **LLM timeouts** — bump `Llm.LlmTimeoutSeconds`; small local models on CPU can take 30+ seconds per response
+- **"World KB URL is not configured" warning** — expected if you haven't set up a second MemorySmith instance yet; see [world-kb-deployment.md](world-kb-deployment.md)
+- **Tool errors after goal change** — the action queue is cleared on goal change (Sprint 12) and on damage interrupt (Sprint 23); errors from the previous plan are expected during the transition
+
+## Next steps
+
+- Read [features-reference.md](features-reference.md) for the full list of goals, tools, and runtime knobs
+- Set up world KB separation with [world-kb-deployment.md](world-kb-deployment.md)
+- Browse `Data/Pages/SprintLog/` for per-sprint design notes

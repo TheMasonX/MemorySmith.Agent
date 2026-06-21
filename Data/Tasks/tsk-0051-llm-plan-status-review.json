@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0051-llm-plan-status-review",
+  "key": "TSK-0051",
+  "title": "LLM Plan Status Review",
+  "description": "Ask the LLM to review the status of the plan given context. I think it would be given the log of actions taken so far, current inventory, etc. so that it can help validate the world state against what it thinks.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-21T17:47:36.5128187Z",
+  "updatedAtUtc": "2026-06-21T17:47:36.5128187Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

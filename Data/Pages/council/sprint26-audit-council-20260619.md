@@ -1,1 +1,200 @@
-IyBNZW1vcnlTbWl0aC5BZ2VudCDigJQgU3ByaW50IDI2IEF1ZGl0IENvdW5jaWwgUmV2aWV3CioqRGF0ZSoqOiAyMDI2LTA2LTE5ICAKKipCcmFuY2gqKjogYHNwcmludC01LXRvb2wtc2FmZXR5YCBAIGQ1ODMyZDQgIAoqKlZlcnNpb24qKjogdjAuMjUuMCAgCioqQ291bmNpbCBmb3JtYXQqKjogNi1zZWF0IChTb3VyY2UtR3JvdW5kZWQgQXJjaGl2aXN0LCBEYXRhIE1vZGVsIEFyY2hpdGVjdCwgUmV0cmlldmFsIFNwZWNpYWxpc3QsIEh1bWFuIExlYXJuaW5nIEFkdm9jYXRlLCBTa2VwdGljYWwgUmV2aWV3ZXIsIFN5bnRoZXNpemVyKSAgCioqUGVlciByZXZpZXcqKjogQW5vbnltb3VzICgyIHJldmlld2VycywgYmxpbmRlZCkgIAoqKlB1cnBvc2UqKjogQ3Jvc3MtdmFsaWRhdGUgdHdvIGV4dGVybmFsIGF1ZGl0cyBhZ2FpbnN0IGN1cnJlbnQgY29kZWJhc2U7IGRlZmluZSBTcHJpbnQgMjYgc2NvcGUKCi0tLQoKIyMgTWF0ZXJpYWxzIFJldmlld2VkCgoxLiBgRGF0YS9QYWdlcy9BdWRpdHMvZXhlYy1zdW1tYXJ5LWF1ZGl0LTIwMjYwNjE5Lm1kYCDigJQgRXh0ZXJuYWwgZXhlY3V0aXZlIHN1bW1hcnkKMi4gYERhdGEvUGFnZXMvQXVkaXRzL2RlZXAtY29kZS1hdWRpdC0yMDI2MDYxOS5tZGAg4oCUIEV4dGVybmFsIGRlZXAgY29kZSBhdWRpdAozLiBgRGF0YS9QYWdlcy9UYXNrcy9hZ2VudC1oYW5kb2ZmLXNwcmludDI2Lm1kYCDigJQgU3ByaW50IDI1IGhhbmRvZmYgKFNwcmludCAyNiBiYWNrbG9nKQo0LiBMaXZlIGJyYW5jaCBjb2RlIGF0IGQ1ODMyZDQ6IFRvb2xEaXNwYXRjaGVyLmNzLCBXb3JsZE1vZGVsLmNzLCBHYXRoZXJHb2FsRGVjb21wb3Nlci5jcywgSHRuUGxhbm5lci5jcywgSUl0ZW1TcGVjR29hbC5jcywgSUdvYWwuY3MsIHRlc3QgZGlyZWN0b3J5IGxpc3RpbmcKCi0tLQoKIyMgU2VhdCAxOiBTb3VyY2UtR3JvdW5kZWQgQXJjaGl2aXN0CioqQ29uZmlkZW5jZTogODglKioKCkNyb3NzLXJlZmVyZW5jaW5nIGV4dGVybmFsIGF1ZGl0IGZpbmRpbmdzIGFnYWluc3QgYWN0dWFsIHNvdXJjZSBhdCBIRUFEOgoKKipDb25maXJtZWQgcmVzb2x2ZWQgKFNwcmludCAyNSk6KioKLSBGaW5kaW5nIDEgKGludGVnZXIgdmFsaWRhdGlvbik6IFRvb2xEaXNwYXRjaGVyLkNoZWNrVHlwZSB1c2VzIGAhdmFsdWUuVHJ5R2V0SW50MzIob3V0IF8pYC4gTGluZS12ZXJpZmllZCBpbiBiYXNlNjQtZGVjb2RlZCBjb250ZW50LiDinIUKLSBGaW5kaW5nIDIgKG5vIHRyeS9jYXRjaCk6IGBDYWxsQXN5bmNgIGhhcyB0cnkvY2F0Y2ggYXJvdW5kIGB0b29sLkV4ZWN1dGVBc3luY2AuIE9wZXJhdGlvbkNhbmNlbGVkRXhjZXB0aW9uIHJlLXRocm93czsgZ2VuZXJpYyBFeGNlcHRpb24g4oaSIFRvb2xSZXN1bHQoZmFsc2UpLiDinIUKLSBGaW5kaW5nIDMgKFdvcmxkTW9kZWwgYWxpYXNpbmcpOiBDb25zdHJ1Y3RvciB1c2VzIHNlcGFyYXRlIGBuZXcgRGljdGlvbmFyeTxzdHJpbmcsaW50PigpYCBwZXIgc3RhdGUuIGBPYnNlcnZlKClgIHVzZXMgYG5ldyBEaWN0aW9uYXJ5PHN0cmluZyxpbnQ+KG9ic2VydmF0aW9uLkludmVudG9yeSlgLiDinIUKCioqQ29uZmlybWVkIG9wZW46KioKLSBGaW5kaW5nIDQgKGpvdXJuYWwgYm91bmRzKTogU3RpbGwgQ29uY3VycmVudFF1ZXVlICsgc2luZ2xlLWRlcXVldWUgdHJpbS4gSW50ZW50aW9uYWwuIOKchSAoYXMgZGVsaWJlcmF0ZSkKLSBGaW5kaW5nIDUgKHBsYW5uZXIgc3BsaXQpOiBIdG5QbGFubmVyIGhhcyBJSXRlbVNwZWNHb2FsLCBCdWlsZEdvYWwsIENyYWZ0SXRlbUdvYWwgdHlwZS1zd2l0Y2ggYWxvbmdzaWRlIFBsYW5uZXJSb3V0ZXIuIFNvdXJjZS1jb25maXJtZWQuIOKchSAoYXMgb3BlbikKLSBGaW5kaW5nIDYgKGNoYXQgZmlsdGVyKTogU1lTVEVNX01FU1NBR0VfUEFUVEVSTlMgc3RpbGwgcmVnZXgtYmFzZWQuIOKchSAoYXMgb3BlbikKCioqTmV3IGZpbmRpbmcgZGlzY292ZXJlZCBkdXJpbmcgaW50YWtlOioqIGBJSXRlbVNwZWNHb2FsLmNzYCAoU0hBIDhmZjhkN2M0KSBkZWNsYXJlcyBvbmx5IGBJdGVtU3BlYyBTcGVjIHsgZ2V0OyB9YCDigJQgbm8gYFRhcmdldENvdW50YC4gR2F0aGVyR29hbERlY29tcG9zZXIuY3MgKFNIQSAxZGVlNjUxNSkgaGFzIGBJSXRlbVNwZWNHb2FsIGlzZyA9PiAoaXNnLlNwZWMsIEFycmF5LkVtcHR5PHN0cmluZz4oKSlgIHdoaWNoIHNpbGVudGx5IHplcm9lcyBvdXQgdGFyZ2V0IGNvdW50IGZvciBhbnkgSUl0ZW1TcGVjR29hbCBpbXBsZW1lbnRvciB0aGF0IGlzbid0IEdlbmVyaWNHYXRoZXJHb2FsIG9yIEdhdGhlcldvb2RHb2FsLiBIdG5QbGFubmVyLmNzIGhhcyB0aGUgc2FtZSBpc3N1ZSBpbiBpdHMgSUl0ZW1TcGVjR29hbCBicmFuY2ggKGBpc2cgaXMgR2VuZXJpY0dhdGhlckdvYWwgZ2dnID8gWy4uLl0gOiBBcnJheS5FbXB0eTxzdHJpbmc+KClgKS4gRml4IHJlcXVpcmVzIGFkZGluZyBgaW50IFRhcmdldENvdW50ID0+IDE7YCBhcyBESU0gdG8gSUl0ZW1TcGVjR29hbC4gKipUaGlzIGlzIFNwcmludCAyNiBQMC1CIHNjb3BlLioqCgotLS0KCiMjIFNlYXQgMjogRGF0YSBNb2RlbCBBcmNoaXRlY3QKKipDb25maWRlbmNlOiA4NSUqKgoKQXNzZXNzbWVudCBvZiBzdHJ1Y3R1cmFsIGNoYW5nZXMgbmVlZGVkIGZvciBTcHJpbnQgMjY6CgoqKklJdGVtU3BlY0dvYWwgVGFyZ2V0Q291bnQgKFAwLUIpOioqICAKVGhlIGNsZWFuZXN0IGZpeCBpcyBhIGRlZmF1bHQgaW50ZXJmYWNlIG1ldGhvZCBgaW50IFRhcmdldENvdW50ID0+IDE7YC4gVGhpczoKLSBEb2Vzbid0IGJyZWFrIGV4aXN0aW5nIElJdGVtU3BlY0dvYWwgaW1wbGVtZW50b3JzICh0aGV5IGdldCBkZWZhdWx0PTEpCi0gR2VuZXJpY0dhdGhlckdvYWwgYW5kIEdhdGhlcldvb2RHb2FsIGFscmVhZHkgaGF2ZSBwdWJsaWMgYFRhcmdldENvdW50YCBwcm9wZXJ0aWVzIHRoYXQgc2F0aXNmeSB0aGUgaW50ZXJmYWNlCi0gQWxsb3dzIEdhdGhlckdvYWxEZWNvbXBvc2VyIGFuZCBIdG5QbGFubmVyIHRvIGNhbGwgYGlzZy5UYXJnZXRDb3VudGAgZGlyZWN0bHksIGVsaW1pbmF0aW5nIHRoZSBgaXMgR2VuZXJpY0dhdGhlckdvYWxgIGNhc3QKLSBEZWZhdWx0IG9mIDEgaXMgY29uc2VydmF0aXZlIChiZXR0ZXIgdGhhbiB0aGUgb2xkIERlY29tcG9zZUdhdGhlckl0ZW0gZGVmYXVsdC1jb3VudC1vZi0xMCkKCipDb25jZXJuKjogQyMgRElNIHNlbWFudGljcyDigJQgaWYgYW4gaW1wbGVtZW50b3IgaGFzIGBwdWJsaWMgaW50IFRhcmdldENvdW50IHsgZ2V0OyB9YCBvbiB0aGUgY2xhc3MgYnV0IGRvZXNuJ3QgZXhwbGljaXRseSBpbXBsZW1lbnQgdGhlIGludGVyZmFjZSBwcm9wZXJ0eSwgdGhlIGNsYXNzIG1lbWJlciB0YWtlcyBwcmlvcml0eSB3aGVuIGNhbGxlZCB0aHJvdWdoIHRoZSBjb25jcmV0ZSB0eXBlIGJ1dCBOT1QgdGhyb3VnaCB0aGUgaW50ZXJmYWNlIHJlZmVyZW5jZS4gVGhpcyBpcyBzdWJ0bGUuIEdpdmVuIHRoYXQgR2VuZXJpY0dhdGhlckdvYWwgYW5kIEdhdGhlcldvb2RHb2FsIGFyZSB0aGUgcHJpbWFyeSBpbXBsZW1lbnRvcnMgYW5kIGJvdGggaGF2ZSB0aGUgcHJvcGVydHksIHRoaXMgd2lsbCB3b3JrIGNvcnJlY3RseS4gRnV0dXJlIGltcGxlbWVudG9ycyBtdXN0IGJlIGRvY3VtZW50ZWQgdG8gcHJvdmlkZSB0aGlzIHByb3BlcnR5LgoKKipBY3Rpb25RdWV1ZS5DbGVhckFuZEVucXVldWUgKFAwLUEgdGVzdCB0YXJnZXQpOioqICAKQWxyZWFkeSBsb2NrLXByb3RlY3RlZCBhcyBvZiBTcHJpbnQgMjMgQi0zIGZpeC4gVGhlIGludGVncmF0aW9uIHRlc3QgbXVzdCBleGVyY2lzZSB0aGUgZnVsbCBjaGFpbjogSGVhbHRoRXZlbnQgZGVsdGEgY29tcHV0YXRpb24g4oaSIHRocmVzaG9sZCBjb21wYXJpc29uIOKGkiBBY3Rpb25RdWV1ZS5DbGVhckFuZEVucXVldWUg4oaSIGVtZXJnZW5jeSBzdG9wIHZpYSBJV29ybGRBZGFwdGVyLiBNb2NrV29ybGRBZGFwdGVyIGF0IDE1MTQgYnl0ZXMgc3VnZ2VzdHMgaXQncyBtaW5pbWFsOyB0aGUgdGVzdCBtYXkgbmVlZCBgU2VuZEVtZXJnZW5jeVN0b3BgIGNhbGwgY2FwdHVyZS4KCioqV29ybGRNb2RlbCBmdWxsIGltbXV0YWJpbGl0eSAoUDIpOioqICAKYE9ic2VydmF0aW9uU3RhdGUuUmVjZW50T2JzZXJ2YXRpb25zYCBpcyBgSVJlYWRPbmx5TGlzdDxGYWN0PmAuIEluIGBPYnNlcnZlKClgLCB0aGUgbGlzdCBpcyBwcm9qZWN0ZWQgdmlhIGAuU2VsZWN0KC4uLikuVG9MaXN0KClgLCBjcmVhdGluZyBhIGZyZXNoIGxpc3QgZWFjaCB0aW1lLiBUaGlzIGlzIGFscmVhZHkgc2FmZS4gRnVsbCBjb3B5LW9uLXdyaXRlIGF0IHRoZSBwcm9qZWN0b3IgYm91bmRhcnkgaXMgZ2VudWluZWx5IFAyLgoKLS0tCgojIyBTZWF0IDM6IFJldHJpZXZhbCBTcGVjaWFsaXN0CioqQ29uZmlkZW5jZTogODIlKioKCkV2YWx1YXRpbmcgdGVzdCBjb3ZlcmFnZSBnYXBzIGFuZCBTcHJpbnQgMjYgdGVzdCByZXF1aXJlbWVudHM6CgoqKlAwLUE6IFRyeUludGVycnVwdE9uRGFtYWdlIGludGVncmF0aW9uIHRlc3QgKHplcm8gZXhpc3RpbmcgdGVzdHMg4oCUIDNyZCBkZWZlcnJhbCkqKgoKUmVxdWlyZWQgY292ZXJhZ2U6CjEuIENvbnNlY3V0aXZlIEhlYWx0aEV2ZW50cyB3aXRoIGxhcmdlIGRlbHRhICjiiaU2IEhQKSDihpIgaW50ZXJydXB0IHRyaWdnZXJlZCDihpIgZW1lcmdlbmN5IHN0b3AgKyBxdWV1ZSBjbGVhcgoyLiBTbWFsbCBkZWx0YSAoPDYgSFApIOKGkiBubyBpbnRlcnJ1cHQKMy4gUmFwaWQgc2Vjb25kIGhpdCB3aXRoaW4gY29vbGRvd24gd2luZG93ICgzcykg4oaSIHN1cHByZXNzZWQKNC4gU2Vjb25kIGhpdCBhZnRlciBjb29sZG93biBleHBpcmVzIOKGkiB0cmlnZ2VycyBhZ2FpbiAgCjUuIEdvYWwgd2l0aCBgRGFtYWdlSW50ZXJydXB0VGhyZXNob2xkSHAgPSAwYCDihpIgbmV2ZXIgaW50ZXJydXB0cwoKVGhlIGV4aXN0aW5nIGBBZ2VudEJhY2tncm91bmRTZXJ2aWNlVGVzdHMuY3NgICgxNzc0NyBieXRlcykgaXMgdGhlIHJpZ2h0IGZpeHR1cmUgaG9zdC4gYE1vY2tXb3JsZEFkYXB0ZXIuY3NgICgxNTE0IGJ5dGVzKSBzaG91bGQgaGF2ZSBhIGBTZW5kRW1lcmdlbmN5U3RvcGAgY2FsbCB0cmFja2VyLiBTcHJpbnQyNlRlc3RzLmNzIGNhbiB1c2UgdGhlIHNhbWUgc2V0dXAgcGF0dGVybi4KCioqUDAtQjogR2F0aGVyR29hbERlY29tcG9zZXIgVGFyZ2V0Q291bnQqKgoKUmVxdWlyZWQgY292ZXJhZ2U6CjEuIEdhdGhlckdvYWxEZWNvbXBvc2VyIHdpdGggSUl0ZW1TcGVjR29hbCBnb2FsIGNhcnJ5aW5nIFRhcmdldENvdW50PTUwIOKGkiBNaW5lQmxvY2sgYWN0aW9uIHVzZXMgY291bnQ9NTAKMi4gR2F0aGVyR29hbERlY29tcG9zZXIgd2l0aCBHZW5lcmljR2F0aGVyR29hbCBUYXJnZXRDb3VudD0yNSDihpIgc3RpbGwgcGFzc2VzIDI1IChyZWdyZXNzaW9uIGd1YXJkKQozLiBIdG5QbGFubmVyIElJdGVtU3BlY0dvYWwgYnJhbmNoIHdpdGggbm9uLUdlbmVyaWNHYXRoZXJHb2FsIOKGkiB1c2VzIFRhcmdldENvdW50IGZyb20gaW50ZXJmYWNlCgoqKlAxLUM6IEpvdXJuYWwgc2VtYW50aWNzIGRlY2lzaW9uKiogIApSZXF1aXJlcyBvbmx5IGEgZG9jdW1lbnRhdGlvbiBjb21taXQgdG8gYXJjaGl0ZWN0dXJlLm1kIOKAlCBubyBuZXcgdGVzdCBuZWVkZWQuCgoqKlRlc3QgY291bnQgcHJvamVjdGlvbioqOiBTcHJpbnQgMjYgc2hvdWxkIGFkZCB+OCBuZXcgdGVzdHMgKDUgUDAtQSwgMyBQMC1CKS4KCi0tLQoKIyMgU2VhdCA0OiBIdW1hbiBMZWFybmluZyBBZHZvY2F0ZQoqKkNvbmZpZGVuY2U6IDc5JSoqCgpBc3Nlc3NpbmcgZGV2ZWxvcGVyIGV4cGVyaWVuY2UgYW5kIG9wZXJhdGlvbmFsIGNsYXJpdHk6CgoqKlBvc2l0aXZlOioqCi0gQXVkaXQgaW50YWtlIHByb2Nlc3MgKGFubm90YXRpbmcgZXh0ZXJuYWwgZmluZGluZ3MgYWdhaW5zdCBjdXJyZW50IHNvdXJjZSkgaXMgZXhjZWxsZW50IHByYWN0aWNlOyB0aGlzIGNvdW5jaWwgcmV2aWV3IGZvcm1hbGl6ZXMgd2hhdCAiYXVkaXQtZHJpdmVuIHNwcmludCBwbGFubmluZyIgbG9va3MgbGlrZS4KLSBUaGUgaGFuZG9mZiBmb3JtYXQgd2l0aCBleHBsaWNpdCBQMC9QMS9QMiB0aWVycywgZGVmZXJyZWQgdGFibGUsIGFuZCBpbnZhcmlhbnQgY2hlY2tsaXN0IGlzIGNsZWFyIGFuZCBhY3Rpb25hYmxlLgotIFRyZWF0V2FybmluZ3NBc0Vycm9ycyArIFJ1bGUgRS0xIHRvZ2V0aGVyIGZvcm0gYSBzdHJvbmcgcXVhbGl0eSBnYXRlLiBCb3RoIGFyZSBlbmZvcmNlZCBieSBleGlzdGluZyB0b29saW5nIGFuZCB0aGUgQ0kgcGlwZWxpbmUuCgoqKkNvbmNlcm5zOioqCjEuIFRoZSBzcHJpbnQtNS10b29sLXNhZmV0eSBicmFuY2ggaGFzIGJlZW4gZGl2ZXJnaW5nIGZyb20gbWFpbiBzaW5jZSBTcHJpbnQgNi4gQXQgU3ByaW50IDI2LCB0aGlzIGlzIDIwKyBzcHJpbnRzIG9mIHVuLW1lcmdlZCB3b3JrLiBBbnkgcmV2aWV3ZXIgbG9va2luZyBhdCB0aGUgUFIgZm9yIHRoZSBmaXJzdCB0aW1lIHdpbGwgYmUgY29uZnVzZWQgYnkgdGhlIGdhcCBiZXR3ZWVuIFBSIGRlc2NyaXB0aW9uICgiU3ByaW50IDUvNiB0b29sIHNhZmV0eSIpIGFuZCBjdXJyZW50IHNjb3BlICh2MC4yNS4wLCBTcHJpbnRzIDXigJMyNSkuIEEgUFIgZGVzY3JpcHRpb24gdXBkYXRlIGlzIG92ZXJkdWUuCgoyLiBUaGUgU3ByaW50IDI2IFAwLUEgdGVzdCBmb3IgVHJ5SW50ZXJydXB0T25EYW1hZ2UgaGFzIGJlZW4gZGVmZXJyZWQgMyB0aW1lcyAoU3ByaW50cyAyNCwgMjUsIGFuZCBub3cgZm9yY2VkIHRvIFAwIGluIFNwcmludCAyNikuIFRoaXMgc3VnZ2VzdHMgdGhlIHRlc3QgaW5mcmFzdHJ1Y3R1cmUgZm9yIGludGVncmF0aW5nIEFnZW50QmFja2dyb3VuZFNlcnZpY2UgZXZlbnRzIGlzIGdlbnVpbmVseSBoYXJkLiBUaGUgU3ByaW50IDI2IGltcGxlbWVudGF0aW9uIG11c3QgYWRkcmVzcyB0aGlzIGRpcmVjdGx5IHJhdGhlciB0aGFuIGRlZmVycmluZyBhZ2Fpbi4KCjMuIGBBR0VOVFMubWRgIFJ1bGUgRS0xIG1lbnRpb25zIHZlcmJhdGltLXN0cmluZyBwYXRjaGluZyBidXQgZnV0dXJlIGFnZW50cyBtYXkgbm90IHJlYWQgaXQuIENvbnNpZGVyIGFkZGluZyBhIGBbRlJBR0lMRTogRE8gTk9UIFBBVENIIFZJQSBJTlRFUk1FRElBUlldYCBjb21tZW50IGRpcmVjdGx5IGluIHRoZSBtb3N0IGRhbmdlcm91cyB2ZXJiYXRpbS1zdHJpbmcgZmlsZXMuCgotLS0KCiMjIFNlYXQgNTogU2tlcHRpY2FsIFJldmlld2VyCioqQ29uZmlkZW5jZTogNzYlKioKCkNoYWxsZW5naW5nIGFzc3VtcHRpb25zOgoKKipDaGFsbGVuZ2UgMTogSXMgUDAtQiBhY3R1YWxseSBQMD8qKiAgClRoZSBJSXRlbVNwZWNHb2FsIGNhdGNoLWFsbCBhcm0gaW4gR2F0aGVyR29hbERlY29tcG9zZXIgaGFzIGJlZW4gd3Jvbmcgc2luY2UgU3ByaW50IDYgKHdoZW4gR2F0aGVyR29hbERlY29tcG9zZXIgd2FzIGludHJvZHVjZWQpLiBUaGUgY29kZSBwYXRocyB0aGF0IG1hdHRlciB0b2RheSBhbGwgdXNlIEdlbmVyaWNHYXRoZXJHb2FsIG9yIEdhdGhlcldvb2RHb2FsIOKAlCBib3RoIGNvcnJlY3RseSBtYXRjaCBiZWZvcmUgdGhlIElJdGVtU3BlY0dvYWwgY2F0Y2gtYWxsLiBObyB1c2VyLXJlcG9ydGVkIGJ1ZyBoYXMgYmVlbiBhdHRyaWJ1dGVkIHRvIHRoaXMuIENsYXNzaWZ5aW5nIHRoaXMgYXMgUDAgKGJsb2NraW5nKSBzZWVtcyBhZ2dyZXNzaXZlIGZvciBhIGxhdGVudCBpc3N1ZS4KCipDb3VudGVyLWFyZ3VtZW50KjogVGhlIFNwcmludCAyNC8yNSBoYW5kb2ZmcyBleHBsaWNpdGx5IG5hbWUgdGhpcyBhcyBQMC1CIHdpdGggZXNjYWxhdGlvbiBkdWUgdG8gZGVmZXJyYWwuIEtlZXBpbmcgaXQgYXMgUDAgaXMgYSBwcm9jZXNzIGNvbW1pdG1lbnQsIG5vdCBqdXN0IGEgdGVjaG5pY2FsIGp1ZGdtZW50LgoKKipDaGFsbGVuZ2UgMjogV2lsbCB0aGUgVHJ5SW50ZXJydXB0T25EYW1hZ2UgdGVzdCBiZSBzdGFibGU/KiogIApEYW1hZ2UgaW50ZXJydXB0IGxvZ2ljIGludm9sdmVzIHRpbWluZyAoYF9sYXN0RGFtYWdlSW50ZXJydXB0QXRgLCBgRGFtYWdlSW50ZXJydXB0Q29vbGRvd25TZWNvbmRzYCkuIFRlc3RzIHdpdGhvdXQgYSBGYWtlVGltZVByb3ZpZGVyIChJVGltZVByb3ZpZGVyIGFic3RyYWN0aW9uIOKAlCBzdGlsbCBQMikgd2lsbCBlaXRoZXIgYmUgZmxha3kgb3IgdXNlIHJlYWwgYFRhc2suRGVsYXlgIGNhbGxzLCBtYWtpbmcgdGhlbSBzbG93LiBVbnRpbCBJVGltZVByb3ZpZGVyIGlzIGFkZGVkLCB0aGUgdGVzdHMgbXVzdCB1c2UgZGVzaWduIHBhdHRlcm5zIHRoYXQgYXZvaWQgcmVhbCB0aW1lIChlLmcuLCBzZXQgY29vbGRvd24gdG8gMCBmb3IgIm5vIGNvb2xkb3duIiB0ZXN0LCB1c2UgYSB2ZXJ5IGxvbmcgY29vbGRvd24gZm9yICJzdXBwcmVzc2VkIiB0ZXN0KS4KCipSZWNvbW1lbmRhdGlvbio6IFdyaXRlIHRlc3RzIHRoYXQgZG9uJ3QgcmVxdWlyZSByZWFsIHRpbWluZyBieSBwYXJhbWV0ZXJpemluZyB0aGUgY29vbGRvd24gb3IgdXNpbmcgYERhdGVUaW1lT2Zmc2V0LlV0Y05vd2AgaW5qZWN0aW9uIHZpYSBjb25zdHJ1Y3RvciBwYXJhbWV0ZXIgKHNpbXBsZSBmb3JtIG9mIElUaW1lUHJvdmlkZXIpLgoKKipDaGFsbGVuZ2UgMzogQXJlIHRoZSBleHRlcm5hbCBhdWRpdHMgdW5iaWFzZWQ/KiogIApCb3RoIGV4dGVybmFsIGF1ZGl0cyByZWZlcmVuY2UgR2l0SHViIFBSIHZpZXdzIGFuZCByYXcgZmlsZSBwYXRocywgbm90IGxvY2FsIGNsb25lcy4gVGhlIGV4ZWMgc3VtbWFyeSBub3RlcyBjb25maWRlbmNlIDAuODQgb3ZlcmFsbC4gVGhlIGRlZXAgYXVkaXQgaW5jbHVkZXMgYGNpdGUgdHVybjk4Mzk0N3ZpZXcwYCByZWZlcmVuY2VzIHN1Z2dlc3RpbmcgTExNLWdlbmVyYXRlZCBjb250ZW50IGJhc2VkIG9uIEdpdEh1YiBzY3JhcGluZy4gVGhpcyBpcyBub3QgYSBkaXNxdWFsaWZpY2F0aW9uIGJ1dCBtZWFucyBib3RoIGF1ZGl0cyBzaG91bGQgYmUgdHJlYXRlZCBhcyBkaXJlY3Rpb25hbCwgbm90IGF1dGhvcml0YXRpdmUuIFRoZSBjb3VuY2lsJ3Mgc291cmNlLWdyb3VuZGVkIHZlcmlmaWNhdGlvbiAoU2VhdCAxKSBpcyB0aGUgYXV0aG9yaXRhdGl2ZSBsYXllci4KCi0tLQoKIyMgU2VhdCA2OiBTeW50aGVzaXplcgoqKkNvbmZpZGVuY2U6IDgzJSoqCgojIyMgVmFsaWRhdGVkIFNwcmludCAyNiBTY29wZQoKKipCTE9DS0lORyAobXVzdCBzaGlwIGJlZm9yZSBTcHJpbnQgMjcpOioqCgoqKlAwLUE6IFRyeUludGVycnVwdE9uRGFtYWdlIGludGVncmF0aW9uIHRlc3QqKiAgCjUgdGVzdHMgY292ZXJpbmc6IGxhcmdlLWRlbHRhIHRyaWdnZXIsIHNtYWxsLWRlbHRhIG5vLXRyaWdnZXIsIGNvb2xkb3duIHN1cHByZXNzaW9uLCBwb3N0LWNvb2xkb3duIHJlLXRyaWdnZXIsIHplcm8tdGhyZXNob2xkIGdvYWwuIFVzZSBgRGF0ZVRpbWVPZmZzZXRgIGluamVjdGlvbiBvciBwYXJhbWV0ZXJpemVkIGNvb2xkb3duIHRvIGF2b2lkIHRpbWluZyBmcmFnaWxpdHkuIFRhcmdldDogU3ByaW50MjZUZXN0cy5jcy4KCioqUDAtQjogR2F0aGVyR29hbERlY29tcG9zZXIgVGFyZ2V0Q291bnQgKyBJSXRlbVNwZWNHb2FsIERJTSoqICAKLSBgQWdlbnQuQ29yZS9JbnRlcmZhY2VzL0lJdGVtU3BlY0dvYWwuY3NgOiBhZGQgYGludCBUYXJnZXRDb3VudCA9PiAxO2AgIAotIGBBZ2VudC5QbGFubmluZy9EZWNvbXBvc2l0aW9uL0dhdGhlckdvYWxEZWNvbXBvc2VyLmNzYDogSUl0ZW1TcGVjR29hbCBhcm0g4oaSIGBuZXdbXSB7IGlzZy5UYXJnZXRDb3VudC5Ub1N0cmluZygpIH1gICAKLSBgQWdlbnQuUGxhbm5pbmcvSHRuUGxhbm5lci5jc2A6IHNpbXBsaWZ5IElJdGVtU3BlY0dvYWwgYnJhbmNoIHRvIHVzZSBgaXNnLlRhcmdldENvdW50YCBkaXJlY3RseSAgCi0gMyB0ZXN0cyBjb3ZlcmluZzogY2F0Y2gtYWxsIElJdGVtU3BlY0dvYWwgd2l0aCBjb3VudCwgR2VuZXJpY0dhdGhlckdvYWwgcmVncmVzc2lvbiBndWFyZCwgSHRuUGxhbm5lciBicmFuY2ggY291bnQgcGFzcy10aHJvdWdoCgoqKlNIT1VMRC1TSElQIChQMSk6KioKCioqUDEtQSoqOiBFMkUgZ2F0aGVyIGludGVncmF0aW9uIHRlc3Qg4oCUIHNjb3BlIHBlcm1pdHRpbmcsIGJ1aWxkcyBvbiBQMC1BIGhhcm5lc3MgIAoqKlAxLUIqKjogSm91cm5hbCBzZW1hbnRpY3MgZGVjaXNpb24g4oCUIGFyY2hpdGVjdHVyZS5tZCBkb2MgY29tbWl0IG9ubHksIDMwIG1pbnV0ZXMgIAoqKlAxLUMqKjogUGxhbm5lciByb3V0aW5nIGNvbnNvbGlkYXRpb24g4oCUIENyYWZ0SXRlbUdvYWxEZWNvbXBvc2VyIGNyZWF0aW9uICsgSHRuUGxhbm5lciBicmFuY2ggcmVtb3ZhbAoKKipOSUNFLVRPLUhBVkUgKFAyKToqKiAgClN0YXJ0dXAgY29uc3RhbnQgbG9nLCBJVGltZVByb3ZpZGVyIGFic3RyYWN0aW9uLCBtb3ZlIGV2ZW50IHRocm90dGxpbmcsIElXb3JsZE9ic2VydmF0aW9uR2F0ZXdheSBub3RlCgoqKkRFRkVSUkVEIEZST00gUFJFVklPVVMgQ09VTkNJTCAoY2FycmllZCBmb3J3YXJkKToqKiAgCkRFRi0xIChKUyBjb3JyZWxhdGlvbklkIHZlcmlmaWNhdGlvbiksIERFRi0yIChzZW5kRXZlbnQgYXVkaXQpLCBERUYtOSAoUmVnaXN0ZXIgY29sbGlzaW9uIGRvY3MpCgojIyMgQmxvY2tpbmcgRmluZGluZ3MKCioqQkxLLTEgKFJFU09MVkVEIE1JRC1TUFJJTlQtMjUpKio6IENBUyBsb29wIGluIFRyYW5zaXRpb25Db3JyZWxhdGVkQWN0aW9uIOKAlCBhbHJlYWR5IGZpeGVkCgoqKk5vIG5ldyBibG9ja2luZyBmaW5kaW5ncyoqIGZyb20gdGhpcyBhdWRpdCBjb3VuY2lsLiBTcHJpbnQgMjYgbWF5IHByb2NlZWQgd2l0aCB0aGUgUDAgc2NvcGUgYWJvdmUuCgojIyMgQWNjZXB0YW5jZSBDcml0ZXJpYQoKU3ByaW50IDI2IGlzIEFQUFJPVkVEIHdoZW46Ci0gWyBdIDUgVHJ5SW50ZXJydXB0T25EYW1hZ2UgdGVzdHMgcGFzcyAoUDAtQSkg4oCUIG5vIHJlYWwtdGltZSBkZWxheXMsIGRldGVybWluaXN0aWMKLSBbIF0gSUl0ZW1TcGVjR29hbC5UYXJnZXRDb3VudCBESU0gYWRkZWQsIGFsbCAzIHRlc3Qgc2l0ZXMgcGFzcyAoUDAtQikKLSBbIF0gQ0kgZ3JlZW4gb24gc3ByaW50LTUtdG9vbC1zYWZldHkgYWZ0ZXIgYWxsIGNoYW5nZXMKLSBbIF0gSGFuZG9mZiBkb2Mgd3JpdHRlbiBmb3IgU3ByaW50IDI3Ci0gWyBdIENvdW5jaWwgcG9zdC1zcHJpbnQgcmV2aWV3IHdyaXR0ZW4gYW5kIGNvbW1pdHRlZAoKLS0tCgojIyBBbm9ueW1vdXMgUGVlciBSZXZpZXcgKDIgcmV2aWV3ZXJzKQoKKipQZWVyIEEqKiAoYmxpbmQpOiAiVGhlIGF1ZGl0IGludGFrZSBhbm5vdGF0aW9uIGZvcm1hdCBpcyBzb2xpZC4gQWdyZWUgd2l0aCBzY29wZS4gT25lIG5vdGU6IHRoZSBHYXRoZXJHb2FsRGVjb21wb3NlciBJSXRlbVNwZWNHb2FsIGFybSBpcyB0ZWNobmljYWxseSBhIGxhdGVudCBidWcgYnV0IGhhcyBiZWVuIHNoaXBwaW5nIGZvciAyMCBzcHJpbnRzIHdpdGhvdXQgdXNlciBpbXBhY3QuIFRoZSBESU0gZml4IGlzIGNsZWFuIGFuZCBsb3ctcmlzay4gU2hpcCBpdC4iCgoqKlBlZXIgQioqIChibGluZCk6ICJJJ20gc2tlcHRpY2FsIGFib3V0IHRlc3RpbmcgVHJ5SW50ZXJydXB0T25EYW1hZ2Ugd2l0aG91dCBJVGltZVByb3ZpZGVyLiBSZWNvbW1lbmQgcGFyYW1ldGVyaXppbmcgYERhbWFnZUludGVycnVwdENvb2xkb3duU2Vjb25kc2AgYXQgdGVzdCBzZXR1cCB0byAwIGZvciB0aGUgJ2Fsd2F5cyB0cmlnZ2VyJyBjYXNlcyBhbmQgOTk5OSBmb3IgdGhlICdzdXBwcmVzcycgY2FzZS4gVGhpcyBhdm9pZHMgdGhlIG5lZWQgZm9yIHJlYWwtdGltZSBpbmplY3Rpb24gYW5kIG1ha2VzIHRlc3RzIGRldGVybWluaXN0aWMuIFRoZSB0ZXN0IGhhcm5lc3MgaW4gQWdlbnRCYWNrZ3JvdW5kU2VydmljZVRlc3RzIGFscmVhZHkgaGFzIHRoaXMgcGF0dGVybiBmb3IgUmVwbGFuR292ZXJub3IgdGhyZXNob2xkLiIKCipTeW50aGVzaXplciBub3RlKjogUGVlciBCJ3MgcmVjb21tZW5kYXRpb24gaXMgYWRvcHRlZCBmb3IgdGhlIFAwLUEgdGVzdCBkZXNpZ24uIE1vY2tXb3JsZEFkYXB0ZXIgY2FuIGV4cG9zZSB0aGUgZW1lcmdlbmN5LXN0b3AgY2FsbCBjb3VudCBmb3IgdmVyaWZpY2F0aW9uLgoKLS0tCgojIyBTdW1tYXJ5IFRhYmxlCgp8IEl0ZW0gfCBTdGF0dXMgfCBDb25maWRlbmNlIHwgU3ByaW50IDI2IHwKfC0tLXwtLS18LS0tfC0tLXwKfCBUb29sIGludGVnZXIgdmFsaWRhdGlvbiB8IFJFU09MVkVEIFNwcmludCAyNSB8IDk2JSB8IOKAlCB8CnwgVG9vbERpc3BhdGNoZXIgdHJ5L2NhdGNoIHwgUkVTT0xWRUQgU3ByaW50IDI1IHwgOTYlIHwg4oCUIHwKfCBXb3JsZE1vZGVsIGFsaWFzaW5nIHwgUkVTT0xWRUQgU3ByaW50IDI1IHwgOTUlIHwg4oCUIHwKfCBKb3VybmFsIGFwcHJveGltYXRlIGJvdW5kcyB8IERlbGliZXJhdGUsIGRvY3VtZW50ZWQgfCA4OCUgfCBQMS1CIChkb2MpIHwKfCBQbGFubmVyIHJvdXRpbmcgZHVwbGljYXRpb24gfCBPcGVuIHwgODklIHwgUDEtQyB8CnwgQ2hhdCBmaWx0ZXIgYnJpdHRsZSB8IE9wZW4sIGRlZmVycmVkIHwgNzglIHwgQmFja2xvZyB8CnwgQ0kgc3RhYmlsaXR5IChCTEstMSkgfCBSRVNPTFZFRCBTcHJpbnQgMjUgfCA5NSUgfCDigJQgfAp8IElJdGVtU3BlY0dvYWwgVGFyZ2V0Q291bnQgfCBOZXcgZmluZGluZywgUDAtQiB8IDkxJSB8IFAwLUIgfAp8IFRyeUludGVycnVwdE9uRGFtYWdlIHRlc3QgfCAzcmQgZGVmZXJyYWwsIFAwLUEgfCA5MyUgfCBQMC1BIHwKCioqQXZlcmFnZSBjb3VuY2lsIGNvbmZpZGVuY2UqKjogODMlICAKKipWZXJkaWN0Kio6IEFQUFJPVkVEIOKAlCBTcHJpbnQgMjYgc2NvcGUgYXMgZGVmaW5lZCBhYm92ZQo=
+# MemorySmith.Agent — Sprint 26 Audit Council Review
+**Date**: 2026-06-19  
+**Branch**: `sprint-5-tool-safety` @ d5832d4  
+**Version**: v0.25.0  
+**Council format**: 6-seat (Source-Grounded Archivist, Data Model Architect, Retrieval Specialist, Human Learning Advocate, Skeptical Reviewer, Synthesizer)  
+**Peer review**: Anonymous (2 reviewers, blinded)  
+**Purpose**: Cross-validate two external audits against current codebase; define Sprint 26 scope
+
+---
+
+## Materials Reviewed
+
+1. `Data/Pages/Audits/exec-summary-audit-20260619.md` — External executive summary
+2. `Data/Pages/Audits/deep-code-audit-20260619.md` — External deep code audit
+3. `Data/Pages/Tasks/agent-handoff-sprint26.md` — Sprint 25 handoff (Sprint 26 backlog)
+4. Live branch code at d5832d4: ToolDispatcher.cs, WorldModel.cs, GatherGoalDecomposer.cs, HtnPlanner.cs, IItemSpecGoal.cs, IGoal.cs, test directory listing
+
+---
+
+## Seat 1: Source-Grounded Archivist
+**Confidence: 88%**
+
+Cross-referencing external audit findings against actual source at HEAD:
+
+**Confirmed resolved (Sprint 25):**
+- Finding 1 (integer validation): ToolDispatcher.CheckType uses `!value.TryGetInt32(out _)`. Line-verified in base64-decoded content. ✅
+- Finding 2 (no try/catch): `CallAsync` has try/catch around `tool.ExecuteAsync`. OperationCanceledException re-throws; generic Exception → ToolResult(false). ✅
+- Finding 3 (WorldModel aliasing): Constructor uses separate `new Dictionary<string,int>()` per state. `Observe()` uses `new Dictionary<string,int>(observation.Inventory)`. ✅
+
+**Confirmed open:**
+- Finding 4 (journal bounds): Still ConcurrentQueue + single-dequeue trim. Intentional. ✅ (as deliberate)
+- Finding 5 (planner split): HtnPlanner has IItemSpecGoal, BuildGoal, CraftItemGoal type-switch alongside PlannerRouter. Source-confirmed. ✅ (as open)
+- Finding 6 (chat filter): SYSTEM_MESSAGE_PATTERNS still regex-based. ✅ (as open)
+
+**New finding discovered during intake:** `IItemSpecGoal.cs` (SHA 8ff8d7c4) declares only `ItemSpec Spec { get; }` — no `TargetCount`. GatherGoalDecomposer.cs (SHA 1dee6515) has `IItemSpecGoal isg => (isg.Spec, Array.Empty<string>())` which silently zeroes out target count for any IItemSpecGoal implementor that isn't GenericGatherGoal or GatherWoodGoal. HtnPlanner.cs has the same issue in its IItemSpecGoal branch (`isg is GenericGatherGoal ggg ? [...] : Array.Empty<string>()`). Fix requires adding `int TargetCount => 1;` as DIM to IItemSpecGoal. **This is Sprint 26 P0-B scope.**
+
+---
+
+## Seat 2: Data Model Architect
+**Confidence: 85%**
+
+Assessment of structural changes needed for Sprint 26:
+
+**IItemSpecGoal TargetCount (P0-B):**  
+The cleanest fix is a default interface method `int TargetCount => 1;`. This:
+- Doesn't break existing IItemSpecGoal implementors (they get default=1)
+- GenericGatherGoal and GatherWoodGoal already have public `TargetCount` properties that satisfy the interface
+- Allows GatherGoalDecomposer and HtnPlanner to call `isg.TargetCount` directly, eliminating the `is GenericGatherGoal` cast
+- Default of 1 is conservative (better than the old DecomposeGatherItem default-count-of-10)
+
+*Concern*: C# DIM semantics — if an implementor has `public int TargetCount { get; }` on the class but doesn't explicitly implement the interface property, the class member takes priority when called through the concrete type but NOT through the interface reference. This is subtle. Given that GenericGatherGoal and GatherWoodGoal are the primary implementors and both have the property, this will work correctly. Future implementors must be documented to provide this property.
+
+**ActionQueue.ClearAndEnqueue (P0-A test target):**  
+Already lock-protected as of Sprint 23 B-3 fix. The integration test must exercise the full chain: HealthEvent delta computation → threshold comparison → ActionQueue.ClearAndEnqueue → emergency stop via IWorldAdapter. MockWorldAdapter at 1514 bytes suggests it's minimal; the test may need `SendEmergencyStop` call capture.
+
+**WorldModel full immutability (P2):**  
+`ObservationState.RecentObservations` is `IReadOnlyList<Fact>`. In `Observe()`, the list is projected via `.Select(...).ToList()`, creating a fresh list each time. This is already safe. Full copy-on-write at the projector boundary is genuinely P2.
+
+---
+
+## Seat 3: Retrieval Specialist
+**Confidence: 82%**
+
+Evaluating test coverage gaps and Sprint 26 test requirements:
+
+**P0-A: TryInterruptOnDamage integration test (zero existing tests — 3rd deferral)**
+
+Required coverage:
+1. Consecutive HealthEvents with large delta (≥6 HP) → interrupt triggered → emergency stop + queue clear
+2. Small delta (<6 HP) → no interrupt
+3. Rapid second hit within cooldown window (3s) → suppressed
+4. Second hit after cooldown expires → triggers again  
+5. Goal with `DamageInterruptThresholdHp = 0` → never interrupts
+
+The existing `AgentBackgroundServiceTests.cs` (17747 bytes) is the right fixture host. `MockWorldAdapter.cs` (1514 bytes) should have a `SendEmergencyStop` call tracker. Sprint26Tests.cs can use the same setup pattern.
+
+**P0-B: GatherGoalDecomposer TargetCount**
+
+Required coverage:
+1. GatherGoalDecomposer with IItemSpecGoal goal carrying TargetCount=50 → MineBlock action uses count=50
+2. GatherGoalDecomposer with GenericGatherGoal TargetCount=25 → still passes 25 (regression guard)
+3. HtnPlanner IItemSpecGoal branch with non-GenericGatherGoal → uses TargetCount from interface
+
+**P1-C: Journal semantics decision**  
+Requires only a documentation commit to architecture.md — no new test needed.
+
+**Test count projection**: Sprint 26 should add ~8 new tests (5 P0-A, 3 P0-B).
+
+---
+
+## Seat 4: Human Learning Advocate
+**Confidence: 79%**
+
+Assessing developer experience and operational clarity:
+
+**Positive:**
+- Audit intake process (annotating external findings against current source) is excellent practice; this council review formalizes what "audit-driven sprint planning" looks like.
+- The handoff format with explicit P0/P1/P2 tiers, deferred table, and invariant checklist is clear and actionable.
+- TreatWarningsAsErrors + Rule E-1 together form a strong quality gate. Both are enforced by existing tooling and the CI pipeline.
+
+**Concerns:**
+1. The sprint-5-tool-safety branch has been diverging from main since Sprint 6. At Sprint 26, this is 20+ sprints of un-merged work. Any reviewer looking at the PR for the first time will be confused by the gap between PR description ("Sprint 5/6 tool safety") and current scope (v0.25.0, Sprints 5–25). A PR description update is overdue.
+
+2. The Sprint 26 P0-A test for TryInterruptOnDamage has been deferred 3 times (Sprints 24, 25, and now forced to P0 in Sprint 26). This suggests the test infrastructure for integrating AgentBackgroundService events is genuinely hard. The Sprint 26 implementation must address this directly rather than deferring again.
+
+3. `AGENTS.md` Rule E-1 mentions verbatim-string patching but future agents may not read it. Consider adding a `[FRAGILE: DO NOT PATCH VIA INTERMEDIARY]` comment directly in the most dangerous verbatim-string files.
+
+---
+
+## Seat 5: Skeptical Reviewer
+**Confidence: 76%**
+
+Challenging assumptions:
+
+**Challenge 1: Is P0-B actually P0?**  
+The IItemSpecGoal catch-all arm in GatherGoalDecomposer has been wrong since Sprint 6 (when GatherGoalDecomposer was introduced). The code paths that matter today all use GenericGatherGoal or GatherWoodGoal — both correctly match before the IItemSpecGoal catch-all. No user-reported bug has been attributed to this. Classifying this as P0 (blocking) seems aggressive for a latent issue.
+
+*Counter-argument*: The Sprint 24/25 handoffs explicitly name this as P0-B with escalation due to deferral. Keeping it as P0 is a process commitment, not just a technical judgment.
+
+**Challenge 2: Will the TryInterruptOnDamage test be stable?**  
+Damage interrupt logic involves timing (`_lastDamageInterruptAt`, `DamageInterruptCooldownSeconds`). Tests without a FakeTimeProvider (ITimeProvider abstraction — still P2) will either be flaky or use real `Task.Delay` calls, making them slow. Until ITimeProvider is added, the tests must use design patterns that avoid real time (e.g., set cooldown to 0 for "no cooldown" test, use a very long cooldown for "suppressed" test).
+
+*Recommendation*: Write tests that don't require real timing by parameterizing the cooldown or using `DateTimeOffset.UtcNow` injection via constructor parameter (simple form of ITimeProvider).
+
+**Challenge 3: Are the external audits unbiased?**  
+Both external audits reference GitHub PR views and raw file paths, not local clones. The exec summary notes confidence 0.84 overall. The deep audit includes `cite turn983947view0` references suggesting LLM-generated content based on GitHub scraping. This is not a disqualification but means both audits should be treated as directional, not authoritative. The council's source-grounded verification (Seat 1) is the authoritative layer.
+
+---
+
+## Seat 6: Synthesizer
+**Confidence: 83%**
+
+### Validated Sprint 26 Scope
+
+**BLOCKING (must ship before Sprint 27):**
+
+**P0-A: TryInterruptOnDamage integration test**  
+5 tests covering: large-delta trigger, small-delta no-trigger, cooldown suppression, post-cooldown re-trigger, zero-threshold goal. Use `DateTimeOffset` injection or parameterized cooldown to avoid timing fragility. Target: Sprint26Tests.cs.
+
+**P0-B: GatherGoalDecomposer TargetCount + IItemSpecGoal DIM**  
+- `Agent.Core/Interfaces/IItemSpecGoal.cs`: add `int TargetCount => 1;`  
+- `Agent.Planning/Decomposition/GatherGoalDecomposer.cs`: IItemSpecGoal arm → `new[] { isg.TargetCount.ToString() }`  
+- `Agent.Planning/HtnPlanner.cs`: simplify IItemSpecGoal branch to use `isg.TargetCount` directly  
+- 3 tests covering: catch-all IItemSpecGoal with count, GenericGatherGoal regression guard, HtnPlanner branch count pass-through
+
+**SHOULD-SHIP (P1):**
+
+**P1-A**: E2E gather integration test — scope permitting, builds on P0-A harness  
+**P1-B**: Journal semantics decision — architecture.md doc commit only, 30 minutes  
+**P1-C**: Planner routing consolidation — CraftItemGoalDecomposer creation + HtnPlanner branch removal
+
+**NICE-TO-HAVE (P2):**  
+Startup constant log, ITimeProvider abstraction, move event throttling, IWorldObservationGateway note
+
+**DEFERRED FROM PREVIOUS COUNCIL (carried forward):**  
+DEF-1 (JS correlationId verification), DEF-2 (sendEvent audit), DEF-9 (Register collision docs)
+
+### Blocking Findings
+
+**BLK-1 (RESOLVED MID-SPRINT-25)**: CAS loop in TransitionCorrelatedAction — already fixed
+
+**No new blocking findings** from this audit council. Sprint 26 may proceed with the P0 scope above.
+
+### Acceptance Criteria
+
+Sprint 26 is APPROVED when:
+- [ ] 5 TryInterruptOnDamage tests pass (P0-A) — no real-time delays, deterministic
+- [ ] IItemSpecGoal.TargetCount DIM added, all 3 test sites pass (P0-B)
+- [ ] CI green on sprint-5-tool-safety after all changes
+- [ ] Handoff doc written for Sprint 27
+- [ ] Council post-sprint review written and committed
+
+---
+
+## Anonymous Peer Review (2 reviewers)
+
+**Peer A** (blind): "The audit intake annotation format is solid. Agree with scope. One note: the GatherGoalDecomposer IItemSpecGoal arm is technically a latent bug but has been shipping for 20 sprints without user impact. The DIM fix is clean and low-risk. Ship it."
+
+**Peer B** (blind): "I'm skeptical about testing TryInterruptOnDamage without ITimeProvider. Recommend parameterizing `DamageInterruptCooldownSeconds` at test setup to 0 for the 'always trigger' cases and 9999 for the 'suppress' case. This avoids the need for real-time injection and makes tests deterministic. The test harness in AgentBackgroundServiceTests already has this pattern for ReplanGovernor threshold."
+
+*Synthesizer note*: Peer B's recommendation is adopted for the P0-A test design. MockWorldAdapter can expose the emergency-stop call count for verification.
+
+---
+
+## Summary Table
+
+| Item | Status | Confidence | Sprint 26 |
+|---|---|---|---|
+| Tool integer validation | RESOLVED Sprint 25 | 96% | — |
+| ToolDispatcher try/catch | RESOLVED Sprint 25 | 96% | — |
+| WorldModel aliasing | RESOLVED Sprint 25 | 95% | — |
+| Journal approximate bounds | Deliberate, documented | 88% | P1-B (doc) |
+| Planner routing duplication | Open | 89% | P1-C |
+| Chat filter brittle | Open, deferred | 78% | Backlog |
+| CI stability (BLK-1) | RESOLVED Sprint 25 | 95% | — |
+| IItemSpecGoal TargetCount | New finding, P0-B | 91% | P0-B |
+| TryInterruptOnDamage test | 3rd deferral, P0-A | 93% | P0-A |
+
+**Average council confidence**: 83%  
+**Verdict**: APPROVED — Sprint 26 scope as defined above

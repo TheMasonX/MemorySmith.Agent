@@ -1,1 +1,111 @@
-IyBGZWF0dXJlcyBSZWZlcmVuY2UKCkEgY3Jvc3Mtc3ByaW50IGNhdGFsb2d1ZSBvZiBhZ2VudCBmZWF0dXJlcywgdGhlaXIgY29uZmlndXJhdGlvbiBrbm9icywgYW5kIHRoZSBhcmNoaXRlY3R1cmFsIG5vdGVzIHdvcnRoIHJlbWVtYmVyaW5nIHdoZW4gdHVuaW5nIG9yIGV4dGVuZGluZyB0aGVtLiBTcHJpbnRzIGFyZSBsaXN0ZWQgbmV3ZXN0LWZpcnN0LgoKIyMgU3ByaW50IDIzIOKAlCBEYW1hZ2UgaW50ZXJydXB0ICsgV29ybGQgS0Igcm91dGluZwoKIyMjIGBEYW1hZ2VUYWtlbkV2ZW50YCBhbmQgZGFtYWdlIGludGVycnVwdCBzeXN0ZW0KCioqV2hhdCBpdCBkb2VzLioqIFdoZW5ldmVyIHRoZSBhZ2VudCdzIGhlYWx0aCBkcm9wcyBieSBhdCBsZWFzdCBhIHRocmVzaG9sZCBhbW91bnQgaW4gYSBzaW5nbGUgdXBkYXRlLCB0aGUgY3VycmVudCBhY3Rpb24gcGxhbiBpcyBhdG9taWNhbGx5IGRpc2NhcmRlZCBhbmQgYSBwcmlvcml0eSBgR2V0U3RhdHVzYCBhY3Rpb24gaXMgZW5xdWV1ZWQgc28gdGhlIHBsYW5uZXIgcmUtZXZhbHVhdGVzIGFnYWluc3QgZnJlc2ggaGVhbHRoLCBodW5nZXIsIGFuZCB0aHJlYXQgY29udGV4dC4KCioqSG93IGl0J3Mgd2lyZWQuKioKLSBUaGUgTm9kZS5qcyBNaW5lZmxheWVyIGFkYXB0ZXIgc3RpbGwgb25seSBlbWl0cyByYXcgYEhlYWx0aEV2ZW50YHMg4oCUIHRoZSBwcm9qZWN0b3IgY29tcGFyZXMgY29uc2VjdXRpdmUgSGVhbHRoRXZlbnRzIG9uIHRoZSBDIyBzaWRlIGFuZCBzeW50aGVzaXplcyBhIGBEYW1hZ2VUYWtlbkV2ZW50YCB3aGVuIHRoZSBuZXcgdmFsdWUgaXMgbG93ZXIgdGhhbiB0aGUgcHJldmlvdXMgb25lLgotIGBEYW1hZ2VUYWtlbkV2ZW50YCBjYXJyaWVzIGBQcmV2aW91c0hlYWx0aGAsIGBIZWFsdGhgLCBgRGVsdGFgIChhbHdheXMgbmVnYXRpdmUpLCBgRm9vZGAsIGFuZCBgVGltZXN0YW1wYC4KLSBUaGUgaW50ZXJydXB0IHBhdGggY2FsbHMgYEFjdGlvblF1ZXVlLkNsZWFyQW5kRW5xdWV1ZShHZXRTdGF0dXMpYCBzbyBhIGNvbmN1cnJlbnQgY2hhdC1yZXNwb25zZSBFbnF1ZXVlIGNhbm5vdCBzbGlwIGJldHdlZW4gdGhlIGNsZWFyIGFuZCB0aGUgcHJpb3JpdHkgcHVzaC4KCioqQ29uZmlndXJhdGlvbi4qKiBOb25lIHJlcXVpcmVkIGZvciB0aGUgZGVmYXVsdCA2IEhQIHRocmVzaG9sZDsgcGVyLWdvYWwgb3ZlcnJpZGVzIHZpYSBgSUdvYWwuRGFtYWdlSW50ZXJydXB0VGhyZXNob2xkSHBgIChiZWxvdykuCgoqKkFyY2hpdGVjdHVyZSBub3RlLioqIFJvdXRpbmcgZGFtYWdlLXNwZWNpZmljIGJlaGF2aW9yIHRocm91Z2ggYERhbWFnZVRha2VuRXZlbnRgIGluc3RlYWQgb2Ygc3Vic2NyaWJpbmcgdG8gYEhlYWx0aEV2ZW50YCBtZWFucyBoZWFsaW5nL2VhdGluZyBubyBsb25nZXIgYWNjaWRlbnRhbGx5IHRyaXBzIGRhbWFnZSBoYW5kbGVycyDigJQgYSByZWN1cnJpbmcgY2xhc3Mgb2YgYnVnIGluIFNwcmludHMgMTjigJMyMS4KCiMjIyBgSUdvYWwuRGFtYWdlSW50ZXJydXB0VGhyZXNob2xkSHBgCgoqKldoYXQgaXQgZG9lcy4qKiBMZXRzIGVhY2ggZ29hbCBvcHQgb3V0IG9mLCByYWlzZSwgb3IgbG93ZXIgdGhlIGRlZmF1bHQgZGFtYWdlIGludGVycnVwdCB0aHJlc2hvbGQuCgoqKlNlbWFudGljcy4qKgotIGBudWxsYCAoZGVmYXVsdCBpbnRlcmZhY2UgaW1wbGVtZW50YXRpb24pIOKAlCB1c2UgdGhlIHN5c3RlbSBkZWZhdWx0IG9mICoqNiBIUCoqCi0gYDBgIOKAlCBuZXZlciBpbnRlcnJ1cHQgdGhpcyBnb2FsIG9uIGRhbWFnZTsgcmVzZXJ2ZWQgZm9yIGZ1dHVyZSBjb21iYXQgZ29hbHMgdGhhdCBuZWVkIHRvIG1hbmFnZSB0aGVpciBvd24gZGFtYWdlIHJlc3BvbnNlIHdpdGhvdXQgdGhlIHBsYW5uZXIgcmlwcGluZyB0aGUgcGxhbiBvdXQgbWlkLXN3aW5nCi0gQW55IHBvc2l0aXZlIGludGVnZXIg4oCUIGdvYWwtc3BlY2lmaWMgdGhyZXNob2xkIChlLmcuLCBhIGZyYWdpbGUgZXhwbG9yYXRpb24gZ29hbCBtaWdodCBzZXQgYDNgIHRvIGJhaWwgb3V0IGVhcmxpZXIpCgoqKkNvbmZpZ3VyYXRpb24uKiogT3ZlcnJpZGUgdGhlIHByb3BlcnR5IG9uIHlvdXIgYElHb2FsYCBpbXBsZW1lbnRhdGlvbjsgZXhpc3RpbmcgZ29hbHMgbmVlZCBubyBjaGFuZ2VzLgoKKipBcmNoaXRlY3R1cmUgbm90ZS4qKiBEZWZhdWx0IGludGVyZmFjZSBpbXBsZW1lbnRhdGlvbiBtZWFucyB0aGlzIGlzIGEgbm9uLWJyZWFraW5nIGFkZGl0aW9uIOKAlCBhbGwgY3VycmVudCBnb2FscyBhdXRvbWF0aWNhbGx5IG9wdCBpbnRvIHRoZSA2IEhQIGRlZmF1bHQgd2l0aG91dCBzb3VyY2UgY2hhbmdlcy4KCiMjIyBXb3JsZCBLQiB0b29sIHJvdXRpbmcKCioqV2hhdCBpdCBkb2VzLioqIFNwbGl0cyB0aGUgYWdlbnQncyB0d28gTWVtb3J5U21pdGggY2FsbHMgYWxvbmcgZnVuY3Rpb25hbCBsaW5lczoKLSBgU2VhcmNoTWVtb3J5YCBhbmQgYENyZWF0ZVBhZ2VgIHJvdXRlIHRvIHRoZSAqKndvcmxkIEtCKiogZm9yIGluLWdhbWUgb2JzZXJ2YXRpb25zLCBibG9jayBkaXNjb3ZlcmllcywgYmlvbWUgbm90ZXMsIGFuZCBleHBsb3JhdGlvbiBoaXN0b3J5Ci0gYEdldFBhZ2VgIHJvdXRlcyB0byB0aGUgKiphZ2VudCBLQioqIGZvciBzcHJpbnQgZG9jcywgZGVzaWduIG5vdGVzLCBhbmQgY29kZSBkb2N1bWVudGF0aW9uCgoqKkhvdyBpdCdzIHdpcmVkLioqIGBQcm9ncmFtLmNzYCByZXNvbHZlcyBhIGtleWVkIGBJTWVtb3J5R2F0ZXdheWAgKGAid29ybGQiYCkgdmlhIGBJU2VydmljZVByb3ZpZGVyLkdldEtleWVkU2VydmljZTxJTWVtb3J5R2F0ZXdheT4oIndvcmxkIilgIGFuZCBwYXNzZXMgdGhlIGFwcHJvcHJpYXRlIGdhdGV3YXkgdG8gZWFjaCB0b29sJ3MgY29uc3RydWN0b3IuIFdoZW4gdGhlIHdvcmxkIGtleSByZXNvbHZlcyB0byBudWxsICh1bmNvbmZpZ3VyZWQpLCBpdCBmYWxscyBiYWNrIHRvIHRoZSBhZ2VudCBnYXRld2F5IHNvIHRoZSBhZ2VudCBzdGlsbCBmdW5jdGlvbnMuCgoqKkNvbmZpZ3VyYXRpb24uKiogU2V0IGBBZ2VudDpNZW1vcnk6V29ybGRLYlVybGAgaW4gYGFwcHNldHRpbmdzLmpzb25gLiBTZWUgW3dvcmxkLWtiLWRlcGxveW1lbnQubWRdKHdvcmxkLWtiLWRlcGxveW1lbnQubWQpIGZvciBpbnN0YW5jZSBzZXR1cC4KCioqQXJjaGl0ZWN0dXJlIG5vdGUuKiogVG9vbCBkZXNjcmlwdGlvbnMgKHZpc2libGUgdG8gdGhlIExMTSBkdXJpbmcgcGxhbm5pbmcpIGV4cGxpY2l0bHkgY2FsbCBvdXQgdGhlIHJvdXRpbmcgc28gdGhlIG1vZGVsIHBpY2tzIHRoZSByaWdodCB0b29sIOKAlCBoaXN0b3JpY2FsbHkgdGhlIG1vZGVsIHdvdWxkIGFsdGVybmF0ZSBiZXR3ZWVuIFNlYXJjaE1lbW9yeSBhbmQgR2V0UGFnZSBmb3IgdGhlIHNhbWUgaW50ZW50LgoKIyMjIGBXb3JsZEtiVXJsYCBudWxsIGRlZmF1bHQgKyBzdGFydHVwIHdhcm5pbmcKCioqV2hhdCBpdCBkb2VzLioqIGBSZXN0TWVtb3J5R2F0ZXdheU9wdGlvbnMuV29ybGRLYlVybGAgbm93IGRlZmF1bHRzIHRvIGBudWxsYCBpbnN0ZWFkIG9mIHRoZSBwcmV2aW91cyBgImh0dHA6Ly8xMjcuMC4wLjE6Njg2OSJgLiBPbiBzdGFydHVwLCBpZiBgYWdlbnRFbmFibGVkICYmIFdvcmxkS2JVcmwgaXMgbnVsbGAsIHRoZSBob3N0IGxvZ3MgYSBgTG9nV2FybmluZ2AgcG9pbnRpbmcgYXQgdGhlIG1pZ3JhdGlvbiBub3RlIGFuZCB0aGUgZGVwbG95bWVudCBndWlkZS4KCioqTWlncmF0aW9uLioqIElmIHlvdSByZWxpZWQgb24gdGhlIGltcGxpY2l0IGxvY2FsaG9zdCBkZWZhdWx0IGluIGVhcmxpZXIgc3ByaW50cywgc2V0IGBXb3JsZEtiVXJsYCBleHBsaWNpdGx5IGluIGBhcHBzZXR0aW5ncy5qc29uYC4gT3RoZXJ3aXNlIHRoZSBhZ2VudCBhbmQgd29ybGQgbWVtb3JpZXMgd2lsbCBzaGFyZSBhIHNpbmdsZSBNZW1vcnlTbWl0aCBpbnN0YW5jZSBhbmQgdGhlIHdhcm5pbmcgd2lsbCBmaXJlIGVhY2ggYm9vdC4KCioqQXJjaGl0ZWN0dXJlIG5vdGUuKiogUmVtb3ZpbmcgdGhlIGhhcmRjb2RlZCBsb2NhbGhvc3QgZGVmYXVsdCBlbGltaW5hdGVzIGEgY2xhc3Mgb2Ygc3VidGxlICJ3aHkgZG9lcyBwcm9kIHN0b3JlIGFnZW50IGRvY3MgYW5kIHdvcmxkIGZhY3RzIGluIHRoZSBzYW1lIEtCPyIgbWlzY29uZmlndXJhdGlvbnMuIFRoZSBzdGFydHVwIHdhcm5pbmcgbWFrZXMgdGhlIGltcGxpY2l0IGZhbGxiYWNrIHZpc2libGUgaW5zdGVhZCBvZiBzaWxlbnQuCgojIyMgYEFjdGlvblF1ZXVlLkNsZWFyQW5kRW5xdWV1ZWAgYXRvbWljIGludGVycnVwdCBtZXRob2QKCioqV2hhdCBpdCBkb2VzLioqIEF0b21pY2FsbHkgY2xlYXJzIGFueSBwZW5kaW5nIGFjdGlvbnMgYW5kIGVucXVldWVzIGEgc2luZ2xlIHByaW9yaXR5IGFjdGlvbiBpbiBvbmUgYGxvY2tgLXByb3RlY3RlZCBvcGVyYXRpb24uIGBFbnF1ZXVlQWxsYCBpcyBub3cgYWxzbyBsb2NrLXByb3RlY3RlZCBzbyB0aGUgaW50ZXJydXB0IHBhdGggb2JzZXJ2ZXMgYSBjb25zaXN0ZW50IHF1ZXVlLgoKKipXaHkuKiogV2l0aG91dCBhdG9taWNpdHksIGEgY29uY3VycmVudCBgRW5xdWV1ZWAgZnJvbSBgQ2hhdENvbnN1bWVyQXN5bmNgIChvciBhIGJ1bGsgYEVucXVldWVBbGxgIGZyb20gdGhlIHBsYW5uZXIpIGNvdWxkIHNsaXAgYmV0d2VlbiBhIHNlcGFyYXRlIGBDbGVhcmAgYW5kIHRoZSBwcmlvcml0eSBwdXNoLCBkZWZlYXRpbmcgdGhlIGRhbWFnZSBpbnRlcnJ1cHQgYnkgbGVhdmluZyBhIHN0YWxlIGNoYXQgcmVzcG9uc2Ugb3IgcGFydGlhbCBwbGFuIGFoZWFkIG9mIGBHZXRTdGF0dXNgLgoKKipBcmNoaXRlY3R1cmUgbm90ZS4qKiBUaGlzIGJ1aWxkcyBvbiB0aGUgU3ByaW50IDEyIHN3aXRjaCBmcm9tIGBRdWV1ZTxUPmAgdG8gYENvbmN1cnJlbnRRdWV1ZTxUPmAg4oCUIGBDb25jdXJyZW50UXVldWVgIG1ha2VzIGluZGl2aWR1YWwgb3BzIHRocmVhZC1zYWZlLCBidXQgZG9lcyBub3QgZ2l2ZSB5b3UgY29tcG91bmQgYXRvbWljIG9wcy4gYENsZWFyQW5kRW5xdWV1ZWAgcHJvdmlkZXMgdGhlIGNvbXBvdW5kIG9wIHRoZSBpbnRlcnJ1cHQgcGF0aCBzcGVjaWZpY2FsbHkgbmVlZHMgd2l0aG91dCBjb2Fyc2VuaW5nIGxvY2tzIGFjcm9zcyB0aGUgcmVzdCBvZiB0aGUgcXVldWUgc3VyZmFjZS4KCiMjIFNwcmludCAyMiDigJQgUGxhbm5lciBjb21wbGV0ZW5lc3MgKyBXb3JsZCBLQiBzZXBhcmF0aW9uCgojIyMgYENyYWZ0SXRlbUdvYWxgIHN0YWxlbmVzcyBnYXRlCgoqKldoYXQgaXQgZG9lcy4qKiBgQ3JhZnRJdGVtR29hbGAgbm93IHJlZnVzZXMgdG8gcmUtaXNzdWUgYSBjcmFmdCByZXF1ZXN0IHdoZW4gaXRzIGxhc3QgaW52ZW50b3J5IHNuYXBzaG90IGlzIG9sZGVyIHRoYW4gYSBmcmVzaG5lc3Mgd2luZG93IChjdXJyZW50bHkgdGllZCB0byB0aGUgcnVudGltZSByZXBsYW4gaW50ZXJ2YWwpLiBQcmV2ZW50cyB0aGUgcGxhbm5lciBmcm9tIHF1ZXVpbmcgYSBjcmFmdCBhZ2FpbnN0IHN0YWxlIHN0YXRlIGltbWVkaWF0ZWx5IGFmdGVyIGFuIGludmVudG9yeSBldmVudCBmbHVzaGVzLgoKKipDb25maWd1cmF0aW9uLioqIFR1bmFibGUgdmlhIGBBZ2VudDpSdW50aW1lOlJlcGxhbkludGVydmFsU2Vjb25kc2AuCgoqKkFyY2hpdGVjdHVyZSBub3RlLioqIFN1cmZhY2VkIGFzIGEgYnVnIGluIFNwcmludCAyMSB3aGVyZSB0aGUgYWdlbnQgd291bGQgcmVxdWVzdCBhIGNyYWZ0LCBnZXQgYW4gaW52ZW50b3J5IHVwZGF0ZSBtaWQtYWN0aW9uLCBhbmQgdGhlbiByZS1yZXF1ZXN0IHRoZSBzYW1lIGNyYWZ0IGFnYWluc3QgdGhlIHByZS11cGRhdGUgc25hcHNob3QuCgojIyMgSHRuUGxhbm5lciBxdWFudGl0eSBwcm9wYWdhdGlvbiBmaXgKCioqV2hhdCBpdCBkb2VzLioqIFN1Yi10YXNrIHF1YW50aXRpZXMgKGUuZy4sICJtaW5lIDggb2FrX2xvZyIgaW5zaWRlICJjcmFmdCA0IHBsYW5rIikgbm93IGNvcnJlY3RseSBwcm9wYWdhdGUgdXAgdGhlIEhUTiBkZWNvbXBvc2l0aW9uIHRyZWUuIFByZXZpb3VzbHkgYSBTcHJpbnQgMTkgcmVmYWN0b3Igc2lsZW50bHkgZHJvcHBlZCB0aGUgcXVhbnRpdHkgd2hlbiB3cmFwcGluZyBhIHN1Yi10YXNrIGluIGEgY29tcG91bmQgdGFzaywgY2F1c2luZyB0aGUgcGxhbm5lciB0byBtaW5lIGEgc2luZ2xlIGxvZyBmb3IgYSBtdWx0aS1vdXRwdXQgcmVjaXBlLgoKKipDb25maWd1cmF0aW9uLioqIE5vbmUg4oCUIHB1cmUgYnVnIGZpeC4KCiMjIyBIZWFsdGgtY3JpdGljYWwgY2hlY2sgKHRocmVzaG9sZCA9IDYgSFApCgoqKldoYXQgaXQgZG9lcy4qKiBBIGNvYXJzZSBoZWFsdGgtY3JpdGljYWwgcHJlZGljYXRlIHRoYXQgZ29hbHMgY29uc3VsdCBiZWZvcmUgY29tbWl0dGluZyB0byByaXNreSBzdWItcGxhbnMuIFRocmVzaG9sZCBpcyAqKjYgSFAqKiAoMyBoZWFydHMpIOKAlCB0aGUgc2FtZSBudW1iZXIgU3ByaW50IDIzJ3MgZGFtYWdlIGludGVycnVwdCB1c2VzIGFzIGl0cyBkZWZhdWx0LgoKKipDb25maWd1cmF0aW9uLioqIEN1cnJlbnRseSBoYXJkLWNvZGVkOyBTcHJpbnQgMjMgYWRkZWQgcGVyLWdvYWwgb3ZlcnJpZGVzIHZpYSBgSUdvYWwuRGFtYWdlSW50ZXJydXB0VGhyZXNob2xkSHBgIGZvciB0aGUgaW50ZXJydXB0IHBhdGguIFRoZSBzdGF0aWMgdGhyZXNob2xkIGhlcmUgd2lsbCBsaWtlbHkgYmUgdW5pZmllZCB3aXRoIHRoYXQgcHJvcGVydHkgaW4gYSBmdXR1cmUgc3ByaW50LgoKIyMjIFdvcmxkIEtCIHNlcGFyYXRpb24gKGBXb3JsZEtiVXJsYCBjb25maWcpCgoqKldoYXQgaXQgZG9lcy4qKiBJbnRyb2R1Y2VzIGEgc2Vjb25kIGBJTWVtb3J5R2F0ZXdheWAga2V5ZWQgc2luZ2xldG9uIChgIndvcmxkImApIHNvIHdvcmxkIG9ic2VydmF0aW9ucyBjYW4gYmUgcGVyc2lzdGVkIHRvIGEgZGlmZmVyZW50IE1lbW9yeVNtaXRoIGluc3RhbmNlIGZyb20gYWdlbnQgY29kZWJhc2UgZG9jdW1lbnRhdGlvbi4gU3ByaW50IDIyIGFkZGVkIHRoZSBwbHVtYmluZzsgU3ByaW50IDIzIG1hZGUgaXQgZGVmYXVsdC1vbiBieSByb3V0aW5nIHRvb2xzIGFuZCBzd2l0Y2hpbmcgdGhlIGRlZmF1bHQgdG8gbnVsbC4KCioqQ29uZmlndXJhdGlvbi4qKiBgQWdlbnQ6TWVtb3J5OldvcmxkS2JVcmxgIOKAlCBzZWUgW3dvcmxkLWtiLWRlcGxveW1lbnQubWRdKHdvcmxkLWtiLWRlcGxveW1lbnQubWQpLgoKIyMgQ29uZmlndXJhdGlvbiBjaGVhdHNoZWV0Cgp8IFNldHRpbmcgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8IERlZmF1bHQgICAgICAgICAgICAgICAgfCBOb3RlcyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8CnwgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIHwgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSB8IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIHwKfCBgQWdlbnQ6RW5hYmxlZGAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCBgdHJ1ZWAgICAgICAgICAgICAgICAgIHwgU2V0IGZhbHNlIHRvIGxvYWQgV2ViVUkgd2l0aG91dCB0aGUgYm90ICAgfAp8IGBBZ2VudDpNaW5lY3JhZnQ6U2VydmVySG9zdGAgICAgICAgICAgICAgICB8IGBsb2NhbGhvc3RgICAgICAgICAgICAgfCBNQyBzZXJ2ZXIgaG9zdG5hbWUgICAgICAgICAgICAgICAgICAgICAgICB8CnwgYEFnZW50Ok1pbmVjcmFmdDpTZXJ2ZXJQb3J0YCAgICAgICAgICAgICAgIHwgYDI1NTY1YCAgICAgICAgICAgICAgICB8IE1DIHNlcnZlciBwb3J0ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwKfCBgQWdlbnQ6TWluZWNyYWZ0OkJvdFVzZXJuYW1lYCAgICAgICAgICAgICAgfCAocmVxdWlyZWQpICAgICAgICAgICAgIHwgSW4tZ2FtZSBuYW1lICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfAp8IGBBZ2VudDpMbG06RW5kcG9pbnRgICAgICAgICAgICAgICAgICAgICAgICB8IGBodHRwOi8vbG9jYWxob3N0OjExNDM0YCB8IE9sbGFtYSBvciBPcGVuQUktY29tcGF0aWJsZSAgICAgICAgICAgICB8CnwgYEFnZW50OkxsbTpNb2RlbGAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgKHJlcXVpcmVkKSAgICAgICAgICAgICB8IGUuZy4gYGxsYW1hMy4xOjhiYCAgICAgICAgICAgICAgICAgICAgICAgIHwKfCBgQWdlbnQ6TGxtOkxsbVRpbWVvdXRTZWNvbmRzYCAgICAgICAgICAgICAgfCBgNjBgICAgICAgICAgICAgICAgICAgIHwgUGVyLXJlcXVlc3QgTExNIHRpbWVvdXQgICAgICAgICAgICAgICAgICAgfAp8IGBBZ2VudDpMbG06UGxheWVyQ29vbGRvd25TZWNvbmRzYCAgICAgICAgICB8IGAyYCAgICAgICAgICAgICAgICAgICAgfCBQZXItcGxheWVyIHJhdGUgbGltaXQgY29vbGRvd24gICAgICAgICAgICB8CnwgYEFnZW50OkxsbTpHbG9iYWxQZXJNaW51dGVNYXhgICAgICAgICAgICAgIHwgYDMwYCAgICAgICAgICAgICAgICAgICB8IEhhcmQgY2FwIG9uIExMTSBjYWxscy9taW51dGUgICAgICAgICAgICAgIHwKfCBgQWdlbnQ6TWVtb3J5OkJhc2VVcmxgICAgICAgICAgICAgICAgICAgICAgfCBgaHR0cDovL2xvY2FsaG9zdDo1MDAwYHwgQWdlbnQgS0IgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfAp8IGBBZ2VudDpNZW1vcnk6V29ybGRLYlVybGAgICAgICAgICAgICAgICAgICB8IGBudWxsYCAoU3ByaW50IDIzKSAgICAgfCBXb3JsZCBLQjsgbnVsbCA9IHVzZSBhZ2VudCBLQiArIHdhcm5pbmcgICB8CnwgYEFnZW50Ok1lbW9yeTpXb3JsZFRpbWVvdXRTZWNvbmRzYCAgICAgICAgIHwgYDMwYCAgICAgICAgICAgICAgICAgICB8IFdvcmxkIEtCIHJlcXVlc3QgdGltZW91dCAgICAgICAgICAgICAgICAgIHwKfCBgQWdlbnQ6UnVudGltZTpSZXBsYW5JbnRlcnZhbFNlY29uZHNgICAgICAgfCBgMmAgICAgICAgICAgICAgICAgICAgIHwgSG93IG9mdGVuIHBsYW5uZXIgcmVjb25zaWRlcnMgICAgICAgICAgICAgfAp8IGBBZ2VudDpSdW50aW1lOkFjdGlvblRpbWVvdXRTZWNvbmRzYCAgICAgICB8IGAzMGAgICAgICAgICAgICAgICAgICAgfCBTaW5nbGUtYWN0aW9uIHdhbGwgY2xvY2sgY2FwICAgICAgICAgICAgICB8CgojIyBSZWxhdGVkIGd1aWRlcwoKLSBbcnVubmluZy10aGUtYWdlbnQubWRdKHJ1bm5pbmctdGhlLWFnZW50Lm1kKSDigJQgZ2V0dGluZy1zdGFydGVkIHdhbGt0aHJvdWdoCi0gW3dvcmxkLWtiLWRlcGxveW1lbnQubWRdKHdvcmxkLWtiLWRlcGxveW1lbnQubWQpIOKAlCBzZWNvbmQgTWVtb3J5U21pdGggaW5zdGFuY2Ugc2V0dXAK
+# Features Reference
+
+A cross-sprint catalogue of agent features, their configuration knobs, and the architectural notes worth remembering when tuning or extending them. Sprints are listed newest-first.
+
+## Sprint 23 — Damage interrupt + World KB routing
+
+### `DamageTakenEvent` and damage interrupt system
+
+**What it does.** Whenever the agent's health drops by at least a threshold amount in a single update, the current action plan is atomically discarded and a priority `GetStatus` action is enqueued so the planner re-evaluates against fresh health, hunger, and threat context.
+
+**How it's wired.**
+- The Node.js Mineflayer adapter still only emits raw `HealthEvent`s — the projector compares consecutive HealthEvents on the C# side and synthesizes a `DamageTakenEvent` when the new value is lower than the previous one.
+- `DamageTakenEvent` carries `PreviousHealth`, `Health`, `Delta` (always negative), `Food`, and `Timestamp`.
+- The interrupt path calls `ActionQueue.ClearAndEnqueue(GetStatus)` so a concurrent chat-response Enqueue cannot slip between the clear and the priority push.
+
+**Configuration.** None required for the default 6 HP threshold; per-goal overrides via `IGoal.DamageInterruptThresholdHp` (below).
+
+**Architecture note.** Routing damage-specific behavior through `DamageTakenEvent` instead of subscribing to `HealthEvent` means healing/eating no longer accidentally trips damage handlers — a recurring class of bug in Sprints 18–21.
+
+### `IGoal.DamageInterruptThresholdHp`
+
+**What it does.** Lets each goal opt out of, raise, or lower the default damage interrupt threshold.
+
+**Semantics.**
+- `null` (default interface implementation) — use the system default of **6 HP**
+- `0` — never interrupt this goal on damage; reserved for future combat goals that need to manage their own damage response without the planner ripping the plan out mid-swing
+- Any positive integer — goal-specific threshold (e.g., a fragile exploration goal might set `3` to bail out earlier)
+
+**Configuration.** Override the property on your `IGoal` implementation; existing goals need no changes.
+
+**Architecture note.** Default interface implementation means this is a non-breaking addition — all current goals automatically opt into the 6 HP default without source changes.
+
+### World KB tool routing
+
+**What it does.** Splits the agent's two MemorySmith calls along functional lines:
+- `SearchMemory` and `CreatePage` route to the **world KB** for in-game observations, block discoveries, biome notes, and exploration history
+- `GetPage` routes to the **agent KB** for sprint docs, design notes, and code documentation
+
+**How it's wired.** `Program.cs` resolves a keyed `IMemoryGateway` (`"world"`) via `IServiceProvider.GetKeyedService<IMemoryGateway>("world")` and passes the appropriate gateway to each tool's constructor. When the world key resolves to null (unconfigured), it falls back to the agent gateway so the agent still functions.
+
+**Configuration.** Set `Agent:Memory:WorldKbUrl` in `appsettings.json`. See [world-kb-deployment.md](world-kb-deployment.md) for instance setup.
+
+**Architecture note.** Tool descriptions (visible to the LLM during planning) explicitly call out the routing so the model picks the right tool — historically the model would alternate between SearchMemory and GetPage for the same intent.
+
+### `WorldKbUrl` null default + startup warning
+
+**What it does.** `RestMemoryGatewayOptions.WorldKbUrl` now defaults to `null` instead of the previous `"http://127.0.0.1:6869"`. On startup, if `agentEnabled && WorldKbUrl is null`, the host logs a `LogWarning` pointing at the migration note and the deployment guide.
+
+**Migration.** If you relied on the implicit localhost default in earlier sprints, set `WorldKbUrl` explicitly in `appsettings.json`. Otherwise the agent and world memories will share a single MemorySmith instance and the warning will fire each boot.
+
+**Architecture note.** Removing the hardcoded localhost default eliminates a class of subtle "why does prod store agent docs and world facts in the same KB?" misconfigurations. The startup warning makes the implicit fallback visible instead of silent.
+
+### `ActionQueue.ClearAndEnqueue` atomic interrupt method
+
+**What it does.** Atomically clears any pending actions and enqueues a single priority action in one `lock`-protected operation. `EnqueueAll` is now also lock-protected so the interrupt path observes a consistent queue.
+
+**Why.** Without atomicity, a concurrent `Enqueue` from `ChatConsumerAsync` (or a bulk `EnqueueAll` from the planner) could slip between a separate `Clear` and the priority push, defeating the damage interrupt by leaving a stale chat response or partial plan ahead of `GetStatus`.
+
+**Architecture note.** This builds on the Sprint 12 switch from `Queue<T>` to `ConcurrentQueue<T>` — `ConcurrentQueue` makes individual ops thread-safe, but does not give you compound atomic ops. `ClearAndEnqueue` provides the compound op the interrupt path specifically needs without coarsening locks across the rest of the queue surface.
+
+## Sprint 22 — Planner completeness + World KB separation
+
+### `CraftItemGoal` staleness gate
+
+**What it does.** `CraftItemGoal` now refuses to re-issue a craft request when its last inventory snapshot is older than a freshness window (currently tied to the runtime replan interval). Prevents the planner from queuing a craft against stale state immediately after an inventory event flushes.
+
+**Configuration.** Tunable via `Agent:Runtime:ReplanIntervalSeconds`.
+
+**Architecture note.** Surfaced as a bug in Sprint 21 where the agent would request a craft, get an inventory update mid-action, and then re-request the same craft against the pre-update snapshot.
+
+### HtnPlanner quantity propagation fix
+
+**What it does.** Sub-task quantities (e.g., "mine 8 oak_log" inside "craft 4 plank") now correctly propagate up the HTN decomposition tree. Previously a Sprint 19 refactor silently dropped the quantity when wrapping a sub-task in a compound task, causing the planner to mine a single log for a multi-output recipe.
+
+**Configuration.** None — pure bug fix.
+
+### Health-critical check (threshold = 6 HP)
+
+**What it does.** A coarse health-critical predicate that goals consult before committing to risky sub-plans. Threshold is **6 HP** (3 hearts) — the same number Sprint 23's damage interrupt uses as its default.
+
+**Configuration.** Currently hard-coded; Sprint 23 added per-goal overrides via `IGoal.DamageInterruptThresholdHp` for the interrupt path. The static threshold here will likely be unified with that property in a future sprint.
+
+### World KB separation (`WorldKbUrl` config)
+
+**What it does.** Introduces a second `IMemoryGateway` keyed singleton (`"world"`) so world observations can be persisted to a different MemorySmith instance from agent codebase documentation. Sprint 22 added the plumbing; Sprint 23 made it default-on by routing tools and switching the default to null.
+
+**Configuration.** `Agent:Memory:WorldKbUrl` — see [world-kb-deployment.md](world-kb-deployment.md).
+
+## Configuration cheatsheet
+
+| Setting                                    | Default                | Notes                                     |
+| ------------------------------------------ | ---------------------- | ----------------------------------------- |
+| `Agent:Enabled`                            | `true`                 | Set false to load WebUI without the bot   |
+| `Agent:Minecraft:ServerHost`               | `localhost`            | MC server hostname                        |
+| `Agent:Minecraft:ServerPort`               | `25565`                | MC server port                            |
+| `Agent:Minecraft:BotUsername`              | (required)             | In-game name                              |
+| `Agent:Llm:Endpoint`                       | `http://localhost:11434` | Ollama or OpenAI-compatible             |
+| `Agent:Llm:Model`                          | (required)             | e.g. `llama3.1:8b`                        |
+| `Agent:Llm:LlmTimeoutSeconds`              | `60`                   | Per-request LLM timeout                   |
+| `Agent:Llm:PlayerCooldownSeconds`          | `2`                    | Per-player rate limit cooldown            |
+| `Agent:Llm:GlobalPerMinuteMax`             | `30`                   | Hard cap on LLM calls/minute              |
+| `Agent:Memory:BaseUrl`                     | `http://localhost:5000`| Agent KB                                  |
+| `Agent:Memory:WorldKbUrl`                  | `null` (Sprint 23)     | World KB; null = use agent KB + warning   |
+| `Agent:Memory:WorldTimeoutSeconds`         | `30`                   | World KB request timeout                  |
+| `Agent:Runtime:ReplanIntervalSeconds`      | `2`                    | How often planner reconsiders             |
+| `Agent:Runtime:ActionTimeoutSeconds`       | `30`                   | Single-action wall clock cap              |
+
+## Related guides
+
+- [running-the-agent.md](running-the-agent.md) — getting-started walkthrough
+- [world-kb-deployment.md](world-kb-deployment.md) — second MemorySmith instance setup

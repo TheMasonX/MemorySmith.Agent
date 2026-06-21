@@ -4,7 +4,7 @@
 
 A modular autonomous agent framework that treats Minecraft as a *world adapter* and uses the [MemorySmith](https://github.com/TheMasonX/MemorySmith) wiki as long-term memory.
 
-**v0.28.0** — Sprint 33 complete — 276+ tests
+**v0.35.0** — Sprint 35 complete — 501+ tests
 
 ---
 
@@ -123,7 +123,7 @@ status
 dotnet test MemorySmith.Agent.slnx --configuration Release
 ```
 
-Expected: **276+ passed, 0 failed** (10 CUDA/ONNX skips are expected in non-GPU environments).
+Expected: **501+ passed, 0 failed** (10 CUDA/ONNX skips are expected in non-GPU environments).
 
 ---
 
@@ -162,6 +162,7 @@ This repo is self-documenting — `Data/Pages/` contains wiki pages served by th
 | Phase 3 — Planner | HTN/GOAP, predefined tasks, blueprints | ✅ Done |
 | Sprints 5-27 | Tool safety, journal, world model, logging, governors, damage interrupt, World KB, planner routing, ITimeProvider | ✅ Done |
 | Sprints 28-33 | Action lifecycle, SEC-01/02 auth, base64 sweep, build restore, DI logger wiring, Program.cs restore | ✅ Done |
+| Sprints 34-35 | Build origin coords, API auth fix, chat announcement, live build gate | ✅ Done |
 | Phase 4 — Vision | Spatial analysis, aesthetic critique | ⬜ Planned |
 | Phase 5 — Advanced | Multi-agent, vector search, CI/CD | ⬜ Planned |
 

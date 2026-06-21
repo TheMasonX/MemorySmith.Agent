@@ -36,6 +36,7 @@ public sealed class AgentBackgroundService(
     string botName = "AgentBot",
     int maxConsecutiveFailures = 3,
     IAgentJournal? journal = null,
+    Logging.IChatLogger? chatLogger = null,
     TimeSpan[]? reconnectDelays = null,
     IReplanGovernor? replanGovernor = null,
     ITimeProvider? timeProvider = null) : BackgroundService
@@ -93,6 +94,7 @@ public sealed class AgentBackgroundService(
     private readonly ActionQueue _queue = new();
     private readonly WorldStateProjector _projector = new();
     private readonly IAgentJournal? _journal = journal;
+    private readonly Logging.IChatLogger? _chatLogger = chatLogger;
     private readonly ITimeProvider _timeProvider = timeProvider ?? SystemTimeProvider.Instance;
 
     private readonly Channel<string> _gameErrors =
@@ -560,6 +562,7 @@ public sealed class AgentBackgroundService(
 
         logger.LogInformation("[chat] <{Username}> {Message}", chat.Username, chat.Message);
         _ = PushChatToDashboardAsync("player", chat.Username, chat.Message);
+        _chatLogger?.LogInbound(chat.Username, chat.Message);
 
         using var thinkingCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         var thinkingTask = EnqueueThinkingIfSlowAsync(thinkingCts.Token);
@@ -947,6 +950,14 @@ public sealed class AgentBackgroundService(
                         // Sprint 19: elevated to Info with timing for runtime visibility
                         logger.LogInformation("[action] {Tool} OK ({ElapsedMs}ms)",
                             action.Tool, sw.ElapsedMilliseconds);
+
+                        // Sprint 36: log outbound chat to disk (opt-out).
+                        if (action.Tool.Equals("Chat", StringComparison.OrdinalIgnoreCase)
+                            && action.Arguments.TryGetValue("message", out var msg)
+                            && msg is not null)
+                        {
+                            _chatLogger?.LogOutbound(botName, msg.ToString() ?? string.Empty, correlationId.ToString());
+                        }
                         _journal?.Log(new JournalEntry(
                             _timeProvider.UtcNow, JournalEntryType.ActionCompleted, action.Tool));
                         // Sprint 25 P0-D: For fire-and-forget tools, CallAsync success means

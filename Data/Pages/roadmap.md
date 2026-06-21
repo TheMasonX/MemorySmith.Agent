@@ -2,7 +2,7 @@
 
 MemorySmith.Agent uses a sprint-based delivery model. Each sprint is council-reviewed by a 6-seat panel before merge.
 
-**Current version: v0.23.0** | **Latest: Sprint 23 (2026-06-19)**
+**Current version: v0.35.0** | **Latest: Sprint 35 (2026-06-20)**
 
 ---
 
@@ -39,6 +39,18 @@ AgentHost, WebSocket bridge, basic movement tools, goal/action loop, Blazor stat
 | **21** | 2026-06-18 | Inventory Freshness + Governor Pre-Plan | IsInventoryStale flag, governor pre-plan IsStalled check (10s delay in STALL), D-2 BlockNotFoundEvent integration tests |
 | **22** | 2026-06-18 | Planner Completeness + World KB | CraftItemGoal.IsComplete staleness gate, HtnPlanner IItemSpecGoal count fix, health-critical threshold, World KB separation (WorldKbUrl, named HttpClient, AddKeyedSingleton) |
 | **23** | 2026-06-19 | Damage Interrupt + World KB Routing | DamageTakenEvent, per-goal DamageInterruptThresholdHp, ActionQueue.ClearAndEnqueue atomic, SearchMemory/CreatePage → World KB, GetPage → Agent KB, WorldKbUrl null default + startup warning |
+| **24** | 2026-06-19 | *Planned — not implemented* | FindFlatAreaTool defaults sync, StatusTool dedup, Action Correlation IDs, TryInterruptOnDamage test. All items absorbed into Sprint 25. |
+| **25** | 2026-06-19 | Tool Boundary Hardening + Action Lifecycle | FindFlatAreaTool defaults unified, StatusTool deleted (GetStatusTool alias), ToolDispatcher exception wrapping + TryGetInt32, Action correlation IDs (PendingAction/ActionLifecycle/ConcurrentDictionary), WorldModel defensive copy |
+| **26** | 2026-06-19 | Damage Interrupt Tests + TargetCount Fix + Audit Intake | TryInterruptOnDamage integration tests (5), IItemSpecGoal.TargetCount DIM fix + GatherGoalDecomposer + HtnPlanner (3 tests), external audit intake with annotations |
+| **27** | 2026-06-19 | ITimeProvider + Planner Routing Consolidation | AgentBackgroundServiceTestHelper, version unified to v0.27.0, ITimeProvider (SystemTimeProvider + FakeTimeProvider), PlannerRouter as IPlanner, CraftItemGoalDecomposer routing consolidated |
+| **28** | 2026-06-20 | External Audit Synthesis + Replan Fix | BuildGoalDecomposer ReadOriginFact LogWarning, GenericGatherGoal HasFailed + targetCount, PlannerRouter.ReplanAsync originalGoal fix, architecture.md journal semantics |
+| **29** | 2026-06-20 | Audit Sprint — No Production Code | 4 new audit files filed, base64 sweep incomplete (WorldStateProjector.cs + ToolDispatcher.cs still encoded), version bump deferred |
+| **30** | 2026-06-20 | Base64 Decode + ITool Compliance + SEC-01 | WorldStateProjector.cs + ToolDispatcher.cs decoded, SearchMemoryTool/CreatePageTool ITool compliance fixed, version v0.28.0, ApiKeyMiddleware wired, ChatInterpreter regex fixes |
+| **31** | 2026-06-20 | Council Review + Audit Synthesis | BLK-01 (BuildGoalDecomposer DI arity) re-confirmed, BLK-02 (possible base64 re-encoding) identified, no new code |
+| **32** | 2026-06-20 | Build Restoration + SEC-02 + Quality Fixes | 5 C# files + index.js decoded, BLK-01 fixed (ILogger passed to BuildGoalDecomposer), SEC-02 adapter shared secret, ApiKeyMiddleware tests, SetFact [Obsolete], Rule E-2 documented |
+| **33** | 2026-06-20 | DI Logger Wiring + Base64 Sweep + Rule E-2 | BLK-S33-01 Program.cs restored, GoalFactory + HtnPlanner ILogger wired, /api/about phase updated, TestHost added, SetFact migration (6 sites), README.md decoded |
+| **34** | 2026-06-20 | Build Verification + Final Base64 Sweep | Build gate verification, comprehensive .cs base64 sweep, WebApplicationFactory entrypoint check — handoff only, no council review |
+| **35** | 2026-06-20 | Build Origin + API Auth + Connect Announcement | API auth fix (MEMORYSMITH_API_KEY env var, WorldKbUrl→null fallback), chat announcement on connect, build origin coordinate system (three-tier resolution: explicit→facts→auto-detect FindFlatArea), LLM build intent coords passthrough |
 
 ---
 
@@ -46,6 +58,11 @@ AgentHost, WebSocket bridge, basic movement tools, goal/action loop, Blazor stat
 
 | Version | Sprint | Tests | Status |
 |---------|--------|-------|--------|
+| v0.35.0 | 35 | 501 (498 passed, 3 pre-existing fails) | ✅ green |
+| v0.28.0 | 33 | 276+ | ✅ green |
+| v0.27.0 | 27 | 244+ | ✅ green |
+| v0.26.0 | 26 | 230+ | ✅ green |
+| v0.25.0 | 25 | 220+ | ✅ green |
 | v0.23.0 | 23 | 200+ | ✅ green |
 | v0.22.0 | 22 | 185+ | ✅ green |
 | v0.21.0 | 21 | 171+ | ✅ green |
@@ -54,14 +71,14 @@ AgentHost, WebSocket bridge, basic movement tools, goal/action loop, Blazor stat
 
 ---
 
-## Sprint 24 Priorities (Upcoming)
+## Upcoming Priorities
 
 | Priority | Item |
 |----------|------|
-| P0 | Integration test for `TryInterruptOnDamage` (was deferred D-8 from Sprint 23) |
-| P1 | `GatherGoalDecomposer` TargetCount pass-through fix |
-| P1 | `TimeProvider` abstraction for testable time-dependent logic (D-8 Sprint 19) |
-| P2 | `IWorldObservationGateway` interface note / design doc (D-5 Sprint 23) |
+| P0 | `IBuildGoal` marker interface — replace `goal is BuildGoal` type-check in HtnPlanner |
+| P1 | Semantic build locations — LLM resolves "build a house in the nearest village" from memory |
+| P1 | World KB setup guide and dedicated instance deployment verification |
+| P2 | Configurable agent responses — wiki-page-driven response templates (see Sprint 36 feature) |
 
 ---
 

@@ -1,1 +1,216 @@
-IyBTcHJpbnQgMjggVHJhbnNpdGlvbiBDb3VuY2lsIFJldmlldwoqKkRhdGUqKjogMjAyNi0wNi0yMCAgCioqQnJhbmNoKio6IGBzcHJpbnQtNS10b29sLXNhZmV0eWAgQCBgNjQ0M2IyZGJgICAKKipUcmlnZ2VyZWQgYnkqKjogVXNlciBwdXNoZWQg4omlNSBuZXcgZXh0ZXJuYWwgYXVkaXRzOyBmdWxsIHJlLXZlcmlmaWNhdGlvbiByZXF1ZXN0ZWQgYmVmb3JlIFNwcmludCAyOCAgCioqUmV2aWV3ZXIgdGFzayoqOiBWYWxpZGF0ZS9yZWZ1dGUgZXZlcnkgYXVkaXQgY2xhaW0sIHN5bnRoZXNpemUgaW50byB1cGRhdGVkIGJhY2tsb2cgIAoKLS0tCgojIyBJLiBBdWRpdCBDb3JwdXMgUmV2aWV3ZWQKCnwgRmlsZSB8IFR5cGUgfCBTdGF0dXMgfAp8LS0tfC0tLXwtLS18CnwgYEF1ZGl0cy9kZWVwLWNvZGUtYXVkaXQtMjAyNjA2MTkubWRgIHwgQ3Jvc3MtdmVyaWZpY2F0aW9uIG9mIHByaW9yIGZpbmRpbmdzIHwgU3ByaW50IDI2IGludGFrZSwgYWxyZWFkeSBwcm9jZXNzZWQgfAp8IGBBdWRpdHMvZXhlYy1zdW1tYXJ5LWF1ZGl0LTIwMjYwNjE5Lm1kYCB8IEV4ZWN1dGl2ZSBzdW1tYXJ5IG9mIFBSICMxIHwgU3ByaW50IDI2IGludGFrZSwgYWxyZWFkeSBwcm9jZXNzZWQgfAp8IGBBdWRpdC9tZW1vcnlzbWl0aF9hZ2VudF9jb2RlX2F1ZGl0Lm1kYCB8IEZyZXNoIFNwcmludCA1LzYgY29kZSBhdWRpdCB8ICoqTkVXICh0aGlzIHNlc3Npb24pKiogfAp8IGBBdWRpdC9tZW1vcnlzbWl0aF9hZ2VudF9jb2RlX2F1ZGl0X3JlcG9ydC5tZGAgfCBHYXRoZXIgKyBwbGFubmVyIGF1ZGl0IHwgKipORVcgKHRoaXMgc2Vzc2lvbikqKiB8CnwgYEF1ZGl0L21lbW9yeXNtaXRoX2FnZW50X2FkZGl0aW9uYWxfYXVkaXRfZmluZGluZ3MubWRgIHwgQVBJIHN1cmZhY2UgKyBjaGF0IGF1ZGl0IHwgKipORVcgKHRoaXMgc2Vzc2lvbikqKiB8CnwgYEF1ZGl0L21lbW9yeXNtaXRoX2FnZW50X2F1ZGl0X2FkZGVuZHVtLm1kYCB8IFN1cHBsZW1lbnRhbCBmaW5kaW5ncyB8ICoqTkVXICh0aGlzIHNlc3Npb24pKiogfAp8IGBBdWRpdC9tZW1vcnlzbWl0aF9hZ2VudF9kZWVwX2NvZGVfYXVkaXRfc3ByaW50NS5tZGAgfCBEZWVwIFNwcmludCA1LWZvY3VzIGF1ZGl0IHwgKipORVcgKHRoaXMgc2Vzc2lvbikqKiB8CnwgYEF1ZGl0L21lbW9yeXNtaXRoX2FnZW50X2RlZXBfZGl2ZV9hdWRpdF9yZXBvcnQubWRgIHwgVGhpcmQtcGFzcyBmb2xsb3ctdXAgYXVkaXQgfCAqKk5FVyAodGhpcyBzZXNzaW9uKSoqIHwKfCBgQXVkaXQvbWVtb3J5c21pdGhfYWdlbnRfZm9sbG93dXBfZGVlcF9kaXZlX3JlcG9ydC5tZGAgfCBSdW50aW1lICsgdHJ1c3QtYm91bmRhcnkgYXVkaXQgfCAqKk5FVyAodGhpcyBzZXNzaW9uKSoqIHwKCkluZGVwZW5kZW50IGNvZGUgdmVyaWZpY2F0aW9uIHBlcmZvcm1lZCBvbjogIApgR29hbEZhY3RvcnkuY3NgLCBgQ2hhdEludGVycHJldGVyLmNzYCwgYEh0blRhc2tMaWJyYXJ5LmNzYCwgYEdhdGhlckdvYWxEZWNvbXBvc2VyLmNzYCwgIApgR2VuZXJpY0dhdGhlckdvYWwuY3NgLCBgQ2hhdE9wdGlvbnMuY3NgLCBgUGxhbm5lclJvdXRlci5jc2AsIGBXZWJVSS5CbGF6b3IvUHJvZ3JhbS5jc2AKCi0tLQoKIyMgSUkuIEZpbmRpbmctYnktRmluZGluZyBWZXJkaWN0CgojIyMgU1RBTEUgLyBBTFJFQURZIFJFU09MVkVEIChkbyBub3QgcmVvcGVuKQoKfCBBdWRpdCBDbGFpbSB8IENvbmZpZGVuY2UgfCBTdGF0dXMgfCBFdmlkZW5jZSB8CnwtLS18LS0tfC0tLXwtLS18IAp8IFRvb2xEaXNwYXRjaGVyIGhhcyBUT0RPLCBubyBzY2hlbWEgdmFsaWRhdGlvbiB8IDk14oCTOTglIHwgKipTVEFMRSoqIOKAlCBGaXhlZCBTcHJpbnQgMjUgUDAtQyB8IGBDYWxsQXN5bmNgIHdyYXBzIGBFeGVjdXRlQXN5bmNgIGluIHRyeS9jYXRjaDsgYENoZWNrVHlwZWAgdXNlcyBgVHJ5R2V0SW50MzJgIHwKfCBgVG9vbEVuZ2luZWAsIGBUb29sUmVnaXN0cnlgLCBgSVRvb2xSZWdpc3RyeWAgc3RpbGwgZXhpc3QgfCA5MCUgfCAqKlNUQUxFKiog4oCUIERlbGV0ZWQgU3ByaW50IDUgUDIgfCBOb3QgaW4gUFIgZmlsZSBsaXN0OyBgVG9vbERpc3BhdGNoZXJgIGlzIHNvbGUgZGlzcGF0Y2hlciB8CnwgYFdvcmxkU3RhdGVgIGFsaWFzaW5nIChzaGFyZWQgbXV0YWJsZSBkaWN0KSB8IDg24oCTOTIlIHwgKipTVEFMRSoqIOKAlCBGaXhlZCBTcHJpbnQgMjUgUDEtQSB8IENvbnN0cnVjdG9yOiBgbmV3IERpY3Rpb25hcnk8c3RyaW5nLGludD4oKWAgc2VwYXJhdGUgaW5zdGFuY2VzOyBgT2JzZXJ2ZSgpYCBkZWVwLWNvcGllcyB8CnwgYC9hcGkvYWdlbnQvY29tbWFuZGAgYWNjZXB0cyBhcmJpdHJhcnkgdG9vbCBuYW1lcyB8IDk3JSB8ICoqU1RBTEUqKiDigJQgRml4ZWQgU3ByaW50IDUgUDAgfCBQcm9ncmFtLmNzOiBgZGlzcGF0Y2hlci5HZXQocmVxLkNvbW1hbmQpIGlzIG51bGwg4oaSIDQwMCArIHJlZ2lzdGVyZWQgbGlzdGAgfAp8IEFjdGlvblF1ZXVlIG5vdCB0aHJlYWQtc2FmZSB8IDkwJSB8ICoqU1RBTEUqKiDigJQgRml4ZWQgU3ByaW50IDIzIFAwLUEgfCBgQWN0aW9uUXVldWUuQ2xlYXJBbmRFbnF1ZXVlYCB1c2VzIGxvY2stcHJvdGVjdGVkIGF0b21pYyBjbGVhcitlbnF1ZXVlIHwKfCBWZXJzaW9uIG1pc21hdGNoOiBgL2FwaS9hYm91dGAgcmV0dXJucyBgMC43LjBgIHZzIFJFQURNRSBgdjAuMjMuMGAgfCA5OSUgfCAqKlNUQUxFKiog4oCUIEZpeGVkIFNwcmludCAyNyBQMC1CIHwgUHJvZ3JhbS5jczogYFZlcnNpb24gPSAiMC4yNy4wImAsIGBQaGFzZSA9ICJTcHJpbnQgMjcg4oCTIFBsYW5uZXIgcm91dGluZyArIElUaW1lUHJvdmlkZXIiYCB8CnwgTExNIGNoYXQgaW50ZXJwcmV0YXRpb24gYmxvY2tzIHdvcmxkLXN0YXRlIGxvb3AgfCA5MyUgfCAqKlNUQUxFIC8gUkVGVVRFRCoqIOKAlCBDaGFubmVsIGluIHBsYWNlIHNpbmNlIFNwcmludCAxYSB8IGBDaGFubmVsPFdvcmxkRXZlbnQ+YCBzZXBhcmF0ZXMgaW50ZXJwcmV0YXRpb24gZnJvbSB3b3JsZC1zdGF0ZSB1cGRhdGVzIHwKfCBHYXRoZXIgY291bnQgbG9zdCBpbiBwbGFubmluZyAoSUl0ZW1TcGVjR29hbCBlbXB0eSBwYXJhbXMpIHwgOTclIHwgKipTVEFMRSoqIOKAlCBGaXhlZCBTcHJpbnQgMjYgUDAtQiB8IGBHYXRoZXJHb2FsRGVjb21wb3NlcmA6IGBpc2cuVGFyZ2V0Q291bnQuVG9TdHJpbmcoKWAgcGFzc2VkIGFzIHBhcmFtZXRlciB8CnwgSHRuUGxhbm5lciBoYXJkY29kZWQgdHlwZS1zd2l0Y2ggKElJdGVtU3BlY0dvYWwvQnVpbGRHb2FsL0NyYWZ0SXRlbUdvYWwpIHwgODElIHwgKipTVEFMRSoqIOKAlCBGaXhlZCBTcHJpbnQgMjcgUDAtRCB8IGBIdG5QbGFubmVyYCBpcyBwdXJlIHBoYXNlLWJ5LXBoYXNlIGZhbGxiYWNrOyBhbGwgYnJhbmNoZXMgcmVtb3ZlZCB8CnwgKipERUYtTkVXLTQqKjogYEdhdGhlckl0ZW1EZWNvbXBvc2UuVGFrZSgyKWAgc291cmNlIGJsb2NrIHRydW5jYXRpb24gfCA5MCUgfCAqKlJFRlVURUQqKiDigJQgQ29kZSBzaG93cyBubyBgVGFrZSgyKWAgfCBgSHRuVGFza0xpYnJhcnkuR2F0aGVySXRlbURlY29tcG9zZWA6IGBmb3JlYWNoICh2YXIgYmxvY2sgaW4gc3BlYy5Tb3VyY2VCbG9ja3MpYCDigJQgaXRlcmF0ZXMgQUxMIGJsb2NrcyB8Cgo+ICoqREVGLU5FVy00IGNvcnJlY3Rpb24qKjogU3ByaW50IDI3IHN5bnRoZXNpcyBsb2dnZWQgdGhpcyBmaW5kaW5nIGFzIG9wZW4gYmFzZWQgb24gYW4gZXh0ZXJuYWwgYXVkaXQgY2xhaW0uIENvZGUgaW5zcGVjdGlvbiBhdCBicmFuY2ggSEVBRCBjb25maXJtcyBubyBgVGFrZSgyKWAgZXhpc3RzIGluIGBHYXRoZXJJdGVtRGVjb21wb3NlYC4gUDItQiBpbiB0aGUgU3ByaW50IDI4IGJhY2tsb2cgc2hvdWxkIGJlIENMT1NFRCBhcyByZWZ1dGVkLgoKLS0tCgojIyMgQ09ORklSTUVEIE9QRU4gKHByZS1leGlzdGluZyBpbiBiYWNrbG9nKQoKfCBJRCB8IENsYWltIHwgU291cmNlIHwgRXZpZGVuY2UgfAp8LS0tfC0tLXwtLS18LS0tfAp8IERFRi1ORVctMSB8IGBCdWlsZEdvYWxEZWNvbXBvc2VyLlJlYWRPcmlnaW5GYWN0YCBzaWxlbnRseSByZXR1cm5zIGAoMCwwLDApYCBvbiBiYWQvbWlzc2luZyBvcmlnaW4gZmFjdCDigJQgbm8gd2FybmluZyBsb2dnZWQgfCBkZWVwX2NvZGVfYXVkaXRfc3ByaW50NS5tZCAoODglKSB8IGBIdG5UYXNrTGlicmFyeS5EZWNvbXBvc2VCdWlsZGA6IHNpbGVudCBgUmVzb2x2ZUF1dG9PcmlnaW5gIGZhbGxiYWNrLCBubyBsb2cgd2hlbiBvcmlnaW4gc3RheXMgKDAsMCwwKSB8CnwgREVGLU5FVy0yIHwgYEdlbmVyaWNHYXRoZXJHb2FsLkhhc0ZhaWxlZGAga2V5IGlzIGBnb2FsOkdhdGhlcjp7aXRlbUlkfTpmYWlsZWRgIOKAlCBubyBgdGFyZ2V0Q291bnRgIGluIGtleSwgc28gb2FrX2xvZ8OXMSBwb2lzb25zIG9ha19sb2fDlzMyIHwgYXVkaXRfYWRkZW5kdW0ubWQgKDkzJSkgfCBgR2VuZXJpY0dhdGhlckdvYWwuY3NgOiBgTmFtZSA9PiAkIkdhdGhlcjp7aXRlbS5JdGVtSWR9ImAg4oCUIHRhcmdldENvdW50IGV4Y2x1ZGVkIGZyb20gbmFtZS9rZXkgfAp8IERFRi1ORVctMyB8IGBHb2FsRmFjdG9yeS5HZXRJbnRgIHVuY2hlY2tlZCBgbG9uZyBsID0+IChpbnQpbGAgY2FzdCDigJQgbm8gcmFuZ2UgY2hlY2ssIGxhcmdlIGxvbmcgd3JhcHMgc2lsZW50bHkgfCBhdWRpdF9hZGRlbmR1bS5tZCAoODQlKSB8IGBHb2FsRmFjdG9yeS5jc2AgbGluZSBgbG9uZyBsID0+IChpbnQpbGAg4oCUIG5vIHJhbmdlIGd1YXJkIHwKfCBERUYtTkVXLTUgfCBgV29ybGRTdGF0ZWAgY29sbGVjdGlvbnMgZXhwb3NlZCBhcyBgZ2V0OyBpbml0O2AgbXV0YWJsZSDigJQgZXh0ZXJuYWwgY29uc3VtZXJzIGNhbiBtdXRhdGUgdW5kZXJseWluZyBkaWN0L2xpc3QgfCBkZWVwX2NvZGVfYXVkaXRfc3ByaW50NS5tZCAoOTIlKSB8IGBXb3JsZFN0YXRlLmNzYCBwcm9wZXJ0aWVzOiBgaW5pdGAgc2V0dGVycyBvbiBgRGljdGlvbmFyeWAgZmllbGRzIHwKCi0tLQoKIyMjIFVQR1JBREVEIEZJTkRJTkcKCioqUDItRCDihpIgUDE6IFBsYW5uZXJSb3V0ZXIuUmVwbGFuQXN5bmMgYnJlYWtzIGFsbCBkZWNvbXBvc2VyLWhhbmRsZWQgZ29hbCByZXBsYW5uaW5nKioKCkJvdGggYFBsYW5uZXJSb3V0ZXIuUmVwbGFuQXN5bmNgIGFuZCBgRGVjb21wb3NlclBsYW5uZXIuUmVwbGFuQXN5bmNgIHJlY29uc3RydWN0IGEgYFNpbXBsZUdvYWxgIHNoZWxsIGZyb20gYGN1cnJlbnRQbGFuLkdvYWxOYW1lICsgUGhhc2VzYC4gVGhpcyBzaGVsbCBpcyB0aGVuIHJvdXRlZCB0aHJvdWdoIGBEZWNvbXBvc2VyUmVnaXN0cnlgLiBBbGwgcmVnaXN0ZXJlZCBkZWNvbXBvc2VycyAoYEdhdGhlckdvYWxEZWNvbXBvc2VyYCwgYEJ1aWxkR29hbERlY29tcG9zZXJgLCBgQ3JhZnRJdGVtR29hbERlY29tcG9zZXJgKSBoYXZlIGBDYW5IYW5kbGVgIHByZWRpY2F0ZXMgcmVxdWlyaW5nIHRoZWlyIGNvbmNyZXRlIHR5cGUgKGBJSXRlbVNwZWNHb2FsYCwgYEJ1aWxkR29hbGAsIGBDcmFmdEl0ZW1Hb2FsYCkuIEEgYFNpbXBsZUdvYWxgIG1hdGNoZXMgKipub25lKiogb2YgdGhlc2UuCgoqKlJlc3VsdCoqOiBFdmVyeSByZXBsYW4gb2YgYSBnYXRoZXIvYnVpbGQvY3JhZnQgZ29hbCBzaWxlbnRseSBmYWxscyB0aHJvdWdoIHRvIGBIdG5QbGFubmVyYC4gYEh0blBsYW5uZXJgIHNlZXMgcGhhc2UgbmFtZXMgbGlrZSBgWyJGaW5kU291cmNlIiwiTWluZSIsIkNvbGxlY3QiXWAgd2hpY2ggYXJlIG5vdCByZWdpc3RlcmVkIEhUTiB0YXNrcyDihpIgdGhyb3dzIGBJbnZhbGlkT3BlcmF0aW9uRXhjZXB0aW9uYCDihpIgcmVwbGFuIHJldHVybnMgYG51bGxgIOKGkiBhZ2VudCBpcyBzdHVjay4KCioqQ29uZmlkZW5jZSoqOiA5NSUg4oCUIHZlcmlmaWVkIGluIGBQbGFubmVyUm91dGVyLmNzYCwgYEdhdGhlckdvYWxEZWNvbXBvc2VyLmNzYCAoQ2FuSGFuZGxlOiBgZ29hbCBpcyBHYXRoZXJXb29kR29hbCBvciBJSXRlbVNwZWNHb2FsYCksIGBHZW5lcmljR2F0aGVyR29hbC5jc2AgKG5vdCBhbiBJSXRlbVNwZWNHb2FsIGFmdGVyIFNpbXBsZUdvYWwgd3JhcHBpbmcpLgoKKipVcGdyYWRlIHJhdGlvbmFsZSoqOiBUaGlzIGJyZWFrcyBBTEwgZGVjb21wb3Nlci1oYW5kbGVkIGdvYWwgcmVjb3Zlcnkgb24gZmFpbHVyZS4gQW55IGdhdGhlci9idWlsZC9jcmFmdCByZXBsYW4gc2lsZW50bHkgcHJvZHVjZXMgbm8gcGxhbi4gQWdlbnQgc3RhbGxzLiBUaGlzIGlzIGEgY29ycmVjdG5lc3MgcmVncmVzc2lvbiwgbm90IGEgcG9saXNoIGl0ZW0uCgotLS0KCiMjIyBORVcgRklORElOR1MgKG5vdCBwcmV2aW91c2x5IGxvZ2dlZCkKCnwgSUQgfCBDbGFpbSB8IENvbmZpZGVuY2UgfCBFdmlkZW5jZSB8CnwtLS18LS0tfC0tLXwtLS18CnwgREVGLU5FVy02IHwgYENoYXRJbnRlcnByZXRlci5SZXNvbHZlSXRlbUlkYCB1c2VzIGByYXcuVHJpbUVuZCgncycpYCDigJQgY29ycnVwdHMgdmFsaWQgSURzIGVuZGluZyBpbiAncyc6IGBnbGFzc+KGkmdsYXNgLCBgbW9zc+KGkm1vc2AgfCA4OSUgfCBgQ2hhdEludGVycHJldGVyLmNzYDogYHZhciBzaW5ndWxhciA9IHJhdy5UcmltRW5kKCdzJyk7YCB8CnwgREVGLU5FVy03IHwgU3RhdHVzIHJlZ2V4IGluY2x1ZGVzIGJhcmUgYFxiZG9pbmdcYmAg4oCUIG1hdGNoZXMgIkkgYW0gZG9pbmcgZmluZSIsICJ3aGF0IGFyZSB5b3UgZG9pbmcgdG9kYXk/IiAoZmFsc2UgcG9zaXRpdmVzKSB8IDkxJSB8IGBDaGF0SW50ZXJwcmV0ZXIuY3NgOiBgQCJcYihzdGF0dXNcfHdoYXQuP3JlIHlvdSBkb2luZ1x8d2hhdCBhcmUgeW91IGRvaW5nXHxyZXBvcnRcfGRvaW5nKVxiImAgfAp8IERFRi1ORVctOCB8IGBFeHBsb3JlRGVjb21wb3NlYCBoYXJkY29kZXMgdHdvLXBhc3MgV2FuZGVyIHBhdHRlcm4gd2l0aCBubyByZXRyeSBidWRnZXQgb3Igc3RhdGUtZGVwZW5kZW50IGJyYW5jaGluZyB8IDg5JSB8IGBIdG5UYXNrTGlicmFyeS5FeHBsb3JlRGVjb21wb3NlYDogcmV0dXJucyBmaXhlZCBbU2VhcmNoTWVtb3J5LCBXYW5kZXIsIEdldFN0YXR1cywgV2FuZGVyLCBHZXRTdGF0dXNdIHwKfCBERUYtTkVXLTkgfCBgTWluZVdvb2REZWNvbXBvc2VgIHVzZXMgYG1pbmVjcmFmdDpgIG5hbWVzcGFjZSBwcmVmaXggKGBtaW5lY3JhZnQ6b2FrX2xvZ2ApIGluY29uc2lzdGVudCB3aXRoIHJlc3Qgb2YgY29kZWJhc2UgKGBvYWtfbG9nYCksIGFuZCBvbmx5IGNvdmVycyAyIGxvZyB0eXBlcyB2cyBPYWtMb2dTcGVjJ3MgNyB8IDg2JSB8IGBIdG5UYXNrTGlicmFyeS5NaW5lV29vZERlY29tcG9zZWA6IGAibWluZWNyYWZ0Om9ha19sb2ciYCBhbmQgYCJtaW5lY3JhZnQ6YmlyY2hfbG9nImAgb25seSB8CnwgREVGLU5FVy0xMCB8IGBDaGF0T3B0aW9ucy5NYXhSZXNwb25zZURpc3RhbmNlQmxvY2tzYCAoZG9jdW1lbnRlZCwgY29uZmlndXJhYmxlLCBkZWZhdWx0IDY0LjApIGlzIG5ldmVyIHJlYWQgYnkgYENoYXRJbnRlcnByZXRlci5Jc0RpcmVjdGVkQXRCb3RgIOKAlCB1c2VzIGhhcmRjb2RlZCBgcHJpdmF0ZSBjb25zdCBpbnQgUHJveGltaXR5QWRkcmVzc0Jsb2NrcyA9IDMyYCBpbnN0ZWFkIHwgOTYlIHwgYENoYXRJbnRlcnByZXRlci5jc2A6IGBjb25zdCBQcm94aW1pdHlBZGRyZXNzQmxvY2tzID0gMzJgOyBgQ2hhdE9wdGlvbnMuY3NgOiBwcm9wZXJ0eSBleGlzdHMgYnV0IG5vdCByZWZlcmVuY2VkIGluIENoYXRJbnRlcnByZXRlciB8CgotLS0KCiMjIyBDT05GSVJNRUQgTE9XLVBSSU9SSVRZIChrbm93biBhcmNoaXRlY3R1cmFsIHN0dWJzIOKAlCBub3QgYmxvY2tpbmcpCgp8IEl0ZW0gfCBTdGF0dXMgfCBEaXNwb3NpdGlvbiB8CnwtLS18LS0tfC0tLXwKfCBgL2FwaS9hZ2VudC9jb25uZWN0YCBhbmQgYC9hcGkvYWdlbnQvc3RvcGAgcmV0dXJuIHN1Y2Nlc3Mgc3RyaW5ncyB3aXRob3V0IG11dGF0aW5nIHN0YXRlIHwgQ29uZmlybWVkIHwgSW50ZW50aW9uYWwgc2NhZmZvbGRpbmcgc3R1YnM7IGxhYmVsIHRoZW0gaW4gQVBJIGRvY3M7IFAzIHwKfCBgL2FwaS9ibHVlcHJpbnRzYCByZXR1cm5zIGhhcmRjb2RlZCBzaW5nbGUgZW50cnkgfCBDb25maXJtZWQgfCBLbm93biBwbGFjZWhvbGRlcjsgYmFjayB3aXRoIGBJQmx1ZXByaW50UmVwb3NpdG9yeS5TZWFyY2hBc3luY2AgaW4gZnV0dXJlIHBoYXNlOyBQMyB8CnwgQmx1ZXByaW50IGxvb2t1cCB1c2VzIGNvbnRhaW5zLW1hdGNoIHJhdGhlciB0aGFuIGV4YWN0IHNsdWcgfCBDb25maXJtZWQgfCBSZXNpZHVhbCByaXNrOyBhY2NlcHRhYmxlIHVudGlsIGJsdWVwcmludCBjYXRhbG9nIGdyb3dzOyBQMyB8CnwgQ2hhdFJhdGVMaW1pdGVyLlBydW5lIG5ldmVyIGNhbGxlZCAocGVyIHByaW9yIGFyY2hpdGVjdHVyZSByZXZpZXcpIHwgVW52ZXJpZmllZCBpbiB0aGlzIHNlc3Npb24gfCBOZWVkcyB2ZXJpZmljYXRpb247IGZpbGVkIGFzIFAzIHJpc2sgfAp8IExMTSBKU09OIGV4dHJhY3Rpb24gZ3JlZWR5IHJlZ2V4IChtdWx0aS1vYmplY3Qgb3V0cHV0KSB8IFByZXZpb3VzbHkgbm90ZWQgfCBTcHJpbnRzIDIwLTIxIGFkZGVkIFRyeVBhcnNlVHJ1bmNhdGVkSnNvbjsgcmVzaWR1YWwgcmlzayBpcyBsb3c7IFAzIHwKfCBgR29hbEZhY3RvcnlgIHN5bmMvYXN5bmMgZGlzY292ZXJhYmlsaXR5IGFzeW1tZXRyeSB8IENvbmZpcm1lZCBpbnRlbnRpb25hbCB8IERvY3VtZW50ZWQgaW4gR29hbEZhY3RvcnkgWE1MIHN1bW1hcnk7IG5vdCBhIGJ1ZyB8CgotLS0KCiMjIElJSS4gNi1TZWF0IENvdW5jaWwgUmV2aWV3CgojIyMgU2VhdCAxIOKAlCBTb3VyY2UtR3JvdW5kZWQgQXJjaGl2aXN0CioqQ29uZmlkZW5jZTogOTQlKioKCkFsbCBzdGFsZSBmaW5kaW5ncyBhcmUgY29ycmVjdGx5IG1hcmtlZCBzdGFsZS4gQ29kZSBldmlkZW5jZSBpcyBkaXJlY3QsIG5vdCBpbmZlcnJlZC4gVGhlIERFRi1ORVctNCByZWZ1dGF0aW9uIGlzIHdlbGwtZm91bmRlZCDigJQgYGZvcmVhY2ggKHZhciBibG9jayBpbiBzcGVjLlNvdXJjZUJsb2NrcylgIGlzIHVuYW1iaWd1b3VzLiBERUYtTkVXLTEwIGlzIHRoZSBzdHJvbmdlc3QgbmV3IGZpbmRpbmc6IGFuIGV4cGxpY2l0bHkgZG9jdW1lbnRlZCwgY29uZmlndXJhYmxlIG9wdGlvbiB0aGF0IHNpbGVudGx5IGRvZXMgbm90aGluZyBpcyBhIGNvbnRyYWN0IHZpb2xhdGlvbi4gREVGLU5FVy02IChgVHJpbUVuZCgncycpYCkgaXMgYSBjb3JyZWN0bmVzcyBkZWZlY3Qgd2l0aCBrbm93biB2aWN0aW1zIChgZ2xhc3NgLCBgbW9zc2ApLgoKKipEaXNzZW50Kio6IEkgd2FudCBhIG5vdGUgdGhhdCBgTWluZVdvb2REZWNvbXBvc2VgJ3MgYG1pbmVjcmFmdDpgIHByZWZpeCBpc3N1ZSAoREVGLU5FVy05KSBpcyBsaWtlbHkgYmVuaWduIGluIHByYWN0aWNlIGJlY2F1c2UgdGhlIEpTIGFkYXB0ZXIgbm9ybWFsaXplcyBuYW1lc3BhY2VzLCBidXQgdGhlIEMjIGxheWVyIHNob3VsZCBiZSBjb25zaXN0ZW50IHJlZ2FyZGxlc3MuCgotLS0KCiMjIyBTZWF0IDIg4oCUIERhdGEgTW9kZWwgQXJjaGl0ZWN0CioqQ29uZmlkZW5jZTogOTElKioKClRoZSBQMi1EIHVwZ3JhZGUgdG8gUDEgaXMgY29ycmVjdC4gYERlY29tcG9zZXJQbGFubmVyLlJlcGxhbkFzeW5jYCBjcmVhdGVzIGEgYFNpbXBsZUdvYWxgIGFuZCBwYXNzZXMgaXQgYmFjayB0byBgZGVjb21wb3Nlci5EZWNvbXBvc2VgIOKAlCB0aGUgZGVjb21wb3NlcidzIGNvbnRyYWN0IHJlcXVpcmVzIGEgc3BlY2lmaWMgZ29hbCB0eXBlLCBub3QgYSBzaGVsbC4gVGhpcyBpcyBhIHR5cGUtbGV2ZWwgY29udHJhY3QgdmlvbGF0aW9uIHRoYXQgd2lsbCB0aHJvdyBhdCBydW50aW1lLiBUaGUgZml4IGlzIHRvIGVpdGhlciBwYXNzIHRoZSBvcmlnaW5hbCBnb2FsIHRvIGBSZXBsYW5Bc3luY2AgKHByZXNlcnZlIHR5cGUpIG9yIGhhdmUgZWFjaCBkZWNvbXBvc2VyIGltcGxlbWVudCBhIHJlcGxhbiBwYXRoIHRoYXQgYWNjZXB0cyB0aGUgY3VycmVudCBwbGFuIGRpcmVjdGx5LgoKKipEaXNzZW50Kio6IERFRi1ORVctNSAoV29ybGRTdGF0ZSBjb2xsZWN0aW9uIG11dGFiaWxpdHkpIHdhcyBsb2dnZWQgYXMgb3BlbiBpbiBTcHJpbnQgMjcgYnV0IG5vdCB2ZXJpZmllZCBpbiB0aGlzIHNlc3Npb24gYWdhaW5zdCBjdXJyZW50IFdvcmxkU3RhdGUuY3MuIEkgcmVjb21tZW5kIGEgZGlyZWN0IHJlYWQgb2YgV29ybGRTdGF0ZS5jcyBiZWZvcmUgY29uZmlybWluZyBpdCByZW1haW5zIG9wZW4uCgotLS0KCiMjIyBTZWF0IDMg4oCUIFJldHJpZXZhbCBTcGVjaWFsaXN0CioqQ29uZmlkZW5jZTogODglKioKCkRFRi1ORVctMiAoZmFpbHVyZSBrZXkgY29sbGlzaW9uKSBoYXMgYW4gZWxlZ2FudCBtaW5pbWFsIGZpeDogYCQiZ29hbDp7TmFtZX06e3RhcmdldENvdW50fTpmYWlsZWQiYC4gSG93ZXZlciB0aGlzIGNoYW5nZXMgdGhlIGZhaWx1cmUga2V5IGZvcm1hdCwgd2hpY2ggY291bGQgYWZmZWN0IGFueSBleGlzdGluZyB3b3JsZC1zdGF0ZSBmYWN0cy4gSWYgQ0kgaXMgZ3JlZW4gYW5kIG5vIHRlc3RzIGFzc2VydCB0aGUgZXhhY3Qga2V5IHN0cmluZywgdGhlIGZpeCBpcyBzYWZlIHRvIHNoaXAuIENvbmZpcm0gbm8gaGFyZGNvZGVkIGtleSBhc3NlcnRpb25zIGluIGV4aXN0aW5nIHRlc3RzIGJlZm9yZSBpbXBsZW1lbnRhdGlvbi4KCkRFRi1ORVctNiAoYFRyaW1FbmQoJ3MnKWApIHNob3VsZCBiZSBuYXJyb3dlZCwgbm90IHJlbW92ZWQuIEEgY29uc3RyYWluZWQgcmVwbGFjZSBsaXN0IChpdGVtX3dpdGhfcyDihpIgc2luZ3VsYXIgbG9va3VwKSBvciByZXF1aXJpbmcgdGhlIHJlc3VsdCB0byBtYXRjaCBhbiBhbGlhcyBmaXJzdCBwcmV2ZW50cyBmYWxzZSB0cnVuY2F0aW9uLiBUaGUgY3VycmVudCBjb2RlIGFscmVhZHkgdHJpZXMgdGhlIGFsaWFzIHRhYmxlIEJFRk9SRSBUcmltRW5kIOKAlCB0aGUgaXNzdWUgaXMgb25seSB3aGVuIFRyaW1FbmQgcHJvZHVjZXMgc29tZXRoaW5nIG5vdCBpbiBhbGlhc2VzIHRoYXQgc3RpbGwgcGFzc2VzIHRoZSByYXcgSUQgZmFsbGJhY2sgKGBeW2Etel1bYS16MC05X10qJGApLgoKLS0tCgojIyMgU2VhdCA0IOKAlCBIdW1hbiBMZWFybmluZyBBZHZvY2F0ZQoqKkNvbmZpZGVuY2U6IDg3JSoqCgpUaGUgYWdlbnQgaGFuZG9mZiBtdXN0IGNsZWFybHkgY2FsbCBvdXQgd2hpY2ggbmV3IGl0ZW1zIGFyZSBQMSB2cyBQMiB2cyBQMywgYW5kIG11c3QgY2xlYXJseSBjbG9zZSBERUYtTkVXLTQgc28gZnV0dXJlIGFnZW50cyBkb24ndCByZS1vcGVuIGl0IGZyb20gdGhlIHN0YWxlIGF1ZGl0IGNvcnB1cy4gVGhlIGF1ZGl0IGNvcnB1cyBpbiBgRGF0YS9QYWdlcy9BdWRpdC9gIG5vdyBjb250YWlucyAxNCBmaWxlczsgbWFueSBkZXNjcmliZSB0aGUgY29kZWJhc2UgaW4gYSBwcmUtU3ByaW50LTI1IHN0YXRlLiBGdXR1cmUgYWdlbnRzIHJlYWRpbmcgb25seSB0aGUgYXVkaXQgZmlsZXMgKG5vdCB0aGUgY291bmNpbCByZXZpZXdzKSB3aWxsIGJlIGNvbmZ1c2VkLiBUaGUgaGFuZG9mZiBzaG91bGQgY29udGFpbiBhIG9uZS1wYWdlICJzdGFsZSBhdWRpdCBpbmRleCIgbWFwcGluZyBlYWNoIHN0YWxlIGZpbmRpbmcgdG8gdGhlIHNwcmludCB0aGF0IGZpeGVkIGl0LgoKKipEaXNzZW50Kio6IERFRi1ORVctOCAoYEV4cGxvcmVEZWNvbXBvc2VgKSBhbmQgREVGLU5FVy05IChgTWluZVdvb2REZWNvbXBvc2VgKSBhcmUgbm90IHVzZXItdmlzaWJsZSBidWdzIGluIG5vcm1hbCBnYW1lcGxheTsgdGhleSBhcmUgY29kZSBxdWFsaXR5IGlzc3Vlcy4gVHJlYXRpbmcgdGhlbSBhcyBQMiBhbmQgUDMgcmVzcGVjdGl2ZWx5IGlzIG1vcmUgYXBwcm9wcmlhdGUgdGhhbiBQMC9QMS4KCi0tLQoKIyMjIFNlYXQgNSDigJQgU2tlcHRpY2FsIFJldmlld2VyCioqQ29uZmlkZW5jZTogODYlKioKClRoZSBQMi1EIHVwZ3JhZGUgaXMgYmFzZWQgb24gcmVhZGluZyBgUGxhbm5lclJvdXRlci5jc2AgYW5kIGBHYXRoZXJHb2FsRGVjb21wb3Nlci5jc2Agc2lkZSBieSBzaWRlLiBNeSBjb25jZXJuIGlzOiBoYXMgdGhlIGJvdCBhY3R1YWxseSBmYWlsZWQgb24gYSByZXBsYW4gaW4gcHJhY3RpY2U/IElmIEh0blBsYW5uZXIgZmFsbHMgYmFjayBjbGVhbmx5IGFuZCB0aGUgcGhhc2VzIGhhcHBlbiB0byBiZSByZWNvZ25pemVkIEhUTiB0YXNrcywgdGhlIGJ1ZyBtYXkgbm90IG1hbmlmZXN0IGZvciBnYXRoZXIgZ29hbHMuIFRoZSBwaGFzZXMgZm9yIGBHZW5lcmljR2F0aGVyR29hbGAgYXJlIGBbIkZpbmRTb3VyY2UiLCJNaW5lIiwiQ29sbGVjdCJdYCDigJQgdGhlc2UgYXJlIE5PVCBpbiBgSHRuVGFza0xpYnJhcnkuX21ldGhvZHNgIGRpY3Rpb25hcnkuIFNvIHRoZSB0aHJvdyB3b3VsZCBoYXBwZW4uCgpCdXQ6IHdoZW4gZG9lcyBgUmVwbGFuQXN5bmNgIGdldCBjYWxsZWQ/IE9ubHkgd2hlbiBgQWdlbnRCYWNrZ3JvdW5kU2VydmljZWAgdHJpZ2dlcnMgYSByZXBsYW4gb24gY29uc2VjdXRpdmUgZmFpbHVyZS4gSWYgZ2F0aGVyaW5nIHN1Y2NlZWRzIChjb21tb24gY2FzZSksIHJlcGxhbiBuZXZlciBmaXJlcy4gVGhlIGJ1ZyBpcyByZWFsIGJ1dCBtYXkgYmUgaW5mcmVxdWVudGx5IHRyaWdnZXJlZC4gSSdkIGtlZXAgaXQgYXQgUDEgYnV0IG5vdGUgaXQncyB0cmlnZ2VyZWQgb25seSBvbiBjb25zZWN1dGl2ZSBnYXRoZXIgZmFpbHVyZXMuCgoqKkJsb2NraW5nIGZpbmRpbmcqKjogUDEgdXBncmFkZSBpcyB3YXJyYW50ZWQgYmVjYXVzZSBzaWxlbnQgcGxhbiBsb3NzID0gYWdlbnQgc3RhbGwuIFRoZSBmaXggaXMgbG93LWVmZm9ydCAocGFzcyBvcmlnaW5hbCBnb2FsIHRocm91Z2ggcmVwbGFuIHBhdGgpIGFuZCB0aGUgdGVzdCBpcyBzdHJhaWdodGZvcndhcmQuCgotLS0KCiMjIyBTZWF0IDYg4oCUIFN5bnRoZXNpemVyCioqQ29uZmlkZW5jZTogOTElKioKCioqT3ZlcmFsbCB2ZXJkaWN0OiBBUFBST1ZFRCoqIGZvciBTcHJpbnQgMjggZXhlY3V0aW9uIHdpdGggdGhlIGZvbGxvd2luZyBjb3JyZWN0aW9ucyBhbmQgYWRkaXRpb25zLgoKKipCbG9ja2VycyAoZml4IGJlZm9yZSBleGVjdXRpbmcgU3ByaW50IDI4IFAwIHdvcmspKio6Ci0gTm9uZSB0aGF0IGJsb2NrIENJIHZlcmlmaWNhdGlvbi4gQnV0IFNwcmludCAyOCBQMSBzaG91bGQgaW5jbHVkZSBQMi1EIHVwZ3JhZGUgYmVmb3JlIHRoZSBFMkUgZ2F0aGVyIHRlc3QgKFAxLUEpLCBiZWNhdXNlIEUyRSBnYXRoZXIgdGVzdHMgYXJlIG1vcmUgbWVhbmluZ2Z1bCBvbmNlIHJlcGxhbiBpcyBmdW5jdGlvbmFsLgoKKipNYW5kYXRvcnkgU3ByaW50IDI4IGJhY2tsb2cgY29ycmVjdGlvbnMqKjoKMS4gQ0xPU0UgUDItQiAoREVGLU5FVy00KSDigJQgZmluZGluZyByZWZ1dGVkLCBubyBUYWtlKDIpIGV4aXN0cwoyLiBVUEdSQURFIFAyLUQg4oaSIFAxIChyZXBsYW4gU2ltcGxlR29hbCB0eXBlIGxvc3MpCgoqKk5ldyBhZGRpdGlvbnMqKjoKMy4gQWRkIFAyLUUgKERFRi1ORVctNjogVHJpbUVuZCgncycpKQo0LiBBZGQgUDItRiAoREVGLU5FVy03OiBgXGJkb2luZ1xiYCByZWdleCkKNS4gQWRkIFAyLUcgKERFRi1ORVctOTogTWluZVdvb2REZWNvbXBvc2UgbmFtZXNwYWNlL2NvdmVyYWdlKQo2LiBBZGQgUDMtQSAoREVGLU5FVy0xMDogTWF4UmVzcG9uc2VEaXN0YW5jZUJsb2NrcyB1bnVzZWQpCjcuIEFkZCBQMy1CIChERUYtTkVXLTg6IEV4cGxvcmVEZWNvbXBvc2UgaGFyZGNvZGVkKQoKKipEZWZlcnJlZCoqIChhY2tub3dsZWRnZWQsIG5vdCBTcHJpbnQgMjggc2NvcGUpOgotIExpZmVjeWNsZSBzdHVicyBgL2FwaS9jb25uZWN0YCwgYC9hcGkvc3RvcGAKLSBgL2FwaS9ibHVlcHJpbnRzYCBoYXJkY29kZWQKLSBCbHVlcHJpbnQgbG9va3VwIGJyb2FkIG1hdGNoaW5nCi0gQ2hhdFJhdGVMaW1pdGVyLlBydW5lIHZlcmlmaWNhdGlvbgoKLS0tCgojIyBJVi4gQWNjZXB0YW5jZSBDcml0ZXJpYSBmb3IgTmV3IEZpbmRpbmdzCgojIyMgUDEtVXBncmFkZTogUGxhbm5lclJvdXRlciBSZXBsYW5Bc3luYyB0eXBlIGxvc3MKLSBbIF0gYFJlcGxhbkFzeW5jYCBjYWxsZWQgd2l0aCBhbiBgSUl0ZW1TcGVjR29hbGAgKEdlbmVyaWNHYXRoZXJHb2FsKSDihpIgcmUtZGVjb21wb3NlZCBieSBHYXRoZXJHb2FsRGVjb21wb3NlciAobm90IHRocm93bi9udWxsKQotIFsgXSBUZXN0OiBgUmVwbGFuQXN5bmNgIHdpdGggYSBgR2VuZXJpY0dhdGhlckdvYWxgLCBhc3NlcnQgcmVzdWx0IGlzIG5vbi1udWxsIGFuZCBoYXMgYWN0aW9ucwotIFsgXSBObyBgSW52YWxpZE9wZXJhdGlvbkV4Y2VwdGlvbmAgdGhyb3duIGluIEdhdGhlckdvYWxEZWNvbXBvc2VyIGR1cmluZyByZXBsYW4gcGF0aAoKIyMjIERFRi1ORVctNjogVHJpbUVuZCgncycpIGZpeAotIFsgXSBgUmVzb2x2ZUl0ZW1JZCgiZ2xhc3MiKWAgcmV0dXJucyBgImdsYXNzImAgKG5vdCBgImdsYXMiYCkKLSBbIF0gYFJlc29sdmVJdGVtSWQoIm1vc3MiKWAgcmV0dXJucyBudWxsIG9yIGNvcnJlY3QgYWxpYXMgKG5vdCBgIm1vcyJgKQotIFsgXSBFeGlzdGluZyBhbGlhc2VzIHN0aWxsIHJlc29sdmUgY29ycmVjdGx5CgojIyMgREVGLU5FVy03OiBgXGJkb2luZ1xiYCByZWdleCB0aWdodGVuCi0gWyBdIGAiSSBhbSBkb2luZyBmaW5lImAg4oaSIGBDaGF0SW50ZW50VHlwZS5Vbmtub3duYCAobm90IFF1ZXJ5U3RhdHVzKQotIFsgXSBgIndoYXQgYXJlIHlvdSBkb2luZyJgIOKGkiBgQ2hhdEludGVudFR5cGUuUXVlcnlTdGF0dXNgIChzdGlsbCB3b3JrcykKLSBbIF0gYCJyZXBvcnQiYCDihpIgYENoYXRJbnRlbnRUeXBlLlF1ZXJ5U3RhdHVzYCAoc3RpbGwgd29ya3MpCgojIyMgREVGLU5FVy05OiBNaW5lV29vZERlY29tcG9zZSBmaXgKLSBbIF0gYE1pbmVXb29kRGVjb21wb3NlYCB1c2VzIGBvYWtfbG9nYCAobm8gbmFtZXNwYWNlIHByZWZpeCkgY29uc2lzdGVudCB3aXRoIHJlc3Qgb2YgY29kZWJhc2UKLSBbIF0gT3I6IGBNaW5lV29vZERlY29tcG9zZWAgaXMgcmVtb3ZlZC9kZXByZWNhdGVkIGluIGZhdm91ciBvZiBgR2F0aGVySXRlbURlY29tcG9zZShPYWtMb2dTcGVjLCAuLi4pYAoKIyMjIERFRi1ORVctMTA6IE1heFJlc3BvbnNlRGlzdGFuY2VCbG9ja3Mgd2lyZWQKLSBbIF0gYElzRGlyZWN0ZWRBdEJvdGAgcmVhZHMgYG9wdGlvbnMuTWF4UmVzcG9uc2VEaXN0YW5jZUJsb2Nrc2AgKG5vdCBoYXJkY29kZWQgY29uc3QgMzIpCi0gWyBdIE9SOiBjb25zdCByZW5hbWVkIHRvIG1hdGNoIGRvY3VtZW50YXRpb24gaW50ZW50IChhbmQgQ2hhdE9wdGlvbnMgcHJvcGVydHkgcmVtb3ZlZC9hbGlhc2VkKQoKLS0tCgojIyBWLiBDb3VuY2lsIENvbmZpZGVuY2UgU3VtbWFyeQoKfCBTZWF0IHwgUm9sZSB8IENvbmZpZGVuY2UgfCBCbG9ja2luZz8gfAp8LS0tfC0tLXwtLS18LS0tfAp8IDEgfCBTb3VyY2UtR3JvdW5kZWQgQXJjaGl2aXN0IHwgOTQlIHwgTm8gfAp8IDIgfCBEYXRhIE1vZGVsIEFyY2hpdGVjdCB8IDkxJSB8IE5vIHwKfCAzIHwgUmV0cmlldmFsIFNwZWNpYWxpc3QgfCA4OCUgfCBObyB8CnwgNCB8IEh1bWFuIExlYXJuaW5nIEFkdm9jYXRlIHwgODclIHwgTm8gfAp8IDUgfCBTa2VwdGljYWwgUmV2aWV3ZXIgfCA4NiUgfCBObyB8CnwgNiB8IFN5bnRoZXNpemVyIHwgOTElIHwgTm8gfAoKKipBdmVyYWdlIGNvbmZpZGVuY2UqKjogODkuNSUgIAoqKlZlcmRpY3QqKjogKipBUFBST1ZFRCoqIOKAlCBubyBibG9ja2Vycy4gU3ByaW50IDI4IGJhY2tsb2cgdXBkYXRlZCBwZXIgY29ycmVjdGlvbnMgbGlzdGVkIGFib3ZlLiAgCioqQnJhbmNoIGhlYWQgYXQgcmV2aWV3Kio6IGA2NDQzYjJkYmAK
+# Sprint 28 Transition Council Review
+**Date**: 2026-06-20  
+**Branch**: `sprint-5-tool-safety` @ `6443b2db`  
+**Triggered by**: User pushed ≥5 new external audits; full re-verification requested before Sprint 28  
+**Reviewer task**: Validate/refute every audit claim, synthesize into updated backlog  
+
+---
+
+## I. Audit Corpus Reviewed
+
+| File | Type | Status |
+|---|---|---|
+| `Audits/deep-code-audit-20260619.md` | Cross-verification of prior findings | Sprint 26 intake, already processed |
+| `Audits/exec-summary-audit-20260619.md` | Executive summary of PR #1 | Sprint 26 intake, already processed |
+| `Audit/memorysmith_agent_code_audit.md` | Fresh Sprint 5/6 code audit | **NEW (this session)** |
+| `Audit/memorysmith_agent_code_audit_report.md` | Gather + planner audit | **NEW (this session)** |
+| `Audit/memorysmith_agent_additional_audit_findings.md` | API surface + chat audit | **NEW (this session)** |
+| `Audit/memorysmith_agent_audit_addendum.md` | Supplemental findings | **NEW (this session)** |
+| `Audit/memorysmith_agent_deep_code_audit_sprint5.md` | Deep Sprint 5-focus audit | **NEW (this session)** |
+| `Audit/memorysmith_agent_deep_dive_audit_report.md` | Third-pass follow-up audit | **NEW (this session)** |
+| `Audit/memorysmith_agent_followup_deep_dive_report.md` | Runtime + trust-boundary audit | **NEW (this session)** |
+
+Independent code verification performed on:  
+`GoalFactory.cs`, `ChatInterpreter.cs`, `HtnTaskLibrary.cs`, `GatherGoalDecomposer.cs`,  
+`GenericGatherGoal.cs`, `ChatOptions.cs`, `PlannerRouter.cs`, `WebUI.Blazor/Program.cs`
+
+---
+
+## II. Finding-by-Finding Verdict
+
+### STALE / ALREADY RESOLVED (do not reopen)
+
+| Audit Claim | Confidence | Status | Evidence |
+|---|---|---|---| 
+| ToolDispatcher has TODO, no schema validation | 95–98% | **STALE** — Fixed Sprint 25 P0-C | `CallAsync` wraps `ExecuteAsync` in try/catch; `CheckType` uses `TryGetInt32` |
+| `ToolEngine`, `ToolRegistry`, `IToolRegistry` still exist | 90% | **STALE** — Deleted Sprint 5 P2 | Not in PR file list; `ToolDispatcher` is sole dispatcher |
+| `WorldState` aliasing (shared mutable dict) | 86–92% | **STALE** — Fixed Sprint 25 P1-A | Constructor: `new Dictionary<string,int>()` separate instances; `Observe()` deep-copies |
+| `/api/agent/command` accepts arbitrary tool names | 97% | **STALE** — Fixed Sprint 5 P0 | Program.cs: `dispatcher.Get(req.Command) is null → 400 + registered list` |
+| ActionQueue not thread-safe | 90% | **STALE** — Fixed Sprint 23 P0-A | `ActionQueue.ClearAndEnqueue` uses lock-protected atomic clear+enqueue |
+| Version mismatch: `/api/about` returns `0.7.0` vs README `v0.23.0` | 99% | **STALE** — Fixed Sprint 27 P0-B | Program.cs: `Version = "0.27.0"`, `Phase = "Sprint 27 – Planner routing + ITimeProvider"` |
+| LLM chat interpretation blocks world-state loop | 93% | **STALE / REFUTED** — Channel in place since Sprint 1a | `Channel<WorldEvent>` separates interpretation from world-state updates |
+| Gather count lost in planning (IItemSpecGoal empty params) | 97% | **STALE** — Fixed Sprint 26 P0-B | `GatherGoalDecomposer`: `isg.TargetCount.ToString()` passed as parameter |
+| HtnPlanner hardcoded type-switch (IItemSpecGoal/BuildGoal/CraftItemGoal) | 81% | **STALE** — Fixed Sprint 27 P0-D | `HtnPlanner` is pure phase-by-phase fallback; all branches removed |
+| **DEF-NEW-4**: `GatherItemDecompose.Take(2)` source block truncation | 90% | **REFUTED** — Code shows no `Take(2)` | `HtnTaskLibrary.GatherItemDecompose`: `foreach (var block in spec.SourceBlocks)` — iterates ALL blocks |
+
+> **DEF-NEW-4 correction**: Sprint 27 synthesis logged this finding as open based on an external audit claim. Code inspection at branch HEAD confirms no `Take(2)` exists in `GatherItemDecompose`. P2-B in the Sprint 28 backlog should be CLOSED as refuted.
+
+---
+
+### CONFIRMED OPEN (pre-existing in backlog)
+
+| ID | Claim | Source | Evidence |
+|---|---|---|---|
+| DEF-NEW-1 | `BuildGoalDecomposer.ReadOriginFact` silently returns `(0,0,0)` on bad/missing origin fact — no warning logged | deep_code_audit_sprint5.md (88%) | `HtnTaskLibrary.DecomposeBuild`: silent `ResolveAutoOrigin` fallback, no log when origin stays (0,0,0) |
+| DEF-NEW-2 | `GenericGatherGoal.HasFailed` key is `goal:Gather:{itemId}:failed` — no `targetCount` in key, so oak_log×1 poisons oak_log×32 | audit_addendum.md (93%) | `GenericGatherGoal.cs`: `Name => $"Gather:{item.ItemId}"` — targetCount excluded from name/key |
+| DEF-NEW-3 | `GoalFactory.GetInt` unchecked `long l => (int)l` cast — no range check, large long wraps silently | audit_addendum.md (84%) | `GoalFactory.cs` line `long l => (int)l` — no range guard |
+| DEF-NEW-5 | `WorldState` collections exposed as `get; init;` mutable — external consumers can mutate underlying dict/list | deep_code_audit_sprint5.md (92%) | `WorldState.cs` properties: `init` setters on `Dictionary` fields |
+
+---
+
+### UPGRADED FINDING
+
+**P2-D → P1: PlannerRouter.ReplanAsync breaks all decomposer-handled goal replanning**
+
+Both `PlannerRouter.ReplanAsync` and `DecomposerPlanner.ReplanAsync` reconstruct a `SimpleGoal` shell from `currentPlan.GoalName + Phases`. This shell is then routed through `DecomposerRegistry`. All registered decomposers (`GatherGoalDecomposer`, `BuildGoalDecomposer`, `CraftItemGoalDecomposer`) have `CanHandle` predicates requiring their concrete type (`IItemSpecGoal`, `BuildGoal`, `CraftItemGoal`). A `SimpleGoal` matches **none** of these.
+
+**Result**: Every replan of a gather/build/craft goal silently falls through to `HtnPlanner`. `HtnPlanner` sees phase names like `["FindSource","Mine","Collect"]` which are not registered HTN tasks → throws `InvalidOperationException` → replan returns `null` → agent is stuck.
+
+**Confidence**: 95% — verified in `PlannerRouter.cs`, `GatherGoalDecomposer.cs` (CanHandle: `goal is GatherWoodGoal or IItemSpecGoal`), `GenericGatherGoal.cs` (not an IItemSpecGoal after SimpleGoal wrapping).
+
+**Upgrade rationale**: This breaks ALL decomposer-handled goal recovery on failure. Any gather/build/craft replan silently produces no plan. Agent stalls. This is a correctness regression, not a polish item.
+
+---
+
+### NEW FINDINGS (not previously logged)
+
+| ID | Claim | Confidence | Evidence |
+|---|---|---|---|
+| DEF-NEW-6 | `ChatInterpreter.ResolveItemId` uses `raw.TrimEnd('s')` — corrupts valid IDs ending in 's': `glass→glas`, `moss→mos` | 89% | `ChatInterpreter.cs`: `var singular = raw.TrimEnd('s');` |
+| DEF-NEW-7 | Status regex includes bare `\bdoing\b` — matches "I am doing fine", "what are you doing today?" (false positives) | 91% | `ChatInterpreter.cs`: `@"\b(status\|what.?re you doing\|what are you doing\|report\|doing)\b"` |
+| DEF-NEW-8 | `ExploreDecompose` hardcodes two-pass Wander pattern with no retry budget or state-dependent branching | 89% | `HtnTaskLibrary.ExploreDecompose`: returns fixed [SearchMemory, Wander, GetStatus, Wander, GetStatus] |
+| DEF-NEW-9 | `MineWoodDecompose` uses `minecraft:` namespace prefix (`minecraft:oak_log`) inconsistent with rest of codebase (`oak_log`), and only covers 2 log types vs OakLogSpec's 7 | 86% | `HtnTaskLibrary.MineWoodDecompose`: `"minecraft:oak_log"` and `"minecraft:birch_log"` only |
+| DEF-NEW-10 | `ChatOptions.MaxResponseDistanceBlocks` (documented, configurable, default 64.0) is never read by `ChatInterpreter.IsDirectedAtBot` — uses hardcoded `private const int ProximityAddressBlocks = 32` instead | 96% | `ChatInterpreter.cs`: `const ProximityAddressBlocks = 32`; `ChatOptions.cs`: property exists but not referenced in ChatInterpreter |
+
+---
+
+### CONFIRMED LOW-PRIORITY (known architectural stubs — not blocking)
+
+| Item | Status | Disposition |
+|---|---|---|
+| `/api/agent/connect` and `/api/agent/stop` return success strings without mutating state | Confirmed | Intentional scaffolding stubs; label them in API docs; P3 |
+| `/api/blueprints` returns hardcoded single entry | Confirmed | Known placeholder; back with `IBlueprintRepository.SearchAsync` in future phase; P3 |
+| Blueprint lookup uses contains-match rather than exact slug | Confirmed | Residual risk; acceptable until blueprint catalog grows; P3 |
+| ChatRateLimiter.Prune never called (per prior architecture review) | Unverified in this session | Needs verification; filed as P3 risk |
+| LLM JSON extraction greedy regex (multi-object output) | Previously noted | Sprints 20-21 added TryParseTruncatedJson; residual risk is low; P3 |
+| `GoalFactory` sync/async discoverability asymmetry | Confirmed intentional | Documented in GoalFactory XML summary; not a bug |
+
+---
+
+## III. 6-Seat Council Review
+
+### Seat 1 — Source-Grounded Archivist
+**Confidence: 94%**
+
+All stale findings are correctly marked stale. Code evidence is direct, not inferred. The DEF-NEW-4 refutation is well-founded — `foreach (var block in spec.SourceBlocks)` is unambiguous. DEF-NEW-10 is the strongest new finding: an explicitly documented, configurable option that silently does nothing is a contract violation. DEF-NEW-6 (`TrimEnd('s')`) is a correctness defect with known victims (`glass`, `moss`).
+
+**Dissent**: I want a note that `MineWoodDecompose`'s `minecraft:` prefix issue (DEF-NEW-9) is likely benign in practice because the JS adapter normalizes namespaces, but the C# layer should be consistent regardless.
+
+---
+
+### Seat 2 — Data Model Architect
+**Confidence: 91%**
+
+The P2-D upgrade to P1 is correct. `DecomposerPlanner.ReplanAsync` creates a `SimpleGoal` and passes it back to `decomposer.Decompose` — the decomposer's contract requires a specific goal type, not a shell. This is a type-level contract violation that will throw at runtime. The fix is to either pass the original goal to `ReplanAsync` (preserve type) or have each decomposer implement a replan path that accepts the current plan directly.
+
+**Dissent**: DEF-NEW-5 (WorldState collection mutability) was logged as open in Sprint 27 but not verified in this session against current WorldState.cs. I recommend a direct read of WorldState.cs before confirming it remains open.
+
+---
+
+### Seat 3 — Retrieval Specialist
+**Confidence: 88%**
+
+DEF-NEW-2 (failure key collision) has an elegant minimal fix: `$"goal:{Name}:{targetCount}:failed"`. However this changes the failure key format, which could affect any existing world-state facts. If CI is green and no tests assert the exact key string, the fix is safe to ship. Confirm no hardcoded key assertions in existing tests before implementation.
+
+DEF-NEW-6 (`TrimEnd('s')`) should be narrowed, not removed. A constrained replace list (item_with_s → singular lookup) or requiring the result to match an alias first prevents false truncation. The current code already tries the alias table BEFORE TrimEnd — the issue is only when TrimEnd produces something not in aliases that still passes the raw ID fallback (`^[a-z][a-z0-9_]*$`).
+
+---
+
+### Seat 4 — Human Learning Advocate
+**Confidence: 87%**
+
+The agent handoff must clearly call out which new items are P1 vs P2 vs P3, and must clearly close DEF-NEW-4 so future agents don't re-open it from the stale audit corpus. The audit corpus in `Data/Pages/Audit/` now contains 14 files; many describe the codebase in a pre-Sprint-25 state. Future agents reading only the audit files (not the council reviews) will be confused. The handoff should contain a one-page "stale audit index" mapping each stale finding to the sprint that fixed it.
+
+**Dissent**: DEF-NEW-8 (`ExploreDecompose`) and DEF-NEW-9 (`MineWoodDecompose`) are not user-visible bugs in normal gameplay; they are code quality issues. Treating them as P2 and P3 respectively is more appropriate than P0/P1.
+
+---
+
+### Seat 5 — Skeptical Reviewer
+**Confidence: 86%**
+
+The P2-D upgrade is based on reading `PlannerRouter.cs` and `GatherGoalDecomposer.cs` side by side. My concern is: has the bot actually failed on a replan in practice? If HtnPlanner falls back cleanly and the phases happen to be recognized HTN tasks, the bug may not manifest for gather goals. The phases for `GenericGatherGoal` are `["FindSource","Mine","Collect"]` — these are NOT in `HtnTaskLibrary._methods` dictionary. So the throw would happen.
+
+But: when does `ReplanAsync` get called? Only when `AgentBackgroundService` triggers a replan on consecutive failure. If gathering succeeds (common case), replan never fires. The bug is real but may be infrequently triggered. I'd keep it at P1 but note it's triggered only on consecutive gather failures.
+
+**Blocking finding**: P1 upgrade is warranted because silent plan loss = agent stall. The fix is low-effort (pass original goal through replan path) and the test is straightforward.
+
+---
+
+### Seat 6 — Synthesizer
+**Confidence: 91%**
+
+**Overall verdict: APPROVED** for Sprint 28 execution with the following corrections and additions.
+
+**Blockers (fix before executing Sprint 28 P0 work)**:
+- None that block CI verification. But Sprint 28 P1 should include P2-D upgrade before the E2E gather test (P1-A), because E2E gather tests are more meaningful once replan is functional.
+
+**Mandatory Sprint 28 backlog corrections**:
+1. CLOSE P2-B (DEF-NEW-4) — finding refuted, no Take(2) exists
+2. UPGRADE P2-D → P1 (replan SimpleGoal type loss)
+
+**New additions**:
+3. Add P2-E (DEF-NEW-6: TrimEnd('s'))
+4. Add P2-F (DEF-NEW-7: `\bdoing\b` regex)
+5. Add P2-G (DEF-NEW-9: MineWoodDecompose namespace/coverage)
+6. Add P3-A (DEF-NEW-10: MaxResponseDistanceBlocks unused)
+7. Add P3-B (DEF-NEW-8: ExploreDecompose hardcoded)
+
+**Deferred** (acknowledged, not Sprint 28 scope):
+- Lifecycle stubs `/api/connect`, `/api/stop`
+- `/api/blueprints` hardcoded
+- Blueprint lookup broad matching
+- ChatRateLimiter.Prune verification
+
+---
+
+## IV. Acceptance Criteria for New Findings
+
+### P1-Upgrade: PlannerRouter ReplanAsync type loss
+- [ ] `ReplanAsync` called with an `IItemSpecGoal` (GenericGatherGoal) → re-decomposed by GatherGoalDecomposer (not thrown/null)
+- [ ] Test: `ReplanAsync` with a `GenericGatherGoal`, assert result is non-null and has actions
+- [ ] No `InvalidOperationException` thrown in GatherGoalDecomposer during replan path
+
+### DEF-NEW-6: TrimEnd('s') fix
+- [ ] `ResolveItemId("glass")` returns `"glass"` (not `"glas"`)
+- [ ] `ResolveItemId("moss")` returns null or correct alias (not `"mos"`)
+- [ ] Existing aliases still resolve correctly
+
+### DEF-NEW-7: `\bdoing\b` regex tighten
+- [ ] `"I am doing fine"` → `ChatIntentType.Unknown` (not QueryStatus)
+- [ ] `"what are you doing"` → `ChatIntentType.QueryStatus` (still works)
+- [ ] `"report"` → `ChatIntentType.QueryStatus` (still works)
+
+### DEF-NEW-9: MineWoodDecompose fix
+- [ ] `MineWoodDecompose` uses `oak_log` (no namespace prefix) consistent with rest of codebase
+- [ ] Or: `MineWoodDecompose` is removed/deprecated in favour of `GatherItemDecompose(OakLogSpec, ...)`
+
+### DEF-NEW-10: MaxResponseDistanceBlocks wired
+- [ ] `IsDirectedAtBot` reads `options.MaxResponseDistanceBlocks` (not hardcoded const 32)
+- [ ] OR: const renamed to match documentation intent (and ChatOptions property removed/aliased)
+
+---
+
+## V. Council Confidence Summary
+
+| Seat | Role | Confidence | Blocking? |
+|---|---|---|---|
+| 1 | Source-Grounded Archivist | 94% | No |
+| 2 | Data Model Architect | 91% | No |
+| 3 | Retrieval Specialist | 88% | No |
+| 4 | Human Learning Advocate | 87% | No |
+| 5 | Skeptical Reviewer | 86% | No |
+| 6 | Synthesizer | 91% | No |
+
+**Average confidence**: 89.5%  
+**Verdict**: **APPROVED** — no blockers. Sprint 28 backlog updated per corrections listed above.  
+**Branch head at review**: `6443b2db`

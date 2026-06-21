@@ -1,1 +1,82 @@
-IyBTcHJpbnQgMjcgQXVkaXQgU3ludGhlc2lzIOKAlCBFeHRlcm5hbCBBdWRpdCBJbnRha2UKCioqRGF0ZSoqOiAyMDI2LTA2LTE5ICAKKipCcmFuY2gqKjogYHNwcmludC01LXRvb2wtc2FmZXR5YCBAIDA4OTQyY2RiIChTcHJpbnQgMjcgUDAgaW1wbGVtZW50YXRpb24pICAKKipBdWRpdHMgcmV2aWV3ZWQqKjogMyBuZXcgZXh0ZXJuYWwgYXVkaXRzIGluIERhdGEvUGFnZXMvQXVkaXQvCgotLS0KCiMjIE5ldyBBdWRpdCBGaWxlcwoKIyMjIDEuIG1lbW9yeXNtaXRoX2FnZW50X2RlZXBfY29kZV9hdWRpdF9zcHJpbnQ1Lm1kICgxMywyNjUgYnl0ZXMpCgpEZWVwIGNvZGUgYXVkaXQgb2YgU3ByaW50IDXigJM2IGFyY2hpdGVjdHVyZSBzZWFtcy4gSW5kZXBlbmRlbnQgcmV2aWV3IHZpYSBQUiAjMSBicmFuY2guCgp8IEZpbmRpbmcgfCBTZXZlcml0eSB8IENvbmZpZGVuY2UgfCBTcHJpbnQgMjcgU3RhdHVzIHwKfC0tLXwtLS18LS0tfC0tLXwKfCBUb29sIHNhZmV0eSBUT0RPIHN0aWxsIHByZXNlbnQgKFRvb2xEaXNwYXRjaGVyIHNjaGVtYSB2YWxpZGF0aW9uKSB8IENSSVRJQ0FMIDk3JSB8IHdhcyBPUEVOIOKGkiAqKlJFU09MVkVEKiogKFNwcmludCAyNSBQMC1DKSB8CnwgV29ybGRTdGF0ZSBtdXRhYmxlIGNvbGxlY3Rpb24gZXhwb3N1cmUgfCBISUdIIDkyJSB8IHdhcyBPUEVOIOKGkiAqKlBBUlRJQUxMWSBSRVNPTFZFRCoqIChTcHJpbnQgMjUgUDEtQSBmaXhlZCBhbGlhc2luZzsgZ2V0O2luaXQ7IHN0aWxsIGV4cG9zZXMgbXV0YWJsZSBjb2xsZWN0aW9ucyDigJQgREVGLU5FVykgfAp8IFJlcGxhbm5pbmcgbG9zZXMgZmFpbHVyZSBjb250ZXh0IChEZWNvbXBvc2VyUGxhbm5lci5SZXBsYW5Bc3luYyBkcm9wcyBmYWlsdXJlUmVhc29uKSB8IEhJR0ggOTAlIHwgKipPUEVOKiog4oCUIGRlZmVycmVkIHwKfCBCdWlsZEdvYWxEZWNvbXBvc2VyLlJlYWRPcmlnaW5GYWN0IHNpbGVudCAoMCwwLDApIGZhbGxiYWNrIHwgSElHSCA4OCUgfCAqKk9QRU4qKiDigJQgdHJhY2tlZCBhcyBERUYtTkVXLTEgfAp8IEpvdXJuYWwgYXBwcm94aW1hdGVseSBib3VuZGVkIChiZXN0LWVmZm9ydCkgfCBNRURJVU0gODclIHwgKipERUxJQkVSQVRFKiog4oCUIGZvcm1hbGx5IGNsb3NlZCBpbiBQMS1CIHwKfCBHb2FsIGRlY29tcG9zZXIgcm91dGluZyBvcmRlci1kZXBlbmRlbnQgfCBNRURJVU0gODQlIHwgKipPUEVOKiog4oCUIGRlZmVycmVkIHRvIFNwcmludCAyOCB8CnwgQmx1ZXByaW50IGxvb2t1cCBicm9hZGVyIHRoYW4gZG9jdW1lbnRlZCB8IE1FRElVTSA4MSUgfCAqKk9QRU4qKiDigJQgZGVmZXJyZWQgfAoKIyMjIDIuIG1lbW9yeXNtaXRoX2FnZW50X2F1ZGl0X2FkZGVuZHVtLm1kICg2LDAzMCBieXRlcykKClN1cHBsZW1lbnRhbCBmaW5kaW5ncyBvbiBnYXRoZXIvZXhwbG9yZS9kZWNvbXBvc2VyIHBhdHRlcm5zLgoKfCBGaW5kaW5nIHwgU2V2ZXJpdHkgfCBDb25maWRlbmNlIHwgU3ByaW50IDI3IFN0YXR1cyB8CnwtLS18LS0tfC0tLXwtLS18CnwgR2VuZXJpY0dhdGhlckdvYWwgZmFpbHVyZSBrZXkgY29sbGlzaW9uIChubyB0YXJnZXRDb3VudCBpbiBrZXkpIHwgTUVESVVNLUhJR0ggOTMlIHwgKipPUEVOKiog4oCUIERFRi1ORVctMiB8CnwgRXhwbG9yZURlY29tcG9zZSBoYXJkY29kZWQgdHdvLXBhc3MgbG9vcCB8IE1FRElVTSA4OSUgfCAqKk9QRU4qKiDigJQgZGVmZXJyZWQgfAp8IEdhdGhlckl0ZW1EZWNvbXBvc2UgaGFyZGNvZGVkIHdhbmRlciByYWRpdXM9NDAgfCBNRURJVU0gOTAlIHwgKipPUEVOKiog4oCUIGRlZmVycmVkIHwKfCBNaW5lV29vZERlY29tcG9zZSBkdXBsaWNhdGVzIGdhdGhlciBwYXR0ZXJuIHwgTUVESVVNIDg2JSB8ICoqT1BFTioqIOKAlCBkZWZlcnJlZCB8CnwgR29hbEZhY3RvcnkuR2V0SW50IHNpbGVudGx5IHRydW5jYXRlcyBsb25n4oaSaW50IHwgTUVESVVNIDg0JSB8ICoqT1BFTioqIOKAlCBERUYtTkVXLTMgfAp8IEdvYWxGYWN0b3J5IHN5bmMvYXN5bmMgYXN5bW1ldHJ5IHwgTUVESVVNIDc2JSB8ICoqT1BFTioqIOKAlCBkZWZlcnJlZCB8CgojIyMgMy4gbWVtb3J5c21pdGhfYWdlbnRfY29kZV9hdWRpdF9yZXBvcnQubWQgKDEyLDIwNSBieXRlcykKCkNvZGUgYXVkaXQgZm9jdXNlZCBvbiBnYXRoZXIgY291bnQsIHNvdXJjZSBibG9jayBsaW1pdHMsIGFuZCBwbGFubmVyIHBvbGljeS4KCnwgRmluZGluZyB8IFNldmVyaXR5IHwgQ29uZmlkZW5jZSB8IFNwcmludCAyNyBTdGF0dXMgfAp8LS0tfC0tLXwtLS18LS0tfAp8IEdhdGhlciBjb3VudCBsb3N0IGluIHBsYW5uaW5nIChIdG5QbGFubmVyIHBhc3NlcyBlbXB0eSBwYXJhbXMpIHwgSElHSCA5NyUgfCAqKlJFU09MVkVEKiogKFNwcmludCAyNiBQMC1CIOKAlCBJSXRlbVNwZWNHb2FsLlRhcmdldENvdW50IERJTSkgfAp8IEdlbmVyaWMgZ2F0aGVyIG9ubHkgY29uc2lkZXJzIFRha2UoMikgc291cmNlIGJsb2NrcyB8IEhJR0ggOTAlIHwgKipPUEVOKiog4oCUIERFRi1ORVctNCB8CnwgSGFyZGNvZGVkIHBsYW5uZXIgbnVtYmVycyB2aW9sYXRlIHJlcG8gcG9saWN5IHwgTUVESVVNLUhJR0ggOTUlIHwgKipPUEVOKiog4oCUIGRlZmVycmVkIHwKfCBHZW5lcmljIGdhdGhlciB0b28gdmFuaWxsYS1iaWFzZWQgZm9yIG1vZCBzdXBwb3J0IHwgTUVESVVNLUhJR0ggODglIHwgKipBUkNISVRFQ1RVUkFMKiog4oCUIGxvbmctdGVybSB8CnwgUmVwbGFuIGRyb3BzIGNvbnRleHQsIHN3YWxsb3dzIGV4Y2VwdGlvbnMgfCBNRURJVU0gODQlIHwgKipQQVJUSUFMTFkgT1BFTioqIOKAlCBjb250ZXh0IHByZXNlcnZhdGlvbiBhZGRlZCBpbiBTcHJpbnQgNTsgUmVwbGFuQXN5bmMgc3RpbGwgc3dhbGxvd3MgfAp8IEdvYWxGYWN0b3J5IHN5bmMvYXN5bmMgYXN5bW1ldHJ5IHwgTUVESVVNIDcyJSB8ICoqT1BFTioqIOKAlCBkZWZlcnJlZCB8CgotLS0KCiMjIENyb3NzLUF1ZGl0IENvbnZlcmdlbmNlCgp8IFRoZW1lIHwgQXVkaXRzIHwgUHJpb3JpdHkgfAp8LS0tfC0tLXwtLS18CnwgUGxhbm5lciByb3V0aW5nIGNvbnNvbGlkYXRpb24gfCBBbGwgMyB8IOKchSBTcHJpbnQgMjcgUDAtRCAoREVMSVZFUkVEKSB8CnwgV29ybGRTdGF0ZSBtdXRhYmlsaXR5IHwgQTEsIEEzIHwgREVGLU5FVy01IChkZWZlcnJlZCkgfAp8IFRvb2wgc2FmZXR5IHNlYW0gfCBBMSwgQTMgfCDinIUgU3ByaW50IDI1IChSRVNPTFZFRCkgfAp8IEdhdGhlciBjb3VudCBjb3JyZWN0bmVzcyB8IEEyLCBBMyB8IOKchSBTcHJpbnQgMjYgKFJFU09MVkVEKSB8CnwgU2lsZW50IGZhbGxiYWNrcyAob3JpZ2luPTAsIGxvbmcgdHJ1bmNhdGlvbikgfCBBMSwgQTIgfCBUcmFja2VkIGFzIERFRi1ORVctMSwgREVGLU5FVy0zIHwKCi0tLQoKIyMgTmV3IERlZmVycmVkIEZpbmRpbmdzIChERUYtTkVXLSopCgp8IElEIHwgRmluZGluZyB8IFByaW9yaXR5IHwgVGFyZ2V0IHwKfC0tLXwtLS18LS0tfC0tLXwKfCBERUYtTkVXLTEgfCBCdWlsZEdvYWxEZWNvbXBvc2VyLlJlYWRPcmlnaW5GYWN0IHNpbGVudCAoMCwwLDApIOKAlCBsb2cgYSB3YXJuaW5nIG9uIGZhbGxiYWNrIHwgUDEgfCBTcHJpbnQgMjggfAp8IERFRi1ORVctMiB8IEdlbmVyaWNHYXRoZXJHb2FsIGZhaWx1cmUga2V5IGNvbGxpc2lvbiDigJQgaW5jbHVkZSB0YXJnZXRDb3VudCBpbiBrZXkgfCBQMSB8IFNwcmludCAyOCB8CnwgREVGLU5FVy0zIHwgR29hbEZhY3RvcnkuR2V0SW50IGxvbmfihpJpbnQgdHJ1bmNhdGlvbiDigJQgYWRkIHJhbmdlIGNoZWNrIHwgUDIgfCBTcHJpbnQgMjggfAp8IERFRi1ORVctNCB8IEdhdGhlckl0ZW1EZWNvbXBvc2UgVGFrZSgyKSBzb3VyY2UgYmxvY2sgbGltaXQgfCBQMiB8IFNwcmludCAyOCB8CnwgREVGLU5FVy01IHwgV29ybGRTdGF0ZSBnZXQ7aW5pdDsgc3RpbGwgYWxsb3dzIGRvd25zdHJlYW0gbXV0YXRpb24gb2YgY29sbGVjdGlvbnMgfCBQMiB8IFNwcmludCAyOCB8CgotLS0KCiMjIFNwcmludCAyNyBEZWxpdmVyZWQgKFAwIHNjb3BlKQoKLSAqKlAwLUEqKjogQWdlbnRCYWNrZ3JvdW5kU2VydmljZVRlc3RIZWxwZXIuQnVpbGRNaW5pbWFsIOKAlCBjbG9zZXMgQkxLLTEg4pyFCi0gKipQMC1CKio6IFZlcnNpb24gMC4yNy4wIHVuaWZpZWQgKFByb2dyYW0uY3MgKyBSRUFETUUpIOKAlCBjbG9zZXMgQkxLLTIg4pyFCi0gKipQMC1DKio6IElUaW1lUHJvdmlkZXIgKyBTeXN0ZW1UaW1lUHJvdmlkZXIgKyBGYWtlVGltZVByb3ZpZGVyOyAzMiBEYXRlVGltZU9mZnNldC5VdGNOb3cgY2FsbHMgcmVwbGFjZWQg4pyFCi0gKipQMC1EKio6IENyYWZ0SXRlbUdvYWxEZWNvbXBvc2VyIGNyZWF0ZWQ7IFBsYW5uZXJSb3V0ZXIgbm93IGltcGxlbWVudHMgSVBsYW5uZXI7IEh0blBsYW5uZXIgdHlwZS1zd2l0Y2ggYnJhbmNoZXMgcmVtb3ZlZDsgR2F0aGVyR29hbERlY29tcG9zZXIgcmVkdW5kYW50IGFybSByZW1vdmVkIOKchQo=
+# Sprint 27 Audit Synthesis — External Audit Intake
+
+**Date**: 2026-06-19  
+**Branch**: `sprint-5-tool-safety` @ 08942cdb (Sprint 27 P0 implementation)  
+**Audits reviewed**: 3 new external audits in Data/Pages/Audit/
+
+---
+
+## New Audit Files
+
+### 1. memorysmith_agent_deep_code_audit_sprint5.md (13,265 bytes)
+
+Deep code audit of Sprint 5–6 architecture seams. Independent review via PR #1 branch.
+
+| Finding | Severity | Confidence | Sprint 27 Status |
+|---|---|---|---|
+| Tool safety TODO still present (ToolDispatcher schema validation) | CRITICAL 97% | was OPEN → **RESOLVED** (Sprint 25 P0-C) |
+| WorldState mutable collection exposure | HIGH 92% | was OPEN → **PARTIALLY RESOLVED** (Sprint 25 P1-A fixed aliasing; get;init; still exposes mutable collections — DEF-NEW) |
+| Replanning loses failure context (DecomposerPlanner.ReplanAsync drops failureReason) | HIGH 90% | **OPEN** — deferred |
+| BuildGoalDecomposer.ReadOriginFact silent (0,0,0) fallback | HIGH 88% | **OPEN** — tracked as DEF-NEW-1 |
+| Journal approximately bounded (best-effort) | MEDIUM 87% | **DELIBERATE** — formally closed in P1-B |
+| Goal decomposer routing order-dependent | MEDIUM 84% | **OPEN** — deferred to Sprint 28 |
+| Blueprint lookup broader than documented | MEDIUM 81% | **OPEN** — deferred |
+
+### 2. memorysmith_agent_audit_addendum.md (6,030 bytes)
+
+Supplemental findings on gather/explore/decomposer patterns.
+
+| Finding | Severity | Confidence | Sprint 27 Status |
+|---|---|---|---|
+| GenericGatherGoal failure key collision (no targetCount in key) | MEDIUM-HIGH 93% | **OPEN** — DEF-NEW-2 |
+| ExploreDecompose hardcoded two-pass loop | MEDIUM 89% | **OPEN** — deferred |
+| GatherItemDecompose hardcoded wander radius=40 | MEDIUM 90% | **OPEN** — deferred |
+| MineWoodDecompose duplicates gather pattern | MEDIUM 86% | **OPEN** — deferred |
+| GoalFactory.GetInt silently truncates long→int | MEDIUM 84% | **OPEN** — DEF-NEW-3 |
+| GoalFactory sync/async asymmetry | MEDIUM 76% | **OPEN** — deferred |
+
+### 3. memorysmith_agent_code_audit_report.md (12,205 bytes)
+
+Code audit focused on gather count, source block limits, and planner policy.
+
+| Finding | Severity | Confidence | Sprint 27 Status |
+|---|---|---|---|
+| Gather count lost in planning (HtnPlanner passes empty params) | HIGH 97% | **RESOLVED** (Sprint 26 P0-B — IItemSpecGoal.TargetCount DIM) |
+| Generic gather only considers Take(2) source blocks | HIGH 90% | **OPEN** — DEF-NEW-4 |
+| Hardcoded planner numbers violate repo policy | MEDIUM-HIGH 95% | **OPEN** — deferred |
+| Generic gather too vanilla-biased for mod support | MEDIUM-HIGH 88% | **ARCHITECTURAL** — long-term |
+| Replan drops context, swallows exceptions | MEDIUM 84% | **PARTIALLY OPEN** — context preservation added in Sprint 5; ReplanAsync still swallows |
+| GoalFactory sync/async asymmetry | MEDIUM 72% | **OPEN** — deferred |
+
+---
+
+## Cross-Audit Convergence
+
+| Theme | Audits | Priority |
+|---|---|---|
+| Planner routing consolidation | All 3 | ✅ Sprint 27 P0-D (DELIVERED) |
+| WorldState mutability | A1, A3 | DEF-NEW-5 (deferred) |
+| Tool safety seam | A1, A3 | ✅ Sprint 25 (RESOLVED) |
+| Gather count correctness | A2, A3 | ✅ Sprint 26 (RESOLVED) |
+| Silent fallbacks (origin=0, long truncation) | A1, A2 | Tracked as DEF-NEW-1, DEF-NEW-3 |
+
+---
+
+## New Deferred Findings (DEF-NEW-*)
+
+| ID | Finding | Priority | Target |
+|---|---|---|---|
+| DEF-NEW-1 | BuildGoalDecomposer.ReadOriginFact silent (0,0,0) — log a warning on fallback | P1 | Sprint 28 |
+| DEF-NEW-2 | GenericGatherGoal failure key collision — include targetCount in key | P1 | Sprint 28 |
+| DEF-NEW-3 | GoalFactory.GetInt long→int truncation — add range check | P2 | Sprint 28 |
+| DEF-NEW-4 | GatherItemDecompose Take(2) source block limit | P2 | Sprint 28 |
+| DEF-NEW-5 | WorldState get;init; still allows downstream mutation of collections | P2 | Sprint 28 |
+
+---
+
+## Sprint 27 Delivered (P0 scope)
+
+- **P0-A**: AgentBackgroundServiceTestHelper.BuildMinimal — closes BLK-1 ✅
+- **P0-B**: Version 0.27.0 unified (Program.cs + README) — closes BLK-2 ✅
+- **P0-C**: ITimeProvider + SystemTimeProvider + FakeTimeProvider; 32 DateTimeOffset.UtcNow calls replaced ✅
+- **P0-D**: CraftItemGoalDecomposer created; PlannerRouter now implements IPlanner; HtnPlanner type-switch branches removed; GatherGoalDecomposer redundant arm removed ✅
