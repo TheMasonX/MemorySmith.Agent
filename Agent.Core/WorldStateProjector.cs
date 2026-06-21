@@ -12,6 +12,15 @@ namespace Agent.Core;
 /// debugging; it never writes <c>game.lastError</c>.
 ///
 /// Sprint 3a: Now uses pattern matching on typed event subtypes.
+/// Sprint 9:  FlatAreaFoundEvent also writes <see cref="BuildFactKeys.LastFlatArea"/>
+///            so planners can read the last scan result without accessing per-event keys.
+/// Sprint 14 P1b: ApplyStatus normalizes inventory keys by stripping the "minecraft:"
+///            namespace prefix so "minecraft:oak_log" and "oak_log" map to the same slot.
+/// Sprint 21 P0-A: ApplyStatus clears WorldState.IsInventoryStale so GenericGatherGoal
+///            knows inventory is fresh after a GetStatus response.
+/// Sprint 23 P0-A: DamageTakenEvent is a synthetic event computed by AgentBackgroundService
+///            from consecutive HealthEvent health-delta comparisons; the projector stores its
+///            facts under event:DamageTaken: for planner/diagnostics use.
 /// </summary>
 public sealed class WorldStateProjector
 {
@@ -23,13 +32,14 @@ public sealed class WorldStateProjector
     {
         SpawnEvent e => ApplySpawn(current, e),
         HealthEvent e => ApplyHealth(current, e),
+        DamageTakenEvent e => StoreFacts(current, e),  // Sprint 23: store facts only; health already updated via HealthEvent
         MoveEvent e => ApplyMove(current, e),
         BlockMinedEvent e => ApplyBlockMined(current, e),
         StatusEvent e => ApplyStatus(current, e),
         // All other events (Chat, Error, BlockNotFound, CraftComplete, SmeltComplete,
-        // Death, BlockPlaced, WanderComplete, WanderFailed, Kicked):
+        // Death, BlockPlaced, WanderComplete, WanderFailed, Kicked, FlatAreaFound):
         // no structured state change; store raw facts for debugging only.
-        _ => StoreFacts(current, ev),
+        _ => StoreFacts(current, ev, SourceFor(ev)),
     };
 
     // ── Private helpers ───────────────────────────────────────────────────────
@@ -55,7 +65,10 @@ public sealed class WorldStateProjector
     private static WorldState ApplyBlockMined(WorldState current, BlockMinedEvent e)
     {
         var itemKey = e.Block.Contains(':') ? e.Block.Split(':')[1] : e.Block;
-        var result = current.With(b => b.AddInventoryItem(itemKey, 1));
+        // Sprint 15 P0: use e.Count (actual blocks mined) instead of hardcoded 1.
+        // Mineflayer can report multiple blocks mined in a single event; hardcoding 1
+        // caused inventory under-counting and gather goals that never completed.
+        var result = current.With(b => b.AddInventoryItem(itemKey, e.Count));
         return StoreFacts(result, e);
     }
 
@@ -66,9 +79,41 @@ public sealed class WorldStateProjector
             b.SetPosition(e.Pos);
             b.SetHealth(e.Health);
             b.SetFood(e.Food);
-            b.SetInventory(e.Inventory);
+            b.SetInventory(NormalizeInventory(e.Inventory));
+            // Sprint 21 P0-A: a GetStatus response confirms the current server-side inventory.
+            // Clearing the stale flag allows GenericGatherGoal.IsComplete to proceed normally.
+            b.SetInventoryStale(false);
         });
         return StoreFacts(result, e);
+    }
+
+    /// <summary>
+    /// Strips the Minecraft namespace prefix (e.g. "minecraft:") from inventory item keys
+    /// so that "minecraft:oak_log" and "oak_log" map to the same inventory slot.
+    ///
+    /// Sprint 14 P1b: Mineflayer's status event may return fully-qualified item IDs.
+    /// Without normalization, IsComplete checks in GenericGatherGoal and CraftItemGoal
+    /// would fail silently because the inventory key never matched the bare item ID.
+    /// </summary>
+    private static IReadOnlyDictionary<string, int> NormalizeInventory(
+        IReadOnlyDictionary<string, int> raw)
+    {
+        // Fast path: no namespaced keys → return original dictionary unchanged.
+        bool needsWork = false;
+        foreach (var key in raw.Keys)
+        {
+            if (key.Contains(':')) { needsWork = true; break; }
+        }
+        if (!needsWork) return raw;
+
+        var result = new Dictionary<string, int>(raw.Count, StringComparer.OrdinalIgnoreCase);
+        foreach (var (key, value) in raw)
+        {
+            var normalized = key.Contains(':') ? key.Split(':', 2)[1] : key;
+            result[normalized] = result.TryGetValue(normalized, out var existing)
+                ? existing + value : value;
+        }
+        return result;
     }
 
     /// <summary>
@@ -76,7 +121,8 @@ public sealed class WorldStateProjector
     /// (e.g. <c>event:Spawn:Health=20</c>). Fact keys use the event type name
     /// (without "Event" suffix) as the namespace.
     /// </summary>
-    private static WorldState StoreFacts(WorldState current, WorldEvent ev)
+    private static WorldState StoreFacts(WorldState current, WorldEvent ev,
+        FactSource source = FactSource.Observed)
     {
         var prefix = $"event:{GetEventKind(ev)}:";
         var result = current;
@@ -86,123 +132,143 @@ public sealed class WorldStateProjector
             case SpawnEvent e:
                 result = result.With(b =>
                 {
-                    b.SetFact($"{prefix}Pos", e.Pos);
-                    b.SetFact($"{prefix}Health", e.Health);
-                    b.SetFact($"{prefix}Food", e.Food);
+                    b.SetFact($"{prefix}Pos", e.Pos.ToString(), source);
+                    b.SetFact($"{prefix}Health", e.Health.ToString(), source);
+                    b.SetFact($"{prefix}Food", e.Food.ToString(), source);
                 });
                 break;
             case HealthEvent e:
                 result = result.With(b =>
                 {
-                    b.SetFact($"{prefix}Health", e.Health);
-                    b.SetFact($"{prefix}Food", e.Food);
+                    b.SetFact($"{prefix}Health", e.Health.ToString(), source);
+                    b.SetFact($"{prefix}Food", e.Food.ToString(), source);
+                });
+                break;
+            case DamageTakenEvent e:
+                // Sprint 23 P0-A: store damage facts for planner access and diagnostics.
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}PreviousHealth", e.PreviousHealth.ToString(), source);
+                    b.SetFact($"{prefix}Health", e.Health.ToString(), source);
+                    b.SetFact($"{prefix}Delta", e.Delta.ToString(), source);
+                    b.SetFact($"{prefix}Food", e.Food.ToString(), source);
                 });
                 break;
             case MoveEvent e:
-                result = result.With(b => b.SetFact($"{prefix}Pos", e.Pos));
+                result = result.With(b => b.SetFact($"{prefix}Pos", e.Pos.ToString(), source));
                 break;
             case BlockMinedEvent e:
                 result = result.With(b =>
                 {
-                    b.SetFact($"{prefix}Block", e.Block);
-                    b.SetFact($"{prefix}Count", e.Count);
-                    b.SetFact($"{prefix}Pos", e.Pos);
+                    b.SetFact($"{prefix}Block", e.Block, source);
+                    b.SetFact($"{prefix}Count", e.Count.ToString(), source);
+                    b.SetFact($"{prefix}Pos", e.Pos.ToString(), source);
                 });
                 break;
             case ChatEvent e:
                 result = result.With(b =>
                 {
-                    b.SetFact($"{prefix}Username", e.Username);
-                    b.SetFact($"{prefix}Message", e.Message);
-                    b.SetFact($"{prefix}OnlinePlayers", e.OnlinePlayers);
+                    b.SetFact($"{prefix}Username", e.Username, source);
+                    b.SetFact($"{prefix}Message", e.Message, source);
+                    b.SetFact($"{prefix}OnlinePlayers", e.OnlinePlayers.ToString(), source);
                     if (e.PlayerPos is { } pp)
-                        b.SetFact($"{prefix}PlayerPos", pp);
+                        b.SetFact($"{prefix}PlayerPos", pp.ToString(), source);
                 });
                 break;
             case ErrorEvent e:
                 result = result.With(b =>
                 {
-                    b.SetFact($"{prefix}Action", e.Action);
-                    b.SetFact($"{prefix}Message", e.Message);
+                    b.SetFact($"{prefix}Action", e.Action, source);
+                    b.SetFact($"{prefix}Message", e.Message, source);
                 });
                 break;
             case BlockNotFoundEvent e:
                 result = result.With(b =>
                 {
-                    b.SetFact($"{prefix}Block", e.Block);
-                    b.SetFact($"{prefix}MinedCount", e.MinedCount);
+                    b.SetFact($"{prefix}Block", e.Block, source);
+                    b.SetFact($"{prefix}MinedCount", e.MinedCount.ToString(), source);
                 });
                 break;
             case CraftCompleteEvent e:
                 result = result.With(b =>
                 {
-                    b.SetFact($"{prefix}Item", e.Item);
-                    b.SetFact($"{prefix}Count", e.Count);
+                    b.SetFact($"{prefix}Item", e.Item, source);
+                    b.SetFact($"{prefix}Count", e.Count.ToString(), source);
                 });
                 break;
             case SmeltCompleteEvent e:
                 result = result.With(b =>
                 {
-                    b.SetFact($"{prefix}Input", e.Input);
-                    b.SetFact($"{prefix}Result", e.Result);
-                    b.SetFact($"{prefix}Count", e.Count);
+                    b.SetFact($"{prefix}Input", e.Input, source);
+                    b.SetFact($"{prefix}Result", e.Result, source);
+                    b.SetFact($"{prefix}Count", e.Count.ToString(), source);
                 });
                 break;
             case DeathEvent e:
-                result = result.With(b => b.SetFact($"{prefix}Pos", e.Pos));
+                result = result.With(b => b.SetFact($"{prefix}Pos", e.Pos.ToString(), source));
                 break;
             case StatusEvent e:
                 result = result.With(b =>
                 {
-                    b.SetFact($"{prefix}Pos", e.Pos);
-                    b.SetFact($"{prefix}Health", e.Health);
-                    b.SetFact($"{prefix}Food", e.Food);
+                    b.SetFact($"{prefix}Pos", e.Pos.ToString(), source);
+                    b.SetFact($"{prefix}Health", e.Health.ToString(), source);
+                    b.SetFact($"{prefix}Food", e.Food.ToString(), source);
                 });
                 break;
             case BlockPlacedEvent e:
                 result = result.With(b =>
                 {
-                    b.SetFact($"{prefix}X", e.X);
-                    b.SetFact($"{prefix}Y", e.Y);
-                    b.SetFact($"{prefix}Z", e.Z);
-                    b.SetFact($"{prefix}Block", e.Block);
+                    b.SetFact($"{prefix}X", e.X.ToString(), source);
+                    b.SetFact($"{prefix}Y", e.Y.ToString(), source);
+                    b.SetFact($"{prefix}Z", e.Z.ToString(), source);
+                    b.SetFact($"{prefix}Block", e.Block, source);
                 });
                 break;
             case WanderCompleteEvent e:
                 result = result.With(b =>
                 {
-                    b.SetFact($"{prefix}Pos", e.Pos);
-                    b.SetFact($"{prefix}TargetX", e.TargetX);
-                    b.SetFact($"{prefix}TargetZ", e.TargetZ);
+                    b.SetFact($"{prefix}Pos", e.Pos.ToString(), source);
+                    b.SetFact($"{prefix}TargetX", e.TargetX.ToString(), source);
+                    b.SetFact($"{prefix}TargetZ", e.TargetZ.ToString(), source);
                 });
                 break;
             case WanderFailedEvent e:
                 result = result.With(b =>
                 {
-                    b.SetFact($"{prefix}Message", e.Message);
-                    b.SetFact($"{prefix}Pos", e.Pos);
+                    b.SetFact($"{prefix}Message", e.Message, source);
+                    b.SetFact($"{prefix}Pos", e.Pos.ToString(), source);
                 });
                 break;
             case KickedEvent e:
-                result = result.With(b => b.SetFact($"{prefix}Reason", e.Reason));
+                result = result.With(b => b.SetFact($"{prefix}Reason", e.Reason, source));
                 break;
             case FlatAreaFoundEvent e:
                 result = result.With(b =>
                 {
-                    b.SetFact($"{prefix}X", e.X);
-                    b.SetFact($"{prefix}Y", e.Y);
-                    b.SetFact($"{prefix}Z", e.Z);
-                    b.SetFact($"{prefix}Area", e.Area);
-                    b.SetFact($"{prefix}MinX", e.MinX);
-                    b.SetFact($"{prefix}MaxX", e.MaxX);
-                    b.SetFact($"{prefix}MinZ", e.MinZ);
-                    b.SetFact($"{prefix}MaxZ", e.MaxZ);
+                    b.SetFact($"{prefix}X", e.X.ToString(), source);
+                    b.SetFact($"{prefix}Y", e.Y.ToString(), source);
+                    b.SetFact($"{prefix}Z", e.Z.ToString(), source);
+                    b.SetFact($"{prefix}Area", e.Area.ToString(), source);
+                    b.SetFact($"{prefix}MinX", e.MinX.ToString(), source);
+                    b.SetFact($"{prefix}MaxX", e.MaxX.ToString(), source);
+                    b.SetFact($"{prefix}MinZ", e.MinZ.ToString(), source);
+                    b.SetFact($"{prefix}MaxZ", e.MaxZ.ToString(), source);
+                    // Sprint 9: cross-event summary key — lets planners read the last
+                    // flat-area scan result via BuildFactKeys without parsing per-event keys.
+                    b.SetFact(BuildFactKeys.LastFlatArea, e.Area.ToString(), source);
                 });
                 break;
         }
 
         return result;
     }
+
+    /// <summary>Determines the provenance for facts derived from an event.</summary>
+    private static FactSource SourceFor(WorldEvent ev) => ev switch
+    {
+        ErrorEvent => FactSource.Inferred,
+        _ => FactSource.Observed,
+    };
 
     /// <summary>Strips "Event" suffix from the type name for fact key namespaces.</summary>
     private static string GetEventKind(WorldEvent ev) => ev.GetType().Name switch

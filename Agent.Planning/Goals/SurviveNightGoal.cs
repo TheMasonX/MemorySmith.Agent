@@ -19,6 +19,9 @@ public sealed class SurviveNightGoal : IGoal
     public string Description => "Find shelter and survive until sunrise.";
     public string[] Phases => ["FindShelter", "LightArea", "WaitForSunrise"];
 
+    /// <inheritdoc/>
+    public string? FailureReason { get; set; }
+
     public bool IsComplete(WorldState state) =>
         IsDaytime(state) || IsInShelter(state);
 
@@ -31,6 +34,16 @@ public sealed class SurviveNightGoal : IGoal
         (ts.Equals("day", StringComparison.OrdinalIgnoreCase) ||
          ts.Equals("morning", StringComparison.OrdinalIgnoreCase));
 
-    private static bool IsInShelter(WorldState state) =>
-        state.Facts.TryGetValue("inShelter", out var s) && s is true;
+    private static bool IsInShelter(WorldState state)
+    {
+        if (!state.Facts.TryGetValue("inShelter", out var s))
+            return false;
+
+        return s switch
+        {
+            bool b => b,
+            string str when bool.TryParse(str, out var parsed) => parsed,
+            _ => false,
+        };
+    }
 }

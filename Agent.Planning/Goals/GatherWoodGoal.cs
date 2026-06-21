@@ -18,11 +18,21 @@ public sealed class GatherWoodGoal(int targetCount = 10) : IGoal
     public string Description => $"Gather at least {targetCount} wood logs from nearby trees.";
     public string[] Phases => ["FindTree", "MineWood", "Collect"];
 
+    /// <inheritdoc/>
+    public string? FailureReason { get; set; }
+
     public bool IsComplete(WorldState state) =>
         GetWoodCount(state) >= targetCount;
 
     public bool HasFailed(WorldState state) =>
-        state.Facts.TryGetValue("goal:GatherWood:failed", out var v) && v is true;
+        state.Facts.TryGetValue("goal:GatherWood:failed", out var v) && IsTruthy(v);
+
+    private static bool IsTruthy(object? value) => value switch
+    {
+        bool b => b,
+        string s when bool.TryParse(s, out var parsed) => parsed,
+        _ => false,
+    };
 
     public int TargetCount => targetCount;
 

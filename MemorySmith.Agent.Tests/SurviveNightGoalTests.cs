@@ -56,35 +56,35 @@ public class SurviveNightGoalTests
     [Test]
     public void IsComplete_TimeOfDay_Day_IsTrue()
     {
-        var state = new WorldState().With(b => b.SetFact("timeOfDay", "day"));
+        var state = new WorldState().With(b => b.SetFact("timeOfDay", "day", FactSource.Observed));
         Assert.That(_goal.IsComplete(state), Is.True);
     }
 
     [Test]
     public void IsComplete_TimeOfDay_Morning_IsTrue()
     {
-        var state = new WorldState().With(b => b.SetFact("timeOfDay", "morning"));
+        var state = new WorldState().With(b => b.SetFact("timeOfDay", "morning", FactSource.Observed));
         Assert.That(_goal.IsComplete(state), Is.True);
     }
 
     [Test]
     public void IsComplete_TimeOfDay_Night_IsFalse()
     {
-        var state = new WorldState().With(b => b.SetFact("timeOfDay", "night"));
+        var state = new WorldState().With(b => b.SetFact("timeOfDay", "night", FactSource.Observed));
         Assert.That(_goal.IsComplete(state), Is.False);
     }
 
     [Test]
     public void IsComplete_InShelter_IsTrue()
     {
-        var state = new WorldState().With(b => b.SetFact("inShelter", (object?)true));
+        var state = new WorldState().With(b => b.SetFact("inShelter", true.ToString(), FactSource.Observed));
         Assert.That(_goal.IsComplete(state), Is.True);
     }
 
     [Test]
     public void IsComplete_InShelter_False_IsFalse()
     {
-        var state = new WorldState().With(b => b.SetFact("inShelter", (object?)false));
+        var state = new WorldState().With(b => b.SetFact("inShelter", false.ToString(), FactSource.Observed));
         Assert.That(_goal.IsComplete(state), Is.False);
     }
 }

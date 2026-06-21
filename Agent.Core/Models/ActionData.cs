@@ -32,8 +32,5 @@ public record ToolResult(bool Success, string? Message = null, Dictionary<string
 /// </summary>
 public record SearchResult(string PageId, double Score, string? Snippet = null, string Kind = "page");
 
-/// <summary>An event pushed from the world adapter (e.g. health changed, block mined).</summary>
-public record WorldEvent(string EventType, Dictionary<string, object?> Payload, DateTimeOffset OccurredAt);
-
 /// <summary>High-level goal metadata returned by the LLM planner.</summary>
 public record GoalMeta(string Name, string Description, string[] Phases);

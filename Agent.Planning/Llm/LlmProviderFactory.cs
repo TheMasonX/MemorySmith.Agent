@@ -1,5 +1,7 @@
 namespace Agent.Planning.Llm;
 
+using Microsoft.Extensions.Logging;
+
 /// <summary>
 /// Creates the appropriate <see cref="ILlmProvider"/> from <see cref="ChatOptions"/>.
 ///
@@ -21,10 +23,11 @@ public static class LlmProviderFactory
 {
     /// <summary>Creates and returns the configured provider. Never returns null.</summary>
     /// <exception cref="NotSupportedException">Unknown provider slug in <paramref name="options"/>.</exception>
-    public static ILlmProvider Create(HttpClient http, ChatOptions options) =>
+    public static ILlmProvider Create(HttpClient http, ChatOptions options,
+        ILogger<OllamaProvider>? ollamaLogger = null) =>
         options.LlmProvider.ToLowerInvariant() switch
         {
-            "ollama"         => new OllamaProvider(http, options),
+            "ollama"         => new OllamaProvider(http, options, ollamaLogger),
             "openai"
             or "openrouter"
             or "deepseek"

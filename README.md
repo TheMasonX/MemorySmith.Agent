@@ -4,13 +4,13 @@
 
 A modular autonomous agent framework that treats Minecraft as a *world adapter* and uses the [MemorySmith](https://github.com/TheMasonX/MemorySmith) wiki as long-term memory.
 
-**v0.23.0** — Sprint 23 complete — 200+ tests, CI green
+**v0.28.0** — Sprint 33 complete — 276+ tests
 
 ---
 
 ## Features
 
-- **HTN Planner** — hierarchical task decomposition with pluggable `IGoalDecomposer` registry (Build, Gather, SurviveNight decomposers + PlannerRouter)
+- **HTN Planner** — hierarchical task decomposition with pluggable `IGoalDecomposer` registry (Build, Gather, Craft, SurviveNight decomposers + PlannerRouter as IPlanner)
 - **Dual Memory Gateway** — Agent KB (codebase) + World KB (world observations) as separate MemorySmith instances; tool routing is automatic
 - **In-game Chat Interpretation** — CraftRegex fast-path + LLM fallback (Ollama) with 10s timeout, rate limiting, and truncation recovery
 - **Replan Governor** — stall detection via plan-fingerprint + inventory-delta; ACTIVE/STALLED states; 60s auto-recovery
@@ -20,6 +20,7 @@ A modular autonomous agent framework that treats Minecraft as a *world adapter* 
 - **Serilog Logging** — structured JSON + human-readable text; ms precision; JS adapter file logger
 - **Tool Validation** — JSON Schema (type/required/properties) checked before every tool execution
 - **Inventory Freshness Gate** — `IsInventoryStale` prevents false goal completion after `/clear`
+- **ITimeProvider abstraction** — injectable time provider for deterministic testing of cooldowns and intervals
 
 ---
 
@@ -122,7 +123,7 @@ status
 dotnet test MemorySmith.Agent.slnx --configuration Release
 ```
 
-Expected: **200+ passed, 0 failed** (10 CUDA/ONNX skips are expected in non-GPU environments).
+Expected: **276+ passed, 0 failed** (10 CUDA/ONNX skips are expected in non-GPU environments).
 
 ---
 
@@ -159,7 +160,8 @@ This repo is self-documenting — `Data/Pages/` contains wiki pages served by th
 | Phase 1 — Core MVP | WebSocket bridge, movement tools, Blazor UI | ✅ Done |
 | Phase 2 — Memory + LLM | MemorySmith gateway, Ollama, chat | ✅ Done |
 | Phase 3 — Planner | HTN/GOAP, predefined tasks, blueprints | ✅ Done |
-| Sprints 5–23 | Tool safety, journal, world model, logging, governors, damage interrupt, World KB | ✅ Done |
+| Sprints 5-27 | Tool safety, journal, world model, logging, governors, damage interrupt, World KB, planner routing, ITimeProvider | ✅ Done |
+| Sprints 28-33 | Action lifecycle, SEC-01/02 auth, base64 sweep, build restore, DI logger wiring, Program.cs restore | ✅ Done |
 | Phase 4 — Vision | Spatial analysis, aesthetic critique | ⬜ Planned |
 | Phase 5 — Advanced | Multi-agent, vector search, CI/CD | ⬜ Planned |
 

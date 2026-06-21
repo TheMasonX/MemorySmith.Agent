@@ -19,31 +19,29 @@ namespace MemorySmith.Agent.Tests;
 public class AgentBackgroundServiceTests
 {
     private MockWorldAdapter _adapter = null!;
-    private ToolRegistry _registry = null!;
-    private ToolEngine _toolCaller = null!;
+    private ToolDispatcher _dispatcher = null!;
     private MockPlanner _planner = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _adapter   = new MockWorldAdapter();
-        _registry  = new ToolRegistry();
-        _toolCaller = new ToolEngine(_registry);
-        _planner   = new MockPlanner();
+        _adapter    = new MockWorldAdapter();
+        _dispatcher = new ToolDispatcher();
+        _planner    = new MockPlanner();
     }
 
     // -- Helpers -----------------------------------------------------------------------
 
     /// <summary>Creates a service with the default maxConsecutiveFailures (3).</summary>
     private WebUI.Blazor.AgentBackgroundService CreateService() =>
-        new(_adapter, _toolCaller, NullLogger<WebUI.Blazor.AgentBackgroundService>.Instance, _planner);
+        new(_adapter, _dispatcher, NullLogger<WebUI.Blazor.AgentBackgroundService>.Instance, _planner);
 
     /// <summary>
     /// Creates a service with a custom maxConsecutiveFailures for faster failure detection
     /// in tests that verify the error-channel path.
     /// </summary>
     private WebUI.Blazor.AgentBackgroundService CreateService(int maxConsecutiveFailures) =>
-        new(_adapter, _toolCaller, NullLogger<WebUI.Blazor.AgentBackgroundService>.Instance,
+        new(_adapter, _dispatcher, NullLogger<WebUI.Blazor.AgentBackgroundService>.Instance,
             _planner, maxConsecutiveFailures: maxConsecutiveFailures);
 
     // -- PlanAsync call verification ---------------------------------------------------
@@ -56,7 +54,7 @@ public class AgentBackgroundServiceTests
             "GatherWood", ["FindTree"],
             [new ActionData { Tool = "NoOp" }]);
 
-        _registry.Register(new NoOpTool("NoOp"));
+        _dispatcher.Register(new NoOpTool("NoOp"));
 
         var service = CreateService();
         service.SetGoal(new SimpleGoal("GatherWood", "", ["FindTree"], _ => false));
@@ -87,7 +85,7 @@ public class AgentBackgroundServiceTests
             "SurviveNight", ["FindShelter"],
             [new ActionData { Tool = "Ping" }]);
 
-        _registry.Register(new NoOpTool("Ping"));
+        _dispatcher.Register(new NoOpTool("Ping"));
 
         var service = CreateService();
         service.SetGoal(new SimpleGoal("SurviveNight", "", ["FindShelter"], _ => false));
@@ -114,7 +112,7 @@ public class AgentBackgroundServiceTests
         // Arrange: goal is already complete from the start
         _planner.PlanToReturn = new ActionPlan("ImmediateDone", [],
             [new ActionData { Tool = "NoOp" }]);
-        _registry.Register(new NoOpTool("NoOp"));
+        _dispatcher.Register(new NoOpTool("NoOp"));
 
         var service = CreateService();
         // Goal is immediately complete
@@ -134,7 +132,7 @@ public class AgentBackgroundServiceTests
     [Test]
     public async Task SetGoal_ClearsExistingQueue()
     {
-        _registry.Register(new NoOpTool("NoOp"));
+        _dispatcher.Register(new NoOpTool("NoOp"));
         var service = CreateService();
 
         // Enqueue an action first
@@ -161,7 +159,7 @@ public class AgentBackgroundServiceTests
     [Test]
     public async Task WorldAdapter_IsConnected_AfterServiceStart()
     {
-        _registry.Register(new NoOpTool("NoOp"));
+        _dispatcher.Register(new NoOpTool("NoOp"));
         var service = CreateService();
 
         using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));
@@ -182,7 +180,7 @@ public class AgentBackgroundServiceTests
     {
         _planner.PlanToReturn = new ActionPlan("Mine", [],
             [new ActionData { Tool = "NoOp" }]);
-        _registry.Register(new NoOpTool("NoOp"));
+        _dispatcher.Register(new NoOpTool("NoOp"));
 
         var service = CreateService(maxConsecutiveFailures: 1);
         service.SetGoal(new SimpleGoal("Mine", "", [], _ => false));
@@ -196,11 +194,7 @@ public class AgentBackgroundServiceTests
         Assert.That(_planner.PlanCalls, Has.Count.GreaterThan(0),
             "Planner must be called before injecting the error event.");
 
-        _adapter.PushEvent("blockNotFound", new()
-        {
-            ["block"] = "minecraft:oak_log",
-            ["mined"] = 0
-        });
+        _adapter.PushEvent(new BlockNotFoundEvent("minecraft:oak_log", 0, DateTimeOffset.UtcNow));
 
         var abandonDeadline = DateTime.UtcNow.AddSeconds(3);
         while (service.CurrentGoal is not null && DateTime.UtcNow < abandonDeadline)
@@ -219,7 +213,7 @@ public class AgentBackgroundServiceTests
     {
         _planner.PlanToReturn = new ActionPlan("Mine", [],
             [new ActionData { Tool = "NoOp" }]);
-        _registry.Register(new NoOpTool("NoOp"));
+        _dispatcher.Register(new NoOpTool("NoOp"));
 
         var service = CreateService(maxConsecutiveFailures: 1);
         service.SetGoal(new SimpleGoal("Mine", "", [], _ => false));
@@ -233,11 +227,7 @@ public class AgentBackgroundServiceTests
         Assert.That(_planner.PlanCalls, Has.Count.GreaterThan(0),
             "Planner must be called before injecting the error event.");
 
-        _adapter.PushEvent("error", new()
-        {
-            ["action"]  = "mine",
-            ["message"] = "path blocked"
-        });
+        _adapter.PushEvent(new ErrorEvent("mine", "path blocked", DateTimeOffset.UtcNow));
 
         var abandonDeadline = DateTime.UtcNow.AddSeconds(3);
         while (service.CurrentGoal is not null && DateTime.UtcNow < abandonDeadline)
@@ -256,7 +246,7 @@ public class AgentBackgroundServiceTests
     {
         _planner.PlanToReturn = new ActionPlan("Mine", [],
             [new ActionData { Tool = "NoOp" }]);
-        _registry.Register(new NoOpTool("NoOp"));
+        _dispatcher.Register(new NoOpTool("NoOp"));
 
         var service = CreateService(maxConsecutiveFailures: 1);
         service.SetGoal(new SimpleGoal("Mine", "", [], _ => false));
@@ -269,11 +259,7 @@ public class AgentBackgroundServiceTests
             await Task.Delay(10);
         Assert.That(_planner.PlanCalls, Has.Count.GreaterThan(0));
 
-        _adapter.PushEvent("blockNotFound", new()
-        {
-            ["block"] = "minecraft:oak_log",
-            ["mined"] = 3
-        });
+        _adapter.PushEvent(new BlockNotFoundEvent("minecraft:oak_log", 3, DateTimeOffset.UtcNow));
 
         await Task.Delay(800);
 
@@ -301,7 +287,7 @@ public class AgentBackgroundServiceTests
         var slowInterp = new SlowChatInterpreter(TimeSpan.FromSeconds(6));
 
         var service = new WebUI.Blazor.AgentBackgroundService(
-            _adapter, _toolCaller,
+            _adapter, _dispatcher,
             NullLogger<WebUI.Blazor.AgentBackgroundService>.Instance,
             _planner,
             chatInterpreter: slowInterp,
@@ -311,19 +297,10 @@ public class AgentBackgroundServiceTests
         var serviceTask = service.StartAsync(cts.Token);
 
         // Push a chat event first — goes to _chatChannel; ChatConsumerAsync will await 6s
-        _adapter.PushEvent("chat", new Dictionary<string, object?>
-        {
-            ["username"]      = "Player1",
-            ["message"]       = "hello",
-            ["onlinePlayers"] = 1
-        });
+        _adapter.PushEvent(new ChatEvent("Player1", "hello", 1, null, DateTimeOffset.UtcNow));
 
         // Immediately push a blockMined event — should be processed within ~1s
-        _adapter.PushEvent("blockMined", new Dictionary<string, object?>
-        {
-            ["block"] = "oak_log",
-            ["count"] = 1
-        });
+        _adapter.PushEvent(new BlockMinedEvent("oak_log", 1, new Position(0, 64, 0), DateTimeOffset.UtcNow));
 
         // Assert: blockMined updates inventory within 2s (well within the 6s LLM window)
         var deadline = DateTime.UtcNow.AddSeconds(2);
@@ -354,10 +331,10 @@ public class AgentBackgroundServiceTests
 
         _planner.PlanToReturn = new ActionPlan("Mine", [],
             [new ActionData { Tool = "NoOp" }]);
-        _registry.Register(new NoOpTool("NoOp"));
+        _dispatcher.Register(new NoOpTool("NoOp"));
 
         var service = new WebUI.Blazor.AgentBackgroundService(
-            failingAdapter, _toolCaller,
+            failingAdapter, _dispatcher,
             NullLogger<WebUI.Blazor.AgentBackgroundService>.Instance,
             _planner,
             reconnectDelays: [TimeSpan.Zero, TimeSpan.Zero, TimeSpan.Zero]); // instant retries

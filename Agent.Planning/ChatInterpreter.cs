@@ -12,8 +12,13 @@ using System.Text.RegularExpressions;
 ///
 /// Directed-at-bot heuristics (any one sufficient):
 ///   - Solo play: <c>onlinePlayers &lt;= 1</c>
-///   - Bot named at start of message (case-insensitive)
+///   - Bot name appears as whole word in message (case-insensitive)
 ///   - Bot spoke within the conversation window (<see cref="ChatOptions.ConversationWindowSeconds"/>)
+///   - Player is within <see cref="ProximityAddressBlocks"/> blocks of the bot
+///
+/// Sprint 11: added CraftRegex — "craft/forge/smelt &lt;item&gt;" is now routed
+/// deterministically, never touching the LLM. Fixes the case where "craft an iron
+/// pickaxe" was forwarded to Ollama which could hang indefinitely.
 /// </summary>
 public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
 {
@@ -30,7 +35,7 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
             ? message[..options.MaxMessageLength]
             : message;
 
-        if (!IsDirectedAtBot(effective, botName, onlinePlayers))
+        if (!IsDirectedAtBot(effective, botName, onlinePlayers, botPosition, playerPosition))
             return Task.FromResult(new ChatInterpretation(ChatIntentType.NotAddressed));
 
         var stripped = StripBotName(effective.Trim(), botName);
@@ -39,7 +44,7 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
 
     public void RecordBotSpoke() => _lastBotSpoke = DateTimeOffset.UtcNow;
 
-    // ── Item / blueprint aliases ──────────────────────────────────────────────
+    // ── Item / blueprint / craft aliases ──────────────────────────────────────
 
     private static readonly Dictionary<string, string> ItemAliases =
         new(StringComparer.OrdinalIgnoreCase)
@@ -47,7 +52,9 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
         ["wood"]       = "oak_log",  ["log"]          = "oak_log",   ["logs"]      = "oak_log",
         ["oak"]        = "oak_log",  ["oak log"]       = "oak_log",  ["oak logs"]  = "oak_log",
         ["birch"]      = "birch_log", ["spruce"]       = "spruce_log",
-        ["cobble"]     = "cobblestone", ["cobblestone"] = "cobblestone", ["stone"]  = "cobblestone",
+        ["cobble"]     = "cobblestone", ["cobblestone"] = "cobblestone",
+        // Sprint 19: "stone" resolves to "stone" — GoalFactory maps yield (cobblestone)
+        ["stone"]      = "stone",
         ["iron"]       = "iron_ore", ["iron ore"]      = "iron_ore",
         ["gold"]       = "gold_ore", ["gold ore"]      = "gold_ore",
         ["coal"]       = "coal_ore", ["coal ore"]      = "coal_ore",
@@ -65,6 +72,60 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
         ["small-house"] = "small-house",
     };
 
+    /// <summary>
+    /// Multi-word craft item aliases. Single-word items are auto-converted to
+    /// underscore form by <see cref="ResolveCraftId"/> without an explicit entry.
+    /// </summary>
+    private static readonly Dictionary<string, string> CraftAliases =
+        new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Pickaxes
+        ["wooden pickaxe"]  = "wooden_pickaxe",  ["wood pickaxe"]    = "wooden_pickaxe",
+        ["stone pickaxe"]   = "stone_pickaxe",
+        ["iron pickaxe"]    = "iron_pickaxe",
+        ["golden pickaxe"]  = "golden_pickaxe",  ["gold pickaxe"]    = "golden_pickaxe",
+        ["diamond pickaxe"] = "diamond_pickaxe",
+        // Axes
+        ["wooden axe"]      = "wooden_axe",      ["wood axe"]        = "wooden_axe",
+        ["stone axe"]       = "stone_axe",
+        ["iron axe"]        = "iron_axe",
+        // Shovels
+        ["wooden shovel"]   = "wooden_shovel",   ["wood shovel"]     = "wooden_shovel",
+        ["stone shovel"]    = "stone_shovel",
+        ["iron shovel"]     = "iron_shovel",
+        // Swords
+        ["wooden sword"]    = "wooden_sword",    ["wood sword"]      = "wooden_sword",
+        ["stone sword"]     = "stone_sword",
+        ["iron sword"]      = "iron_sword",
+        // Armour
+        ["iron helmet"]     = "iron_helmet",
+        ["iron chestplate"] = "iron_chestplate",
+        ["iron leggings"]   = "iron_leggings",
+        ["iron boots"]      = "iron_boots",
+        // Blocks
+        ["crafting table"]  = "crafting_table",
+        ["oak planks"]      = "oak_planks",
+        ["oak slab"]        = "oak_slab",        ["oak slabs"]       = "oak_slab",
+        ["oak stairs"]      = "oak_stairs",
+        ["oak door"]        = "oak_door",        ["oak doors"]       = "oak_door",
+        ["oak fence"]       = "oak_fence",       ["oak fences"]      = "oak_fence",
+        ["oak fence gate"]  = "oak_fence_gate",
+        ["stone bricks"]    = "stone_bricks",
+        // Misc items
+        ["iron ingot"]      = "iron_ingot",      ["iron ingots"]     = "iron_ingot",
+        ["gold ingot"]      = "gold_ingot",      ["gold ingots"]     = "gold_ingot",
+        ["glass pane"]      = "glass_pane",      ["glass panes"]     = "glass_pane",
+        ["glass bottle"]    = "glass_bottle",
+        ["bookshelf"]       = "bookshelf",
+        ["chest"]           = "chest",
+        ["stick"]           = "stick",           ["sticks"]          = "stick",
+        ["torch"]           = "torch",           ["torches"]         = "torch",
+        ["bowl"]            = "bowl",
+        ["bucket"]          = "bucket",
+        ["compass"]         = "compass",
+        ["clock"]           = "clock",
+    };
+
     // ── Regexes ────────────────────────────────────────────────────────────────
 
     // Allow zero or more filler words (me, some, more, a, an, the, us) before count
@@ -80,14 +141,33 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
 
     // Allow zero or more filler words before the blueprint name. Using * instead of ?
     // handles "build me a shelter" → fillers consumed = ["me", "a"], blueprint = "shelter".
+    // Sprint 35: optional "at X Y Z" suffix so "build a house at 100 64 200" captures coords.
     private static readonly Regex BuildRegex = new(
         @"\b(build|construct|make)\b\s+" +
         @"(?:(?:me|us|a|the|an)\s+)*" +
-        @"(?<blueprint>[a-z_][a-z_\- ]{1,30})",
+        @"(?<blueprint>[a-z_][a-z_\- ]{1,30})" +
+        @"(?:\s+at\s+(?<x>-?\d+)\s+(?<y>-?\d+)\s+(?<z>-?\d+))?",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     private static readonly Regex GoToRegex = new(
         @"\bgo\s+to\s+(?<x>-?\d+)\s+(?<y>-?\d+)\s+(?<z>-?\d+)\b",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    /// <summary>
+    /// Sprint 11: deterministic routing for craft / forge / smelt commands.
+    /// "craft" and "forge" are not in <see cref="GatherRegex"/> or <see cref="BuildRegex"/>
+    /// so there is no ambiguity. "smelt" maps to the CraftItem goal; the HTN planner
+    /// routes it to the furnace via the smelting chain.
+    ///
+    /// Examples matched: "craft an iron pickaxe", "forge 2 iron swords",
+    /// "smelt iron ore", "craft me a crafting table".
+    /// </summary>
+    private static readonly Regex CraftRegex = new(
+        @"\b(craft|forge|smelt)\b\s+" +
+        @"(?:(?:me|us|a|an|the|some)\s+)*" +
+        @"(?:(?<count>\d+)\s+)?" +
+        @"(?:(?:me|us|a|an|the|some)\s+)*" +
+        @"(?<item>[a-z_][a-z_ ]{1,35})",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     // ── Intent parsing ─────────────────────────────────────────────────────────
@@ -99,7 +179,11 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
             return new ChatInterpretation(ChatIntentType.CancelGoal,
                 Response: "Ok, stopping.");
 
-        if (Regex.IsMatch(message, @"\b(status|what.?re you doing|what are you doing|report|doing)\b",
+        // Sprint 30 P1-E: removed bare \bdoing\b token — it matched any sentence
+        // containing "doing" (e.g. "what are you doing with that wood") as a status query.
+        // The compound patterns "what.?re you doing" and "what are you doing" already cover
+        // all legitimate status queries that contain "doing".
+        if (Regex.IsMatch(message, @"\b(status|what.?re you doing|what are you doing|report)\b",
             RegexOptions.IgnoreCase))
         {
             var goal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s
@@ -111,7 +195,7 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
         if (Regex.IsMatch(message, @"\b(help|commands|what can you do|usage)\b",
             RegexOptions.IgnoreCase))
             return new ChatInterpretation(ChatIntentType.QueryHelp,
-                Response: "Commands: 'get/mine <item> [n]', 'build <blueprint>', " +
+                Response: "Commands: 'get/mine <item> [n]', 'craft <item>', 'build <blueprint> [at X Y Z]', " +
                           "'go to X Y Z', 'come here', 'stop', 'status', 'help'");
 
         if (Regex.IsMatch(message, @"\b(come here|come to me|follow me|follow)\b",
@@ -137,9 +221,27 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
         {
             var bpId = ResolveBlueprintId(build.Groups["blueprint"].Value.Trim());
             if (bpId is not null)
+            {
+                // Sprint 35: optional "at X Y Z" coordinates
+                var hasCoords = build.Groups["x"].Success;
+                var pars = hasCoords
+                    ? new Dictionary<string, object?>
+                    {
+                        ["originX"] = int.Parse(build.Groups["x"].Value),
+                        ["originY"] = int.Parse(build.Groups["y"].Value),
+                        ["originZ"] = int.Parse(build.Groups["z"].Value),
+                    }
+                    : null;
+
+                var coordSuffix = hasCoords
+                    ? $" at ({build.Groups["x"]},{build.Groups["y"]},{build.Groups["z"]})"
+                    : "";
+
                 return new ChatInterpretation(ChatIntentType.CreateGoal,
                     GoalName: $"Build:{bpId}",
-                    Response: $"Starting to build {bpId.Replace('-', ' ')}.");
+                    GoalParameters: pars,
+                    Response: $"Starting to build {bpId.Replace('-', ' ')}{coordSuffix}.");
+            }
         }
 
         var gather = GatherRegex.Match(message);
@@ -156,19 +258,68 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
             }
         }
 
+        // Sprint 11: deterministic craft routing — never forward to LLM.
+        var craft = CraftRegex.Match(message);
+        if (craft.Success)
+        {
+            var craftId = ResolveCraftId(craft.Groups["item"].Value.Trim());
+            if (craftId is not null)
+            {
+                var count = int.TryParse(craft.Groups["count"].Value, out var c) ? c : 1;
+                return new ChatInterpretation(ChatIntentType.CreateGoal,
+                    GoalName: $"CraftItem:{craftId}",
+                    GoalParameters: new Dictionary<string, object?> { ["count"] = count },
+                    Response: $"Crafting {count}x {craftId.Replace('_', ' ')}.");
+            }
+        }
+
         return new ChatInterpretation(ChatIntentType.Unknown,
             Response: "Didn't catch that. Say 'help' for commands.");
     }
 
     // ── Heuristics ─────────────────────────────────────────────────────────────
 
-    private bool IsDirectedAtBot(string message, string botName, int onlinePlayers)
+    // Proximity in blocks within which all chat is treated as addressed at the bot.
+    private const int ProximityAddressBlocks = 32;
+
+    private bool IsDirectedAtBot(
+        string message, string botName, int onlinePlayers,
+        Position botPosition, Position? playerPosition)
     {
         if (onlinePlayers <= 1) return true;
-        if (message.StartsWith(botName, StringComparison.OrdinalIgnoreCase)) return true;
+        // Whole-word name match anywhere in message so that
+        // "hello Leo" and "Leo, come here" both address the bot correctly.
+        if (ContainsBotName(message, botName)) return true;
+        // Bot spoke recently — continue the conversation thread.
         var window = TimeSpan.FromSeconds(options.ConversationWindowSeconds);
         if (DateTimeOffset.UtcNow - _lastBotSpoke < window) return true;
+        // Player is within proximity range — treat as a local conversation.
+        if (playerPosition is not null)
+        {
+            var dx = botPosition.X - playerPosition.X;
+            var dy = botPosition.Y - playerPosition.Y;
+            var dz = botPosition.Z - playerPosition.Z;
+            var distSq = dx * dx + dy * dy + dz * dz;
+            if (distSq <= ProximityAddressBlocks * ProximityAddressBlocks) return true;
+        }
         return false;
+    }
+
+    // Cached per-instance — botName is fixed at startup; no need to recompile every call.
+    private Regex? _botNameRegex;
+
+    /// <summary>
+    /// Returns true when <paramref name="message"/> contains <paramref name="botName"/>
+    /// as a whole word (not part of a longer word or username). Case-insensitive.
+    /// Matches "hello Leo", "Leo come here", "Leo," but NOT "Leopold" or "Leo_bot".
+    /// Regex is compiled once per interpreter instance for performance.
+    /// </summary>
+    private bool ContainsBotName(string message, string botName)
+    {
+        _botNameRegex ??= new Regex(
+            $@"(?<![a-zA-Z0-9_]){Regex.Escape(botName)}(?![a-zA-Z0-9_])",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        return _botNameRegex.IsMatch(message);
     }
 
     private static string StripBotName(string message, string botName)
@@ -180,9 +331,10 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
 
     private static string? ResolveItemId(string raw)
     {
+        // Sprint 30 P1-D: constrained plural map — explicit entries in ItemAliases
+        // cover all known plurals (logs, diamonds, etc.). The former TrimEnd('s')
+        // heuristic was removed; it could strip valid letters (e.g. "grass" -> "gra").
         if (ItemAliases.TryGetValue(raw, out var id)) return id;
-        var singular = raw.TrimEnd('s');
-        if (ItemAliases.TryGetValue(singular, out id)) return id;
         var underscored = raw.Replace(' ', '_').ToLowerInvariant();
         if (ItemAliases.TryGetValue(underscored, out id)) return id;
         if (Regex.IsMatch(raw, @"^[a-z][a-z0-9_]*$")) return raw;
@@ -195,6 +347,21 @@ public sealed class ChatInterpreter(ChatOptions options) : IChatInterpreter
         var hyph = raw.Replace(' ', '-').ToLowerInvariant();
         if (BlueprintAliases.TryGetValue(hyph, out id)) return id;
         if (Regex.IsMatch(raw, @"^[a-z][a-z0-9\-]*$")) return raw;
+        return null;
+    }
+
+    /// <summary>
+    /// Resolves a raw craft item string to a Minecraft item ID.
+    /// Checks <see cref="CraftAliases"/> first (handles multi-word items like "iron pickaxe"),
+    /// then converts spaces to underscores and accepts any lowercase identifier.
+    /// </summary>
+    private static string? ResolveCraftId(string raw)
+    {
+        if (CraftAliases.TryGetValue(raw, out var id)) return id;
+        var underscored = raw.Replace(' ', '_').ToLowerInvariant();
+        if (CraftAliases.TryGetValue(underscored, out id)) return id;
+        // Accept any string that looks like a valid Minecraft item ID.
+        if (Regex.IsMatch(underscored, @"^[a-z][a-z0-9_]*$")) return underscored;
         return null;
     }
 }

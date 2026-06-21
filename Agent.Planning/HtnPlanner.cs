@@ -1,68 +1,77 @@
 namespace Agent.Planning;
 
-using Agent.Construction;
 using Agent.Core;
 using Agent.Planning.Goals;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 /// <summary>
 /// Hybrid HTN planner implementation.
 ///
-/// Strategy:
-///   1. If the goal name has a direct decomposition in the task library,
-///      use it (single-shot decomposition).
-///   2. If the goal implements <see cref="IItemSpecGoal"/> (e.g. <see cref="GenericGatherGoal"/>),
-///      delegate to <see cref="HtnTaskLibrary.DecomposeGatherItem"/> with the goal's
-///      <see cref="ItemSpec"/>. This avoids registering one library entry per item ID
-///      while still allowing the full ItemSpec to drive action generation.
-///   3. If the goal is a <see cref="BuildGoal"/>, delegate to
-///      <see cref="HtnTaskLibrary.DecomposeBuild"/> with the parsed block list and
-///      build origin from world-state facts.
-///   4. Otherwise, iterate through the goal's phases and decompose each phase
-///      that has a known task method. Unknown phases are skipped.
-///   5. If no actions result after all paths, throw — caller must fall back to
-///      LLM (Phase 4 path, not yet implemented).
+/// Sprint 27 P0-D: type-switch branches for <see cref="IItemSpecGoal"/>,
+/// <see cref="BuildGoal"/>, and <see cref="CraftItemGoal"/> have been removed.
+/// Those are now handled by registered <see cref="IGoalDecomposer"/> implementations
+/// (<see cref="GatherGoalDecomposer"/>, <see cref="BuildGoalDecomposer"/>,
+/// <see cref="CraftItemGoalDecomposer"/>) through the <see cref="PlannerRouter"/>
+/// which checks the <see cref="DecomposerRegistry"/> first.
 ///
-/// GOAP integration (Phase 4): when a phase fails at runtime, ReplanAsync will ask
-/// the GOAP engine for an alternative sequence. Currently it restarts from scratch.
+/// <see cref="HtnPlanner"/> is now a pure fallback that handles goals by:
+///   1. Direct task-library name match.
+///   2. Phase-by-phase decomposition.
+///   3. Throw if no actions result (caller falls back to LLM).
+///
+/// In production the agent loop uses <see cref="IPlanner"/> → <see cref="PlannerRouter"/>
+/// which routes typed goals to their decomposers before reaching <see cref="HtnPlanner"/>.
+/// <see cref="HtnPlanner"/> therefore only receives goals with no registered decomposer.
 /// </summary>
-public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
+public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logger = null) : IPlanner
 {
+    private readonly ILogger<HtnPlanner> _logger = logger ??
+        Microsoft.Extensions.Logging.Abstractions.NullLogger<HtnPlanner>.Instance;
+
+    // ── PlanAsync ─────────────────────────────────────────────────────────────
     public Task<IPlan> PlanAsync(
         IGoal goal, WorldState state, CancellationToken cancellationToken = default)
     {
         var actions = new List<ActionData>();
 
-        // 1. Direct task-library decomposition by goal name.
-        if (library.HasTask(goal.Name))
+        if (goal is BuildGoal buildGoal)
+        {
+            var originX = ReadOriginFact(state, buildGoal.Blueprint.Id, "x");
+            var originY = ReadOriginFact(state, buildGoal.Blueprint.Id, "y");
+            var originZ = ReadOriginFact(state, buildGoal.Blueprint.Id, "z");
+
+            actions.AddRange(library.DecomposeBuild(
+                buildGoal.Blueprint,
+                buildGoal.Blocks,
+                originX,
+                originY,
+                originZ,
+                state));
+        }
+        else if (goal is CraftItemGoal craftGoal)
+        {
+            actions.AddRange(library.DecomposeCraftItem(craftGoal.ItemId, craftGoal.Count, state));
+        }
+        else if (goal is IItemSpecGoal itemSpecGoal)
+        {
+            actions.AddRange(library.DecomposeGatherItem(
+                itemSpecGoal.Spec,
+                [itemSpecGoal.TargetCount.ToString()],
+                state));
+        }
+        else if (library.HasTask(goal.Name))
         {
             actions.AddRange(library.Decompose(goal.Name, [], state));
         }
-        // 2. IItemSpecGoal — ItemSpec-aware decomposition (e.g. GenericGatherGoal).
-        //    Goal name is "Gather:{itemId}" which is not a fixed library task;
-        //    delegate with the full ItemSpec instead.
-        else if (goal is IItemSpecGoal isg)
-        {
-            actions.AddRange(library.DecomposeGatherItem(isg.Spec, [], state));
-        }
-        // 3. BuildGoal — blueprint-aware decomposition.
-        //    Emits material-gather actions followed by PlaceBlock actions.
-        //    Build origin is read from world-state facts; defaults to (0,0,0).
-        else if (goal is BuildGoal bg)
-        {
-            var ox = ReadOriginFact(state, bg.Blueprint.Id, "x");
-            var oy = ReadOriginFact(state, bg.Blueprint.Id, "y");
-            var oz = ReadOriginFact(state, bg.Blueprint.Id, "z");
-            actions.AddRange(library.DecomposeBuild(bg.Blueprint, bg.Blocks, ox, oy, oz, state));
-        }
         else
         {
-            // 4. Phase-by-phase decomposition.
+            // 2. Phase-by-phase decomposition (pure HTN fallback).
+            // Typed goals now decompose directly above for compatibility with the
+            // older tests and direct callers that still invoke HtnPlanner directly.
             foreach (var phase in goal.Phases)
-            {
                 if (library.HasTask(phase))
                     actions.AddRange(library.Decompose(phase, [], state));
-                // Unknown phases skipped — triggers LLM fallback in Phase 4
-            }
         }
 
         if (actions.Count == 0)
@@ -74,12 +83,45 @@ public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
         return Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases.ToArray(), actions));
     }
 
+    private static readonly string[] PreservedContextPrefixes =
+        ["SearchMemory:", "CraftItem:", "FindFlatArea:", "Build:", "MoveTo:"];
+
+    private static int ReadOriginFact(WorldState state, string blueprintId, string axis)
+    {
+        var key = $"build:{blueprintId}:origin:{axis}";
+        if (!state.Facts.TryGetValue(key, out var v))
+            return 0;
+
+        return v switch
+        {
+            int i => i,
+            long l when l >= int.MinValue && l <= int.MaxValue => (int)l,
+            string s when int.TryParse(s, out var parsed) => parsed,
+            _ => 0,
+        };
+    }
+
+    // ── ReplanAsync ───────────────────────────────────────────────────────────
     public async Task<IPlan?> ReplanAsync(
         IPlan currentPlan, WorldState state, string failureReason,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default, IGoal? originalGoal = null)
     {
-        // Phase 3: simple full-restart replan from the original goal phases.
-        // Phase 4: GOAP will substitute alternative actions for the failed phase.
+        // Sprint 32 P2-2: thread failureReason to log so it is visible in telemetry.
+        // Two independent audits (Sprint 25 deep-code-audit + Sprint 32 refinement-audit)
+        // both flagged this parameter as accepted but unused. Adaptive replanning that
+        // acts on the reason (e.g. choose alternative decomposer) is future scope.
+        if (!string.IsNullOrWhiteSpace(failureReason))
+            _logger.LogInformation(
+                "ReplanAsync triggered for goal '{GoalName}' with reason: {FailureReason}",
+                currentPlan.GoalName, failureReason);
+
+        var preservedContext = new Dictionary<string, object?>();
+        foreach (var action in currentPlan.Actions)
+            foreach (var (key, value) in action.Context)
+                if (Array.Exists(PreservedContextPrefixes,
+                        prefix => key.StartsWith(prefix, StringComparison.Ordinal)))
+                    preservedContext.TryAdd(key, value);
+
         var goal = new SimpleGoal(
             currentPlan.GoalName, "",
             [.. currentPlan.Phases],
@@ -87,31 +129,18 @@ public sealed class HtnPlanner(HtnTaskLibrary library) : IPlanner
 
         try
         {
-            return await PlanAsync(goal, state, cancellationToken);
+            var newPlan = await PlanAsync(goal, state, cancellationToken);
+
+            if (preservedContext.Count > 0)
+                foreach (var newAction in (newPlan as ActionPlan)?.Actions ?? newPlan.Actions)
+                    foreach (var (key, value) in preservedContext)
+                        newAction.Context.TryAdd(key, value);
+
+            return newPlan;
         }
         catch
         {
-            // No decomposition available — caller falls back to idle or LLM (Phase 4)
             return null;
         }
-    }
-
-    /// <summary>
-    /// Reads an integer build origin coordinate from world-state facts.
-    /// Key format: "build:{blueprintId}:origin:{axis}".
-    /// Returns 0 if the fact is absent or unparseable.
-    /// </summary>
-    private static int ReadOriginFact(WorldState state, string blueprintId, string axis)
-    {
-        var key = $"build:{blueprintId}:origin:{axis}";
-        return state.Facts.TryGetValue(key, out var v)
-            ? v switch
-            {
-                int i                                          => i,
-                long l                                         => (int)l,
-                string s when int.TryParse(s, out var parsed) => parsed,
-                _                                              => 0,
-            }
-            : 0;
     }
 }

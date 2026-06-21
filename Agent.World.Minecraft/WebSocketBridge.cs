@@ -52,10 +52,27 @@ public sealed class WebSocketBridge(string uri) : IDisposable
 
     // ── Connect / Close ──────────────────────────────────────────────────────
 
-    public async Task ConnectAsync(CancellationToken cancellationToken = default)
+    public async Task ConnectAsync(CancellationToken cancellationToken = default,
+        string? adapterSecret = null)
     {
         _ws = new ClientWebSocket();
         await _ws.ConnectAsync(_uri, cancellationToken);
+
+        // Sprint 32 SEC-02: send handshake message so the Node.js server can validate
+        // the shared secret before accepting commands. The secret is never logged.
+        // When null or empty, no handshake is sent (dev/localhost mode).
+        if (!string.IsNullOrWhiteSpace(adapterSecret))
+        {
+            using var ms = new System.IO.MemoryStream();
+            using var writer = new Utf8JsonWriter(ms);
+            writer.WriteStartObject();
+            writer.WriteString("type", "handshake");
+            writer.WriteString("secret", adapterSecret);
+            writer.WriteEndObject();
+            await writer.FlushAsync(cancellationToken);
+            await _ws.SendAsync(ms.ToArray(), WebSocketMessageType.Text,
+                endOfMessage: true, cancellationToken);
+        }
 
         // Start background receive loop
         _receiveCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);

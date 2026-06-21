@@ -79,7 +79,7 @@ public sealed class BuildGoalTests
     {
         var goal  = new BuildGoal(MakeBlueprint("test-house"), NoBlocks);
         var state = new WorldState().With(b =>
-            b.SetFact("goal:Build:test-house:complete", true));
+            b.SetFact("goal:Build:test-house:complete", true.ToString(), FactSource.Observed));
         Assert.That(goal.IsComplete(state), Is.True);
     }
 
@@ -88,7 +88,7 @@ public sealed class BuildGoalTests
     {
         var goal  = new BuildGoal(MakeBlueprint("test-house"), NoBlocks);
         var state = new WorldState().With(b =>
-            b.SetFact("goal:Build:test-house:complete", false));
+            b.SetFact("goal:Build:test-house:complete", false.ToString(), FactSource.Observed));
         Assert.That(goal.IsComplete(state), Is.False);
     }
 
@@ -99,7 +99,7 @@ public sealed class BuildGoalTests
         var goalB = new BuildGoal(MakeBlueprint("house-b"), NoBlocks);
 
         var state = new WorldState().With(b =>
-            b.SetFact("goal:Build:house-a:complete", true));
+            b.SetFact("goal:Build:house-a:complete", true.ToString(), FactSource.Observed));
 
         Assert.That(goalA.IsComplete(state), Is.True,  "house-a should be complete");
         Assert.That(goalB.IsComplete(state), Is.False, "house-b should not be complete");
@@ -120,7 +120,7 @@ public sealed class BuildGoalTests
     {
         var goal  = new BuildGoal(MakeBlueprint("test-house"), NoBlocks);
         var state = new WorldState().With(b =>
-            b.SetFact("goal:Build:test-house:failed", true));
+            b.SetFact("goal:Build:test-house:failed", true.ToString(), FactSource.Observed));
         Assert.That(goal.HasFailed(state), Is.True);
     }
 

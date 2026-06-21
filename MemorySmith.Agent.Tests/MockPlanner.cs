@@ -29,7 +29,8 @@ public sealed class MockPlanner : IPlanner
     }
 
     public Task<IPlan?> ReplanAsync(IPlan currentPlan, WorldState state,
-        string failureReason, CancellationToken cancellationToken = default)
+        string failureReason, CancellationToken cancellationToken = default,
+        IGoal? originalGoal = null)
     {
         ReplanCalls.Add((currentPlan, state, failureReason));
         return Task.FromResult(ReplanToReturn);

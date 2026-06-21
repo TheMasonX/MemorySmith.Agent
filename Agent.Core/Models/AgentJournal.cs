@@ -1,0 +1,60 @@
+using System.Collections.Concurrent;
+using Agent.Core;
+
+namespace Agent.Core;
+
+/// <summary>
+/// Thread-safe, bounded append-only journal. Uses a ConcurrentQueue for lock-free writes
+/// and trims oldest entries when exceeding capacity.
+/// </summary>
+public sealed class AgentJournal : IAgentJournal
+{
+    /// <summary>Maximum journal entries before oldest are trimmed.</summary>
+    public const int MaxEntries = 1000;
+
+    private readonly ConcurrentQueue<JournalEntry> _entries = new();
+    private int _count;
+
+    /// <inheritdoc/>
+    public int Count => Volatile.Read(ref _count);
+
+    public IReadOnlyList<JournalEntry> All => [.. _entries.Reverse()];
+
+    public void Log(JournalEntry entry)
+    {
+        _entries.Enqueue(entry);
+
+        // Best-effort trim: dequeue one oldest entry when over capacity.
+        // The queue may transiently hold up to MaxEntries + (concurrent callers) entries,
+        // but never grows unboundedly and does not over-drain.
+        if (Interlocked.Increment(ref _count) > MaxEntries)
+        {
+            if (_entries.TryDequeue(out _))
+                Interlocked.Decrement(ref _count);
+        }
+    }
+
+    public IReadOnlyList<JournalEntry> Recent(int count) =>
+        _entries.Reverse().Take(count).ToList();
+
+    public IReadOnlyList<JournalEntry> Query(
+        JournalEntryType? type = null,
+        DateTimeOffset? from = null,
+        DateTimeOffset? to = null)
+    {
+        var query = _entries.AsEnumerable();
+        if (type.HasValue)
+            query = query.Where(e => e.Type == type.Value);
+        if (from.HasValue)
+            query = query.Where(e => e.Timestamp >= from.Value);
+        if (to.HasValue)
+            query = query.Where(e => e.Timestamp <= to.Value);
+        return query.Reverse().ToList();
+    }
+
+    public void Clear()
+    {
+        while (_entries.TryDequeue(out _)) { }
+        Interlocked.Exchange(ref _count, 0);
+    }
+}

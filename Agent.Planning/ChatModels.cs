@@ -33,4 +33,10 @@ public enum ChatIntentType
 
     /// <summary>Intent could not be parsed — bot asks a clarifying question.</summary>
     Unknown,
+
+    /// <summary>
+    /// Conversational message addressed to the bot (greetings, questions, small-talk).
+    /// No goal or navigation action — just send the LLM response to in-game chat.
+    /// </summary>
+    Chat,
 }

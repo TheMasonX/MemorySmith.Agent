@@ -29,7 +29,9 @@ public sealed class MinecraftAdapter(MinecraftAdapterConfig config) : IWorldAdap
             await StartNodeProcessAsync(cancellationToken);
 
         _bridge = new WebSocketBridge(config.WebSocketUrl);
-        await _bridge.ConnectAsync(cancellationToken);
+        // Sprint 32 SEC-02: pass AdapterSecret so the bridge sends the handshake.
+        // Secret is not logged by WebSocketBridge.ConnectAsync.
+        await _bridge.ConnectAsync(cancellationToken, config.AdapterSecret);
     }
 
     public async Task DisconnectAsync(CancellationToken cancellationToken = default)
@@ -37,10 +39,54 @@ public sealed class MinecraftAdapter(MinecraftAdapterConfig config) : IWorldAdap
         if (_bridge is not null)
             await _bridge.CloseAsync(cancellationToken);
 
-        if (_nodeProcess is { HasExited: false })
+        if (_nodeProcess is not { HasExited: false })
+            return;
+
+        // 1. Send SIGTERM for graceful shutdown.
+        //    .NET's Process.Kill() sends SIGKILL on Linux, so we use kill -TERM
+        //    to give the Node process a chance to flush state and exit cleanly.
+        try
         {
-            _nodeProcess.Kill(entireProcessTree: true);
-            await _nodeProcess.WaitForExitAsync(cancellationToken);
+            var pid = _nodeProcess.Id;
+            using var killProc = new Process
+            {
+                StartInfo = new ProcessStartInfo("kill", $"-TERM {pid}")
+                {
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                }
+            };
+            killProc.Start();
+            killProc.WaitForExit(1000);
+        }
+        catch
+        {
+            // Swallow — process may have already exited or kill may not be available.
+        }
+
+        // 2. Wait up to 5 seconds for the process to exit gracefully.
+        try
+        {
+            _nodeProcess.WaitForExit(5000);
+        }
+        catch (SystemException)
+        {
+            // Guard against WaitForExit throwing on an invalid handle.
+        }
+
+        // 3. If still alive after the grace period, force-kill the entire tree.
+        if (!_nodeProcess.HasExited)
+        {
+            try
+            {
+                _nodeProcess.Kill(entireProcessTree: true);
+                await _nodeProcess.WaitForExitAsync(cancellationToken);
+            }
+            catch (InvalidOperationException)
+            {
+                // Process already exited between the check and the kill.
+            }
         }
     }
 
@@ -74,6 +120,11 @@ public sealed class MinecraftAdapter(MinecraftAdapterConfig config) : IWorldAdap
         psi.EnvironmentVariables["MC_HOST"]       = config.ServerHost;
         psi.EnvironmentVariables["MC_PORT"]       = config.ServerPort.ToString();
         psi.EnvironmentVariables["MC_USERNAME"]   = config.BotUsername;
+        // Sprint 32 SEC-02 (BLK-S32-02): inject WS_TOKEN so the Node.js adapter validates
+        // the shared secret. Only inject when AdapterSecret is configured; when null/empty,
+        // leave WS_TOKEN unset so the adapter runs in open dev mode (WS_TOKEN = null in JS).
+        if (!string.IsNullOrEmpty(config.AdapterSecret))
+            psi.EnvironmentVariables["WS_TOKEN"] = config.AdapterSecret;
 
         _nodeProcess = Process.Start(psi)
             ?? throw new InvalidOperationException($"Failed to start Node process: {config.NodeScriptPath}");

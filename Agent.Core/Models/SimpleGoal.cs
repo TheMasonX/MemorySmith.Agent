@@ -16,6 +16,9 @@ public sealed class SimpleGoal(
     public string Description { get; } = description;
     public string[] Phases { get; } = phases;
 
+    /// <inheritdoc/>
+    public string? FailureReason { get; set; }
+
     public bool IsComplete(WorldState state) => isComplete(state);
     public bool HasFailed(WorldState state) => hasFailed?.Invoke(state) ?? false;
 }

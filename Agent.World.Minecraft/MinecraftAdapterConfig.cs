@@ -29,4 +29,15 @@ public sealed record MinecraftAdapterConfig
 
     /// <summary>Milliseconds to wait for the Node WebSocket server to start before giving up.</summary>
     public int NodeStartTimeoutMs { get; init; } = 10_000;
+
+    /// <summary>
+    /// Sprint 32 SEC-02: shared secret sent by the C# agent in the WebSocket handshake.
+    /// Configure via env var <c>Agent__Minecraft__AdapterSecret</c> or
+    /// appsettings section <c>Agent:Minecraft:AdapterSecret</c>.
+    ///
+    /// When null or empty, no secret is sent and the Node.js server must also have
+    /// <c>WS_TOKEN</c> unset for the connection to be accepted (dev/localhost mode).
+    /// Never commit a real secret value — always use environment variables.
+    /// </summary>
+    public string? AdapterSecret { get; init; } = null;
 }

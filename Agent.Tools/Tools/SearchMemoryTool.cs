@@ -4,49 +4,50 @@ using Agent.Core;
 using System.Text.Json;
 
 /// <summary>
-/// Searches MemorySmith (memories + pages) for content matching the query.
-/// Backed by IMemoryGateway — works with MockMemoryGateway in tests and
-/// RestMemoryGateway in production.
+/// Searches the world knowledge base for observations, notes, and other in-world context.
 /// </summary>
-public sealed class SearchMemoryTool(IMemoryGateway memory) : ITool
+public sealed class SearchMemoryTool : ITool
 {
+    private readonly IMemoryGateway _memory;
+
+    public SearchMemoryTool(IMemoryGateway memory) => _memory = memory;
+
     public string Name => "SearchMemory";
-    public string Description => "Full-text and semantic search across MemorySmith wiki pages and memories.";
-    public JsonElement InputSchema => JsonDocument.Parse(
-        "{\"type\":\"object\",\"properties\":{\"query\":{\"type\":\"string\",\"description\":\"Search query\"}},\"required\":[\"query\"]}"
-    ).RootElement;
 
-    public async Task<ToolResult> ExecuteAsync(JsonElement arguments, CancellationToken cancellationToken = default)
-    {
-        if (!arguments.TryGetProperty("query", out var qEl))
-            return new ToolResult(false, "SearchMemory requires a 'query' argument.");
+    public string Description => "Searches the world knowledge base for spatial observations, block data, biome notes, and in-world exploration history. Routes to the world KB instance (see WorldKbUrl in appsettings).";
 
-        var query = qEl.GetString() ?? "";
-        var results = await memory.SearchAsync(query, cancellationToken);
-
-        var summary = results.Count == 0
-            ? "No results found."
-            : string.Join(", ", results.Take(5).Select(r => $"{r.PageId}({r.Score:F2})"));
-
-        // Phase 4: write best page result into Data so AgentBackgroundService
-        // can carry it forward as plan context for subsequent actions.
-        var data = new Dictionary<string, object?>
+    public JsonElement InputSchema => JsonDocument.Parse("""
         {
-            ["results"] = results,
-        };
-        if (results.Count > 0)
-        {
-            // The best page result (kind=page) is the primary result for GetPageAsync calls.
-            var bestPage = results.FirstOrDefault(r =>
-                r.Kind.Equals("page", StringComparison.OrdinalIgnoreCase));
-            if (bestPage is not null)
-            {
-                data["bestPageId"]  = bestPage.PageId;
-                data["bestScore"]   = bestPage.Score;
-                data["bestSnippet"] = bestPage.Snippet;
-            }
+          "type": "object",
+          "properties": {
+            "query": { "type": "string", "description": "Search query for the world knowledge base" },
+            "limit": { "type": "integer", "description": "Maximum number of results to return (default 10)" }
+          },
+          "required": ["query"]
         }
+        """).RootElement;
 
-        return new ToolResult(true, $"Found {results.Count} result(s): {summary}", data);
+    public async Task<ToolResult> ExecuteAsync(JsonElement arguments, CancellationToken ct = default)
+    {
+        var query = arguments.TryGetProperty("query", out var q) ? q.GetString()
+                    : throw new ArgumentException("SearchMemory requires a 'query' parameter.");
+        var limit = arguments.TryGetProperty("limit", out var l) && l.TryGetInt32(out var parsedLimit)
+            ? Math.Max(1, parsedLimit)
+            : 10;
+
+        var results = await _memory.SearchAsync(query!, ct).ConfigureAwait(false);
+        var limitedResults = results.Take(limit).ToList();
+        var bestPageId = limitedResults.FirstOrDefault()?.PageId;
+
+        return new ToolResult(
+            true,
+            $"Found {limitedResults.Count} result(s).",
+            new Dictionary<string, object?>
+            {
+                ["query"] = query,
+                ["results"] = limitedResults,
+                ["bestPageId"] = bestPageId,
+                ["count"] = limitedResults.Count,
+            });
     }
 }

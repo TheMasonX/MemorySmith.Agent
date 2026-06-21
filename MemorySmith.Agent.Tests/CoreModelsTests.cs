@@ -25,7 +25,7 @@ public class CoreModelsTests
     public void WorldState_With_UpdatesFact()
     {
         var state = new WorldState();
-        var updated = state.With(b => b.SetFact("biome", "forest"));
+        var updated = state.With(b => b.SetFact("biome", "forest", FactSource.Observed));
         Assert.That(updated.Facts["biome"]?.ToString(), Is.EqualTo("forest"));
     }
 
@@ -62,23 +62,23 @@ public class CoreModelsTests
     }
 
     [Test]
-    public void ToolRegistry_RegisterAndGet_FindsTool()
+    public void ToolDispatcher_RegisterAndGet_FindsTool()
     {
-        var registry = new ToolRegistry();
+        var dispatcher = new ToolDispatcher();
         var tool = new StubTool("TestTool");
-        registry.Register(tool);
+        dispatcher.Register(tool);
 
-        Assert.That(registry.Get("TestTool"), Is.SameAs(tool));
-        Assert.That(registry.Get("nonexistent"), Is.Null);
+        Assert.That(dispatcher.Get("TestTool"), Is.SameAs(tool));
+        Assert.That(dispatcher.Get("nonexistent"), Is.Null);
     }
 
     [Test]
-    public void ToolRegistry_Get_IsCaseInsensitive()
+    public void ToolDispatcher_Get_IsCaseInsensitive()
     {
-        var registry = new ToolRegistry();
-        registry.Register(new StubTool("MoveTo"));
-        Assert.That(registry.Get("moveto"), Is.Not.Null);
-        Assert.That(registry.Get("MOVETO"), Is.Not.Null);
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new StubTool("MoveTo"));
+        Assert.That(dispatcher.Get("moveto"), Is.Not.Null);
+        Assert.That(dispatcher.Get("MOVETO"), Is.Not.Null);
     }
 }
 

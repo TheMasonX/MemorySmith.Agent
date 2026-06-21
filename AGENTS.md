@@ -88,6 +88,35 @@ json.dump(params, open('/tmp/params.json','w'))
 
 ---
 
+
+## Rule E-2: github__create_or_update_file — Pass Plain Text, Not Base64
+
+When writing C# or JS files via `paramsFile`, the `content` field MUST be plain UTF-8 text.
+
+**Background:** The GitHub REST API requires file content to be base64-encoded in the request body.
+The `github__create_or_update_file` MCP action handles this encoding automatically.
+
+**WRONG — causes double-encoding (the BLK-02 pattern):**
+```python
+import base64
+params = {
+    "content": base64.b64encode(file_text.encode()).decode()  # ← DO NOT DO THIS
+}
+```
+
+**CORRECT — pass plain text:**
+```python
+params = {
+    "content": file_text   # ← MCP handles GitHub API base64 transparently
+}
+```
+
+**Symptoms of double-encoding:**
+- File content in GitHub shows as a base64 string (starts with `Ly8g` for `// `, `bmFt` for `namespace`, etc.)
+- `dotnet build` fails with "unrecognized escape sequence" or parser errors on every line
+- Sprint 28/29/30/32 had this problem; Sprint 33 BLK-S33-01 (truncated Program.cs) was the result
+
+---
 ## C# Conventions
 
 - `*Options` classes must be `sealed record` so tests can use `with {}` expressions.

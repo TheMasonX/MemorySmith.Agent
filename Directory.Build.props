@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <!--
+      Treat all compiler warnings as errors.
+      Rationale: warnings indicate code quality issues that left unfixed accumulate
+      into bugs. Agents and contributors MUST fix all warnings before pushing.
+      If a warning cannot be fixed (e.g. a third-party SDK warning), suppress it
+      explicitly with #pragma warning disable <ID> and a comment explaining why.
+    -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>

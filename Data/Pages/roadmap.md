@@ -67,6 +67,16 @@ AgentHost, WebSocket bridge, basic movement tools, goal/action loop, Blazor stat
 
 ## Future Phases
 
+### Sprint 36 — Configurable Agent Responses (priority: upcoming)
+
+All hardcoded bot chat responses (thinking indicators, navigation replies, stop acknowledgements, task announcements, error messages) should be configurable via a wiki page with named options per response type. See `Data/Pages/Tasks/configurable-agent-responses.md`.
+
+| Priority | Item |
+|----------|------|
+| P0 | Define response type schema and wiki page format |
+| P1 | Wire chat interpreter to read response config |
+| P2 | REST API endpoint to query/update response config |
+
 ### Phase 4 — Vision & Aesthetics (confidence 0.60)
 
 ISpatialAnalyzer, IVisionModel, `TakeScreenshot` tool, aesthetic critique via Ollama/Gemma.

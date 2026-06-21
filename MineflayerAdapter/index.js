@@ -3,41 +3,142 @@
  * and a Minecraft server.
  *
  * Sprint 2a: craft case now pathfinds to the nearest crafting table before
- *   calling bot.craft() for recipes that require one. Search radius expanded
- *   from 4 to CRAFT_TABLE_SEARCH_RADIUS (8) blocks. Radius is also overridable
- *   per-call via args.tableSearchRadius so C# can pass a custom value.
+ *   calling bot.craft() for recipes that require one.
  *
  * Phase 5b additions:
- *   - chat event: includes playerX/Y/Z (bot.players[username].entity.position)
- *     so C# can compute bot-to-player distance for the "closest agent" heuristic.
+ *   - chat event: includes playerX/Y/Z.
+ *
+ * Sprint 9 (flat-area scanner):
+ *   - A1: vertical scan window widened.
+ *   - A2: compactness scoring added.
+ *   - A5: slope/roughness penalty.
+ *
+ * Sprint 18 (house-building MVP):
+ *   - toVec3(x,y,z): helper that creates a position object with .floored() so
+ *     bot.blockAt() doesn't crash. Mineflayer now calls pos.floored() internally;
+ *     plain {x,y,z} objects no longer work. All blockAt calls in findFlatArea updated.
+ *   - Emergency stop: handleStop() clears cmdQueue, stops pathfinder, sets _stopRequested.
+ *     The "stop" action bypasses the command queue and executes immediately in the ws
+ *     message handler — so "leo stop" now truly stops in-progress mining/pathfinding.
+ *   - Mine/wander/findFlatArea check _stopRequested at the start of each iteration.
+ *
+ * Sprint 25 (action correlation):
+ *   - correlationId: extracted from incoming action message and echoed in all result
+ *     events. Enables C#-side end-to-end action lifecycle tracking.
  */
 
 import mineflayer from 'mineflayer';
 import mflPathfinder from 'mineflayer-pathfinder';
 const { pathfinder, Movements, goals: pfGoals } = mflPathfinder;
 import { WebSocketServer } from 'ws';
+import { appendFileSync, mkdirSync, existsSync } from 'node:fs';
 
 // ── Environment / connection ──────────────────────────────────────────────────
 
 const WS_PORT  = parseInt(process.env.WS_PORT   ?? '3000',  10);
 const MC_HOST  = process.env.MC_HOST   ?? 'localhost';
 const MC_PORT  = parseInt(process.env.MC_PORT   ?? '25565', 10);
-const MC_USER  = process.env.MC_USERNAME ?? 'AgentBot';
+const MC_USER  = process.env.MC_USERNAME ?? 'Leo';
 const MC_VER   = process.env.MC_VERSION;
 const WS_TOKEN = process.env.WS_TOKEN ?? null;
 
 // ── Tunable constants ─────────────────────────────────────────────────────────
-// All search radii, distances, and retry counts are named here.
-// Override per-call via args where supported.
 
-const MINE_SEARCH_RADIUS_NEAR    = 64;   // blocks — first findBlock pass
-const MINE_SEARCH_RADIUS_FAR     = 128;  // blocks — second findBlock pass
-const MAX_MINE_PATH_FAILURES     = 3;    // consecutive pathfinder failures before abort
-const CRAFT_TABLE_SEARCH_RADIUS  = 8;    // blocks — findBlock for crafting_table (Sprint 2a)
-const CRAFT_TABLE_REACH_DISTANCE = 2;    // blocks — GoalNear tolerance when pathfinding to table
-const FURNACE_SEARCH_RADIUS      = 16;   // blocks — findBlock for furnace
-const FURNACE_REACH_DISTANCE     = 2;    // blocks — GoalNear tolerance when pathfinding to furnace
-const SMELT_TIMEOUT_MS           = 40_000; // ms — max wait for smelting output
+const MINE_SEARCH_RADIUS_NEAR    = 64;
+const MINE_SEARCH_RADIUS_FAR     = 128;
+const MAX_MINE_PATH_FAILURES     = 3;
+const CRAFT_TABLE_SEARCH_RADIUS  = 8;
+const CRAFT_TABLE_REACH_DISTANCE = 2;
+const FURNACE_SEARCH_RADIUS      = 16;
+const FURNACE_REACH_DISTANCE     = 2;
+const SMELT_TIMEOUT_MS           = 40_000;
+
+// Sprint 9: flat-area scan defaults.
+// Sprint 19: increased default radius from 20 to 32 for better initial coverage.
+// C# planner sends radius=48 on retry after a zero-area result.
+const FLAT_AREA_SCAN_RADIUS      = 32;
+const FLAT_AREA_MIN_SIZE         = 25;
+const FLAT_AREA_Y_ABOVE          = 10;
+const FLAT_AREA_Y_BELOW          = 16;
+const FLAT_AREA_MAX_SLOPE        = 3;
+
+const FLAT_SCORE_WEIGHTS = Object.freeze({
+  area:        0.5,
+  compactness: 0.3,
+  flatness:    0.2,
+});
+
+const LIQUID_BLOCK_NAMES = new Set(['water', 'lava', 'flowing_water', 'flowing_lava']);
+
+// ── Sprint 19: Structured file logging ────────────────────────────────────────
+// Writes JSON lines to a daily rolling log file alongside the C# host's Serilog output.
+// Console stays concise (summary lines only); the file captures full structured context
+// for post-hoc diagnostics: block names, counts, coordinates, timing, args.
+
+const LOG_DIR = process.env.LOG_DIR ?? './logs';
+try { if (!existsSync(LOG_DIR)) mkdirSync(LOG_DIR, { recursive: true }); } catch { /* best-effort */ }
+
+/**
+ * Writes a structured JSON line to the daily adapter log file.
+ * @param {'debug'|'info'|'warn'|'error'} level
+ * @param {string} category - action category (mine, wander, findFlatArea, craft, smelt, dispatch)
+ * @param {string} message - human-readable summary
+ * @param {Object} [data] - structured context (merged into the JSON entry)
+ */
+function logStructured(level, category, message, data = {}) {
+  const entry = JSON.stringify({
+    t: new Date().toISOString(),
+    l: level,
+    c: category,
+    m: message,
+    ...data,
+  });
+  const dateStr = new Date().toISOString().split('T')[0];
+  try {
+    appendFileSync(`${LOG_DIR}/adapter-${dateStr}.log`, entry + '\\n');
+  } catch { /* best-effort — never crash the bot on log I/O failure */ }
+}
+
+// ── Sprint 18: Emergency stop state ───────────────────────────────────────────
+// Set by handleStop(), cleared at the start of each action case.
+// Checked inside long-running loops (mine while, findFlatArea column scan) to
+// allow the C# "stop" command to abort in-progress actions immediately.
+
+let _stopRequested = false;
+
+/**
+ * Immediately aborts the current operation:
+ *   1. Sets _stopRequested so in-progress loops exit on next iteration.
+ *   2. Clears cmdQueue so no more queued commands run.
+ *   3. Calls bot.pathfinder.setGoal(null) to cancel active pathfinding.
+ *
+ * Called directly from the WebSocket message handler (bypasses enqueueCommand)
+ * so it takes effect immediately without waiting for the queue to drain.
+ */
+function handleStop() {
+  console.log('[stop] emergency stop — clearing queue, stopping pathfinder');
+  _stopRequested = true;
+  cmdQueue.length = 0; // Drain pending commands
+  try { bot.pathfinder.setGoal(null); } catch { /* ignore — bot may not be connected */ }
+  sendEvent('stopComplete', {});
+  console.log('[stop] done');
+}
+
+// ── Sprint 18: Vec3 compatibility helper ──────────────────────────────────────
+// Mineflayer's bot.blockAt() and world.getBlock() call pos.floored() internally.
+// Plain {x,y,z} objects no longer work in current Mineflayer versions.
+// This helper creates a minimal Vec3-compatible object for integer coordinates.
+// .floored() is a no-op (values are already integers from Math.round/Math.floor).
+// .offset() returns another toVec3 so chained calls also work.
+
+function toVec3(x, y, z) {
+  const ix = Math.floor(x), iy = Math.floor(y), iz = Math.floor(z);
+  return {
+    x: ix, y: iy, z: iz,
+    floored() { return this; },
+    offset(dx, dy, dz) { return toVec3(ix + dx, iy + dy, iz + dz); },
+  };
+}
 
 // ── WebSocket server ─────────────────────────────────────────────────────────
 
@@ -77,17 +178,49 @@ async function drainQueue() {
 
 wss.on('listening', () => console.log(`[ws] listening on port ${WS_PORT}`));
 
+// Sprint 32 SEC-02: connection-level authentication state.
+// When WS_TOKEN is set, the first message from each connection must be a
+// handshake message: {"type":"handshake","secret":"<WS_TOKEN>"}.
+// Commands arriving before a successful handshake are rejected and the
+// connection is closed. When WS_TOKEN is null, all connections are trusted
+// (dev/localhost mode). The secret value is never logged.
+
 wss.on('connection', (ws) => {
   console.log('[ws] C# agent connected');
   agentSocket = ws;
+
+  // Track per-connection auth state. No secret configured → pre-authenticated.
+  let isAuthenticated = !WS_TOKEN;
 
   ws.on('message', (raw) => {
     let msg;
     try { msg = JSON.parse(raw.toString()); }
     catch (e) { console.error('[ws] bad JSON:', e.message); return; }
 
-    if (WS_TOKEN && msg.token !== WS_TOKEN) {
+    // Sprint 32 SEC-02: handle handshake message type first.
+    if (msg.type === 'handshake') {
+      if (WS_TOKEN && msg.secret !== WS_TOKEN) {
+        console.warn('[ws] handshake rejected: invalid secret');
+        ws.close(1008, 'Unauthorized');
+        return;
+      }
+      isAuthenticated = true;
+      console.log('[ws] handshake accepted');
+      return;
+    }
+
+    // Reject any command arriving before a successful handshake.
+    if (!isAuthenticated) {
+      console.warn('[ws] command rejected: not authenticated (missing handshake)');
       ws.close(1008, 'Unauthorized');
+      return;
+    }
+
+    // Sprint 18: emergency stop bypasses the command queue — execute immediately.
+    // This ensures "leo stop" actually stops in-progress mining/pathfinding
+    // rather than being queued behind the current action.
+    if (msg.action === 'stop' || msg.action === 'StopNow' || msg.action === 'EmergencyStop') {
+      handleStop();
       return;
     }
 
@@ -150,8 +283,57 @@ bot.on('death',  () => { console.warn('[mc] bot died'); sendEvent('death', botPo
 bot.on('kicked', (reason) => { console.warn('[mc] kicked:', reason); sendEvent('kicked', { reason }); });
 bot.on('error',  (e)      => { console.error('[mc] error:', e.message); sendEvent('error', { message: e.message }); });
 
+// ── Sprint 19: System message filtering ───────────────────────────────────────
+// Server-generated messages (teleport confirmations, join/leave, time set, etc.)
+// must never reach the LLM chat pipeline. In solo play, all messages pass the
+// IsDirectedAtBot heuristic, so a teleport like "Teleported TheMasonX23 to Leo"
+// triggers a 15-second Ollama call that returns null. Filter them at the source.
+
+const SYSTEM_MESSAGE_PATTERNS = [
+  /^Teleported\s+\S+\s+to\s+\S+/i,      // Teleport confirmations
+  /^\S+\s+joined\s+the\s+game$/i,       // Join messages
+  /^\S+\s+left\s+the\s+game$/i,         // Leave messages
+  /^\[Server\]/i,                       // Server-prefixed messages
+  /^Set\s+the\s+time\s+to\s+/i,         // Time set
+  /^Set\s+\S+\s+game\s+mode\s+to\s+/i,  // Gamemode changes
+  /^Killed\s+/i,                        // Kill notifications
+  /^Gave\s+\d+\s+/i,                    // /give command confirmations
+  /^Set\s+own\s+game\s+mode/i,          // Own gamemode change
+  // Sprint 20: additional server-confirmation patterns observed in runtime
+  /^Removed\s+\d+\s+items?\s+from\s+/i, // /clear response: "Removed 13 items from player Leo"
+  /^Cleared\s+(?:\d+|\S+'s|the\s+inventory)/i, // /clear: "Cleared 64 items", "Cleared Leo's inventory", "Cleared the inventory of Leo"
+  /^Gave\s+\S+\s+\d+\s+/i,             // /give alt: "Gave TheMasonX23 64 [Dirt]"
+];
+
+/**
+ * Returns true if the message is a Minecraft server system message that should
+ * not be forwarded to the C# chat pipeline.
+ */
+function isSystemMessage(username, message) {
+  // No username or empty username = server message
+  if (!username || username.trim() === '') return true;
+  return SYSTEM_MESSAGE_PATTERNS.some(re => re.test(message));
+}
+
 bot.on('chat', (username, message) => {
   if (username === bot.username) return;
+
+  // Sprint 19: filter system messages before they reach the LLM pipeline
+  if (isSystemMessage(username, message)) {
+    logStructured('debug', 'chat', 'system message filtered', { username, message });
+    // If the bot was teleported, emit a position update so WorldState stays current
+    const teleportMatch = message.match(/^Teleported\s+(\S+)\s+to\s+(\S+)/i);
+    if (teleportMatch && teleportMatch[1].toLowerCase() === bot.username.toLowerCase()) {
+      setTimeout(() => {
+        if (bot.entity) {
+          sendEvent('move', botPos());
+          logStructured('info', 'chat', 'bot teleport detected — position update sent', botPos());
+        }
+      }, 100);
+    }
+    return;
+  }
+
   const onlinePlayers = Object.keys(bot.players).filter(p => p !== bot.username).length;
   const playerEntity  = bot.players[username]?.entity;
   const playerPos     = playerEntity?.position ?? null;
@@ -167,7 +349,10 @@ bot.on('chat', (username, message) => {
 
 // ── Action dispatcher ─────────────────────────────────────────────────────────
 
-async function dispatch({ action, arguments: args = {} }) {
+async function dispatch({ action, arguments: args = {}, correlationId }) {
+  const _dispatchStart = Date.now();
+  logStructured('debug', 'dispatch', 'received', { action, args });
+  try {
   switch (action) {
 
     case 'move': {
@@ -177,7 +362,7 @@ async function dispatch({ action, arguments: args = {} }) {
       const movements = new Movements(bot);
       bot.pathfinder.setMovements(movements);
       await bot.pathfinder.goto(new pfGoals.GoalNear(x, y, z, 1));
-      sendEvent('moveComplete', botPos());
+      sendEvent('moveComplete', { ...botPos(), correlationId });
       break;
     }
 
@@ -196,13 +381,29 @@ async function dispatch({ action, arguments: args = {} }) {
       let mined = 0;
       let pathFailures = 0;
 
+      // Sprint 18: reset stop flag for this action
+      _stopRequested = false;
+      const _mineStart = Date.now();
+      logStructured('info', 'mine', 'start', { block: shortName, targetCount: count, pos: botPos() });
+
       while (mined < count) {
+        // Sprint 18: check stop flag at start of each iteration
+        if (_stopRequested) {
+          console.log(`[mine] aborted by stop signal after ${mined}/${count} ${shortName}`);
+          sendEvent('mineAborted', { block: shortName, mined, correlationId });
+          return; // Exit dispatch — don't send a normal completion event
+        }
+
         let target = bot.findBlock({ matching: blockId, maxDistance: MINE_SEARCH_RADIUS_NEAR });
         if (!target) target = bot.findBlock({ matching: blockId, maxDistance: MINE_SEARCH_RADIUS_FAR });
 
         if (!target) {
-          console.log(`[mine] no ${shortName} found within ${MINE_SEARCH_RADIUS_FAR} blocks after ${mined} mined`);
-          sendEvent('blockNotFound', { block: blockName, mined });
+          console.log(`[mine] no ${shortName} found (mined ${mined}/${count})`);
+          logStructured('warn', 'mine', 'no blocks in range', {
+            block: shortName, mined, targetCount: count,
+            searchRadius: MINE_SEARCH_RADIUS_FAR, elapsedMs: Date.now() - _mineStart,
+          });
+          sendEvent('blockNotFound', { block: blockName, mined, correlationId });
           if (mined === 0) throw new Error(`No ${shortName} found within ${MINE_SEARCH_RADIUS_FAR} blocks`);
           break;
         }
@@ -213,6 +414,10 @@ async function dispatch({ action, arguments: args = {} }) {
           );
           pathFailures = 0;
         } catch (e) {
+          if (_stopRequested) {
+            console.log(`[mine] aborted during navigation after ${mined}/${count} ${shortName}`);
+            return;
+          }
           pathFailures++;
           console.warn(`[mine] nav to ${shortName} failed (${pathFailures}/${MAX_MINE_PATH_FAILURES}): ${e.message}`);
           if (pathFailures >= MAX_MINE_PATH_FAILURES)
@@ -231,12 +436,16 @@ async function dispatch({ action, arguments: args = {} }) {
           await bot.dig(fresh);
           mined++;
           pathFailures = 0;
-          sendEvent('blockMined', { block: shortName, count: mined, ...botPos() });
+          sendEvent('blockMined', { block: shortName, count: mined, ...botPos(), correlationId });
         } catch (e) {
+          if (_stopRequested) { console.log(`[mine] aborted after dig error`); return; }
           console.warn(`[mine] dig failed: ${e.message}`);
           await new Promise(r => setTimeout(r, 500));
         }
       }
+      logStructured('info', 'mine', 'complete', {
+        block: shortName, mined, targetCount: count, elapsedMs: Date.now() - _mineStart,
+      });
       break;
     }
 
@@ -277,7 +486,7 @@ async function dispatch({ action, arguments: args = {} }) {
       }
 
       if (!placed) throw new Error(`Cannot place ${material} at (${x},${y},${z}) — no solid reference block`);
-      sendEvent('blockPlaced', { x, y, z, block: shortMat });
+      sendEvent('blockPlaced', { x, y, z, block: shortMat, correlationId });
       break;
     }
 
@@ -302,41 +511,133 @@ async function dispatch({ action, arguments: args = {} }) {
         }
       }
 
+      // Sprint 18: reset stop flag; pathfinder.setGoal(null) in handleStop() will
+      // cause goto() to throw, which is caught below — no extra check needed.
+      _stopRequested = false;
+      logStructured('info', 'wander', 'start', {
+        radius, maxDistanceFromSpawn, targetX: Math.round(tX), targetZ: Math.round(tZ),
+        fromPos: botPos(),
+      });
+
       const movements = new Movements(bot);
       bot.pathfinder.setMovements(movements);
       try {
         await bot.pathfinder.goto(
           new pfGoals.GoalNear(Math.round(tX), Math.round(bot.entity.position.y), Math.round(tZ), 2)
         );
-        sendEvent('wanderComplete', { ...botPos(), targetX: Math.round(tX), targetZ: Math.round(tZ) });
+        sendEvent('wanderComplete', { ...botPos(), targetX: Math.round(tX), targetZ: Math.round(tZ), correlationId });
       } catch (e) {
+        if (_stopRequested) {
+          console.log('[wander] aborted by stop signal');
+          return;
+        }
         console.warn(`[wander] pathfinding failed: ${e.message}`);
-        sendEvent('wanderFailed', { message: e.message, ...botPos() });
+        sendEvent('wanderFailed', { message: e.message, ...botPos(), correlationId });
       }
       break;
     }
 
     case 'findFlatArea': {
-      const { radius = 20, minFlatArea = 9 } = args;
-      const botPosObj = botPos();
-      const r = Math.max(1, Math.min(radius, 64));
+      // Sprint 9: all tuning values are named constants with per-call overrides.
+      const {
+        radius      = FLAT_AREA_SCAN_RADIUS,
+        minFlatArea = FLAT_AREA_MIN_SIZE,
+        yAbove      = FLAT_AREA_Y_ABOVE,
+        yBelow      = FLAT_AREA_Y_BELOW,
+        maxSlope    = FLAT_AREA_MAX_SLOPE,
+      } = args;
+
+      let botPosObj = botPos();
+      const r       = Math.max(1, Math.min(radius, 64));
       const minArea = Math.max(1, Math.min(minFlatArea, 256));
 
-      // Build a height map: sample every column within radius, recording the
-      // Y level of the highest solid (opaque) block that has air above it.
-      const heightMap = new Map(); // key: "x,z", value: { x, z, y, isFlat }
+      // Sprint 18: reset stop flag for this scan
+      _stopRequested = false;
+
+      // Sprint 35: wait for chunks to load before scanning. The bot may have just
+      // moved to this area and blockAt() returns null for unloaded chunks, which
+      // produces an empty height map and a false "no flat area" result.
+      // Uses a custom wait that covers the full scan radius (not just the default
+      // 5x5 chunk window from bot.waitForChunksToLoad).
+      try {
+        const chunkRadius = Math.ceil(r / 16) + 1; // +1 for safety margin
+        const pos = bot.entity?.position ?? { x: 0, y: 0, z: 0 };
+        const chunkPosToCheck = new Set();
+        const centerCX = Math.floor(pos.x / 16);
+        const centerCZ = Math.floor(pos.z / 16);
+        for (let cx = centerCX - chunkRadius; cx <= centerCX + chunkRadius; cx++) {
+          for (let cz = centerCZ - chunkRadius; cz <= centerCZ + chunkRadius; cz++) {
+            const col = bot.world.getColumn(cx, cz);
+            if (!col) chunkPosToCheck.add(`${cx},${cz}`);
+          }
+        }
+        if (chunkPosToCheck.size > 0) {
+          await new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+              bot.world.off('chunkColumnLoad', waitForLoad);
+              reject(new Error(`Timeout waiting for ${chunkPosToCheck.size} chunks`));
+            }, 10000);
+            function waitForLoad(columnCorner) {
+              const cx = Math.floor(columnCorner.x / 16);
+              const cz = Math.floor(columnCorner.z / 16);
+              chunkPosToCheck.delete(`${cx},${cz}`);
+              if (chunkPosToCheck.size === 0) {
+                clearTimeout(timeout);
+                bot.world.off('chunkColumnLoad', waitForLoad);
+                resolve();
+              }
+            }
+            bot.world.on('chunkColumnLoad', waitForLoad);
+          });
+        }
+      } catch {
+        // If chunks time out, log and continue — scan will use whatever is loaded.
+        console.warn('[findFlatArea] chunk load wait timed out — scanning with loaded chunks only');
+        logStructured('warn', 'findFlatArea', 'chunk load timeout', { radius: r });
+      }
+
+      // Re-read position after chunk loading (bot may have settled)
+      botPosObj = botPos();
+      const _scanStart = Date.now();
+      logStructured('info', 'findFlatArea', 'start', { radius: r, minArea, botPos: botPosObj });
+
+      // ── Height map ─────────────────────────────────────────────────────────
+      // Sprint 18 fix: bot.blockAt() now calls pos.floored() internally in current
+      // Mineflayer. Plain {x,y,z} objects fail with "pos.floored is not a function".
+      // Use toVec3() which provides a compatible .floored() pass-through.
+
+      /** @type {Map<string, {x:number, z:number, y:number}>} */
+      const heightMap = new Map();
+
+      let columnIdx = 0;
+
       for (let dx = -r; dx <= r; dx++) {
+        // Sprint 18: check stop flag every outer column strip
+        if (_stopRequested) {
+          console.log('[findFlatArea] aborted by stop signal');
+          return;
+        }
+
         for (let dz = -r; dz <= r; dz++) {
+          if (++columnIdx % 200 === 0) {
+            await new Promise(resolve => setImmediate(resolve));
+          }
+
           const cx = botPosObj.x + dx;
           const cz = botPosObj.z + dz;
-          // Scan top-down from bot's Y level
-          for (let cy = botPosObj.y + 4; cy >= botPosObj.y - 6; cy--) {
-            const block = bot.blockAt(new Vec3(cx, cy, cz));
+
+          for (let cy = botPosObj.y + yAbove; cy >= botPosObj.y - yBelow; cy--) {
+            // Sprint 18: use toVec3 so bot.blockAt() gets .floored() method
+            const block = bot.blockAt(toVec3(cx, cy, cz));
             if (!block) continue;
-            // Solid ground: block with bounding box (not empty/plant) + air above
-            if (block.name !== 'air' && block.boundingBox === 'block') {
-              const above = bot.blockAt(new Vec3(cx, cy + 1, cz));
-              if (!above || above.name === 'air' || above.boundingBox === 'empty') {
+
+            if (block.name !== 'air'
+                && block.boundingBox === 'block'
+                && !LIQUID_BLOCK_NAMES.has(block.name)) {
+              // Sprint 18: use toVec3 for the above-block check too
+              const above = bot.blockAt(toVec3(cx, cy + 1, cz));
+              if ((!above || above.name === 'air' || above.boundingBox === 'empty')
+                  && !LIQUID_BLOCK_NAMES.has(above?.name ?? '')) {
                 heightMap.set(`${cx},${cz}`, { x: cx, z: cz, y: cy + 1 });
                 break;
               }
@@ -345,20 +646,21 @@ async function dispatch({ action, arguments: args = {} }) {
         }
       }
 
-      // Flood-fill to find the largest contiguous flat region
-      // "Flat" = adjacent columns whose Y values differ by at most 1
-      const visited = new Set();
-      let bestCandidate = null;
-      let bestArea = 0;
+      // ── Flood-fill: find connected flat components ─────────────────────────
 
-      const isFlatNeighbor = (a, b) => a && b && Math.abs(a.y - b.y) <= 1;
+      /** @param {{y:number}|undefined} a @param {{y:number}|undefined} b */
+      const isFlatNeighbour = (a, b) => a && b && Math.abs(a.y - b.y) <= 1;
+
+      const visited      = new Set();
+      let bestCandidate  = null;
+      let bestScore      = 0;
 
       for (const [key, col] of heightMap) {
         if (visited.has(key)) continue;
 
-        // BFS to find the connected flat component
+        /** @type {Array<{x:number, z:number, y:number}>} */
         const component = [];
-        const queue = [col];
+        const queue     = [col];
         visited.add(key);
 
         while (queue.length > 0) {
@@ -366,39 +668,83 @@ async function dispatch({ action, arguments: args = {} }) {
           component.push(cur);
 
           for (const [ndx, ndz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-            const nk = `${cur.x + ndx},${cur.z + ndz}`;
+            const nk  = `${cur.x + ndx},${cur.z + ndz}`;
             const nbr = heightMap.get(nk);
-            if (nbr && !visited.has(nk) && isFlatNeighbor(cur, nbr)) {
+            if (nbr && !visited.has(nk) && isFlatNeighbour(cur, nbr)) {
               visited.add(nk);
               queue.push(nbr);
             }
           }
         }
 
-        if (component.length >= minArea && component.length > bestArea) {
-          bestArea = component.length;
-          // Compute the centroid of the component
-          const avgY = Math.round(component.reduce((s, c) => s + c.y, 0) / component.length);
-          const minX = Math.min(...component.map(c => c.x));
-          const maxX = Math.max(...component.map(c => c.x));
-          const minZ = Math.min(...component.map(c => c.z));
-          const maxZ = Math.max(...component.map(c => c.z));
+        if (component.length < minArea) continue;
+
+        const yValues = component.map(c => c.y);
+        const yMin    = Math.min(...yValues);
+        const yMax    = Math.max(...yValues);
+        const yRange  = yMax - yMin;
+
+        if (yRange > maxSlope) continue;
+
+        const minX  = Math.min(...component.map(c => c.x));
+        const maxX  = Math.max(...component.map(c => c.x));
+        const minZ  = Math.min(...component.map(c => c.z));
+        const maxZ  = Math.max(...component.map(c => c.z));
+        const bboxW = maxX - minX + 1;
+        const bboxD = maxZ - minZ + 1;
+
+        const compactness = component.length / (bboxW * bboxD);
+        const flatness    = maxSlope > 0 ? 1 - yRange / maxSlope : 1;
+        const score       = component.length * (
+          FLAT_SCORE_WEIGHTS.area        +
+          FLAT_SCORE_WEIGHTS.compactness * compactness +
+          FLAT_SCORE_WEIGHTS.flatness    * flatness
+        );
+
+        if (score > bestScore) {
+          bestScore = score;
+          const avgY = Math.round(yValues.reduce((s, y) => s + y, 0) / yValues.length);
           bestCandidate = {
             x: Math.round((minX + maxX) / 2),
             y: avgY,
             z: Math.round((minZ + maxZ) / 2),
             area: component.length,
             minX, maxX, minZ, maxZ,
+            yRange,
+            compactness: Math.round(compactness * 100) / 100,
           };
         }
       }
 
       if (bestCandidate) {
-        sendEvent('flatAreaFound', bestCandidate);
-        console.log(`[findFlatArea] best candidate at (${bestCandidate.x},${bestCandidate.y},${bestCandidate.z}) area=${bestCandidate.area}`);
+        sendEvent('flatAreaFound', { ...bestCandidate, correlationId });
+        const scanElapsed = Date.now() - _scanStart;
+        console.log(
+          `[findFlatArea] best at (${bestCandidate.x},${bestCandidate.y},${bestCandidate.z})` +
+          ` area=${bestCandidate.area} yRange=${bestCandidate.yRange}` +
+          ` compact=${bestCandidate.compactness} score=${bestScore.toFixed(1)} (${scanElapsed}ms)`
+        );
+        logStructured('info', 'findFlatArea', 'found', {
+          ...bestCandidate, score: +bestScore.toFixed(1), columns: columnIdx, elapsedMs: scanElapsed,
+        });
       } else {
-        console.warn(`[findFlatArea] no flat area >= ${minArea} found within radius ${r}`);
-        sendEvent('flatAreaFound', { x: botPosObj.x, y: botPosObj.y + 1, z: botPosObj.z, area: 0 });
+        const heightMapSize = heightMap.size;
+        console.warn(
+          `[findFlatArea] no qualifying flat area found ` +
+          `(min=${minArea}, maxSlope=${maxSlope}, radius=${r}, ` +
+          `columns=${columnIdx}, heightMap=${heightMapSize})`
+        );
+        logStructured('warn', 'findFlatArea', 'no qualifying area', {
+          minArea, maxSlope, radius: r, columns: columnIdx,
+          heightMapSize, elapsedMs: Date.now() - _scanStart,
+        });
+        // Sprint 19: include searchedRadius so C# can distinguish "searched small area"
+        // from "searched large area". DecomposeBuild uses this to expand radius on retry.
+        sendEvent('flatAreaFound', {
+          x: botPosObj.x, y: botPosObj.y + 1, z: botPosObj.z,
+          area: 0, minX: botPosObj.x, maxX: botPosObj.x, minZ: botPosObj.z, maxZ: botPosObj.z,
+          yRange: 0, compactness: 0, searchedRadius: r, correlationId,
+        });
       }
       break;
     }
@@ -412,8 +758,6 @@ async function dispatch({ action, arguments: args = {} }) {
       break;
 
     case 'craft': {
-      // Sprint 2a: pathfind to crafting table before crafting.
-      // tableSearchRadius can be overridden per-call; defaults to CRAFT_TABLE_SEARCH_RADIUS.
       const { item: itemName, count = 1, tableSearchRadius = CRAFT_TABLE_SEARCH_RADIUS } = args;
       if (!itemName) throw new Error('craft requires item');
 
@@ -431,12 +775,10 @@ async function dispatch({ action, arguments: args = {} }) {
         const tableId = bot.registry.blocksByName['crafting_table']?.id;
         if (tableId == null) throw new Error('crafting_table not found in registry');
 
-        // Sprint 2a: search with expanded radius and pathfind to the table.
         craftingTable = bot.findBlock({ matching: tableId, maxDistance: tableSearchRadius });
         if (!craftingTable)
           throw new Error(`No crafting_table within ${tableSearchRadius} blocks`);
 
-        // Pathfind to the crafting table so bot.craft() can reach it.
         const movements = new Movements(bot);
         bot.pathfinder.setMovements(movements);
         await bot.pathfinder.goto(new pfGoals.GoalNear(
@@ -446,14 +788,13 @@ async function dispatch({ action, arguments: args = {} }) {
           CRAFT_TABLE_REACH_DISTANCE
         ));
 
-        // Re-fetch after navigation: bot may have shifted the chunk slightly.
         craftingTable = bot.blockAt(craftingTable.position);
         if (!craftingTable || craftingTable.type !== tableId)
           throw new Error('Crafting table not found after navigation');
       }
 
       await bot.craft(recipe, count, craftingTable);
-      sendEvent('craftComplete', { item: itemName, count });
+      sendEvent('craftComplete', { item: itemName, count, correlationId });
       console.log(`[craft] crafted ${count}x ${itemName}`);
       break;
     }
@@ -507,7 +848,7 @@ async function dispatch({ action, arguments: args = {} }) {
         });
 
         if (furnace.outputItem()) await furnace.takeOutput();
-        sendEvent('smeltComplete', { item: inputName, result: outputName, count: toSmelt });
+        sendEvent('smeltComplete', { item: inputName, result: outputName, count: toSmelt, correlationId });
         console.log(`[smelt] smelted ${toSmelt}x ${inputName} → ${outputName}`);
       } finally {
         furnace.close();
@@ -517,6 +858,9 @@ async function dispatch({ action, arguments: args = {} }) {
 
     default:
       throw new Error(`Unknown action: ${action}`);
+  }
+  } finally {
+    logStructured('info', 'dispatch', 'done', { action, elapsedMs: Date.now() - _dispatchStart });
   }
 }
 

@@ -114,6 +114,39 @@ public class ItemRegistryTests
         Assert.That(spec, Is.Null);
     }
 
+    [Test]
+    public async Task GetAsync_LocalPageFallback_ReturnsItemSpecWhenGatewayMisses()
+    {
+        var tempRoot = Path.Combine(Path.GetTempPath(), "memorysmith-item-registry-tests", Guid.NewGuid().ToString("N"));
+        var pageDir = Path.Combine(tempRoot, "Data", "Pages", "item-registry");
+        Directory.CreateDirectory(pageDir);
+
+        var pagePath = Path.Combine(pageDir, "oak-log.md");
+        await File.WriteAllTextAsync(pagePath,
+            "# oak-log\n\n" +
+            "item_id: oak_log\n" +
+            "display_name: Oak Log\n" +
+            "source_blocks: oak_log, birch_log\n" +
+            "requires_smelting: false\n" +
+            "min_harvest_level: 0\n");
+
+        try
+        {
+            var registry = new MemorySmithItemRegistry(_gateway, new RestMemoryGatewayOptions(), tempRoot);
+
+            var spec = await registry.GetAsync("oak_log");
+
+            Assert.That(spec, Is.Not.Null);
+            Assert.That(spec!.ItemId, Is.EqualTo("oak_log"));
+            Assert.That(spec.DisplayName, Is.EqualTo("Oak Log"));
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot))
+                Directory.Delete(tempRoot, recursive: true);
+        }
+    }
+
     // ── Not-found / null returns ───────────────────────────────────────────────
 
     [Test]

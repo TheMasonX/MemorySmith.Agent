@@ -49,7 +49,7 @@ public class MockWorldAdapterTests
     public async Task ReceiveEventsAsync_YieldsQueuedEvent()
     {
         var adapter = new MockWorldAdapter();
-        adapter.PushEvent("health", new Dictionary<string, object?> { ["hp"] = 18 });
+        adapter.PushEvent(new HealthEvent(18, 20, DateTimeOffset.UtcNow));
 
         using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));
         var received = new List<WorldEvent>();
@@ -65,29 +65,29 @@ public class MockWorldAdapterTests
         catch (OperationCanceledException) { /* timeout = nothing received */ }
 
         Assert.That(received, Has.Count.EqualTo(1));
-        Assert.That(received[0].EventType, Is.EqualTo("health"));
+        Assert.That(received[0], Is.TypeOf<HealthEvent>());
     }
 
     [Test]
     public async Task ReceiveEventsAsync_MultipleEvents_YieldsAllInOrder()
     {
         var adapter = new MockWorldAdapter();
-        adapter.PushEvent("spawn", new Dictionary<string, object?>());
-        adapter.PushEvent("health", new Dictionary<string, object?> { ["hp"] = 20 });
+        adapter.PushEvent(new SpawnEvent(new Position(0, 64, 0), 20, 20, DateTimeOffset.UtcNow));
+        adapter.PushEvent(new HealthEvent(20, 20, DateTimeOffset.UtcNow));
 
         using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));
-        var received = new List<string>();
+        var received = new List<Type>();
 
         try
         {
             await foreach (var ev in adapter.ReceiveEventsAsync(cts.Token))
             {
-                received.Add(ev.EventType);
+                received.Add(ev.GetType());
                 if (received.Count >= 2) break;
             }
         }
         catch (OperationCanceledException) { }
 
-        Assert.That(received, Is.EqualTo(new[] { "spawn", "health" }));
+        Assert.That(received, Is.EqualTo(new[] { typeof(SpawnEvent), typeof(HealthEvent) }));
     }
 }
