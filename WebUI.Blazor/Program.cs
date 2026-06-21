@@ -18,8 +18,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((context, services, loggerConfig) =>
 {
+    var loggingConfig = context.Configuration.GetSection("Agent:Logging");
+    var defaultLevelName = loggingConfig.GetValue<string?>("Default") ?? "Information";
+    if (Enum.TryParse<LogEventLevel>(defaultLevelName, true, out var configuredDefault))
+        loggerConfig.MinimumLevel.Is(configuredDefault);
+    else
+        loggerConfig.MinimumLevel.Information();
+
+    foreach (var overrideEntry in loggingConfig.GetSection("Overrides").GetChildren())
+    {
+        if (Enum.TryParse<LogEventLevel>(overrideEntry.Value, true, out var overrideLevel))
+            loggerConfig.MinimumLevel.Override(overrideEntry.Key, overrideLevel);
+    }
+
     loggerConfig
-        .MinimumLevel.Information()
         .MinimumLevel.Override("Microsoft",              LogEventLevel.Warning)
         .MinimumLevel.Override("Microsoft.AspNetCore",   LogEventLevel.Warning)
         .MinimumLevel.Override("System.Net.Http",        LogEventLevel.Warning)
@@ -117,7 +129,7 @@ if (agentEnabled)
         chatOpts = chatOpts with { LlmModel = legacyModel };
     builder.Services.AddSingleton(chatOpts);
 
-    builder.Services.AddHttpClient("lmm", http =>
+    builder.Services.AddHttpClient("llm", http =>
     {
         http.BaseAddress = new Uri(chatOpts.ResolvedBaseUrl);
         http.Timeout     = TimeSpan.FromSeconds(chatOpts.LlmTimeoutSeconds + 2);
@@ -125,7 +137,8 @@ if (agentEnabled)
     builder.Services.AddSingleton<ILlmProvider>(sp =>
     {
         var http = sp.GetRequiredService<IHttpClientFactory>().CreateClient("llm");
-        return LlmProviderFactory.Create(http, chatOpts);
+        var ollamaLogger = sp.GetRequiredService<ILogger<OllamaProvider>>();
+        return LlmProviderFactory.Create(http, chatOpts, ollamaLogger);
     });
 
     builder.Services.AddSingleton<ChatRateLimiter>();
@@ -172,8 +185,6 @@ if (agentEnabled)
         new HtnPlanner(
             sp.GetRequiredService<HtnTaskLibrary>(),
             sp.GetRequiredService<ILogger<HtnPlanner>>())); // Sprint 33 DEF-S32-G
-    builder.Services.AddSingleton<IPlanner>(sp =>
-        sp.GetRequiredService<PlannerRouter>());  // Sprint 27 P0-D: route through decomposer registry first
 
     builder.Services.AddSingleton<IWorldModel>(new WorldModel());
 
@@ -188,7 +199,12 @@ if (agentEnabled)
         reg.Register(new CraftItemGoalDecomposer(lib)); // Sprint 27 P0-D
         return reg;
     });
-    builder.Services.AddSingleton<PlannerRouter>();
+    builder.Services.AddSingleton<PlannerRouter>(sp =>
+        new PlannerRouter(
+            sp.GetRequiredService<DecomposerRegistry>(),
+            sp.GetRequiredService<HtnPlanner>()));
+    builder.Services.AddSingleton<IPlanner>(sp =>
+        sp.GetRequiredService<PlannerRouter>());  // Sprint 27 P0-D: route through decomposer registry first
 
     builder.Services.AddSingleton<IAgentJournal>(new AgentJournal());
 

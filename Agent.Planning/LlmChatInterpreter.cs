@@ -67,8 +67,19 @@ public sealed class LlmChatInterpreter(
         }
 
         // 5. Rate-limit check
-        if (!provider.IsAvailable || !rateLimiter.TryAcquire(username, out _))
+        if (!provider.IsAvailable)
+        {
+            logger?.LogInformation("[llm] {Provider} not available (LlmEnabled={Enabled}, provider={Provider}) -- falling back to pattern for <{Username}>",
+                provider.ProviderName, options.LlmEnabled, options.LlmProvider, username);
             return quick;
+        }
+
+        if (!rateLimiter.TryAcquire(username, out var wait))
+        {
+            logger?.LogInformation("[llm] rate-limited for <{Username}> (wait={Wait}s) -- falling back to pattern",
+                username, wait.TotalSeconds.ToString("F1"));
+            return quick;
+        }
 
         // 6. LLM call
         var currentGoal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s ? s : null;
@@ -109,7 +120,7 @@ public sealed class LlmChatInterpreter(
 
         {
           "addressed": "yes" | "maybe" | "no",
-          "intent": "gather" | "build" | "cancel" | "status" | "help" | "navigate" | "ignore" | "clarify",
+          "intent": "gather" | "build" | "cancel" | "status" | "help" | "navigate" | "conversation" | "ignore" | "clarify",
           "item": "<minecraft_id or null>",
           "blueprint": "<blueprint_id or null>",
           "count": <integer or null>,
@@ -122,6 +133,7 @@ public sealed class LlmChatInterpreter(
         Rules: "yes" when your name is used or only 1 player is online.
         "maybe" when it could be a command but your name is not mentioned.
         "no" when players are talking to each other, not you.
+        "conversation" when the player is just chatting (greetings, questions about you, casual talk).
         "clarify" when uncertain -- ask politely.
         Use Minecraft item IDs without namespace prefix (oak_log, cobblestone, iron_ore).
         """;
@@ -196,6 +208,7 @@ public sealed class LlmChatInterpreter(
                 "status"            => ChatIntentType.QueryStatus,
                 "help"              => ChatIntentType.QueryHelp,
                 "navigate"          => ChatIntentType.NavigateTo,
+                "conversation"      => ChatIntentType.Chat,
                 "clarify"           => ChatIntentType.Unknown,
                 _                   => isUncertain ? ChatIntentType.Unknown : ChatIntentType.NotAddressed,
             };
@@ -277,6 +290,7 @@ public sealed class LlmChatInterpreter(
                 "cancel"            => ChatIntentType.CancelGoal,
                 "status"            => ChatIntentType.QueryStatus,
                 "help"              => ChatIntentType.QueryHelp,
+                "conversation"      => ChatIntentType.Chat,
                 "clarify"           => ChatIntentType.Unknown,
                 "ignore"            => ChatIntentType.NotAddressed,
                 _                   => ChatIntentType.Unknown,

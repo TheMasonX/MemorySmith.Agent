@@ -638,6 +638,9 @@ public sealed class AgentBackgroundService(
                 break;
 
             case ChatIntentType.Chat:
+                logger.LogInformation("[chat] conversational response for <{Username}>: '{Response}'",
+                    chat.Username, pendingResponse?.Length > 80 ? pendingResponse[..80] : pendingResponse);
+                break;
             case ChatIntentType.Unknown:
                 break;
         }
@@ -1174,6 +1177,10 @@ public sealed class AgentBackgroundService(
     }
 
     // ── Thinking indicator ─────────────────────────────────────────────────────
+    // Sprint 34: increased delay to 5s to avoid sending chat indicators for
+    // fast-path pattern matches and to prevent server anti-spam kicks
+    // (multiplayer.disconnect.chat_validation_failed). Only one indicator per
+    // interpretation cycle.
 
     private static readonly string[] _thinkingMessages =
         ["Hmm...", "...", "Let me think...", "*thinks*"];
@@ -1182,10 +1189,10 @@ public sealed class AgentBackgroundService(
     {
         try
         {
-            await Task.Delay(TimeSpan.FromSeconds(1.5), ct);
+            await Task.Delay(TimeSpan.FromSeconds(5), ct);
             var msg = _thinkingMessages[Random.Shared.Next(_thinkingMessages.Length)];
             _queue.Enqueue(new ActionData { Tool = "Chat", Arguments = { ["message"] = msg } });
-            logger.LogInformation("[chat] thinking indicator sent ('{Msg}') — LLM response pending >1.5s", msg);
+            logger.LogInformation("[chat] thinking indicator sent ('{Msg}') — LLM response pending >5s", msg);
         }
         catch (OperationCanceledException) { /* fast path — thinking not needed */ }
     }
