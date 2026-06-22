@@ -117,6 +117,91 @@ params = {
 - Sprint 28/29/30/32 had this problem; Sprint 33 BLK-S33-01 (truncated Program.cs) was the result
 
 ---
+
+## CRITICAL — LLM-First Architecture (Sprint 35+)
+
+These rules encode architectural decisions locked in Sprint 35. Violations require
+a council review and an explicit ADR to reverse.
+
+---
+
+### CRITICAL Rule A-1: Parsers Never Create Goals
+
+**Chat → IntentDraft → Planner → Goal** is the only valid pipeline. The reverse
+direction (`Chat → Interpreter → Goal`) is forbidden.
+
+- `IChatInterpreter.InterpretAsync` returns `ChatInterpretation`. It expresses semantic
+  intent (what, item, blueprint, count, coords, confidence). It does **not** call
+  `GoalFactory` and does **not** return a `GoalName` string.
+- `IntentDraft` has no `GoalName` field. The mapping `intent → GoalName` is done
+  exclusively in `AgentBackgroundService.IntentDraftToGoal` (Sprint 35 transition
+  layer; moves to `IIntentManager` in Sprint 36+).
+- No regex or fast-path in `ChatInterpreter` may produce a `ChatIntentType.CreateGoal`
+  result for gather/build/craft intents. Only `CancelGoal`, `QueryStatus`,
+  `QueryInventory`, and `QueryHelp` may be fast-pathed (zero-risk, deterministic).
+
+**Why this matters:** Fast-path goal creation bypasses the LLM and skips confidence
+scoring, clarification questions, and context enrichment. Sprint 35 P1-B explicitly
+removed these fast-paths after they caused BUG-4 (two-minute stall on "craft an
+iron pickaxe" when Ollama timed out).
+
+---
+
+### IntentDraft Schema (Sprint 35 P1-A)
+
+The LLM returns a JSON object. `LlmChatInterpreter.ParseDecision` deserialises it
+into this shape:
+
+```json
+{
+  "addressed":             "yes" | "maybe" | "no",
+  "intent":                "gather" | "build" | "craft" | "navigate" | "cancel"
+                           | "status" | "help" | "conversation" | "clarify" | "ignore",
+  "item":                  "<minecraft_id or null>",
+  "blueprint":             "<blueprint_id or null>",
+  "count":                 <integer or null>,
+  "x": <integer or null>,  "y": <integer or null>,  "z": <integer or null>,
+  "confidence":            <0.0–1.0>,
+  "clarificationQuestion": "<question to ask if confidence is low, or null>",
+  "response":              "<in-game reply, max 50 words, empty if intent is ignore>"
+}
+```
+
+- **`confidence`** — must be present; default 1.0 if absent. `LlmConfidenceThreshold`
+  (default 0.6, `ChatOptions`) gates clarification: if `confidence < threshold` AND
+  `clarificationQuestion` is non-empty, the interpretation becomes
+  `ChatIntentType.Unknown` and the bot asks the clarifying question.
+- **No `goalName` field** — goal mapping is the planner's responsibility.
+- Truncated JSON (no closing brace) is recovered via `TryParseTruncatedJson`.
+
+---
+
+### ActionOutcome — Universal Tool Result (Sprint 35 P1-E)
+
+Every `ToolDispatcher.CallAsync` (and its future `CallWithOutcomeAsync` variant)
+will produce an `ActionOutcome` record. This is the single result type flowing
+into recovery, replanning, journaling, and world-state updates.
+
+```csharp
+// Agent.Core/Models/ActionOutcome.cs
+public sealed record ActionOutcome(
+    Guid GoalId, string ToolName, bool Success,
+    string ObservationSummary,
+    IReadOnlyList<StructuredEffect> Effects,
+    DateTimeOffset Timestamp);
+
+public sealed record StructuredEffect(
+    string Type, string Item, int Count);   // e.g. "ItemCollected", "oak_log", 3
+```
+
+Factory helpers: `ActionOutcome.Collected(goalId, tool, item, count)`,
+`ActionOutcome.Succeeded(goalId, tool, summary)`, `ActionOutcome.Failed(goalId, tool, reason)`.
+
+Sprint 35 added the records and stubs; Sprint 36 wires `CallWithOutcomeAsync` in
+`ToolDispatcher` and `LogOutcome` in `IAgentJournal`.
+
+---
+
 ## C# Conventions
 
 - `*Options` classes must be `sealed record` so tests can use `with {}` expressions.
@@ -160,6 +245,46 @@ params = {
   server output that leaks through (e.g. `/clear` responses, `/give` echoes, teleport
   announcements). Never remove existing patterns without verifying they don't filter
   real player chat.
+
+### playerCollect guard (Sprint 35 P0-A)
+
+The `bot.on('playerCollect', ...)` listener must guard against items collected by
+other players sharing the entity. The safe pattern:
+
+```js
+bot.on('playerCollect', (collector, itemDrop) => {
+    if (collector.username !== bot.username) return; // not our pickup
+    // entity.metadata is Mineflayer-version-sensitive; use fallback chain:
+    const itemName = entity?.metadata?.find(m => m?.value?.name)?.value?.name
+                     ?? entity?.name ?? 'unknown';
+    sendEvent('itemCollected', { item: itemName, count: 1, correlationId });
+});
+```
+
+Without the guard, items picked up by other players increment the bot's inventory
+in WorldState — a bug that is very hard to reproduce in single-player tests.
+
+`entity?.metadata?.name` is Mineflayer-version-specific. The fallback chain
+(`entity?.metadata?.find(m => m?.value?.name)?.value?.name ?? entity?.name ?? 'unknown'`)
+is version-safe. Do not simplify to `entity.name` alone.
+
+### mineComplete event contract (Sprint 35 P0-B)
+
+At the end of every mine-block loop, emit `mineComplete` with the final counts:
+
+```js
+sendEvent('mineComplete', {
+    block: targetBlock,
+    mined: actualMinedCount,
+    targetCount: requestedCount,
+    correlationId: args.correlationId
+});
+```
+
+C# `MineCompleteEvent(string Block, int Mined, int TargetCount, DateTimeOffset Timestamp)`
+is the typed counterpart. `AgentBackgroundService.ProcessEventsAsync` uses this event
+to transition the correlated `PendingAction` to `Completed` state — critical for the
+`SweepTimedOutActions` path not to orphan successful mine completions.
 
 ---
 
@@ -205,6 +330,9 @@ implement → push → CI green (conclusion: success) →
 | D-007 | .slnx solution format |
 | D-008 | Node.js for Mineflayer subprocess |
 | D-010 | ActionProtocol wire names (all lowercase) |
+| D-011 | Parsers never create goals (Sprint 35, CRITICAL) |
+| D-012 | ActionOutcome is the universal tool result (Sprint 35) |
+| D-013 | Inventory is event-sourced via ItemCollectedEvent (Sprint 35) |
 
 Full decisions in `Data/Pages/decisions.md`.
 
@@ -213,7 +341,7 @@ Full decisions in `Data/Pages/decisions.md`.
 ## Key Interfaces (quick reference)
 
 | Interface | Location | Purpose |
-|-----------|----------|---------|
+|-----------|----------|---------| 
 | `IGoal` | `Agent.Core` | Goal evaluation; `DamageInterruptThresholdHp` per-goal override |
 | `IPlanner` | `Agent.Planning` | `PlanAsync` + `ReplanAsync` |
 | `IGoalDecomposer` | `Agent.Planning` | Pluggable goal decomposition (CanHandle + Decompose) |
@@ -223,6 +351,9 @@ Full decisions in `Data/Pages/decisions.md`.
 | `IMemoryGateway` | `Agent.Memory` | Search / GetPage / CreatePage / UpdatePage |
 | `ITool` | `Agent.Tools` | Name, Description, InputSchema, ExecuteAsync |
 | `IWorldAdapter` | `Agent.World.Minecraft` | Connect, SendAction, ReceiveEvents |
-| `IChatInterpreter` | `Agent.Personality` | InterpretAsync → ChatInterpretation |
+| `IChatInterpreter` | `Agent.Personality` | InterpretAsync → ChatInterpretation (no goal creation) |
+
+Sprint 36 will add: `IIntentManager`, `IPlanningManager`, `IExecutionManager`,
+`IRecoveryManager`, `IStateManager`, `IDashboardPublisher` (AgentRuntime decomposition).
 
 See `Data/Pages/architecture.md` for the full interface list and runtime flow.
