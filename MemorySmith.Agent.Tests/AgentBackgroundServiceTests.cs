@@ -15,6 +15,13 @@ namespace MemorySmith.Agent.Tests;
 /// Sprint 1 additions:
 ///   1a — SlowChatInterpreter_DoesNotBlock_BlockMinedEvent
 ///   1b — Reconnect_AfterTwoFailures_ResumesCurrentGoal
+///
+/// Sprint 36 BLK-S36-03 test fixes:
+///   - Chat registered as NoOp in SetUp to eliminate the 300ms settle cycle that preceded
+///     the first PlanAsync call, making error-channel tests with maxConsecutiveFailures=1 robust.
+///   - SlowChatInterpreter test updated: Sprint 35 P0-A removed inventory updates from
+///     BlockMinedEvent; push ItemCollectedEvent instead so the inventory check still works.
+///   - Error-channel test deadlines raised from 2s to 4s for CI reliability.
 /// </summary>
 [TestFixture]
 public class AgentBackgroundServiceTests
@@ -29,6 +36,11 @@ public class AgentBackgroundServiceTests
         _adapter    = new MockWorldAdapter();
         _dispatcher = new ToolDispatcher();
         _planner    = new MockPlanner();
+        // Sprint 36 BLK-S36-03: Register Chat as a no-op so the startup
+        // announcement message dispatches synchronously without a failure/settle
+        // cycle. Without this, the 300ms settle before the first PlanAsync call
+        // made the 2s deadline in error-channel tests unreliable under CI load.
+        _dispatcher.Register(new NoOpTool("Chat"));
     }
 
     // -- Helpers -----------------------------------------------------------------------
@@ -228,7 +240,9 @@ public class AgentBackgroundServiceTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
         var serviceTask = service.StartAsync(cts.Token);
 
-        var planDeadline = DateTime.UtcNow.AddSeconds(2);
+        // Sprint 36 BLK-S36-03: raised from 2s to 4s — Chat NoOp registration (SetUp)
+        // eliminates the 300ms settle cycle, but extra headroom guards against CI load.
+        var planDeadline = DateTime.UtcNow.AddSeconds(4);
         while (_planner.PlanCalls.Count == 0 && DateTime.UtcNow < planDeadline)
             await Task.Delay(10);
         Assert.That(_planner.PlanCalls, Has.Count.GreaterThan(0),
@@ -261,7 +275,8 @@ public class AgentBackgroundServiceTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
         var serviceTask = service.StartAsync(cts.Token);
 
-        var planDeadline = DateTime.UtcNow.AddSeconds(2);
+        // Sprint 36 BLK-S36-03: raised from 2s to 4s for CI reliability.
+        var planDeadline = DateTime.UtcNow.AddSeconds(4);
         while (_planner.PlanCalls.Count == 0 && DateTime.UtcNow < planDeadline)
             await Task.Delay(10);
         Assert.That(_planner.PlanCalls, Has.Count.GreaterThan(0),
@@ -294,7 +309,8 @@ public class AgentBackgroundServiceTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         var serviceTask = service.StartAsync(cts.Token);
 
-        var planDeadline = DateTime.UtcNow.AddSeconds(2);
+        // Sprint 36 BLK-S36-03: raised from 2s to 4s for CI reliability.
+        var planDeadline = DateTime.UtcNow.AddSeconds(4);
         while (_planner.PlanCalls.Count == 0 && DateTime.UtcNow < planDeadline)
             await Task.Delay(10);
         Assert.That(_planner.PlanCalls, Has.Count.GreaterThan(0));
@@ -317,9 +333,14 @@ public class AgentBackgroundServiceTests
 
     /// <summary>
     /// Sprint 1a acceptance criterion: a slow LLM (6s mock) does NOT delay processing
-    /// of subsequent blockMined events. Without the Channel fix, blockMined would be
+    /// of subsequent item-collected events. Without the Channel fix, itemCollected would be
     /// queued behind the 6s LLM await; with it, the event loop returns immediately after
     /// writing the chat event to the channel.
+    ///
+    /// Sprint 36 BLK-S36-03: Updated from BlockMinedEvent to ItemCollectedEvent.
+    /// Sprint 35 P0-A removed inventory updates from BlockMinedEvent — inventory truth now
+    /// comes exclusively from ItemCollectedEvent (Mineflayer playerCollect). The underlying
+    /// behaviour being tested (LLM channel non-blocking) is unchanged.
     /// </summary>
     [Test]
     public async Task SlowChatInterpreter_DoesNotBlock_BlockMinedEventProcessing()
@@ -339,10 +360,12 @@ public class AgentBackgroundServiceTests
         // Push a chat event first — goes to _chatChannel; ChatConsumerAsync will await 6s
         _adapter.PushEvent(new ChatEvent("Player1", "hello", 1, null, DateTimeOffset.UtcNow));
 
-        // Immediately push a blockMined event — should be processed within ~1s
-        _adapter.PushEvent(new BlockMinedEvent("oak_log", 1, new Position(0, 64, 0), DateTimeOffset.UtcNow));
+        // Sprint 36 BLK-S36-03: push ItemCollectedEvent instead of BlockMinedEvent.
+        // Sprint 35 P0-A: ApplyBlockMined no longer updates inventory; only
+        // ItemCollectedEvent (via playerCollect) provides the authoritative inventory update.
+        _adapter.PushEvent(new ItemCollectedEvent("oak_log", 1, DateTimeOffset.UtcNow));
 
-        // Assert: blockMined updates inventory within 2s (well within the 6s LLM window)
+        // Assert: itemCollected updates inventory within 2s (well within the 6s LLM window)
         var deadline = DateTime.UtcNow.AddSeconds(2);
         while (service.WorldState.Inventory.GetValueOrDefault("oak_log") == 0
                && DateTime.UtcNow < deadline)
@@ -352,7 +375,7 @@ public class AgentBackgroundServiceTests
         try { await serviceTask; } catch (OperationCanceledException) { }
 
         Assert.That(service.WorldState.Inventory.GetValueOrDefault("oak_log"), Is.GreaterThan(0),
-            "blockMined inventory update should complete within 2s even when LLM takes 6s " +
+            "itemCollected inventory update should complete within 2s even when LLM takes 6s " +
             "(Sprint 1a: non-blocking chat channel verified).");
     }
 
