@@ -19,6 +19,10 @@ using System.Text.Json;
 /// Sprint 25 P0-C: ExecuteAsync is now wrapped in try/catch — tool exceptions produce
 /// ToolResult(false, ...) instead of propagating. Integer validation uses TryGetInt32
 /// to correctly reject scientific notation (e.g. "1e5").
+///
+/// Sprint 36 P0-B: CallWithOutcomeAsync wraps CallAsync and produces an ActionOutcome,
+/// recording it to the journal. Use this overload when recovery/replanning/LLM evaluation
+/// need structured outcome data.
 /// </summary>
 public sealed class ToolDispatcher : IToolCaller
 {
@@ -122,6 +126,40 @@ public sealed class ToolDispatcher : IToolCaller
         _journal?.Log(entry);
 
         return result;
+    }
+
+    /// <summary>
+    /// Sprint 36 P0-B: Executes the named tool and wraps the result in an
+    /// <see cref="ActionOutcome"/> that is also recorded in the journal via
+    /// <see cref="IAgentJournal.LogOutcome"/>.
+    ///
+    /// Use this overload when recovery, replanning, or LLM evaluation needs
+    /// structured outcome data (effects, observation summary). Callers that only
+    /// need the raw <see cref="ToolResult"/> can continue using <see cref="CallAsync"/>.
+    ///
+    /// <para>
+    /// The returned ActionOutcome uses factory helpers:
+    /// <c>ActionOutcome.Succeeded</c> for success; <c>ActionOutcome.Failed</c> for failure.
+    /// Callers that need richer outcomes (e.g. <c>ActionOutcome.Collected</c>) should
+    /// build the outcome from the ToolResult and the world event that follows.
+    /// </para>
+    /// </summary>
+    public async Task<(ToolResult Result, ActionOutcome Outcome)> CallWithOutcomeAsync(
+        Guid goalId,
+        string toolName,
+        JsonElement arguments,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await CallAsync(toolName, arguments, cancellationToken);
+
+        var outcome = result.Success
+            ? ActionOutcome.Succeeded(goalId, toolName, result.Message ?? "Success")
+            : ActionOutcome.Failed(goalId, toolName, result.Message ?? "Failed");
+
+        // Log the structured outcome (Sprint 36 P0-B default interface method).
+        _journal?.LogOutcome(outcome);
+
+        return (result, outcome);
     }
 
     // ── Schema validation ─────────────────────────────────────────────────────
