@@ -24,6 +24,7 @@ public delegate IReadOnlyList<ActionData> TaskDecomposer(
 /// Sprint 14 P0: DecomposeCraftItem pre-gathers iron ingots (iron tools) and cobblestone (stone tools).
 /// Sprint 14 P1a: DirectMineBlocks now delegates to CommonMinecraftBlocks.DirectMineBlocks.
 /// Sprint 16 D3-S15: Extracted crafting-table bootstrap into AddCraftingTableIfNeeded helper.
+/// Sprint 36 P0-C: DecomposeBuild retry gated on SearchedRadius < FlatAreaRetryRadius (48).
 /// </summary>
 public sealed class HtnTaskLibrary
 {
@@ -58,6 +59,15 @@ public sealed class HtnTaskLibrary
 
     /// <summary>Minimum qualifying flat area (cells) passed to FindFlatArea during preflight.</summary>
     private const int PreflightFlatAreaMin = 25;
+
+    /// <summary>
+    /// Sprint 36 P0-C: Retry radius for FindFlatArea when the initial scan at
+    /// <see cref="PreflightFlatAreaRadius"/> returned area=0. Matches the JS
+    /// FLAT_AREA_RETRY_RADIUS = 48 constant in MineflayerAdapter/index.js.
+    /// Used as the gate condition — if the last search was at this radius or
+    /// larger and found nothing, no further retry is emitted (prevents infinite loops).
+    /// </summary>
+    private const int FlatAreaRetryRadius = 48;
 
     private static readonly ItemSpec OakLogSpec = new()
     {
@@ -307,6 +317,7 @@ public sealed class HtnTaskLibrary
     /// Sprint 11 B1-v2: accepts <paramref name="requireOrigin"/> — when true and no valid
     /// origin is resolvable, returns a single FindFlatArea action.
     /// Sprint 10 B2: resumes from checkpoint.
+    /// Sprint 36 P0-C: retry gated on SearchedRadius &lt; FlatAreaRetryRadius.
     /// </summary>
     public IReadOnlyList<ActionData> DecomposeBuild(
         Blueprint blueprint,
@@ -320,12 +331,32 @@ public sealed class HtnTaskLibrary
 
         if (requireOrigin && originX == 0 && originY == 0 && originZ == 0)
         {
-            // Sprint 19: expand search radius if the last scan returned area=0.
-            // First attempt uses default radius (30); subsequent attempts use 48.
-            // The replan governor (Sprint 19) prevents infinite retry loops.
             var lastAreaStr = state.Facts.TryGetValue(BuildFactKeys.LastFlatArea, out var la) ? la : null;
             var lastArea = lastAreaStr is string las && int.TryParse(las, out var parsed) ? parsed : -1;
-            var searchRadius = lastArea == 0 ? 48 : PreflightFlatAreaRadius;
+
+            // Sprint 36 P0-C: gate retry on SearchedRadius < FlatAreaRetryRadius.
+            // Previously the retry always fired when area=0, even after searching at
+            // FlatAreaRetryRadius — creating an infinite retry loop. Now we only retry
+            // if the last search used a smaller radius than the maximum retry radius.
+            // FlatAreaRetryRadius = 48 matches the JS FLAT_AREA_RETRY_RADIUS constant.
+            if (lastArea == 0)
+            {
+                var searchedRadiusStr = state.Facts.TryGetValue(
+                    "event:FlatAreaFound:SearchedRadius", out var sr) ? sr : null;
+                var lastSearchedRadius = searchedRadiusStr is string srs
+                    && int.TryParse(srs, out var parsedR) ? parsedR : 0;
+
+                if (lastSearchedRadius >= FlatAreaRetryRadius)
+                {
+                    // Already searched at or beyond max retry radius and still found nothing.
+                    // Return empty plan — goal will fail via the consecutive-failures counter.
+                    return Array.Empty<ActionData>();
+                }
+            }
+
+            // Sprint 19: expand search radius if the last scan returned area=0.
+            // Sprint 36 P0-C: only reached when SearchedRadius < FlatAreaRetryRadius.
+            var searchRadius = lastArea == 0 ? FlatAreaRetryRadius : PreflightFlatAreaRadius;
 
             return [MakeAction("FindFlatArea",
                 ("radius", (object?)searchRadius),
