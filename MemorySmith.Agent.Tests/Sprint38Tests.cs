@@ -11,7 +11,7 @@ using System.Text.Json;
 /// <summary>
 /// Sprint 38 tests covering:
 ///   P0-A: GetStatus removed from GatherItemDecompose,
-///   P0-B/P0-C regression: BlockMinedEvent clears stale-flag and completes correlated MineBlock,
+///   P0-B/P0-C regression: BlockMinedEvent projector records facts (stale-flag handled by ABS handler),
 ///   P0-D: end-to-end gather completes via BlockMined without GetStatus,
 ///   P2:   _currentGoal?.Id used in ActionOutcome.GoalId,
 ///   P3:   ILlmEvaluator interface exists in Agent.Core,
@@ -53,7 +53,7 @@ public class Sprint38Tests
     // ── P0-B/P0-C regression: BlockMinedEvent handler behaviour (from Sprint 37) ──────
 
     [Test]
-    public void BlockMinedEvent_ClearsStaleFlag_InWorldState()
+    public void BlockMinedEvent_ProjectorRecordsFacts_StaleHandledByAbs()
     {
         // Regression test for Sprint 37 P0-B: the BlockMined handler must clear
         // WorldState.IsInventoryStale so GenericGatherGoal.IsComplete proceeds without
