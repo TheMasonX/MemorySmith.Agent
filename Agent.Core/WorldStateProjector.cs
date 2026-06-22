@@ -28,6 +28,7 @@ namespace Agent.Core;
 /// Sprint 35 P0-B: MineCompleteEvent stored as facts only (lifecycle handled by AgentBackgroundService).
 /// Sprint 35 P2-A stubs: ItemCraftedEvent and ItemConsumedEvent stored as facts; full wiring Sprint 36.
 /// Sprint 36 P1-B: ApplyItemCrafted added — ItemCraftedEvent now updates inventory.
+/// Sprint 38 P4-A: ApplyItemConsumed added — ItemConsumedEvent now updates inventory.
 /// </summary>
 public sealed class WorldStateProjector
 {
@@ -49,9 +50,9 @@ public sealed class WorldStateProjector
         // Sprint 35 P0-B: MineCompleteEvent stored as facts; lifecycle handled by AgentBackgroundService.
         MineCompleteEvent e => StoreFacts(current, e),
         // Sprint 36 P1-B: ItemCraftedEvent now updates inventory (full wiring).
-        // ItemConsumedEvent remains a stub — full wiring in Sprint 37.
+        // Sprint 38 P4-A: ItemConsumedEvent now updates inventory (full wiring).
         ItemCraftedEvent e => ApplyItemCrafted(current, e),
-        ItemConsumedEvent e => StoreFacts(current, e),
+        ItemConsumedEvent e => ApplyItemConsumed(current, e),
         StatusEvent e => ApplyStatus(current, e),
         // All other events (Chat, Error, BlockNotFound, CraftComplete, SmeltComplete,
         // Death, BlockPlaced, WanderComplete, WanderFailed, Kicked, FlatAreaFound):
@@ -111,6 +112,32 @@ public sealed class WorldStateProjector
         // Normalize: strip minecraft: prefix if present
         var itemKey = e.Item.Contains(':') ? e.Item.Split(':', 2)[1] : e.Item;
         var result = current.With(b => b.AddInventoryItem(itemKey, e.Count));
+        return StoreFacts(result, e);
+    }
+
+    /// <summary>
+    /// Sprint 38 P4-A: Deducts consumed ingredient quantities from inventory.
+    /// Fired when an ItemConsumedEvent arrives (e.g. ingredients used during crafting).
+    /// Normalizes the item key (strips "minecraft:" prefix) for consistency with
+    /// the rest of the inventory system. Clamps at zero — never goes negative.
+    /// ItemConsumedEvent wiring: Sprint 35 P2-A stub → Sprint 38 P4-A full wiring.
+    /// </summary>
+    private static WorldState ApplyItemConsumed(WorldState current, ItemConsumedEvent e)
+    {
+        // Normalize: strip minecraft: prefix if present
+        var itemKey = e.Item.Contains(':') ? e.Item.Split(':', 2)[1] : e.Item;
+        var have    = current.Inventory.GetValueOrDefault(itemKey);
+        var after   = Math.Max(0, have - e.Count);
+
+        // Build updated inventory with the deducted count
+        var newInv = new Dictionary<string, int>(
+            current.Inventory, StringComparer.OrdinalIgnoreCase);
+        if (after == 0)
+            newInv.Remove(itemKey);
+        else
+            newInv[itemKey] = after;
+
+        var result = current.With(b => b.SetInventory(newInv));
         return StoreFacts(result, e);
     }
 
@@ -245,7 +272,8 @@ public sealed class WorldStateProjector
                 });
                 break;
             case ItemConsumedEvent e:
-                // Sprint 35 P2-A stub; full wiring Sprint 36.
+                // Sprint 38 P4-A: inventory deduction done in ApplyItemConsumed above;
+                // here we only record diagnostic facts.
                 result = result.With(b =>
                 {
                     b.SetFact($"{prefix}Item", e.Item, source);
