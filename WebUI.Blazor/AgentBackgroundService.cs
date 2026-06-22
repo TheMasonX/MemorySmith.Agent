@@ -24,6 +24,11 @@ using System.Threading.Channels;
 /// Sprint 25:
 ///   - P0-D: ConcurrentDictionary&lt;Guid, PendingAction&gt; tracks dispatched action lifecycle.
 ///     Replaces implicit "dispatched = done" assumption. Timeout sweep catches orphans.
+///
+/// Sprint 36:
+///   - P0-A: TryInterruptOnDamageAsync: ClearAndEnqueueAsync replaces the separate
+///     SendEmergencyStop() + ClearAndEnqueue() pattern to ensure stop reaches JS before
+///     the queue is cleared and new actions are dispatched.
 /// </summary>
 public sealed class AgentBackgroundService(
     IWorldAdapter worldAdapter,
@@ -362,7 +367,7 @@ public sealed class AgentBackgroundService(
                     Food: _worldState.Food,
                     Timestamp: _timeProvider.UtcNow);
                 _worldState = _projector.Apply(_worldState, damageTaken);
-                TryInterruptOnDamage(damageTaken);
+                await TryInterruptOnDamageAsync(damageTaken, ct);
             }
             else if (currentHealthNow is > 0 and < HealthCriticalThreshold && _currentGoal is not null)
             {
@@ -527,7 +532,7 @@ public sealed class AgentBackgroundService(
     /// D-6 resolution: both <c>_lastDamageInterruptAt</c> and <c>_lastHealthStatusEnqueuedAt</c>
     ///   are updated so the passive health-check gate does not fire immediately after an interrupt.
     /// </summary>
-    private void TryInterruptOnDamage(DamageTakenEvent damage)
+    private async Task TryInterruptOnDamageAsync(DamageTakenEvent damage, CancellationToken ct = default)
     {
         if (_currentGoal is null) return;
 
@@ -568,9 +573,15 @@ public sealed class AgentBackgroundService(
             damage.PreviousHealth, damage.Health, damage.Delta,
             _currentGoal.Name, threshold, queueDepthBeforeClear);
 
-        SendEmergencyStop();
-        // B-3: atomic clear + priority GetStatus enqueue via ActionQueue.ClearAndEnqueue.
-        _queue.ClearAndEnqueue(new ActionData { Tool = "GetStatus" });
+        // Sprint 36 P0-A: ClearAndEnqueueAsync sends stop BEFORE clearing the queue.
+        // Previously SendEmergencyStop() was fire-and-forget — the JS adapter could receive
+        // new GetStatus actions before the stop, leaving the old mine/wander loop running.
+        // ClearAndEnqueueAsync awaits the stop callback before the lock-protected
+        // clear+enqueue, ensuring JS receives the stop before any new actions are dispatched.
+        await _queue.ClearAndEnqueueAsync(
+            new ActionData { Tool = "GetStatus" },
+            () => worldAdapter.SendActionAsync(
+                new ActionData { Tool = EmergencyStopActionName }, CancellationToken.None));
         _lastDamageInterruptAt = _timeProvider.UtcNow;
         _lastHealthStatusEnqueuedAt = _timeProvider.UtcNow; // D-6: sync passive check gate
 
