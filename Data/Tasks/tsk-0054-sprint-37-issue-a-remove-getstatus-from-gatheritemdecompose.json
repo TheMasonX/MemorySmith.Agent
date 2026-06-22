@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0054-sprint-37-issue-a-remove-getstatus-from-gatheritemdecompose",
+  "key": "TSK-0054",
+  "title": "Sprint 37 Issue A: Remove GetStatus from GatherItemDecompose",
+  "description": "Remove \u0060MakeAction(\u0022GetStatus\u0022)\u0060 from GatherItemDecompose in HtnTaskLibrary.cs. This prevents inventory resets mid-gather by eliminating the GetStatus action that triggers a StatusEvent which replaces (rather than appends to) the projected inventory.",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "Sprint37",
+    "fix",
+    "HtnTaskLibrary"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-22T03:38:47.6461186Z",
+  "updatedAtUtc": "2026-06-22T03:40:33.0580774Z",
+  "completedAtUtc": "2026-06-22T03:40:33.0580774Z",
+  "revision": 3,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0054-sprint-37-issue-a-remove-getstatus-from-gatheritemdecompose.json"
+}

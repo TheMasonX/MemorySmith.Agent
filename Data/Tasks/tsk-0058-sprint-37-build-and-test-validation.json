@@ -1,0 +1,32 @@
+﻿{
+  "id": "tsk-0058-sprint-37-build-and-test-validation",
+  "key": "TSK-0058",
+  "title": "Sprint 37: Build and test validation",
+  "description": "Run dotnet build and dotnet test to validate all C# changes. Verify all existing 504\u002B tests pass with zero failures.",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "Sprint37",
+    "validation"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-22T03:38:47.7170174Z",
+  "updatedAtUtc": "2026-06-22T03:40:33.1310799Z",
+  "completedAtUtc": "2026-06-22T03:40:33.1310799Z",
+  "revision": 3,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0058-sprint-37-build-and-test-validation.json"
+}

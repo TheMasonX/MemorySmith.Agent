@@ -338,6 +338,7 @@ public sealed class WebSocketBridge(string uri) : IDisposable
             Health: GetInt(root, "hp", 20),
             Food: GetInt(root, "food", 20),
             Inventory: inv,
+            GameMode: GetString(root, "gameMode"),
             Timestamp: now);
     }
 

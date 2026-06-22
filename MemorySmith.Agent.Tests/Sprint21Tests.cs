@@ -107,6 +107,7 @@ public sealed class Sprint21FreshnessGateTests
         var statusEv = new StatusEvent(
             new Position(0, 64, 0), Health: 20, Food: 20,
             Inventory: new Dictionary<string, int> { ["dirt"] = 5 },
+            GameMode: null,
             Timestamp: DateTimeOffset.UtcNow);
 
         // Act: apply status event

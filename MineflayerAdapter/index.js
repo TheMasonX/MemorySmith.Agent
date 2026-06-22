@@ -32,7 +32,7 @@ import mflPathfinder from 'mineflayer-pathfinder';
 const { pathfinder, Movements, goals: pfGoals } = mflPathfinder;
 import { WebSocketServer } from 'ws';
 import { appendFileSync, mkdirSync, existsSync } from 'node:fs';
-import { emitGameModeEvent } from './gameModeState.js';
+import { emitGameModeEvent, normalizeGameMode } from './gameModeState.js';
 
 // ── Environment / connection ──────────────────────────────────────────────────
 
@@ -268,11 +268,17 @@ function sendBotStatus() {
   for (const item of invItems) {
     invMap[item.name] = (invMap[item.name] ?? 0) + item.count;
   }
+  // Sprint 37: include game mode so C# ApplyStatus can set it from the status
+  // response. Previously game mode was only set via GameModeChangedEvent which
+  // fires asynchronously and can be missed on startup.
+  const rawMode = bot?.game?.gameMode;
+  const gameMode = rawMode != null ? normalizeGameMode(rawMode) : undefined;
   sendEvent('status', {
     ...botPos(),
     hp:   bot.health ?? 20,
     food: bot.food   ?? 20,
     inventory: invMap,
+    ...(gameMode ? { gameMode } : {}),
   });
 }
 
@@ -611,7 +617,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       // produces an empty height map and a false "no flat area" result.
       // Uses a custom wait that covers the full scan radius (not just the default
       // 5x5 chunk window from bot.waitForChunksToLoad).
-      const chunkRadius = Math.ceil(r / 16) + 1; // +1 for safety margin — hoisted before try for diagnostic use
+      const chunkRadius = Math.ceil(r / 16) + 2; // +2 for safety margin (Sprint 37: increased from +1 for boundary chunks)
       try {
         const pos = bot.entity?.position ?? { x: 0, y: 0, z: 0 };
         const chunkPosToCheck = new Set();
@@ -670,6 +676,24 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
 
       /** @type {Map<string, {x:number, z:number, y:number}>} */
       const heightMap = new Map();
+
+      // Sprint 37: direct ground check — seeds the height map with the block below
+      // the bot's current position, ensuring at least one entry even if chunks
+      // aren't fully loaded yet. Prevents false "area=0" on flat ground.
+      const groundCheckPos = toVec3(botPosObj.x, botPosObj.y - 1, botPosObj.z);
+      const groundBlock = bot.blockAt(groundCheckPos);
+      if (groundBlock && groundBlock.boundingBox === 'block' && !LIQUID_BLOCK_NAMES.has(groundBlock.name)) {
+        const aboveGround = bot.blockAt(toVec3(botPosObj.x, botPosObj.y, botPosObj.z));
+        if (!aboveGround || aboveGround.name === 'air' || aboveGround.boundingBox === 'empty') {
+          heightMap.set(`${botPosObj.x},${botPosObj.z}`, {
+            x: botPosObj.x, z: botPosObj.z, y: botPosObj.y,
+          });
+          console.log(
+            `[findFlatArea] direct ground hit at (${botPosObj.x},${botPosObj.y},${botPosObj.z})` +
+            ` block=${groundBlock.name}`
+          );
+        }
+      }
 
       let columnIdx = 0;
 
@@ -793,10 +817,15 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       if (bestCandidate) {
         sendEvent('flatAreaFound', { ...bestCandidate, correlationId });
         const scanElapsed = Date.now() - _scanStart;
+        const distFromCenter = Math.sqrt(
+          ((bestCandidate.minX + bestCandidate.maxX) / 2 - scanCenter.x) ** 2 +
+          ((bestCandidate.minZ + bestCandidate.maxZ) / 2 - scanCenter.z) ** 2
+        );
         console.log(
           `[findFlatArea] best at (${bestCandidate.x},${bestCandidate.y},${bestCandidate.z})` +
           ` area=${bestCandidate.area} yRange=${bestCandidate.yRange}` +
-          ` compact=${bestCandidate.compactness} score=${bestScore.toFixed(1)} (${scanElapsed}ms)`
+          ` compact=${bestCandidate.compactness} score=${bestScore.toFixed(1)}` +
+          ` distFromCenter=${distFromCenter.toFixed(1)} (${scanElapsed}ms)`
         );
         logStructured('info', 'findFlatArea', 'found', {
           ...bestCandidate, score: +bestScore.toFixed(1), columns: columnIdx, elapsedMs: scanElapsed,
@@ -843,7 +872,12 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       break;
 
     case 'chat':
-      bot.chat(args.message ?? '');
+      try {
+        bot.chat(args.message ?? '');
+      } catch (e) {
+        console.error(`[chat] failed to send message: ${e.message}`);
+        sendEvent('error', { action: 'chat', message: e.message, correlationId });
+      }
       break;
 
     case 'craft': {

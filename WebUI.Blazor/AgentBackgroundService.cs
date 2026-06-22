@@ -402,8 +402,23 @@ public sealed class AgentBackgroundService(
                     // Sprint 15 P0: log actual count (was always 1 before the projector fix)
                     logger.LogInformation("Inventory +{Count} {Block} -> total {Total}",
                         e.Count, itemKey, _worldState.Inventory.GetValueOrDefault(itemKey));
-                    // Sprint 25 P0-D: blockMined is a partial-progress event for MineBlock.
-                    // Don't transition to Completed yet — the mine loop may continue.
+                    // Sprint 37 (Issue A): a block was mined — inventory is no longer stale.
+                    // This replaces the stale-flag-clearing role formerly served by GetStatus
+                    // in the gather plan. Without this, GenericGatherGoal.IsComplete defers
+                    // indefinitely when no GetStatus action is dispatched.
+                    if (_worldState.IsInventoryStale)
+                        _worldState = _worldState.With(b => b.SetInventoryStale(false));
+                    // Sprint 37 (Issue B): complete MineBlock correlation on each mined block.
+                    // Check for pending correlation BEFORE completing so the diagnostic is accurate.
+                    var hadPendingMineBlock = _correlatedActions.Values.Any(a =>
+                        a.State == ActionLifecycle.Dispatched &&
+                        a.ToolName.Equals("MineBlock", StringComparison.OrdinalIgnoreCase));
+                    CompleteCorrelatedActionByTool("MineBlock");
+                    if (!hadPendingMineBlock)
+                        logger.LogDebug(
+                            "[correlation] BlockMinedEvent for {Block} arrived — no pending MineBlock " +
+                            "(normal: already completed by previous block, or event for abandoned goal)",
+                            itemKey);
                     break;
 
                 case CraftCompleteEvent e:

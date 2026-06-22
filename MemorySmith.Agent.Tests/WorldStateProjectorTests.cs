@@ -108,7 +108,7 @@ public class WorldStateProjectorTests
     public void Apply_StatusEvent_UpdatesPositionHealthAndInventory()
     {
         var inventory = new Dictionary<string, int> { ["oak_log"] = 3, ["stone"] = 10 };
-        var ev = new StatusEvent(new Position(1, 2, 3), 19, 17, inventory, Now);
+        var ev = new StatusEvent(new Position(1, 2, 3), 19, 17, inventory, null, Now);
 
         var result = _projector.Apply(EmptyState, ev);
 
@@ -132,7 +132,7 @@ public class WorldStateProjectorTests
         // StatusEvent already filters zero-quantity items in ParseStatus;
         // we simulate a post-filter dictionary here.
         var inventory = new Dictionary<string, int> { ["oak_log"] = 3, ["stone"] = 5 };
-        var ev = new StatusEvent(new Position(0, 0, 0), 20, 20, inventory, Now);
+        var ev = new StatusEvent(new Position(0, 0, 0), 20, 20, inventory, null, Now);
 
         var result = _projector.Apply(EmptyState, ev);
 
@@ -147,7 +147,7 @@ public class WorldStateProjectorTests
     {
         // Mineflayer can return "minecraft:oak_log" in the status payload.
         var inventory = new Dictionary<string, int> { ["minecraft:oak_log"] = 5 };
-        var ev = new StatusEvent(new Position(0, 64, 0), 20, 20, inventory, Now);
+        var ev = new StatusEvent(new Position(0, 64, 0), 20, 20, inventory, null, Now);
 
         var result = _projector.Apply(EmptyState, ev);
 
@@ -169,7 +169,7 @@ public class WorldStateProjectorTests
             ["minecraft:iron_ingot"] = 2,
             ["iron_ingot"]           = 1,
         };
-        var ev = new StatusEvent(new Position(0, 64, 0), 20, 20, inventory, Now);
+        var ev = new StatusEvent(new Position(0, 64, 0), 20, 20, inventory, null, Now);
 
         var result = _projector.Apply(EmptyState, ev);
 
@@ -182,7 +182,7 @@ public class WorldStateProjectorTests
     {
         // Fast path: no namespace prefix → no allocation, same semantics.
         var inventory = new Dictionary<string, int> { ["cobblestone"] = 64, ["stick"] = 32 };
-        var ev = new StatusEvent(new Position(0, 64, 0), 20, 20, inventory, Now);
+        var ev = new StatusEvent(new Position(0, 64, 0), 20, 20, inventory, null, Now);
 
         var result = _projector.Apply(EmptyState, ev);
 

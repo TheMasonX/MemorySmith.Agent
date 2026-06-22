@@ -33,3 +33,5 @@ function normalizeGameMode(rawValue) {
   if (mode.includes('spectator')) return 'spectator';
   return null;
 }
+
+export { normalizeGameMode };
