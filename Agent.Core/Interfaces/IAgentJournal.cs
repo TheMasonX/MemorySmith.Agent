@@ -27,4 +27,28 @@ public interface IAgentJournal
 
     /// <summary>Clear all entries (e.g., on agent restart).</summary>
     void Clear();
+
+    /// <summary>
+    /// Sprint 36 P0-B: Records an ActionOutcome as a journal entry.
+    /// Default implementation translates the outcome to a JournalEntry
+    /// using existing ActionCompleted / ActionFailed types so existing
+    /// implementations (AgentJournal, NullAgentJournal, test doubles) do
+    /// not need to change.
+    ///
+    /// Override in specialised implementations if richer outcome storage is needed.
+    /// </summary>
+    void LogOutcome(ActionOutcome outcome)
+    {
+        Log(new JournalEntry(
+            outcome.Timestamp,
+            outcome.Success ? JournalEntryType.ActionCompleted : JournalEntryType.ActionFailed,
+            $"[outcome] {outcome.ToolName}: {outcome.ObservationSummary}",
+            new Dictionary<string, object?>
+            {
+                ["goalId"]      = outcome.GoalId.ToString("N"),
+                ["toolName"]    = outcome.ToolName,
+                ["success"]     = outcome.Success,
+                ["effectCount"] = outcome.Effects.Count,
+            }));
+    }
 }
