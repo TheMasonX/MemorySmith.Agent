@@ -24,6 +24,9 @@ public sealed class BuildGoalDecomposer(HtnTaskLibrary taskLibrary, ILogger<Buil
         var bg = (BuildGoal)goal;
 
         // Sprint 35: explicit origin from chat takes precedence over stored facts.
+        // Sprint 37: when explicit origin is given, it's used as the scan center for
+        // FindFlatArea to find the nearest flat ground near those coordinates, rather
+        // than building directly at the specified position.
         int ox, oy, oz;
         if (bg.HasExplicitOrigin)
         {
@@ -31,7 +34,8 @@ public sealed class BuildGoalDecomposer(HtnTaskLibrary taskLibrary, ILogger<Buil
             oy = bg.OriginY ?? 0;
             oz = bg.OriginZ ?? 0;
             logger.LogInformation(
-                "Using explicit build origin ({X},{Y},{Z}) for '{Blueprint}' from chat parameters.",
+                "Using explicit build origin ({X},{Y},{Z}) for '{Blueprint}' from chat parameters " +
+                "— scanning for flat ground near this location.",
                 ox, oy, oz, bg.Blueprint.Id);
         }
         else
@@ -48,9 +52,9 @@ public sealed class BuildGoalDecomposer(HtnTaskLibrary taskLibrary, ILogger<Buil
             }
         }
 
-        // requireOrigin=true when no explicit origin was given AND no stored facts exist.
-        // This causes DecomposeBuild to emit a FindFlatArea action instead of defaulting to (0,0,0).
-        var requireOrigin = !bg.HasExplicitOrigin;
+        // Sprint 37: always requireOrigin=true when explicit origin is given, so
+        // DecomposeBuild emits FindFlatArea with scanOrigin set to those coords.
+        var requireOrigin = true;
 
         var actions = taskLibrary.DecomposeBuild(
             bg.Blueprint, bg.Blocks, ox, oy, oz, state, requireOrigin);

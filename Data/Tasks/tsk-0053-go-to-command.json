@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0053-go-to-command",
+  "key": "TSK-0053",
+  "title": "Go To Command",
+  "description": "Tell the agent to go somewhere. If it\u0027s coordinates or an entity, use those. For structures or biomes, use the locate command",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-22T02:37:45.6921028Z",
+  "updatedAtUtc": "2026-06-22T02:37:45.6921028Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

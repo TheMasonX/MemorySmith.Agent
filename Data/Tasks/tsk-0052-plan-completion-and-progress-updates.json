@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0052-plan-completion-and-progress-updates",
+  "key": "TSK-0052",
+  "title": "Plan Completion and Progress Updates",
+  "description": "The agent should report on the plan completion and for longer plans, or when replanning, make chat announcements",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-22T02:36:50.9181993Z",
+  "updatedAtUtc": "2026-06-22T02:36:50.9181993Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

@@ -144,6 +144,11 @@ public sealed class AgentBackgroundService(
     // Updated both by the passive check and by the damage interrupt path (D-6 resolution).
     private DateTimeOffset _lastHealthStatusEnqueuedAt = DateTimeOffset.MinValue;
 
+    // Sprint 37: tracks consecutive FindFlatArea scans that returned area=0.
+    // Reset to 0 whenever a valid flat area (area >= MinUsableFlatArea) is found,
+    // or when a new goal is set.
+    private int _consecutiveZeroAreaScans;
+
     public WorldState WorldState => _worldState;
     public IGoal? CurrentGoal => _currentGoal;
     public int ConsecutiveFailures => _consecutiveFailures;
@@ -194,6 +199,8 @@ public sealed class AgentBackgroundService(
         lock (_pendingLock) _pendingActions.Clear();
         // Sprint 25 P0-D: clear correlation tracking for new goal.
         _correlatedActions.Clear();
+        // Sprint 37: reset zero-area scan counter for new goal.
+        _consecutiveZeroAreaScans = 0;
         // TSK-0021: report task-relevant inventory instead of generic top-5 summary.
         var taskInv = SummarizeTaskRelevantInventory(goal);
         logger.LogInformation("[goal] set: {Goal} — {Description} | inventory: [{Inventory}]",
@@ -415,6 +422,7 @@ public sealed class AgentBackgroundService(
                     break;
 
                 case FlatAreaFoundEvent ffa when ffa.Area >= MinUsableFlatArea:
+                    _consecutiveZeroAreaScans = 0;
                     SetBuildOrigin(BuildFactKeys.AutoBlueprintId, ffa.X, ffa.Y, ffa.Z);
                     _journal?.Log(new JournalEntry(
                         _timeProvider.UtcNow, JournalEntryType.Observation, "FlatAreaFound",
@@ -432,9 +440,35 @@ public sealed class AgentBackgroundService(
                     break;
 
                 case FlatAreaFoundEvent ffa:
-                    logger.LogInformation(
-                        "[findFlatArea] scan area={Area} below minimum {Min} — auto-origin not updated",
-                        ffa.Area, MinUsableFlatArea);
+                    _consecutiveZeroAreaScans++;
+                    if (_consecutiveZeroAreaScans >= 2 && ffa.Area == 0)
+                    {
+                        // Sprint 37: after 2 consecutive scans with area=0, use bot's current
+                        // position as fallback build origin. This prevents the scanner from
+                        // expanding radius to find far-away locations when the bot can just
+                        // build where it's standing.
+                        var pos = _worldState.Position;
+                        SetBuildOrigin(BuildFactKeys.AutoBlueprintId, pos.X, pos.Y - 1, pos.Z);
+                        logger.LogWarning(
+                            "[findFlatArea] 2 consecutive zero-area scans — falling back to bot position " +
+                            "({X},{Y},{Z}) area=0 (fallback)",
+                            pos.X, pos.Y - 1, pos.Z);
+                        _journal?.Log(new JournalEntry(
+                            _timeProvider.UtcNow, JournalEntryType.Observation, "FlatAreaFoundFallback",
+                            new Dictionary<string, object?>
+                            {
+                                ["x"] = pos.X,
+                                ["y"] = pos.Y - 1,
+                                ["z"] = pos.Z,
+                                ["area"] = 0,
+                            }));
+                    }
+                    else
+                    {
+                        logger.LogInformation(
+                            "[findFlatArea] scan area={Area} below minimum {Min} — auto-origin not updated (consecutiveZero={Count})",
+                            ffa.Area, MinUsableFlatArea, _consecutiveZeroAreaScans);
+                    }
                     CompleteCorrelatedActionByTool("FindFlatArea");
                     break;
 
@@ -607,10 +641,14 @@ public sealed class AgentBackgroundService(
                 break;
 
             case ChatIntentType.CreateGoal when interpretation.GoalName is not null:
+                if (pendingResponse is not null)
+                    logger.LogInformation("[chat] bot: {Response}", pendingResponse);
                 await TryCreateGoalFromChatAsync(interpretation, ct);
                 break;
 
             case ChatIntentType.NavigateTo:
+                if (pendingResponse is not null)
+                    logger.LogInformation("[chat] bot: {Response}", pendingResponse);
                 CancelGoal();
 
                 if (pendingResponse is not null)
@@ -676,6 +714,14 @@ public sealed class AgentBackgroundService(
     {
         if (_currentGoal is null) return;
         if (!_currentGoal.IsComplete(_worldState)) return;
+
+        // Sprint 37: diagnostic logging for premature goal completion via event path.
+        if (_currentGoal is IItemSpecGoal isg)
+            logger.LogInformation(
+                "[goal] event-completed: {Goal} (gameMode={GameMode}, stale={Stale}, " +
+                "inventory=[{Inventory}], target={Target})",
+                _currentGoal.Name, _worldState.GameMode, _worldState.IsInventoryStale,
+                SummarizeTaskRelevantInventory(_currentGoal), isg.TargetCount);
 
         logger.LogInformation("[goal] completed: {Goal} | inventory: [{Inventory}]",
             _currentGoal.Name, SummarizeTaskRelevantInventory(_currentGoal));
@@ -797,6 +843,21 @@ public sealed class AgentBackgroundService(
 
              if (_currentGoal.IsComplete(_worldState))
                 {
+                    // Sprint 37: diagnostic logging for gather goal completion — log game mode,
+                    // stale flag, and actual inventory so we can debug why goals complete early.
+                    if (_currentGoal is IItemSpecGoal && _worldState.IsInventoryStale)
+                        logger.LogWarning(
+                            "[goal] {Goal} completed while inventory STALE (gameMode={GameMode}, " +
+                            "inventory=[{Inventory}]) — may be premature",
+                            _currentGoal.Name, _worldState.GameMode,
+                            SummarizeTaskRelevantInventory(_currentGoal));
+                    else if (_currentGoal is IItemSpecGoal itemGoal2)
+                        logger.LogInformation(
+                            "[goal] {Goal} completed (gameMode={GameMode}, stale={Stale}, " +
+                            "inventory=[{Inventory}], target={Target})",
+                            _currentGoal.Name, _worldState.GameMode, _worldState.IsInventoryStale,
+                            SummarizeTaskRelevantInventory(_currentGoal), itemGoal2.TargetCount);
+
                     logger.LogInformation("[goal] completed: {Goal} | inventory: [{Inventory}]",
                         _currentGoal.Name, SummarizeTaskRelevantInventory(_currentGoal));
                     _currentGoal = null; _consecutiveFailures = 0; planContext.Clear();

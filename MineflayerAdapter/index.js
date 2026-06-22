@@ -63,10 +63,13 @@ const FLAT_AREA_Y_ABOVE          = 10;
 const FLAT_AREA_Y_BELOW          = 16;
 const FLAT_AREA_MAX_SLOPE        = 3;
 
+// Sprint 37: added proximity weight so closer flat areas (ground-level) are
+// preferred over far-away ones (tower tops, distant platforms).
 const FLAT_SCORE_WEIGHTS = Object.freeze({
-  area:        0.5,
-  compactness: 0.3,
-  flatness:    0.2,
+  area:        0.35,
+  compactness: 0.20,
+  flatness:    0.15,
+  proximity:   0.30,
 });
 
 const LIQUID_BLOCK_NAMES = new Set(['water', 'lava', 'flowing_water', 'flowing_lava']);
@@ -321,8 +324,20 @@ function isSystemMessage(username, message) {
   return SYSTEM_MESSAGE_PATTERNS.some(re => re.test(message));
 }
 
+/** Sprint 37: handles numeric game mode values (0=survival, 1=creative, etc.) */
+const GAME_MODE_NUMBERS = Object.freeze({
+  0: 'survival',
+  1: 'creative',
+  2: 'adventure',
+  3: 'spectator',
+});
+
 function normalizeGameMode(rawValue) {
-  const mode = (rawValue ?? '').trim().toLowerCase();
+  if (rawValue === undefined || rawValue === null) return null;
+  // Handle numeric game mode (Mineflayer stores as number in MC 1.21+)
+  if (typeof rawValue === 'number') return GAME_MODE_NUMBERS[rawValue] ?? null;
+  // Handle string game mode (older Mineflayer or chat-detected)
+  const mode = String(rawValue).trim().toLowerCase();
   if (!mode) return null;
   if (mode.includes('creative')) return 'creative';
   if (mode.includes('survival')) return 'survival';
@@ -575,7 +590,14 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         yAbove      = FLAT_AREA_Y_ABOVE,
         yBelow      = FLAT_AREA_Y_BELOW,
         maxSlope    = FLAT_AREA_MAX_SLOPE,
+        scanOriginX, scanOriginY, scanOriginZ,
       } = args;
+
+      // Sprint 37: if scanOrigin is provided, center the scan there instead of at
+      // the bot's current position. This lets the C# side say "find flat ground
+      // near X,Y,Z" rather than "find flat ground near wherever the bot is".
+      const scanCenterX = scanOriginX != null ? scanOriginX : null;
+      const scanCenterZ = scanOriginZ != null ? scanOriginZ : null;
 
       let botPosObj = botPos();
       const r       = Math.max(1, Math.min(radius, 64));
@@ -629,7 +651,17 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       // Re-read position after chunk loading (bot may have settled)
       botPosObj = botPos();
       const _scanStart = Date.now();
-      logStructured('info', 'findFlatArea', 'start', { radius: r, minArea, botPos: botPosObj });
+
+      // Sprint 37: use scanOrigin as the scan center if provided, otherwise use botPos.
+      const scanCenter = {
+        x: scanCenterX ?? botPosObj.x,
+        y: scanOriginY ?? botPosObj.y,
+        z: scanCenterZ ?? botPosObj.z,
+      };
+
+      logStructured('info', 'findFlatArea', 'start', {
+        radius: r, minArea, botPos: botPosObj, scanCenter,
+      });
 
       // ── Height map ─────────────────────────────────────────────────────────
       // Sprint 18 fix: bot.blockAt() now calls pos.floored() internally in current
@@ -653,10 +685,10 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
             await new Promise(resolve => setImmediate(resolve));
           }
 
-          const cx = botPosObj.x + dx;
-          const cz = botPosObj.z + dz;
+          const cx = scanCenter.x + dx;
+          const cz = scanCenter.z + dz;
 
-          for (let cy = botPosObj.y + yAbove; cy >= botPosObj.y - yBelow; cy--) {
+          for (let cy = scanCenter.y + yAbove; cy >= scanCenter.y - yBelow; cy--) {
             // Sprint 18: use toVec3 so bot.blockAt() gets .floored() method
             const block = bot.blockAt(toVec3(cx, cy, cz));
             if (!block) continue;
@@ -725,10 +757,22 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
 
         const compactness = component.length / (bboxW * bboxD);
         const flatness    = maxSlope > 0 ? 1 - yRange / maxSlope : 1;
+        // Sprint 37: proximity penalty — closer to scan center is preferred.
+        // This prevents the scanner from choosing a far-away tower top over
+        // nearby ground-level flat patches.
+        const compCenterX = (minX + maxX) / 2;
+        const compCenterZ = (minZ + maxZ) / 2;
+        const distFromCenter = Math.sqrt(
+          (compCenterX - scanCenter.x) ** 2 +
+          (compCenterZ - scanCenter.z) ** 2
+        );
+        const maxPossibleDist  = Math.sqrt(2) * r;
+        const proximity        = Math.max(0, 1 - distFromCenter / maxPossibleDist);
         const score       = component.length * (
           FLAT_SCORE_WEIGHTS.area        +
           FLAT_SCORE_WEIGHTS.compactness * compactness +
-          FLAT_SCORE_WEIGHTS.flatness    * flatness
+          FLAT_SCORE_WEIGHTS.flatness    * flatness +
+          FLAT_SCORE_WEIGHTS.proximity   * proximity
         );
 
         if (score > bestScore) {
