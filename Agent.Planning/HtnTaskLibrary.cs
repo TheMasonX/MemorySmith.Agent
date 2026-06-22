@@ -24,7 +24,8 @@ public delegate IReadOnlyList<ActionData> TaskDecomposer(
 /// Sprint 14 P0: DecomposeCraftItem pre-gathers iron ingots (iron tools) and cobblestone (stone tools).
 /// Sprint 14 P1a: DirectMineBlocks now delegates to CommonMinecraftBlocks.DirectMineBlocks.
 /// Sprint 16 D3-S15: Extracted crafting-table bootstrap into AddCraftingTableIfNeeded helper.
-/// Sprint 36 P0-C: DecomposeBuild retry gated on SearchedRadius < FlatAreaRetryRadius (48).
+/// Sprint 36 P0-C: DecomposeBuild retry gated on SearchedRadius &lt; FlatAreaRetryRadius (48).
+/// Sprint 38 P0-A: GetStatus removed from GatherItemDecompose.
 /// </summary>
 public sealed class HtnTaskLibrary
 {
@@ -622,7 +623,13 @@ public sealed class HtnTaskLibrary
 
         foreach (var block in spec.SourceBlocks)
             actions.Add(MakeAction("MineBlock", ("block", block), ("count", (object?)count)));
-        actions.Add(MakeAction("GetStatus"));
+        // Sprint 38 P0-A: GetStatus removed — inventory truth now comes from
+        // ItemCollectedEvent (playerCollect) which fires after each pickup.
+        // ApplyStatus replaces the entire inventory snapshot, wiping additive
+        // ApplyItemCollected increments. Stale-flag clearing and MineBlock
+        // correlation completion are both handled in the BlockMinedEvent handler
+        // (added in Sprint 37). Periodic GetStatus for drift reconciliation is
+        // triggered separately by the health-check and status-check paths.
         return actions;
     }
 
