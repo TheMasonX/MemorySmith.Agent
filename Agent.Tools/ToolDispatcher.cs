@@ -1,1 +1,273 @@
-bmFtZXNwYWNlIEFnZW50LlRvb2xzOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zLkNvbmN1cnJlbnQ7CnVzaW5nIFN5c3RlbS5UZXh0Lkpzb247CgovLy8gPHN1bW1hcnk+Ci8vLyBEZWVwIG1vZHVsZTogcmVnaXN0ZXJzIHRvb2xzLCByZXNvbHZlcyBieSBuYW1lLCBhbmQgZXhlY3V0ZXMgd2l0aCBzY2hlbWEgdmFsaWRhdGlvbi4KLy8vCi8vLyBSZXBsYWNlcyB0aGUgZm9ybWVyIFRvb2xSZWdpc3RyeSArIFRvb2xFbmdpbmUgcGFpciAodHdvIHNoYWxsb3cgbW9kdWxlcyB0aGF0IHRoZQovLy8gZGVsZXRpb24gdGVzdCBjb25maXJtZWQgZWFybmVkIG5vIHNlcGFyYXRlIGludGVyZmFjZSBkZXB0aCkuIFRoZSBjYWxsZXIgc3VyZmFjZSBzaHJpbmtzCi8vLyBmcm9tIGZvdXIgdHlwZXMgKElUb29sUmVnaXN0cnksIElUb29sQ2FsbGVyLCBUb29sUmVnaXN0cnksIFRvb2xFbmdpbmUpIHRvIHR3bwovLy8gKElUb29sQ2FsbGVyIHN0YXlzIGZvciBESTsgVG9vbERpc3BhdGNoZXIgaXMgdGhlIHNpbmdsZSBjb25jcmV0ZSBjbGFzcykuCi8vLwovLy8gU3ByaW50IDU6IHNjaGVtYSB2YWxpZGF0aW9uIGlzIG5vdyBlbmZvcmNlZCBhdCB0aGUgZGlzcGF0Y2ggYm91bmRhcnkuIEV2ZXJ5IHRvb2wncwovLy8gSW5wdXRTY2hlbWEgaXMgdmFsaWRhdGVkIGJlZm9yZSBleGVjdXRpb24g4oCUIHRoaXMgaXMgdGhlIHNhZmV0eSBib3VuZGFyeSBiZXR3ZWVuCi8vLyB1bnRydXN0ZWQgYXJndW1lbnRzIChmcm9tIExMTXMgb3IgUkVTVCBBUEkpIGFuZCB0aGUgdG9vbCBsYXllci4KLy8vCi8vLyBTcHJpbnQgMjUgUDAtQzogRXhlY3V0ZUFzeW5jIGlzIG5vdyB3cmFwcGVkIGluIHRyeS9jYXRjaCDigJQgdG9vbCBleGNlcHRpb25zIHByb2R1Y2UKLy8vIFRvb2xSZXN1bHQoZmFsc2UsIC4uLikgaW5zdGVhZCBvZiBwcm9wYWdhdGluZy4gSW50ZWdlciB2YWxpZGF0aW9uIHVzZXMgVHJ5R2V0SW50MzIKLy8vIHRvIGNvcnJlY3RseSByZWplY3Qgc2NpZW50aWZpYyBub3RhdGlvbiAoZS5nLiAiMWU1IikuCi8vLwovLy8gU3ByaW50IDM2IFAwLUI6IENhbGxXaXRoT3V0Y29tZUFzeW5jIHdyYXBzIENhbGxBc3luYyBhbmQgcHJvZHVjZXMgYW4gQWN0aW9uT3V0Y29tZS4KLy8vIFNwcmludCAzNyBQMC1COiBDYWxsQXN5bmMgbm8gbG9uZ2VyIGVtaXRzIGl0cyBvd24gc3VjY2Vzcy9mYWlsdXJlIGpvdXJuYWwgZW50cnk7Ci8vLyBjYWxsZXJzIHVzaW5nIENhbGxXaXRoT3V0Y29tZUFzeW5jIGNhbGwgX2pvdXJuYWw/LkxvZ091dGNvbWUob3V0Y29tZSkgZXhwbGljaXRseS4KLy8vCi8vLyBTcHJpbnQgMzYgUDEtQzogUmVnaXN0ZXJlZE5hbWVzIGV4cG9zZXMgYWxsIHJlZ2lzdHJhdGlvbiBrZXlzIChpbmNsdWRpbmcgYWxpYXNlcykgaW4KLy8vIHNvcnRlZCBvcmRlciBmb3IgZGV0ZXJtaW5pc3RpYyBMTE0gcHJvbXB0IGluamVjdGlvbi4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCBjbGFzcyBUb29sRGlzcGF0Y2hlciA6IElUb29sQ2FsbGVyCnsKICAgIHByaXZhdGUgcmVhZG9ubHkgQ29uY3VycmVudERpY3Rpb25hcnk8c3RyaW5nLCBJVG9vbD4gX3Rvb2xzID0KICAgICAgICBuZXcoU3RyaW5nQ29tcGFyZXIuT3JkaW5hbElnbm9yZUNhc2UpOwogICAgcHJpdmF0ZSByZWFkb25seSBJQWdlbnRKb3VybmFsPyBfam91cm5hbDsKCiAgICBwdWJsaWMgVG9vbERpc3BhdGNoZXIoSUFnZW50Sm91cm5hbD8gam91cm5hbCA9IG51bGwpCiAgICB7CiAgICAgICAgX2pvdXJuYWwgPSBqb3VybmFsOwogICAgfQoKICAgIC8vIOKUgOKUgCBSZWdpc3RyYXRpb24g4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgcHVibGljIHZvaWQgUmVnaXN0ZXIoSVRvb2wgdG9vbCkgPT4gX3Rvb2xzW3Rvb2wuTmFtZV0gPSB0b29sOwoKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBTcHJpbnQgMjUgUDAtQjogUmVnaXN0ZXIgYSB0b29sIHVuZGVyIGFuIGV4cGxpY2l0IGFsaWFzIG5hbWUuCiAgICAvLy8gVXNlZCB0byByZWdpc3RlciBHZXRTdGF0dXNUb29sIHVuZGVyIGJvdGggIkdldFN0YXR1cyIgYW5kICJTdGF0dXMiIGFmdGVyCiAgICAvLy8gZGVsZXRpbmcgdGhlIGR1cGxpY2F0ZSBTdGF0dXNUb29sIGNsYXNzLgogICAgLy8vCiAgICAvLy8gQ29sbGlzaW9uIHNlbWFudGljczogaWYgPHBhcmFtcmVmIG5hbWU9Im5hbWUiLz4gaXMgYWxyZWFkeSByZWdpc3RlcmVkLCB0aGUKICAgIC8vLyBleGlzdGluZyBlbnRyeSBpcyBzaWxlbnRseSBvdmVyd3JpdHRlbiAoPGM+X3Rvb2xzW25hbWVdID0gdG9vbDwvYz4pLiBUaGlzIGlzCiAgICAvLy8gaW50ZW50aW9uYWwgZm9yIGFsaWFzIHJlZ2lzdHJhdGlvbi4gQ2FsbGVycyB0aGF0IG5lZWQgdG8gZGV0ZWN0IGNvbGxpc2lvbnMKICAgIC8vLyBzaG91bGQgY2hlY2sgPHNlZSBjcmVmPSJHZXQiLz4gYmVmb3JlIGNhbGxpbmcgdGhpcyBvdmVybG9hZC4KICAgIC8vLyA8L3N1bW1hcnk+CiAgICBwdWJsaWMgdm9pZCBSZWdpc3RlcihzdHJpbmcgbmFtZSwgSVRvb2wgdG9vbCkgPT4gX3Rvb2xzW25hbWVdID0gdG9vbDsKCiAgICBwdWJsaWMgSVRvb2w/IEdldChzdHJpbmcgbmFtZSkgPT4KICAgICAgICBfdG9vbHMuVHJ5R2V0VmFsdWUobmFtZSwgb3V0IHZhciB0KSA/IHQgOiBudWxsOwoKICAgIHB1YmxpYyBJUmVhZE9ubHlMaXN0PElUb29sPiBBbGwgPT4gWy4uIF90b29scy5WYWx1ZXNdOwoKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBTcHJpbnQgMzYgUDEtQzogUmV0dXJucyBhbGwgcmVnaXN0ZXJlZCBuYW1lcyAoaW5jbHVkaW5nIGFsaWFzZXMpIGluCiAgICAvLy8gY2FzZS1pbnNlbnNpdGl2ZSBhbHBoYWJldGljYWwgb3JkZXIuIFVzZSB0aGlzIGluc3RlYWQgb2YKICAgIC8vLyA8c2VlIGNyZWY9IkFsbCIvPiB3aGVuIGJ1aWxkaW5nIGFuIExMTSBwcm9tcHQg4oCUIDxzZWUgY3JlZj0iQWxsIi8+CiAgICAvLy8gaXRlcmF0ZXMgZGljdCB2YWx1ZXMgaW4gbm9uZGV0ZXJtaW5pc3RpYyBvcmRlciBhbmQgZG9lcyBub3Qgc3VyZmFjZQogICAgLy8vIGFsaWFzIGtleXMgKGUuZy4gIlN0YXR1cyIgaXMgcmVnaXN0ZXJlZCBhcyBhbiBhbGlhcyBmb3IgR2V0U3RhdHVzVG9vbAogICAgLy8vIGJ1dCBkb2VzIG5vdCBhcHBlYXIgaW4gPHNlZSBjcmVmPSJBbGwiLz4gYmVjYXVzZSB0aGUgZGljdCBzdG9yZXMgb25seQogICAgLy8vIG9uZSB0b29sIGluc3RhbmNlIHBlciB2YWx1ZSwgbm90IHBlciByZWdpc3RyYXRpb24ga2V5KS4KICAgIC8vLyA8L3N1bW1hcnk+CiAgICBwdWJsaWMgSVJlYWRPbmx5TGlzdDxzdHJpbmc+IFJlZ2lzdGVyZWROYW1lcyA9PgogICAgICAgIFsuLiBfdG9vbHMuS2V5cy5PcmRlckJ5KGsgPT4gaywgU3RyaW5nQ29tcGFyZXIuT3JkaW5hbElnbm9yZUNhc2UpXTsKCiAgICAvLyDilIDilIAgRGlzcGF0Y2gg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIFJlc29sdmVzIHRoZSBuYW1lZCB0b29sLCB2YWxpZGF0ZXMgYXJndW1lbnRzIGFnYWluc3QgaXRzIElucHV0U2NoZW1hLAogICAgLy8vIGFuZCBleGVjdXRlcy4gUmV0dXJucyBhIGZhaWx1cmUgcmVzdWx0IChub3QgdGhyb3dzKSB3aGVuIHRoZSB0b29sIGlzCiAgICAvLy8gdW5rbm93biBvciB0aGUgYXJndW1lbnRzIGFyZSBtYWxmb3JtZWQg4oCUIHRoZSBjYWxsZXIncyBkaXNwYXRjaCBsb29wCiAgICAvLy8gZGVjaWRlcyB3aGV0aGVyIHRvIHJldHJ5IG9yIGFiYW5kb24uCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHVibGljIGFzeW5jIFRhc2s8VG9vbFJlc3VsdD4gQ2FsbEFzeW5jKAogICAgICAgIHN0cmluZyB0b29sTmFtZSwgSnNvbkVsZW1lbnQgYXJndW1lbnRzLAogICAgICAgIENhbmNlbGxhdGlvblRva2VuIGNhbmNlbGxhdGlvblRva2VuID0gZGVmYXVsdCkKICAgIHsKICAgICAgICBpZiAoIV90b29scy5UcnlHZXRWYWx1ZSh0b29sTmFtZSwgb3V0IHZhciB0b29sKSkKICAgICAgICB7CiAgICAgICAgICAgIHZhciB1bmtub3duRW50cnkgPSBuZXcgSm91cm5hbEVudHJ5KAogICAgICAgICAgICAgICAgRGF0ZVRpbWVPZmZzZXQuVXRjTm93LAogICAgICAgICAgICAgICAgSm91cm5hbEVudHJ5VHlwZS5BY3Rpb25GYWlsZWQsCiAgICAgICAgICAgICAgICAkIlRvb2wgJ3t0b29sTmFtZX0nIG5vdCByZWdpc3RlcmVkIik7CiAgICAgICAgICAgIF9qb3VybmFsPy5Mb2codW5rbm93bkVudHJ5KTsKICAgICAgICAgICAgcmV0dXJuIG5ldyBUb29sUmVzdWx0KGZhbHNlLCAkIlRvb2wgJ3t0b29sTmFtZX0nIGlzIG5vdCByZWdpc3RlcmVkLiIpOwogICAgICAgIH0KCiAgICAgICAgLy8gU3ByaW50IDU6IHZhbGlkYXRlIGFyZ3VtZW50cyBhZ2FpbnN0IHRoZSB0b29sJ3MgZGVjbGFyZWQgSW5wdXRTY2hlbWEKICAgICAgICB2YXIgc2NoZW1hID0gdG9vbC5JbnB1dFNjaGVtYTsKICAgICAgICBpZiAoc2NoZW1hLlZhbHVlS2luZCAhPSBKc29uVmFsdWVLaW5kLlVuZGVmaW5lZCkKICAgICAgICB7CiAgICAgICAgICAgIHZhciB2YWxpZGF0aW9uRXJyb3IgPSBWYWxpZGF0ZUFnYWluc3RTY2hlbWEoYXJndW1lbnRzLCBzY2hlbWEpOwogICAgICAgICAgICBpZiAodmFsaWRhdGlvbkVycm9yIGlzIG5vdCBudWxsKQogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICB2YXIgZmFpbEVudHJ5ID0gbmV3IEpvdXJuYWxFbnRyeSgKICAgICAgICAgICAgICAgICAgICBEYXRlVGltZU9mZnNldC5VdGNOb3csCiAgICAgICAgICAgICAgICAgICAgSm91cm5hbEVudHJ5VHlwZS5BY3Rpb25GYWlsZWQsCiAgICAgICAgICAgICAgICAgICAgJCJWYWxpZGF0aW9uIGZhaWxlZCBmb3IgJ3t0b29sTmFtZX0nOiB7dmFsaWRhdGlvbkVycm9yfSIpOwogICAgICAgICAgICAgICAgX2pvdXJuYWw/LkxvZyhmYWlsRW50cnkpOwogICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBUb29sUmVzdWx0KGZhbHNlLCAkIlNjaGVtYSB2YWxpZGF0aW9uIGZhaWxlZCBmb3IgJ3t0b29sTmFtZX0nOiB7dmFsaWRhdGlvbkVycm9yfSIpOwogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICAvLyBTcHJpbnQgMjUgUDAtQzogd3JhcCBFeGVjdXRlQXN5bmMgaW4gdHJ5L2NhdGNoIHNvIHRvb2wgZXhjZXB0aW9ucyBwcm9kdWNlCiAgICAgICAgLy8gVG9vbFJlc3VsdCBmYWlsdXJlcyBpbnN0ZWFkIG9mIHByb3BhZ2F0aW5nIHVwIHRvIHRoZSBkaXNwYXRjaCBsb29wLgogICAgICAgIC8vIFRoaXMgaXMgdGhlIHNhZmV0eSBib3VuZGFyeTogVG9vbFJlc3VsdCBpcyB0aGUgT05MWSBmYWlsdXJlIGNoYW5uZWwuCiAgICAgICAgVG9vbFJlc3VsdCByZXN1bHQ7CiAgICAgICAgdHJ5CiAgICAgICAgewogICAgICAgICAgICByZXN1bHQgPSBhd2FpdCB0b29sLkV4ZWN1dGVBc3luYyhhcmd1bWVudHMsIGNhbmNlbGxhdGlvblRva2VuKTsKICAgICAgICB9CiAgICAgICAgY2F0Y2ggKE9wZXJhdGlvbkNhbmNlbGVkRXhjZXB0aW9uKQogICAgICAgIHsKICAgICAgICAgICAgLy8gTGV0IGNhbmNlbGxhdGlvbiBwcm9wYWdhdGUg4oCUIHRoZSBjYWxsZXIgbWFuYWdlcyBjYW5jZWxsYXRpb24gdG9rZW5zLgogICAgICAgICAgICB0aHJvdzsKICAgICAgICB9CiAgICAgICAgY2F0Y2ggKEV4Y2VwdGlvbiBleCkKICAgICAgICB7CiAgICAgICAgICAgIHZhciBleEVudHJ5ID0gbmV3IEpvdXJuYWxFbnRyeSgKICAgICAgICAgICAgICAgIERhdGVUaW1lT2Zmc2V0LlV0Y05vdywKICAgICAgICAgICAgICAgIEpvdXJuYWxFbnRyeVR5cGUuQWN0aW9uRmFpbGVkLAogICAgICAgICAgICAgICAgJCJUb29sICd7dG9vbE5hbWV9JyB0aHJldzoge2V4Lk1lc3NhZ2V9Iik7CiAgICAgICAgICAgIF9qb3VybmFsPy5Mb2coZXhFbnRyeSk7CiAgICAgICAgICAgIHJldHVybiBuZXcgVG9vbFJlc3VsdChmYWxzZSwgJCJUb29sICd7dG9vbE5hbWV9JyB0aHJldzoge2V4Lk1lc3NhZ2V9Iik7CiAgICAgICAgfQoKICAgICAgICAvLyBTcHJpbnQgMzcgUDAtQjogc3VjY2Vzcy9mYWlsdXJlIGpvdXJuYWwgZW50cnkgcmVtb3ZlZCBoZXJlLiBDYWxsZXJzIHVzaW5nCiAgICAgICAgLy8gQ2FsbFdpdGhPdXRjb21lQXN5bmMgKGUuZy4gRGlzcGF0Y2hBY3Rpb25zQXN5bmMpIGNhbGwgX2pvdXJuYWw/LkxvZ091dGNvbWUob3V0Y29tZSkKICAgICAgICAvLyBleHBsaWNpdGx5IGluIHRoZSBvdXRlciBkaXNwYXRjaCBsb29wLiBUaGlzIGVsaW1pbmF0ZXMgdGhlIGRvdWJsZS1qb3VybmFsIGlzc3VlCiAgICAgICAgLy8gaWRlbnRpZmllZCBpbiBTcHJpbnQgMzYgYXVkaXQgZmluZGluZyAjNCB3aGlsZSBrZWVwaW5nIHZhbGlkYXRpb24tZmFpbHVyZSBhbmQKICAgICAgICAvLyBleGNlcHRpb24gZW50cmllcyAod2hpY2ggYXJlIHNlcGFyYXRlIHNlbWFudGljcyBhbmQgbXVzdCByZW1haW4pLgogICAgICAgIHJldHVybiByZXN1bHQ7CiAgICB9CgogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIFNwcmludCAzNiBQMC1COiBFeGVjdXRlcyB0aGUgbmFtZWQgdG9vbCBhbmQgd3JhcHMgdGhlIHJlc3VsdCBpbiBhbgogICAgLy8vIDxzZWUgY3JlZj0iQWN0aW9uT3V0Y29tZSIvPiB0aGF0IGlzIGFsc28gcmVjb3JkZWQgaW4gdGhlIGpvdXJuYWwgdmlhCiAgICAvLy8gPHNlZSBjcmVmPSJJQWdlbnRKb3VybmFsLkxvZ091dGNvbWUiLz4uCiAgICAvLy8KICAgIC8vLyBVc2UgdGhpcyBvdmVybG9hZCB3aGVuIHJlY292ZXJ5LCByZXBsYW5uaW5nLCBvciBMTE0gZXZhbHVhdGlvbiBuZWVkcwogICAgLy8vIHN0cnVjdHVyZWQgb3V0Y29tZSBkYXRhIChlZmZlY3RzLCBvYnNlcnZhdGlvbiBzdW1tYXJ5KS4gQ2FsbGVycyB0aGF0IG9ubHkKICAgIC8vLyBuZWVkIHRoZSByYXcgPHNlZSBjcmVmPSJUb29sUmVzdWx0Ii8+IGNhbiBjb250aW51ZSB1c2luZyA8c2VlIGNyZWY9IkNhbGxBc3luYyIvPi4KICAgIC8vLwogICAgLy8vIDxwYXJhPgogICAgLy8vIFRoZSByZXR1cm5lZCBBY3Rpb25PdXRjb21lIHVzZXMgZmFjdG9yeSBoZWxwZXJzOgogICAgLy8vIDxjPkFjdGlvbk91dGNvbWUuU3VjY2VlZGVkPC9jPiBmb3Igc3VjY2VzczsgPGM+QWN0aW9uT3V0Y29tZS5GYWlsZWQ8L2M+IGZvciBmYWlsdXJlLgogICAgLy8vIENhbGxlcnMgdGhhdCBuZWVkIHJpY2hlciBvdXRjb21lcyAoZS5nLiA8Yz5BY3Rpb25PdXRjb21lLkNvbGxlY3RlZDwvYz4pIHNob3VsZAogICAgLy8vIGJ1aWxkIHRoZSBvdXRjb21lIGZyb20gdGhlIFRvb2xSZXN1bHQgYW5kIHRoZSB3b3JsZCBldmVudCB0aGF0IGZvbGxvd3MuCiAgICAvLy8gPC9wYXJhPgogICAgLy8vCiAgICAvLy8gPHBhcmE+CiAgICAvLy8gU3ByaW50IDM3IFAwLUI6IENhbGxBc3luYyBubyBsb25nZXIgZW1pdHMgaXRzIG93biBBY3Rpb25Db21wbGV0ZWQgLyBBY3Rpb25GYWlsZWQKICAgIC8vLyBlbnRyeSAodGhhdCBlbnRyeSB3YXMgcmVtb3ZlZCB0byBwcmV2ZW50IGRvdWJsZS1sb2dnaW5nKS4gVGhlIGNhbGxlcgogICAgLy8vICg8Yz5EaXNwYXRjaEFjdGlvbnNBc3luYzwvYz4pIGNhbGxzIDxjPl9qb3VybmFsPy5Mb2dPdXRjb21lKG91dGNvbWUpPC9jPiBleHBsaWNpdGx5CiAgICAvLy8gYWZ0ZXIgdGhpcyBtZXRob2QgcmV0dXJucy4gVGhpcyBtZXRob2QgaXRzZWxmIGRvZXMgTk9UIGNhbGwgTG9nT3V0Y29tZS4KICAgIC8vLyA8L3BhcmE+CiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHVibGljIGFzeW5jIFRhc2s8KFRvb2xSZXN1bHQgUmVzdWx0LCBBY3Rpb25PdXRjb21lIE91dGNvbWUpPiBDYWxsV2l0aE91dGNvbWVBc3luYygKICAgICAgICBHdWlkIGdvYWxJZCwKICAgICAgICBzdHJpbmcgdG9vbE5hbWUsCiAgICAgICAgSnNvbkVsZW1lbnQgYXJndW1lbnRzLAogICAgICAgIENhbmNlbGxhdGlvblRva2VuIGNhbmNlbGxhdGlvblRva2VuID0gZGVmYXVsdCkKICAgIHsKICAgICAgICB2YXIgcmVzdWx0ID0gYXdhaXQgQ2FsbEFzeW5jKHRvb2xOYW1lLCBhcmd1bWVudHMsIGNhbmNlbGxhdGlvblRva2VuKTsKCiAgICAgICAgdmFyIG91dGNvbWUgPSByZXN1bHQuU3VjY2VzcwogICAgICAgICAgICA/IEFjdGlvbk91dGNvbWUuU3VjY2VlZGVkKGdvYWxJZCwgdG9vbE5hbWUsIHJlc3VsdC5NZXNzYWdlID8/ICJTdWNjZXNzIikKICAgICAgICAgICAgOiBBY3Rpb25PdXRjb21lLkZhaWxlZChnb2FsSWQsIHRvb2xOYW1lLCByZXN1bHQuTWVzc2FnZSA/PyAiRmFpbGVkIik7CgogICAgICAgIC8vIFNwcmludCAzNyBQMC1COiBDYWxsQXN5bmMgbm8gbG9uZ2VyIGVtaXRzIGl0cyBvd24gQWN0aW9uQ29tcGxldGVkIC8gQWN0aW9uRmFpbGVkCiAgICAgICAgLy8gam91cm5hbCBlbnRyeSAocmVtb3ZlZCB0byBwcmV2ZW50IGRvdWJsZS1sb2dnaW5nIHdpdGggRGlzcGF0Y2hBY3Rpb25zQXN5bmMncwogICAgICAgIC8vIGV4cGxpY2l0IF9qb3VybmFsPy5Mb2dPdXRjb21lKG91dGNvbWUpIGNhbGwpLiBEbyBOT1QgYWRkIExvZ091dGNvbWUgaGVyZS4KICAgICAgICAvLyBUaGUgb3V0ZXIgZGlzcGF0Y2ggbG9vcCBsb2dzIHRoZSBzdHJ1Y3R1cmVkIG91dGNvbWUgZXhwbGljaXRseS4KICAgICAgICByZXR1cm4gKHJlc3VsdCwgb3V0Y29tZSk7CiAgICB9CgogICAgLy8g4pSA4pSAIFNjaGVtYSB2YWxpZGF0aW9uIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAogICAgLy8KICAgIC8vIExpZ2h0d2VpZ2h0IEpTT04gU2NoZW1hIHZhbGlkYXRvciBjb3ZlcmluZyB0aGUgc3Vic2V0IHVzZWQgYnkgdG9vbCBzY2hlbWFzOgogICAgLy8gdHlwZSAob2JqZWN0KSwgcHJvcGVydGllcyAobmFtZSDihpIgeyB0eXBlLCBkZXNjcmlwdGlvbiB9KSwgcmVxdWlyZWQgYXJyYXkuCiAgICAvLyBUaGlzIGlzIGludGVudGlvbmFsbHkgbWluaW1hbCDigJQgaXQgdmFsaWRhdGVzIHRoZSBndWFyZC1yYWlsIHN1YnNldCwgbm90IGZ1bGwKICAgIC8vIEpTT04gU2NoZW1hIERyYWZ0IHN1cHBvcnQuIEFsbCAxMiByZWdpc3RlcmVkIHRvb2xzIHVzZSB0aGlzIHN1YnNldC4KCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gVmFsaWRhdGVzIDxwYXJhbXJlZiBuYW1lPSJhcmdzIi8+IGFnYWluc3QgYSBKU09OIFNjaGVtYSBvYmplY3QuCiAgICAvLy8gUmV0dXJucyBudWxsIG9uIHN1Y2Nlc3MsIG9yIGFuIGVycm9yIG1lc3NhZ2Ugc3RyaW5nIG9uIGZhaWx1cmUuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgaW50ZXJuYWwgc3RhdGljIHN0cmluZz8gVmFsaWRhdGVBZ2FpbnN0U2NoZW1hKEpzb25FbGVtZW50IGFyZ3MsIEpzb25FbGVtZW50IHNjaGVtYSkKICAgIHsKICAgICAgICAvLyBTY2hlbWEgcm9vdCBtdXN0IGRlY2xhcmUgdHlwZSAib2JqZWN0IgogICAgICAgIGlmIChzY2hlbWEuVHJ5R2V0UHJvcGVydHkoInR5cGUiLCBvdXQgdmFyIHJvb3RUeXBlKSAmJgogICAgICAgICAgICByb290VHlwZS5HZXRTdHJpbmcoKSAhPSAib2JqZWN0IikKICAgICAgICAgICAgcmV0dXJuICQiU2NoZW1hIHJvb3QgdHlwZSBtdXN0IGJlICdvYmplY3QnLCBnb3QgJ3tyb290VHlwZS5HZXRTdHJpbmcoKX0nLiI7CgogICAgICAgIC8vIElmIGFyZ3MgaXMgbm90IGFuIG9iamVjdCwgaXQgY2FuIG5ldmVyIHNhdGlzZnkgYSAidHlwZSI6ICJvYmplY3QiIHNjaGVtYQogICAgICAgIGlmIChhcmdzLlZhbHVlS2luZCAhPSBKc29uVmFsdWVLaW5kLk9iamVjdCkKICAgICAgICAgICAgcmV0dXJuICJBcmd1bWVudHMgbXVzdCBiZSBhIEpTT04gb2JqZWN0LiI7CgogICAgICAgIC8vIEdhdGhlciB0aGUgc2V0IG9mIGV4cGVjdGVkIHByb3BlcnR5IG5hbWVzCiAgICAgICAgaWYgKCFzY2hlbWEuVHJ5R2V0UHJvcGVydHkoInByb3BlcnRpZXMiLCBvdXQgdmFyIHNjaGVtYVByb3BzKSkKICAgICAgICAgICAgcmV0dXJuIG51bGw7IC8vIG5vIHByb3BlcnR5IGNvbnN0cmFpbnRzIOKAlCBhY2NlcHQgYW55dGhpbmcKCiAgICAgICAgdmFyIGtub3duUHJvcHMgPSBuZXcgSGFzaFNldDxzdHJpbmc+KFN0cmluZ0NvbXBhcmVyLk9yZGluYWwpOwogICAgICAgIGZvcmVhY2ggKHZhciBwcm9wIGluIHNjaGVtYVByb3BzLkVudW1lcmF0ZU9iamVjdCgpKQogICAgICAgICAgICBrbm93blByb3BzLkFkZChwcm9wLk5hbWUpOwoKICAgICAgICAvLyBDaGVjayB0aGF0IGFsbCBwcm92aWRlZCBwcm9wZXJ0aWVzIGFyZSBkZWNsYXJlZCBpbiB0aGUgc2NoZW1hCiAgICAgICAgZm9yZWFjaCAodmFyIGFyZ1Byb3AgaW4gYXJncy5FbnVtZXJhdGVPYmplY3QoKSkKICAgICAgICB7CiAgICAgICAgICAgIGlmICgha25vd25Qcm9wcy5Db250YWlucyhhcmdQcm9wLk5hbWUpKQogICAgICAgICAgICAgICAgcmV0dXJuICQiVW5leHBlY3RlZCBwcm9wZXJ0eSAne2FyZ1Byb3AuTmFtZX0nIGlzIG5vdCBkZWNsYXJlZCBpbiB0aGUgdG9vbCBzY2hlbWEuIjsKCiAgICAgICAgICAgIGlmIChzY2hlbWFQcm9wcy5UcnlHZXRQcm9wZXJ0eShhcmdQcm9wLk5hbWUsIG91dCB2YXIgcHJvcFNjaGVtYSkgJiYKICAgICAgICAgICAgICAgIHByb3BTY2hlbWEuVHJ5R2V0UHJvcGVydHkoInR5cGUiLCBvdXQgdmFyIGV4cGVjdGVkVHlwZSkpCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgIHZhciBlcnJvciA9IENoZWNrVHlwZShhcmdQcm9wLk5hbWUsIGFyZ1Byb3AuVmFsdWUsIGV4cGVjdGVkVHlwZS5HZXRTdHJpbmcoKSEpOwogICAgICAgICAgICAgICAgaWYgKGVycm9yIGlzIG5vdCBudWxsKSByZXR1cm4gZXJyb3I7CiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgIC8vIENoZWNrIHRoYXQgYWxsIHJlcXVpcmVkIHByb3BlcnRpZXMgYXJlIHByZXNlbnQKICAgICAgICBpZiAoc2NoZW1hLlRyeUdldFByb3BlcnR5KCJyZXF1aXJlZCIsIG91dCB2YXIgcmVxdWlyZWQpKQogICAgICAgIHsKICAgICAgICAgICAgZm9yZWFjaCAodmFyIHJlcSBpbiByZXF1aXJlZC5FbnVtZXJhdGVBcnJheSgpKQogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICB2YXIgbmFtZSA9IHJlcS5HZXRTdHJpbmcoKSE7CiAgICAgICAgICAgICAgICBpZiAoIWFyZ3MuVHJ5R2V0UHJvcGVydHkobmFtZSwgb3V0IF8pKQogICAgICAgICAgICAgICAgICAgIHJldHVybiAkIk1pc3NpbmcgcmVxdWlyZWQgcHJvcGVydHkgJ3tuYW1lfScuIjsKICAgICAgICAgICAgfQogICAgICAgIH0KCiAgICAgICAgcmV0dXJuIG51bGw7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgc3RyaW5nPyBDaGVja1R5cGUoc3RyaW5nIG5hbWUsIEpzb25FbGVtZW50IHZhbHVlLCBzdHJpbmcgZXhwZWN0ZWQpCiAgICB7CiAgICAgICAgcmV0dXJuIGV4cGVjdGVkIHN3aXRjaAogICAgICAgIHsKICAgICAgICAgICAgLy8gU3ByaW50IDI1IFAwLUM6IHVzZSBUcnlHZXRJbnQzMiBpbnN0ZWFkIG9mIENvbnRhaW5zKCcuJykgZm9yIGludGVnZXIgdmFsaWRhdGlvbi4KICAgICAgICAgICAgLy8gQ29udGFpbnMoJy4nKSBtaXNzZWQgc2NpZW50aWZpYyBub3RhdGlvbiBsaWtlICIxZTUiIHdoaWNoIGlzIGEgdmFsaWQgSlNPTiBudW1iZXIKICAgICAgICAgICAgLy8gYnV0IG5vdCBhIHZhbGlkIGludGVnZXIgZm9yIHRvb2wgYXJndW1lbnRzLiBUcnlHZXRJbnQzMiBjb3JyZWN0bHkgaGFuZGxlcyBhbGwKICAgICAgICAgICAgLy8gSlNPTiBudW1lcmljIHJlcHJlc2VudGF0aW9ucyBpbmNsdWRpbmcgc2NpZW50aWZpYyBub3RhdGlvbi4KICAgICAgICAgICAgImludGVnZXIiIHdoZW4gdmFsdWUuVmFsdWVLaW5kICE9IEpzb25WYWx1ZUtpbmQuTnVtYmVyIHx8CiAgICAgICAgICAgICAgICAgICAgICAgICAgIXZhbHVlLlRyeUdldEludDMyKG91dCBfKSA9PiAkIlByb3BlcnR5ICd7bmFtZX0nIG11c3QgYmUgYW4gaW50ZWdlciwgZ290ICd7dmFsdWUuR2V0UmF3VGV4dCgpfScuIiwKICAgICAgICAgICAgIm51bWJlciIgd2hlbiB2YWx1ZS5WYWx1ZUtpbmQgIT0gSnNvblZhbHVlS2luZC5OdW1iZXIgPT4gJCJQcm9wZXJ0eSAne25hbWV9JyBtdXN0IGJlIGEgbnVtYmVyLCBnb3QgJ3t2YWx1ZS5HZXRSYXdUZXh0KCl9Jy4iLAogICAgICAgICAgICAic3RyaW5nIiB3aGVuIHZhbHVlLlZhbHVlS2luZCAhPSBKc29uVmFsdWVLaW5kLlN0cmluZyA9PiAkIlByb3BlcnR5ICd7bmFtZX0nIG11c3QgYmUgYSBzdHJpbmcsIGdvdCAne3ZhbHVlLkdldFJhd1RleHQoKX0nLiIsCiAgICAgICAgICAgICJib29sZWFuIiB3aGVuIHZhbHVlLlZhbHVlS2luZCBpcyBub3QgSnNvblZhbHVlS2luZC5UcnVlIGFuZCBub3QgSnNvblZhbHVlS2luZC5GYWxzZSA9PiAkIlByb3BlcnR5ICd7bmFtZX0nIG11c3QgYmUgYSBib29sZWFuLCBnb3QgJ3t2YWx1ZS5HZXRSYXdUZXh0KCl9Jy4iLAogICAgICAgICAgICAib2JqZWN0IiB3aGVuIHZhbHVlLlZhbHVlS2luZCAhPSBKc29uVmFsdWVLaW5kLk9iamVjdCA9PiAkIlByb3BlcnR5ICd7bmFtZX0nIG11c3QgYmUgYW4gb2JqZWN0LCBnb3QgJ3t2YWx1ZS5HZXRSYXdUZXh0KCl9Jy4iLAogICAgICAgICAgICAiYXJyYXkiIHdoZW4gdmFsdWUuVmFsdWVLaW5kICE9IEpzb25WYWx1ZUtpbmQuQXJyYXkgPT4gJCJQcm9wZXJ0eSAne25hbWV9JyBtdXN0IGJlIGFuIGFycmF5LCBnb3QgJ3t2YWx1ZS5HZXRSYXdUZXh0KCl9Jy4iLAogICAgICAgICAgICBfID0+IG51bGwsIC8vIHVua25vd24gdHlwZSDigJQgYWNjZXB0IChmb3J3YXJkLWNvbXBhdGlibGUpCiAgICAgICAgfTsKICAgIH0KfQo=
+namespace Agent.Tools;
+
+using Agent.Core;
+using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
+using System.Text.Json;
+
+/// <summary>
+/// Deep module: registers tools, resolves by name, and executes with schema validation.
+///
+/// Replaces the former ToolRegistry + ToolEngine pair (two shallow modules that the
+/// deletion test confirmed earned no separate interface depth). The caller surface shrinks
+/// from four types (IToolRegistry, IToolCaller, ToolRegistry, ToolEngine) to two
+/// (IToolCaller stays for DI; ToolDispatcher is the single concrete class).
+///
+/// Sprint 5: schema validation is now enforced at the dispatch boundary. Every tool's
+/// InputSchema is validated before execution — this is the safety boundary between
+/// untrusted arguments (from LLMs or REST API) and the tool layer.
+///
+/// Sprint 25 P0-C: ExecuteAsync is now wrapped in try/catch — tool exceptions produce
+/// ToolResult(false, ...) instead of propagating. Integer validation uses TryGetInt32
+/// to correctly reject scientific notation (e.g. "1e5").
+///
+/// Sprint 36 P0-B: CallWithOutcomeAsync wraps CallAsync and produces an ActionOutcome.
+/// Sprint 37 P0-B: CallAsync no longer emits its own success/failure journal entry;
+/// callers using CallWithOutcomeAsync call _journal?.LogOutcome(outcome) explicitly.
+///
+/// Sprint 36 P1-C: RegisteredNames exposes all registration keys (including aliases) in
+/// sorted order for deterministic LLM prompt injection.
+/// </summary>
+public sealed class ToolDispatcher : IToolCaller
+{
+    private readonly ConcurrentDictionary<string, ITool> _tools =
+        new(StringComparer.OrdinalIgnoreCase);
+    private readonly IAgentJournal? _journal;
+    private readonly ILogger<ToolDispatcher>? _logger;
+
+    public ToolDispatcher(IAgentJournal? journal = null, ILogger<ToolDispatcher>? logger = null)
+    {
+        _journal = journal;
+        _logger  = logger;
+    }
+
+    // ── Registration ──────────────────────────────────────────────────────────
+
+    public void Register(ITool tool) => _tools[tool.Name] = tool;
+
+    /// <summary>
+    /// Sprint 25 P0-B: Register a tool under an explicit alias name.
+    /// Used to register GetStatusTool under both "GetStatus" and "Status" after
+    /// deleting the duplicate StatusTool class.
+    ///
+    /// Collision semantics: if <paramref name="name"/> is already registered, the
+    /// existing entry is silently overwritten (<c>_tools[name] = tool</c>). This is
+    /// intentional for alias registration. Callers that need to detect collisions
+    /// should check <see cref="Get"/> before calling this overload.
+    ///
+    /// Sprint 38 P4-C: LogWarning when overwriting an existing registration to aid
+    /// diagnostics in production (double-registration is almost always a bug).
+    /// </summary>
+    public void Register(string name, ITool tool)
+    {
+        if (_tools.ContainsKey(name))
+            _logger?.LogWarning("[ToolDispatcher] Register: overwriting existing tool '{Name}' " +
+                "with {NewTool}. Check for duplicate registrations.", name, tool.Name);
+        _tools[name] = tool;
+    }
+
+    public ITool? Get(string name) =>
+        _tools.TryGetValue(name, out var t) ? t : null;
+
+    public IReadOnlyList<ITool> All => [.. _tools.Values];
+
+    /// <summary>
+    /// Sprint 36 P1-C: Returns all registered names (including aliases) in
+    /// case-insensitive alphabetical order. Use this instead of
+    /// <see cref="All"/> when building an LLM prompt — <see cref="All"/>
+    /// iterates dict values in nondeterministic order and does not surface
+    /// alias keys (e.g. "Status" is registered as an alias for GetStatusTool
+    /// but does not appear in <see cref="All"/> because the dict stores only
+    /// one tool instance per value, not per registration key).
+    /// </summary>
+    public IReadOnlyList<string> RegisteredNames =>
+        [.. _tools.Keys.OrderBy(k => k, StringComparer.OrdinalIgnoreCase)];
+
+    // ── Dispatch ─────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Resolves the named tool, validates arguments against its InputSchema,
+    /// and executes. Returns a failure result (not throws) when the tool is
+    /// unknown or the arguments are malformed — the caller's dispatch loop
+    /// decides whether to retry or abandon.
+    /// </summary>
+    public async Task<ToolResult> CallAsync(
+        string toolName, JsonElement arguments,
+        CancellationToken cancellationToken = default)
+    {
+        if (!_tools.TryGetValue(toolName, out var tool))
+        {
+            var unknownEntry = new JournalEntry(
+                DateTimeOffset.UtcNow,
+                JournalEntryType.ActionFailed,
+                $"Tool '{toolName}' not registered");
+            _journal?.Log(unknownEntry);
+            return new ToolResult(false, $"Tool '{toolName}' is not registered.");
+        }
+
+        // Sprint 5: validate arguments against the tool's declared InputSchema
+        var schema = tool.InputSchema;
+        if (schema.ValueKind != JsonValueKind.Undefined)
+        {
+            var validationError = ValidateAgainstSchema(arguments, schema);
+            if (validationError is not null)
+            {
+                var failEntry = new JournalEntry(
+                    DateTimeOffset.UtcNow,
+                    JournalEntryType.ActionFailed,
+                    $"Validation failed for '{toolName}': {validationError}");
+                _journal?.Log(failEntry);
+                return new ToolResult(false, $"Schema validation failed for '{toolName}': {validationError}");
+            }
+        }
+
+        // Sprint 25 P0-C: wrap ExecuteAsync in try/catch so tool exceptions produce
+        // ToolResult failures instead of propagating up to the dispatch loop.
+        // This is the safety boundary: ToolResult is the ONLY failure channel.
+        ToolResult result;
+        try
+        {
+            result = await tool.ExecuteAsync(arguments, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            // Let cancellation propagate — the caller manages cancellation tokens.
+            throw;
+        }
+        catch (Exception ex)
+        {
+            var exEntry = new JournalEntry(
+                DateTimeOffset.UtcNow,
+                JournalEntryType.ActionFailed,
+                $"Tool '{toolName}' threw: {ex.Message}");
+            _journal?.Log(exEntry);
+            return new ToolResult(false, $"Tool '{toolName}' threw: {ex.Message}");
+        }
+
+        // Sprint 37 P0-B: success/failure journal entry removed here. Callers using
+        // CallWithOutcomeAsync (e.g. DispatchActionsAsync) call _journal?.LogOutcome(outcome)
+        // explicitly in the outer dispatch loop. This eliminates the double-journal issue
+        // identified in Sprint 36 audit finding #4 while keeping validation-failure and
+        // exception entries (which are separate semantics and must remain).
+        return result;
+    }
+
+    /// <summary>
+    /// Sprint 36 P0-B: Executes the named tool and wraps the result in an
+    /// <see cref="ActionOutcome"/> that is also recorded in the journal via
+    /// <see cref="IAgentJournal.LogOutcome"/>.
+    ///
+    /// Use this overload when recovery, replanning, or LLM evaluation needs
+    /// structured outcome data (effects, observation summary). Callers that only
+    /// need the raw <see cref="ToolResult"/> can continue using <see cref="CallAsync"/>.
+    ///
+    /// <para>
+    /// The returned ActionOutcome uses factory helpers:
+    /// <c>ActionOutcome.Succeeded</c> for success; <c>ActionOutcome.Failed</c> for failure.
+    /// Callers that need richer outcomes (e.g. <c>ActionOutcome.Collected</c>) should
+    /// build the outcome from the ToolResult and the world event that follows.
+    /// </para>
+    ///
+    /// <para>
+    /// Sprint 37 P0-B: CallAsync no longer emits its own ActionCompleted / ActionFailed
+    /// entry (that entry was removed to prevent double-logging). The caller
+    /// (<c>DispatchActionsAsync</c>) calls <c>_journal?.LogOutcome(outcome)</c> explicitly
+    /// after this method returns. This method itself does NOT call LogOutcome.
+    /// </para>
+    /// </summary>
+    public async Task<(ToolResult Result, ActionOutcome Outcome)> CallWithOutcomeAsync(
+        Guid goalId,
+        string toolName,
+        JsonElement arguments,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await CallAsync(toolName, arguments, cancellationToken);
+
+        var outcome = result.Success
+            ? ActionOutcome.Succeeded(goalId, toolName, result.Message ?? "Success")
+            : ActionOutcome.Failed(goalId, toolName, result.Message ?? "Failed");
+
+        // Sprint 37 P0-B: CallAsync no longer emits its own ActionCompleted / ActionFailed
+        // journal entry (removed to prevent double-logging with DispatchActionsAsync's
+        // explicit _journal?.LogOutcome(outcome) call). Do NOT add LogOutcome here.
+        // The outer dispatch loop logs the structured outcome explicitly.
+        return (result, outcome);
+    }
+
+    // ── Schema validation ─────────────────────────────────────────────────────
+    //
+    // Lightweight JSON Schema validator covering the subset used by tool schemas:
+    // type (object), properties (name → { type, description }), required array.
+    // This is intentionally minimal — it validates the guard-rail subset, not full
+    // JSON Schema Draft support. All 12 registered tools use this subset.
+
+    /// <summary>
+    /// Validates <paramref name="args"/> against a JSON Schema object.
+    /// Returns null on success, or an error message string on failure.
+    /// </summary>
+    internal static string? ValidateAgainstSchema(JsonElement args, JsonElement schema)
+    {
+        // Schema root must declare type "object"
+        if (schema.TryGetProperty("type", out var rootType) &&
+            rootType.GetString() != "object")
+            return $"Schema root type must be 'object', got '{rootType.GetString()}'.";
+
+        // If args is not an object, it can never satisfy a "type": "object" schema
+        if (args.ValueKind != JsonValueKind.Object)
+            return "Arguments must be a JSON object.";
+
+        // Gather the set of expected property names
+        if (!schema.TryGetProperty("properties", out var schemaProps))
+            return null; // no property constraints — accept anything
+
+        var knownProps = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var prop in schemaProps.EnumerateObject())
+            knownProps.Add(prop.Name);
+
+        // Check that all provided properties are declared in the schema
+        foreach (var argProp in args.EnumerateObject())
+        {
+            if (!knownProps.Contains(argProp.Name))
+                return $"Unexpected property '{argProp.Name}' is not declared in the tool schema.";
+
+            if (schemaProps.TryGetProperty(argProp.Name, out var propSchema) &&
+                propSchema.TryGetProperty("type", out var expectedType))
+            {
+                var error = CheckType(argProp.Name, argProp.Value, expectedType.GetString()!);
+                if (error is not null) return error;
+            }
+        }
+
+        // Check that all required properties are present
+        if (schema.TryGetProperty("required", out var required))
+        {
+            foreach (var req in required.EnumerateArray())
+            {
+                var name = req.GetString()!;
+                if (!args.TryGetProperty(name, out _))
+                    return $"Missing required property '{name}'.";
+            }
+        }
+
+        return null;
+    }
+
+    private static string? CheckType(string name, JsonElement value, string expected)
+    {
+        return expected switch
+        {
+            // Sprint 25 P0-C: use TryGetInt32 instead of Contains('.') for integer validation.
+            // Contains('.') missed scientific notation like "1e5" which is a valid JSON number
+            // but not a valid integer for tool arguments. TryGetInt32 correctly handles all
+            // JSON numeric representations including scientific notation.
+            "integer" when value.ValueKind != JsonValueKind.Number ||
+                          !value.TryGetInt32(out _) => $"Property '{name}' must be an integer, got '{value.GetRawText()}'.",
+            "number" when value.ValueKind != JsonValueKind.Number => $"Property '{name}' must be a number, got '{value.GetRawText()}'.",
+            "string" when value.ValueKind != JsonValueKind.String => $"Property '{name}' must be a string, got '{value.GetRawText()}'.",
+            "boolean" when value.ValueKind is not JsonValueKind.True and not JsonValueKind.False => $"Property '{name}' must be a boolean, got '{value.GetRawText()}'.",
+            "object" when value.ValueKind != JsonValueKind.Object => $"Property '{name}' must be an object, got '{value.GetRawText()}'.",
+            "array" when value.ValueKind != JsonValueKind.Array => $"Property '{name}' must be an array, got '{value.GetRawText()}'.",
+            _ => null, // unknown type — accept (forward-compatible)
+        };
+    }
+}
