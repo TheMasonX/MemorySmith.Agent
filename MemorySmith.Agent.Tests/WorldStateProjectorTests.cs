@@ -1,1 +1,463 @@
-dXNpbmcgQWdlbnQuQ29yZTsKCm5hbWVzcGFjZSBNZW1vcnlTbWl0aC5BZ2VudC5UZXN0czsKCi8vLyA8c3VtbWFyeT4KLy8vIFVuaXQgdGVzdHMgZm9yIDxzZWUgY3JlZj0iV29ybGRTdGF0ZVByb2plY3RvciIvPi4KLy8vIFZlcmlmaWVzIHRoZSBwdXJlLWZ1bmN0aW9uIGNvbnRyYWN0OiBhcHBseWluZyBhIFdvcmxkRXZlbnQgcmV0dXJucyB0aGUKLy8vIGNvcnJlY3QgbmV3IFdvcmxkU3RhdGUgd2l0aG91dCBtdXRhdGluZyB0aGUgaW5wdXQuCi8vLyBTcHJpbnQgMTQgUDFiOiBhZGRlZCBpbnZlbnRvcnkga2V5IG5vcm1hbGl6YXRpb24gdGVzdHMgZm9yIFN0YXR1c0V2ZW50LgovLy8gU3ByaW50IDM1IFAwLUE6IHVwZGF0ZWQgQmxvY2tNaW5lZCB0ZXN0cyDigJQgQXBwbHlCbG9ja01pbmVkIG5vIGxvbmdlciB1cGRhdGVzIGludmVudG9yeS4KLy8vICAgSW52ZW50b3J5IHRydXRoIG5vdyBjb21lcyBleGNsdXNpdmVseSBmcm9tIEl0ZW1Db2xsZWN0ZWRFdmVudCAocGxheWVyQ29sbGVjdCkuCi8vLyAgIFBlcmlvZGljIEdldFN0YXR1cyByZWNvbmNpbGVzIGRyaWZ0LgovLy8gU3ByaW50IDM1IFAwLUM6IGFkZGVkIFNlYXJjaGVkUmFkaXVzIHRvIEZsYXRBcmVhRm91bmRFdmVudCBjb25zdHJ1Y3RvcnMuCi8vLyA8L3N1bW1hcnk+CltUZXN0Rml4dHVyZV0KcHVibGljIGNsYXNzIFdvcmxkU3RhdGVQcm9qZWN0b3JUZXN0cwp7CiAgICBwcml2YXRlIFdvcmxkU3RhdGVQcm9qZWN0b3IgX3Byb2plY3RvciA9IG51bGwhOwoKICAgIFtTZXRVcF0KICAgIHB1YmxpYyB2b2lkIFNldFVwKCkgPT4gX3Byb2plY3RvciA9IG5ldyBXb3JsZFN0YXRlUHJvamVjdG9yKCk7CgogICAgLy8g4pSA4pSAIEhlbHBlcnMg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgcHJpdmF0ZSBzdGF0aWMgRGF0ZVRpbWVPZmZzZXQgTm93ID0+IERhdGVUaW1lT2Zmc2V0LlV0Y05vdzsKCiAgICBwcml2YXRlIHN0YXRpYyBXb3JsZFN0YXRlIEVtcHR5U3RhdGUgPT4gbmV3KCk7CgogICAgLy8gQ29udmVuaWVuY2U6IHNldCBwb3NpdGlvbiB2aWEgYSBtb3ZlIGV2ZW50LCB0aGVuIGFwcGx5IGFub3RoZXIgZXZlbnQgb24gdG9wLgogICAgcHJpdmF0ZSBXb3JsZFN0YXRlIFN0YXRlV2l0aFBvc2l0aW9uKGludCB4LCBpbnQgeSwgaW50IHopID0+CiAgICAgICAgX3Byb2plY3Rvci5BcHBseShFbXB0eVN0YXRlLCBuZXcgTW92ZUV2ZW50KG5ldyBQb3NpdGlvbih4LCB5LCB6KSwgTm93KSk7CgogICAgcHJpdmF0ZSBXb3JsZFN0YXRlIFN0YXRlV2l0aEhlYWx0aChpbnQgaHAsIGludCBmb29kID0gMjApID0+CiAgICAgICAgX3Byb2plY3Rvci5BcHBseShFbXB0eVN0YXRlLCBuZXcgSGVhbHRoRXZlbnQoaHAsIGZvb2QsIE5vdykpOwoKICAgIC8vIOKUgOKUgCBIZWFsdGgg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBBcHBseV9IZWFsdGhFdmVudF9VcGRhdGVzSGVhbHRoQW5kRm9vZCgpCiAgICB7CiAgICAgICAgdmFyIGV2ID0gbmV3IEhlYWx0aEV2ZW50KDE1LCAxOCwgTm93KTsKICAgICAgICB2YXIgcmVzdWx0ID0gX3Byb2plY3Rvci5BcHBseShFbXB0eVN0YXRlLCBldik7CgogICAgICAgIEFzc2VydC5NdWx0aXBsZSgoKSA9PgogICAgICAgIHsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkhlYWx0aCwgSXMuRXF1YWxUbygxNSkpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuRm9vZCwgICBJcy5FcXVhbFRvKDE4KSk7CiAgICAgICAgfSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBBcHBseV9IZWFsdGhFdmVudF9Eb2VzTm90Q2hhbmdlUG9zaXRpb24oKQogICAgewogICAgICAgIHZhciB3aXRoUG9zICAgID0gU3RhdGVXaXRoUG9zaXRpb24oNSwgNjQsIDUpOwogICAgICAgIHZhciBhZnRlckhlYWx0aCA9IF9wcm9qZWN0b3IuQXBwbHkod2l0aFBvcywgbmV3IEhlYWx0aEV2ZW50KDEwLCAxMCwgTm93KSk7CgogICAgICAgIEFzc2VydC5UaGF0KGFmdGVySGVhbHRoLlBvc2l0aW9uLCBJcy5FcXVhbFRvKG5ldyBQb3NpdGlvbig1LCA2NCwgNSkpKTsKICAgIH0KCiAgICAvLyDilIDilIAgU3Bhd24g4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBBcHBseV9TcGF3bkV2ZW50X1VwZGF0ZXNQb3NpdGlvbkhlYWx0aEFuZEZvb2QoKQogICAgewogICAgICAgIHZhciBldiA9IG5ldyBTcGF3bkV2ZW50KG5ldyBQb3NpdGlvbigxMCwgNjQsIC0yMCksIDIwLCAyMCwgTm93KTsKICAgICAgICB2YXIgcmVzdWx0ID0gX3Byb2plY3Rvci5BcHBseShFbXB0eVN0YXRlLCBldik7CgogICAgICAgIEFzc2VydC5NdWx0aXBsZSgoKSA9PgogICAgICAgIHsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LlBvc2l0aW9uLCBJcy5FcXVhbFRvKG5ldyBQb3NpdGlvbigxMCwgNjQsIC0yMCkpKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkhlYWx0aCwgICBJcy5FcXVhbFRvKDIwKSk7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5Gb29kLCAgICAgSXMuRXF1YWxUbygyMCkpOwogICAgICAgIH0pOwogICAgfQoKICAgIC8vIOKUgOKUgCBNb3ZlIC8gbW92ZUNvbXBsZXRlIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQXBwbHlfTW92ZUV2ZW50X1VwZGF0ZXNQb3NpdGlvbigpCiAgICB7CiAgICAgICAgdmFyIGV2ID0gbmV3IE1vdmVFdmVudChuZXcgUG9zaXRpb24oNSwgNjMsIDcpLCBOb3cpOwogICAgICAgIHZhciByZXN1bHQgPSBfcHJvamVjdG9yLkFwcGx5KEVtcHR5U3RhdGUsIGV2KTsKCiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LlBvc2l0aW9uLCBJcy5FcXVhbFRvKG5ldyBQb3NpdGlvbig1LCA2MywgNykpKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIEFwcGx5X01vdmVDb21wbGV0ZUV2ZW50X1VwZGF0ZXNQb3NpdGlvbigpCiAgICB7CiAgICAgICAgdmFyIGV2ID0gbmV3IE1vdmVFdmVudChuZXcgUG9zaXRpb24oOSwgNjUsIC0xKSwgTm93KTsKICAgICAgICB2YXIgcmVzdWx0ID0gX3Byb2plY3Rvci5BcHBseShFbXB0eVN0YXRlLCBldik7CgogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5Qb3NpdGlvbiwgSXMuRXF1YWxUbyhuZXcgUG9zaXRpb24oOSwgNjUsIC0xKSkpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQXBwbHlfTW92ZUV2ZW50X0RvZXNOb3RDaGFuZ2VIZWFsdGhPckZvb2QoKQogICAgewogICAgICAgIHZhciB3aXRoSGVhbHRoID0gU3RhdGVXaXRoSGVhbHRoKDE0LCAxMik7CiAgICAgICAgdmFyIGFmdGVyTW92ZSAgPSBfcHJvamVjdG9yLkFwcGx5KHdpdGhIZWFsdGgsIG5ldyBNb3ZlRXZlbnQobmV3IFBvc2l0aW9uKDEsIDEsIDEpLCBOb3cpKTsKCiAgICAgICAgQXNzZXJ0Lk11bHRpcGxlKCgpID0+CiAgICAgICAgewogICAgICAgICAgICBBc3NlcnQuVGhhdChhZnRlck1vdmUuSGVhbHRoLCBJcy5FcXVhbFRvKDE0KSk7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KGFmdGVyTW92ZS5Gb29kLCAgIElzLkVxdWFsVG8oMTIpKTsKICAgICAgICB9KTsKICAgIH0KCiAgICAvLyDilIDilIAgU3RhdHVzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQXBwbHlfU3RhdHVzRXZlbnRfVXBkYXRlc1Bvc2l0aW9uSGVhbHRoQW5kSW52ZW50b3J5KCkKICAgIHsKICAgICAgICB2YXIgaW52ZW50b3J5ID0gbmV3IERpY3Rpb25hcnk8c3RyaW5nLCBpbnQ+IHsgWyJvYWtfbG9nIl0gPSAzLCBbInN0b25lIl0gPSAxMCB9OwogICAgICAgIHZhciBldiA9IG5ldyBTdGF0dXNFdmVudChuZXcgUG9zaXRpb24oMSwgMiwgMyksIDE5LCAxNywgaW52ZW50b3J5LCBudWxsLCBOb3cpOwoKICAgICAgICB2YXIgcmVzdWx0ID0gX3Byb2plY3Rvci5BcHBseShFbXB0eVN0YXRlLCBldik7CgogICAgICAgIEFzc2VydC5NdWx0aXBsZSgoKSA9PgogICAgICAgIHsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LlBvc2l0aW9uLCBJcy5FcXVhbFRvKG5ldyBQb3NpdGlvbigxLCAyLCAzKSkpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuSGVhbHRoLCAgIElzLkVxdWFsVG8oMTkpKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkZvb2QsICAgICBJcy5FcXVhbFRvKDE3KSk7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5JbnZlbnRvcnkuR2V0VmFsdWVPckRlZmF1bHQoIm9ha19sb2ciKSwgSXMuRXF1YWxUbygzKSk7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5JbnZlbnRvcnkuR2V0VmFsdWVPckRlZmF1bHQoInN0b25lIiksICAgSXMuRXF1YWxUbygxMCkpOwogICAgICAgIH0pOwogICAgfQoKICAgIC8vIFN0YXR1c0V2ZW50IGludmVudG9yeSBpcyBhbHJlYWR5IHBhcnNlZCBieSBXZWJTb2NrZXRCcmlkZ2Ug4oCUIG1hbGZvcm1lZAogICAgLy8gaW52ZW50b3J5IGlzIGhhbmRsZWQgdXBzdHJlYW0sIHNvIHRoaXMgdGVzdCBpcyBubyBsb25nZXIgYXBwbGljYWJsZS4KICAgIC8vIChUaGUgcHJvamVjdG9yIHJlY2VpdmVzIGEgY2xlYW4gSVJlYWRPbmx5RGljdGlvbmFyeSwgbm90IGEgcmF3IEpTT04gc3RyaW5nLikKCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIEFwcGx5X1N0YXR1c0V2ZW50X1plcm9RdWFudGl0eUl0ZW1zRXhjbHVkZWQoKQogICAgewogICAgICAgIC8vIFN0YXR1c0V2ZW50IGFscmVhZHkgZmlsdGVycyB6ZXJvLXF1YW50aXR5IGl0ZW1zIGluIFBhcnNlU3RhdHVzOwogICAgICAgIC8vIHdlIHNpbXVsYXRlIGEgcG9zdC1maWx0ZXIgZGljdGlvbmFyeSBoZXJlLgogICAgICAgIHZhciBpbnZlbnRvcnkgPSBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIGludD4geyBbIm9ha19sb2ciXSA9IDMsIFsic3RvbmUiXSA9IDUgfTsKICAgICAgICB2YXIgZXYgPSBuZXcgU3RhdHVzRXZlbnQobmV3IFBvc2l0aW9uKDAsIDAsIDApLCAyMCwgMjAsIGludmVudG9yeSwgbnVsbCwgTm93KTsKCiAgICAgICAgdmFyIHJlc3VsdCA9IF9wcm9qZWN0b3IuQXBwbHkoRW1wdHlTdGF0ZSwgZXYpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuSW52ZW50b3J5LkNvbnRhaW5zS2V5KCJkaXJ0IiksIElzLkZhbHNlLAogICAgICAgICAgICAiWmVyby1xdWFudGl0eSBpdGVtcyBhcmUgYWxyZWFkeSBleGNsdWRlZCBieSBXZWJTb2NrZXRCcmlkZ2U7IHByb2plY3RvciBuZXZlciBzZWVzIHRoZW0uIik7CiAgICB9CgogICAgLy8g4pSA4pSAIFNwcmludCAxNCBQMWI6IFN0YXR1c0V2ZW50IGludmVudG9yeSBrZXkgbm9ybWFsaXphdGlvbiDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIEFwcGx5X1N0YXR1c0V2ZW50X05hbWVzcGFjZWRJbnZlbnRvcnlLZXlfSXNOb3JtYWxpemVkKCkKICAgIHsKICAgICAgICAvLyBNaW5lZmxheWVyIGNhbiByZXR1cm4gIm1pbmVjcmFmdDpvYWtfbG9nIiBpbiB0aGUgc3RhdHVzIHBheWxvYWQuCiAgICAgICAgdmFyIGludmVudG9yeSA9IG5ldyBEaWN0aW9uYXJ5PHN0cmluZywgaW50PiB7IFsibWluZWNyYWZ0Om9ha19sb2ciXSA9IDUgfTsKICAgICAgICB2YXIgZXYgPSBuZXcgU3RhdHVzRXZlbnQobmV3IFBvc2l0aW9uKDAsIDY0LCAwKSwgMjAsIDIwLCBpbnZlbnRvcnksIG51bGwsIE5vdyk7CgogICAgICAgIHZhciByZXN1bHQgPSBfcHJvamVjdG9yLkFwcGx5KEVtcHR5U3RhdGUsIGV2KTsKCiAgICAgICAgQXNzZXJ0Lk11bHRpcGxlKCgpID0+CiAgICAgICAgewogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuSW52ZW50b3J5LkdldFZhbHVlT3JEZWZhdWx0KCJvYWtfbG9nIiksIElzLkVxdWFsVG8oNSksCiAgICAgICAgICAgICAgICAiQmFyZSBrZXkgJ29ha19sb2cnIHNob3VsZCByZXNvbHZlIGFmdGVyIG5hbWVzcGFjZSBzdHJpcC4iKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkludmVudG9yeS5Db250YWluc0tleSgibWluZWNyYWZ0Om9ha19sb2ciKSwgSXMuRmFsc2UsCiAgICAgICAgICAgICAgICAiT3JpZ2luYWwgbmFtZXNwYWNlZCBrZXkgbXVzdCBub3QgcmVtYWluIGluIGludmVudG9yeS4iKTsKICAgICAgICB9KTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIEFwcGx5X1N0YXR1c0V2ZW50X01peGVkTmFtZXNwYWNlZEFuZEJhcmVfQXJlVW5pZmllZCgpCiAgICB7CiAgICAgICAgLy8gQm90aCBmb3JtcyBwcmVzZW50IHNpbXVsdGFuZW91c2x5IOKAlCBjb3VudHMgbXVzdCBiZSBtZXJnZWQuCiAgICAgICAgdmFyIGludmVudG9yeSA9IG5ldyBEaWN0aW9uYXJ5PHN0cmluZywgaW50PgogICAgICAgIHsKICAgICAgICAgICAgWyJtaW5lY3JhZnQ6aXJvbl9pbmdvdCJdID0gMiwKICAgICAgICAgICAgWyJpcm9uX2luZ290Il0gICAgICAgICAgID0gMSwKICAgICAgICB9OwogICAgICAgIHZhciBldiA9IG5ldyBTdGF0dXNFdmVudChuZXcgUG9zaXRpb24oMCwgNjQsIDApLCAyMCwgMjAsIGludmVudG9yeSwgbnVsbCwgTm93KTsKCiAgICAgICAgdmFyIHJlc3VsdCA9IF9wcm9qZWN0b3IuQXBwbHkoRW1wdHlTdGF0ZSwgZXYpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuSW52ZW50b3J5LkdldFZhbHVlT3JEZWZhdWx0KCJpcm9uX2luZ290IiksIElzLkVxdWFsVG8oMyksCiAgICAgICAgICAgICJOYW1lc3BhY2VkIGFuZCBiYXJlIGNvdW50cyBmb3IgdGhlIHNhbWUgaXRlbSBtdXN0IGJlIHN1bW1lZC4iKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIEFwcGx5X1N0YXR1c0V2ZW50X0JhcmVLZXlzX1Bhc3NUaHJvdWdoVW5jaGFuZ2VkKCkKICAgIHsKICAgICAgICAvLyBGYXN0IHBhdGg6IG5vIG5hbWVzcGFjZSBwcmVmaXgg4oaSIG5vIGFsbG9jYXRpb24sIHNhbWUgc2VtYW50aWNzLgogICAgICAgIHZhciBpbnZlbnRvcnkgPSBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIGludD4geyBbImNvYmJsZXN0b25lIl0gPSA2NCwgWyJzdGljayJdID0gMzIgfTsKICAgICAgICB2YXIgZXYgPSBuZXcgU3RhdHVzRXZlbnQobmV3IFBvc2l0aW9uKDAsIDY0LCAwKSwgMjAsIDIwLCBpbnZlbnRvcnksIG51bGwsIE5vdyk7CgogICAgICAgIHZhciByZXN1bHQgPSBfcHJvamVjdG9yLkFwcGx5KEVtcHR5U3RhdGUsIGV2KTsKCiAgICAgICAgQXNzZXJ0Lk11bHRpcGxlKCgpID0+CiAgICAgICAgewogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuSW52ZW50b3J5LkdldFZhbHVlT3JEZWZhdWx0KCJjb2JibGVzdG9uZSIpLCBJcy5FcXVhbFRvKDY0KSk7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5JbnZlbnRvcnkuR2V0VmFsdWVPckRlZmF1bHQoInN0aWNrIiksICAgICAgIElzLkVxdWFsVG8oMzIpKTsKICAgICAgICB9KTsKICAgIH0KCiAgICAvLyDilIDilIAgYmxvY2tNaW5lZCAoU3ByaW50IDM1IFAwLUE6IG5vIGxvbmdlciB1cGRhdGVzIGludmVudG9yeSkg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACiAgICAvLyBTcHJpbnQgMzU6IEFwcGx5QmxvY2tNaW5lZCBzdG9yZXMgZmFjdHMgb25seS4gSW52ZW50b3J5IHVwZGF0ZXMgY29tZSBleGNsdXNpdmVseQogICAgLy8gZnJvbSBJdGVtQ29sbGVjdGVkRXZlbnQgKE1pbmVmbGF5ZXIgcGxheWVyQ29sbGVjdCkuIEdldFN0YXR1cyByZWNvbmNpbGVzIGRyaWZ0LgoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQXBwbHlfQmxvY2tNaW5lZF9Eb2VzTm90VXBkYXRlSW52ZW50b3J5KCkKICAgIHsKICAgICAgICAvLyBTcHJpbnQgMzUgUDAtQTogQmxvY2tNaW5lZEV2ZW50IG11c3QgTk9UIHVwZGF0ZSBpbnZlbnRvcnkuCiAgICAgICAgLy8gZGlhbW9uZF9vcmUg4oaSICJkaWFtb25kIiBtaXNtYXRjaCAoQlVHLTEpIHdhcyB0aGUgbW90aXZhdGlvbi4KICAgICAgICAvLyBJdGVtQ29sbGVjdGVkRXZlbnQgaXMgbm93IHRoZSBzb2xlIGludmVudG9yeSBhdXRob3JpdHkuCiAgICAgICAgdmFyIGV2ID0gbmV3IEJsb2NrTWluZWRFdmVudCgib2FrX2xvZyIsIDUsIG5ldyBQb3NpdGlvbigwLCA2NCwgMCksIE5vdyk7CiAgICAgICAgdmFyIHJlc3VsdCA9IF9wcm9qZWN0b3IuQXBwbHkoRW1wdHlTdGF0ZSwgZXYpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuSW52ZW50b3J5LkdldFZhbHVlT3JEZWZhdWx0KCJvYWtfbG9nIiksIElzLkVxdWFsVG8oMCksCiAgICAgICAgICAgICJTcHJpbnQgMzU6IEJsb2NrTWluZWRFdmVudCBtdXN0IE5PVCBhZGQgdG8gaW52ZW50b3J5IOKAlCBJdGVtQ29sbGVjdGVkRXZlbnQgaXMgdGhlIGF1dGhvcml0eSIpOwogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5JbnZlbnRvcnksIElzLkVtcHR5LAogICAgICAgICAgICAiTm8gaW52ZW50b3J5IGNoYW5nZXMgZnJvbSBCbG9ja01pbmVkRXZlbnQiKTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIEFwcGx5X0Jsb2NrTWluZWRfU3RvcmVzQmxvY2tOYW1lRmFjdCgpCiAgICB7CiAgICAgICAgLy8gRXZlbiB0aG91Z2ggaW52ZW50b3J5IGlzIG5vIGxvbmdlciB1cGRhdGVkLCBibG9jayBuYW1lICsgY291bnQgZmFjdHMgc3RpbGwgc3RvcmVkLgogICAgICAgIHZhciBldiA9IG5ldyBCbG9ja01pbmVkRXZlbnQoIm9ha19sb2ciLCA1LCBuZXcgUG9zaXRpb24oMTAwLCA2NCwgMjAwKSwgTm93KTsKICAgICAgICB2YXIgcmVzdWx0ID0gX3Byb2plY3Rvci5BcHBseShFbXB0eVN0YXRlLCBldik7CgogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5GYWN0cy5UcnlHZXRWYWx1ZSgiZXZlbnQ6QmxvY2tNaW5lZDpCbG9jayIsIG91dCB2YXIgYmxvY2spLCBJcy5UcnVlLAogICAgICAgICAgICAiQmxvY2tNaW5lZCBibG9jayBuYW1lIGZhY3Qgc2hvdWxkIGJlIHN0b3JlZCBmb3IgZGlhZ25vc3RpY3MiKTsKICAgICAgICBBc3NlcnQuVGhhdChibG9jaz8uVG9TdHJpbmcoKSwgSXMuRXF1YWxUbygib2FrX2xvZyIpKTsKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuRmFjdHMuVHJ5R2V0VmFsdWUoImV2ZW50OkJsb2NrTWluZWQ6Q291bnQiLCBvdXQgdmFyIGNvdW50KSwgSXMuVHJ1ZSk7CiAgICAgICAgQXNzZXJ0LlRoYXQoY291bnQ/LlRvU3RyaW5nKCksIElzLkVxdWFsVG8oIjUiKSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBBcHBseV9CbG9ja01pbmVkX05hbWVzcGFjZWRJZF9Eb2VzTm90VXBkYXRlSW52ZW50b3J5KCkKICAgIHsKICAgICAgICAvLyBTcHJpbnQgMzUgUDAtQTogbmFtZXNwYWNlZCBpZHMgYWxzbyBwcm9kdWNlIG5vIGludmVudG9yeSB1cGRhdGUKICAgICAgICB2YXIgZXYgPSBuZXcgQmxvY2tNaW5lZEV2ZW50KCJtaW5lY3JhZnQ6Y29iYmxlc3RvbmUiLCA2NCwgbmV3IFBvc2l0aW9uKDAsIDY0LCAwKSwgTm93KTsKICAgICAgICB2YXIgcmVzdWx0ID0gX3Byb2plY3Rvci5BcHBseShFbXB0eVN0YXRlLCBldik7CgogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5JbnZlbnRvcnksIElzLkVtcHR5LAogICAgICAgICAgICAiU3ByaW50IDM1OiBuYW1lc3BhY2VkIEJsb2NrTWluZWRFdmVudCBtdXN0IG5vdCB1cGRhdGUgaW52ZW50b3J5Iik7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBBcHBseV9JdGVtQ29sbGVjdGVkRXZlbnRfVXBkYXRlc0ludmVudG9yeSgpCiAgICB7CiAgICAgICAgLy8gU3ByaW50IDM1IFAwLUE6IEl0ZW1Db2xsZWN0ZWRFdmVudCBpcyBub3cgdGhlIGNhbm9uaWNhbCBpbnZlbnRvcnkgc291cmNlCiAgICAgICAgdmFyIGV2ID0gbmV3IEl0ZW1Db2xsZWN0ZWRFdmVudCgib2FrX2xvZyIsIDUsIE5vdyk7CiAgICAgICAgdmFyIHJlc3VsdCA9IF9wcm9qZWN0b3IuQXBwbHkoRW1wdHlTdGF0ZSwgZXYpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuSW52ZW50b3J5LkdldFZhbHVlT3JEZWZhdWx0KCJvYWtfbG9nIiksIElzLkVxdWFsVG8oNSksCiAgICAgICAgICAgICJJdGVtQ29sbGVjdGVkRXZlbnQgbXVzdCB1cGRhdGUgaW52ZW50b3J5IHdpdGggY29ycmVjdCBpdGVtIGNvdW50Iik7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBBcHBseV9JdGVtQ29sbGVjdGVkRXZlbnRfTmFtZXNwYWNlZEl0ZW1fTm9ybWFsaXplZCgpCiAgICB7CiAgICAgICAgLy8gR3VhcmQ6IHBsYXllckNvbGxlY3Qgc2hvdWxkIHJldHVybiBiYXJlIG5hbWVzLCBidXQgbm9ybWFsaXplIGRlZmVuc2l2ZWx5CiAgICAgICAgdmFyIGV2ID0gbmV3IEl0ZW1Db2xsZWN0ZWRFdmVudCgibWluZWNyYWZ0OmRpYW1vbmQiLCAxLCBOb3cpOwogICAgICAgIHZhciByZXN1bHQgPSBfcHJvamVjdG9yLkFwcGx5KEVtcHR5U3RhdGUsIGV2KTsKCiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkludmVudG9yeS5HZXRWYWx1ZU9yRGVmYXVsdCgiZGlhbW9uZCIpLCBJcy5FcXVhbFRvKDEpLAogICAgICAgICAgICAiSXRlbUNvbGxlY3RlZEV2ZW50IHdpdGggbmFtZXNwYWNlZCBpdGVtIHNob3VsZCBub3JtYWxpemUgdG8gYmFyZSBuYW1lIik7CiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkludmVudG9yeS5Db250YWluc0tleSgibWluZWNyYWZ0OmRpYW1vbmQiKSwgSXMuRmFsc2UpOwogICAgfQoKICAgIC8vIOKUgOKUgCBFcnJvciAvIGJsb2NrTm90Rm91bmQg4oCUIG5vIHN0cnVjdHVyZWQgc3RhdGUgY2hhbmdlIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQXBwbHlfRXJyb3JFdmVudF9Eb2VzTm90Q2hhbmdlU3RydWN0dXJlZFN0YXRlKCkKICAgIHsKICAgICAgICB2YXIgd2l0aEhlYWx0aCA9IFN0YXRlV2l0aEhlYWx0aCgyMCwgMTgpOwogICAgICAgIHZhciB3aXRoUG9zICAgID0gX3Byb2plY3Rvci5BcHBseSh3aXRoSGVhbHRoLCBuZXcgTW92ZUV2ZW50KG5ldyBQb3NpdGlvbigxLCAyLCAzKSwgTm93KSk7CgogICAgICAgIHZhciByZXN1bHQgPSBfcHJvamVjdG9yLkFwcGx5KHdpdGhQb3MsIG5ldyBFcnJvckV2ZW50KCJtaW5lIiwgInBhdGggYmxvY2tlZCIsIE5vdykpOwoKICAgICAgICBBc3NlcnQuTXVsdGlwbGUoKCkgPT4KICAgICAgICB7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5IZWFsdGgsICAgSXMuRXF1YWxUbygyMCkpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuRm9vZCwgICAgIElzLkVxdWFsVG8oMTgpKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LlBvc2l0aW9uLCBJcy5FcXVhbFRvKG5ldyBQb3NpdGlvbigxLCAyLCAzKSkpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuSW52ZW50b3J5LCBJcy5FbXB0eSk7CiAgICAgICAgfSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBBcHBseV9FcnJvckV2ZW50X0RvZXNOb3RXcml0ZUdhbWVMYXN0RXJyb3JGYWN0KCkKICAgIHsKICAgICAgICB2YXIgZXYgICAgID0gbmV3IEVycm9yRXZlbnQoIm1pbmUiLCAidGltZW91dCIsIE5vdyk7CiAgICAgICAgdmFyIHJlc3VsdCA9IF9wcm9qZWN0b3IuQXBwbHkoRW1wdHlTdGF0ZSwgZXYpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuRmFjdHMuQ29udGFpbnNLZXkoImdhbWUubGFzdEVycm9yIiksIElzLkZhbHNlLAogICAgICAgICAgICAiV29ybGRTdGF0ZVByb2plY3RvciBtdXN0IG5vdCB3cml0ZSBnYW1lLmxhc3RFcnJvciDigJQgcm91dGluZyBiZWxvbmdzIHRvIHRoZSBlcnJvciBjaGFubmVsLiIpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQXBwbHlfQmxvY2tOb3RGb3VuZEV2ZW50X0RvZXNOb3RDaGFuZ2VTdHJ1Y3R1cmVkU3RhdGUoKQogICAgewogICAgICAgIHZhciB3aXRoSGVhbHRoID0gU3RhdGVXaXRoSGVhbHRoKDIwKTsKICAgICAgICB2YXIgZXYgPSBuZXcgQmxvY2tOb3RGb3VuZEV2ZW50KCJtaW5lY3JhZnQ6b2FrX2xvZyIsIDAsIE5vdyk7CgogICAgICAgIHZhciByZXN1bHQgPSBfcHJvamVjdG9yLkFwcGx5KHdpdGhIZWFsdGgsIGV2KTsKCiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkhlYWx0aCwgSXMuRXF1YWxUbygyMCkpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQXBwbHlfQmxvY2tOb3RGb3VuZEV2ZW50X0RvZXNOb3RXcml0ZUdhbWVMYXN0RXJyb3JGYWN0KCkKICAgIHsKICAgICAgICB2YXIgZXYgICAgID0gbmV3IEJsb2NrTm90Rm91bmRFdmVudCgibWluZWNyYWZ0Om9ha19sb2ciLCAwLCBOb3cpOwogICAgICAgIHZhciByZXN1bHQgPSBfcHJvamVjdG9yLkFwcGx5KEVtcHR5U3RhdGUsIGV2KTsKCiAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkZhY3RzLkNvbnRhaW5zS2V5KCJnYW1lLmxhc3RFcnJvciIpLCBJcy5GYWxzZSwKICAgICAgICAgICAgIldvcmxkU3RhdGVQcm9qZWN0b3IgbXVzdCBub3Qgd3JpdGUgZ2FtZS5sYXN0RXJyb3Ig4oCUIHJvdXRpbmcgYmVsb25ncyB0byB0aGUgZXJyb3IgY2hhbm5lbC4iKTsKICAgIH0KCiAgICAvLyDilIDilIAgUmF3IGV2ZW50IGZhY3RzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQXBwbHlfU3RvcmVzUmF3RXZlbnRGYWN0c19Gb3JLbm93bkV2ZW50VHlwZXMoKQogICAgewogICAgICAgIHZhciBldiA9IG5ldyBNb3ZlRXZlbnQobmV3IFBvc2l0aW9uKDUsIDY0LCAzKSwgTm93KTsKICAgICAgICB2YXIgcmVzdWx0ID0gX3Byb2plY3Rvci5BcHBseShFbXB0eVN0YXRlLCBldik7CgogICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5GYWN0cy5Db250YWluc0tleSgiZXZlbnQ6TW92ZTpQb3MiKSwgSXMuVHJ1ZSwKICAgICAgICAgICAgIlJhdyBldmVudCBmYWN0cyBzaG91bGQgYmUgc3RvcmVkIGZvciBhbGwgZXZlbnQgdHlwZXMuIik7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBBcHBseV9TdG9yZXNSYXdFdmVudEZhY3RzX0ZvckVycm9yRXZlbnRzKCkKICAgIHsKICAgICAgICB2YXIgZXYgPSBuZXcgRXJyb3JFdmVudCgibWluZSIsICJwYXRoIGJsb2NrZWQiLCBOb3cpOwogICAgICAgIHZhciByZXN1bHQgPSBfcHJvamVjdG9yLkFwcGx5KEVtcHR5U3RhdGUsIGV2KTsKCiAgICAgICAgQXNzZXJ0Lk11bHRpcGxlKCgpID0+CiAgICAgICAgewogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuRmFjdHMuQ29udGFpbnNLZXkoImV2ZW50OkVycm9yOkFjdGlvbiIpLCAgSXMuVHJ1ZSk7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5GYWN0cy5Db250YWluc0tleSgiZXZlbnQ6RXJyb3I6TWVzc2FnZSIpLCBJcy5UcnVlKTsKICAgICAgICB9KTsKICAgIH0KCiAgICAvLyDilIDilIAgRmFsbGJhY2sgZXZlbnRzICh0eXBlZCBidXQgbm90IHN0YXRlLWNoYW5naW5nKSDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIEFwcGx5X05vblN0YXRlQ2hhbmdpbmdFdmVudF9TdG9yZXNSYXdGYWN0c0FuZExlYXZlc1N0cnVjdHVyZWRTdGF0ZVVuY2hhbmdlZCgpCiAgICB7CiAgICAgICAgdmFyIHdpdGhIZWFsdGggPSBTdGF0ZVdpdGhIZWFsdGgoMTUsIDEwKTsKICAgICAgICB2YXIgZXYgICAgICAgICA9IG5ldyBEZWF0aEV2ZW50KG5ldyBQb3NpdGlvbigwLCA2NCwgMCksIE5vdyk7CgogICAgICAgIHZhciByZXN1bHQgPSBfcHJvamVjdG9yLkFwcGx5KHdpdGhIZWFsdGgsIGV2KTsKCiAgICAgICAgQXNzZXJ0Lk11bHRpcGxlKCgpID0+CiAgICAgICAgewogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuSGVhbHRoLCBJcy5FcXVhbFRvKDE1KSwKICAgICAgICAgICAgICAgICJOb24tc3RhdGUtY2hhbmdpbmcgZXZlbnQgc2hvdWxkIG5vdCBjaGFuZ2UgaGVhbHRoLiIpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuRmFjdHMuQ29udGFpbnNLZXkoImV2ZW50OkRlYXRoOlBvcyIpLCBJcy5UcnVlLAogICAgICAgICAgICAgICAgIlJhdyBldmVudCBmYWN0cyBzaG91bGQgc3RpbGwgYmUgc3RvcmVkIGZvciBub24tc3RhdGUtY2hhbmdpbmcgZXZlbnRzLiIpOwogICAgICAgIH0pOwogICAgfQoKICAgIC8vIOKUgOKUgCBQdXJpdHkg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBBcHBseV9Jc1B1cmVfSW5wdXRTdGF0ZUlzTm90TXV0YXRlZCgpCiAgICB7CiAgICAgICAgdmFyIG9yaWdpbmFsICAgICAgID0gRW1wdHlTdGF0ZTsKICAgICAgICB2YXIgb3JpZ2luYWxIZWFsdGggPSBvcmlnaW5hbC5IZWFsdGg7CiAgICAgICAgdmFyIG9yaWdpbmFsRm9vZCAgID0gb3JpZ2luYWwuRm9vZDsKCiAgICAgICAgdmFyIGV2ID0gbmV3IEhlYWx0aEV2ZW50KDUsIDUsIE5vdyk7CiAgICAgICAgX3Byb2plY3Rvci5BcHBseShvcmlnaW5hbCwgZXYpOyAvLyBkaXNjYXJkIHJlc3VsdAoKICAgICAgICBBc3NlcnQuTXVsdGlwbGUoKCkgPT4KICAgICAgICB7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KG9yaWdpbmFsLkhlYWx0aCwgSXMuRXF1YWxUbyhvcmlnaW5hbEhlYWx0aCksCiAgICAgICAgICAgICAgICAiQXBwbHkgbXVzdCBub3QgbXV0YXRlIHRoZSBpbnB1dCBXb3JsZFN0YXRlLkhlYWx0aC4iKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQob3JpZ2luYWwuRm9vZCwgICBJcy5FcXVhbFRvKG9yaWdpbmFsRm9vZCksCiAgICAgICAgICAgICAgICAiQXBwbHkgbXVzdCBub3QgbXV0YXRlIHRoZSBpbnB1dCBXb3JsZFN0YXRlLkZvb2QuIik7CiAgICAgICAgfSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBBcHBseV9SZXR1cm5zTmV3SW5zdGFuY2VfTm90U2FtZVJlZmVyZW5jZSgpCiAgICB7CiAgICAgICAgdmFyIG9yaWdpbmFsID0gRW1wdHlTdGF0ZTsKICAgICAgICB2YXIgZXYgICAgICAgPSBuZXcgSGVhbHRoRXZlbnQoMTAsIDEwLCBOb3cpOwoKICAgICAgICB2YXIgcmVzdWx0ID0gX3Byb2plY3Rvci5BcHBseShvcmlnaW5hbCwgZXYpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQsIElzLk5vdC5TYW1lQXMob3JpZ2luYWwpKTsKICAgIH0KCiAgICAvLyDilIDilIAgRmxhdEFyZWFGb3VuZCAoU3ByaW50IDkgQTQsIFNwcmludCAzNSBQMC1DIFNlYXJjaGVkUmFkaXVzKSDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIEFwcGx5X0ZsYXRBcmVhRm91bmRFdmVudF9TdG9yZXNBbGxGaWVsZHNBc0ZhY3RzX0FuZExlYXZlc1N0cnVjdHVyZWRTdGF0ZVVuY2hhbmdlZCgpCiAgICB7CiAgICAgICAgdmFyIHdpdGhIZWFsdGggPSBTdGF0ZVdpdGhIZWFsdGgoMjApOwogICAgICAgIC8vIFNwcmludCAzNSBQMC1DOiBTZWFyY2hlZFJhZGl1cyBpcyBub3cgYSByZXF1aXJlZCBwb3NpdGlvbmFsIGFyZwogICAgICAgIHZhciBldiA9IG5ldyBGbGF0QXJlYUZvdW5kRXZlbnQoCiAgICAgICAgICAgIFg6IDEwLCBZOiA2NCwgWjogLTUsCiAgICAgICAgICAgIEFyZWE6IDM2LAogICAgICAgICAgICBNaW5YOiA3LCBNYXhYOiAxMywgTWluWjogLTgsIE1heFo6IC0yLAogICAgICAgICAgICBTZWFyY2hlZFJhZGl1czogMzIsCiAgICAgICAgICAgIFRpbWVzdGFtcDogTm93KTsKCiAgICAgICAgdmFyIHJlc3VsdCA9IF9wcm9qZWN0b3IuQXBwbHkod2l0aEhlYWx0aCwgZXYpOwoKICAgICAgICBBc3NlcnQuTXVsdGlwbGUoKCkgPT4KICAgICAgICB7CiAgICAgICAgICAgIC8vIFN0cnVjdHVyZWQgc3RhdGUgbXVzdCBiZSB1bmNoYW5nZWQKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkhlYWx0aCwgSXMuRXF1YWxUbygyMCksCiAgICAgICAgICAgICAgICAiRmxhdEFyZWFGb3VuZCBtdXN0IG5vdCBjaGFuZ2UgSGVhbHRoLiIpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuSW52ZW50b3J5LCBJcy5FbXB0eSwKICAgICAgICAgICAgICAgICJGbGF0QXJlYUZvdW5kIG11c3Qgbm90IGFmZmVjdCBpbnZlbnRvcnkuIik7CgogICAgICAgICAgICAvLyBQZXItZXZlbnQgcmF3IGZhY3RzCiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5GYWN0cy5Db250YWluc0tleSgiZXZlbnQ6RmxhdEFyZWFGb3VuZDpYIiksIElzLlRydWUpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuRmFjdHMuQ29udGFpbnNLZXkoImV2ZW50OkZsYXRBcmVhRm91bmQ6QXJlYSIpLCBJcy5UcnVlKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkZhY3RzLkNvbnRhaW5zS2V5KCJldmVudDpGbGF0QXJlYUZvdW5kOk1pblgiKSwgSXMuVHJ1ZSk7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5GYWN0c1siZXZlbnQ6RmxhdEFyZWFGb3VuZDpYIl0/LlRvU3RyaW5nKCksICAgIElzLkVxdWFsVG8oIjEwIikpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuRmFjdHNbImV2ZW50OkZsYXRBcmVhRm91bmQ6QXJlYSJdPy5Ub1N0cmluZygpLCBJcy5FcXVhbFRvKCIzNiIpKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkZhY3RzWyJldmVudDpGbGF0QXJlYUZvdW5kOk1pblgiXT8uVG9TdHJpbmcoKSwgSXMuRXF1YWxUbygiNyIpKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkZhY3RzWyJldmVudDpGbGF0QXJlYUZvdW5kOk1heFoiXT8uVG9TdHJpbmcoKSwgSXMuRXF1YWxUbygiLTIiKSk7CgogICAgICAgICAgICAvLyBTcHJpbnQgMzUgUDAtQzogU2VhcmNoZWRSYWRpdXMgZmFjdCBzdG9yZWQKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkZhY3RzLkNvbnRhaW5zS2V5KCJldmVudDpGbGF0QXJlYUZvdW5kOlNlYXJjaGVkUmFkaXVzIiksIElzLlRydWUsCiAgICAgICAgICAgICAgICAiU2VhcmNoZWRSYWRpdXMgZmFjdCBtdXN0IGJlIHN0b3JlZCBmb3IgQnVpbGRHb2FsRGVjb21wb3NlciByZXRyeSBsb2dpYy4iKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVzdWx0LkZhY3RzWyJldmVudDpGbGF0QXJlYUZvdW5kOlNlYXJjaGVkUmFkaXVzIl0/LlRvU3RyaW5nKCksIElzLkVxdWFsVG8oIjMyIikpOwoKICAgICAgICAgICAgLy8gU3ByaW50IDk6IGNyb3NzLWV2ZW50IHN1bW1hcnkga2V5IHJlYWRhYmxlIGJ5IHBsYW5uZXJzCiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5GYWN0cy5Db250YWluc0tleShCdWlsZEZhY3RLZXlzLkxhc3RGbGF0QXJlYSksIElzLlRydWUsCiAgICAgICAgICAgICAgICAiTGFzdEZsYXRBcmVhIHN1bW1hcnkgZmFjdCBzaG91bGQgYmUgd3JpdHRlbiBmb3IgcGxhbm5lciBhY2Nlc3MuIik7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5GYWN0c1tCdWlsZEZhY3RLZXlzLkxhc3RGbGF0QXJlYV0/LlRvU3RyaW5nKCksIElzLkVxdWFsVG8oIjM2IikpOwogICAgICAgIH0pOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQXBwbHlfRmxhdEFyZWFGb3VuZEV2ZW50X1plcm9BcmVhX1N0aWxsU3RvcmVzRmFjdHMoKQogICAgewogICAgICAgIC8vIEFyZWE9MCBtZWFucyBubyBzdWl0YWJsZSBmbGF0IHJlZ2lvbiB3YXMgZm91bmQgYnkgdGhlIHNjYW5uZXIKICAgICAgICAvLyBTcHJpbnQgMzUgUDAtQzogU2VhcmNoZWRSYWRpdXM9NDggbWVhbnMgd2Ugc2VhcmNoZWQgdGhlIG1heCByYWRpdXMg4oCUIG5vIHJldHJ5IG5lZWRlZAogICAgICAgIHZhciBldiA9IG5ldyBGbGF0QXJlYUZvdW5kRXZlbnQoCiAgICAgICAgICAgIFg6IDAsIFk6IDY0LCBaOiAwLAogICAgICAgICAgICBBcmVhOiAwLAogICAgICAgICAgICBNaW5YOiAwLCBNYXhYOiAwLCBNaW5aOiAwLCBNYXhaOiAwLAogICAgICAgICAgICBTZWFyY2hlZFJhZGl1czogNDgsCiAgICAgICAgICAgIFRpbWVzdGFtcDogTm93KTsKCiAgICAgICAgdmFyIHJlc3VsdCA9IF9wcm9qZWN0b3IuQXBwbHkoRW1wdHlTdGF0ZSwgZXYpOwoKICAgICAgICBBc3NlcnQuTXVsdGlwbGUoKCkgPT4KICAgICAgICB7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5GYWN0cy5Db250YWluc0tleSgiZXZlbnQ6RmxhdEFyZWFGb3VuZDpBcmVhIiksIElzLlRydWUpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuRmFjdHNbImV2ZW50OkZsYXRBcmVhRm91bmQ6QXJlYSJdPy5Ub1N0cmluZygpLCBJcy5FcXVhbFRvKCIwIiksCiAgICAgICAgICAgICAgICAiQXJlYT0wIChubyBmbGF0IGFyZWEgZm91bmQpIHNob3VsZCBzdGlsbCBiZSBzdG9yZWQgYXMgYSBmYWN0LiIpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuRmFjdHMuQ29udGFpbnNLZXkoQnVpbGRGYWN0S2V5cy5MYXN0RmxhdEFyZWEpLCBJcy5UcnVlLAogICAgICAgICAgICAgICAgIkxhc3RGbGF0QXJlYSBzaG91bGQgYmUgc3RvcmVkIGV2ZW4gZm9yIGFyZWE9MCByZXN1bHQgKG5vIGZsYXQgYXJlYSBmb3VuZCkuIik7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5GYWN0c1siZXZlbnQ6RmxhdEFyZWFGb3VuZDpTZWFyY2hlZFJhZGl1cyJdPy5Ub1N0cmluZygpLCBJcy5FcXVhbFRvKCI0OCIpLAogICAgICAgICAgICAgICAgIlNlYXJjaGVkUmFkaXVzPTQ4IHNob3VsZCBiZSBzdG9yZWQgc28gQnVpbGRHb2FsRGVjb21wb3NlciBrbm93cyBub3QgdG8gcmV0cnkuIik7CiAgICAgICAgfSk7CiAgICB9Cn0K
+using Agent.Core;
+
+namespace MemorySmith.Agent.Tests;
+
+/// <summary>
+/// Unit tests for <see cref="WorldStateProjector"/>.
+/// Verifies the pure-function contract: applying a WorldEvent returns the
+/// correct new WorldState without mutating the input.
+/// Sprint 14 P1b: added inventory key normalization tests for StatusEvent.
+/// Sprint 35 P0-A: updated BlockMined tests — ApplyBlockMined no longer updates inventory.
+///   Inventory truth now comes exclusively from ItemCollectedEvent (playerCollect).
+///   Periodic GetStatus reconciles drift.
+/// Sprint 35 P0-C: added SearchedRadius to FlatAreaFoundEvent constructors.
+/// </summary>
+[TestFixture]
+public class WorldStateProjectorTests
+{
+    private WorldStateProjector _projector = null!;
+
+    [SetUp]
+    public void SetUp() => _projector = new WorldStateProjector();
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private static DateTimeOffset Now => DateTimeOffset.UtcNow;
+
+    private static WorldState EmptyState => new();
+
+    // Convenience: set position via a move event, then apply another event on top.
+    private WorldState StateWithPosition(int x, int y, int z) =>
+        _projector.Apply(EmptyState, new MoveEvent(new Position(x, y, z), Now));
+
+    private WorldState StateWithHealth(int hp, int food = 20) =>
+        _projector.Apply(EmptyState, new HealthEvent(hp, food, Now));
+
+    // ── Health ────────────────────────────────────────────────────────────────
+
+    [Test]
+    public void Apply_HealthEvent_UpdatesHealthAndFood()
+    {
+        var ev = new HealthEvent(15, 18, Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Health, Is.EqualTo(15));
+            Assert.That(result.Food,   Is.EqualTo(18));
+        });
+    }
+
+    [Test]
+    public void Apply_HealthEvent_DoesNotChangePosition()
+    {
+        var withPos    = StateWithPosition(5, 64, 5);
+        var afterHealth = _projector.Apply(withPos, new HealthEvent(10, 10, Now));
+
+        Assert.That(afterHealth.Position, Is.EqualTo(new Position(5, 64, 5)));
+    }
+
+    // ── Spawn ─────────────────────────────────────────────────────────────────
+
+    [Test]
+    public void Apply_SpawnEvent_UpdatesPositionHealthAndFood()
+    {
+        var ev = new SpawnEvent(new Position(10, 64, -20), 20, 20, Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Position, Is.EqualTo(new Position(10, 64, -20)));
+            Assert.That(result.Health,   Is.EqualTo(20));
+            Assert.That(result.Food,     Is.EqualTo(20));
+        });
+    }
+
+    // ── Move / moveComplete ───────────────────────────────────────────────────
+
+    [Test]
+    public void Apply_MoveEvent_UpdatesPosition()
+    {
+        var ev = new MoveEvent(new Position(5, 63, 7), Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Position, Is.EqualTo(new Position(5, 63, 7)));
+    }
+
+    [Test]
+    public void Apply_MoveCompleteEvent_UpdatesPosition()
+    {
+        var ev = new MoveEvent(new Position(9, 65, -1), Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Position, Is.EqualTo(new Position(9, 65, -1)));
+    }
+
+    [Test]
+    public void Apply_MoveEvent_DoesNotChangeHealthOrFood()
+    {
+        var withHealth = StateWithHealth(14, 12);
+        var afterMove  = _projector.Apply(withHealth, new MoveEvent(new Position(1, 1, 1), Now));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(afterMove.Health, Is.EqualTo(14));
+            Assert.That(afterMove.Food,   Is.EqualTo(12));
+        });
+    }
+
+    // ── Status ────────────────────────────────────────────────────────────────
+
+    [Test]
+    public void Apply_StatusEvent_UpdatesPositionHealthAndInventory()
+    {
+        var inventory = new Dictionary<string, int> { ["oak_log"] = 3, ["stone"] = 10 };
+        var ev = new StatusEvent(new Position(1, 2, 3), 19, 17, inventory, null, Now);
+
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Position, Is.EqualTo(new Position(1, 2, 3)));
+            Assert.That(result.Health,   Is.EqualTo(19));
+            Assert.That(result.Food,     Is.EqualTo(17));
+            Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(3));
+            Assert.That(result.Inventory.GetValueOrDefault("stone"),   Is.EqualTo(10));
+        });
+    }
+
+    // StatusEvent inventory is already parsed by WebSocketBridge — malformed
+    // inventory is handled upstream, so this test is no longer applicable.
+    // (The projector receives a clean IReadOnlyDictionary, not a raw JSON string.)
+
+    [Test]
+    public void Apply_StatusEvent_ZeroQuantityItemsExcluded()
+    {
+        // StatusEvent already filters zero-quantity items in ParseStatus;
+        // we simulate a post-filter dictionary here.
+        var inventory = new Dictionary<string, int> { ["oak_log"] = 3, ["stone"] = 5 };
+        var ev = new StatusEvent(new Position(0, 0, 0), 20, 20, inventory, null, Now);
+
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Inventory.ContainsKey("dirt"), Is.False,
+            "Zero-quantity items are already excluded by WebSocketBridge; projector never sees them.");
+    }
+
+    // ── Sprint 14 P1b: StatusEvent inventory key normalization ────────────────
+
+    [Test]
+    public void Apply_StatusEvent_NamespacedInventoryKey_IsNormalized()
+    {
+        // Mineflayer can return "minecraft:oak_log" in the status payload.
+        var inventory = new Dictionary<string, int> { ["minecraft:oak_log"] = 5 };
+        var ev = new StatusEvent(new Position(0, 64, 0), 20, 20, inventory, null, Now);
+
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(5),
+                "Bare key 'oak_log' should resolve after namespace strip.");
+            Assert.That(result.Inventory.ContainsKey("minecraft:oak_log"), Is.False,
+                "Original namespaced key must not remain in inventory.");
+        });
+    }
+
+    [Test]
+    public void Apply_StatusEvent_MixedNamespacedAndBare_AreUnified()
+    {
+        // Both forms present simultaneously — counts must be merged.
+        var inventory = new Dictionary<string, int>
+        {
+            ["minecraft:iron_ingot"] = 2,
+            ["iron_ingot"]           = 1,
+        };
+        var ev = new StatusEvent(new Position(0, 64, 0), 20, 20, inventory, null, Now);
+
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Inventory.GetValueOrDefault("iron_ingot"), Is.EqualTo(3),
+            "Namespaced and bare counts for the same item must be summed.");
+    }
+
+    [Test]
+    public void Apply_StatusEvent_BareKeys_PassThroughUnchanged()
+    {
+        // Fast path: no namespace prefix → no allocation, same semantics.
+        var inventory = new Dictionary<string, int> { ["cobblestone"] = 64, ["stick"] = 32 };
+        var ev = new StatusEvent(new Position(0, 64, 0), 20, 20, inventory, null, Now);
+
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Inventory.GetValueOrDefault("cobblestone"), Is.EqualTo(64));
+            Assert.That(result.Inventory.GetValueOrDefault("stick"),       Is.EqualTo(32));
+        });
+    }
+
+    // ── blockMined (Sprint 35 P0-A: no longer updates inventory) ─────────────
+    // Sprint 35: ApplyBlockMined stores facts only. Inventory updates come exclusively
+    // from ItemCollectedEvent (Mineflayer playerCollect). GetStatus reconciles drift.
+
+    [Test]
+    public void Apply_BlockMined_DoesNotUpdateInventory()
+    {
+        // Sprint 35 P0-A: BlockMinedEvent must NOT update inventory.
+        // diamond_ore → "diamond" mismatch (BUG-1) was the motivation.
+        // ItemCollectedEvent is now the sole inventory authority.
+        var ev = new BlockMinedEvent("oak_log", 5, new Position(0, 64, 0), Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(0),
+            "Sprint 35: BlockMinedEvent must NOT add to inventory — ItemCollectedEvent is the authority");
+        Assert.That(result.Inventory, Is.Empty,
+            "No inventory changes from BlockMinedEvent");
+    }
+
+    [Test]
+    public void Apply_BlockMined_StoresBlockNameFact()
+    {
+        // Even though inventory is no longer updated, block name + count facts still stored.
+        var ev = new BlockMinedEvent("oak_log", 5, new Position(100, 64, 200), Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Facts.TryGetValue("event:BlockMined:Block", out var block), Is.True,
+            "BlockMined block name fact should be stored for diagnostics");
+        Assert.That(block?.ToString(), Is.EqualTo("oak_log"));
+        Assert.That(result.Facts.TryGetValue("event:BlockMined:Count", out var count), Is.True);
+        Assert.That(count?.ToString(), Is.EqualTo("5"));
+    }
+
+    [Test]
+    public void Apply_BlockMined_NamespacedId_DoesNotUpdateInventory()
+    {
+        // Sprint 35 P0-A: namespaced ids also produce no inventory update
+        var ev = new BlockMinedEvent("minecraft:cobblestone", 64, new Position(0, 64, 0), Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Inventory, Is.Empty,
+            "Sprint 35: namespaced BlockMinedEvent must not update inventory");
+    }
+
+    [Test]
+    public void Apply_ItemCollectedEvent_UpdatesInventory()
+    {
+        // Sprint 35 P0-A: ItemCollectedEvent is now the canonical inventory source
+        var ev = new ItemCollectedEvent("oak_log", 5, Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(5),
+            "ItemCollectedEvent must update inventory with correct item count");
+    }
+
+    [Test]
+    public void Apply_ItemCollectedEvent_NamespacedItem_Normalized()
+    {
+        // Guard: playerCollect should return bare names, but normalize defensively
+        var ev = new ItemCollectedEvent("minecraft:diamond", 1, Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Inventory.GetValueOrDefault("diamond"), Is.EqualTo(1),
+            "ItemCollectedEvent with namespaced item should normalize to bare name");
+        Assert.That(result.Inventory.ContainsKey("minecraft:diamond"), Is.False);
+    }
+
+    // ── Error / blockNotFound — no structured state change ────────────────────
+
+    [Test]
+    public void Apply_ErrorEvent_DoesNotChangeStructuredState()
+    {
+        var withHealth = StateWithHealth(20, 18);
+        var withPos    = _projector.Apply(withHealth, new MoveEvent(new Position(1, 2, 3), Now));
+
+        var result = _projector.Apply(withPos, new ErrorEvent("mine", "path blocked", Now));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Health,   Is.EqualTo(20));
+            Assert.That(result.Food,     Is.EqualTo(18));
+            Assert.That(result.Position, Is.EqualTo(new Position(1, 2, 3)));
+            Assert.That(result.Inventory, Is.Empty);
+        });
+    }
+
+    [Test]
+    public void Apply_ErrorEvent_DoesNotWriteGameLastErrorFact()
+    {
+        var ev     = new ErrorEvent("mine", "timeout", Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Facts.ContainsKey("game.lastError"), Is.False,
+            "WorldStateProjector must not write game.lastError — routing belongs to the error channel.");
+    }
+
+    [Test]
+    public void Apply_BlockNotFoundEvent_DoesNotChangeStructuredState()
+    {
+        var withHealth = StateWithHealth(20);
+        var ev = new BlockNotFoundEvent("minecraft:oak_log", 0, Now);
+
+        var result = _projector.Apply(withHealth, ev);
+
+        Assert.That(result.Health, Is.EqualTo(20));
+    }
+
+    [Test]
+    public void Apply_BlockNotFoundEvent_DoesNotWriteGameLastErrorFact()
+    {
+        var ev     = new BlockNotFoundEvent("minecraft:oak_log", 0, Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Facts.ContainsKey("game.lastError"), Is.False,
+            "WorldStateProjector must not write game.lastError — routing belongs to the error channel.");
+    }
+
+    // ── Raw event facts ───────────────────────────────────────────────────────
+
+    [Test]
+    public void Apply_StoresRawEventFacts_ForKnownEventTypes()
+    {
+        var ev = new MoveEvent(new Position(5, 64, 3), Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.That(result.Facts.ContainsKey("event:Move:Pos"), Is.True,
+            "Raw event facts should be stored for all event types.");
+    }
+
+    [Test]
+    public void Apply_StoresRawEventFacts_ForErrorEvents()
+    {
+        var ev = new ErrorEvent("mine", "path blocked", Now);
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Facts.ContainsKey("event:Error:Action"),  Is.True);
+            Assert.That(result.Facts.ContainsKey("event:Error:Message"), Is.True);
+        });
+    }
+
+    // ── Fallback events (typed but not state-changing) ────────────────────────
+
+    [Test]
+    public void Apply_NonStateChangingEvent_StoresRawFactsAndLeavesStructuredStateUnchanged()
+    {
+        var withHealth = StateWithHealth(15, 10);
+        var ev         = new DeathEvent(new Position(0, 64, 0), Now);
+
+        var result = _projector.Apply(withHealth, ev);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Health, Is.EqualTo(15),
+                "Non-state-changing event should not change health.");
+            Assert.That(result.Facts.ContainsKey("event:Death:Pos"), Is.True,
+                "Raw event facts should still be stored for non-state-changing events.");
+        });
+    }
+
+    // ── Purity ────────────────────────────────────────────────────────────────
+
+    [Test]
+    public void Apply_IsPure_InputStateIsNotMutated()
+    {
+        var original       = EmptyState;
+        var originalHealth = original.Health;
+        var originalFood   = original.Food;
+
+        var ev = new HealthEvent(5, 5, Now);
+        _projector.Apply(original, ev); // discard result
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(original.Health, Is.EqualTo(originalHealth),
+                "Apply must not mutate the input WorldState.Health.");
+            Assert.That(original.Food,   Is.EqualTo(originalFood),
+                "Apply must not mutate the input WorldState.Food.");
+        });
+    }
+
+    [Test]
+    public void Apply_ReturnsNewInstance_NotSameReference()
+    {
+        var original = EmptyState;
+        var ev       = new HealthEvent(10, 10, Now);
+
+        var result = _projector.Apply(original, ev);
+
+        Assert.That(result, Is.Not.SameAs(original));
+    }
+
+    // ── FlatAreaFound (Sprint 9 A4, Sprint 35 P0-C SearchedRadius) ──────────
+
+    [Test]
+    public void Apply_FlatAreaFoundEvent_StoresAllFieldsAsFacts_AndLeavesStructuredStateUnchanged()
+    {
+        var withHealth = StateWithHealth(20);
+        // Sprint 35 P0-C: SearchedRadius is now a required positional arg
+        var ev = new FlatAreaFoundEvent(
+            X: 10, Y: 64, Z: -5,
+            Area: 36,
+            MinX: 7, MaxX: 13, MinZ: -8, MaxZ: -2,
+            SearchedRadius: 32,
+            Timestamp: Now);
+
+        var result = _projector.Apply(withHealth, ev);
+
+        Assert.Multiple(() =>
+        {
+            // Structured state must be unchanged
+            Assert.That(result.Health, Is.EqualTo(20),
+                "FlatAreaFound must not change Health.");
+            Assert.That(result.Inventory, Is.Empty,
+                "FlatAreaFound must not affect inventory.");
+
+            // Per-event raw facts
+            Assert.That(result.Facts.ContainsKey("event:FlatAreaFound:X"), Is.True);
+            Assert.That(result.Facts.ContainsKey("event:FlatAreaFound:Area"), Is.True);
+            Assert.That(result.Facts.ContainsKey("event:FlatAreaFound:MinX"), Is.True);
+            Assert.That(result.Facts["event:FlatAreaFound:X"]?.ToString(),    Is.EqualTo("10"));
+            Assert.That(result.Facts["event:FlatAreaFound:Area"]?.ToString(), Is.EqualTo("36"));
+            Assert.That(result.Facts["event:FlatAreaFound:MinX"]?.ToString(), Is.EqualTo("7"));
+            Assert.That(result.Facts["event:FlatAreaFound:MaxZ"]?.ToString(), Is.EqualTo("-2"));
+
+            // Sprint 35 P0-C: SearchedRadius fact stored
+            Assert.That(result.Facts.ContainsKey("event:FlatAreaFound:SearchedRadius"), Is.True,
+                "SearchedRadius fact must be stored for BuildGoalDecomposer retry logic.");
+            Assert.That(result.Facts["event:FlatAreaFound:SearchedRadius"]?.ToString(), Is.EqualTo("32"));
+
+            // Sprint 9: cross-event summary key readable by planners
+            Assert.That(result.Facts.ContainsKey(BuildFactKeys.LastFlatArea), Is.True,
+                "LastFlatArea summary fact should be written for planner access.");
+            Assert.That(result.Facts[BuildFactKeys.LastFlatArea]?.ToString(), Is.EqualTo("36"));
+        });
+    }
+
+    [Test]
+    public void Apply_FlatAreaFoundEvent_ZeroArea_StillStoresFacts()
+    {
+        // Area=0 means no suitable flat region was found by the scanner
+        // Sprint 35 P0-C: SearchedRadius=48 means we searched the max radius — no retry needed
+        var ev = new FlatAreaFoundEvent(
+            X: 0, Y: 64, Z: 0,
+            Area: 0,
+            MinX: 0, MaxX: 0, MinZ: 0, MaxZ: 0,
+            SearchedRadius: 48,
+            Timestamp: Now);
+
+        var result = _projector.Apply(EmptyState, ev);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Facts.ContainsKey("event:FlatAreaFound:Area"), Is.True);
+            Assert.That(result.Facts["event:FlatAreaFound:Area"]?.ToString(), Is.EqualTo("0"),
+                "Area=0 (no flat area found) should still be stored as a fact.");
+            Assert.That(result.Facts.ContainsKey(BuildFactKeys.LastFlatArea), Is.True,
+                "LastFlatArea should be stored even for area=0 result (no flat area found).");
+            Assert.That(result.Facts["event:FlatAreaFound:SearchedRadius"]?.ToString(), Is.EqualTo("48"),
+                "SearchedRadius=48 should be stored so BuildGoalDecomposer knows not to retry.");
+        });
+    }
+}

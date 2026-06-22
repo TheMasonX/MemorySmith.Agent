@@ -35,7 +35,10 @@ public sealed class Sprint19Tests
             "Default gather plan should not include Wander — findBlock handles nearby blocks");
         Assert.That(toolNames, Does.Contain("MineBlock"));
         Assert.That(toolNames, Does.Contain("SearchMemory"));
-        Assert.That(toolNames, Does.Contain("GetStatus"));
+        // Sprint 38 P0-A: GetStatus removed from GatherItemDecompose to fix the inventory reset
+        // bug where GetStatus overwrote incremental collection. Verify it is NOT in the plan.
+        Assert.That(toolNames, Does.Not.Contain("GetStatus"),
+            "Sprint 38 P0-A: GetStatus must NOT appear in gather plan — inventory is event-driven now.");
     }
 
     [Test]
@@ -102,9 +105,10 @@ public sealed class Sprint19Tests
         var result = await interp.InterpretAsync(
             "Player1", "get 10 stone", "Bot", 1, botPos, playerPos, state);
 
-        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CreateGoal));
-        Assert.That(result.GoalName, Is.EqualTo("GatherItem:stone"),
-            "\"get stone\" should resolve to stone, not cobblestone");
+        // Sprint 39 P1-C: Gather is no longer fast-pathed by ChatInterpreter (Sprint 35 P1-D).
+        // ChatInterpreter returns "clarify" so LlmChatInterpreter routes to the LLM.
+        Assert.That(result!.Intent, Is.EqualTo("clarify"),
+            "Gather routes to LLM via 'clarify' — stone alias resolution happens in LlmChatInterpreter.");
     }
 
     [Test]
@@ -123,9 +127,9 @@ public sealed class Sprint19Tests
         var result = await interp.InterpretAsync(
             "Player1", "get cobblestone", "Bot", 1, botPos, playerPos, state);
 
-        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CreateGoal));
-        Assert.That(result.GoalName, Is.EqualTo("GatherItem:cobblestone"),
-            "\"get cobblestone\" should still resolve to cobblestone");
+        // Sprint 39 P1-C: same as stone — gather routes through LLM.
+        Assert.That(result!.Intent, Is.EqualTo("clarify"),
+            "Cobblestone gather routes to LLM via 'clarify' from ChatInterpreter.");
     }
 
     // ── GoalFactory: yield-aware SourceBlocks ─────────────────────────────────

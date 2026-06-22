@@ -1,1 +1,361 @@
-bmFtZXNwYWNlIEFnZW50LlBsYW5uaW5nOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgU3lzdGVtLlRleHQuUmVndWxhckV4cHJlc3Npb25zOwoKLy8vIDxzdW1tYXJ5PgovLy8gRGV0ZXJtaW5pc3RpYyBwYXR0ZXJuLW1hdGNoaW5nIGNoYXQgaW50ZXJwcmV0ZXIuIFBhcnNlcyBpbi1nYW1lIHBsYXllciBtZXNzYWdlcwovLy8gaW50byA8c2VlIGNyZWY9IkNoYXRJbnRlcnByZXRhdGlvbiIvPiB2YWx1ZXMgdXNpbmcgcmVnZXggYW5kIGFsaWFzIGRpY3Rpb25hcmllcy4KLy8vCi8vLyBUaGlzIGNsYXNzIGlzIHRoZSBmYXN0LXBhdGggZmFsbGJhY2sgdXNlZCBieSA8c2VlIGNyZWY9IkxsbUNoYXRJbnRlcnByZXRlciIvPiBmb3IKLy8vIHNhZmUsIHplcm8tcmlzayBvcGVyYXRpb25zIChjYW5jZWwsIHN0YXR1cywgaW52ZW50b3J5LCBoZWxwKSBhbmQgYXMgdGhlIGZhbGxiYWNrCi8vLyB3aGVuIHRoZSBMTE0gcHJvdmlkZXIgaXMgdW5hdmFpbGFibGUgb3IgcmF0ZS1saW1pdGVkLgovLy8KLy8vIFNwcmludCAzNSBQMS1EOiBHYXRoZXJSZWdleCwgQnVpbGRSZWdleCwgYW5kIENyYWZ0UmVnZXggbWF0Y2ggYmxvY2tzIGhhdmUgYmVlbgovLy8gcmVtb3ZlZCBmcm9tIDxzZWUgY3JlZj0iUGFyc2VJbnRlbnQiLz4uIEFsbCBnYXRoZXIvYnVpbGQvY3JhZnQgaW50ZW50IGlzIG5vdyBoYW5kbGVkCi8vLyBleGNsdXNpdmVseSBieSA8c2VlIGNyZWY9IkxsbUNoYXRJbnRlcnByZXRlciIvPiDihpIgTExNIOKGkiBJbnRlbnREcmFmdCBwaXBlbGluZS4KLy8vIFRoZSByZWdleCBmaWVsZCBkZWZpbml0aW9ucyBhbmQgYWxpYXMgZGljdGlvbmFyaWVzIGFyZSBwcmVzZXJ2ZWQgZm9yIHVzZSBieQovLy8gTGxtQ2hhdEludGVycHJldGVyJ3MgaXRlbSBub3JtYWxpemF0aW9uIGluIFNwcmludCAzNi4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCBjbGFzcyBDaGF0SW50ZXJwcmV0ZXIgOiBJQ2hhdEludGVycHJldGVyCnsKICAgIC8vIOKUgOKUgCBSZWdleCBmaWVsZCBkZWZpbml0aW9ucyAocHJlc2VydmVkIGZvciB0ZXN0IGFuZCBTcHJpbnQgMzYgdXNlKSDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gTWF0Y2hlcyBnYXRoZXIvbWluZS9jb2xsZWN0IGNvbW1hbmRzLgogICAgLy8vIFNwcmludCAzNSBQMS1EOiBubyBsb25nZXIgdXNlZCBpbiBQYXJzZUludGVudDsgbWF0Y2ggYmxvY2sgcmVtb3ZlZC4KICAgIC8vLyBQcmVzZXJ2ZWQgZm9yIHRlc3QgY292ZXJhZ2UgYW5kIFNwcmludCAzNiBpdGVtIG5vcm1hbGl6YXRpb24uCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHJpdmF0ZSBzdGF0aWMgcmVhZG9ubHkgUmVnZXggR2F0aGVyUmVnZXggPSBuZXcoCiAgICAgICAgQCJcYihnZXR8bWluZXxnYXRoZXJ8Y29sbGVjdHxmZXRjaHxicmluZ3xjaG9wfGN1dHxkaWcpXGJccysoPzxjb3VudD5cZCtccyspPyg/PGl0ZW0+W2Etel9dKyhccytbYS16X10rKT8pIiwKICAgICAgICBSZWdleE9wdGlvbnMuSWdub3JlQ2FzZSB8IFJlZ2V4T3B0aW9ucy5Db21waWxlZCk7CgogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIE1hdGNoZXMgYnVpbGQgY29tbWFuZHMgd2l0aCBvcHRpb25hbCBibHVlcHJpbnQgYW5kIGNvb3JkaW5hdGVzLgogICAgLy8vIFNwcmludCAzNSBQMS1EOiBubyBsb25nZXIgdXNlZCBpbiBQYXJzZUludGVudDsgbWF0Y2ggYmxvY2sgcmVtb3ZlZC4KICAgIC8vLyBQcmVzZXJ2ZWQgZm9yIHRlc3QgY292ZXJhZ2UgYW5kIFNwcmludCAzNiBpdGVtIG5vcm1hbGl6YXRpb24uCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHJpdmF0ZSBzdGF0aWMgcmVhZG9ubHkgUmVnZXggQnVpbGRSZWdleCA9IG5ldygKICAgICAgICBAIlxiKGJ1aWxkfGNvbnN0cnVjdHxtYWtlfHBsYWNlfGNyZWF0ZSlcYlxzKyg/PGJsdWVwcmludD5bYS16X1wtXSsoXHMrW2Etel9cLV0rKT8pKFxzK2F0XHMrKD88eD4tP1xkKylccysoPzx5Pi0/XGQrKVxzKyg/PHo+LT9cZCspKT8iLAogICAgICAgIFJlZ2V4T3B0aW9ucy5JZ25vcmVDYXNlIHwgUmVnZXhPcHRpb25zLkNvbXBpbGVkKTsKCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gTWF0Y2hlcyBjcmFmdCBjb21tYW5kcy4KICAgIC8vLyBTcHJpbnQgMzUgUDEtRDogbm8gbG9uZ2VyIHVzZWQgaW4gUGFyc2VJbnRlbnQ7IG1hdGNoIGJsb2NrIHJlbW92ZWQuCiAgICAvLy8gUHJlc2VydmVkIGZvciB0ZXN0IGNvdmVyYWdlIGFuZCBTcHJpbnQgMzYgaXRlbSBub3JtYWxpemF0aW9uLgogICAgLy8vIDwvc3VtbWFyeT4KICAgIHByaXZhdGUgc3RhdGljIHJlYWRvbmx5IFJlZ2V4IENyYWZ0UmVnZXggPSBuZXcoCiAgICAgICAgQCJcYihjcmFmdHxzbWVsdHxjb29rfGJyZXcpXGJccysoPzxjb3VudD5cZCtccyspPyg/PGl0ZW0+W2Etel9dKyhccytbYS16X10rKT8pIiwKICAgICAgICBSZWdleE9wdGlvbnMuSWdub3JlQ2FzZSB8IFJlZ2V4T3B0aW9ucy5Db21waWxlZCk7CgogICAgLy8vIDxzdW1tYXJ5Pk1hdGNoZXMgZXhwbGljaXQgY29vcmRpbmF0ZSBuYXZpZ2F0aW9uIGNvbW1hbmRzLjwvc3VtbWFyeT4KICAgIHByaXZhdGUgc3RhdGljIHJlYWRvbmx5IFJlZ2V4IEdvVG9SZWdleCA9IG5ldygKICAgICAgICBAIlxiKGdvXHMrdG98Z290b3xtb3ZlXHMrdG98d2Fsa1xzK3RvfG5hdmlnYXRlXHMrdG98dGVsZXBvcnRccyt0b3x0cFxzK3RvKVxiXHMrKD88eD4tP1xkKylccysoPzx5Pi0/XGQrKVxzKyg/PHo+LT9cZCspIiwKICAgICAgICBSZWdleE9wdGlvbnMuSWdub3JlQ2FzZSB8IFJlZ2V4T3B0aW9ucy5Db21waWxlZCk7CgogICAgLy8g4pSA4pSAIEFsaWFzIGRpY3Rpb25hcmllcyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gTWFwcyBjb21tb24gcGxheWVyIHNob3J0aGFuZCB0byBjYW5vbmljYWwgTWluZWNyYWZ0IGl0ZW0gSURzLgogICAgLy8vIFVzZWQgYnkgTGxtQ2hhdEludGVycHJldGVyIGl0ZW0gbm9ybWFsaXphdGlvbiAoU3ByaW50IDM2KSBhbmQKICAgIC8vLyBwcmVzZXJ2ZWQgZnJvbSB0aGUgb3JpZ2luYWwgcGF0dGVybi1tYXRjaGluZyBpbXBsZW1lbnRhdGlvbi4KICAgIC8vLyA8L3N1bW1hcnk+CiAgICBwcml2YXRlIHN0YXRpYyByZWFkb25seSBJUmVhZE9ubHlEaWN0aW9uYXJ5PHN0cmluZywgc3RyaW5nPiBJdGVtQWxpYXNlcyA9CiAgICAgICAgbmV3IERpY3Rpb25hcnk8c3RyaW5nLCBzdHJpbmc+KFN0cmluZ0NvbXBhcmVyLk9yZGluYWxJZ25vcmVDYXNlKQogICAgICAgIHsKICAgICAgICAgICAgLy8gV29vZAogICAgICAgICAgICBbIndvb2QiXSAgICAgICAgPSAib2FrX2xvZyIsCiAgICAgICAgICAgIFsibG9nIl0gICAgICAgICA9ICJvYWtfbG9nIiwKICAgICAgICAgICAgWyJsb2dzIl0gICAgICAgID0gIm9ha19sb2ciLAogICAgICAgICAgICBbIm9hayJdICAgICAgICAgPSAib2FrX2xvZyIsCiAgICAgICAgICAgIFsiYmlyY2giXSAgICAgICA9ICJiaXJjaF9sb2ciLAogICAgICAgICAgICBbInNwcnVjZSJdICAgICAgPSAic3BydWNlX2xvZyIsCiAgICAgICAgICAgIFsicGluZSJdICAgICAgICA9ICJzcHJ1Y2VfbG9nIiwKICAgICAgICAgICAgWyJkYXJrIG9hayJdICAgID0gImRhcmtfb2FrX2xvZyIsCiAgICAgICAgICAgIFsianVuZ2xlIl0gICAgICA9ICJqdW5nbGVfbG9nIiwKICAgICAgICAgICAgWyJhY2FjaWEiXSAgICAgID0gImFjYWNpYV9sb2ciLAogICAgICAgICAgICBbImNoZXJyeSJdICAgICAgPSAiY2hlcnJ5X2xvZyIsCiAgICAgICAgICAgIFsibWFuZ3JvdmUiXSAgICA9ICJtYW5ncm92ZV9sb2ciLAogICAgICAgICAgICAvLyBTdG9uZQogICAgICAgICAgICBbImNvYmJsZSJdICAgICAgPSAiY29iYmxlc3RvbmUiLAogICAgICAgICAgICBbInJvY2siXSAgICAgICAgPSAiY29iYmxlc3RvbmUiLAogICAgICAgICAgICBbInJvY2tzIl0gICAgICAgPSAiY29iYmxlc3RvbmUiLAogICAgICAgICAgICBbInN0b25lIl0gICAgICAgPSAic3RvbmUiLAogICAgICAgICAgICAvLyBPcmVzIGFuZCBkcm9wcwogICAgICAgICAgICBbImNvYWwiXSAgICAgICAgPSAiY29hbCIsCiAgICAgICAgICAgIFsiaXJvbiJdICAgICAgICA9ICJyYXdfaXJvbiIsCiAgICAgICAgICAgIFsiZ29sZCJdICAgICAgICA9ICJyYXdfZ29sZCIsCiAgICAgICAgICAgIFsiZGlhbW9uZCJdICAgICA9ICJkaWFtb25kIiwKICAgICAgICAgICAgWyJkaWFtb25kcyJdICAgID0gImRpYW1vbmQiLAogICAgICAgICAgICBbImVtZXJhbGQiXSAgICAgPSAiZW1lcmFsZCIsCiAgICAgICAgICAgIFsiZW1lcmFsZHMiXSAgICA9ICJlbWVyYWxkIiwKICAgICAgICAgICAgWyJyZWRzdG9uZSJdICAgID0gInJlZHN0b25lIiwKICAgICAgICAgICAgWyJsYXBpcyJdICAgICAgID0gImxhcGlzX2xhenVsaSIsCiAgICAgICAgICAgIFsiY29wcGVyIl0gICAgICA9ICJyYXdfY29wcGVyIiwKICAgICAgICAgICAgLy8gVGVycmFpbgogICAgICAgICAgICBbImRpcnQiXSAgICAgICAgPSAiZGlydCIsCiAgICAgICAgICAgIFsic2FuZCJdICAgICAgICA9ICJzYW5kIiwKICAgICAgICAgICAgWyJncmF2ZWwiXSAgICAgID0gImdyYXZlbCIsCiAgICAgICAgICAgIFsiY2xheSJdICAgICAgICA9ICJjbGF5IiwKICAgICAgICAgICAgWyJzbm93Il0gICAgICAgID0gInNub3dfYmxvY2siLAogICAgICAgIH07CgogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIE1hcHMgY29tbW9uIGJsdWVwcmludCBzaG9ydGhhbmQgdG8gY2Fub25pY2FsIGJsdWVwcmludCBJRHMuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHJpdmF0ZSBzdGF0aWMgcmVhZG9ubHkgSVJlYWRPbmx5RGljdGlvbmFyeTxzdHJpbmcsIHN0cmluZz4gQmx1ZXByaW50QWxpYXNlcyA9CiAgICAgICAgbmV3IERpY3Rpb25hcnk8c3RyaW5nLCBzdHJpbmc+KFN0cmluZ0NvbXBhcmVyLk9yZGluYWxJZ25vcmVDYXNlKQogICAgICAgIHsKICAgICAgICAgICAgWyJob3VzZSJdICAgICAgICAgICA9ICJzbWFsbC1ob3VzZSIsCiAgICAgICAgICAgIFsic21hbGwgaG91c2UiXSAgICAgPSAic21hbGwtaG91c2UiLAogICAgICAgICAgICBbImNhYmluIl0gICAgICAgICAgID0gInNtYWxsLWhvdXNlIiwKICAgICAgICAgICAgWyJzaGVsdGVyIl0gICAgICAgICA9ICJzbWFsbC1ob3VzZSIsCiAgICAgICAgICAgIFsiaHV0Il0gICAgICAgICAgICAgPSAic21hbGwtaG91c2UiLAogICAgICAgICAgICBbImhvbWUiXSAgICAgICAgICAgID0gInNtYWxsLWhvdXNlIiwKICAgICAgICAgICAgWyJzaGFjayJdICAgICAgICAgICA9ICJzbWFsbC1ob3VzZSIsCiAgICAgICAgfTsKCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gTWFwcyBjb21tb24gY3JhZnQgc2hvcnRoYW5kIHRvIGNhbm9uaWNhbCBNaW5lY3JhZnQgaXRlbSBJRHMuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHJpdmF0ZSBzdGF0aWMgcmVhZG9ubHkgSVJlYWRPbmx5RGljdGlvbmFyeTxzdHJpbmcsIHN0cmluZz4gQ3JhZnRBbGlhc2VzID0KICAgICAgICBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIHN0cmluZz4oU3RyaW5nQ29tcGFyZXIuT3JkaW5hbElnbm9yZUNhc2UpCiAgICAgICAgewogICAgICAgICAgICBbInBsYW5rIl0gICAgICAgICAgID0gIm9ha19wbGFua3MiLAogICAgICAgICAgICBbInBsYW5rcyJdICAgICAgICAgID0gIm9ha19wbGFua3MiLAogICAgICAgICAgICBbIm9hayBwbGFuayJdICAgICAgID0gIm9ha19wbGFua3MiLAogICAgICAgICAgICBbIm9hayBwbGFua3MiXSAgICAgID0gIm9ha19wbGFua3MiLAogICAgICAgICAgICBbInN0aWNrIl0gICAgICAgICAgID0gInN0aWNrIiwKICAgICAgICAgICAgWyJzdGlja3MiXSAgICAgICAgICA9ICJzdGljayIsCiAgICAgICAgICAgIFsiY2hlc3QiXSAgICAgICAgICAgPSAiY2hlc3QiLAogICAgICAgICAgICBbInRhYmxlIl0gICAgICAgICAgID0gImNyYWZ0aW5nX3RhYmxlIiwKICAgICAgICAgICAgWyJjcmFmdGluZyB0YWJsZSJdICA9ICJjcmFmdGluZ190YWJsZSIsCiAgICAgICAgICAgIFsid29ya2JlbmNoIl0gICAgICAgPSAiY3JhZnRpbmdfdGFibGUiLAogICAgICAgICAgICBbImZ1cm5hY2UiXSAgICAgICAgID0gImZ1cm5hY2UiLAogICAgICAgICAgICBbInRvcmNoIl0gICAgICAgICAgID0gInRvcmNoIiwKICAgICAgICAgICAgWyJ0b3JjaGVzIl0gICAgICAgICA9ICJ0b3JjaCIsCiAgICAgICAgICAgIFsicGlja2F4ZSJdICAgICAgICAgPSAid29vZGVuX3BpY2theGUiLAogICAgICAgICAgICBbImF4ZSJdICAgICAgICAgICAgID0gIndvb2Rlbl9heGUiLAogICAgICAgICAgICBbInNob3ZlbCJdICAgICAgICAgID0gIndvb2Rlbl9zaG92ZWwiLAogICAgICAgICAgICBbInN3b3JkIl0gICAgICAgICAgID0gIndvb2Rlbl9zd29yZCIsCiAgICAgICAgICAgIFsiaXJvbiBwaWNrYXhlIl0gICAgPSAiaXJvbl9waWNrYXhlIiwKICAgICAgICAgICAgWyJpcm9uIGF4ZSJdICAgICAgICA9ICJpcm9uX2F4ZSIsCiAgICAgICAgICAgIFsiaXJvbiBzaG92ZWwiXSAgICAgPSAiaXJvbl9zaG92ZWwiLAogICAgICAgICAgICBbImlyb24gc3dvcmQiXSAgICAgID0gImlyb25fc3dvcmQiLAogICAgICAgICAgICBbImlyb24gaGVsbWV0Il0gICAgID0gImlyb25faGVsbWV0IiwKICAgICAgICAgICAgWyJpcm9uIGNoZXN0cGxhdGUiXSA9ICJpcm9uX2NoZXN0cGxhdGUiLAogICAgICAgICAgICBbImlyb24gbGVnZ2luZ3MiXSAgID0gImlyb25fbGVnZ2luZ3MiLAogICAgICAgICAgICBbImlyb24gYm9vdHMiXSAgICAgID0gImlyb25fYm9vdHMiLAogICAgICAgICAgICBbImJyZWFkIl0gICAgICAgICAgID0gImJyZWFkIiwKICAgICAgICAgICAgWyJib3dsIl0gICAgICAgICAgICA9ICJib3dsIiwKICAgICAgICAgICAgWyJzaWduIl0gICAgICAgICAgICA9ICJvYWtfc2lnbiIsCiAgICAgICAgICAgIFsibGFkZGVyIl0gICAgICAgICAgPSAibGFkZGVyIiwKICAgICAgICAgICAgWyJmZW5jZSJdICAgICAgICAgICA9ICJvYWtfZmVuY2UiLAogICAgICAgICAgICBbImRvb3IiXSAgICAgICAgICAgID0gIm9ha19kb29yIiwKICAgICAgICAgICAgWyJ0cmFwZG9vciJdICAgICAgICA9ICJvYWtfdHJhcGRvb3IiLAogICAgICAgICAgICBbInNsYWIiXSAgICAgICAgICAgID0gIm9ha19zbGFiIiwKICAgICAgICAgICAgWyJzdGFpcnMiXSAgICAgICAgICA9ICJvYWtfc3RhaXJzIiwKICAgICAgICB9OwoKICAgIC8vIOKUgOKUgCBTdGF0ZSDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBwcml2YXRlIHJlYWRvbmx5IHN0cmluZyBfYm90TmFtZTsKICAgIHByaXZhdGUgRGF0ZVRpbWVPZmZzZXQgX2xhc3RCb3RTcG9rZSA9IERhdGVUaW1lT2Zmc2V0Lk1pblZhbHVlOwogICAgcHJpdmF0ZSByZWFkb25seSBpbnQgX2NvbnZlcnNhdGlvbldpbmRvd1NlY29uZHM7CgogICAgLy8g4pSA4pSAIENvbnN0cnVjdG9yIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIHB1YmxpYyBDaGF0SW50ZXJwcmV0ZXIoc3RyaW5nIGJvdE5hbWUsIGludCBjb252ZXJzYXRpb25XaW5kb3dTZWNvbmRzID0gNjApCiAgICB7CiAgICAgICAgX2JvdE5hbWUgPSBib3ROYW1lOwogICAgICAgIF9jb252ZXJzYXRpb25XaW5kb3dTZWNvbmRzID0gY29udmVyc2F0aW9uV2luZG93U2Vjb25kczsKICAgIH0KCiAgICAvLyDilIDilIAgSUNoYXRJbnRlcnByZXRlciDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBwdWJsaWMgVGFzazxDaGF0SW50ZXJwcmV0YXRpb24+IEludGVycHJldEFzeW5jKAogICAgICAgIHN0cmluZyB1c2VybmFtZSwgc3RyaW5nIG1lc3NhZ2UsIHN0cmluZyBib3ROYW1lLAogICAgICAgIGludCBvbmxpbmVQbGF5ZXJzLCBQb3NpdGlvbiBib3RQb3NpdGlvbiwgUG9zaXRpb24/IHBsYXllclBvc2l0aW9uLAogICAgICAgIFdvcmxkU3RhdGUgc3RhdGUsIENhbmNlbGxhdGlvblRva2VuIGN0ID0gZGVmYXVsdCkKICAgIHsKICAgICAgICB2YXIgZGlyZWN0ZWQgPSBJc0RpcmVjdGVkQXRCb3QobWVzc2FnZSwgYm90TmFtZSwgb25saW5lUGxheWVycywgcGxheWVyUG9zaXRpb24sIGJvdFBvc2l0aW9uKTsKICAgICAgICBpZiAoIWRpcmVjdGVkKQogICAgICAgICAgICByZXR1cm4gVGFzay5Gcm9tUmVzdWx0KG5ldyBDaGF0SW50ZXJwcmV0YXRpb24oQ2hhdEludGVudFR5cGUuTm90QWRkcmVzc2VkKSk7CgogICAgICAgIHZhciByZXN1bHQgPSBQYXJzZUludGVudChtZXNzYWdlLCBzdGF0ZSk7CiAgICAgICAgcmV0dXJuIFRhc2suRnJvbVJlc3VsdChyZXN1bHQpOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIFJlY29yZEJvdFNwb2tlKCkgPT4gX2xhc3RCb3RTcG9rZSA9IERhdGVUaW1lT2Zmc2V0LlV0Y05vdzsKCiAgICAvLyDilIDilIAgUHJpdmF0ZSBoZWxwZXJzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBEZXRlcm1pbmVzIHdoZXRoZXIgdGhpcyBtZXNzYWdlIGlzIGRpcmVjdGVkIGF0IHRoZSBib3QuCiAgICAvLy8gQ3JpdGVyaWEgKGFueSBvZik6CiAgICAvLy8gICAtIEJvdCBuYW1lIGFwcGVhcnMgaW4gdGhlIG1lc3NhZ2UKICAgIC8vLyAgIC0gT25seSAxIHBsYXllciBpcyBvbmxpbmUgKG11c3QgYmUgdGFsa2luZyB0byB0aGUgYm90KQogICAgLy8vICAgLSBCb3Qgc3Bva2UgcmVjZW50bHkgKHdpdGhpbiBjb252ZXJzYXRpb24gd2luZG93KSDigJQgY29udGludWF0aW9uIGhldXJpc3RpYwogICAgLy8vIDwvc3VtbWFyeT4KICAgIHByaXZhdGUgYm9vbCBJc0RpcmVjdGVkQXRCb3QoCiAgICAgICAgc3RyaW5nIG1lc3NhZ2UsIHN0cmluZyBib3ROYW1lLAogICAgICAgIGludCBvbmxpbmVQbGF5ZXJzLCBQb3NpdGlvbj8gcGxheWVyUG9zaXRpb24sIFBvc2l0aW9uIGJvdFBvc2l0aW9uKQogICAgewogICAgICAgIC8vIEV4cGxpY2l0IG5hbWUgbWVudGlvbgogICAgICAgIGlmIChtZXNzYWdlLkNvbnRhaW5zKGJvdE5hbWUsIFN0cmluZ0NvbXBhcmlzb24uT3JkaW5hbElnbm9yZUNhc2UpKQogICAgICAgICAgICByZXR1cm4gdHJ1ZTsKCiAgICAgICAgLy8gU29sbyBwbGF5ZXIg4oCUIG11c3QgYmUgdGFsa2luZyB0byB0aGUgYm90CiAgICAgICAgaWYgKG9ubGluZVBsYXllcnMgPD0gMSkKICAgICAgICAgICAgcmV0dXJuIHRydWU7CgogICAgICAgIC8vIENvbnZlcnNhdGlvbiBjb250aW51YXRpb24gd2luZG93CiAgICAgICAgdmFyIGVsYXBzZWQgPSBEYXRlVGltZU9mZnNldC5VdGNOb3cgLSBfbGFzdEJvdFNwb2tlOwogICAgICAgIGlmIChlbGFwc2VkLlRvdGFsU2Vjb25kcyA8PSBfY29udmVyc2F0aW9uV2luZG93U2Vjb25kcykKICAgICAgICAgICAgcmV0dXJuIHRydWU7CgogICAgICAgIHJldHVybiBmYWxzZTsKICAgIH0KCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gQ29yZSBwYXR0ZXJuLW1hdGNoaW5nIHBhcnNlci4gUmV0dXJucyBhIDxzZWUgY3JlZj0iQ2hhdEludGVycHJldGF0aW9uIi8+CiAgICAvLy8gZm9yIGVhY2ggcmVjb2duaXplZCBjb21tYW5kIGNhdGVnb3J5LgogICAgLy8vCiAgICAvLy8gU3ByaW50IDM1IFAxLUQ6IEdhdGhlclJlZ2V4LCBCdWlsZFJlZ2V4LCBhbmQgQ3JhZnRSZWdleCBtYXRjaCBibG9ja3MgcmVtb3ZlZC4KICAgIC8vLyBBbGwgZ2F0aGVyL2J1aWxkL2NyYWZ0IGludGVudCBpcyBub3cgaGFuZGxlZCBieSBMbG1DaGF0SW50ZXJwcmV0ZXIg4oaSIExMTSDihpIgSW50ZW50RHJhZnQuCiAgICAvLy8gVGhlIGFsaWFzIGRpY3Rpb25hcmllcyAoSXRlbUFsaWFzZXMsIEJsdWVwcmludEFsaWFzZXMsIENyYWZ0QWxpYXNlcykgYW5kIHJlc29sdmVyIG1ldGhvZHMKICAgIC8vLyBhcmUgcHJlc2VydmVkIGZvciB1c2UgYnkgTGxtQ2hhdEludGVycHJldGVyJ3MgaXRlbSBub3JtYWxpemF0aW9uIGluIFNwcmludCAzNi4KICAgIC8vLyBDaGF0SW50ZXJwcmV0ZXIgKHBhdHRlcm4tb25seSBmYWxsYmFjaykgcmV0dXJucyBVbmtub3duIGZvciB0aGVzZSBjb21tYW5kcyBzbyB0aGUKICAgIC8vLyBMbG1DaGF0SW50ZXJwcmV0ZXIgYWx3YXlzIHJvdXRlcyB0aGVtIHRvIHRoZSBMTE0uCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHJpdmF0ZSBzdGF0aWMgQ2hhdEludGVycHJldGF0aW9uIFBhcnNlSW50ZW50KHN0cmluZyBtZXNzYWdlLCBXb3JsZFN0YXRlIHN0YXRlKQogICAgewogICAgICAgIGlmIChSZWdleC5Jc01hdGNoKG1lc3NhZ2UsIEAiXGIoc3RvcHxjYW5jZWx8ZW5vdWdofHF1aXR8YWJvcnR8bmV2ZXJtaW5kfG5ldmVyIG1pbmQpXGIiLAogICAgICAgICAgICBSZWdleE9wdGlvbnMuSWdub3JlQ2FzZSkpCiAgICAgICAgICAgIHJldHVybiBuZXcgQ2hhdEludGVycHJldGF0aW9uKENoYXRJbnRlbnRUeXBlLkNhbmNlbEdvYWwsCiAgICAgICAgICAgICAgICBSZXNwb25zZTogIk9rLCBzdG9wcGluZy4iKTsKCiAgICAgICAgLy8gVFNLLTAwMTU6IGludmVudG9yeSByZXBvcnQgY29tbWFuZAogICAgICAgIGlmIChSZWdleC5Jc01hdGNoKG1lc3NhZ2UsIEAiXGIoaW52ZW50b3J5fHdoYXQgZG8geW91IGhhdmV8d2hhdCBhcmUgeW91IGNhcnJ5aW5nfGl0ZW1zKVxiIiwKICAgICAgICAgICAgUmVnZXhPcHRpb25zLklnbm9yZUNhc2UpKQogICAgICAgIHsKICAgICAgICAgICAgdmFyIGludiA9IHN0YXRlLkludmVudG9yeS5Db3VudCA9PSAwCiAgICAgICAgICAgICAgICA/ICJJbnZlbnRvcnkgaXMgZW1wdHkuIgogICAgICAgICAgICAgICAgOiBzdHJpbmcuSm9pbigiLCAiLCBzdGF0ZS5JbnZlbnRvcnkKICAgICAgICAgICAgICAgICAgICAuT3JkZXJCeURlc2NlbmRpbmcoa3YgPT4ga3YuVmFsdWUpCiAgICAgICAgICAgICAgICAgICAgLlNlbGVjdChrdiA9PiAkIntrdi5WYWx1ZX14IHtrdi5LZXl9IikpOwogICAgICAgICAgICByZXR1cm4gbmV3IENoYXRJbnRlcnByZXRhdGlvbihDaGF0SW50ZW50VHlwZS5RdWVyeVN0YXR1cywKICAgICAgICAgICAgICAgIFJlc3BvbnNlOiAkIkludmVudG9yeToge2ludn0iKTsKICAgICAgICB9CgogICAgICAgIGlmIChSZWdleC5Jc01hdGNoKG1lc3NhZ2UsIEAiXGIoc3RhdHVzfHdoYXQuP3JlIHlvdSBkb2luZ3x3aGF0IGFyZSB5b3UgZG9pbmd8cmVwb3J0KVxiIiwKICAgICAgICAgICAgUmVnZXhPcHRpb25zLklnbm9yZUNhc2UpKQogICAgICAgIHsKICAgICAgICAgICAgdmFyIGdvYWwgPSBzdGF0ZS5GYWN0cy5UcnlHZXRWYWx1ZSgiY3VycmVudEdvYWwiLCBvdXQgdmFyIGNnKSAmJiBjZyBpcyBzdHJpbmcgcwogICAgICAgICAgICAgICAgPyAkIldvcmtpbmcgb246IHtzfS4iIDogIklkbGUuIjsKICAgICAgICAgICAgcmV0dXJuIG5ldyBDaGF0SW50ZXJwcmV0YXRpb24oQ2hhdEludGVudFR5cGUuUXVlcnlTdGF0dXMsCiAgICAgICAgICAgICAgICBSZXNwb25zZTogJCJ7Z29hbH0gSFA6IHtzdGF0ZS5IZWFsdGh9LzIwLCBGb29kOiB7c3RhdGUuRm9vZH0vMjAuIik7CiAgICAgICAgfQoKICAgICAgICBpZiAoUmVnZXguSXNNYXRjaChtZXNzYWdlLCBAIlxiKGhlbHB8Y29tbWFuZHN8d2hhdCBjYW4geW91IGRvfHVzYWdlKVxiIiwKICAgICAgICAgICAgUmVnZXhPcHRpb25zLklnbm9yZUNhc2UpKQogICAgICAgICAgICByZXR1cm4gbmV3IENoYXRJbnRlcnByZXRhdGlvbihDaGF0SW50ZW50VHlwZS5RdWVyeUhlbHAsCiAgICAgICAgICAgICAgICBSZXNwb25zZTogIkNvbW1hbmRzOiAnZ2V0L21pbmUgPGl0ZW0+IFtuXScsICdjcmFmdCA8aXRlbT4nLCAnYnVpbGQgPGJsdWVwcmludD4gW2F0IFggWSBaXScsICIgKwogICAgICAgICAgICAgICAgICAgICAgICAgICInZ28gdG8gWCBZIFonLCAnY29tZSBoZXJlJywgJ3N0b3AnLCAnc3RhdHVzJywgJ2ludmVudG9yeScsICdoZWxwJyIpOwoKICAgICAgICBpZiAoUmVnZXguSXNNYXRjaChtZXNzYWdlLCBAIlxiKGNvbWUgaGVyZXxjb21lIHRvIG1lfGZvbGxvdyBtZXxmb2xsb3cpXGIiLAogICAgICAgICAgICBSZWdleE9wdGlvbnMuSWdub3JlQ2FzZSkpCiAgICAgICAgICAgIHJldHVybiBuZXcgQ2hhdEludGVycHJldGF0aW9uKENoYXRJbnRlbnRUeXBlLk5hdmlnYXRlVG8sCiAgICAgICAgICAgICAgICBHb2FsUGFyYW1ldGVyczogbmV3IERpY3Rpb25hcnk8c3RyaW5nLCBvYmplY3Q/PiB7IFsidGFyZ2V0Il0gPSAicGxheWVyIiB9LAogICAgICAgICAgICAgICAgUmVzcG9uc2U6ICJPbiBteSB3YXkhIik7CgogICAgICAgIHZhciBnb1RvID0gR29Ub1JlZ2V4Lk1hdGNoKG1lc3NhZ2UpOwogICAgICAgIGlmIChnb1RvLlN1Y2Nlc3MpCiAgICAgICAgewogICAgICAgICAgICB2YXIgeCA9IGludC5QYXJzZShnb1RvLkdyb3Vwc1sieCJdLlZhbHVlKTsKICAgICAgICAgICAgdmFyIHkgPSBpbnQuUGFyc2UoZ29Uby5Hcm91cHNbInkiXS5WYWx1ZSk7CiAgICAgICAgICAgIHZhciB6ID0gaW50LlBhcnNlKGdvVG8uR3JvdXBzWyJ6Il0uVmFsdWUpOwogICAgICAgICAgICByZXR1cm4gbmV3IENoYXRJbnRlcnByZXRhdGlvbihDaGF0SW50ZW50VHlwZS5OYXZpZ2F0ZVRvLAogICAgICAgICAgICAgICAgR29hbE5hbWU6ICJNb3ZlVG8iLAogICAgICAgICAgICAgICAgR29hbFBhcmFtZXRlcnM6IG5ldyBEaWN0aW9uYXJ5PHN0cmluZywgb2JqZWN0Pz4geyBbIngiXSA9IHgsIFsieSJdID0geSwgWyJ6Il0gPSB6IH0sCiAgICAgICAgICAgICAgICBSZXNwb25zZTogJCJIZWFkaW5nIHRvICh7eH0se3l9LHt6fSkuIik7CiAgICAgICAgfQoKICAgICAgICAvLyBTcHJpbnQgMzUgUDEtRDogR2F0aGVyUmVnZXgsIEJ1aWxkUmVnZXgsIGFuZCBDcmFmdFJlZ2V4IG1hdGNoIGJsb2NrcyByZW1vdmVkLgogICAgICAgIC8vIEFsbCBnYXRoZXIvYnVpbGQvY3JhZnQgaW50ZW50IGlzIG5vdyBoYW5kbGVkIGJ5IExsbUNoYXRJbnRlcnByZXRlciDihpIgTExNIOKGkiBJbnRlbnREcmFmdC4KICAgICAgICAvLyBUaGUgYWxpYXMgZGljdGlvbmFyaWVzIChJdGVtQWxpYXNlcywgQmx1ZXByaW50QWxpYXNlcywgQ3JhZnRBbGlhc2VzKSBhbmQgcmVzb2x2ZXIgbWV0aG9kcwogICAgICAgIC8vIGFyZSBwcmVzZXJ2ZWQgZm9yIHVzZSBieSBMbG1DaGF0SW50ZXJwcmV0ZXIncyBpdGVtIG5vcm1hbGl6YXRpb24gaW4gU3ByaW50IDM2LgogICAgICAgIC8vIENoYXRJbnRlcnByZXRlciAocGF0dGVybi1vbmx5IGZhbGxiYWNrKSByZXR1cm5zIFVua25vd24gZm9yIHRoZXNlIGNvbW1hbmRzIHNvIHRoZQogICAgICAgIC8vIExsbUNoYXRJbnRlcnByZXRlciBhbHdheXMgcm91dGVzIHRoZW0gdG8gdGhlIExMTS4KCiAgICAgICAgcmV0dXJuIG5ldyBDaGF0SW50ZXJwcmV0YXRpb24oQ2hhdEludGVudFR5cGUuVW5rbm93biwKICAgICAgICAgICAgUmVzcG9uc2U6ICJEaWRuJ3QgY2F0Y2ggdGhhdC4gU2F5ICdoZWxwJyBmb3IgY29tbWFuZHMuIik7CiAgICB9CgogICAgLy8g4pSA4pSAIEl0ZW0gLyBibHVlcHJpbnQgcmVzb2x1dGlvbiBoZWxwZXJzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBSZXNvbHZlcyBhIHJhdyBpdGVtIHRva2VuIChmcm9tIHJlZ2V4IGNhcHR1cmUpIHRvIGEgY2Fub25pY2FsIE1pbmVjcmFmdCBpdGVtIElELgogICAgLy8vIENoZWNrcyBJdGVtQWxpYXNlcyBmaXJzdCwgdGhlbiByZXR1cm5zIHRoZSB0b2tlbiBhcy1pcyAobG93ZXJjYXNlZCwgc3BhY2VzIOKGkiB1bmRlcnNjb3JlcykuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHVibGljIHN0YXRpYyBzdHJpbmcgUmVzb2x2ZUl0ZW0oc3RyaW5nIHJhdykKICAgIHsKICAgICAgICB2YXIgbm9ybWFsaXplZCA9IHJhdy5UcmltKCkuVG9Mb3dlckludmFyaWFudCgpOwogICAgICAgIGlmIChJdGVtQWxpYXNlcy5UcnlHZXRWYWx1ZShub3JtYWxpemVkLCBvdXQgdmFyIGFsaWFzKSkKICAgICAgICAgICAgcmV0dXJuIGFsaWFzOwogICAgICAgIHJldHVybiBub3JtYWxpemVkLlJlcGxhY2UoJyAnLCAnXycpOwogICAgfQoKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBSZXNvbHZlcyBhIHJhdyBibHVlcHJpbnQgdG9rZW4gdG8gYSBjYW5vbmljYWwgYmx1ZXByaW50IElELgogICAgLy8vIENoZWNrcyBCbHVlcHJpbnRBbGlhc2VzIGZpcnN0LCB0aGVuIHJldHVybnMgdGhlIHRva2VuIGFzLWlzIChsb3dlcmNhc2VkLCBzcGFjZXMg4oaSIGh5cGhlbnMpLgogICAgLy8vIDwvc3VtbWFyeT4KICAgIHB1YmxpYyBzdGF0aWMgc3RyaW5nIFJlc29sdmVCbHVlcHJpbnQoc3RyaW5nIHJhdykKICAgIHsKICAgICAgICB2YXIgbm9ybWFsaXplZCA9IHJhdy5UcmltKCkuVG9Mb3dlckludmFyaWFudCgpOwogICAgICAgIGlmIChCbHVlcHJpbnRBbGlhc2VzLlRyeUdldFZhbHVlKG5vcm1hbGl6ZWQsIG91dCB2YXIgYWxpYXMpKQogICAgICAgICAgICByZXR1cm4gYWxpYXM7CiAgICAgICAgcmV0dXJuIG5vcm1hbGl6ZWQuUmVwbGFjZSgnICcsICctJyk7CiAgICB9CgogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIFJlc29sdmVzIGEgcmF3IGNyYWZ0IGl0ZW0gdG9rZW4gdG8gYSBjYW5vbmljYWwgTWluZWNyYWZ0IGl0ZW0gSUQuCiAgICAvLy8gQ2hlY2tzIENyYWZ0QWxpYXNlcyBmaXJzdCwgdGhlbiBmYWxscyBiYWNrIHRvIFJlc29sdmVJdGVtLgogICAgLy8vIDwvc3VtbWFyeT4KICAgIHB1YmxpYyBzdGF0aWMgc3RyaW5nIFJlc29sdmVDcmFmdEl0ZW0oc3RyaW5nIHJhdykKICAgIHsKICAgICAgICB2YXIgbm9ybWFsaXplZCA9IHJhdy5UcmltKCkuVG9Mb3dlckludmFyaWFudCgpOwogICAgICAgIGlmIChDcmFmdEFsaWFzZXMuVHJ5R2V0VmFsdWUobm9ybWFsaXplZCwgb3V0IHZhciBhbGlhcykpCiAgICAgICAgICAgIHJldHVybiBhbGlhczsKICAgICAgICByZXR1cm4gUmVzb2x2ZUl0ZW0ocmF3KTsKICAgIH0KfQo=
+namespace Agent.Planning;
+
+using Agent.Core;
+using Agent.Planning.Llm;
+using System.Text.RegularExpressions;
+
+/// <summary>
+/// Deterministic pattern-matching chat interpreter. Parses in-game player messages
+/// into <see cref="IntentDraft"/> values using regex and alias dictionaries.
+///
+/// This class is the fast-path fallback used by <see cref="LlmChatInterpreter"/> for
+/// safe, zero-risk operations (cancel, status, inventory, help) and as the fallback
+/// when the LLM provider is unavailable or rate-limited.
+///
+/// Sprint 35 P1-D: GatherRegex, BuildRegex, and CraftRegex match blocks have been
+/// removed from <see cref="ParseIntent"/>. All gather/build/craft intent is now handled
+/// exclusively by <see cref="LlmChatInterpreter"/> → LLM → IntentDraft pipeline.
+/// The regex field definitions and alias dictionaries are preserved for use by
+/// LlmChatInterpreter's item normalization in Sprint 36.
+///
+/// Sprint 39 P1-C: <see cref="InterpretAsync"/> return type changed to
+/// <see cref="IntentDraft"/>? — null means "not addressed" (replaces NotAddressed enum value).
+/// </summary>
+public sealed class ChatInterpreter : IChatInterpreter
+{
+    // ── Regex field definitions (preserved for test and Sprint 36 use) ────────
+
+    /// <summary>
+    /// Matches gather/mine/collect commands.
+    /// Sprint 35 P1-D: no longer used in ParseIntent; match block removed.
+    /// Preserved for test coverage and Sprint 36 item normalization.
+    /// </summary>
+    private static readonly Regex GatherRegex = new(
+        @"\b(get|mine|gather|collect|fetch|bring|chop|cut|dig)\b\s+(?<count>\d+\s+)?(?<item>[a-z_]+(\s+[a-z_]+)?)",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    /// <summary>
+    /// Matches build commands with optional blueprint and coordinates.
+    /// Sprint 35 P1-D: no longer used in ParseIntent; match block removed.
+    /// Preserved for test coverage and Sprint 36 item normalization.
+    /// </summary>
+    private static readonly Regex BuildRegex = new(
+        @"\b(build|construct|make|place|create)\b\s+(?<blueprint>[a-z_\-]+(\s+[a-z_\-]+)?)(\s+at\s+(?<x>-?\d+)\s+(?<y>-?\d+)\s+(?<z>-?\d+))?",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    /// <summary>
+    /// Matches craft commands.
+    /// Sprint 35 P1-D: no longer used in ParseIntent; match block removed.
+    /// Preserved for test coverage and Sprint 36 item normalization.
+    /// </summary>
+    private static readonly Regex CraftRegex = new(
+        @"\b(craft|smelt|cook|brew)\b\s+(?<count>\d+\s+)?(?<item>[a-z_]+(\s+[a-z_]+)?)",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    /// <summary>Matches explicit coordinate navigation commands.</summary>
+    private static readonly Regex GoToRegex = new(
+        @"\b(go\s+to|goto|move\s+to|walk\s+to|navigate\s+to|teleport\s+to|tp\s+to)\b\s+(?<x>-?\d+)\s+(?<y>-?\d+)\s+(?<z>-?\d+)",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    // ── Alias dictionaries ────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Maps common player shorthand to canonical Minecraft item IDs.
+    /// Used by LlmChatInterpreter item normalization (Sprint 36) and
+    /// preserved from the original pattern-matching implementation.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, string> ItemAliases =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            // Wood
+            ["wood"]        = "oak_log",
+            ["log"]         = "oak_log",
+            ["logs"]        = "oak_log",
+            ["oak"]         = "oak_log",
+            ["birch"]       = "birch_log",
+            ["spruce"]      = "spruce_log",
+            ["pine"]        = "spruce_log",
+            ["dark oak"]    = "dark_oak_log",
+            ["jungle"]      = "jungle_log",
+            ["acacia"]      = "acacia_log",
+            ["cherry"]      = "cherry_log",
+            ["mangrove"]    = "mangrove_log",
+            // Stone
+            ["cobble"]      = "cobblestone",
+            ["rock"]        = "cobblestone",
+            ["rocks"]       = "cobblestone",
+            ["stone"]       = "stone",
+            // Ores and drops
+            ["coal"]        = "coal",
+            ["iron"]        = "raw_iron",
+            ["gold"]        = "raw_gold",
+            ["diamond"]     = "diamond",
+            ["diamonds"]    = "diamond",
+            ["emerald"]     = "emerald",
+            ["emeralds"]    = "emerald",
+            ["redstone"]    = "redstone",
+            ["lapis"]       = "lapis_lazuli",
+            ["copper"]      = "raw_copper",
+            // Terrain
+            ["dirt"]        = "dirt",
+            ["sand"]        = "sand",
+            ["gravel"]      = "gravel",
+            ["clay"]        = "clay",
+            ["snow"]        = "snow_block",
+        };
+
+    /// <summary>
+    /// Maps common blueprint shorthand to canonical blueprint IDs.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, string> BlueprintAliases =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["house"]           = "small-house",
+            ["small house"]     = "small-house",
+            ["cabin"]           = "small-house",
+            ["shelter"]         = "small-house",
+            ["hut"]             = "small-house",
+            ["home"]            = "small-house",
+            ["shack"]           = "small-house",
+        };
+
+    /// <summary>
+    /// Maps common craft shorthand to canonical Minecraft item IDs.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, string> CraftAliases =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["plank"]           = "oak_planks",
+            ["planks"]          = "oak_planks",
+            ["oak plank"]       = "oak_planks",
+            ["oak planks"]      = "oak_planks",
+            ["stick"]           = "stick",
+            ["sticks"]          = "stick",
+            ["chest"]           = "chest",
+            ["table"]           = "crafting_table",
+            ["crafting table"]  = "crafting_table",
+            ["workbench"]       = "crafting_table",
+            ["furnace"]         = "furnace",
+            ["torch"]           = "torch",
+            ["torches"]         = "torch",
+            ["pickaxe"]         = "wooden_pickaxe",
+            ["axe"]             = "wooden_axe",
+            ["shovel"]          = "wooden_shovel",
+            ["sword"]           = "wooden_sword",
+            ["iron pickaxe"]    = "iron_pickaxe",
+            ["iron axe"]        = "iron_axe",
+            ["iron shovel"]     = "iron_shovel",
+            ["iron sword"]      = "iron_sword",
+            ["iron helmet"]     = "iron_helmet",
+            ["iron chestplate"] = "iron_chestplate",
+            ["iron leggings"]   = "iron_leggings",
+            ["iron boots"]      = "iron_boots",
+            ["bread"]           = "bread",
+            ["bowl"]            = "bowl",
+            ["sign"]            = "oak_sign",
+            ["ladder"]          = "ladder",
+            ["fence"]           = "oak_fence",
+            ["door"]            = "oak_door",
+            ["trapdoor"]        = "oak_trapdoor",
+            ["slab"]            = "oak_slab",
+            ["stairs"]          = "oak_stairs",
+        };
+
+    // ── State ─────────────────────────────────────────────────────────────────
+
+    private readonly string _botName;
+    private DateTimeOffset _lastBotSpoke = DateTimeOffset.MinValue;
+    private readonly int _conversationWindowSeconds;
+
+    // ── Constructor ───────────────────────────────────────────────────────────
+
+    public ChatInterpreter(string botName, int conversationWindowSeconds = 60)
+    {
+        _botName = botName;
+        _conversationWindowSeconds = conversationWindowSeconds;
+    }
+
+    /// <summary>
+    /// Sprint 39 P1-C: convenience constructor that takes <see cref="ChatOptions"/>.
+    /// Bot name is not stored here — it arrives via the <c>botName</c> parameter of
+    /// <see cref="InterpretAsync"/> at call time.
+    /// </summary>
+    public ChatInterpreter(ChatOptions opts)
+        : this(string.Empty, opts.ConversationWindowSeconds) { }
+
+    // ── IChatInterpreter ──────────────────────────────────────────────────────
+
+    // Sprint 39 P1-C: returns IntentDraft? — null means the message is not addressed at this bot.
+    public Task<IntentDraft?> InterpretAsync(
+        string username, string message, string botName,
+        int onlinePlayers, Position botPosition, Position? playerPosition,
+        WorldState state, CancellationToken ct = default)
+    {
+        var directed = IsDirectedAtBot(message, botName, onlinePlayers, playerPosition, botPosition);
+        if (!directed)
+            return Task.FromResult<IntentDraft?>(null);
+
+        IntentDraft? result = ParseIntent(message, state);
+        return Task.FromResult<IntentDraft?>(result);
+    }
+
+    public void RecordBotSpoke() => _lastBotSpoke = DateTimeOffset.UtcNow;
+
+    // ── Private helpers ───────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Determines whether this message is directed at the bot.
+    /// Criteria (any of):
+    ///   - Bot name appears in the message
+    ///   - Only 1 player is online (must be talking to the bot)
+    ///   - Bot spoke recently (within conversation window) — continuation heuristic
+    /// </summary>
+    private bool IsDirectedAtBot(
+        string message, string botName,
+        int onlinePlayers, Position? playerPosition, Position botPosition)
+    {
+        // Explicit name mention
+        if (message.Contains(botName, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        // Solo player — must be talking to the bot
+        if (onlinePlayers <= 1)
+            return true;
+
+        // Conversation continuation window
+        var elapsed = DateTimeOffset.UtcNow - _lastBotSpoke;
+        if (elapsed.TotalSeconds <= _conversationWindowSeconds)
+            return true;
+
+        return false;
+    }
+
+    /// <summary>
+    /// Core pattern-matching parser. Returns a <see cref="ChatInterpretation"/>
+    /// for each recognized command category.
+    ///
+    /// Sprint 35 P1-D: GatherRegex, BuildRegex, and CraftRegex match blocks removed.
+    /// All gather/build/craft intent is now handled by LlmChatInterpreter → LLM → IntentDraft.
+    /// The alias dictionaries (ItemAliases, BlueprintAliases, CraftAliases) and resolver methods
+    /// are preserved for use by LlmChatInterpreter's item normalization in Sprint 36.
+    /// ChatInterpreter (pattern-only fallback) returns Unknown for these commands so the
+    /// LlmChatInterpreter always routes them to the LLM.
+    /// </summary>
+    /// <summary>
+    /// Core pattern-matching parser. Returns an <see cref="IntentDraft"/> for each
+    /// recognised command category.
+    ///
+    /// Sprint 35 P1-D: GatherRegex, BuildRegex, and CraftRegex match blocks removed.
+    /// All gather/build/craft intent is now handled by LlmChatInterpreter → LLM → IntentDraft.
+    ///
+    /// Sprint 39 P1-C: return type changed from <see cref="ChatInterpretation"/> to
+    /// <see cref="IntentDraft"/>. navigate/come-here uses null X/Y/Z to signal "follow player".
+    /// </summary>
+    private static IntentDraft ParseIntent(string message, WorldState state)
+    {
+        if (Regex.IsMatch(message, @"\b(stop|cancel|enough|quit|abort|nevermind|never mind)\b",
+            RegexOptions.IgnoreCase))
+            return new IntentDraft("yes", "cancel",
+                null, null, null, null, null, null,
+                1.0, null, "Ok, stopping.");
+
+        // TSK-0015: inventory report command
+        if (Regex.IsMatch(message, @"\b(inventory|what do you have|what are you carrying|items)\b",
+            RegexOptions.IgnoreCase))
+        {
+            var inv = state.Inventory.Count == 0
+                ? "Inventory is empty."
+                : string.Join(", ", state.Inventory
+                    .OrderByDescending(kv => kv.Value)
+                    .Select(kv => $"{kv.Value}x {kv.Key}"));
+            return new IntentDraft("yes", "status",
+                null, null, null, null, null, null,
+                1.0, null, $"Inventory: {inv}");
+        }
+
+        if (Regex.IsMatch(message, @"\b(status|what.?re you doing|what are you doing|report)\b",
+            RegexOptions.IgnoreCase))
+        {
+            var goal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s
+                ? $"Working on: {s}." : "Idle.";
+            return new IntentDraft("yes", "status",
+                null, null, null, null, null, null,
+                1.0, null, $"{goal} HP: {state.Health}/20, Food: {state.Food}/20.");
+        }
+
+        if (Regex.IsMatch(message, @"\b(help|commands|what can you do|usage)\b",
+            RegexOptions.IgnoreCase))
+            return new IntentDraft("yes", "help",
+                null, null, null, null, null, null,
+                1.0, null,
+                "Commands: 'get/mine <item> [n]', 'craft <item>', 'build <blueprint> [at X Y Z]', " +
+                "'go to X Y Z', 'come here', 'stop', 'status', 'inventory', 'help'");
+
+        // "come here" / "follow me" — null X/Y/Z signals "follow player" to the caller
+        if (Regex.IsMatch(message, @"\b(come here|come to me|follow me|follow)\b",
+            RegexOptions.IgnoreCase))
+            return new IntentDraft("yes", "navigate",
+                null, null, null, null, null, null,
+                1.0, null, "On my way!");
+
+        var goTo = GoToRegex.Match(message);
+        if (goTo.Success)
+        {
+            var x = int.Parse(goTo.Groups["x"].Value);
+            var y = int.Parse(goTo.Groups["y"].Value);
+            var z = int.Parse(goTo.Groups["z"].Value);
+            return new IntentDraft("yes", "navigate",
+                null, null, null, x, y, z,
+                1.0, null, $"Heading to ({x},{y},{z}).");
+        }
+
+        // Sprint 35 P1-D: GatherRegex, BuildRegex, and CraftRegex match blocks removed.
+        // All gather/build/craft intent is handled by LlmChatInterpreter → LLM → IntentDraft.
+        // The alias dictionaries (ItemAliases, BlueprintAliases, CraftAliases) and resolver methods
+        // are preserved for use by LlmChatInterpreter's item normalization in Sprint 36.
+        // ChatInterpreter (pattern-only fallback) returns "clarify" so LlmChatInterpreter
+        // always routes these to the LLM.
+
+        return new IntentDraft("yes", "clarify",
+            null, null, null, null, null, null,
+            0.5, null, "Didn't catch that. Say 'help' for commands.");
+    }
+
+    // ── Item / blueprint resolution helpers ───────────────────────────────────
+
+    /// <summary>
+    /// Resolves a raw item token (from regex capture) to a canonical Minecraft item ID.
+    /// Checks ItemAliases first, then returns the token as-is (lowercased, spaces → underscores).
+    /// </summary>
+    public static string ResolveItem(string raw)
+    {
+        var normalized = raw.Trim().ToLowerInvariant();
+        if (ItemAliases.TryGetValue(normalized, out var alias))
+            return alias;
+        return normalized.Replace(' ', '_');
+    }
+
+    /// <summary>
+    /// Resolves a raw blueprint token to a canonical blueprint ID.
+    /// Checks BlueprintAliases first, then returns the token as-is (lowercased, spaces → hyphens).
+    /// </summary>
+    public static string ResolveBlueprint(string raw)
+    {
+        var normalized = raw.Trim().ToLowerInvariant();
+        if (BlueprintAliases.TryGetValue(normalized, out var alias))
+            return alias;
+        return normalized.Replace(' ', '-');
+    }
+
+    /// <summary>
+    /// Resolves a raw craft item token to a canonical Minecraft item ID.
+    /// Checks CraftAliases first, then falls back to ResolveItem.
+    /// </summary>
+    public static string ResolveCraftItem(string raw)
+    {
+        var normalized = raw.Trim().ToLowerInvariant();
+        if (CraftAliases.TryGetValue(normalized, out var alias))
+            return alias;
+        return ResolveItem(raw);
+    }
+}

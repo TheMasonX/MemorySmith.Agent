@@ -1,1 +1,100 @@
-bmFtZXNwYWNlIEFnZW50LlBsYW5uaW5nOwoKLy8vIDxzdW1tYXJ5PgovLy8gU3ByaW50IDM3IFAxLUE6IE1hcHMgYW4gPHNlZSBjcmVmPSJJbnRlbnREcmFmdCIvPiB0byBhIDxzZWUgY3JlZj0iR29hbFJlcXVlc3QiLz4KLy8vIHRoYXQgPGM+R29hbEZhY3RvcnkuQ3JlYXRlQXN5bmM8L2M+IGNhbiBjb25zdW1lLgovLy8KLy8vIEVuZm9yY2VzIEFHRU5UUy5tZCBDUklUSUNBTCBydWxlOiBwYXJzZXJzIG5ldmVyIGNyZWF0ZSBnb2Fscy4KLy8vCi8vLyBCZWZvcmUgU3ByaW50IDM3OgovLy8gICBMbG1DaGF0SW50ZXJwcmV0ZXIuUGFyc2VEZWNpc2lvbiBjb250YWluZWQgYSBzd2l0Y2ggc3RhdGVtZW50IHRoYXQgbWFwcGVkCi8vLyAgIGludGVudCBzdHJpbmdzIOKGkiBnb2FsIG5hbWVzICgiZ2F0aGVyIiDihpIgIkdhdGhlckl0ZW06e2l0ZW19IiwgZXRjLikuCi8vLyAgIFRoaXMgdmlvbGF0ZWQgUFJJTkNJUExFLTEgYmVjYXVzZSB0aGUgUEFSU0VSIHdhcyBjcmVhdGluZyBnb2FsLW5hbWUgc3RyaW5ncy4KLy8vCi8vLyBBZnRlciBTcHJpbnQgMzc6Ci8vLyAgIFBhcnNlRGVjaXNpb24gcG9wdWxhdGVzIGFuIEludGVudERyYWZ0IChwdXJlIHNlbWFudGljIGRhdGEsIG5vIGdvYWwgbmFtZSkuCi8vLyAgIEludGVudE1hbmFnZXIuQnVpbGRHb2FsUmVxdWVzdCBjb252ZXJ0cyB0aGF0IGRyYWZ0IHRvIChHb2FsTmFtZSwgUGFyYW1ldGVycykuCi8vLyAgIEdvYWxGYWN0b3J5LkNyZWF0ZUFzeW5jIGNyZWF0ZXMgdGhlIGFjdHVhbCBJR29hbCBmcm9tIHRob3NlIGlucHV0cy4KLy8vICAgVGhlIHBhcnNlciBubyBsb25nZXIga25vd3Mgd2hhdCBhICJnb2FsIiBpcy4KLy8vCi8vLyBQaXBlbGluZToKLy8vICAgQ2hhdCDihpIgTGxtQ2hhdEludGVycHJldGVyIOKGkiBJbnRlbnREcmFmdCDihpIgSW50ZW50TWFuYWdlciDihpIgR29hbFJlcXVlc3Qg4oaSIEdvYWxGYWN0b3J5IOKGkiBJR29hbAovLy8KLy8vIFNwcmludCAzODogSW50ZW50TWFuYWdlciB3aWxsIGltcGxlbWVudCBJSW50ZW50TWFuYWdlciAoZnJvbSBBZ2VudC5Db3JlLlJ1bnRpbWUpCi8vLyBhbmQgYmUgd2lyZWQgaW50byB0aGUgQWdlbnRSdW50aW1lIGRlY29tcG9zaXRpb24uCi8vLyA8L3N1bW1hcnk+CnB1YmxpYyBzZWFsZWQgY2xhc3MgSW50ZW50TWFuYWdlcgp7CiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gQ29udmVydHMgdGhlIHNlbWFudGljIGludGVudCBpbiA8cGFyYW1yZWYgbmFtZT0iZHJhZnQiLz4gdG8gYQogICAgLy8vIDxzZWUgY3JlZj0iR29hbFJlcXVlc3QiLz4gZm9yIDxjPkdvYWxGYWN0b3J5LkNyZWF0ZUFzeW5jPC9jPi4KICAgIC8vLwogICAgLy8vIFJldHVybnMgPHNlZSBsYW5nd29yZD0ibnVsbCIvPiB3aGVuIHRoZSBpbnRlbnQgbWFwcyB0byBubyBnb2FsCiAgICAvLy8gKGNvbnZlcnNhdGlvbiwgc3RhdHVzLCBjYW5jZWwsIGNsYXJpZnksIGlnbm9yZSwgZXRjLikuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHVibGljIEdvYWxSZXF1ZXN0PyBCdWlsZEdvYWxSZXF1ZXN0KEludGVudERyYWZ0IGRyYWZ0KQogICAgewogICAgICAgIHN3aXRjaCAoZHJhZnQuSW50ZW50LlRvTG93ZXJJbnZhcmlhbnQoKSkKICAgICAgICB7CiAgICAgICAgICAgIGNhc2UgImdhdGhlciI6CiAgICAgICAgICAgICAgICBpZiAoZHJhZnQuSXRlbSBpcyBub3QgbnVsbCkKICAgICAgICAgICAgICAgICAgICByZXR1cm4gbmV3IEdvYWxSZXF1ZXN0KAogICAgICAgICAgICAgICAgICAgICAgICAkIkdhdGhlckl0ZW06e2RyYWZ0Lkl0ZW19IiwKICAgICAgICAgICAgICAgICAgICAgICAgbmV3IERpY3Rpb25hcnk8c3RyaW5nLCBvYmplY3Q/PiB7IFsiY291bnQiXSA9IGRyYWZ0LkNvdW50ID8/IDEwIH0pOwogICAgICAgICAgICAgICAgYnJlYWs7CgogICAgICAgICAgICBjYXNlICJjcmFmdCI6CiAgICAgICAgICAgICAgICBpZiAoZHJhZnQuSXRlbSBpcyBub3QgbnVsbCkKICAgICAgICAgICAgICAgICAgICByZXR1cm4gbmV3IEdvYWxSZXF1ZXN0KAogICAgICAgICAgICAgICAgICAgICAgICAkIkNyYWZ0SXRlbTp7ZHJhZnQuSXRlbX0iLAogICAgICAgICAgICAgICAgICAgICAgICBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+IHsgWyJjb3VudCJdID0gZHJhZnQuQ291bnQgPz8gMSB9KTsKICAgICAgICAgICAgICAgIGJyZWFrOwoKICAgICAgICAgICAgY2FzZSAiYnVpbGQiOgogICAgICAgICAgICAgICAgaWYgKGRyYWZ0LkJsdWVwcmludCBpcyBub3QgbnVsbCkKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBEaWN0aW9uYXJ5PHN0cmluZywgb2JqZWN0Pz4/IHBhcmFtZXRlcnMgPSBudWxsOwogICAgICAgICAgICAgICAgICAgIGlmIChkcmFmdC5YIGlzIG5vdCBudWxsICYmIGRyYWZ0LlkgaXMgbm90IG51bGwgJiYgZHJhZnQuWiBpcyBub3QgbnVsbCkKICAgICAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgICAgIHBhcmFtZXRlcnMgPSBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+CiAgICAgICAgICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsib3JpZ2luWCJdID0gZHJhZnQuWCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsib3JpZ2luWSJdID0gZHJhZnQuWSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsib3JpZ2luWiJdID0gZHJhZnQuWiwKICAgICAgICAgICAgICAgICAgICAgICAgfTsKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBHb2FsUmVxdWVzdCgkIkJ1aWxkOntkcmFmdC5CbHVlcHJpbnR9IiwgcGFyYW1ldGVycyk7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBicmVhazsKCiAgICAgICAgICAgIGNhc2UgIm5hdmlnYXRlIjoKICAgICAgICAgICAgICAgIGlmIChkcmFmdC5YIGlzIG5vdCBudWxsICYmIGRyYWZ0LlkgaXMgbm90IG51bGwgJiYgZHJhZnQuWiBpcyBub3QgbnVsbCkKICAgICAgICAgICAgICAgICAgICByZXR1cm4gbmV3IEdvYWxSZXF1ZXN0KAogICAgICAgICAgICAgICAgICAgICAgICAiTW92ZVRvIiwKICAgICAgICAgICAgICAgICAgICAgICAgbmV3IERpY3Rpb25hcnk8c3RyaW5nLCBvYmplY3Q/PgogICAgICAgICAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBbIngiXSA9IGRyYWZ0LlgsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBbInkiXSA9IGRyYWZ0LlksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBbInoiXSA9IGRyYWZ0LlosCiAgICAgICAgICAgICAgICAgICAgICAgIH0pOwogICAgICAgICAgICAgICAgYnJlYWs7CiAgICAgICAgfQogICAgICAgIHJldHVybiBudWxsOwogICAgfQp9CgovLy8gPHN1bW1hcnk+Ci8vLyBTcHJpbnQgMzcgUDEtQTogQSByZXNvbHZlZCAoR29hbE5hbWUsIFBhcmFtZXRlcnMpIHBhaXIgcmVhZHkgZm9yCi8vLyA8Yz5Hb2FsRmFjdG9yeS5DcmVhdGVBc3luYzwvYz4uCi8vLwovLy8gUHJvZHVjZWQgYnkgPHNlZSBjcmVmPSJJbnRlbnRNYW5hZ2VyLkJ1aWxkR29hbFJlcXVlc3QiLz47IGNvbnN1bWVkIGJ5Ci8vLyA8Yz5BZ2VudEJhY2tncm91bmRTZXJ2aWNlLlRyeUNyZWF0ZUdvYWxGcm9tQ2hhdEFzeW5jPC9jPi4KLy8vIFJlcGxhY2VzIHRoZSBpbmxpbmUgZ29hbC1uYW1lIHN0cmluZ3MgcHJldmlvdXNseSBjb21wdXRlZCBpbnNpZGUgUGFyc2VEZWNpc2lvbi4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCByZWNvcmQgR29hbFJlcXVlc3QoCiAgICAvLy8gPHN1bW1hcnk+R29hbEZhY3Rvcnkga2V5IChlLmcuICJHYXRoZXJJdGVtOm9ha19sb2ciLCAiQnVpbGQ6c21hbGwtaG91c2UiKS48L3N1bW1hcnk+CiAgICBzdHJpbmcgR29hbE5hbWUsCiAgICAvLy8gPHN1bW1hcnk+T3B0aW9uYWwgcGFyYW1ldGVycyBmb3J3YXJkZWQgdG8gR29hbEZhY3RvcnkuQ3JlYXRlQXN5bmMuPC9zdW1tYXJ5PgogICAgSVJlYWRPbmx5RGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+PyBQYXJhbWV0ZXJzKTsK
+namespace Agent.Planning;
+
+using Agent.Core;
+
+/// <summary>
+/// Sprint 37 P1-A: Maps an <see cref="IntentDraft"/> to a <see cref="GoalRequest"/>
+/// that <c>GoalFactory.CreateAsync</c> can consume.
+///
+/// Enforces AGENTS.md CRITICAL rule: parsers never create goals.
+///
+/// Before Sprint 37:
+///   LlmChatInterpreter.ParseDecision contained a switch statement that mapped
+///   intent strings → goal names ("gather" → "GatherItem:{item}", etc.).
+///   This violated PRINCIPLE-1 because the PARSER was creating goal-name strings.
+///
+/// After Sprint 37:
+///   ParseDecision populates an IntentDraft (pure semantic data, no goal name).
+///   IntentManager.BuildGoalRequest converts that draft to (GoalName, Parameters).
+///   GoalFactory.CreateAsync creates the actual IGoal from those inputs.
+///   The parser no longer knows what a "goal" is.
+///
+/// Pipeline:
+///   Chat → LlmChatInterpreter → IntentDraft → IntentManager → GoalRequest → GoalFactory → IGoal
+///
+/// Sprint 38: IntentManager will implement IIntentManager (from Agent.Core.Runtime)
+/// and be wired into the AgentRuntime decomposition.
+/// </summary>
+public sealed class IntentManager
+{
+    /// <summary>
+    /// Converts the semantic intent in <paramref name="draft"/> to a
+    /// <see cref="GoalRequest"/> for <c>GoalFactory.CreateAsync</c>.
+    ///
+    /// Returns <see langword="null"/> when the intent maps to no goal
+    /// (conversation, status, cancel, clarify, ignore, etc.).
+    /// </summary>
+    public GoalRequest? BuildGoalRequest(IntentDraft draft)
+    {
+        switch (draft.Intent.ToLowerInvariant())
+        {
+            case "gather":
+                if (draft.Item is not null)
+                    return new GoalRequest(
+                        $"GatherItem:{draft.Item}",
+                        new Dictionary<string, object?> { ["count"] = draft.Count ?? 10 });
+                break;
+
+            case "craft":
+                if (draft.Item is not null)
+                    return new GoalRequest(
+                        $"CraftItem:{draft.Item}",
+                        new Dictionary<string, object?> { ["count"] = draft.Count ?? 1 });
+                break;
+
+            case "build":
+                if (draft.Blueprint is not null)
+                {
+                    Dictionary<string, object?>? parameters = null;
+                    if (draft.X is not null && draft.Y is not null && draft.Z is not null)
+                    {
+                        parameters = new Dictionary<string, object?>
+                        {
+                            ["originX"] = draft.X,
+                            ["originY"] = draft.Y,
+                            ["originZ"] = draft.Z,
+                        };
+                    }
+                    return new GoalRequest($"Build:{draft.Blueprint}", parameters);
+                }
+                break;
+
+            case "navigate":
+                if (draft.X is not null && draft.Y is not null && draft.Z is not null)
+                    return new GoalRequest(
+                        "MoveTo",
+                        new Dictionary<string, object?>
+                        {
+                            ["x"] = draft.X,
+                            ["y"] = draft.Y,
+                            ["z"] = draft.Z,
+                        });
+                break;
+        }
+        return null;
+    }
+}
+
+/// <summary>
+/// Sprint 37 P1-A: A resolved (GoalName, Parameters) pair ready for
+/// <c>GoalFactory.CreateAsync</c>.
+///
+/// Produced by <see cref="IntentManager.BuildGoalRequest"/>; consumed by
+/// <c>AgentBackgroundService.TryCreateGoalFromChatAsync</c>.
+/// Replaces the inline goal-name strings previously computed inside ParseDecision.
+/// </summary>
+public sealed record GoalRequest(
+    /// <summary>GoalFactory key (e.g. "GatherItem:oak_log", "Build:small-house").</summary>
+    string GoalName,
+    /// <summary>Optional parameters forwarded to GoalFactory.CreateAsync.</summary>
+    IReadOnlyDictionary<string, object?>? Parameters);

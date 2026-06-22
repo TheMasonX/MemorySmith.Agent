@@ -1,1 +1,247 @@
-bmFtZXNwYWNlIE1lbW9yeVNtaXRoLkFnZW50LlRlc3RzOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuUGxhbm5pbmc7CnVzaW5nIEFnZW50LlRvb2xzOwp1c2luZyBTeXN0ZW0uVGV4dC5Kc29uOwoKLy8vIDxzdW1tYXJ5PgovLy8gU3ByaW50IDM3IHRlc3RzIGNvdmVyaW5nIFAwLUEgKEFjdGlvbk91dGNvbWUgOiBJT2JzZXJ2YXRpb25TdW1tYXJ5KSwKLy8vIFAwLUIgKElUb29sQ2FsbGVyLkNhbGxXaXRoT3V0Y29tZUFzeW5jIGRlZmF1bHQgaW1wbGVtZW50YXRpb24pLAovLy8gUDEtQSAoSW50ZW50TWFuYWdlci5CdWlsZEdvYWxSZXF1ZXN0KSwgUDEtQiAoTGxtQ2hhdEludGVycHJldGVyIHdpdGggSW50ZW50TWFuYWdlciksCi8vLyBhbmQgUDEtQyAoSW50ZW50QXNzZXNzbWVudCByZWNvcmQpLgovLy8KLy8vIFRlc3QgY291bnQ6IDEwIG5ldyB0ZXN0cy4KLy8vIDwvc3VtbWFyeT4KW1Rlc3RGaXh0dXJlXQpwdWJsaWMgY2xhc3MgU3ByaW50MzdUZXN0cwp7CiAgICAvLyDilIDilIAgUDAtQTogQWN0aW9uT3V0Y29tZSBpbXBsZW1lbnRzIElPYnNlcnZhdGlvblN1bW1hcnkg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBBY3Rpb25PdXRjb21lX0ltcGxlbWVudHNJT2JzZXJ2YXRpb25TdW1tYXJ5KCkKICAgIHsKICAgICAgICAvLyBBY3Rpb25PdXRjb21lIG11c3QgaW1wbGVtZW50IElPYnNlcnZhdGlvblN1bW1hcnkgc28gaXQgY2FuIGJlIHBhc3NlZAogICAgICAgIC8vIHRvIGFueSBjb25zdW1lciB0aGF0IGV4cGVjdHMgc3RydWN0dXJlZCBvYnNlcnZhdGlvbiBjb250ZXh0LgogICAgICAgIHZhciBvdXRjb21lID0gQWN0aW9uT3V0Y29tZS5TdWNjZWVkZWQoR3VpZC5OZXdHdWlkKCksICJHZXRTdGF0dXMiLCAiQm90IGlzIGhlYWx0aHkiKTsKICAgICAgICBBc3NlcnQuVGhhdChvdXRjb21lLCBJcy5JbnN0YW5jZU9mPElPYnNlcnZhdGlvblN1bW1hcnk+KCkpOwogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgQWN0aW9uT3V0Y29tZV9JT2JzZXJ2YXRpb25TdW1tYXJ5X1N1bW1hcnlfTWFwc1RvT2JzZXJ2YXRpb25TdW1tYXJ5KCkKICAgIHsKICAgICAgICB2YXIgc3VtbWFyeSA9ICJNaW5lZCA1IG9ha19sb2cgYXQgKDEwMCw2NCwyMDApIjsKICAgICAgICB2YXIgb3V0Y29tZSA9IEFjdGlvbk91dGNvbWUuU3VjY2VlZGVkKEd1aWQuTmV3R3VpZCgpLCAiTWluZUJsb2NrIiwgc3VtbWFyeSk7CgogICAgICAgIC8vIElPYnNlcnZhdGlvblN1bW1hcnkuU3VtbWFyeSBtdXN0IHJldHVybiB0aGUgc2FtZSB0ZXh0IGFzIE9ic2VydmF0aW9uU3VtbWFyeS4KICAgICAgICB2YXIgb2JzID0gKElPYnNlcnZhdGlvblN1bW1hcnkpb3V0Y29tZTsKICAgICAgICBBc3NlcnQuTXVsdGlwbGUoKCkgPT4KICAgICAgICB7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KG9icy5TdW1tYXJ5LCBJcy5FcXVhbFRvKHN1bW1hcnkpKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQob2JzLlN1bW1hcnksIElzLkVxdWFsVG8ob3V0Y29tZS5PYnNlcnZhdGlvblN1bW1hcnkpKTsKICAgICAgICB9KTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIEFjdGlvbk91dGNvbWVfRmFpbGVkX0lPYnNlcnZhdGlvblN1bW1hcnlfU3VtbWFyeV9Jc0Vycm9yTWVzc2FnZSgpCiAgICB7CiAgICAgICAgdmFyIHJlYXNvbiA9ICJUb29sICdNaW5lQmxvY2snIHRocmV3OiBlbnRpdHkgbm90IGZvdW5kIjsKICAgICAgICB2YXIgb3V0Y29tZSA9IEFjdGlvbk91dGNvbWUuRmFpbGVkKEd1aWQuTmV3R3VpZCgpLCAiTWluZUJsb2NrIiwgcmVhc29uKTsKCiAgICAgICAgdmFyIG9icyA9IChJT2JzZXJ2YXRpb25TdW1tYXJ5KW91dGNvbWU7CiAgICAgICAgQXNzZXJ0LlRoYXQob2JzLlN1bW1hcnksIElzLkVxdWFsVG8ocmVhc29uKSk7CiAgICB9CgogICAgLy8g4pSA4pSAIFAwLUI6IElUb29sQ2FsbGVyLkNhbGxXaXRoT3V0Y29tZUFzeW5jIGRlZmF1bHQgaW1wbGVtZW50YXRpb24g4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgW1Rlc3RdCiAgICBwdWJsaWMgYXN5bmMgVGFzayBJVG9vbENhbGxlcl9DYWxsV2l0aE91dGNvbWVBc3luY19TdWNjZXNzUmVzdWx0X1Byb2R1Y2VzU3VjY2VlZGVkT3V0Y29tZSgpCiAgICB7CiAgICAgICAgLy8gQSBtaW5pbWFsIElUb29sQ2FsbGVyIHN0dWIgdGhhdCByZXR1cm5zIGEgc3VjY2VzcyByZXN1bHQuCiAgICAgICAgLy8gVGhlIGRlZmF1bHQgaW50ZXJmYWNlIGltcGxlbWVudGF0aW9uIHdyYXBzIGl0IGluIEFjdGlvbk91dGNvbWUuU3VjY2VlZGVkLgogICAgICAgIC8vIElNUE9SVEFOVDogTXVzdCBiZSB0eXBlZCBhcyBJVG9vbENhbGxlciDigJQgZGVmYXVsdCBpbnRlcmZhY2UgbWV0aG9kcyBhcmUgb25seQogICAgICAgIC8vIGFjY2Vzc2libGUgdGhyb3VnaCB0aGUgaW50ZXJmYWNlIHR5cGUsIG5vdCB0aGUgY29uY3JldGUgaW1wbGVtZW50aW5nIGNsYXNzLgogICAgICAgIElUb29sQ2FsbGVyIHRvb2xDYWxsZXIgPSBuZXcgU3R1YlRvb2xDYWxsZXIoc3VjY2VzczogdHJ1ZSwgbWVzc2FnZTogIm9rIik7CiAgICAgICAgdmFyIGdvYWxJZCA9IEd1aWQuTmV3R3VpZCgpOwogICAgICAgIHZhciBhcmdzID0gSnNvbkRvY3VtZW50LlBhcnNlKCJ7fSIpLlJvb3RFbGVtZW50OwoKICAgICAgICB2YXIgKHJlc3VsdCwgb3V0Y29tZSkgPSBhd2FpdCB0b29sQ2FsbGVyLkNhbGxXaXRoT3V0Y29tZUFzeW5jKGdvYWxJZCwgIkdldFN0YXR1cyIsIGFyZ3MpOwoKICAgICAgICBBc3NlcnQuTXVsdGlwbGUoKCkgPT4KICAgICAgICB7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5TdWNjZXNzLCBJcy5UcnVlKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQob3V0Y29tZS5TdWNjZXNzLCBJcy5UcnVlKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQob3V0Y29tZS5Hb2FsSWQsIElzLkVxdWFsVG8oZ29hbElkKSk7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KG91dGNvbWUuVG9vbE5hbWUsIElzLkVxdWFsVG8oIkdldFN0YXR1cyIpKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQob3V0Y29tZSwgSXMuSW5zdGFuY2VPZjxJT2JzZXJ2YXRpb25TdW1tYXJ5PigpKTsKICAgICAgICB9KTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyBhc3luYyBUYXNrIElUb29sQ2FsbGVyX0NhbGxXaXRoT3V0Y29tZUFzeW5jX0ZhaWx1cmVSZXN1bHRfUHJvZHVjZXNGYWlsZWRPdXRjb21lKCkKICAgIHsKICAgICAgICBJVG9vbENhbGxlciB0b29sQ2FsbGVyID0gbmV3IFN0dWJUb29sQ2FsbGVyKHN1Y2Nlc3M6IGZhbHNlLCBtZXNzYWdlOiAiYmxvY2sgbm90IGZvdW5kIik7CiAgICAgICAgdmFyIGdvYWxJZCA9IEd1aWQuTmV3R3VpZCgpOwogICAgICAgIHZhciBhcmdzID0gSnNvbkRvY3VtZW50LlBhcnNlKCJ7fSIpLlJvb3RFbGVtZW50OwoKICAgICAgICB2YXIgKHJlc3VsdCwgb3V0Y29tZSkgPSBhd2FpdCB0b29sQ2FsbGVyLkNhbGxXaXRoT3V0Y29tZUFzeW5jKGdvYWxJZCwgIk1pbmVCbG9jayIsIGFyZ3MpOwoKICAgICAgICBBc3NlcnQuTXVsdGlwbGUoKCkgPT4KICAgICAgICB7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlc3VsdC5TdWNjZXNzLCBJcy5GYWxzZSk7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KG91dGNvbWUuU3VjY2VzcywgSXMuRmFsc2UpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChvdXRjb21lLk9ic2VydmF0aW9uU3VtbWFyeSwgSXMuRXF1YWxUbygiYmxvY2sgbm90IGZvdW5kIikpOwogICAgICAgIH0pOwogICAgfQoKICAgIC8vIOKUgOKUgCBQMS1BOiBJbnRlbnRNYW5hZ2VyLkJ1aWxkR29hbFJlcXVlc3Qg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBJbnRlbnRNYW5hZ2VyX0dhdGhlcl9XaXRoSXRlbV9SZXR1cm5zR2F0aGVySXRlbUdvYWwoKQogICAgewogICAgICAgIHZhciBtYW5hZ2VyID0gbmV3IEludGVudE1hbmFnZXIoKTsKICAgICAgICB2YXIgZHJhZnQgPSBuZXcgSW50ZW50RHJhZnQoCiAgICAgICAgICAgICJ5ZXMiLCAiZ2F0aGVyIiwgSXRlbTogIm9ha19sb2ciLCBCbHVlcHJpbnQ6IG51bGwsCiAgICAgICAgICAgIENvdW50OiAzMiwgWDogbnVsbCwgWTogbnVsbCwgWjogbnVsbCwKICAgICAgICAgICAgQ29uZmlkZW5jZTogMC45NSwgQ2xhcmlmaWNhdGlvblF1ZXN0aW9uOiBudWxsLCBSZXNwb25zZTogIk9uIGl0ISIpOwoKICAgICAgICB2YXIgcmVxdWVzdCA9IG1hbmFnZXIuQnVpbGRHb2FsUmVxdWVzdChkcmFmdCk7CgogICAgICAgIEFzc2VydC5NdWx0aXBsZSgoKSA9PgogICAgICAgIHsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVxdWVzdCwgSXMuTm90Lk51bGwpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXF1ZXN0IS5Hb2FsTmFtZSwgSXMuRXF1YWxUbygiR2F0aGVySXRlbTpvYWtfbG9nIikpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXF1ZXN0LlBhcmFtZXRlcnMhWyJjb3VudCJdLCBJcy5FcXVhbFRvKDMyKSk7CiAgICAgICAgfSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBJbnRlbnRNYW5hZ2VyX0NyYWZ0X1dpdGhJdGVtX1JldHVybnNDcmFmdEl0ZW1Hb2FsKCkKICAgIHsKICAgICAgICB2YXIgbWFuYWdlciA9IG5ldyBJbnRlbnRNYW5hZ2VyKCk7CiAgICAgICAgdmFyIGRyYWZ0ID0gbmV3IEludGVudERyYWZ0KAogICAgICAgICAgICAieWVzIiwgImNyYWZ0IiwgSXRlbTogImlyb25fcGlja2F4ZSIsIEJsdWVwcmludDogbnVsbCwKICAgICAgICAgICAgQ291bnQ6IDEsIFg6IG51bGwsIFk6IG51bGwsIFo6IG51bGwsCiAgICAgICAgICAgIENvbmZpZGVuY2U6IDAuOSwgQ2xhcmlmaWNhdGlvblF1ZXN0aW9uOiBudWxsLCBSZXNwb25zZTogIkNyYWZ0aW5nISIpOwoKICAgICAgICB2YXIgcmVxdWVzdCA9IG1hbmFnZXIuQnVpbGRHb2FsUmVxdWVzdChkcmFmdCk7CgogICAgICAgIEFzc2VydC5NdWx0aXBsZSgoKSA9PgogICAgICAgIHsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVxdWVzdCwgSXMuTm90Lk51bGwpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXF1ZXN0IS5Hb2FsTmFtZSwgSXMuRXF1YWxUbygiQ3JhZnRJdGVtOmlyb25fcGlja2F4ZSIpKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVxdWVzdC5QYXJhbWV0ZXJzIVsiY291bnQiXSwgSXMuRXF1YWxUbygxKSk7CiAgICAgICAgfSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBJbnRlbnRNYW5hZ2VyX0J1aWxkX1dpdGhCbHVlcHJpbnRfUmV0dXJuc0J1aWxkR29hbCgpCiAgICB7CiAgICAgICAgdmFyIG1hbmFnZXIgPSBuZXcgSW50ZW50TWFuYWdlcigpOwogICAgICAgIHZhciBkcmFmdCA9IG5ldyBJbnRlbnREcmFmdCgKICAgICAgICAgICAgInllcyIsICJidWlsZCIsIEl0ZW06IG51bGwsIEJsdWVwcmludDogInNtYWxsLWhvdXNlIiwKICAgICAgICAgICAgQ291bnQ6IG51bGwsIFg6IDEwMCwgWTogNjQsIFo6IDIwMCwKICAgICAgICAgICAgQ29uZmlkZW5jZTogMC44NSwgQ2xhcmlmaWNhdGlvblF1ZXN0aW9uOiBudWxsLCBSZXNwb25zZTogIkJ1aWxkaW5nISIpOwoKICAgICAgICB2YXIgcmVxdWVzdCA9IG1hbmFnZXIuQnVpbGRHb2FsUmVxdWVzdChkcmFmdCk7CgogICAgICAgIEFzc2VydC5NdWx0aXBsZSgoKSA9PgogICAgICAgIHsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVxdWVzdCwgSXMuTm90Lk51bGwpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXF1ZXN0IS5Hb2FsTmFtZSwgSXMuRXF1YWxUbygiQnVpbGQ6c21hbGwtaG91c2UiKSk7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlcXVlc3QuUGFyYW1ldGVycyFbIm9yaWdpblgiXSwgSXMuRXF1YWxUbygxMDApKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVxdWVzdC5QYXJhbWV0ZXJzIVsib3JpZ2luWSJdLCBJcy5FcXVhbFRvKDY0KSk7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlcXVlc3QuUGFyYW1ldGVycyFbIm9yaWdpbloiXSwgSXMuRXF1YWxUbygyMDApKTsKICAgICAgICB9KTsKICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIEludGVudE1hbmFnZXJfTmF2aWdhdGVfV2l0aENvb3Jkc19SZXR1cm5zTW92ZVRvR29hbCgpCiAgICB7CiAgICAgICAgdmFyIG1hbmFnZXIgPSBuZXcgSW50ZW50TWFuYWdlcigpOwogICAgICAgIHZhciBkcmFmdCA9IG5ldyBJbnRlbnREcmFmdCgKICAgICAgICAgICAgInllcyIsICJuYXZpZ2F0ZSIsIEl0ZW06IG51bGwsIEJsdWVwcmludDogbnVsbCwKICAgICAgICAgICAgQ291bnQ6IG51bGwsIFg6IC01MCwgWTogNzAsIFo6IDMwMCwKICAgICAgICAgICAgQ29uZmlkZW5jZTogMC45LCBDbGFyaWZpY2F0aW9uUXVlc3Rpb246IG51bGwsIFJlc3BvbnNlOiAiTW92aW5nISIpOwoKICAgICAgICB2YXIgcmVxdWVzdCA9IG1hbmFnZXIuQnVpbGRHb2FsUmVxdWVzdChkcmFmdCk7CgogICAgICAgIEFzc2VydC5NdWx0aXBsZSgoKSA9PgogICAgICAgIHsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQocmVxdWVzdCwgSXMuTm90Lk51bGwpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXF1ZXN0IS5Hb2FsTmFtZSwgSXMuRXF1YWxUbygiTW92ZVRvIikpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXF1ZXN0LlBhcmFtZXRlcnMhWyJ4Il0sIElzLkVxdWFsVG8oLTUwKSk7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJlcXVlc3QuUGFyYW1ldGVycyFbInkiXSwgSXMuRXF1YWxUbyg3MCkpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChyZXF1ZXN0LlBhcmFtZXRlcnMhWyJ6Il0sIElzLkVxdWFsVG8oMzAwKSk7CiAgICAgICAgfSk7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBJbnRlbnRNYW5hZ2VyX0NvbnZlcnNhdGlvbl9SZXR1cm5zTnVsbCgpCiAgICB7CiAgICAgICAgdmFyIG1hbmFnZXIgPSBuZXcgSW50ZW50TWFuYWdlcigpOwogICAgICAgIHZhciBkcmFmdCA9IG5ldyBJbnRlbnREcmFmdCgKICAgICAgICAgICAgInllcyIsICJjb252ZXJzYXRpb24iLCBJdGVtOiBudWxsLCBCbHVlcHJpbnQ6IG51bGwsCiAgICAgICAgICAgIENvdW50OiBudWxsLCBYOiBudWxsLCBZOiBudWxsLCBaOiBudWxsLAogICAgICAgICAgICBDb25maWRlbmNlOiAxLjAsIENsYXJpZmljYXRpb25RdWVzdGlvbjogbnVsbCwgUmVzcG9uc2U6ICJIZWxsbyEiKTsKCiAgICAgICAgdmFyIHJlcXVlc3QgPSBtYW5hZ2VyLkJ1aWxkR29hbFJlcXVlc3QoZHJhZnQpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXF1ZXN0LCBJcy5OdWxsLAogICAgICAgICAgICAiY29udmVyc2F0aW9uIGludGVudCBzaG91bGQgcHJvZHVjZSBubyBHb2FsUmVxdWVzdCDigJQgdGhlcmUncyBub3RoaW5nIHRvIGRvIik7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBJbnRlbnRNYW5hZ2VyX0dhdGhlcldpdGhvdXRJdGVtX1JldHVybnNOdWxsKCkKICAgIHsKICAgICAgICB2YXIgbWFuYWdlciA9IG5ldyBJbnRlbnRNYW5hZ2VyKCk7CiAgICAgICAgdmFyIGRyYWZ0ID0gbmV3IEludGVudERyYWZ0KAogICAgICAgICAgICAieWVzIiwgImdhdGhlciIsIEl0ZW06IG51bGwsIEJsdWVwcmludDogbnVsbCwKICAgICAgICAgICAgQ291bnQ6IDEwLCBYOiBudWxsLCBZOiBudWxsLCBaOiBudWxsLAogICAgICAgICAgICBDb25maWRlbmNlOiAwLjUsIENsYXJpZmljYXRpb25RdWVzdGlvbjogbnVsbCwgUmVzcG9uc2U6ICIiKTsKCiAgICAgICAgdmFyIHJlcXVlc3QgPSBtYW5hZ2VyLkJ1aWxkR29hbFJlcXVlc3QoZHJhZnQpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXF1ZXN0LCBJcy5OdWxsLAogICAgICAgICAgICAiZ2F0aGVyIHdpdGhvdXQgaXRlbSBjYW5ub3QgcHJvZHVjZSBhIHZhbGlkIEdvYWxSZXF1ZXN0Iik7CiAgICB9CgogICAgLy8g4pSA4pSAIFAxLUM6IEludGVudEFzc2Vzc21lbnQgcmVjb3JkIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgSW50ZW50QXNzZXNzbWVudF9SZWNvcmRGaWVsZHNBcmVBY2Nlc3NpYmxlKCkKICAgIHsKICAgICAgICB2YXIgZHJhZnQgPSBuZXcgSW50ZW50RHJhZnQoCiAgICAgICAgICAgICJ5ZXMiLCAiYnVpbGQiLCBJdGVtOiBudWxsLCBCbHVlcHJpbnQ6ICJsYXJnZS1jYXN0bGUiLAogICAgICAgICAgICBDb3VudDogbnVsbCwgWDogMCwgWTogNjQsIFo6IDAsCiAgICAgICAgICAgIENvbmZpZGVuY2U6IDAuOTIsIENsYXJpZmljYXRpb25RdWVzdGlvbjogbnVsbCwgUmVzcG9uc2U6ICJCdWlsZGluZyBhIGNhc3RsZSEiKTsKCiAgICAgICAgdmFyIGFzc2Vzc21lbnQgPSBuZXcgSW50ZW50QXNzZXNzbWVudCgKICAgICAgICAgICAgRHJhZnQ6IGRyYWZ0LAogICAgICAgICAgICBSaXNrTGV2ZWw6IFJpc2tMZXZlbC5IaWdoLAogICAgICAgICAgICBSZXF1aXJlc0NvbmZpcm1hdGlvbjogdHJ1ZSwKICAgICAgICAgICAgUmVhc29uaW5nU3VtbWFyeTogIkJ1aWxkaW5nIGEgbGFyZ2Ugc3RydWN0dXJlIGlzIGhpZ2gtcmlzayBhbmQgaXJyZXZlcnNpYmxlLiIpOwoKICAgICAgICBBc3NlcnQuTXVsdGlwbGUoKCkgPT4KICAgICAgICB7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KGFzc2Vzc21lbnQuRHJhZnQsIElzLlNhbWVBcyhkcmFmdCkpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChhc3Nlc3NtZW50LlJpc2tMZXZlbCwgSXMuRXF1YWxUbyhSaXNrTGV2ZWwuSGlnaCkpOwogICAgICAgICAgICBBc3NlcnQuVGhhdChhc3Nlc3NtZW50LlJlcXVpcmVzQ29uZmlybWF0aW9uLCBJcy5UcnVlKTsKICAgICAgICAgICAgQXNzZXJ0LlRoYXQoYXNzZXNzbWVudC5SZWFzb25pbmdTdW1tYXJ5LCBEb2VzLkNvbnRhaW4oImlycmV2ZXJzaWJsZSIpKTsKICAgICAgICB9KTsKICAgIH0KCiAgICAvLyDilIDilIAgU3R1YiBoZWxwZXJzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBNaW5pbWFsIElUb29sQ2FsbGVyIHN0dWIgdGhhdCByZXR1cm5zIGEgZml4ZWQgVG9vbFJlc3VsdC4KICAgIC8vLyBVc2VkIHRvIHRlc3QgdGhlIElUb29sQ2FsbGVyLkNhbGxXaXRoT3V0Y29tZUFzeW5jIGRlZmF1bHQgaW1wbGVtZW50YXRpb24uCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHJpdmF0ZSBzZWFsZWQgY2xhc3MgU3R1YlRvb2xDYWxsZXIoYm9vbCBzdWNjZXNzLCBzdHJpbmcgbWVzc2FnZSkgOiBJVG9vbENhbGxlcgogICAgewogICAgICAgIHB1YmxpYyBUYXNrPFRvb2xSZXN1bHQ+IENhbGxBc3luYygKICAgICAgICAgICAgc3RyaW5nIHRvb2xOYW1lLCBKc29uRWxlbWVudCBhcmd1bWVudHMsCiAgICAgICAgICAgIENhbmNlbGxhdGlvblRva2VuIGNhbmNlbGxhdGlvblRva2VuID0gZGVmYXVsdCkKICAgICAgICAgICAgPT4gVGFzay5Gcm9tUmVzdWx0KG5ldyBUb29sUmVzdWx0KHN1Y2Nlc3MsIG1lc3NhZ2UpKTsKICAgIH0KfQo=
+namespace MemorySmith.Agent.Tests;
+
+using global::Agent.Core;
+using global::Agent.Planning;
+using global::Agent.Tools;
+using System.Text.Json;
+
+/// <summary>
+/// Sprint 37 tests covering P0-A (ActionOutcome : IObservationSummary),
+/// P0-B (IToolCaller.CallWithOutcomeAsync default implementation),
+/// P1-A (IntentManager.BuildGoalRequest), P1-B (LlmChatInterpreter with IntentManager),
+/// and P1-C (IntentAssessment record).
+///
+/// Test count: 10 new tests.
+/// </summary>
+[TestFixture]
+public class Sprint37Tests
+{
+    // ── P0-A: ActionOutcome implements IObservationSummary ───────────────────────────────
+
+    [Test]
+    public void ActionOutcome_ImplementsIObservationSummary()
+    {
+        // ActionOutcome must implement IObservationSummary so it can be passed
+        // to any consumer that expects structured observation context.
+        var outcome = ActionOutcome.Succeeded(Guid.NewGuid(), "GetStatus", "Bot is healthy");
+        Assert.That(outcome, Is.InstanceOf<IObservationSummary>());
+    }
+
+    [Test]
+    public void ActionOutcome_IObservationSummary_Summary_MapsToObservationSummary()
+    {
+        var summary = "Mined 5 oak_log at (100,64,200)";
+        var outcome = ActionOutcome.Succeeded(Guid.NewGuid(), "MineBlock", summary);
+
+        // IObservationSummary.Summary must return the same text as ObservationSummary.
+        var obs = (IObservationSummary)outcome;
+        Assert.Multiple(() =>
+        {
+            Assert.That(obs.Summary, Is.EqualTo(summary));
+            Assert.That(obs.Summary, Is.EqualTo(outcome.ObservationSummary));
+        });
+    }
+
+    [Test]
+    public void ActionOutcome_Failed_IObservationSummary_Summary_IsErrorMessage()
+    {
+        var reason = "Tool 'MineBlock' threw: entity not found";
+        var outcome = ActionOutcome.Failed(Guid.NewGuid(), "MineBlock", reason);
+
+        var obs = (IObservationSummary)outcome;
+        Assert.That(obs.Summary, Is.EqualTo(reason));
+    }
+
+    // ── P0-B: IToolCaller.CallWithOutcomeAsync default implementation ─────────────────────
+
+    [Test]
+    public async Task IToolCaller_CallWithOutcomeAsync_SuccessResult_ProducesSucceededOutcome()
+    {
+        // A minimal IToolCaller stub that returns a success result.
+        // The default interface implementation wraps it in ActionOutcome.Succeeded.
+        // IMPORTANT: Must be typed as IToolCaller — default interface methods are only
+        // accessible through the interface type, not the concrete implementing class.
+        IToolCaller toolCaller = new StubToolCaller(success: true, message: "ok");
+        var goalId = Guid.NewGuid();
+        var args = JsonDocument.Parse("{}").RootElement;
+
+        var (result, outcome) = await toolCaller.CallWithOutcomeAsync(goalId, "GetStatus", args);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Success, Is.True);
+            Assert.That(outcome.Success, Is.True);
+            Assert.That(outcome.GoalId, Is.EqualTo(goalId));
+            Assert.That(outcome.ToolName, Is.EqualTo("GetStatus"));
+            Assert.That(outcome, Is.InstanceOf<IObservationSummary>());
+        });
+    }
+
+    [Test]
+    public async Task IToolCaller_CallWithOutcomeAsync_FailureResult_ProducesFailedOutcome()
+    {
+        IToolCaller toolCaller = new StubToolCaller(success: false, message: "block not found");
+        var goalId = Guid.NewGuid();
+        var args = JsonDocument.Parse("{}").RootElement;
+
+        var (result, outcome) = await toolCaller.CallWithOutcomeAsync(goalId, "MineBlock", args);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Success, Is.False);
+            Assert.That(outcome.Success, Is.False);
+            Assert.That(outcome.ObservationSummary, Is.EqualTo("block not found"));
+        });
+    }
+
+    // ── P1-A: IntentManager.BuildGoalRequest ─────────────────────────────────────────────
+
+    [Test]
+    public void IntentManager_Gather_WithItem_ReturnsGatherItemGoal()
+    {
+        var manager = new IntentManager();
+        var draft = new IntentDraft(
+            "yes", "gather", Item: "oak_log", Blueprint: null,
+            Count: 32, X: null, Y: null, Z: null,
+            Confidence: 0.95, ClarificationQuestion: null, Response: "On it!");
+
+        var request = manager.BuildGoalRequest(draft);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(request, Is.Not.Null);
+            Assert.That(request!.GoalName, Is.EqualTo("GatherItem:oak_log"));
+            Assert.That(request.Parameters!["count"], Is.EqualTo(32));
+        });
+    }
+
+    [Test]
+    public void IntentManager_Craft_WithItem_ReturnsCraftItemGoal()
+    {
+        var manager = new IntentManager();
+        var draft = new IntentDraft(
+            "yes", "craft", Item: "iron_pickaxe", Blueprint: null,
+            Count: 1, X: null, Y: null, Z: null,
+            Confidence: 0.9, ClarificationQuestion: null, Response: "Crafting!");
+
+        var request = manager.BuildGoalRequest(draft);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(request, Is.Not.Null);
+            Assert.That(request!.GoalName, Is.EqualTo("CraftItem:iron_pickaxe"));
+            Assert.That(request.Parameters!["count"], Is.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public void IntentManager_Build_WithBlueprint_ReturnsBuildGoal()
+    {
+        var manager = new IntentManager();
+        var draft = new IntentDraft(
+            "yes", "build", Item: null, Blueprint: "small-house",
+            Count: null, X: 100, Y: 64, Z: 200,
+            Confidence: 0.85, ClarificationQuestion: null, Response: "Building!");
+
+        var request = manager.BuildGoalRequest(draft);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(request, Is.Not.Null);
+            Assert.That(request!.GoalName, Is.EqualTo("Build:small-house"));
+            Assert.That(request.Parameters!["originX"], Is.EqualTo(100));
+            Assert.That(request.Parameters!["originY"], Is.EqualTo(64));
+            Assert.That(request.Parameters!["originZ"], Is.EqualTo(200));
+        });
+    }
+
+    [Test]
+    public void IntentManager_Navigate_WithCoords_ReturnsMoveToGoal()
+    {
+        var manager = new IntentManager();
+        var draft = new IntentDraft(
+            "yes", "navigate", Item: null, Blueprint: null,
+            Count: null, X: -50, Y: 70, Z: 300,
+            Confidence: 0.9, ClarificationQuestion: null, Response: "Moving!");
+
+        var request = manager.BuildGoalRequest(draft);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(request, Is.Not.Null);
+            Assert.That(request!.GoalName, Is.EqualTo("MoveTo"));
+            Assert.That(request.Parameters!["x"], Is.EqualTo(-50));
+            Assert.That(request.Parameters!["y"], Is.EqualTo(70));
+            Assert.That(request.Parameters!["z"], Is.EqualTo(300));
+        });
+    }
+
+    [Test]
+    public void IntentManager_Conversation_ReturnsNull()
+    {
+        var manager = new IntentManager();
+        var draft = new IntentDraft(
+            "yes", "conversation", Item: null, Blueprint: null,
+            Count: null, X: null, Y: null, Z: null,
+            Confidence: 1.0, ClarificationQuestion: null, Response: "Hello!");
+
+        var request = manager.BuildGoalRequest(draft);
+
+        Assert.That(request, Is.Null,
+            "conversation intent should produce no GoalRequest — there's nothing to do");
+    }
+
+    [Test]
+    public void IntentManager_GatherWithoutItem_ReturnsNull()
+    {
+        var manager = new IntentManager();
+        var draft = new IntentDraft(
+            "yes", "gather", Item: null, Blueprint: null,
+            Count: 10, X: null, Y: null, Z: null,
+            Confidence: 0.5, ClarificationQuestion: null, Response: "");
+
+        var request = manager.BuildGoalRequest(draft);
+
+        Assert.That(request, Is.Null,
+            "gather without item cannot produce a valid GoalRequest");
+    }
+
+    // ── P1-C: IntentAssessment record ────────────────────────────────────────────────────
+
+    [Test]
+    public void IntentAssessment_RecordFieldsAreAccessible()
+    {
+        var draft = new IntentDraft(
+            "yes", "build", Item: null, Blueprint: "large-castle",
+            Count: null, X: 0, Y: 64, Z: 0,
+            Confidence: 0.92, ClarificationQuestion: null, Response: "Building a castle!");
+
+        var assessment = new IntentAssessment(
+            Draft: draft,
+            RiskLevel: RiskLevel.High,
+            RequiresConfirmation: true,
+            ReasoningSummary: "Building a large structure is high-risk and irreversible.");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(assessment.Draft, Is.SameAs(draft));
+            Assert.That(assessment.RiskLevel, Is.EqualTo(RiskLevel.High));
+            Assert.That(assessment.RequiresConfirmation, Is.True);
+            Assert.That(assessment.ReasoningSummary, Does.Contain("irreversible"));
+        });
+    }
+
+    // ── Stub helpers ─────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Minimal IToolCaller stub that returns a fixed ToolResult.
+    /// Used to test the IToolCaller.CallWithOutcomeAsync default implementation.
+    /// </summary>
+    private sealed class StubToolCaller(bool success, string message) : IToolCaller
+    {
+        public Task<ToolResult> CallAsync(
+            string toolName, JsonElement arguments,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(new ToolResult(success, message));
+    }
+}

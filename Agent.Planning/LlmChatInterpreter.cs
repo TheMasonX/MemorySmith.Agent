@@ -57,7 +57,8 @@ public sealed class LlmChatInterpreter(
 
     // -- IChatInterpreter ------------------------------------------------------------------
 
-    public async Task<ChatInterpretation> InterpretAsync(
+    // Sprint 39 P1-C: returns IntentDraft? — null when not addressed.
+    public async Task<IntentDraft?> InterpretAsync(
         string username, string message, string botName,
         int onlinePlayers, Position botPosition, Position? playerPosition,
         WorldState state, CancellationToken ct = default)
@@ -75,20 +76,19 @@ public sealed class LlmChatInterpreter(
             username, effective, botName, onlinePlayers,
             botPosition, playerPosition, state, ct);
 
-        // 3. Distance gate
-        if (quick.IntentType == ChatIntentType.NotAddressed
+        // 3. Distance gate: null quick means "not addressed" — if player is far, ignore.
+        if (quick is null
             && playerPosition is not null
             && Distance(botPosition, playerPosition) > options.MaxResponseDistanceBlocks)
         {
-            return quick;
+            return null;
         }
 
         // Sprint 35 P1-B: fast-path ONLY for the 4 safe deterministic operations.
         // CreateGoal and NavigateTo are removed — all non-trivial chat reaches the LLM.
         // This enforces the "LLM owns intent" architecture locked in Sprint 35.
-        if (quick.IntentType is ChatIntentType.CancelGoal
-                              or ChatIntentType.QueryHelp
-                              or ChatIntentType.QueryStatus)
+        // Sprint 39 P1-C: check by Intent string instead of ChatIntentType enum.
+        if (quick?.Intent is "cancel" or "status" or "help")
         {
             return quick;
         }
@@ -126,15 +126,14 @@ public sealed class LlmChatInterpreter(
             return quick;
         }
 
-        // 6. Parse LLM response (IntentDraft schema)
-        // Sprint 37 P1-B: pass _intentManager so ParseDecision delegates goal mapping to it.
-        var llmResult = ParseDecision(raw, options.LlmConfidenceThreshold, logger, _intentManager);
+        // 6. Parse LLM response into IntentDraft (Sprint 39 P1-C: ParseDecision now returns IntentDraft?)
+        var llmResult = ParseDecision(raw, options.LlmConfidenceThreshold, logger);
         if (llmResult is null)
             logger?.LogWarning("[llm] failed to parse JSON from {Provider} response: '{Content}'",
                 provider.ProviderName, raw.Length > 100 ? raw[..100] : raw);
 
         // If low confidence with clarifying question — log it; bot.chat will be called by AgentBackgroundService
-        if (llmResult?.IntentType == ChatIntentType.Unknown && llmResult.Response.Length > 0)
+        if (llmResult?.Intent == "clarify" && !string.IsNullOrEmpty(llmResult.Response))
             logger?.LogInformation("[llm] low-confidence — clarification requested: {Question}", llmResult.Response);
 
         return llmResult ?? quick;
@@ -219,22 +218,17 @@ public sealed class LlmChatInterpreter(
         new(@"\{[\s\S]*\}", RegexOptions.Compiled);
 
     /// <summary>
-    /// Sprint 35 P1-B: ParseDecision now reads the IntentDraft schema response.
-    /// Handles confidence threshold — low confidence + clarificationQuestion → Unknown.
+    /// Sprint 35 P1-B: ParseDecision reads the IntentDraft JSON schema from the LLM.
+    /// Handles confidence threshold — low confidence + clarificationQuestion → clarify intent.
     ///
-    /// Sprint 37 P1-B: intent→goal mapping moved to IntentManager.BuildGoalRequest.
-    /// When <paramref name="intentManager"/> is non-null, it resolves (GoalName, Parameters)
-    /// from the parsed IntentDraft. When null (legacy / test mode), falls back to the
-    /// local switch statement that was present before Sprint 37.
-    ///
-    /// AGENTS.md CRITICAL rule: parsers never create goals. ParseDecision now creates
-    /// an IntentDraft value and asks IntentManager to map it — it does NOT derive goal
-    /// names itself.
+    /// Sprint 39 P1-C: now returns <see cref="IntentDraft"/>? directly. IntentManager is
+    /// no longer called here — the parser is purely a JSON → IntentDraft converter.
+    /// Goal creation is the caller's responsibility (AgentBackgroundService via IntentManager).
+    /// AGENTS.md CRITICAL rule: parsers never create goals.
     /// </summary>
-    private static ChatInterpretation? ParseDecision(
+    private static IntentDraft? ParseDecision(
         string content, double confidenceThreshold,
-        ILogger<LlmChatInterpreter>? logger,
-        IntentManager? intentManager = null)
+        ILogger<LlmChatInterpreter>? logger)
     {
         try
         {
@@ -246,8 +240,7 @@ public sealed class LlmChatInterpreter(
             if (!m.Success)
             {
                 // Sprint 20: try to salvage intent from truncated JSON (no closing brace).
-                // Sprint 38 P1-B: pass intentManager so TryParseTruncatedJson delegates goal mapping.
-                return TryParseTruncatedJson(json, intentManager);
+                return TryParseTruncatedJson(json);
             }
 
             using var doc  = JsonDocument.Parse(m.Value);
@@ -255,64 +248,34 @@ public sealed class LlmChatInterpreter(
             var addressed  = GetStr(root, "addressed") ?? "no";
 
             if (string.Equals(addressed, "no", StringComparison.OrdinalIgnoreCase))
-                return new ChatInterpretation(ChatIntentType.NotAddressed);
+                return null;   // not addressed → caller returns null
 
-            var isUncertain = string.Equals(addressed, "maybe", StringComparison.OrdinalIgnoreCase);
-            var intent      = GetStr(root, "intent") ?? "ignore";
-            var response    = GetStr(root, "response") ?? string.Empty;
+            var intent   = GetStr(root, "intent") ?? "ignore";
+            var response = GetStr(root, "response") ?? string.Empty;
+            var item      = GetStr(root, "item");
+            var blueprint = GetStr(root, "blueprint");
+            var count     = GetInt(root, "count");
+            var x         = GetInt(root, "x");
+            var y         = GetInt(root, "y");
+            var z         = GetInt(root, "z");
 
             // Sprint 35 P1-A: read confidence and clarificationQuestion from IntentDraft schema
             var confidence = GetDouble(root, "confidence") ?? 1.0;
             var clarifyQ   = GetStr(root, "clarificationQuestion");
 
-            // Low confidence → clarify (bot sends the question as its response)
+            // Low confidence → override intent to "clarify" (bot sends the question as response)
             if (confidence < confidenceThreshold && !string.IsNullOrWhiteSpace(clarifyQ))
             {
                 logger?.LogDebug("[llm] confidence={Confidence:F2} < threshold={Threshold:F2} — requesting clarification",
                     confidence, confidenceThreshold);
-                return new ChatInterpretation(ChatIntentType.Unknown, Response: clarifyQ);
+                return new IntentDraft(addressed, "clarify",
+                    item, blueprint, count, x, y, z,
+                    confidence, clarifyQ, clarifyQ);
             }
 
-            // Sprint 37 P1-B: build IntentDraft and delegate goal mapping to IntentManager.
-            // AGENTS.md CRITICAL: parsers never create goals — IntentManager owns this mapping.
-            string? goalName = null;
-            IReadOnlyDictionary<string, object?>? parameters = null;
-
-            if (intentManager is not null)
-            {
-                // New path (Sprint 37+): IntentManager maps IntentDraft → GoalRequest.
-                var draft = new IntentDraft(
-                    addressed, intent,
-                    GetStr(root, "item"),
-                    GetStr(root, "blueprint"),
-                    GetInt(root, "count"),
-                    GetInt(root, "x"),
-                    GetInt(root, "y"),
-                    GetInt(root, "z"),
-                    confidence, clarifyQ, response);
-                var goalRequest = intentManager.BuildGoalRequest(draft);
-                goalName   = goalRequest?.GoalName;
-                parameters = goalRequest?.Parameters;
-            }
-            // Sprint 38 P1-A: Legacy switch removed. goalName and parameters remain null
-            // when intentManager is not injected (test-only / backward-compat path).
-            // In production, IntentManager is always injected via Program.cs DI.
-            // Tests that do not inject IntentManager will get ChatInterpretation(CreateGoal)
-            // with null GoalName — TryCreateGoalFromChatAsync is a no-op in that case.
-
-            var intentType = intent.ToLowerInvariant() switch
-            {
-                "gather" or "build" or "craft" => ChatIntentType.CreateGoal,
-                "cancel"                        => ChatIntentType.CancelGoal,
-                "status"                        => ChatIntentType.QueryStatus,
-                "help"                          => ChatIntentType.QueryHelp,
-                "navigate"                      => ChatIntentType.NavigateTo,
-                "conversation"                  => ChatIntentType.Chat,
-                "clarify"                       => ChatIntentType.Unknown,
-                _                               => isUncertain ? ChatIntentType.Unknown : ChatIntentType.NotAddressed,
-            };
-
-            return new ChatInterpretation(intentType, goalName, parameters, response);
+            return new IntentDraft(addressed, intent,
+                item, blueprint, count, x, y, z,
+                confidence, clarifyQ, response);
         }
         catch { return null; }
     }
@@ -349,14 +312,12 @@ public sealed class LlmChatInterpreter(
     /// <summary>
     /// Sprint 20: best-effort extraction from truncated JSON missing the closing brace.
     /// Sprint 21 P1-C: extended to extract item/count from truncated gather/build JSON.
-    /// Sprint 37: TryParseTruncatedJson still uses local mapping (legacy path) — Sprint 38
-    ///   will wire IntentManager here once the happy-path wiring is validated.
-    /// Sprint 38 P1-B: accepts optional <paramref name="intentManager"/> — when supplied,
-    ///   maps the partial IntentDraft to a GoalRequest via IntentManager (no goal-name
-    ///   strings in the parser). The legacy local-switch path is kept for Sprint 21
-    ///   reflection-based tests that call without IntentManager.
+    ///
+    /// Sprint 39 P1-C: return type changed to <see cref="IntentDraft"/>? (was ChatInterpretation?).
+    /// Now a pure JSON-fragment → IntentDraft converter; IntentManager and goal-name strings
+    /// are gone. Callers (Sprint21Tests) now assert on IntentDraft fields (Item, Count, Intent).
     /// </summary>
-    private static ChatInterpretation? TryParseTruncatedJson(string json, IntentManager? intentManager = null)
+    private static IntentDraft? TryParseTruncatedJson(string json)
     {
         try
         {
@@ -368,7 +329,7 @@ public sealed class LlmChatInterpreter(
 
             var addressed = addressedM.Groups["v"].Value;
             if (string.Equals(addressed, "no", StringComparison.OrdinalIgnoreCase))
-                return new ChatInterpretation(ChatIntentType.NotAddressed);
+                return null;   // not addressed
 
             var intent = intentM.Success ? intentM.Groups["v"].Value : "ignore";
 
@@ -376,80 +337,18 @@ public sealed class LlmChatInterpreter(
                 @"""response""\s*:\s*""(?<v>[^""\\]*(?:\\.[^""\\]*)*)""");
             var response = responseM.Success ? responseM.Groups["v"].Value : string.Empty;
 
-            string? goalName = null;
-            IReadOnlyDictionary<string, object?>? parameters = null;
+            var itemM  = Regex.Match(json, @"""item""\s*:\s*""(?<v>[^""]+)""",      RegexOptions.IgnoreCase);
+            var bpM    = Regex.Match(json, @"""blueprint""\s*:\s*""(?<v>[^""]+)""", RegexOptions.IgnoreCase);
+            var countM = Regex.Match(json, @"""count""\s*:\s*(?<v>\d+)",             RegexOptions.IgnoreCase);
 
-            if (intentManager is not null)
-            {
-                // Sprint 38 P1-B: migrate to IntentManager — no goal-name strings in parser.
-                var itemM2  = Regex.Match(json, @"""item""\s*:\s*""(?<v>[^""]+)""", RegexOptions.IgnoreCase);
-                var bpM2    = Regex.Match(json, @"""blueprint""\s*:\s*""(?<v>[^""]+)""", RegexOptions.IgnoreCase);
-                var countM2 = Regex.Match(json, @"""count""\s*:\s*(?<v>\d+)", RegexOptions.IgnoreCase);
-                var partialDraft = new IntentDraft(
-                    addressed,
-                    intent,
-                    itemM2.Success  ? itemM2.Groups["v"].Value  : null,
-                    bpM2.Success    ? bpM2.Groups["v"].Value    : null,
-                    countM2.Success && int.TryParse(countM2.Groups["v"].Value, out var pCount) ? pCount : null,
-                    null, null, null,
-                    1.0, null, response);
-                var goalRequest = intentManager.BuildGoalRequest(partialDraft);
-                goalName   = goalRequest?.GoalName;
-                parameters = goalRequest?.Parameters;
-            }
-            else
-            {
-                // Legacy path — kept for Sprint 21 reflection-based tests that call without IntentManager.
-                // Sprint 39 target: remove once all test callers inject IntentManager.
-                switch (intent.ToLowerInvariant())
-                {
-                    case "gather":
-                    {
-                        var itemM  = Regex.Match(json, @"""item""\s*:\s*""(?<v>[^""]+)""",  RegexOptions.IgnoreCase);
-                        var countM = Regex.Match(json, @"""count""\s*:\s*(?<v>\d+)",         RegexOptions.IgnoreCase);
-                        if (itemM.Success)
-                        {
-                            goalName   = $"GatherItem:{itemM.Groups["v"].Value}";
-                            var cnt    = countM.Success && int.TryParse(countM.Groups["v"].Value, out var c) ? c : 10;
-                            parameters = new Dictionary<string, object?> { ["count"] = cnt };
-                        }
-                        break;
-                    }
-                    case "build":
-                    {
-                        var bpM = Regex.Match(json, @"""blueprint""\s*:\s*""(?<v>[^""]+)""", RegexOptions.IgnoreCase);
-                        if (bpM.Success)
-                            goalName = $"Build:{bpM.Groups["v"].Value}";
-                        break;
-                    }
-                    case "craft":
-                    {
-                        var itemM  = Regex.Match(json, @"""item""\s*:\s*""(?<v>[^""]+)""",  RegexOptions.IgnoreCase);
-                        var countM = Regex.Match(json, @"""count""\s*:\s*(?<v>\d+)",         RegexOptions.IgnoreCase);
-                        if (itemM.Success)
-                        {
-                            goalName   = $"CraftItem:{itemM.Groups["v"].Value}";
-                            var cnt    = countM.Success && int.TryParse(countM.Groups["v"].Value, out var c) ? c : 1;
-                            parameters = new Dictionary<string, object?> { ["count"] = cnt };
-                        }
-                        break;
-                    }
-                }
-            }
+            var item      = itemM.Success  ? itemM.Groups["v"].Value  : null;
+            var blueprint = bpM.Success    ? bpM.Groups["v"].Value    : null;
+            int? count    = countM.Success && int.TryParse(countM.Groups["v"].Value, out var c) ? c : null;
 
-            var intentType = intent.ToLowerInvariant() switch
-            {
-                "gather" or "build" or "craft" => goalName is not null ? ChatIntentType.CreateGoal : ChatIntentType.Unknown,
-                "cancel"                        => ChatIntentType.CancelGoal,
-                "status"                        => ChatIntentType.QueryStatus,
-                "help"                          => ChatIntentType.QueryHelp,
-                "conversation"                  => ChatIntentType.Chat,
-                "clarify"                       => ChatIntentType.Unknown,
-                "ignore"                        => ChatIntentType.NotAddressed,
-                _                               => ChatIntentType.Unknown,
-            };
-
-            return new ChatInterpretation(intentType, goalName, parameters, response);
+            return new IntentDraft(addressed, intent,
+                item, blueprint, count,
+                null, null, null,
+                1.0, null, response);
         }
         catch { return null; }
     }

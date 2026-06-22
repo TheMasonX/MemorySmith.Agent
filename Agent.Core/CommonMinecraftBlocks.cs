@@ -1,1 +1,52 @@
-bmFtZXNwYWNlIEFnZW50LkNvcmU7CgovLy8gPHN1bW1hcnk+Ci8vLyBTaGFyZWQgY2F0YWxvZyBvZiBibG9ja3MgYW5kIHJhdyBpdGVtIGRyb3BzIHRoZSBib3QgY2FuIG9idGFpbiBieSBtaW5pbmcgZGlyZWN0bHkKLy8vIChubyBjcmFmdGluZyBvciBzbWVsdGluZyByZXF1aXJlZCkuCi8vLwovLy8gU3ByaW50IDE0IFAxYTogZXh0cmFjdGVkIGZyb20gc2VwYXJhdGUgc3RhdGljIHNldHMgaW4gSHRuVGFza0xpYnJhcnkgYW5kIEdvYWxGYWN0b3J5Ci8vLyB0byBlbGltaW5hdGUgdGhlIG1hbnVhbC1zeW5jIGZvb3RndW4gZmxhZ2dlZCBpbiBTcHJpbnQgMTMgY291bmNpbCByZXZpZXcgRDEuCi8vLyBCb3RoIEh0blRhc2tMaWJyYXJ5LkRpcmVjdE1pbmVCbG9ja3MgKHBsYW5uaW5nKSBhbmQgR29hbEZhY3RvcnkuQnVpbHRJbkRpcmVjdE1pbmVJdGVtcwovLy8gKGdvYWwgY3JlYXRpb24pIG5vdyByZWZlcmVuY2UgdGhpcyBzaW5nbGUgc291cmNlIG9mIHRydXRoLgovLy8KLy8vIFNwcmludCAxNyBQMDogZXhwYW5kZWQgdG8gaW5jbHVkZSByYXcgb3JlIGRyb3BzIHdoZXJlIHRoZSBkcm9wcGVkIGl0ZW0gbmFtZSBkaWZmZXJzCi8vLyBmcm9tIHRoZSBtaW5lZCBibG9jayBuYW1lIChlLmcuIG1pbmluZyAiZGlhbW9uZF9vcmUiIHlpZWxkcyAiZGlhbW9uZCIsIG5vdCAiZGlhbW9uZF9vcmUiKS4KLy8vIENsYXNzaWZ5U3BlYyBpbiBMb2NhbEtub3dsZWRnZVJlc29sdmVyIGNoZWNrcyB0aGlzIHNldCB0byBjb3JyZWN0bHkgY2xhc3NpZnkgdGhvc2UgaXRlbXMKLy8vIGFzIERpcmVjdE1pbmVhYmxlIHJhdGhlciB0aGFuIENyYWZ0YWJsZS4KLy8vCi8vLyBTcHJpbnQgMzUgUDItQjogZXhwYW5kZWQgdG8gaW5jbHVkZSBjb3BwZXIgb3JlIHZhcmlhbnRzIChhbGwgb3ZlcndvcmxkICsgZGVlcHNsYXRlKQovLy8gYW5kIGFkZGl0aW9uYWwgZGVlcHNsYXRlIHZhcmlhbnRzIG5vdCBwcmV2aW91c2x5IGxpc3RlZC4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHN0YXRpYyBjbGFzcyBDb21tb25NaW5lY3JhZnRCbG9ja3MKewogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIEJsb2NrcyBhbmQgcmF3IGl0ZW0gZHJvcHMgdGhlIGJvdCBjYW4gb2J0YWluIGJ5IG1pbmluZyBkaXJlY3RseSAobm8gY3JhZnRpbmcgb3Igc21lbHRpbmcpLgogICAgLy8vIFVuaW9uIG9mIHRoZSBmb3JtZXIgSHRuVGFza0xpYnJhcnkuRGlyZWN0TWluZUJsb2NrcyBhbmQgR29hbEZhY3RvcnkuQnVpbHRJbkRpcmVjdE1pbmVJdGVtcyBzZXRzLAogICAgLy8vIHBsdXMgcmF3IG9yZSBkcm9wcyB3aGVyZSB0aGUgaXRlbSBuYW1lIGRpZmZlcnMgZnJvbSB0aGUgb3JlIGJsb2NrIG5hbWUuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHVibGljIHN0YXRpYyByZWFkb25seSBIYXNoU2V0PHN0cmluZz4gRGlyZWN0TWluZUJsb2NrcyA9IG5ldyhTdHJpbmdDb21wYXJlci5PcmRpbmFsSWdub3JlQ2FzZSkKICAgIHsKICAgICAgICAvLyBFYXJ0aCAvIHRlcnJhaW4KICAgICAgICAiZGlydCIsICJzYW5kIiwgImdyYXZlbCIsICJjbGF5IiwgInNub3ciLCAic25vd19ibG9jayIsCiAgICAgICAgLy8gU3RvbmUKICAgICAgICAiY29iYmxlc3RvbmUiLCAic3RvbmUiLAogICAgICAgIC8vIFdvb2QgKGFsbCBvdmVyd29ybGQgbG9nIHR5cGVzKQogICAgICAgICJvYWtfbG9nIiwgImJpcmNoX2xvZyIsICJzcHJ1Y2VfbG9nIiwgImRhcmtfb2FrX2xvZyIsCiAgICAgICAgImp1bmdsZV9sb2ciLCAiYWNhY2lhX2xvZyIsICJjaGVycnlfbG9nIiwgIm1hbmdyb3ZlX2xvZyIsCiAgICAgICAgLy8gT3JlcyAoc3VyZmFjZSArIGRlZXBzbGF0ZSDigJQgYmxvY2sgbmFtZXMpCiAgICAgICAgImlyb25fb3JlIiwgICAgICAiZGVlcHNsYXRlX2lyb25fb3JlIiwKICAgICAgICAiZ29sZF9vcmUiLCAgICAgICJkZWVwc2xhdGVfZ29sZF9vcmUiLAogICAgICAgICJjb2FsX29yZSIsICAgICAgImRlZXBzbGF0ZV9jb2FsX29yZSIsCiAgICAgICAgImRpYW1vbmRfb3JlIiwgICAiZGVlcHNsYXRlX2RpYW1vbmRfb3JlIiwKICAgICAgICAicmVkc3RvbmVfb3JlIiwgICJkZWVwc2xhdGVfcmVkc3RvbmVfb3JlIiwKICAgICAgICAibGFwaXNfb3JlIiwgICAgICJkZWVwc2xhdGVfbGFwaXNfb3JlIiwKICAgICAgICAiZW1lcmFsZF9vcmUiLCAgICJkZWVwc2xhdGVfZW1lcmFsZF9vcmUiLAogICAgICAgIC8vIFNwcmludCAzNSBQMi1COiBjb3BwZXIgb3JlIHZhcmlhbnRzCiAgICAgICAgImNvcHBlcl9vcmUiLCAgICAiZGVlcHNsYXRlX2NvcHBlcl9vcmUiLAogICAgICAgIC8vIFJhdyBvcmUgZHJvcHMgKGl0ZW0gSUQgZGlmZmVycyBmcm9tIGJsb2NrIElEIOKAlCBuZWVkZWQgZm9yIENsYXNzaWZ5U3BlYyBjb3JyZWN0bmVzcykKICAgICAgICAvLyBNaW5pbmcgZGlhbW9uZF9vcmUgeWllbGRzICJkaWFtb25kIjsgbWluaW5nIGNvYWxfb3JlIHlpZWxkcyAiY29hbCI7IGV0Yy4KICAgICAgICAiZGlhbW9uZCIsICJjb2FsIiwgImVtZXJhbGQiLCAicmVkc3RvbmUiLCAibGFwaXNfbGF6dWxpIiwKICAgICAgICAvLyBTcHJpbnQgMzUgUDItQjogcmF3IGNvcHBlciBkcm9wCiAgICAgICAgInJhd19jb3BwZXIiLCAicmF3X2lyb24iLCAicmF3X2dvbGQiLAogICAgfTsKfQo=
+namespace Agent.Core;
+
+/// <summary>
+/// Shared catalog of blocks and raw item drops the bot can obtain by mining directly
+/// (no crafting or smelting required).
+///
+/// Sprint 14 P1a: extracted from separate static sets in HtnTaskLibrary and GoalFactory
+/// to eliminate the manual-sync footgun flagged in Sprint 13 council review D1.
+/// Both HtnTaskLibrary.DirectMineBlocks (planning) and GoalFactory.BuiltInDirectMineItems
+/// (goal creation) now reference this single source of truth.
+///
+/// Sprint 17 P0: expanded to include raw ore drops where the dropped item name differs
+/// from the mined block name (e.g. mining "diamond_ore" yields "diamond", not "diamond_ore").
+/// ClassifySpec in LocalKnowledgeResolver checks this set to correctly classify those items
+/// as DirectMineable rather than Craftable.
+///
+/// Sprint 35 P2-B: expanded to include copper ore variants (all overworld + deepslate)
+/// and additional deepslate variants not previously listed.
+/// </summary>
+public static class CommonMinecraftBlocks
+{
+    /// <summary>
+    /// Blocks and raw item drops the bot can obtain by mining directly (no crafting or smelting).
+    /// Union of the former HtnTaskLibrary.DirectMineBlocks and GoalFactory.BuiltInDirectMineItems sets,
+    /// plus raw ore drops where the item name differs from the ore block name.
+    /// </summary>
+    public static readonly HashSet<string> DirectMineBlocks = new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Earth / terrain
+        "dirt", "sand", "gravel", "clay", "snow", "snow_block",
+        // Stone
+        "cobblestone", "stone",
+        // Wood (all overworld log types)
+        "oak_log", "birch_log", "spruce_log", "dark_oak_log",
+        "jungle_log", "acacia_log", "cherry_log", "mangrove_log",
+        // Ores (surface + deepslate — block names)
+        "iron_ore",      "deepslate_iron_ore",
+        "gold_ore",      "deepslate_gold_ore",
+        "coal_ore",      "deepslate_coal_ore",
+        "diamond_ore",   "deepslate_diamond_ore",
+        "redstone_ore",  "deepslate_redstone_ore",
+        "lapis_ore",     "deepslate_lapis_ore",
+        "emerald_ore",   "deepslate_emerald_ore",
+        // Sprint 35 P2-B: copper ore variants
+        "copper_ore",    "deepslate_copper_ore",
+        // Raw ore drops (item ID differs from block ID — needed for ClassifySpec correctness)
+        // Mining diamond_ore yields "diamond"; mining coal_ore yields "coal"; etc.
+        "diamond", "coal", "emerald", "redstone", "lapis_lazuli",
+        // Sprint 35 P2-B: raw copper drop
+        "raw_copper", "raw_iron", "raw_gold",
+    };
+}

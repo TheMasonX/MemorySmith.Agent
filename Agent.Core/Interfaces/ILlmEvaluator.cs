@@ -18,11 +18,16 @@ public interface ILlmEvaluator
     /// </summary>
     /// <param name="goal">The active goal being pursued.</param>
     /// <param name="outcomes">Outcomes accumulated since the last plan was generated.</param>
+    /// <param name="worldState">
+    /// Current world state at evaluation time. Allows the evaluator to cross-check outcomes
+    /// against observed world changes (e.g. inventory delta, position change, health).
+    /// Added in Sprint 39 D-S38-02.
+    /// </param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>
     /// <see langword="true"/> to trigger replanning (agent discards remaining actions and
     /// calls <see cref="IPlanner.PlanAsync"/> again); <see langword="false"/> to continue.
     /// </returns>
     Task<bool> EvaluateAsync(IGoal goal, IReadOnlyList<ActionOutcome> outcomes,
-        CancellationToken ct = default);
+        WorldState worldState, CancellationToken ct = default);
 }

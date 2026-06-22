@@ -333,15 +333,20 @@ public sealed class Sprint25Tests
         var dispatcher = new ToolDispatcher(journal);
         dispatcher.Register(new GetStatusTool(_adapter));
 
-        // Successful call
+        // Sprint 37: CallAsync success NO longer emits ActionCompleted to avoid double-logging with
+        // DispatchActionsAsync's explicit _journal?.LogOutcome(outcome) call. Verify no entry yet.
         await dispatcher.CallAsync("GetStatus", Args("{}"));
+        Assert.That(journal.Entries.Any(e => e.Type == JournalEntryType.ActionCompleted), Is.False,
+            "Sprint 37: CallAsync success does not emit ActionCompleted — caller (DispatchActionsAsync) does.");
 
-        Assert.That(journal.Entries, Has.Count.GreaterThanOrEqualTo(1));
-        Assert.That(journal.Entries.Any(e => e.Type == JournalEntryType.ActionCompleted), Is.True);
+        // Simulate what DispatchActionsAsync does: log the outcome via LogOutcome.
+        var (_, outcome) = await dispatcher.CallWithOutcomeAsync(Guid.NewGuid(), "GetStatus", Args("{}"));
+        ((IAgentJournal)journal).LogOutcome(outcome);  // default interface method — needs interface cast
+        Assert.That(journal.Entries.Any(e => e.Type == JournalEntryType.ActionCompleted), Is.True,
+            "LogOutcome on journal produces ActionCompleted entry.");
 
-        // Unknown tool call (failure)
+        // Unknown tool call still emits ActionFailed directly in CallAsync.
         await dispatcher.CallAsync("NonExistent", Args("{}"));
-
         Assert.That(journal.Entries.Any(e => e.Type == JournalEntryType.ActionFailed), Is.True);
     }
 }

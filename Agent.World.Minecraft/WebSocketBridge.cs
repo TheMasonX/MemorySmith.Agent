@@ -1,1 +1,391 @@
-bmFtZXNwYWNlIEFnZW50LldvcmxkLk1pbmVjcmFmdDsKCnVzaW5nIEFnZW50LkNvcmU7CnVzaW5nIFN5c3RlbS5OZXQuV2ViU29ja2V0czsKdXNpbmcgU3lzdGVtLlJ1bnRpbWUuQ29tcGlsZXJTZXJ2aWNlczsKdXNpbmcgU3lzdGVtLlRleHQ7CnVzaW5nIFN5c3RlbS5UZXh0Lkpzb247CnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuQ2hhbm5lbHM7CgovLy8gPHN1bW1hcnk+Ci8vLyBXZWJTb2NrZXQgYnJpZGdlIGJldHdlZW4gdGhlIEMjIGFnZW50IGhvc3QgYW5kIHRoZSBOb2RlLmpzL01pbmVmbGF5ZXIgcHJvY2Vzcy4KLy8vCi8vLyBTZW5kcyBhY3Rpb24gY29tbWFuZHMgYXMgSlNPTjsgcmVjZWl2ZXMgd29ybGQgZXZlbnRzIGFzIEpTT04uCi8vLyBBIGJhY2tncm91bmQgcmVjZWl2ZSBsb29wIGJ1ZmZlcnMgaW5jb21pbmcgZnJhbWVzIGludG8gYSBDaGFubmVsIHNvIHRoYXQKLy8vIDxzZWUgY3JlZj0iUmVjZWl2ZUFzeW5jIi8+IGFuZCA8c2VlIGNyZWY9IlNlbmRBc3luYyIvPiBjYW4gcnVuIGNvbmN1cnJlbnRseQovLy8gd2l0aG91dCBibG9ja2luZyBlYWNoIG90aGVyLgovLy8KLy8vIEMjIOKGkiBOb2RlIGNvbW1hbmQgcHJvdG9jb2w6Ci8vLyAgIHsiYWN0aW9uIjoibW92ZSIsICAgICJhcmd1bWVudHMiOnsieCI6MTAsInkiOjY0LCJ6IjoyMH19Ci8vLyAgIHsiYWN0aW9uIjoibWluZSIsICAgICJhcmd1bWVudHMiOnsiYmxvY2siOiJtaW5lY3JhZnQ6b2FrX2xvZyIsImNvdW50Ijo1fX0KLy8vICAgeyJhY3Rpb24iOiJzdGF0dXMiLCAgImFyZ3VtZW50cyI6e319Ci8vLwovLy8gTm9kZSDihpIgQyMgZXZlbnQgcHJvdG9jb2w6Ci8vLyAgIHsiZXZlbnQiOiJzcGF3biIsICAgICAgICAieCI6MTAwLCJ5Ijo2NCwieiI6MTAwfQovLy8gICB7ImV2ZW50IjoiaGVhbHRoIiwgICAgICAgImhwIjoyMCwiZm9vZCI6MjB9Ci8vLyAgIHsiZXZlbnQiOiJtb3ZlIiwgICAgICAgICAieCI6MTEwLCJ5Ijo2NCwieiI6MTEwfQovLy8gICB7ImV2ZW50IjoiYmxvY2tNaW5lZCIsICAgImJsb2NrIjoib2FrX2xvZyIsImNvdW50IjozfQovLy8gICB7ImV2ZW50IjoibW92ZUNvbXBsZXRlIiwgIngiOjExMCwieSI6NjQsInoiOjExMH0KLy8vICAgeyJldmVudCI6InN0YXR1cyIsICAgICAgICJ4IjoxMDAsInkiOjY0LCJ6IjoxMDAsImhwIjoyMH0KLy8vICAgeyJldmVudCI6ImVycm9yIiwgICAgICAgICJtZXNzYWdlIjoicGF0aCBibG9ja2VkIn0KLy8vICAgeyJldmVudCI6Iml0ZW1Db2xsZWN0ZWQiLCJpdGVtIjoiZGlhbW9uZCIsImNvdW50IjoxfSAgIFNwcmludCAzNSBQMC1BCi8vLyAgIHsiZXZlbnQiOiJtaW5lQ29tcGxldGUiLCAiYmxvY2siOiJvYWtfbG9nIiwibWluZWQiOjUsInRhcmdldENvdW50Ijo1fSAgU3ByaW50IDM1IFAwLUIKLy8vCi8vLyBXaXJlLW5hbWUgcmVzcG9uc2liaWxpdHk6IGVhY2ggdG9vbCBzZXRzIDxzZWUgY3JlZj0iQWN0aW9uRGF0YS5Ub29sIi8+IHRvIHRoZQovLy8gY29ycmVjdCBOb2RlLmpzIGFjdGlvbiBuYW1lIHZpYSA8c2VlIGNyZWY9IkFjdGlvblByb3RvY29sIi8+IGNvbnN0YW50cy4KLy8vIFRoaXMgYnJpZGdlIGZvcndhcmRzIHRoZSB2YWx1ZSBhcy1pcyAobm8gbG93ZXJjYXNpbmcpLiBTZWUgQURSLTAxMC4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCBjbGFzcyBXZWJTb2NrZXRCcmlkZ2Uoc3RyaW5nIHVyaSkgOiBJRGlzcG9zYWJsZQp7CiAgICBwcml2YXRlIENsaWVudFdlYlNvY2tldD8gX3dzOwogICAgcHJpdmF0ZSByZWFkb25seSBVcmkgX3VyaSA9IG5ldyh1cmkpOwogICAgcHJpdmF0ZSBDYW5jZWxsYXRpb25Ub2tlblNvdXJjZT8gX3JlY2VpdmVDdHM7CgogICAgLy8gSW5ib3VuZCBldmVudHMgYnVmZmVyZWQgZnJvbSB0aGUgYmFja2dyb3VuZCByZWNlaXZlIGxvb3AKICAgIHByaXZhdGUgcmVhZG9ubHkgQ2hhbm5lbDxXb3JsZEV2ZW50PiBfaW5ib3VuZCA9CiAgICAgICAgQ2hhbm5lbC5DcmVhdGVVbmJvdW5kZWQ8V29ybGRFdmVudD4obmV3IFVuYm91bmRlZENoYW5uZWxPcHRpb25zIHsgU2luZ2xlV3JpdGVyID0gdHJ1ZSB9KTsKCiAgICBwcml2YXRlIHN0YXRpYyByZWFkb25seSBKc29uU2VyaWFsaXplck9wdGlvbnMgSnNvbk9wdHMgPSBuZXcoKQogICAgewogICAgICAgIFByb3BlcnR5TmFtZUNhc2VJbnNlbnNpdGl2ZSA9IHRydWUsCiAgICB9OwoKICAgIHB1YmxpYyBib29sIElzT3BlbiA9PiBfd3M/LlN0YXRlID09IFdlYlNvY2tldFN0YXRlLk9wZW47CgogICAgLy8g4pSA4pSAIENvbm5lY3QgLyBDbG9zZSDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBwdWJsaWMgYXN5bmMgVGFzayBDb25uZWN0QXN5bmMoQ2FuY2VsbGF0aW9uVG9rZW4gY2FuY2VsbGF0aW9uVG9rZW4gPSBkZWZhdWx0LAogICAgICAgIHN0cmluZz8gYWRhcHRlclNlY3JldCA9IG51bGwpCiAgICB7CiAgICAgICAgX3dzID0gbmV3IENsaWVudFdlYlNvY2tldCgpOwogICAgICAgIGF3YWl0IF93cy5Db25uZWN0QXN5bmMoX3VyaSwgY2FuY2VsbGF0aW9uVG9rZW4pOwoKICAgICAgICAvLyBTcHJpbnQgMzIgU0VDLTAyOiBzZW5kIGhhbmRzaGFrZSBtZXNzYWdlIHNvIHRoZSBOb2RlLmpzIHNlcnZlciBjYW4gdmFsaWRhdGUKICAgICAgICAvLyB0aGUgc2hhcmVkIHNlY3JldCBiZWZvcmUgYWNjZXB0aW5nIGNvbW1hbmRzLiBUaGUgc2VjcmV0IGlzIG5ldmVyIGxvZ2dlZC4KICAgICAgICAvLyBXaGVuIG51bGwgb3IgZW1wdHksIG5vIGhhbmRzaGFrZSBpcyBzZW50IChkZXYvbG9jYWxob3N0IG1vZGUpLgogICAgICAgIGlmICghc3RyaW5nLklzTnVsbE9yV2hpdGVTcGFjZShhZGFwdGVyU2VjcmV0KSkKICAgICAgICB7CiAgICAgICAgICAgIHVzaW5nIHZhciBtcyA9IG5ldyBTeXN0ZW0uSU8uTWVtb3J5U3RyZWFtKCk7CiAgICAgICAgICAgIHVzaW5nIHZhciB3cml0ZXIgPSBuZXcgVXRmOEpzb25Xcml0ZXIobXMpOwogICAgICAgICAgICB3cml0ZXIuV3JpdGVTdGFydE9iamVjdCgpOwogICAgICAgICAgICB3cml0ZXIuV3JpdGVTdHJpbmcoInR5cGUiLCAiaGFuZHNoYWtlIik7CiAgICAgICAgICAgIHdyaXRlci5Xcml0ZVN0cmluZygic2VjcmV0IiwgYWRhcHRlclNlY3JldCk7CiAgICAgICAgICAgIHdyaXRlci5Xcml0ZUVuZE9iamVjdCgpOwogICAgICAgICAgICBhd2FpdCB3cml0ZXIuRmx1c2hBc3luYyhjYW5jZWxsYXRpb25Ub2tlbik7CiAgICAgICAgICAgIGF3YWl0IF93cy5TZW5kQXN5bmMobXMuVG9BcnJheSgpLCBXZWJTb2NrZXRNZXNzYWdlVHlwZS5UZXh0LAogICAgICAgICAgICAgICAgZW5kT2ZNZXNzYWdlOiB0cnVlLCBjYW5jZWxsYXRpb25Ub2tlbik7CiAgICAgICAgfQoKICAgICAgICAvLyBTdGFydCBiYWNrZ3JvdW5kIHJlY2VpdmUgbG9vcAogICAgICAgIF9yZWNlaXZlQ3RzID0gQ2FuY2VsbGF0aW9uVG9rZW5Tb3VyY2UuQ3JlYXRlTGlua2VkVG9rZW5Tb3VyY2UoY2FuY2VsbGF0aW9uVG9rZW4pOwogICAgICAgIF8gPSBSZWNlaXZlTG9vcEFzeW5jKF9yZWNlaXZlQ3RzLlRva2VuKTsKICAgIH0KCiAgICBwdWJsaWMgYXN5bmMgVGFzayBDbG9zZUFzeW5jKENhbmNlbGxhdGlvblRva2VuIGNhbmNlbGxhdGlvblRva2VuID0gZGVmYXVsdCkKICAgIHsKICAgICAgICBfcmVjZWl2ZUN0cz8uQ2FuY2VsKCk7CiAgICAgICAgaWYgKF93cz8uU3RhdGUgPT0gV2ViU29ja2V0U3RhdGUuT3BlbikKICAgICAgICB7CiAgICAgICAgICAgIHRyeSB7IGF3YWl0IF93cy5DbG9zZUFzeW5jKFdlYlNvY2tldENsb3NlU3RhdHVzLk5vcm1hbENsb3N1cmUsICJEaXNjb25uZWN0IiwgY2FuY2VsbGF0aW9uVG9rZW4pOyB9CiAgICAgICAgICAgIGNhdGNoIHsgLyogYmVzdCBlZmZvcnQgKi8gfQogICAgICAgIH0KICAgIH0KCiAgICAvLyDilIDilIAgU2VuZCDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gU2VyaWFsaXNlcyBhbiA8c2VlIGNyZWY9IkFjdGlvbkRhdGEiLz4gdG8gdGhlIE5vZGUuanMgY29tbWFuZCBwcm90b2NvbAogICAgLy8vIGFuZCBzZW5kcyBpdCBvdmVyIHRoZSBXZWJTb2NrZXQuCiAgICAvLy8KICAgIC8vLyBUaGUgPHNlZSBjcmVmPSJBY3Rpb25EYXRhLlRvb2wiLz4gdmFsdWUgaXMgZm9yd2FyZGVkIGFzLWlzIOKAlCB0b29scyBzZXQgdGhlCiAgICAvLy8gY29ycmVjdCB3aXJlIG5hbWUgdmlhIDxzZWUgY3JlZj0iQWN0aW9uUHJvdG9jb2wiLz4gY29uc3RhbnRzLgogICAgLy8vIDwvc3VtbWFyeT4KICAgIHB1YmxpYyBhc3luYyBUYXNrIFNlbmRBc3luYyhBY3Rpb25EYXRhIGFjdGlvbiwgQ2FuY2VsbGF0aW9uVG9rZW4gY2FuY2VsbGF0aW9uVG9rZW4gPSBkZWZhdWx0KQogICAgewogICAgICAgIGlmIChfd3MgaXMgbm90IHsgU3RhdGU6IFdlYlNvY2tldFN0YXRlLk9wZW4gfSkKICAgICAgICAgICAgdGhyb3cgbmV3IEludmFsaWRPcGVyYXRpb25FeGNlcHRpb24oIldlYlNvY2tldCBpcyBub3QgY29ubmVjdGVkLiIpOwoKICAgICAgICB1c2luZyB2YXIgbXMgPSBuZXcgU3lzdGVtLklPLk1lbW9yeVN0cmVhbSgpOwogICAgICAgIHVzaW5nIHZhciB3cml0ZXIgPSBuZXcgVXRmOEpzb25Xcml0ZXIobXMpOwoKICAgICAgICB3cml0ZXIuV3JpdGVTdGFydE9iamVjdCgpOwogICAgICAgIHdyaXRlci5Xcml0ZVN0cmluZygiYWN0aW9uIiwgYWN0aW9uLlRvb2wpOyAvLyB3aXJlIG5hbWUgc2V0IGJ5IHRoZSB0b29sIHZpYSBBY3Rpb25Qcm90b2NvbAogICAgICAgIHdyaXRlci5Xcml0ZVByb3BlcnR5TmFtZSgiYXJndW1lbnRzIik7CiAgICAgICAgd3JpdGVyLldyaXRlU3RhcnRPYmplY3QoKTsKICAgICAgICBmb3JlYWNoICh2YXIga3YgaW4gYWN0aW9uLkFyZ3VtZW50cykKICAgICAgICB7CiAgICAgICAgICAgIHN3aXRjaCAoa3YuVmFsdWUpCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgIGNhc2UgaW50IGk6ICAgIHdyaXRlci5Xcml0ZU51bWJlcihrdi5LZXksIGkpOyAgYnJlYWs7CiAgICAgICAgICAgICAgICBjYXNlIGxvbmcgbDogICB3cml0ZXIuV3JpdGVOdW1iZXIoa3YuS2V5LCBsKTsgIGJyZWFrOwogICAgICAgICAgICAgICAgY2FzZSBkb3VibGUgZDogd3JpdGVyLldyaXRlTnVtYmVyKGt2LktleSwgZCk7ICBicmVhazsKICAgICAgICAgICAgICAgIGNhc2UgZmxvYXQgZjogIHdyaXRlci5Xcml0ZU51bWJlcihrdi5LZXksIGYpOyAgYnJlYWs7CiAgICAgICAgICAgICAgICBjYXNlIGJvb2wgYjogICB3cml0ZXIuV3JpdGVCb29sZWFuKGt2LktleSwgYik7IGJyZWFrOwogICAgICAgICAgICAgICAgY2FzZSBudWxsOiAgICAgd3JpdGVyLldyaXRlTnVsbChrdi5LZXkpOyAgICAgICAgYnJlYWs7CiAgICAgICAgICAgICAgICBkZWZhdWx0OiAgICAgICB3cml0ZXIuV3JpdGVTdHJpbmcoa3YuS2V5LCBrdi5WYWx1ZS5Ub1N0cmluZygpKTsgYnJlYWs7CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgd3JpdGVyLldyaXRlRW5kT2JqZWN0KCk7CiAgICAgICAgd3JpdGVyLldyaXRlRW5kT2JqZWN0KCk7CiAgICAgICAgYXdhaXQgd3JpdGVyLkZsdXNoQXN5bmMoY2FuY2VsbGF0aW9uVG9rZW4pOwoKICAgICAgICBhd2FpdCBfd3MuU2VuZEFzeW5jKG1zLlRvQXJyYXkoKSwgV2ViU29ja2V0TWVzc2FnZVR5cGUuVGV4dCwgZW5kT2ZNZXNzYWdlOiB0cnVlLCBjYW5jZWxsYXRpb25Ub2tlbik7CiAgICB9CgogICAgLy8g4pSA4pSAIFJlY2VpdmUgKGNvbnN1bWVyLWZhY2luZykg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIFN0cmVhbXMgPHNlZSBjcmVmPSJXb3JsZEV2ZW50Ii8+cyBhcyB0aGV5IGFycml2ZSBmcm9tIE5vZGUuanMuCiAgICAvLy8gRXZlbnRzIGFyZSBidWZmZXJlZCBieSB0aGUgYmFja2dyb3VuZCBsb29wIHNvIHRoaXMgbmV2ZXIgcmFjZXMgd2l0aAogICAgLy8vIDxzZWUgY3JlZj0iU2VuZEFzeW5jIi8+LgogICAgLy8vIDwvc3VtbWFyeT4KICAgIHB1YmxpYyBhc3luYyBJQXN5bmNFbnVtZXJhYmxlPFdvcmxkRXZlbnQ+IFJlY2VpdmVBc3luYygKICAgICAgICBbRW51bWVyYXRvckNhbmNlbGxhdGlvbl0gQ2FuY2VsbGF0aW9uVG9rZW4gY2FuY2VsbGF0aW9uVG9rZW4gPSBkZWZhdWx0KQogICAgewogICAgICAgIHdoaWxlICghY2FuY2VsbGF0aW9uVG9rZW4uSXNDYW5jZWxsYXRpb25SZXF1ZXN0ZWQpCiAgICAgICAgewogICAgICAgICAgICBXb3JsZEV2ZW50IGV2OwogICAgICAgICAgICB0cnkgeyBldiA9IGF3YWl0IF9pbmJvdW5kLlJlYWRlci5SZWFkQXN5bmMoY2FuY2VsbGF0aW9uVG9rZW4pOyB9CiAgICAgICAgICAgIGNhdGNoIChPcGVyYXRpb25DYW5jZWxlZEV4Y2VwdGlvbikgeyB5aWVsZCBicmVhazsgfQogICAgICAgICAgICBjYXRjaCAoQ2hhbm5lbENsb3NlZEV4Y2VwdGlvbikgeyB5aWVsZCBicmVhazsgfQogICAgICAgICAgICB5aWVsZCByZXR1cm4gZXY7CiAgICAgICAgfQogICAgfQoKICAgIC8vIOKUgOKUgCBCYWNrZ3JvdW5kIHJlY2VpdmUgbG9vcCDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBwcml2YXRlIGFzeW5jIFRhc2sgUmVjZWl2ZUxvb3BBc3luYyhDYW5jZWxsYXRpb25Ub2tlbiBjdCkKICAgIHsKICAgICAgICB2YXIgYnVmZmVyID0gbmV3IGJ5dGVbMzJfNzY4XTsKICAgICAgICB2YXIgc2IgPSBuZXcgU3RyaW5nQnVpbGRlcig0MDk2KTsKCiAgICAgICAgdHJ5CiAgICAgICAgewogICAgICAgICAgICB3aGlsZSAoX3dzIGlzIHsgU3RhdGU6IFdlYlNvY2tldFN0YXRlLk9wZW4gfSAmJiAhY3QuSXNDYW5jZWxsYXRpb25SZXF1ZXN0ZWQpCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgIHNiLkNsZWFyKCk7CiAgICAgICAgICAgICAgICBXZWJTb2NrZXRSZWNlaXZlUmVzdWx0IHJlc3VsdDsKCiAgICAgICAgICAgICAgICAvLyBSZWFzc2VtYmxlIG11bHRpLWZyYW1lIG1lc3NhZ2VzCiAgICAgICAgICAgICAgICBkbwogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgIHJlc3VsdCA9IGF3YWl0IF93cy5SZWNlaXZlQXN5bmMoYnVmZmVyLCBjdCk7CiAgICAgICAgICAgICAgICAgICAgaWYgKHJlc3VsdC5NZXNzYWdlVHlwZSA9PSBXZWJTb2NrZXRNZXNzYWdlVHlwZS5DbG9zZSkgcmV0dXJuOwogICAgICAgICAgICAgICAgICAgIHNiLkFwcGVuZChFbmNvZGluZy5VVEY4LkdldFN0cmluZyhidWZmZXIsIDAsIHJlc3VsdC5Db3VudCkpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgd2hpbGUgKCFyZXN1bHQuRW5kT2ZNZXNzYWdlKTsKCiAgICAgICAgICAgICAgICB2YXIgZXYgPSBQYXJzZUV2ZW50KHNiLlRvU3RyaW5nKCkpOwogICAgICAgICAgICAgICAgaWYgKGV2IGlzIG5vdCBudWxsKQogICAgICAgICAgICAgICAgICAgIF9pbmJvdW5kLldyaXRlci5UcnlXcml0ZShldik7CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgY2F0Y2ggKE9wZXJhdGlvbkNhbmNlbGVkRXhjZXB0aW9uKSB7IC8qIG5vcm1hbCBzaHV0ZG93biAqLyB9CiAgICAgICAgY2F0Y2ggKFdlYlNvY2tldEV4Y2VwdGlvbikgeyAvKiBjb25uZWN0aW9uIGRyb3BwZWQgKi8gfQogICAgICAgIGZpbmFsbHkKICAgICAgICB7CiAgICAgICAgICAgIF9pbmJvdW5kLldyaXRlci5UcnlDb21wbGV0ZSgpOwogICAgICAgIH0KICAgIH0KCiAgICAvLyDilIDilIAgSlNPTiBwYXJzaW5nIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBTcHJpbnQgM2E6IFBhcnNlIEpTT04gaW50byB0eXBlZCBldmVudCBzdWJ0eXBlcyBpbnN0ZWFkIG9mCiAgICAvLy8gPGM+V29ybGRFdmVudChzdHJpbmcsIERpY3Rpb25hcnksIERhdGVUaW1lT2Zmc2V0KTwvYz4uCiAgICAvLy8gU3ByaW50IDM1IFAwLUE6IEFkZGVkIGl0ZW1Db2xsZWN0ZWQg4oaSIEl0ZW1Db2xsZWN0ZWRFdmVudC4KICAgIC8vLyBTcHJpbnQgMzUgUDAtQjogQWRkZWQgbWluZUNvbXBsZXRlIOKGkiBNaW5lQ29tcGxldGVFdmVudC4KICAgIC8vLyBTcHJpbnQgMzUgUDAtQzogRmxhdEFyZWFGb3VuZEV2ZW50IG5vdyBpbmNsdWRlcyBTZWFyY2hlZFJhZGl1cy4KICAgIC8vLyA8L3N1bW1hcnk+CiAgICBwcml2YXRlIHN0YXRpYyBXb3JsZEV2ZW50PyBQYXJzZUV2ZW50KHN0cmluZyBqc29uKQogICAgewogICAgICAgIHRyeQogICAgICAgIHsKICAgICAgICAgICAgdXNpbmcgdmFyIGRvYyA9IEpzb25Eb2N1bWVudC5QYXJzZShqc29uKTsKICAgICAgICAgICAgdmFyIHJvb3QgPSBkb2MuUm9vdEVsZW1lbnQ7CgogICAgICAgICAgICBpZiAoIXJvb3QuVHJ5R2V0UHJvcGVydHkoImV2ZW50Iiwgb3V0IHZhciBldmVudFByb3ApKQogICAgICAgICAgICAgICAgcmV0dXJuIG51bGw7CgogICAgICAgICAgICB2YXIgZXZlbnRUeXBlID0gZXZlbnRQcm9wLkdldFN0cmluZygpID8/IHN0cmluZy5FbXB0eTsKICAgICAgICAgICAgdmFyIG5vdyAgICAgICA9IERhdGVUaW1lT2Zmc2V0LlV0Y05vdzsKCiAgICAgICAgICAgIHJldHVybiBldmVudFR5cGUgc3dpdGNoCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICJzcGF3biIgPT4gbmV3IFNwYXduRXZlbnQoCiAgICAgICAgICAgICAgICAgICAgUG9zOiBuZXcgUG9zaXRpb24oR2V0SW50KHJvb3QsICJ4IiksIEdldEludChyb290LCAieSIpLCBHZXRJbnQocm9vdCwgInoiKSksCiAgICAgICAgICAgICAgICAgICAgSGVhbHRoOiBHZXRJbnQocm9vdCwgImhwIiwgMjApLAogICAgICAgICAgICAgICAgICAgIEZvb2Q6IEdldEludChyb290LCAiZm9vZCIsIDIwKSwKICAgICAgICAgICAgICAgICAgICBUaW1lc3RhbXA6IG5vdyksCgogICAgICAgICAgICAgICAgImhlYWx0aCIgPT4gbmV3IEhlYWx0aEV2ZW50KAogICAgICAgICAgICAgICAgICAgIEhlYWx0aDogR2V0SW50KHJvb3QsICJocCIsIDIwKSwKICAgICAgICAgICAgICAgICAgICBGb29kOiBHZXRJbnQocm9vdCwgImZvb2QiLCAyMCksCiAgICAgICAgICAgICAgICAgICAgVGltZXN0YW1wOiBub3cpLAoKICAgICAgICAgICAgICAgICJnYW1lTW9kZSIgPT4gbmV3IEdhbWVNb2RlQ2hhbmdlZEV2ZW50KAogICAgICAgICAgICAgICAgICAgIE1vZGU6IEdldFN0cmluZyhyb290LCAibW9kZSIpID8/ICJ1bmtub3duIiwKICAgICAgICAgICAgICAgICAgICBUaW1lc3RhbXA6IG5vdyksCgogICAgICAgICAgICAgICAgIm1vdmUiIG9yICJtb3ZlQ29tcGxldGUiID0+IG5ldyBNb3ZlRXZlbnQoCiAgICAgICAgICAgICAgICAgICAgUG9zOiBuZXcgUG9zaXRpb24oR2V0SW50KHJvb3QsICJ4IiksIEdldEludChyb290LCAieSIpLCBHZXRJbnQocm9vdCwgInoiKSksCiAgICAgICAgICAgICAgICAgICAgVGltZXN0YW1wOiBub3cpLAoKICAgICAgICAgICAgICAgICJibG9ja01pbmVkIiA9PiBuZXcgQmxvY2tNaW5lZEV2ZW50KAogICAgICAgICAgICAgICAgICAgIEJsb2NrOiBHZXRTdHJpbmcocm9vdCwgImJsb2NrIikgPz8gInVua25vd24iLAogICAgICAgICAgICAgICAgICAgIENvdW50OiBHZXRJbnQocm9vdCwgImNvdW50IiwgMSksCiAgICAgICAgICAgICAgICAgICAgUG9zOiBuZXcgUG9zaXRpb24oR2V0SW50KHJvb3QsICJ4IiksIEdldEludChyb290LCAieSIpLCBHZXRJbnQocm9vdCwgInoiKSksCiAgICAgICAgICAgICAgICAgICAgVGltZXN0YW1wOiBub3cpLAoKICAgICAgICAgICAgICAgIC8vIFNwcmludCAzNSBQMC1BOiBhY3R1YWwgaXRlbSBjb2xsZWN0ZWQgYnkgdGhlIGJvdCAocGxheWVyQ29sbGVjdCBldmVudCBpbiBNaW5lZmxheWVyKS4KICAgICAgICAgICAgICAgIC8vIFByb3ZpZGVzIHRoZSB0cnVlIGRyb3AgbmFtZSAoZS5nLiAiZGlhbW9uZCIgZnJvbSBkaWFtb25kX29yZSwgImNvYmJsZXN0b25lIiBmcm9tIHN0b25lKS4KICAgICAgICAgICAgICAgIC8vIEd1YXJkIGluIGluZGV4LmpzIGVuc3VyZXMgb25seSB0aGUgYm90J3Mgb3duIGNvbGxlY3Rpb25zIHJlYWNoIGhlcmUuCiAgICAgICAgICAgICAgICAiaXRlbUNvbGxlY3RlZCIgPT4gbmV3IEl0ZW1Db2xsZWN0ZWRFdmVudCgKICAgICAgICAgICAgICAgICAgICBJdGVtOiBHZXRTdHJpbmcocm9vdCwgIml0ZW0iKSA/PyAidW5rbm93biIsCiAgICAgICAgICAgICAgICAgICAgQ291bnQ6IEdldEludChyb290LCAiY291bnQiLCAxKSwKICAgICAgICAgICAgICAgICAgICBUaW1lc3RhbXA6IG5vdyksCgogICAgICAgICAgICAgICAgLy8gU3ByaW50IDM1IFAwLUI6IG1pbmluZyBsb29wIGNvbXBsZXRlZCDigJQgZGVmaW5pdGl2ZSBlbmQtb2YtbWluZSBzaWduYWwuCiAgICAgICAgICAgICAgICAibWluZUNvbXBsZXRlIiA9PiBuZXcgTWluZUNvbXBsZXRlRXZlbnQoCiAgICAgICAgICAgICAgICAgICAgQmxvY2s6IEdldFN0cmluZyhyb290LCAiYmxvY2siKSA/PyAidW5rbm93biIsCiAgICAgICAgICAgICAgICAgICAgTWluZWQ6IEdldEludChyb290LCAibWluZWQiKSwKICAgICAgICAgICAgICAgICAgICBUYXJnZXRDb3VudDogR2V0SW50KHJvb3QsICJ0YXJnZXRDb3VudCIpLAogICAgICAgICAgICAgICAgICAgIFRpbWVzdGFtcDogbm93KSwKCiAgICAgICAgICAgICAgICAiY2hhdCIgPT4gbmV3IENoYXRFdmVudCgKICAgICAgICAgICAgICAgICAgICBVc2VybmFtZTogR2V0U3RyaW5nKHJvb3QsICJ1c2VybmFtZSIpID8/ICI/IiwKICAgICAgICAgICAgICAgICAgICBNZXNzYWdlOiBHZXRTdHJpbmcocm9vdCwgIm1lc3NhZ2UiKSA/PyBzdHJpbmcuRW1wdHksCiAgICAgICAgICAgICAgICAgICAgT25saW5lUGxheWVyczogR2V0SW50KHJvb3QsICJvbmxpbmVQbGF5ZXJzIiwgMSksCiAgICAgICAgICAgICAgICAgICAgUGxheWVyUG9zOiByb290LlRyeUdldFByb3BlcnR5KCJwbGF5ZXJYIiwgb3V0IF8pCiAgICAgICAgICAgICAgICAgICAgICAgID8gbmV3IFBvc2l0aW9uKEdldEludChyb290LCAicGxheWVyWCIpLCBHZXRJbnQocm9vdCwgInBsYXllclkiKSwgR2V0SW50KHJvb3QsICJwbGF5ZXJaIikpCiAgICAgICAgICAgICAgICAgICAgICAgIDogbnVsbCwKICAgICAgICAgICAgICAgICAgICBUaW1lc3RhbXA6IG5vdyksCgogICAgICAgICAgICAgICAgImVycm9yIiA9PiBuZXcgRXJyb3JFdmVudCgKICAgICAgICAgICAgICAgICAgICBBY3Rpb246IEdldFN0cmluZyhyb290LCAiYWN0aW9uIikgPz8gIj8iLAogICAgICAgICAgICAgICAgICAgIE1lc3NhZ2U6IEdldFN0cmluZyhyb290LCAibWVzc2FnZSIpID8/ICJ1bmtub3duIiwKICAgICAgICAgICAgICAgICAgICBUaW1lc3RhbXA6IG5vdyksCgogICAgICAgICAgICAgICAgImJsb2NrTm90Rm91bmQiID0+IG5ldyBCbG9ja05vdEZvdW5kRXZlbnQoCiAgICAgICAgICAgICAgICAgICAgQmxvY2s6IEdldFN0cmluZyhyb290LCAiYmxvY2siKSA/PyAiPyIsCiAgICAgICAgICAgICAgICAgICAgTWluZWRDb3VudDogR2V0SW50KHJvb3QsICJtaW5lZCIpLAogICAgICAgICAgICAgICAgICAgIFRpbWVzdGFtcDogbm93KSwKCiAgICAgICAgICAgICAgICAiY3JhZnRDb21wbGV0ZSIgPT4gbmV3IENyYWZ0Q29tcGxldGVFdmVudCgKICAgICAgICAgICAgICAgICAgICBJdGVtOiBHZXRTdHJpbmcocm9vdCwgIml0ZW0iKSA/PyAiPyIsCiAgICAgICAgICAgICAgICAgICAgQ291bnQ6IEdldEludChyb290LCAiY291bnQiLCAxKSwKICAgICAgICAgICAgICAgICAgICBUaW1lc3RhbXA6IG5vdyksCgogICAgICAgICAgICAgICAgInNtZWx0Q29tcGxldGUiID0+IG5ldyBTbWVsdENvbXBsZXRlRXZlbnQoCiAgICAgICAgICAgICAgICAgICAgSW5wdXQ6IEdldFN0cmluZyhyb290LCAiaXRlbSIpID8/ICI/IiwKICAgICAgICAgICAgICAgICAgICBSZXN1bHQ6IEdldFN0cmluZyhyb290LCAicmVzdWx0IikgPz8gIj8iLAogICAgICAgICAgICAgICAgICAgIENvdW50OiBHZXRJbnQocm9vdCwgImNvdW50IiwgMSksCiAgICAgICAgICAgICAgICAgICAgVGltZXN0YW1wOiBub3cpLAoKICAgICAgICAgICAgICAgICJkZWF0aCIgPT4gbmV3IERlYXRoRXZlbnQoCiAgICAgICAgICAgICAgICAgICAgUG9zOiBuZXcgUG9zaXRpb24oR2V0SW50KHJvb3QsICJ4IiksIEdldEludChyb290LCAieSIpLCBHZXRJbnQocm9vdCwgInoiKSksCiAgICAgICAgICAgICAgICAgICAgVGltZXN0YW1wOiBub3cpLAoKICAgICAgICAgICAgICAgICJzdGF0dXMiID0+IFBhcnNlU3RhdHVzKHJvb3QsIG5vdyksCgogICAgICAgICAgICAgICAgImJsb2NrUGxhY2VkIiA9PiBuZXcgQmxvY2tQbGFjZWRFdmVudCgKICAgICAgICAgICAgICAgICAgICBYOiBHZXRJbnQocm9vdCwgIngiKSwgWTogR2V0SW50KHJvb3QsICJ5IiksIFo6IEdldEludChyb290LCAieiIpLAogICAgICAgICAgICAgICAgICAgIEJsb2NrOiBHZXRTdHJpbmcocm9vdCwgImJsb2NrIikgPz8gIj8iLAogICAgICAgICAgICAgICAgICAgIFRpbWVzdGFtcDogbm93KSwKCiAgICAgICAgICAgICAgICAid2FuZGVyQ29tcGxldGUiID0+IG5ldyBXYW5kZXJDb21wbGV0ZUV2ZW50KAogICAgICAgICAgICAgICAgICAgIFBvczogbmV3IFBvc2l0aW9uKEdldEludChyb290LCAieCIpLCBHZXRJbnQocm9vdCwgInkiKSwgR2V0SW50KHJvb3QsICJ6IikpLAogICAgICAgICAgICAgICAgICAgIFRhcmdldFg6IEdldEludChyb290LCAidGFyZ2V0WCIpLAogICAgICAgICAgICAgICAgICAgIFRhcmdldFo6IEdldEludChyb290LCAidGFyZ2V0WiIpLAogICAgICAgICAgICAgICAgICAgIFRpbWVzdGFtcDogbm93KSwKCiAgICAgICAgICAgICAgICAid2FuZGVyRmFpbGVkIiA9PiBuZXcgV2FuZGVyRmFpbGVkRXZlbnQoCiAgICAgICAgICAgICAgICAgICAgTWVzc2FnZTogR2V0U3RyaW5nKHJvb3QsICJtZXNzYWdlIikgPz8gIj8iLAogICAgICAgICAgICAgICAgICAgIFBvczogbmV3IFBvc2l0aW9uKEdldEludChyb290LCAieCIpLCBHZXRJbnQocm9vdCwgInkiKSwgR2V0SW50KHJvb3QsICJ6IikpLAogICAgICAgICAgICAgICAgICAgIFRpbWVzdGFtcDogbm93KSwKCiAgICAgICAgICAgICAgICAia2lja2VkIiA9PiBuZXcgS2lja2VkRXZlbnQoCiAgICAgICAgICAgICAgICAgICAgUmVhc29uOiBHZXRTdHJpbmcocm9vdCwgInJlYXNvbiIpID8/ICI/IiwKICAgICAgICAgICAgICAgICAgICBUaW1lc3RhbXA6IG5vdyksCgogICAgICAgICAgICAgICAgLy8gU3ByaW50IDM1IFAwLUM6IG5vdyBwYXJzZXMgU2VhcmNoZWRSYWRpdXMgc28gQnVpbGRHb2FsRGVjb21wb3NlcgogICAgICAgICAgICAgICAgLy8gY2FuIGRpc3Rpbmd1aXNoICJzZWFyY2hlZCBzbWFsbCByYWRpdXMiIGZyb20gInNlYXJjaGVkIG1heGltdW0gcmFkaXVzIi4KICAgICAgICAgICAgICAgICJmbGF0QXJlYUZvdW5kIiA9PiBuZXcgRmxhdEFyZWFGb3VuZEV2ZW50KAogICAgICAgICAgICAgICAgICAgIFg6IEdldEludChyb290LCAieCIpLAogICAgICAgICAgICAgICAgICAgIFk6IEdldEludChyb290LCAieSIpLAogICAgICAgICAgICAgICAgICAgIFo6IEdldEludChyb290LCAieiIpLAogICAgICAgICAgICAgICAgICAgIEFyZWE6IEdldEludChyb290LCAiYXJlYSIpLAogICAgICAgICAgICAgICAgICAgIE1pblg6IEdldEludChyb290LCAibWluWCIpLAogICAgICAgICAgICAgICAgICAgIE1heFg6IEdldEludChyb290LCAibWF4WCIpLAogICAgICAgICAgICAgICAgICAgIE1pblo6IEdldEludChyb290LCAibWluWiIpLAogICAgICAgICAgICAgICAgICAgIE1heFo6IEdldEludChyb290LCAibWF4WiIpLAogICAgICAgICAgICAgICAgICAgIFNlYXJjaGVkUmFkaXVzOiBHZXRJbnQocm9vdCwgInNlYXJjaGVkUmFkaXVzIiwgMzIpLAogICAgICAgICAgICAgICAgICAgIFRpbWVzdGFtcDogbm93KSwKCiAgICAgICAgICAgICAgICBfID0+IG51bGwsIC8vIHVua25vd24gZXZlbnQgdHlwZSDigJQgaWdub3JlZAogICAgICAgICAgICB9OwogICAgICAgIH0KICAgICAgICBjYXRjaAogICAgICAgIHsKICAgICAgICAgICAgcmV0dXJuIG51bGw7CiAgICAgICAgfQogICAgfQoKICAgIHByaXZhdGUgc3RhdGljIFN0YXR1c0V2ZW50IFBhcnNlU3RhdHVzKEpzb25FbGVtZW50IHJvb3QsIERhdGVUaW1lT2Zmc2V0IG5vdykKICAgIHsKICAgICAgICB2YXIgaW52ID0gbmV3IERpY3Rpb25hcnk8c3RyaW5nLCBpbnQ+KCk7CiAgICAgICAgaWYgKHJvb3QuVHJ5R2V0UHJvcGVydHkoImludmVudG9yeSIsIG91dCB2YXIgaW52RWwpKQogICAgICAgIHsKICAgICAgICAgICAgaWYgKGludkVsLlZhbHVlS2luZCA9PSBKc29uVmFsdWVLaW5kLlN0cmluZykKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgLy8gbGVnYWN5OiBpbnZlbnRvcnkgc2VudCBhcyBKU09OIHN0cmluZwogICAgICAgICAgICAgICAgdHJ5CiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgdXNpbmcgdmFyIGludkRvYyA9IEpzb25Eb2N1bWVudC5QYXJzZShpbnZFbC5HZXRTdHJpbmcoKSEpOwogICAgICAgICAgICAgICAgICAgIGZvcmVhY2ggKHZhciBwcm9wIGluIGludkRvYy5Sb290RWxlbWVudC5FbnVtZXJhdGVPYmplY3QoKSkKICAgICAgICAgICAgICAgICAgICAgICAgaWYgKHByb3AuVmFsdWUuVHJ5R2V0SW50MzIob3V0IHZhciBxdHkpICYmIHF0eSA+IDApCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbnZbcHJvcC5OYW1lXSA9IHF0eTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGNhdGNoIHsgLyogbWFsZm9ybWVkIGludmVudG9yeSDigJQgbGVhdmUgZW1wdHkgKi8gfQogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsc2UgaWYgKGludkVsLlZhbHVlS2luZCA9PSBKc29uVmFsdWVLaW5kLk9iamVjdCkKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgZm9yZWFjaCAodmFyIHByb3AgaW4gaW52RWwuRW51bWVyYXRlT2JqZWN0KCkpCiAgICAgICAgICAgICAgICAgICAgaWYgKHByb3AuVmFsdWUuVHJ5R2V0SW50MzIob3V0IHZhciBxdHkpICYmIHF0eSA+IDApCiAgICAgICAgICAgICAgICAgICAgICAgIGludltwcm9wLk5hbWVdID0gcXR5OwogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICByZXR1cm4gbmV3IFN0YXR1c0V2ZW50KAogICAgICAgICAgICBQb3M6IG5ldyBQb3NpdGlvbihHZXRJbnQocm9vdCwgIngiKSwgR2V0SW50KHJvb3QsICJ5IiksIEdldEludChyb290LCAieiIpKSwKICAgICAgICAgICAgSGVhbHRoOiBHZXRJbnQocm9vdCwgImhwIiwgMjApLAogICAgICAgICAgICBGb29kOiBHZXRJbnQocm9vdCwgImZvb2QiLCAyMCksCiAgICAgICAgICAgIEludmVudG9yeTogaW52LAogICAgICAgICAgICBHYW1lTW9kZTogR2V0U3RyaW5nKHJvb3QsICJnYW1lTW9kZSIpLAogICAgICAgICAgICBUaW1lc3RhbXA6IG5vdyk7CiAgICB9CgogICAgLy8g4pSA4pSAIEpTT04gaGVscGVycyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBwcml2YXRlIHN0YXRpYyBpbnQgR2V0SW50KEpzb25FbGVtZW50IHJvb3QsIHN0cmluZyBrZXksIGludCBkZWZhdWx0VmFsdWUgPSAwKQogICAgewogICAgICAgIGlmICghcm9vdC5UcnlHZXRQcm9wZXJ0eShrZXksIG91dCB2YXIgZWwpKSByZXR1cm4gZGVmYXVsdFZhbHVlOwogICAgICAgIHJldHVybiBlbC5WYWx1ZUtpbmQgPT0gSnNvblZhbHVlS2luZC5OdW1iZXIgJiYgZWwuVHJ5R2V0SW50MzIob3V0IHZhciBpKQogICAgICAgICAgICA/IGkgOiBkZWZhdWx0VmFsdWU7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgc3RyaW5nPyBHZXRTdHJpbmcoSnNvbkVsZW1lbnQgcm9vdCwgc3RyaW5nIGtleSwgc3RyaW5nPyBkZWZhdWx0VmFsdWUgPSBudWxsKQogICAgewogICAgICAgIGlmICghcm9vdC5UcnlHZXRQcm9wZXJ0eShrZXksIG91dCB2YXIgZWwpKSByZXR1cm4gZGVmYXVsdFZhbHVlOwogICAgICAgIHJldHVybiBlbC5WYWx1ZUtpbmQgPT0gSnNvblZhbHVlS2luZC5TdHJpbmcgPyBlbC5HZXRTdHJpbmcoKSA6IGRlZmF1bHRWYWx1ZTsKICAgIH0KCiAgICAvLyDilIDilIAgRGlzcG9zZSDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBwdWJsaWMgdm9pZCBEaXNwb3NlKCkKICAgIHsKICAgICAgICBfcmVjZWl2ZUN0cz8uQ2FuY2VsKCk7CiAgICAgICAgX3JlY2VpdmVDdHM/LkRpc3Bvc2UoKTsKICAgICAgICBfd3M/LkRpc3Bvc2UoKTsKICAgIH0KfQo=
+namespace Agent.World.Minecraft;
+
+using Agent.Core;
+using System.Net.WebSockets;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Channels;
+
+/// <summary>
+/// WebSocket bridge between the C# agent host and the Node.js/Mineflayer process.
+///
+/// Sends action commands as JSON; receives world events as JSON.
+/// A background receive loop buffers incoming frames into a Channel so that
+/// <see cref="ReceiveAsync"/> and <see cref="SendAsync"/> can run concurrently
+/// without blocking each other.
+///
+/// C# → Node command protocol:
+///   {"action":"move",    "arguments":{"x":10,"y":64,"z":20}}
+///   {"action":"mine",    "arguments":{"block":"minecraft:oak_log","count":5}}
+///   {"action":"status",  "arguments":{}}
+///
+/// Node → C# event protocol:
+///   {"event":"spawn",        "x":100,"y":64,"z":100}
+///   {"event":"health",       "hp":20,"food":20}
+///   {"event":"move",         "x":110,"y":64,"z":110}
+///   {"event":"blockMined",   "block":"oak_log","count":3}
+///   {"event":"moveComplete", "x":110,"y":64,"z":110}
+///   {"event":"status",       "x":100,"y":64,"z":100,"hp":20}
+///   {"event":"error",        "message":"path blocked"}
+///   {"event":"itemCollected","item":"diamond","count":1}   Sprint 35 P0-A
+///   {"event":"mineComplete", "block":"oak_log","mined":5,"targetCount":5}  Sprint 35 P0-B
+///
+/// Wire-name responsibility: each tool sets <see cref="ActionData.Tool"/> to the
+/// correct Node.js action name via <see cref="ActionProtocol"/> constants.
+/// This bridge forwards the value as-is (no lowercasing). See ADR-010.
+/// </summary>
+public sealed class WebSocketBridge(string uri) : IDisposable
+{
+    private ClientWebSocket? _ws;
+    private readonly Uri _uri = new(uri);
+    private CancellationTokenSource? _receiveCts;
+
+    // Inbound events buffered from the background receive loop
+    private readonly Channel<WorldEvent> _inbound =
+        Channel.CreateUnbounded<WorldEvent>(new UnboundedChannelOptions { SingleWriter = true });
+
+    private static readonly JsonSerializerOptions JsonOpts = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
+
+    public bool IsOpen => _ws?.State == WebSocketState.Open;
+
+    // ── Connect / Close ──────────────────────────────────────────────────────
+
+    public async Task ConnectAsync(CancellationToken cancellationToken = default,
+        string? adapterSecret = null)
+    {
+        _ws = new ClientWebSocket();
+        await _ws.ConnectAsync(_uri, cancellationToken);
+
+        // Sprint 32 SEC-02: send handshake message so the Node.js server can validate
+        // the shared secret before accepting commands. The secret is never logged.
+        // When null or empty, no handshake is sent (dev/localhost mode).
+        if (!string.IsNullOrWhiteSpace(adapterSecret))
+        {
+            using var ms = new System.IO.MemoryStream();
+            using var writer = new Utf8JsonWriter(ms);
+            writer.WriteStartObject();
+            writer.WriteString("type", "handshake");
+            writer.WriteString("secret", adapterSecret);
+            writer.WriteEndObject();
+            await writer.FlushAsync(cancellationToken);
+            await _ws.SendAsync(ms.ToArray(), WebSocketMessageType.Text,
+                endOfMessage: true, cancellationToken);
+        }
+
+        // Start background receive loop
+        _receiveCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        _ = ReceiveLoopAsync(_receiveCts.Token);
+    }
+
+    public async Task CloseAsync(CancellationToken cancellationToken = default)
+    {
+        _receiveCts?.Cancel();
+        if (_ws?.State == WebSocketState.Open)
+        {
+            try { await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Disconnect", cancellationToken); }
+            catch { /* best effort */ }
+        }
+    }
+
+    // ── Send ─────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Serialises an <see cref="ActionData"/> to the Node.js command protocol
+    /// and sends it over the WebSocket.
+    ///
+    /// The <see cref="ActionData.Tool"/> value is forwarded as-is — tools set the
+    /// correct wire name via <see cref="ActionProtocol"/> constants.
+    /// </summary>
+    public async Task SendAsync(ActionData action, CancellationToken cancellationToken = default)
+    {
+        if (_ws is not { State: WebSocketState.Open })
+            throw new InvalidOperationException("WebSocket is not connected.");
+
+        using var ms = new System.IO.MemoryStream();
+        using var writer = new Utf8JsonWriter(ms);
+
+        writer.WriteStartObject();
+        writer.WriteString("action", action.Tool); // wire name set by the tool via ActionProtocol
+        writer.WritePropertyName("arguments");
+        writer.WriteStartObject();
+        foreach (var kv in action.Arguments)
+        {
+            switch (kv.Value)
+            {
+                case int i:    writer.WriteNumber(kv.Key, i);  break;
+                case long l:   writer.WriteNumber(kv.Key, l);  break;
+                case double d: writer.WriteNumber(kv.Key, d);  break;
+                case float f:  writer.WriteNumber(kv.Key, f);  break;
+                case bool b:   writer.WriteBoolean(kv.Key, b); break;
+                case null:     writer.WriteNull(kv.Key);        break;
+                default:       writer.WriteString(kv.Key, kv.Value.ToString()); break;
+            }
+        }
+        writer.WriteEndObject();
+        writer.WriteEndObject();
+        await writer.FlushAsync(cancellationToken);
+
+        await _ws.SendAsync(ms.ToArray(), WebSocketMessageType.Text, endOfMessage: true, cancellationToken);
+    }
+
+    // ── Receive (consumer-facing) ─────────────────────────────────────────────
+
+    /// <summary>
+    /// Streams <see cref="WorldEvent"/>s as they arrive from Node.js.
+    /// Events are buffered by the background loop so this never races with
+    /// <see cref="SendAsync"/>.
+    /// </summary>
+    public async IAsyncEnumerable<WorldEvent> ReceiveAsync(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            WorldEvent ev;
+            try { ev = await _inbound.Reader.ReadAsync(cancellationToken); }
+            catch (OperationCanceledException) { yield break; }
+            catch (ChannelClosedException) { yield break; }
+            yield return ev;
+        }
+    }
+
+    // ── Background receive loop ───────────────────────────────────────────────
+
+    private async Task ReceiveLoopAsync(CancellationToken ct)
+    {
+        var buffer = new byte[32_768];
+        var sb = new StringBuilder(4096);
+
+        try
+        {
+            while (_ws is { State: WebSocketState.Open } && !ct.IsCancellationRequested)
+            {
+                sb.Clear();
+                WebSocketReceiveResult result;
+
+                // Reassemble multi-frame messages
+                do
+                {
+                    result = await _ws.ReceiveAsync(buffer, ct);
+                    if (result.MessageType == WebSocketMessageType.Close) return;
+                    sb.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                }
+                while (!result.EndOfMessage);
+
+                var ev = ParseEvent(sb.ToString());
+                if (ev is not null)
+                    _inbound.Writer.TryWrite(ev);
+            }
+        }
+        catch (OperationCanceledException) { /* normal shutdown */ }
+        catch (WebSocketException) { /* connection dropped */ }
+        finally
+        {
+            _inbound.Writer.TryComplete();
+        }
+    }
+
+    // ── JSON parsing ─────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Sprint 3a: Parse JSON into typed event subtypes instead of
+    /// <c>WorldEvent(string, Dictionary, DateTimeOffset)</c>.
+    /// Sprint 35 P0-A: Added itemCollected → ItemCollectedEvent.
+    /// Sprint 35 P0-B: Added mineComplete → MineCompleteEvent.
+    /// Sprint 35 P0-C: FlatAreaFoundEvent now includes SearchedRadius.
+    /// </summary>
+    private static WorldEvent? ParseEvent(string json)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+
+            if (!root.TryGetProperty("event", out var eventProp))
+                return null;
+
+            var eventType = eventProp.GetString() ?? string.Empty;
+            var now       = DateTimeOffset.UtcNow;
+
+            return eventType switch
+            {
+                "spawn" => new SpawnEvent(
+                    Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+                    Health: GetInt(root, "hp", 20),
+                    Food: GetInt(root, "food", 20),
+                    Timestamp: now),
+
+                "health" => new HealthEvent(
+                    Health: GetInt(root, "hp", 20),
+                    Food: GetInt(root, "food", 20),
+                    Timestamp: now),
+
+                "gameMode" => new GameModeChangedEvent(
+                    Mode: GetString(root, "mode") ?? "unknown",
+                    Timestamp: now),
+
+                "move" or "moveComplete" => new MoveEvent(
+                    Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+                    Timestamp: now),
+
+                "blockMined" => new BlockMinedEvent(
+                    Block: GetString(root, "block") ?? "unknown",
+                    Count: GetInt(root, "count", 1),
+                    Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+                    Timestamp: now),
+
+                // Sprint 35 P0-A: actual item collected by the bot (playerCollect event in Mineflayer).
+                // Provides the true drop name (e.g. "diamond" from diamond_ore, "cobblestone" from stone).
+                // Guard in index.js ensures only the bot's own collections reach here.
+                "itemCollected" => new ItemCollectedEvent(
+                    Item: GetString(root, "item") ?? "unknown",
+                    Count: GetInt(root, "count", 1),
+                    Timestamp: now),
+
+                // Sprint 35 P0-B: mining loop completed — definitive end-of-mine signal.
+                "mineComplete" => new MineCompleteEvent(
+                    Block: GetString(root, "block") ?? "unknown",
+                    Mined: GetInt(root, "mined"),
+                    TargetCount: GetInt(root, "targetCount"),
+                    Timestamp: now),
+
+                "chat" => new ChatEvent(
+                    Username: GetString(root, "username") ?? "?",
+                    Message: GetString(root, "message") ?? string.Empty,
+                    OnlinePlayers: GetInt(root, "onlinePlayers", 1),
+                    PlayerPos: root.TryGetProperty("playerX", out _)
+                        ? new Position(GetInt(root, "playerX"), GetInt(root, "playerY"), GetInt(root, "playerZ"))
+                        : null,
+                    Timestamp: now),
+
+                "error" => new ErrorEvent(
+                    Action: GetString(root, "action") ?? "?",
+                    Message: GetString(root, "message") ?? "unknown",
+                    Timestamp: now),
+
+                "blockNotFound" => new BlockNotFoundEvent(
+                    Block: GetString(root, "block") ?? "?",
+                    MinedCount: GetInt(root, "mined"),
+                    Timestamp: now),
+
+                "craftComplete" => new CraftCompleteEvent(
+                    Item: GetString(root, "item") ?? "?",
+                    Count: GetInt(root, "count", 1),
+                    Timestamp: now),
+
+                "smeltComplete" => new SmeltCompleteEvent(
+                    Input: GetString(root, "item") ?? "?",
+                    Result: GetString(root, "result") ?? "?",
+                    Count: GetInt(root, "count", 1),
+                    Timestamp: now),
+
+                "death" => new DeathEvent(
+                    Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+                    Timestamp: now),
+
+                "status" => ParseStatus(root, now),
+
+                "blockPlaced" => new BlockPlacedEvent(
+                    X: GetInt(root, "x"), Y: GetInt(root, "y"), Z: GetInt(root, "z"),
+                    Block: GetString(root, "block") ?? "?",
+                    Timestamp: now),
+
+                "wanderComplete" => new WanderCompleteEvent(
+                    Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+                    TargetX: GetInt(root, "targetX"),
+                    TargetZ: GetInt(root, "targetZ"),
+                    Timestamp: now),
+
+                "wanderFailed" => new WanderFailedEvent(
+                    Message: GetString(root, "message") ?? "?",
+                    Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+                    Timestamp: now),
+
+                "kicked" => new KickedEvent(
+                    Reason: GetString(root, "reason") ?? "?",
+                    Timestamp: now),
+
+                // Sprint 35 P0-C: now parses SearchedRadius so BuildGoalDecomposer
+                // can distinguish "searched small radius" from "searched maximum radius".
+                "flatAreaFound" => new FlatAreaFoundEvent(
+                    X: GetInt(root, "x"),
+                    Y: GetInt(root, "y"),
+                    Z: GetInt(root, "z"),
+                    Area: GetInt(root, "area"),
+                    MinX: GetInt(root, "minX"),
+                    MaxX: GetInt(root, "maxX"),
+                    MinZ: GetInt(root, "minZ"),
+                    MaxZ: GetInt(root, "maxZ"),
+                    SearchedRadius: GetInt(root, "searchedRadius", 32),
+                    Timestamp: now),
+
+                _ => null, // unknown event type — ignored
+            };
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static StatusEvent ParseStatus(JsonElement root, DateTimeOffset now)
+    {
+        var inv = new Dictionary<string, int>();
+        if (root.TryGetProperty("inventory", out var invEl))
+        {
+            if (invEl.ValueKind == JsonValueKind.String)
+            {
+                // legacy: inventory sent as JSON string
+                try
+                {
+                    using var invDoc = JsonDocument.Parse(invEl.GetString()!);
+                    foreach (var prop in invDoc.RootElement.EnumerateObject())
+                        if (prop.Value.TryGetInt32(out var qty) && qty > 0)
+                            inv[prop.Name] = qty;
+                }
+                catch { /* malformed inventory — leave empty */ }
+            }
+            else if (invEl.ValueKind == JsonValueKind.Object)
+            {
+                foreach (var prop in invEl.EnumerateObject())
+                    if (prop.Value.TryGetInt32(out var qty) && qty > 0)
+                        inv[prop.Name] = qty;
+            }
+        }
+
+        return new StatusEvent(
+            Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+            Health: GetInt(root, "hp", 20),
+            Food: GetInt(root, "food", 20),
+            Inventory: inv,
+            GameMode: GetString(root, "gameMode"),
+            Timestamp: now);
+    }
+
+    // ── JSON helpers ──────────────────────────────────────────────────────────
+
+    private static int GetInt(JsonElement root, string key, int defaultValue = 0)
+    {
+        if (!root.TryGetProperty(key, out var el)) return defaultValue;
+        return el.ValueKind == JsonValueKind.Number && el.TryGetInt32(out var i)
+            ? i : defaultValue;
+    }
+
+    private static string? GetString(JsonElement root, string key, string? defaultValue = null)
+    {
+        if (!root.TryGetProperty(key, out var el)) return defaultValue;
+        return el.ValueKind == JsonValueKind.String ? el.GetString() : defaultValue;
+    }
+
+    // ── Dispose ──────────────────────────────────────────────────────────────
+
+    public void Dispose()
+    {
+        _receiveCts?.Cancel();
+        _receiveCts?.Dispose();
+        _ws?.Dispose();
+    }
+}

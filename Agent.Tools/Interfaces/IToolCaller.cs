@@ -1,1 +1,51 @@
-bmFtZXNwYWNlIEFnZW50LlRvb2xzOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgU3lzdGVtLlRleHQuSnNvbjsKCi8vLyA8c3VtbWFyeT4KLy8vIERpc3BhdGNoZXMgYSBuYW1lZCB0b29sIGNhbGwgZnJvbSB0aGUgTExNLiBWYWxpZGF0ZXMgYXJndW1lbnRzIGFnYWluc3QgdGhlCi8vLyByZWdpc3RlcmVkIHRvb2wncyBKU09OIHNjaGVtYSBiZWZvcmUgZXhlY3V0aW9uLiBQcmV2ZW50cyB1bnNhZmUgcmF3IGV4ZWN1dGlvbi4KLy8vCi8vLyBTcHJpbnQgMzcgUDAtQjogPHNlZSBjcmVmPSJDYWxsV2l0aE91dGNvbWVBc3luYyIvPiBhZGRlZCBhcyBhIGRlZmF1bHQgaW50ZXJmYWNlCi8vLyBtZXRob2Qgc28gZXhpc3RpbmcgaW1wbGVtZW50b3JzICh0ZXN0IGRvdWJsZXMsIG1vY2sgdG9vbCBjYWxsZXJzKSBkbyBub3QgbmVlZCB0bwovLy8gY2hhbmdlLiA8c2VlIGNyZWY9IlRvb2xEaXNwYXRjaGVyIi8+IHByb3ZpZGVzIGEgcmljaGVyIG92ZXJyaWRlIHRoYXQgYWxzbyBqb3VybmFscwovLy8gdGhlIGV4ZWN1dGlvbiBwYXRoIHNlcGFyYXRlbHkgZnJvbSB0aGUgb3V0ZXIgZGlzcGF0Y2ggbG9vcC4KLy8vIDwvc3VtbWFyeT4KcHVibGljIGludGVyZmFjZSBJVG9vbENhbGxlcgp7CiAgICAvLy8gPHN1bW1hcnk+VmFsaWRhdGVzIGFuZCBleGVjdXRlcyBhIG5hbWVkIHRvb2wuIFJldHVybnMgYSBmYWlsdXJlIHJlc3VsdCAobmV2ZXIgdGhyb3dzKS48L3N1bW1hcnk+CiAgICBUYXNrPFRvb2xSZXN1bHQ+IENhbGxBc3luYyhzdHJpbmcgdG9vbE5hbWUsIEpzb25FbGVtZW50IGFyZ3VtZW50cywgQ2FuY2VsbGF0aW9uVG9rZW4gY2FuY2VsbGF0aW9uVG9rZW4gPSBkZWZhdWx0KTsKCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gU3ByaW50IDM3IFAwLUI6IEV4ZWN1dGVzIHRoZSBuYW1lZCB0b29sIGFuZCB3cmFwcyB0aGUgcmVzdWx0IGluIGFuCiAgICAvLy8gPHNlZSBjcmVmPSJBY3Rpb25PdXRjb21lIi8+IGZvciBzdHJ1Y3R1cmVkIGpvdXJuYWwgbG9nZ2luZyBhbmQgTExNIG9ic2VydmF0aW9uLgogICAgLy8vCiAgICAvLy8gPHBhcmE+CiAgICAvLy8gRGVmYXVsdCBpbXBsZW1lbnRhdGlvbjogZGVsZWdhdGVzIHRvIDxzZWUgY3JlZj0iQ2FsbEFzeW5jIi8+IGFuZCB3cmFwcyB0aGUKICAgIC8vLyByZXN1bHQgdXNpbmcgPHNlZSBjcmVmPSJBY3Rpb25PdXRjb21lLlN1Y2NlZWRlZCIvPiAvIDxzZWUgY3JlZj0iQWN0aW9uT3V0Y29tZS5GYWlsZWQiLz4uCiAgICAvLy8gPC9wYXJhPgogICAgLy8vCiAgICAvLy8gPHBhcmE+CiAgICAvLy8gPHNlZSBjcmVmPSJUb29sRGlzcGF0Y2hlciIvPiBvdmVycmlkZXMgdGhpcyB3aXRoIGEgcmljaGVyIGltcGxlbWVudGF0aW9uIHRoYXQKICAgIC8vLyBhdm9pZHMgdGhlIGRvdWJsZS1qb3VybmFsLWVudHJ5IHByb2JsZW0gKHNlZSBUb29sRGlzcGF0Y2hlci5DYWxsV2l0aE91dGNvbWVBc3luYwogICAgLy8vIFhNTCBkb2MgZm9yIGRldGFpbHMpLgogICAgLy8vIDwvcGFyYT4KICAgIC8vLwogICAgLy8vIDxwYXJhPgogICAgLy8vIE5PVEU6IENhbGxlcnMgc2hvdWxkIGNhbGwgPGM+X2pvdXJuYWw/LkxvZ091dGNvbWUob3V0Y29tZSk8L2M+IGV4cGxpY2l0bHkgYWZ0ZXIKICAgIC8vLyB0aGlzIG1ldGhvZCByZXR1cm5zLiBUaGUgZGVmYXVsdCBpbXBsZW1lbnRhdGlvbiBkb2VzIE5PVCBsb2cgdG8gdGhlIGpvdXJuYWwg4oCUCiAgICAvLy8gdGhhdCByZXNwb25zaWJpbGl0eSBiZWxvbmdzIHRvIHRoZSBvdXRlciBkaXNwYXRjaCBsb29wLgogICAgLy8vIDwvcGFyYT4KICAgIC8vLyA8L3N1bW1hcnk+CiAgICBhc3luYyBUYXNrPChUb29sUmVzdWx0IFJlc3VsdCwgQWN0aW9uT3V0Y29tZSBPdXRjb21lKT4gQ2FsbFdpdGhPdXRjb21lQXN5bmMoCiAgICAgICAgR3VpZCBnb2FsSWQsIHN0cmluZyB0b29sTmFtZSwgSnNvbkVsZW1lbnQgYXJndW1lbnRzLAogICAgICAgIENhbmNlbGxhdGlvblRva2VuIGNhbmNlbGxhdGlvblRva2VuID0gZGVmYXVsdCkKICAgIHsKICAgICAgICB2YXIgcmVzdWx0ID0gYXdhaXQgQ2FsbEFzeW5jKHRvb2xOYW1lLCBhcmd1bWVudHMsIGNhbmNlbGxhdGlvblRva2VuKTsKICAgICAgICB2YXIgb3V0Y29tZSA9IHJlc3VsdC5TdWNjZXNzCiAgICAgICAgICAgID8gQWN0aW9uT3V0Y29tZS5TdWNjZWVkZWQoZ29hbElkLCB0b29sTmFtZSwgcmVzdWx0Lk1lc3NhZ2UgPz8gIlN1Y2Nlc3MiKQogICAgICAgICAgICA6IEFjdGlvbk91dGNvbWUuRmFpbGVkKGdvYWxJZCwgdG9vbE5hbWUsIHJlc3VsdC5NZXNzYWdlID8/ICJGYWlsZWQiKTsKICAgICAgICByZXR1cm4gKHJlc3VsdCwgb3V0Y29tZSk7CiAgICB9Cn0K
+namespace Agent.Tools;
+
+using Agent.Core;
+using System.Text.Json;
+
+/// <summary>
+/// Dispatches a named tool call from the LLM. Validates arguments against the
+/// registered tool's JSON schema before execution. Prevents unsafe raw execution.
+///
+/// Sprint 37 P0-B: <see cref="CallWithOutcomeAsync"/> added as a default interface
+/// method so existing implementors (test doubles, mock tool callers) do not need to
+/// change. <see cref="ToolDispatcher"/> provides a richer override that also journals
+/// the execution path separately from the outer dispatch loop.
+/// </summary>
+public interface IToolCaller
+{
+    /// <summary>Validates and executes a named tool. Returns a failure result (never throws).</summary>
+    Task<ToolResult> CallAsync(string toolName, JsonElement arguments, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Sprint 37 P0-B: Executes the named tool and wraps the result in an
+    /// <see cref="ActionOutcome"/> for structured journal logging and LLM observation.
+    ///
+    /// <para>
+    /// Default implementation: delegates to <see cref="CallAsync"/> and wraps the
+    /// result using <see cref="ActionOutcome.Succeeded"/> / <see cref="ActionOutcome.Failed"/>.
+    /// </para>
+    ///
+    /// <para>
+    /// <see cref="ToolDispatcher"/> overrides this with a richer implementation that
+    /// avoids the double-journal-entry problem (see ToolDispatcher.CallWithOutcomeAsync
+    /// XML doc for details).
+    /// </para>
+    ///
+    /// <para>
+    /// NOTE: Callers should call <c>_journal?.LogOutcome(outcome)</c> explicitly after
+    /// this method returns. The default implementation does NOT log to the journal —
+    /// that responsibility belongs to the outer dispatch loop.
+    /// </para>
+    /// </summary>
+    async Task<(ToolResult Result, ActionOutcome Outcome)> CallWithOutcomeAsync(
+        Guid goalId, string toolName, JsonElement arguments,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await CallAsync(toolName, arguments, cancellationToken);
+        var outcome = result.Success
+            ? ActionOutcome.Succeeded(goalId, toolName, result.Message ?? "Success")
+            : ActionOutcome.Failed(goalId, toolName, result.Message ?? "Failed");
+        return (result, outcome);
+    }
+}

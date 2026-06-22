@@ -13,6 +13,8 @@ public sealed class GenericGatherGoal(ItemSpec item, int targetCount) : IGoal, I
     public string Name => $"Gather:{item.ItemId}";
     public string Description => $"Gather at least {targetCount} {item.DisplayName}.";
     public string[] Phases => ["FindSource", "Mine", "Collect"];
+    /// <summary>Sprint 39: stable per-instance ID so ActionOutcome.GoalId is unique across goals.</summary>
+    public Guid Id { get; } = Guid.NewGuid();
     public string? FailureReason { get; set; }
 
     public bool IsComplete(WorldState state)

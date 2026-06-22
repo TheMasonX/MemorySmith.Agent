@@ -16,6 +16,9 @@ public sealed class SimpleGoal(
     public string Description { get; } = description;
     public string[] Phases { get; } = phases;
 
+    /// <summary>Sprint 39: stable per-instance ID so ActionOutcome.GoalId is unique across goals.</summary>
+    public Guid Id { get; } = Guid.NewGuid();
+
     /// <inheritdoc/>
     public string? FailureReason { get; set; }
 

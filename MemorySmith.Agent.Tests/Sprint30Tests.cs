@@ -94,9 +94,10 @@ public class Sprint30Tests
     // ── P1-D: ChatInterpreter plural-map regression ──────────────────────────
 
     private static MethodInfo? GetResolveItemId()
+        // Sprint 39: method is named ResolveItem (not ResolveItemId) — public static.
         => typeof(ChatInterpreter).GetMethod(
-            "ResolveItemId",
-            BindingFlags.NonPublic | BindingFlags.Static);
+            "ResolveItem",
+            BindingFlags.Public | BindingFlags.Static);
 
     [Test]
     public void ChatInterpreter_ResolveItemId_Grass_DoesNotReturnGra()

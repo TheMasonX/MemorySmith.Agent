@@ -18,6 +18,9 @@ public sealed class GatherWoodGoal(int targetCount = 10) : IGoal
     public string Description => $"Gather at least {targetCount} wood logs from nearby trees.";
     public string[] Phases => ["FindTree", "MineWood", "Collect"];
 
+    /// <summary>Sprint 39: stable per-instance ID so ActionOutcome.GoalId is unique across goals.</summary>
+    public Guid Id { get; } = Guid.NewGuid();
+
     /// <inheritdoc/>
     public string? FailureReason { get; set; }
 

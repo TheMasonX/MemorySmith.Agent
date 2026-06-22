@@ -440,15 +440,16 @@ file sealed class NoOpTool(string name) : ITool
 /// Sprint 1a: IChatInterpreter that sleeps for a configurable duration before returning
 /// NotAddressed. Simulates a slow LLM to verify the chat channel doesn't block the event loop.
 /// </summary>
+// Sprint 39 P1-C: return type changed from ChatInterpretation to IntentDraft?
 file sealed class SlowChatInterpreter(TimeSpan delay) : IChatInterpreter
 {
-    public async Task<ChatInterpretation> InterpretAsync(
+    public async Task<IntentDraft?> InterpretAsync(
         string username, string message, string botName,
         int onlinePlayers, Position botPosition, Position? playerPosition,
         WorldState state, CancellationToken ct = default)
     {
         await Task.Delay(delay, ct);
-        return new ChatInterpretation(ChatIntentType.NotAddressed);
+        return null;  // null = not addressed (was ChatIntentType.NotAddressed)
     }
 
     public void RecordBotSpoke() { }

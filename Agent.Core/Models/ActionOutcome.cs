@@ -1,1 +1,85 @@
-bmFtZXNwYWNlIEFnZW50LkNvcmU7CgovLy8gPHN1bW1hcnk+Ci8vLyBTcHJpbnQgMzYgUDItQiBzdHViOiBjb250cmFjdCBmb3IgcGFzc2luZyBzdHJ1Y3R1cmVkIG9ic2VydmF0aW9uIGNvbnRleHQKLy8vIHRvIHRoZSBMTE0gZXZhbHVhdG9yLiBGdWxsIGltcGxlbWVudGF0aW9uIGluIFNwcmludCAzNyB3aGVuIEFjdGlvbk91dGNvbWUKLy8vIGlzIHdpcmVkIGludG8gdGhlIERpc3BhdGNoQWN0aW9uc0FzeW5jIG9ic2VydmF0aW9uLWRyaXZlbiByZXBsYW5uaW5nIGxvb3AuCi8vLyBDb25zdW1lczogQWN0aW9uT3V0Y29tZS5PYnNlcnZhdGlvblN1bW1hcnkgYXMgdGhlIGRlZmF1bHQgU3VtbWFyeSB0ZXh0LgovLy8gPC9zdW1tYXJ5PgpwdWJsaWMgaW50ZXJmYWNlIElPYnNlcnZhdGlvblN1bW1hcnkKewogICAgc3RyaW5nIFN1bW1hcnkgeyBnZXQ7IH0KfQoKLy8vIDxzdW1tYXJ5PgovLy8gQSB0eXBlZCwgc3RydWN0dXJlZCBlZmZlY3QgcHJvZHVjZWQgYnkgYSBzaW5nbGUgdG9vbCBleGVjdXRpb24uCi8vLyBVc2VkIGJ5IDxzZWUgY3JlZj0iQWN0aW9uT3V0Y29tZS5FZmZlY3RzIi8+IHRvIGRlc2NyaWJlIHdoYXQgY2hhbmdlZCBpbiB0aGUgd29ybGQuCi8vLwovLy8gVHlwZSB2b2NhYnVsYXJ5IChTcHJpbnQgMzUgaW5pdGlhbCBzZXQ7IFNwcmludCAzNiBleHBhbmRzKToKLy8vICAgSXRlbUNvbGxlY3RlZCAgICDigJQgaXRlbSBsYW5kZWQgaW4gaW52ZW50b3J5IChmcm9tIHBsYXllckNvbGxlY3Qgb3IgY3JhZnQvc21lbHQgb3V0cHV0KQovLy8gICBJdGVtQ29uc3VtZWQgICAgIOKAlCBpdGVtIHJlbW92ZWQgZnJvbSBpbnZlbnRvcnkgKHBsYWNlZCwgdXNlZCBhcyBpbmdyZWRpZW50KQovLy8gICBJdGVtQ3JhZnRlZCAgICAgICDigJQgaXRlbSBjcmFmdGVkIGF0IHRhYmxlL2Z1cm5hY2UgKFNwcmludCAzNikKLy8vICAgUG9zaXRpb25DaGFuZ2VkICAgIOKAlCBib3QgbW92ZWQgdG8gYSBuZXcgbG9jYXRpb24KLy8vICAgQmxvY2tQbGFjZWQgICAgICAgIOKAlCBibG9jayBwbGFjZWQgaW4gdGhlIHdvcmxkCi8vLyAgIEJsb2NrTWluZWQgICAgICAgIOKAlCBibG9jayByZW1vdmVkIGZyb20gdGhlIHdvcmxkCi8vLyAgIFN0YXR1c1JlZnJlc2hlZCAgIOKAlCBmdWxsIGJvdCBzdGF0dXMgcmVmcmVzaGVkIChIUCwgZm9vZCwgaW52ZW50b3J5KQovLy8gICBNZW1vcnlTZWFyY2hlZCAgICDigJQgTWVtb3J5U21pdGggc2VhcmNoIGV4ZWN1dGVkCi8vLyAgIE1lbW9yeVBhZ2VDcmVhdGVkIOKAlCBuZXcgTWVtb3J5U21pdGggcGFnZSBjcmVhdGVkCi8vLyA8L3N1bW1hcnk+CnB1YmxpYyByZWNvcmQgU3RydWN0dXJlZEVmZmVjdCgKICAgIHN0cmluZyBUeXBlLAogICAgc3RyaW5nPyBJdGVtID0gbnVsbCwKICAgIGludD8gQ291bnQgPSBudWxsLAogICAgc3RyaW5nPyBEZXRhaWwgPSBudWxsKTsKCi8vLyA8c3VtbWFyeT4KLy8vIFVuaXZlcnNhbCByZXN1bHQgYXJ0aWZhY3QgZm9yIGV2ZXJ5IDxzZWUgY3JlZj0iQWdlbnQuVG9vbHMuVG9vbERpc3BhdGNoZXIuQ2FsbEFzeW5jIi8+IGV4ZWN1dGlvbi4KLy8vCi8vLyBTcHJpbnQgMzU6IGludHJvZHVjZXMgQWN0aW9uT3V0Y29tZSBhcyB0aGUgc2hhcmVkIGFydGlmYWN0IGNvbnN1bWVkIGJ5OgovLy8gICAtIEFnZW50Sm91cm5hbCAocmVjb3JkcyB3aGF0IGhhcHBlbmVkKQovLy8gICAtIEFnZW50QmFja2dyb3VuZFNlcnZpY2UgKFdvcmxkU3RhdGUgdXBkYXRlIGhpbnRzKQovLy8gU3ByaW50IDM2OiBMTE0gZXZhbHVhdGlvbiBsb29wIHJlY2VpdmVzIEFjdGlvbk91dGNvbWVbXSBhcyBvYnNlcnZhdGlvbiBjb250ZXh0OgovLy8gICBQbGFuIOKGkiBFeGVjdXRlIOKGkiBBY3Rpb25PdXRjb21lIOKGkiBMTE0gRXZhbHVhdGUg4oaSIFJlcGxhbj8g4oaSIEV4ZWN1dGUKLy8vIFRoaXMgaXMgdGhlIHRyYW5zaXRpb24gZnJvbSBjb21tYW5kLWRyaXZlbiBib3QgdG8gZ2VudWluZSBhZ2VudCBydW50aW1lLgovLy8KLy8vIFNwcmludCAzNyBQMC1BOiBBY3Rpb25PdXRjb21lIG5vdyBpbXBsZW1lbnRzIElPYnNlcnZhdGlvblN1bW1hcnkgc28gaXQgY2FuIGJlCi8vLyBwYXNzZWQgZGlyZWN0bHkgdG8gYW55IGNvbnN1bWVyIHRoYXQgZXhwZWN0cyBzdHJ1Y3R1cmVkIG9ic2VydmF0aW9uIGNvbnRleHQKLy8vIChlLmcuIHRoZSBMTE0gZXZhbHVhdG9yIGluIHRoZSBvYnNlcnZhdGlvbi1kcml2ZW4gcmVwbGFubmluZyBsb29wKS4KLy8vCi8vLyBFeGFtcGxlIGZvciBNaW5lQmxvY2sob2FrX2xvZywgNSkgc3VjY2VzczoKLy8vICAgR29hbElkICAgICAgID0gJmx0O2FjdGl2ZSBnb2FsIEdVSUQmZ3Q7Ci8vLyAgIFRvb2xOYW1lICAgICA9ICJNaW5lQmxvY2siCi8vLyAgIFN1Y2Nlc3MgICAgICA9IHRydWUKLy8vICAgU3VtbWFyeSAgICAgID0gIk1pbmVkIDUgb2FrX2xvZyBhdCAoMTAwLDY0LDIwMCkiCi8vLyAgIEVmZmVjdHMgICAgICA9IFsge0l0ZW1Db2xsZWN0ZWQsIG9ha19sb2csIDV9LCB7UG9zaXRpb25DaGFuZ2VkfSBdCi8vLyA8L3N1bW1hcnk+CnB1YmxpYyByZWNvcmQgQWN0aW9uT3V0Y29tZSgKICAgIEd1aWQgR29hbElkLAogICAgc3RyaW5nIFRvb2xOYW1lLAogICAgYm9vbCBTdWNjZXNzLAogICAgc3RyaW5nIE9ic2VydmF0aW9uU3VtbWFyeSwKICAgIElSZWFkT25seUxpc3Q8U3RydWN0dXJlZEVmZmVjdD4gRWZmZWN0cywKICAgIERhdGVUaW1lT2Zmc2V0IFRpbWVzdGFtcCkgOiBJT2JzZXJ2YXRpb25TdW1tYXJ5CnsKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBTcHJpbnQgMzcgUDAtQTogSW1wbGVtZW50cyBJT2JzZXJ2YXRpb25TdW1tYXJ5LlN1bW1hcnkuCiAgICAvLy8gTWFwcyBPYnNlcnZhdGlvblN1bW1hcnkg4oaSIFN1bW1hcnkgc28gQWN0aW9uT3V0Y29tZSBjYW4gYmUgcGFzc2VkIGRpcmVjdGx5CiAgICAvLy8gdG8gYW55IElPYnNlcnZhdGlvblN1bW1hcnkgY29uc3VtZXIgKGUuZy4gdGhlIExMTSBldmFsdWF0b3IpLgogICAgLy8vIDwvc3VtbWFyeT4KICAgIHN0cmluZyBJT2JzZXJ2YXRpb25TdW1tYXJ5LlN1bW1hcnkgPT4gT2JzZXJ2YXRpb25TdW1tYXJ5OwoKICAgIC8vLyA8c3VtbWFyeT5DcmVhdGVzIGEgc3VjY2Vzc2Z1bCBvdXRjb21lIHdpdGggYSBzaW5nbGUgSXRlbUNvbGxlY3RlZCBlZmZlY3QuPC9zdW1tYXJ5PgogICAgcHVibGljIHN0YXRpYyBBY3Rpb25PdXRjb21lIENvbGxlY3RlZChHdWlkIGdvYWxJZCwgc3RyaW5nIHRvb2wsIHN0cmluZyBpdGVtLCBpbnQgY291bnQpID0+CiAgICAgICAgbmV3KGdvYWxJZCwgdG9vbCwgdHJ1ZSwKICAgICAgICAgICAgJCJDb2xsZWN0ZWQge2NvdW50fXgge2l0ZW19IiwKICAgICAgICAgICAgW25ldyBTdHJ1Y3R1cmVkRWZmZWN0KCJJdGVtQ29sbGVjdGVkIiwgaXRlbSwgY291bnQpXSwKICAgICAgICAgICAgRGF0ZVRpbWVPZmZzZXQuVXRjTm93KTsKCiAgICAvLy8gPHN1bW1hcnk+Q3JlYXRlcyBhIGZhaWx1cmUgb3V0Y29tZSB3aXRoIHRoZSBnaXZlbiBlcnJvciBtZXNzYWdlLjwvc3VtbWFyeT4KICAgIHB1YmxpYyBzdGF0aWMgQWN0aW9uT3V0Y29tZSBGYWlsZWQoR3VpZCBnb2FsSWQsIHN0cmluZyB0b29sLCBzdHJpbmcgcmVhc29uKSA9PgogICAgICAgIG5ldyhnb2FsSWQsIHRvb2wsIGZhbHNlLCByZWFzb24sIFtdLCBEYXRlVGltZU9mZnNldC5VdGNOb3cpOwoKICAgIC8vLyA8c3VtbWFyeT5DcmVhdGVzIGEgc2ltcGxlIHN1Y2Nlc3Mgb3V0Y29tZSB3aXRoIG5vIHN0cnVjdHVyZWQgZWZmZWN0cy48L3N1bW1hcnk+CiAgICBwdWJsaWMgc3RhdGljIEFjdGlvbk91dGNvbWUgU3VjY2VlZGVkKEd1aWQgZ29hbElkLCBzdHJpbmcgdG9vbCwgc3RyaW5nIHN1bW1hcnkpID0+CiAgICAgICAgbmV3KGdvYWxJZCwgdG9vbCwgdHJ1ZSwgc3VtbWFyeSwgW10sIERhdGVUaW1lT2Zmc2V0LlV0Y05vdyk7Cn0K
+namespace Agent.Core;
+
+/// <summary>
+/// Sprint 36 P2-B stub: contract for passing structured observation context
+/// to the LLM evaluator. Full implementation in Sprint 37 when ActionOutcome
+/// is wired into the DispatchActionsAsync observation-driven replanning loop.
+/// Consumes: ActionOutcome.ObservationSummary as the default Summary text.
+/// </summary>
+public interface IObservationSummary
+{
+    string Summary { get; }
+}
+
+/// <summary>
+/// A typed, structured effect produced by a single tool execution.
+/// Used by <see cref="ActionOutcome.Effects"/> to describe what changed in the world.
+///
+/// Type vocabulary (Sprint 35 initial set; Sprint 36 expands):
+///   ItemCollected    — item landed in inventory (from playerCollect or craft/smelt output)
+///   ItemConsumed     — item removed from inventory (placed, used as ingredient)
+///   ItemCrafted       — item crafted at table/furnace (Sprint 36)
+///   PositionChanged    — bot moved to a new location
+///   BlockPlaced        — block placed in the world
+///   BlockMined        — block removed from the world
+///   StatusRefreshed   — full bot status refreshed (HP, food, inventory)
+///   MemorySearched    — MemorySmith search executed
+///   MemoryPageCreated — new MemorySmith page created
+/// </summary>
+public record StructuredEffect(
+    string Type,
+    string? Item = null,
+    int? Count = null,
+    string? Detail = null);
+
+/// <summary>
+/// Universal result artifact for every <see cref="Agent.Tools.ToolDispatcher.CallAsync"/> execution.
+///
+/// Sprint 35: introduces ActionOutcome as the shared artifact consumed by:
+///   - AgentJournal (records what happened)
+///   - AgentBackgroundService (WorldState update hints)
+/// Sprint 36: LLM evaluation loop receives ActionOutcome[] as observation context:
+///   Plan → Execute → ActionOutcome → LLM Evaluate → Replan? → Execute
+/// This is the transition from command-driven bot to genuine agent runtime.
+///
+/// Sprint 37 P0-A: ActionOutcome now implements IObservationSummary so it can be
+/// passed directly to any consumer that expects structured observation context
+/// (e.g. the LLM evaluator in the observation-driven replanning loop).
+///
+/// Example for MineBlock(oak_log, 5) success:
+///   GoalId       = &lt;active goal GUID&gt;
+///   ToolName     = "MineBlock"
+///   Success      = true
+///   Summary      = "Mined 5 oak_log at (100,64,200)"
+///   Effects      = [ {ItemCollected, oak_log, 5}, {PositionChanged} ]
+/// </summary>
+public record ActionOutcome(
+    Guid GoalId,
+    string ToolName,
+    bool Success,
+    string ObservationSummary,
+    IReadOnlyList<StructuredEffect> Effects,
+    DateTimeOffset Timestamp) : IObservationSummary
+{
+    /// <summary>
+    /// Sprint 37 P0-A: Implements IObservationSummary.Summary.
+    /// Maps ObservationSummary → Summary so ActionOutcome can be passed directly
+    /// to any IObservationSummary consumer (e.g. the LLM evaluator).
+    /// </summary>
+    string IObservationSummary.Summary => ObservationSummary;
+
+    /// <summary>Creates a successful outcome with a single ItemCollected effect.</summary>
+    public static ActionOutcome Collected(Guid goalId, string tool, string item, int count) =>
+        new(goalId, tool, true,
+            $"Collected {count}x {item}",
+            [new StructuredEffect("ItemCollected", item, count)],
+            DateTimeOffset.UtcNow);
+
+    /// <summary>Creates a failure outcome with the given error message.</summary>
+    public static ActionOutcome Failed(Guid goalId, string tool, string reason) =>
+        new(goalId, tool, false, reason, [], DateTimeOffset.UtcNow);
+
+    /// <summary>Creates a simple success outcome with no structured effects.</summary>
+    public static ActionOutcome Succeeded(Guid goalId, string tool, string summary) =>
+        new(goalId, tool, true, summary, [], DateTimeOffset.UtcNow);
+}

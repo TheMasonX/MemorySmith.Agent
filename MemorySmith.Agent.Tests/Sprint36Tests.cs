@@ -1,1 +1,374 @@
-bmFtZXNwYWNlIE1lbW9yeVNtaXRoLkFnZW50LlRlc3RzOwoKdXNpbmcgZ2xvYmFsOjpBZ2VudC5Db3JlOwp1c2luZyBnbG9iYWw6OkFnZW50LlBsYW5uaW5nOwp1c2luZyBnbG9iYWw6OkFnZW50LlBsYW5uaW5nLkdvYWxzOwp1c2luZyBnbG9iYWw6OkFnZW50LlRvb2xzOwp1c2luZyBNaWNyb3NvZnQuRXh0ZW5zaW9ucy5Mb2dnaW5nLkFic3RyYWN0aW9uczsKCi8vLyA8c3VtbWFyeT4KLy8vIFNwcmludCAzNiDigJQgQWdlbnRSdW50aW1lIERlY29tcG9zaXRpb24gKyBPYnNlcnZhdGlvbi1Ecml2ZW4gUmVwbGFubmluZy4KLy8vCi8vLyBUZXN0IGNvdmVyYWdlOgovLy8gICBQMC1BOiBUcnlJbnRlcnJ1cHRPbkRhbWFnZUFzeW5jIHVzZXMgQ2xlYXJBbmRFbnF1ZXVlQXN5bmMg4oCUIHN0b3Agc2VudCBiZWZvcmUgY2xlYXIKLy8vICAgUDAtQjogQ2FsbFdpdGhPdXRjb21lQXN5bmMgcmV0dXJucyAoVG9vbFJlc3VsdCwgQWN0aW9uT3V0Y29tZSkgYW5kIGRvZXMgTk9UIGRvdWJsZS1sb2cKLy8vICAgUDAtQzogQnVpbGRHb2FsRGVjb21wb3Nlci9IdG5UYXNrTGlicmFyeSBTZWFyY2hlZFJhZGl1cyByZXRyeSBnYXRlCi8vLyAgIFAxLUI6IFdvcmxkU3RhdGVQcm9qZWN0b3IuQXBwbHlJdGVtQ3JhZnRlZCB1cGRhdGVzIGludmVudG9yeSBjb3JyZWN0bHkKLy8vICAgUDEtQzogKHN0dWIpIExsbUNoYXRJbnRlcnByZXRlciBCdWlsZFN5c3RlbVByb21wdCBpbmNsdWRlcyByZWdpc3RlcmVkIHRvb2wgbmFtZXMKLy8vIDwvc3VtbWFyeT4KW1Rlc3RGaXh0dXJlXQpwdWJsaWMgY2xhc3MgU3ByaW50MzZUZXN0cwp7CiAgICAvLyDilIDilIDilIAgUDAtQTogVHJ5SW50ZXJydXB0T25EYW1hZ2VBc3luYyBzdG9wLWJlZm9yZS1jbGVhciDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gU3ByaW50IDM2IFAwLUE6IENsZWFyQW5kRW5xdWV1ZUFzeW5jIHNlbmRzIHRoZSBzdG9wIGFjdGlvbiBCRUZPUkUgY2xlYXJpbmcKICAgIC8vLyB0aGUgcXVldWUuIFZlcmlmeSB0aGF0ICJTdG9wTm93IiBhcHBlYXJzIGluIE1vY2tXb3JsZEFkYXB0ZXIuU2VudEFjdGlvbnMgd2hlbgogICAgLy8vIGEgZGFtYWdlIGludGVycnVwdCBmaXJlcy4KICAgIC8vLwogICAgLy8vIFJlZ3Jlc3Npb24gY292ZXJhZ2U6IHByZXZpb3VzbHkgU2VuZEVtZXJnZW5jeVN0b3AoKSB3YXMgZmlyZS1hbmQtZm9yZ2V0IChubwogICAgLy8vIGF3YWl0KSwgc28gbmV3IGFjdGlvbnMgY291bGQgYmUgZGlzcGF0Y2hlZCBiZWZvcmUgSlMgcmVjZWl2ZWQgdGhlIHN0b3Agc2lnbmFsLgogICAgLy8vIFdpdGggQ2xlYXJBbmRFbnF1ZXVlQXN5bmMsIHRoZSBzdG9wIGNhbGxiYWNrIGlzIGF3YWl0ZWQgYmVmb3JlIHRoZSBhdG9taWMKICAgIC8vLyBjbGVhcitlbnF1ZXVlLCBndWFyYW50ZWVpbmcgY29ycmVjdCBzdG9wLWZpcnN0IG9yZGVyaW5nLgogICAgLy8vIDwvc3VtbWFyeT4KICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgVHJ5SW50ZXJydXB0T25EYW1hZ2VBc3luY19TdG9wU2VudEJlZm9yZUNsZWFyX1N0b3BOb3dJblNlbnRBY3Rpb25zKCkKICAgIHsKICAgICAgICB2YXIgYWRhcHRlciA9IG5ldyBNb2NrV29ybGRBZGFwdGVyKCk7CiAgICAgICAgdmFyIGpvdXJuYWwgPSBOdWxsQWdlbnRKb3VybmFsLkluc3RhbmNlOwogICAgICAgIHZhciBzZXJ2aWNlID0gQWdlbnRCYWNrZ3JvdW5kU2VydmljZVRlc3RIZWxwZXIuQnVpbGRNaW5pbWFsKGFkYXB0ZXIsIGpvdXJuYWwpOwoKICAgICAgICBhd2FpdCBzZXJ2aWNlLlN0YXJ0QXN5bmMoQ2FuY2VsbGF0aW9uVG9rZW4uTm9uZSk7CiAgICAgICAgdHJ5CiAgICAgICAgewogICAgICAgICAgICBzZXJ2aWNlLlNldEdvYWwobmV3IFNpbXBsZUdvYWwoIk1pbmUiLCAiTWluZSBibG9ja3MiLCBbIm1pbmUiXSwgXyA9PiBmYWxzZSkpOwoKICAgICAgICAgICAgLy8gRmlyc3QgSGVhbHRoRXZlbnQgZXN0YWJsaXNoZXMgdGhlIGJhc2VsaW5lIChfcHJldmlvdXNIZWFsdGgpCiAgICAgICAgICAgIGFkYXB0ZXIuUHVzaEV2ZW50KG5ldyBIZWFsdGhFdmVudCgyMCwgMjAsIERhdGVUaW1lT2Zmc2V0LlV0Y05vdykpOwoKICAgICAgICAgICAgLy8gTGFyZ2UgZHJvcDogMjAg4oaSIDEwIEhQICh8ZGVsdGF8PTEwIOKJpSBzeXN0ZW0gdGhyZXNob2xkIG9mIDYgSFApCiAgICAgICAgICAgIGF3YWl0IFRhc2suRGVsYXkoMzApOyAvLyBsZXQgZmlyc3QgZXZlbnQgYmUgcHJvY2Vzc2VkCiAgICAgICAgICAgIGFkYXB0ZXIuUHVzaEV2ZW50KG5ldyBIZWFsdGhFdmVudCgxMCwgMjAsIERhdGVUaW1lT2Zmc2V0LlV0Y05vdykpOwoKICAgICAgICAgICAgLy8gQWxsb3cgZXZlbnQgbG9vcCB0byBwcm9jZXNzIHRoZSBzZWNvbmQgZXZlbnQgYW5kIGZpcmUgaW50ZXJydXB0CiAgICAgICAgICAgIGF3YWl0IFRhc2suRGVsYXkoMjAwKTsKCiAgICAgICAgICAgIHZhciBzdG9wU2VudCA9IGFkYXB0ZXIuU2VudEFjdGlvbnMuQW55KGEgPT4KICAgICAgICAgICAgICAgIGEuVG9vbC5FcXVhbHMoIlN0b3BOb3ciLCBTdHJpbmdDb21wYXJpc29uLk9yZGluYWxJZ25vcmVDYXNlKSk7CgogICAgICAgICAgICBBc3NlcnQuVGhhdChzdG9wU2VudCwgSXMuVHJ1ZSwKICAgICAgICAgICAgICAgICJUcnlJbnRlcnJ1cHRPbkRhbWFnZUFzeW5jIG11c3QgY2FsbCBDbGVhckFuZEVucXVldWVBc3luYyB3aXRoIGEgc3RvcCBjYWxsYmFjayAiICsKICAgICAgICAgICAgICAgICJ0aGF0IGZpcmVzIFNlbmRBY3Rpb25Bc3luYygnU3RvcE5vdycpIGJlZm9yZSBjbGVhcmluZyB0aGUgcXVldWUgKFNwcmludCAzNiBQMC1BKS4iKTsKICAgICAgICB9CiAgICAgICAgZmluYWxseQogICAgICAgIHsKICAgICAgICAgICAgYXdhaXQgc2VydmljZS5TdG9wQXN5bmMoQ2FuY2VsbGF0aW9uVG9rZW4uTm9uZSk7CiAgICAgICAgfQogICAgfQoKICAgIFtUZXN0XQogICAgcHVibGljIGFzeW5jIFRhc2sgVHJ5SW50ZXJydXB0T25EYW1hZ2VBc3luY19TbWFsbERyb3BfTm9TdG9wKCkKICAgIHsKICAgICAgICB2YXIgYWRhcHRlciA9IG5ldyBNb2NrV29ybGRBZGFwdGVyKCk7CiAgICAgICAgdmFyIGpvdXJuYWwgPSBOdWxsQWdlbnRKb3VybmFsLkluc3RhbmNlOwogICAgICAgIHZhciBzZXJ2aWNlID0gQWdlbnRCYWNrZ3JvdW5kU2VydmljZVRlc3RIZWxwZXIuQnVpbGRNaW5pbWFsKGFkYXB0ZXIsIGpvdXJuYWwpOwoKICAgICAgICBhd2FpdCBzZXJ2aWNlLlN0YXJ0QXN5bmMoQ2FuY2VsbGF0aW9uVG9rZW4uTm9uZSk7CiAgICAgICAgdHJ5CiAgICAgICAgewogICAgICAgICAgICBzZXJ2aWNlLlNldEdvYWwobmV3IFNpbXBsZUdvYWwoIk1pbmUiLCAiTWluZSBibG9ja3MiLCBbIm1pbmUiXSwgXyA9PiBmYWxzZSkpOwoKICAgICAgICAgICAgYWRhcHRlci5QdXNoRXZlbnQobmV3IEhlYWx0aEV2ZW50KDIwLCAyMCwgRGF0ZVRpbWVPZmZzZXQuVXRjTm93KSk7CiAgICAgICAgICAgIGF3YWl0IFRhc2suRGVsYXkoMzApOwogICAgICAgICAgICAvLyBPbmx5IDIgSFAgZHJvcCDigJQgYmVsb3cgc3lzdGVtIHRocmVzaG9sZCAoNiBIUCkKICAgICAgICAgICAgYWRhcHRlci5QdXNoRXZlbnQobmV3IEhlYWx0aEV2ZW50KDE4LCAyMCwgRGF0ZVRpbWVPZmZzZXQuVXRjTm93KSk7CiAgICAgICAgICAgIGF3YWl0IFRhc2suRGVsYXkoMjAwKTsKCiAgICAgICAgICAgIHZhciBzdG9wU2VudCA9IGFkYXB0ZXIuU2VudEFjdGlvbnMuQW55KGEgPT4KICAgICAgICAgICAgICAgIGEuVG9vbC5FcXVhbHMoIlN0b3BOb3ciLCBTdHJpbmdDb21wYXJpc29uLk9yZGluYWxJZ25vcmVDYXNlKSk7CgogICAgICAgICAgICBBc3NlcnQuVGhhdChzdG9wU2VudCwgSXMuRmFsc2UsCiAgICAgICAgICAgICAgICAiMiBIUCBkcm9wIGlzIGJlbG93IGludGVycnVwdCB0aHJlc2hvbGQg4oCUIG5vIHN0b3Agc2hvdWxkIGJlIHNlbnQuIik7CiAgICAgICAgfQogICAgICAgIGZpbmFsbHkKICAgICAgICB7CiAgICAgICAgICAgIGF3YWl0IHNlcnZpY2UuU3RvcEFzeW5jKENhbmNlbGxhdGlvblRva2VuLk5vbmUpOwogICAgICAgIH0KICAgIH0KCiAgICAvLyDilIDilIDilIAgUDAtQjogQ2FsbFdpdGhPdXRjb21lQXN5bmMg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIFNwcmludCAzNiBQMC1COiBDYWxsV2l0aE91dGNvbWVBc3luYyBtdXN0IHJldHVybiBhIChUb29sUmVzdWx0LCBBY3Rpb25PdXRjb21lKQogICAgLy8vIHR1cGxlIHdpdGggY29ycmVjdCBHb2FsL1Rvb2wgbWV0YWRhdGEsIGFuZCBtdXN0IE5PVCBwcm9kdWNlIGR1cGxpY2F0ZSBqb3VybmFsCiAgICAvLy8gZW50cmllcy4gQ2FsbEFzeW5jIGFscmVhZHkgd3JpdGVzIG9uZSBBY3Rpb25Db21wbGV0ZWQgZW50cnk7IENhbGxXaXRoT3V0Y29tZUFzeW5jCiAgICAvLy8gbXVzdCBub3QgY2FsbCBMb2dPdXRjb21lIG9uIHRvcCBvZiB0aGF0IChhdWRpdCBmaW5kaW5nICM0IOKAlCBmaXhlZCB0aGlzIHNwcmludCkuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgW1Rlc3RdCiAgICBwdWJsaWMgYXN5bmMgVGFzayBDYWxsV2l0aE91dGNvbWVBc3luY19TdWNjZXNzX1JldHVybnNPdXRjb21lQW5kRG9lc05vdERvdWJsZUxvZygpCiAgICB7CiAgICAgICAgdmFyIGpvdXJuYWwgPSBuZXcgU3B5Sm91cm5hbCgpOwogICAgICAgIHZhciBkaXNwYXRjaGVyID0gbmV3IFRvb2xEaXNwYXRjaGVyKGpvdXJuYWwpOwogICAgICAgIGRpc3BhdGNoZXIuUmVnaXN0ZXIobmV3IE51bGxUb29sKCJHZXRTdGF0dXMiKSk7CgogICAgICAgIHVzaW5nIHZhciBkb2MgPSBTeXN0ZW0uVGV4dC5Kc29uLkpzb25Eb2N1bWVudC5QYXJzZSgie30iKTsKICAgICAgICB2YXIgZ29hbElkID0gR3VpZC5OZXdHdWlkKCk7CiAgICAgICAgdmFyIChyZXN1bHQsIG91dGNvbWUpID0gYXdhaXQgZGlzcGF0Y2hlci5DYWxsV2l0aE91dGNvbWVBc3luYyhnb2FsSWQsICJHZXRTdGF0dXMiLCBkb2MuUm9vdEVsZW1lbnQpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuU3VjY2VzcywgSXMuVHJ1ZSwgIlRvb2xSZXN1bHQgbXVzdCBiZSBTdWNjZXNzLiIpOwogICAgICAgIEFzc2VydC5UaGF0KG91dGNvbWUuU3VjY2VzcywgSXMuVHJ1ZSwgIkFjdGlvbk91dGNvbWUgbXVzdCByZWZsZWN0IFN1Y2Nlc3MuIik7CiAgICAgICAgQXNzZXJ0LlRoYXQob3V0Y29tZS5Hb2FsSWQsIElzLkVxdWFsVG8oZ29hbElkKSwgIkdvYWxJZCBtdXN0IGJlIHRocmVhZGVkIHRocm91Z2guIik7CiAgICAgICAgQXNzZXJ0LlRoYXQob3V0Y29tZS5Ub29sTmFtZSwgSXMuRXF1YWxUbygiR2V0U3RhdHVzIiksICJUb29sTmFtZSBtdXN0IGJlIHNldC4iKTsKICAgICAgICAvLyBDYWxsQXN5bmMgbG9ncyBleGFjdGx5IG9uZSBBY3Rpb25Db21wbGV0ZWQgZW50cnk7IENhbGxXaXRoT3V0Y29tZUFzeW5jCiAgICAgICAgLy8gbXVzdCBOT1QgYWRkIGEgc2Vjb25kIExvZ091dGNvbWUgZW50cnkgKGFudGktZHVwbGljYXRlIGd1YXJkIOKAlCBhdWRpdCAjNCkuCiAgICAgICAgQXNzZXJ0LlRoYXQoam91cm5hbC5FbnRyaWVzLCBIYXMuQ291bnQuRXF1YWxUbygxKSwKICAgICAgICAgICAgIkNhbGxXaXRoT3V0Y29tZUFzeW5jIG11c3QgcHJvZHVjZSBleGFjdGx5IG9uZSBqb3VybmFsIGVudHJ5IChmcm9tIENhbGxBc3luYykuICIgKwogICAgICAgICAgICAiQXVkaXQgZmluZGluZyAjNCBmaXg6IHJlbW92ZWQgZHVwbGljYXRlIF9qb3VybmFsPy5Mb2dPdXRjb21lIGZyb20gQ2FsbFdpdGhPdXRjb21lQXN5bmMuIik7CiAgICB9CgogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIFNwcmludCAzNiBQMC1COiBBIHRvb2wgdGhhdCByZXR1cm5zIGZhaWx1cmUgbXVzdCBwcm9kdWNlIGEgZmFpbGVkIEFjdGlvbk91dGNvbWUuCiAgICAvLy8gR29hbElkIGFuZCBUb29sTmFtZSBtdXN0IGJlIGNvcnJlY3RseSB0aHJlYWRlZCB0aHJvdWdoIG9uIGZhaWx1cmUgcGF0aHMuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgW1Rlc3RdCiAgICBwdWJsaWMgYXN5bmMgVGFzayBDYWxsV2l0aE91dGNvbWVBc3luY19Ub29sRmFpbHVyZV9SZXR1cm5zRmFpbGVkT3V0Y29tZSgpCiAgICB7CiAgICAgICAgdmFyIGRpc3BhdGNoZXIgPSBuZXcgVG9vbERpc3BhdGNoZXIoKTsKICAgICAgICBkaXNwYXRjaGVyLlJlZ2lzdGVyKG5ldyBGYWlsaW5nVG9vbCgiQmFkVG9vbCIpKTsKCiAgICAgICAgdXNpbmcgdmFyIGRvYyA9IFN5c3RlbS5UZXh0Lkpzb24uSnNvbkRvY3VtZW50LlBhcnNlKCJ7fSIpOwogICAgICAgIHZhciBnb2FsSWQgPSBHdWlkLk5ld0d1aWQoKTsKICAgICAgICB2YXIgKHJlc3VsdCwgb3V0Y29tZSkgPSBhd2FpdCBkaXNwYXRjaGVyLkNhbGxXaXRoT3V0Y29tZUFzeW5jKGdvYWxJZCwgIkJhZFRvb2wiLCBkb2MuUm9vdEVsZW1lbnQpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXN1bHQuU3VjY2VzcywgSXMuRmFsc2UsICJUb29sUmVzdWx0IG11c3QgYmUgZmFpbHVyZS4iKTsKICAgICAgICBBc3NlcnQuVGhhdChvdXRjb21lLlN1Y2Nlc3MsIElzLkZhbHNlLCAiQWN0aW9uT3V0Y29tZSBtdXN0IHJlZmxlY3QgZmFpbHVyZS4iKTsKICAgICAgICBBc3NlcnQuVGhhdChvdXRjb21lLkdvYWxJZCwgSXMuRXF1YWxUbyhnb2FsSWQpLCAiR29hbElkIG11c3QgYmUgdGhyZWFkZWQgdGhyb3VnaCBvbiBmYWlsdXJlLiIpOwogICAgICAgIEFzc2VydC5UaGF0KG91dGNvbWUuVG9vbE5hbWUsIElzLkVxdWFsVG8oIkJhZFRvb2wiKSwgIlRvb2xOYW1lIG11c3QgYmUgc2V0IG9uIGZhaWx1cmUuIik7CiAgICB9CgogICAgLy8g4pSA4pSA4pSAIFAwLUM6IEJ1aWxkR29hbERlY29tcG9zZXIgLyBIdG5UYXNrTGlicmFyeSBTZWFyY2hlZFJhZGl1cyByZXRyeSBnYXRlIOKUgAoKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBTcHJpbnQgMzYgUDAtQzogV2hlbiBCdWlsZEZhY3RLZXlzLkxhc3RGbGF0QXJlYSA9PSAwIEFORAogICAgLy8vIGV2ZW50OkZsYXRBcmVhRm91bmQ6U2VhcmNoZWRSYWRpdXMgJmx0OyA0OCAoRmxhdEFyZWFSZXRyeVJhZGl1cyksIERlY29tcG9zZUJ1aWxkCiAgICAvLy8gc2hvdWxkIHJldHJ5IHdpdGggdGhlIGxhcmdlciByYWRpdXMgKDQ4KS4gVGhpcyB2ZXJpZmllcyB0aGUgcmV0cnkgaXMgZW1pdHRlZAogICAgLy8vIHdoZW4gdGhlcmUncyBzdGlsbCByb29tIHRvIGV4cGFuZCB0aGUgc2VhcmNoLgogICAgLy8vIDwvc3VtbWFyeT4KICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgRGVjb21wb3NlQnVpbGRfU2VhcmNoZWRSYWRpdXMzMl9BcmVhWmVyb19SZXRyeUZpbmRGbGF0QXJlYUVtaXR0ZWQoKQogICAgewogICAgICAgIC8vIEFycmFuZ2U6IGxhc3Qgc2NhbiBmb3VuZCBhcmVhPTAgYXQgcmFkaXVzPTMyIOKGkiByZXRyeSB3aXRoIHJhZGl1cz00OAogICAgICAgIHZhciBzdGF0ZSA9IFdvcmxkU3RhdGUuRW1wdHkuV2l0aChiID0+CiAgICAgICAgewogICAgICAgICAgICBiLlNldEZhY3QoQnVpbGRGYWN0S2V5cy5MYXN0RmxhdEFyZWEsICAgICAgICAgICIwIiwgIEZhY3RTb3VyY2UuT2JzZXJ2ZWQpOwogICAgICAgICAgICBiLlNldEZhY3QoImV2ZW50OkZsYXRBcmVhRm91bmQ6U2VhcmNoZWRSYWRpdXMiLCAiMzIiLCBGYWN0U291cmNlLk9ic2VydmVkKTsKICAgICAgICB9KTsKCiAgICAgICAgdmFyIGxpYnJhcnkgPSBuZXcgSHRuVGFza0xpYnJhcnkoKTsKICAgICAgICB2YXIgYmx1ZXByaW50ID0gbmV3IEFnZW50LkNvbnN0cnVjdGlvbi5CbHVlcHJpbnQKICAgICAgICB7CiAgICAgICAgICAgIElkID0gInRlc3QtaG91c2UiLCBOYW1lID0gIlRlc3QgSG91c2UiLCBNYXRlcmlhbHMgPSBbXQogICAgICAgIH07CgogICAgICAgIC8vIERlY29tcG9zZUJ1aWxkIHdpdGggcmVxdWlyZU9yaWdpbj10cnVlIGFuZCBubyBzdG9yZWQgb3JpZ2luCiAgICAgICAgdmFyIGFjdGlvbnMgPSBsaWJyYXJ5LkRlY29tcG9zZUJ1aWxkKGJsdWVwcmludCwgW10sIDAsIDAsIDAsIHN0YXRlLCByZXF1aXJlT3JpZ2luOiB0cnVlKTsKCiAgICAgICAgLy8gQXNzZXJ0OiBlbWl0cyBhIEZpbmRGbGF0QXJlYSB3aXRoIHJhZGl1cyA+PSA0OAogICAgICAgIHZhciBmaW5kRmxhdCA9IGFjdGlvbnMuRmlyc3RPckRlZmF1bHQoYSA9PgogICAgICAgICAgICBhLlRvb2wuRXF1YWxzKCJGaW5kRmxhdEFyZWEiLCBTdHJpbmdDb21wYXJpc29uLk9yZGluYWxJZ25vcmVDYXNlKSk7CgogICAgICAgIEFzc2VydC5UaGF0KGZpbmRGbGF0LCBJcy5Ob3QuTnVsbCwKICAgICAgICAgICAgIlNlYXJjaGVkUmFkaXVzPTMyLCBBcmVhPTAg4oaSIHJldHJ5IEZpbmRGbGF0QXJlYSBtdXN0IGJlIGVtaXR0ZWQgKFNwcmludCAzNiBQMC1DKS4iKTsKCiAgICAgICAgaWYgKGZpbmRGbGF0IS5Bcmd1bWVudHMuVHJ5R2V0VmFsdWUoInJhZGl1cyIsIG91dCB2YXIgcnYpKQogICAgICAgIHsKICAgICAgICAgICAgdmFyIHJhZGl1cyA9IENvbnZlcnQuVG9JbnQzMihydik7CiAgICAgICAgICAgIEFzc2VydC5UaGF0KHJhZGl1cywgSXMuR3JlYXRlclRoYW5PckVxdWFsVG8oNDgpLAogICAgICAgICAgICAgICAgIlJldHJ5IEZpbmRGbGF0QXJlYSBtdXN0IHVzZSBhdCBsZWFzdCByYWRpdXM9NDggKEZsYXRBcmVhUmV0cnlSYWRpdXMpLiIpOwogICAgICAgIH0KICAgIH0KCiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIERlY29tcG9zZUJ1aWxkX1NlYXJjaGVkUmFkaXVzNDhfQXJlYVplcm9fTm9SZXRyeV9FbXB0eVBsYW4oKQogICAgewogICAgICAgIC8vIEFycmFuZ2U6IGxhc3Qgc2NhbiBmb3VuZCBhcmVhPTAgYXQgcmFkaXVzPTQ4IOKGkiBhbHJlYWR5IGF0IG1heCwgbm8gcmV0cnkKICAgICAgICB2YXIgc3RhdGUgPSBXb3JsZFN0YXRlLkVtcHR5LldpdGgoYiA9PgogICAgICAgIHsKICAgICAgICAgICAgYi5TZXRGYWN0KEJ1aWxkRmFjdEtleXMuTGFzdEZsYXRBcmVhLCAgICAgICAgICAiMCIsICBGYWN0U291cmNlLk9ic2VydmVkKTsKICAgICAgICAgICAgYi5TZXRGYWN0KCJldmVudDpGbGF0QXJlYUZvdW5kOlNlYXJjaGVkUmFkaXVzIiwgIjQ4IiwgRmFjdFNvdXJjZS5PYnNlcnZlZCk7CiAgICAgICAgfSk7CgogICAgICAgIHZhciBsaWJyYXJ5ID0gbmV3IEh0blRhc2tMaWJyYXJ5KCk7CiAgICAgICAgdmFyIGJsdWVwcmludCA9IG5ldyBBZ2VudC5Db25zdHJ1Y3Rpb24uQmx1ZXByaW50CiAgICAgICAgewogICAgICAgICAgICBJZCA9ICJ0ZXN0LWhvdXNlIiwgTmFtZSA9ICJUZXN0IEhvdXNlIiwgTWF0ZXJpYWxzID0gW10KICAgICAgICB9OwoKICAgICAgICB2YXIgYWN0aW9ucyA9IGxpYnJhcnkuRGVjb21wb3NlQnVpbGQoYmx1ZXByaW50LCBbXSwgMCwgMCwgMCwgc3RhdGUsIHJlcXVpcmVPcmlnaW46IHRydWUpOwoKICAgICAgICAvLyBXaGVuIFNlYXJjaGVkUmFkaXVzID49IDQ4IGFuZCBBcmVhID0gMCwgcGxhbiBtdXN0IGJlIGVtcHR5IChubyBtb3JlIHJldHJ5KS4KICAgICAgICB2YXIgcmV0cnlGaW5kRmxhdCA9IGFjdGlvbnMuQW55KGEgPT4KICAgICAgICAgICAgYS5Ub29sLkVxdWFscygiRmluZEZsYXRBcmVhIiwgU3RyaW5nQ29tcGFyaXNvbi5PcmRpbmFsSWdub3JlQ2FzZSkKICAgICAgICAgICAgJiYgYS5Bcmd1bWVudHMuVHJ5R2V0VmFsdWUoInJhZGl1cyIsIG91dCB2YXIgcnYpCiAgICAgICAgICAgICYmIENvbnZlcnQuVG9JbnQzMihydikgPj0gNDgpOwoKICAgICAgICBBc3NlcnQuVGhhdChyZXRyeUZpbmRGbGF0LCBJcy5GYWxzZSwKICAgICAgICAgICAgIlNlYXJjaGVkUmFkaXVzPTQ4LCBBcmVhPTAg4oaSIG5vIHJldHJ5IEZpbmRGbGF0QXJlYSA+PSA0OCBzaG91bGQgYmUgZW1pdHRlZC4gIiArCiAgICAgICAgICAgICJNYXhpbXVtIHNlYXJjaCByYWRpdXMgZXhoYXVzdGVkIChTcHJpbnQgMzYgUDAtQykuIik7CgogICAgICAgIEFzc2VydC5UaGF0KGFjdGlvbnMsIElzLkVtcHR5LAogICAgICAgICAgICAiV2hlbiBtYXggcmFkaXVzIGV4aGF1c3RlZCBhbmQgbm8gZmxhdCBhcmVhIGZvdW5kLCBwbGFuIG11c3QgYmUgZW1wdHkuIik7CiAgICB9CgogICAgW1Rlc3RdCiAgICBwdWJsaWMgdm9pZCBEZWNvbXBvc2VCdWlsZF9Ob1NlYXJjaGVkUmFkaXVzX0FyZWFaZXJvX0RlZmF1bHRSZXRyeSgpCiAgICB7CiAgICAgICAgLy8gQXJyYW5nZTogYXJlYT0wIGJ1dCBubyBTZWFyY2hlZFJhZGl1cyBmYWN0IChmaXJzdC1ldmVyIHplcm8tYXJlYSByZXN1bHQpCiAgICAgICAgLy8g4oaSIHNob3VsZCByZXRyeSAoU2VhcmNoZWRSYWRpdXMgZGVmYXVsdHMgdG8gMCA8IDQ4KQogICAgICAgIHZhciBzdGF0ZSA9IFdvcmxkU3RhdGUuRW1wdHkuV2l0aChiID0+CiAgICAgICAgewogICAgICAgICAgICBiLlNldEZhY3QoQnVpbGRGYWN0S2V5cy5MYXN0RmxhdEFyZWEsICIwIiwgRmFjdFNvdXJjZS5PYnNlcnZlZCk7CiAgICAgICAgICAgIC8vIE5vIFNlYXJjaGVkUmFkaXVzIGZhY3QKICAgICAgICB9KTsKCiAgICAgICAgdmFyIGxpYnJhcnkgPSBuZXcgSHRuVGFza0xpYnJhcnkoKTsKICAgICAgICB2YXIgYmx1ZXByaW50ID0gbmV3IEFnZW50LkNvbnN0cnVjdGlvbi5CbHVlcHJpbnQKICAgICAgICB7CiAgICAgICAgICAgIElkID0gInRlc3QtaG91c2UiLCBOYW1lID0gIlRlc3QgSG91c2UiLCBNYXRlcmlhbHMgPSBbXQogICAgICAgIH07CgogICAgICAgIHZhciBhY3Rpb25zID0gbGlicmFyeS5EZWNvbXBvc2VCdWlsZChibHVlcHJpbnQsIFtdLCAwLCAwLCAwLCBzdGF0ZSwgcmVxdWlyZU9yaWdpbjogdHJ1ZSk7CgogICAgICAgIC8vIFNob3VsZCBzdGlsbCByZXRyeSBzaW5jZSBsYXN0U2VhcmNoZWRSYWRpdXMgZGVmYXVsdHMgdG8gMCA8IDQ4CiAgICAgICAgdmFyIGZpbmRGbGF0ID0gYWN0aW9ucy5GaXJzdE9yRGVmYXVsdChhID0+CiAgICAgICAgICAgIGEuVG9vbC5FcXVhbHMoIkZpbmRGbGF0QXJlYSIsIFN0cmluZ0NvbXBhcmlzb24uT3JkaW5hbElnbm9yZUNhc2UpKTsKCiAgICAgICAgQXNzZXJ0LlRoYXQoZmluZEZsYXQsIElzLk5vdC5OdWxsLAogICAgICAgICAgICAiQXJlYT0wIHdpdGhvdXQgU2VhcmNoZWRSYWRpdXMgZmFjdCBkZWZhdWx0cyB0byByYWRpdXM9MCA8IDQ4LCBzbyByZXRyeSBzaG91bGQgZmlyZS4iKTsKICAgIH0KCiAgICAvLyDilIDilIDilIAgUDEtQjogSXRlbUNyYWZ0ZWRFdmVudCBpbnZlbnRvcnkgdGVzdHMg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIFNwcmludCAzNiBQMS1COiBXb3JsZFN0YXRlUHJvamVjdG9yLkFwcGx5SXRlbUNyYWZ0ZWQgbXVzdCBhZGQgdGhlIGNyYWZ0ZWQKICAgIC8vLyBpdGVtIHRvIGludmVudG9yeSwgbWlycm9yaW5nIHRoZSBBcHBseUl0ZW1Db2xsZWN0ZWQgcGF0dGVybiBmcm9tIFNwcmludCAzNS4KICAgIC8vLyA8L3N1bW1hcnk+CiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIEl0ZW1DcmFmdGVkRXZlbnRfVXBkYXRlc0ludmVudG9yeSgpCiAgICB7CiAgICAgICAgdmFyIHByb2plY3RvciA9IG5ldyBXb3JsZFN0YXRlUHJvamVjdG9yKCk7CiAgICAgICAgdmFyIHVwZGF0ZWQgPSBwcm9qZWN0b3IuQXBwbHkoV29ybGRTdGF0ZS5FbXB0eSwKICAgICAgICAgICAgbmV3IEl0ZW1DcmFmdGVkRXZlbnQoImlyb25fcGlja2F4ZSIsIDEsIERhdGVUaW1lT2Zmc2V0LlV0Y05vdykpOwoKICAgICAgICBBc3NlcnQuVGhhdCh1cGRhdGVkLkludmVudG9yeS5UcnlHZXRWYWx1ZSgiaXJvbl9waWNrYXhlIiwgb3V0IHZhciBjb3VudCksIElzLlRydWUsCiAgICAgICAgICAgICJJdGVtQ3JhZnRlZEV2ZW50IG11c3QgYWRkIHRoZSBjcmFmdGVkIGl0ZW0gdG8gaW52ZW50b3J5IChTcHJpbnQgMzYgUDEtQikuIik7CiAgICAgICAgQXNzZXJ0LlRoYXQoY291bnQsIElzLkVxdWFsVG8oMSkpOwogICAgfQoKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBTcHJpbnQgMzYgUDEtQjogSXRlbUNyYWZ0ZWRFdmVudCBtdXN0IHN0cmlwIHRoZSBtaW5lY3JhZnQ6IG5hbWVzcGFjZSBwcmVmaXgKICAgIC8vLyBzbyBpbnZlbnRvcnkga2V5cyBhcmUgYWx3YXlzIGJhcmUgaXRlbSBJRHMgKG1pcnJvcnMgQXBwbHlJdGVtQ29sbGVjdGVkIG5vcm1hbGl6YXRpb24pLgogICAgLy8vIDwvc3VtbWFyeT4KICAgIFtUZXN0XQogICAgcHVibGljIHZvaWQgSXRlbUNyYWZ0ZWRFdmVudF9TdHJpcHNNaW5lY3JhZnRQcmVmaXgoKQogICAgewogICAgICAgIHZhciBwcm9qZWN0b3IgPSBuZXcgV29ybGRTdGF0ZVByb2plY3RvcigpOwogICAgICAgIHZhciB1cGRhdGVkID0gcHJvamVjdG9yLkFwcGx5KFdvcmxkU3RhdGUuRW1wdHksCiAgICAgICAgICAgIG5ldyBJdGVtQ3JhZnRlZEV2ZW50KCJtaW5lY3JhZnQ6aXJvbl9waWNrYXhlIiwgMSwgRGF0ZVRpbWVPZmZzZXQuVXRjTm93KSk7CgogICAgICAgIEFzc2VydC5UaGF0KHVwZGF0ZWQuSW52ZW50b3J5LlRyeUdldFZhbHVlKCJpcm9uX3BpY2theGUiLCBvdXQgdmFyIGNvdW50KSwgSXMuVHJ1ZSwKICAgICAgICAgICAgIm1pbmVjcmFmdDogcHJlZml4IG11c3QgYmUgc3RyaXBwZWQgZnJvbSBjcmFmdGVkIGl0ZW0ga2V5IChTcHJpbnQgMzYgUDEtQikuIik7CiAgICAgICAgQXNzZXJ0LlRoYXQoY291bnQsIElzLkVxdWFsVG8oMSkpOwogICAgICAgIEFzc2VydC5UaGF0KHVwZGF0ZWQuSW52ZW50b3J5LkNvbnRhaW5zS2V5KCJtaW5lY3JhZnQ6aXJvbl9waWNrYXhlIiksIElzLkZhbHNlLAogICAgICAgICAgICAiUmF3IG5hbWVzcGFjZS1wcmVmaXhlZCBrZXkgbXVzdCBub3QgYXBwZWFyIGluIGludmVudG9yeS4iKTsKICAgIH0KCiAgICAvLyDilIDilIDilIAgUDEtQzogVG9vbCBuYW1lcyBpbiBMTE0gc3lzdGVtIHByb21wdCAoc2NhZmZvbGRpbmcgdGVzdCkg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgLy8vIDxzdW1tYXJ5PgogICAgLy8vIFNwcmludCAzNiBQMS1DIHNjYWZmb2xkaW5nOiB2ZXJpZnkgdGhhdCByZWdpc3RlcmVkIHRvb2wgbmFtZXMgYXJlIGV4cG9zZWQKICAgIC8vLyBhcyBhIGxpc3QgdGhhdCBjYW4gYmUgaW5qZWN0ZWQgaW50byB0aGUgTExNIHN5c3RlbSBwcm9tcHQuCiAgICAvLy8KICAgIC8vLyBUaGUgZnVsbCBpbXBsZW1lbnRhdGlvbiB3aXJlcyBUb29sRGlzcGF0Y2hlci5SZWdpc3RlcmVkTmFtZXMgaW50bwogICAgLy8vIExsbUNoYXRJbnRlcnByZXRlci5CdWlsZFN5c3RlbVByb21wdCB2aWEgUHJvZ3JhbS5jcyBESS4gVGhpcyB0ZXN0IHZhbGlkYXRlcwogICAgLy8vIHRoZSBkYXRhIHBpcGVsaW5lIOKAlCB0aGF0IFJlZ2lzdGVyZWROYW1lcyByZXR1cm5zIGFsbCBrZXlzIChpbmNsdWRpbmcgYWxpYXNlcykKICAgIC8vLyBpbiBkZXRlcm1pbmlzdGljIHNvcnRlZCBvcmRlci4KICAgIC8vLyA8L3N1bW1hcnk+CiAgICBbVGVzdF0KICAgIHB1YmxpYyB2b2lkIFRvb2xEaXNwYXRjaGVyX1JlZ2lzdGVyZWROYW1lc19JbmNsdWRlc0FsaWFzZXNBbmRJc1NvcnRlZCgpCiAgICB7CiAgICAgICAgdmFyIGRpc3BhdGNoZXIgPSBuZXcgVG9vbERpc3BhdGNoZXIoKTsKICAgICAgICBkaXNwYXRjaGVyLlJlZ2lzdGVyKG5ldyBOdWxsVG9vbCgiTWluZUJsb2NrIikpOwogICAgICAgIGRpc3BhdGNoZXIuUmVnaXN0ZXIobmV3IE51bGxUb29sKCJHZXRTdGF0dXMiKSk7CiAgICAgICAgZGlzcGF0Y2hlci5SZWdpc3RlcigiU3RhdHVzIiwgZGlzcGF0Y2hlci5HZXQoIkdldFN0YXR1cyIpISk7ICAgLy8gYWxpYXMKICAgICAgICBkaXNwYXRjaGVyLlJlZ2lzdGVyKG5ldyBOdWxsVG9vbCgiU2VhcmNoTWVtb3J5IikpOwogICAgICAgIGRpc3BhdGNoZXIuUmVnaXN0ZXIobmV3IE51bGxUb29sKCJGaW5kRmxhdEFyZWEiKSk7CgogICAgICAgIHZhciBuYW1lcyA9IGRpc3BhdGNoZXIuUmVnaXN0ZXJlZE5hbWVzOwoKICAgICAgICAvLyBBbGlhc2VzIG11c3QgYmUgaW5jbHVkZWQKICAgICAgICBBc3NlcnQuVGhhdChuYW1lcywgQ29udGFpbnMuSXRlbSgiR2V0U3RhdHVzIiksCiAgICAgICAgICAgICJSZWdpc3RlcmVkTmFtZXMgbXVzdCBpbmNsdWRlIGNhbm9uaWNhbCB0b29sIG5hbWVzLiIpOwogICAgICAgIEFzc2VydC5UaGF0KG5hbWVzLCBDb250YWlucy5JdGVtKCJTdGF0dXMiKSwKICAgICAgICAgICAgIlJlZ2lzdGVyZWROYW1lcyBtdXN0IGluY2x1ZGUgYWxpYXMga2V5cyAoU3ByaW50IDM2IFAxLUMgYXVkaXQgZml4ICMyKS4iKTsKICAgICAgICBBc3NlcnQuVGhhdChuYW1lcywgQ29udGFpbnMuSXRlbSgiTWluZUJsb2NrIikpOwogICAgICAgIEFzc2VydC5UaGF0KG5hbWVzLCBDb250YWlucy5JdGVtKCJTZWFyY2hNZW1vcnkiKSk7CiAgICAgICAgQXNzZXJ0LlRoYXQobmFtZXMsIENvbnRhaW5zLkl0ZW0oIkZpbmRGbGF0QXJlYSIpKTsKCiAgICAgICAgLy8gTXVzdCBiZSBzb3J0ZWQgKGNhc2UtaW5zZW5zaXRpdmUpCiAgICAgICAgdmFyIHNvcnRlZCA9IG5hbWVzLk9yZGVyQnkobiA9PiBuLCBTdHJpbmdDb21wYXJlci5PcmRpbmFsSWdub3JlQ2FzZSkuVG9MaXN0KCk7CiAgICAgICAgQXNzZXJ0LlRoYXQobmFtZXMuVG9MaXN0KCksIElzLkVxdWFsVG8oc29ydGVkKSwKICAgICAgICAgICAgIlJlZ2lzdGVyZWROYW1lcyBtdXN0IGJlIGluIGNhc2UtaW5zZW5zaXRpdmUgYWxwaGFiZXRpY2FsIG9yZGVyIChkZXRlcm1pbmlzdGljIGZvciBMTE0gcHJvbXB0KS4iKTsKICAgIH0KCiAgICAvLyDilIDilIDilIAgTG9jYWwgaGVscGVycyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBmaWxlIHNlYWxlZCBjbGFzcyBOdWxsVG9vbChzdHJpbmcgbmFtZSkgOiBJVG9vbAogICAgewogICAgICAgIHB1YmxpYyBzdHJpbmcgTmFtZSAgICAgICAgPT4gbmFtZTsKICAgICAgICBwdWJsaWMgc3RyaW5nIERlc2NyaXB0aW9uID0+ICJ0ZXN0IHN0dWIiOwogICAgICAgIHB1YmxpYyBTeXN0ZW0uVGV4dC5Kc29uLkpzb25FbGVtZW50IElucHV0U2NoZW1hID0+CiAgICAgICAgICAgIFN5c3RlbS5UZXh0Lkpzb24uSnNvbkRvY3VtZW50LlBhcnNlKCJ7fSIpLlJvb3RFbGVtZW50OwogICAgICAgIHB1YmxpYyBUYXNrPFRvb2xSZXN1bHQ+IEV4ZWN1dGVBc3luYygKICAgICAgICAgICAgU3lzdGVtLlRleHQuSnNvbi5Kc29uRWxlbWVudCBhcmd1bWVudHMsIENhbmNlbGxhdGlvblRva2VuIGN0ID0gZGVmYXVsdCkKICAgICAgICAgICAgPT4gVGFzay5Gcm9tUmVzdWx0KG5ldyBUb29sUmVzdWx0KHRydWUsICJvayIpKTsKICAgIH0KCiAgICBmaWxlIHNlYWxlZCBjbGFzcyBGYWlsaW5nVG9vbChzdHJpbmcgbmFtZSkgOiBJVG9vbAogICAgewogICAgICAgIHB1YmxpYyBzdHJpbmcgTmFtZSAgICAgICAgPT4gbmFtZTsKICAgICAgICBwdWJsaWMgc3RyaW5nIERlc2NyaXB0aW9uID0+ICJhbHdheXMgZmFpbHMiOwogICAgICAgIHB1YmxpYyBTeXN0ZW0uVGV4dC5Kc29uLkpzb25FbGVtZW50IElucHV0U2NoZW1hID0+CiAgICAgICAgICAgIFN5c3RlbS5UZXh0Lkpzb24uSnNvbkRvY3VtZW50LlBhcnNlKCJ7fSIpLlJvb3RFbGVtZW50OwogICAgICAgIHB1YmxpYyBUYXNrPFRvb2xSZXN1bHQ+IEV4ZWN1dGVBc3luYygKICAgICAgICAgICAgU3lzdGVtLlRleHQuSnNvbi5Kc29uRWxlbWVudCBhcmd1bWVudHMsIENhbmNlbGxhdGlvblRva2VuIGN0ID0gZGVmYXVsdCkKICAgICAgICAgICAgPT4gVGFzay5Gcm9tUmVzdWx0KG5ldyBUb29sUmVzdWx0KGZhbHNlLCAiaW50ZW50aW9uYWwgZmFpbHVyZSIpKTsKICAgIH0KCiAgICBmaWxlIHNlYWxlZCBjbGFzcyBTcHlKb3VybmFsIDogSUFnZW50Sm91cm5hbAogICAgewogICAgICAgIHByaXZhdGUgcmVhZG9ubHkgTGlzdDxKb3VybmFsRW50cnk+IF9lbnRyaWVzID0gW107CiAgICAgICAgcHVibGljIExpc3Q8Sm91cm5hbEVudHJ5PiBFbnRyaWVzID0+IF9lbnRyaWVzOwogICAgICAgIHB1YmxpYyBpbnQgQ291bnQgPT4gX2VudHJpZXMuQ291bnQ7CiAgICAgICAgcHVibGljIElSZWFkT25seUxpc3Q8Sm91cm5hbEVudHJ5PiBBbGwgPT4gX2VudHJpZXMuQXNSZWFkT25seSgpOwogICAgICAgIHB1YmxpYyB2b2lkIExvZyhKb3VybmFsRW50cnkgZW50cnkpID0+IF9lbnRyaWVzLkFkZChlbnRyeSk7CiAgICAgICAgcHVibGljIElSZWFkT25seUxpc3Q8Sm91cm5hbEVudHJ5PiBSZWNlbnQoaW50IGNvdW50KSA9PgogICAgICAgICAgICBfZW50cmllcy5UYWtlTGFzdChjb3VudCkuUmV2ZXJzZSgpLlRvTGlzdCgpLkFzUmVhZE9ubHkoKTsKICAgICAgICBwdWJsaWMgSVJlYWRPbmx5TGlzdDxKb3VybmFsRW50cnk+IFF1ZXJ5KAogICAgICAgICAgICBKb3VybmFsRW50cnlUeXBlPyB0eXBlID0gbnVsbCwKICAgICAgICAgICAgRGF0ZVRpbWVPZmZzZXQ/IGZyb20gPSBudWxsLAogICAgICAgICAgICBEYXRlVGltZU9mZnNldD8gdG8gPSBudWxsKSA9PgogICAgICAgICAgICBfZW50cmllcy5XaGVyZShlID0+CiAgICAgICAgICAgICAgICAodHlwZSBpcyBudWxsIHx8IGUuVHlwZSA9PSB0eXBlKSAmJgogICAgICAgICAgICAgICAgKGZyb20gaXMgbnVsbCB8fCBlLlRpbWVzdGFtcCA+PSBmcm9tKSAmJgogICAgICAgICAgICAgICAgKHRvIGlzIG51bGwgfHwgZS5UaW1lc3RhbXAgPD0gdG8pKQogICAgICAgICAgICAuVG9MaXN0KCkuQXNSZWFkT25seSgpOwogICAgICAgIHB1YmxpYyB2b2lkIENsZWFyKCkgPT4gX2VudHJpZXMuQ2xlYXIoKTsKICAgIH0KfQo=
+namespace MemorySmith.Agent.Tests;
+
+using global::Agent.Core;
+using global::Agent.Planning;
+using global::Agent.Planning.Goals;
+using global::Agent.Tools;
+using Microsoft.Extensions.Logging.Abstractions;
+
+/// <summary>
+/// Sprint 36 — AgentRuntime Decomposition + Observation-Driven Replanning.
+///
+/// Test coverage:
+///   P0-A: TryInterruptOnDamageAsync uses ClearAndEnqueueAsync — stop sent before clear
+///   P0-B: CallWithOutcomeAsync returns (ToolResult, ActionOutcome) and does NOT double-log
+///   P0-C: BuildGoalDecomposer/HtnTaskLibrary SearchedRadius retry gate
+///   P1-B: WorldStateProjector.ApplyItemCrafted updates inventory correctly
+///   P1-C: (stub) LlmChatInterpreter BuildSystemPrompt includes registered tool names
+/// </summary>
+[TestFixture]
+public class Sprint36Tests
+{
+    // ─── P0-A: TryInterruptOnDamageAsync stop-before-clear ───────────────────
+
+    /// <summary>
+    /// Sprint 36 P0-A: ClearAndEnqueueAsync sends the stop action BEFORE clearing
+    /// the queue. Verify that "StopNow" appears in MockWorldAdapter.SentActions when
+    /// a damage interrupt fires.
+    ///
+    /// Regression coverage: previously SendEmergencyStop() was fire-and-forget (no
+    /// await), so new actions could be dispatched before JS received the stop signal.
+    /// With ClearAndEnqueueAsync, the stop callback is awaited before the atomic
+    /// clear+enqueue, guaranteeing correct stop-first ordering.
+    /// </summary>
+    [Test]
+    public async Task TryInterruptOnDamageAsync_StopSentBeforeClear_StopNowInSentActions()
+    {
+        var adapter = new MockWorldAdapter();
+        var journal = NullAgentJournal.Instance;
+        var service = AgentBackgroundServiceTestHelper.BuildMinimal(adapter, journal);
+
+        await service.StartAsync(CancellationToken.None);
+        try
+        {
+            service.SetGoal(new SimpleGoal("Mine", "Mine blocks", ["mine"], _ => false));
+
+            // First HealthEvent establishes the baseline (_previousHealth)
+            adapter.PushEvent(new HealthEvent(20, 20, DateTimeOffset.UtcNow));
+
+            // Large drop: 20 → 10 HP (|delta|=10 ≥ system threshold of 6 HP)
+            await Task.Delay(30); // let first event be processed
+            adapter.PushEvent(new HealthEvent(10, 20, DateTimeOffset.UtcNow));
+
+            // Allow event loop to process the second event and fire interrupt
+            await Task.Delay(200);
+
+            var stopSent = adapter.SentActions.Any(a =>
+                a.Tool.Equals("StopNow", StringComparison.OrdinalIgnoreCase));
+
+            Assert.That(stopSent, Is.True,
+                "TryInterruptOnDamageAsync must call ClearAndEnqueueAsync with a stop callback " +
+                "that fires SendActionAsync('StopNow') before clearing the queue (Sprint 36 P0-A).");
+        }
+        finally
+        {
+            await service.StopAsync(CancellationToken.None);
+        }
+    }
+
+    [Test]
+    public async Task TryInterruptOnDamageAsync_SmallDrop_NoStop()
+    {
+        var adapter = new MockWorldAdapter();
+        var journal = NullAgentJournal.Instance;
+        var service = AgentBackgroundServiceTestHelper.BuildMinimal(adapter, journal);
+
+        await service.StartAsync(CancellationToken.None);
+        try
+        {
+            service.SetGoal(new SimpleGoal("Mine", "Mine blocks", ["mine"], _ => false));
+
+            adapter.PushEvent(new HealthEvent(20, 20, DateTimeOffset.UtcNow));
+            await Task.Delay(30);
+            // Only 2 HP drop — below system threshold (6 HP)
+            adapter.PushEvent(new HealthEvent(18, 20, DateTimeOffset.UtcNow));
+            await Task.Delay(200);
+
+            var stopSent = adapter.SentActions.Any(a =>
+                a.Tool.Equals("StopNow", StringComparison.OrdinalIgnoreCase));
+
+            Assert.That(stopSent, Is.False,
+                "2 HP drop is below interrupt threshold — no stop should be sent.");
+        }
+        finally
+        {
+            await service.StopAsync(CancellationToken.None);
+        }
+    }
+
+    // ─── P0-B: CallWithOutcomeAsync ───────────────────────────────────────────
+
+    /// <summary>
+    /// Sprint 36 P0-B: CallWithOutcomeAsync must return a (ToolResult, ActionOutcome)
+    /// tuple with correct Goal/Tool metadata, and must NOT produce duplicate journal
+    /// entries. CallAsync already writes one ActionCompleted entry; CallWithOutcomeAsync
+    /// must not call LogOutcome on top of that (audit finding #4 — fixed this sprint).
+    /// </summary>
+    [Test]
+    public async Task CallWithOutcomeAsync_Success_ReturnsOutcomeAndDoesNotDoubleLog()
+    {
+        var journal = new SpyJournal();
+        var dispatcher = new ToolDispatcher(journal);
+        dispatcher.Register(new NullTool("GetStatus"));
+
+        using var doc = System.Text.Json.JsonDocument.Parse("{}");
+        var goalId = Guid.NewGuid();
+        var (result, outcome) = await dispatcher.CallWithOutcomeAsync(goalId, "GetStatus", doc.RootElement);
+
+        Assert.That(result.Success, Is.True, "ToolResult must be Success.");
+        Assert.That(outcome.Success, Is.True, "ActionOutcome must reflect Success.");
+        Assert.That(outcome.GoalId, Is.EqualTo(goalId), "GoalId must be threaded through.");
+        Assert.That(outcome.ToolName, Is.EqualTo("GetStatus"), "ToolName must be set.");
+        // Sprint 37: CallWithOutcomeAsync intentionally does NOT call LogOutcome
+        // (anti-double-log guard — audit #4). The caller (DispatchActionsAsync) calls
+        // _journal?.LogOutcome(outcome) after CallWithOutcomeAsync returns.
+        // Verify: journal still empty after CallWithOutcomeAsync (no double log).
+        Assert.That(journal.Entries, Has.Count.EqualTo(0),
+            "CallWithOutcomeAsync must NOT produce a journal entry. " +
+            "Caller (DispatchActionsAsync) calls _journal?.LogOutcome(outcome) explicitly.");
+        // Simulate what the caller does — exactly one entry produced.
+        ((IAgentJournal)journal).LogOutcome(outcome);  // default interface method — needs interface cast
+        Assert.That(journal.Entries, Has.Count.EqualTo(1),
+            "After caller calls LogOutcome, exactly one ActionCompleted entry exists.");
+    }
+
+    /// <summary>
+    /// Sprint 36 P0-B: A tool that returns failure must produce a failed ActionOutcome.
+    /// GoalId and ToolName must be correctly threaded through on failure paths.
+    /// </summary>
+    [Test]
+    public async Task CallWithOutcomeAsync_ToolFailure_ReturnsFailedOutcome()
+    {
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new FailingTool("BadTool"));
+
+        using var doc = System.Text.Json.JsonDocument.Parse("{}");
+        var goalId = Guid.NewGuid();
+        var (result, outcome) = await dispatcher.CallWithOutcomeAsync(goalId, "BadTool", doc.RootElement);
+
+        Assert.That(result.Success, Is.False, "ToolResult must be failure.");
+        Assert.That(outcome.Success, Is.False, "ActionOutcome must reflect failure.");
+        Assert.That(outcome.GoalId, Is.EqualTo(goalId), "GoalId must be threaded through on failure.");
+        Assert.That(outcome.ToolName, Is.EqualTo("BadTool"), "ToolName must be set on failure.");
+    }
+
+    // ─── P0-C: BuildGoalDecomposer / HtnTaskLibrary SearchedRadius retry gate ─
+
+    /// <summary>
+    /// Sprint 36 P0-C: When BuildFactKeys.LastFlatArea == 0 AND
+    /// event:FlatAreaFound:SearchedRadius &lt; 48 (FlatAreaRetryRadius), DecomposeBuild
+    /// should retry with the larger radius (48). This verifies the retry is emitted
+    /// when there's still room to expand the search.
+    /// </summary>
+    [Test]
+    public void DecomposeBuild_SearchedRadius32_AreaZero_RetryFindFlatAreaEmitted()
+    {
+        // Arrange: last scan found area=0 at radius=32 → retry with radius=48
+        var state = new WorldState().With(b =>
+        {
+            b.SetFact(BuildFactKeys.LastFlatArea,          "0",  FactSource.Observed);
+            b.SetFact("event:FlatAreaFound:SearchedRadius", "32", FactSource.Observed);
+        });
+
+        var library = new HtnTaskLibrary();
+        var blueprint = new global::Agent.Construction.Blueprint
+        {
+            Id = "test-house", Name = "Test House", Materials = []
+        };
+
+        // DecomposeBuild with requireOrigin=true and no stored origin
+        var actions = library.DecomposeBuild(blueprint, [], 0, 0, 0, state, requireOrigin: true);
+
+        // Assert: emits a FindFlatArea with radius >= 48
+        var findFlat = actions.FirstOrDefault(a =>
+            a.Tool.Equals("FindFlatArea", StringComparison.OrdinalIgnoreCase));
+
+        Assert.That(findFlat, Is.Not.Null,
+            "SearchedRadius=32, Area=0 → retry FindFlatArea must be emitted (Sprint 36 P0-C).");
+
+        if (findFlat!.Arguments.TryGetValue("radius", out var rv))
+        {
+            var radius = Convert.ToInt32(rv);
+            Assert.That(radius, Is.GreaterThanOrEqualTo(48),
+                "Retry FindFlatArea must use at least radius=48 (FlatAreaRetryRadius).");
+        }
+    }
+
+    [Test]
+    public void DecomposeBuild_SearchedRadius48_AreaZero_NoRetry_EmptyPlan()
+    {
+        // Arrange: last scan found area=0 at radius=48 → already at max, no retry
+        var state = new WorldState().With(b =>
+        {
+            b.SetFact(BuildFactKeys.LastFlatArea,          "0",  FactSource.Observed);
+            b.SetFact("event:FlatAreaFound:SearchedRadius", "48", FactSource.Observed);
+        });
+
+        var library = new HtnTaskLibrary();
+        var blueprint = new global::Agent.Construction.Blueprint
+        {
+            Id = "test-house", Name = "Test House", Materials = []
+        };
+
+        var actions = library.DecomposeBuild(blueprint, [], 0, 0, 0, state, requireOrigin: true);
+
+        // When SearchedRadius >= 48 and Area = 0, plan must be empty (no more retry).
+        var retryFindFlat = actions.Any(a =>
+            a.Tool.Equals("FindFlatArea", StringComparison.OrdinalIgnoreCase)
+            && a.Arguments.TryGetValue("radius", out var rv)
+            && Convert.ToInt32(rv) >= 48);
+
+        Assert.That(retryFindFlat, Is.False,
+            "SearchedRadius=48, Area=0 → no retry FindFlatArea >= 48 should be emitted. " +
+            "Maximum search radius exhausted (Sprint 36 P0-C).");
+
+        Assert.That(actions, Is.Empty,
+            "When max radius exhausted and no flat area found, plan must be empty.");
+    }
+
+    [Test]
+    public void DecomposeBuild_NoSearchedRadius_AreaZero_DefaultRetry()
+    {
+        // Arrange: area=0 but no SearchedRadius fact (first-ever zero-area result)
+        // → should retry (SearchedRadius defaults to 0 < 48)
+        var state = new WorldState().With(b =>
+        {
+            b.SetFact(BuildFactKeys.LastFlatArea, "0", FactSource.Observed);
+            // No SearchedRadius fact
+        });
+
+        var library = new HtnTaskLibrary();
+        var blueprint = new global::Agent.Construction.Blueprint
+        {
+            Id = "test-house", Name = "Test House", Materials = []
+        };
+
+        var actions = library.DecomposeBuild(blueprint, [], 0, 0, 0, state, requireOrigin: true);
+
+        // Should still retry since lastSearchedRadius defaults to 0 < 48
+        var findFlat = actions.FirstOrDefault(a =>
+            a.Tool.Equals("FindFlatArea", StringComparison.OrdinalIgnoreCase));
+
+        Assert.That(findFlat, Is.Not.Null,
+            "Area=0 without SearchedRadius fact defaults to radius=0 < 48, so retry should fire.");
+    }
+
+    // ─── P1-B: ItemCraftedEvent inventory tests ────────────────────────────────
+
+    /// <summary>
+    /// Sprint 36 P1-B: WorldStateProjector.ApplyItemCrafted must add the crafted
+    /// item to inventory, mirroring the ApplyItemCollected pattern from Sprint 35.
+    /// </summary>
+    [Test]
+    public void ItemCraftedEvent_UpdatesInventory()
+    {
+        var projector = new WorldStateProjector();
+        var updated = projector.Apply(new WorldState(),
+            new ItemCraftedEvent("iron_pickaxe", 1, DateTimeOffset.UtcNow));
+
+        Assert.That(updated.Inventory.TryGetValue("iron_pickaxe", out var count), Is.True,
+            "ItemCraftedEvent must add the crafted item to inventory (Sprint 36 P1-B).");
+        Assert.That(count, Is.EqualTo(1));
+    }
+
+    /// <summary>
+    /// Sprint 36 P1-B: ItemCraftedEvent must strip the minecraft: namespace prefix
+    /// so inventory keys are always bare item IDs (mirrors ApplyItemCollected normalization).
+    /// </summary>
+    [Test]
+    public void ItemCraftedEvent_StripsMinecraftPrefix()
+    {
+        var projector = new WorldStateProjector();
+        var updated = projector.Apply(new WorldState(),
+            new ItemCraftedEvent("minecraft:iron_pickaxe", 1, DateTimeOffset.UtcNow));
+
+        Assert.That(updated.Inventory.TryGetValue("iron_pickaxe", out var count), Is.True,
+            "minecraft: prefix must be stripped from crafted item key (Sprint 36 P1-B).");
+        Assert.That(count, Is.EqualTo(1));
+        Assert.That(updated.Inventory.ContainsKey("minecraft:iron_pickaxe"), Is.False,
+            "Raw namespace-prefixed key must not appear in inventory.");
+    }
+
+    // ─── P1-C: Tool names in LLM system prompt (scaffolding test) ─────────────
+
+    /// <summary>
+    /// Sprint 36 P1-C scaffolding: verify that registered tool names are exposed
+    /// as a list that can be injected into the LLM system prompt.
+    ///
+    /// The full implementation wires ToolDispatcher.RegisteredNames into
+    /// LlmChatInterpreter.BuildSystemPrompt via Program.cs DI. This test validates
+    /// the data pipeline — that RegisteredNames returns all keys (including aliases)
+    /// in deterministic sorted order.
+    /// </summary>
+    [Test]
+    public void ToolDispatcher_RegisteredNames_IncludesAliasesAndIsSorted()
+    {
+        var dispatcher = new ToolDispatcher();
+        dispatcher.Register(new NullTool("MineBlock"));
+        dispatcher.Register(new NullTool("GetStatus"));
+        dispatcher.Register("Status", dispatcher.Get("GetStatus")!);   // alias
+        dispatcher.Register(new NullTool("SearchMemory"));
+        dispatcher.Register(new NullTool("FindFlatArea"));
+
+        var names = dispatcher.RegisteredNames;
+
+        // Aliases must be included
+        Assert.That(names, Contains.Item("GetStatus"),
+            "RegisteredNames must include canonical tool names.");
+        Assert.That(names, Contains.Item("Status"),
+            "RegisteredNames must include alias keys (Sprint 36 P1-C audit fix #2).");
+        Assert.That(names, Contains.Item("MineBlock"));
+        Assert.That(names, Contains.Item("SearchMemory"));
+        Assert.That(names, Contains.Item("FindFlatArea"));
+
+        // Must be sorted (case-insensitive)
+        var sorted = names.OrderBy(n => n, StringComparer.OrdinalIgnoreCase).ToList();
+        Assert.That(names.ToList(), Is.EqualTo(sorted),
+            "RegisteredNames must be in case-insensitive alphabetical order (deterministic for LLM prompt).");
+    }
+
+    // ─── Local helpers ─────────────────────────────────────────────────────────
+
+    private sealed class NullTool(string name) : ITool
+    {
+        public string Name        => name;
+        public string Description => "test stub";
+        public System.Text.Json.JsonElement InputSchema =>
+            System.Text.Json.JsonDocument.Parse("{}").RootElement;
+        public Task<ToolResult> ExecuteAsync(
+            System.Text.Json.JsonElement arguments, CancellationToken ct = default)
+            => Task.FromResult(new ToolResult(true, "ok"));
+    }
+
+    private sealed class FailingTool(string name) : ITool
+    {
+        public string Name        => name;
+        public string Description => "always fails";
+        public System.Text.Json.JsonElement InputSchema =>
+            System.Text.Json.JsonDocument.Parse("{}").RootElement;
+        public Task<ToolResult> ExecuteAsync(
+            System.Text.Json.JsonElement arguments, CancellationToken ct = default)
+            => Task.FromResult(new ToolResult(false, "intentional failure"));
+    }
+
+    private sealed class SpyJournal : IAgentJournal
+    {
+        private readonly List<JournalEntry> _entries = [];
+        public List<JournalEntry> Entries => _entries;
+        public int Count => _entries.Count;
+        public IReadOnlyList<JournalEntry> All => _entries.AsReadOnly();
+        public void Log(JournalEntry entry) => _entries.Add(entry);
+        public IReadOnlyList<JournalEntry> Recent(int count) =>
+            _entries.TakeLast(count).Reverse().ToList().AsReadOnly();
+        public IReadOnlyList<JournalEntry> Query(
+            JournalEntryType? type = null,
+            DateTimeOffset? from = null,
+            DateTimeOffset? to = null) =>
+            _entries.Where(e =>
+                (type is null || e.Type == type) &&
+                (from is null || e.Timestamp >= from) &&
+                (to is null || e.Timestamp <= to))
+            .ToList().AsReadOnly();
+        public void Clear() => _entries.Clear();
+    }
+}

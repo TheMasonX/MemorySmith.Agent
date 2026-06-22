@@ -1,8 +1,8 @@
 namespace MemorySmith.Agent.Tests;
 
-using Agent.Core;
-using Agent.Planning;
-using Agent.Tools;
+using global::Agent.Core;
+using global::Agent.Planning;
+using global::Agent.Tools;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
@@ -122,7 +122,7 @@ public class Sprint38Tests
             RequiresSmelting = false,
             MinHarvestLevel  = 0,
         };
-        var goal = new Agent.Planning.Goals.GenericGatherGoal(spec, targetCount: 2);
+        var goal = new global::Agent.Planning.Goals.GenericGatherGoal(spec, targetCount: 2);
 
         // Simulate 2 oak_log pickups via ItemCollectedEvent — additive update, NOT GetStatus.
         var state = new WorldState { IsInventoryStale = false };

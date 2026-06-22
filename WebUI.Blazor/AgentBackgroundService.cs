@@ -44,7 +44,9 @@ public sealed class AgentBackgroundService(
     Logging.IChatLogger? chatLogger = null,
     TimeSpan[]? reconnectDelays = null,
     IReplanGovernor? replanGovernor = null,
-    ITimeProvider? timeProvider = null) : BackgroundService
+    ITimeProvider? timeProvider = null,
+    // Sprint 39 P1-C: IntentManager maps IntentDraft → GoalRequest for HandleChatEventAsync.
+    IntentManager? intentManager = null) : BackgroundService
 {
     // Sprint 1b: default exponential backoff delays
     private static readonly TimeSpan[] DefaultReconnectDelays =
@@ -101,6 +103,8 @@ public sealed class AgentBackgroundService(
     private readonly IAgentJournal? _journal = journal;
     private readonly Logging.IChatLogger? _chatLogger = chatLogger;
     private readonly ITimeProvider _timeProvider = timeProvider ?? SystemTimeProvider.Instance;
+    // Sprint 39 P1-C: maps IntentDraft → GoalRequest in HandleChatEventAsync.
+    private readonly IntentManager? _intentManager = intentManager;
 
     private readonly Channel<string> _gameErrors =
         Channel.CreateUnbounded<string>(new UnboundedChannelOptions { SingleWriter = true });
@@ -117,9 +121,12 @@ public sealed class AgentBackgroundService(
     // Key = correlationId (Guid generated at dispatch time). Value = PendingAction with lifecycle state.
     private readonly ConcurrentDictionary<Guid, PendingAction> _correlatedActions = new();
 
-    // Sprint 38 P3: accumulate ActionOutcomes per dispatch cycle for observation-driven replanning.
-    // Cleared when a new plan is generated. Read by ILlmEvaluator (Sprint 39).
-    private readonly List<ActionOutcome> _cycleOutcomes = [];
+    // Sprint 38 P3 / Sprint 39 D-S38-04: accumulate ActionOutcomes per dispatch cycle for
+    // observation-driven replanning. ConcurrentQueue is safe for concurrent Enqueue from
+    // DispatchActionsAsync and Clear from SetGoal/plan generation without an extra lock.
+    // Cleared when a new plan is generated or when a new goal is set.
+    // Read by ILlmEvaluator (Sprint 39).
+    private readonly ConcurrentQueue<ActionOutcome> _cycleOutcomes = new();
 
     private WorldState _worldState = new();
     private IGoal? _currentGoal;
@@ -208,6 +215,9 @@ public sealed class AgentBackgroundService(
         lock (_pendingLock) _pendingActions.Clear();
         // Sprint 25 P0-D: clear correlation tracking for new goal.
         _correlatedActions.Clear();
+        // Sprint 39 D-S38-01: clear cycle outcomes so the ILlmEvaluator only sees outcomes
+        // from the active goal, not carry-over from a previous one.
+        _cycleOutcomes.Clear();
         // Sprint 37: reset zero-area scan counter for new goal.
         _consecutiveZeroAreaScans = 0;
         // TSK-0021: report task-relevant inventory instead of generic top-5 summary.
@@ -619,6 +629,8 @@ public sealed class AgentBackgroundService(
         }
     }
 
+    // Sprint 39 P1-C: HandleChatEventAsync now consumes IntentDraft? (was ChatInterpretation).
+    // null = not addressed. Intent is a string field; goal creation routes through IntentManager.
     private async Task HandleChatEventAsync(WorldEvent worldEvent, CancellationToken ct)
     {
         if (chatInterpreter is null) return;
@@ -631,7 +643,7 @@ public sealed class AgentBackgroundService(
         using var thinkingCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         var thinkingTask = EnqueueThinkingIfSlowAsync(thinkingCts.Token);
 
-        var interpretation = await chatInterpreter.InterpretAsync(
+        var intent = await chatInterpreter.InterpretAsync(
             chat.Username, chat.Message, botName, chat.OnlinePlayers,
             _worldState.Position, chat.PlayerPos, _worldState, ct);
 
@@ -639,12 +651,11 @@ public sealed class AgentBackgroundService(
         try { await thinkingTask.ConfigureAwait(false); } catch (OperationCanceledException) { }
 
         // Sprint 11: log the resolved intent for visibility
-        if (interpretation.IntentType != ChatIntentType.NotAddressed)
-            logger.LogInformation("[chat] <{Username}> -> {Intent}{Goal}",
-                chat.Username, interpretation.IntentType,
-                interpretation.GoalName is null ? "" : $" ({interpretation.GoalName})");
+        if (intent is not null)
+            logger.LogInformation("[chat] <{Username}> -> {Intent}",
+                chat.Username, intent.Intent);
 
-        if (interpretation.IntentType == ChatIntentType.NotAddressed)
+        if (intent is null)
         {
             logger.LogDebug("[chat] not-addressed from <{Username}>: '{Snippet}'",
                 chat.Username, chat.Message[..Math.Min(40, chat.Message.Length)]);
@@ -652,31 +663,36 @@ public sealed class AgentBackgroundService(
         }
 
         // Sprint 12: IMPORTANT — save the response BEFORE the switch.
-        var pendingResponse = !string.IsNullOrEmpty(interpretation.Response)
-            ? interpretation.Response : null;
+        var pendingResponse = !string.IsNullOrEmpty(intent.Response)
+            ? intent.Response : null;
 
         chatInterpreter.RecordBotSpoke();
 
-        switch (interpretation.IntentType)
+        switch (intent.Intent.ToLowerInvariant())
         {
-            case ChatIntentType.CancelGoal:
+            case "cancel":
                 CancelGoal();
                 break;
 
-            case ChatIntentType.QueryStatus:
+            case "status" or "help":
                 _worldState = _worldState.With(b =>
                     b.SetFact("currentGoal", _currentGoal?.Name ?? "idle", FactSource.Observed));
                 if (pendingResponse is not null)
                     logger.LogInformation("[chat] bot: {Response}", pendingResponse);
                 break;
 
-            case ChatIntentType.CreateGoal when interpretation.GoalName is not null:
+            case "gather" or "build" or "craft":
                 if (pendingResponse is not null)
                     logger.LogInformation("[chat] bot: {Response}", pendingResponse);
-                await TryCreateGoalFromChatAsync(interpretation, ct);
+                if (_intentManager is not null)
+                {
+                    var goalRequest = _intentManager.BuildGoalRequest(intent);
+                    if (goalRequest is not null)
+                        await TryCreateGoalFromChatAsync(goalRequest, ct);
+                }
                 break;
 
-            case ChatIntentType.NavigateTo:
+            case "navigate":
                 if (pendingResponse is not null)
                     logger.LogInformation("[chat] bot: {Response}", pendingResponse);
                 CancelGoal();
@@ -692,10 +708,8 @@ public sealed class AgentBackgroundService(
                     pendingResponse = null;
                 }
 
-                if (interpretation.GoalName == "MoveTo"
-                    && interpretation.GoalParameters is { } nav
-                    && nav.TryGetValue("x", out var nx) && nav.TryGetValue("y", out var ny)
-                    && nav.TryGetValue("z", out var nz))
+                // Explicit coords → MoveTo; null coords → follow player to their position
+                if (intent.X is { } nx && intent.Y is { } ny && intent.Z is { } nz)
                 {
                     _queue.Enqueue(new ActionData
                     {
@@ -703,10 +717,7 @@ public sealed class AgentBackgroundService(
                         Arguments = { ["x"] = nx, ["y"] = ny, ["z"] = nz }
                     });
                 }
-                else if (interpretation.GoalParameters is { } follow
-                    && follow.TryGetValue("target", out var target)
-                    && string.Equals(target?.ToString(), "player", StringComparison.OrdinalIgnoreCase)
-                    && chat.PlayerPos is { } playerPos)
+                else if (chat.PlayerPos is { } playerPos)
                 {
                     _queue.Enqueue(new ActionData
                     {
@@ -721,11 +732,12 @@ public sealed class AgentBackgroundService(
                 }
                 break;
 
-            case ChatIntentType.Chat:
+            case "conversation":
                 logger.LogInformation("[chat] conversational response for <{Username}>: '{Response}'",
                     chat.Username, pendingResponse?.Length > 80 ? pendingResponse[..80] : pendingResponse);
                 break;
-            case ChatIntentType.Unknown:
+            case "clarify":
+                // Low-confidence — bot sends the clarification question (in pendingResponse)
                 break;
         }
 
@@ -770,13 +782,14 @@ public sealed class AgentBackgroundService(
         _ = PushGoalToDashboardAsync();
     }
 
-    private async Task TryCreateGoalFromChatAsync(ChatInterpretation interpretation, CancellationToken ct)
+    // Sprint 39 P1-C: accepts GoalRequest (was ChatInterpretation) — caller resolves via IntentManager.
+    private async Task TryCreateGoalFromChatAsync(GoalRequest goalRequest, CancellationToken ct)
     {
-        if (goalFactory is null || interpretation.GoalName is null) return;
+        if (goalFactory is null) return;
 
         try
         {
-            var goal = await goalFactory.CreateAsync(interpretation.GoalName, interpretation.GoalParameters, ct);
+            var goal = await goalFactory.CreateAsync(goalRequest.GoalName, goalRequest.Parameters, ct);
             if (goal is not null)
             {
                 SetGoal(goal);
@@ -784,7 +797,7 @@ public sealed class AgentBackgroundService(
             }
             else
             {
-                logger.LogWarning("Chat goal '{Name}' could not be created.", interpretation.GoalName);
+                logger.LogWarning("Chat goal '{Name}' could not be created.", goalRequest.GoalName);
                 _queue.Enqueue(new ActionData
                 {
                     Tool = "Chat",
@@ -795,7 +808,7 @@ public sealed class AgentBackgroundService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error creating goal from chat: {Name}", interpretation.GoalName);
+            logger.LogError(ex, "Error creating goal from chat: {Name}", goalRequest.GoalName);
         }
     }
 
@@ -1046,8 +1059,9 @@ public sealed class AgentBackgroundService(
                     // Sprint 37 P2-B / Sprint 38 P3: accumulate outcomes per dispatch cycle for
                     // observation-driven replanning: Plan → Execute → ActionOutcome → LLM Evaluate → Replan?
                     _journal?.LogOutcome(outcome);
-                    _cycleOutcomes.Add(outcome);
-                    // Sprint 39: wire ILlmEvaluator.EvaluateAsync(_currentGoal, _cycleOutcomes) here.
+                    _cycleOutcomes.Enqueue(outcome);
+                    // Sprint 39 P1: wire ILlmEvaluator.EvaluateAsync(_currentGoal, _cycleOutcomes, _worldState) here.
+                    // Concrete LlmEvaluatorImpl is implemented later in Sprint 39 second half.
                     if (result.Success)
                     {
                         // Sprint 19: elevated to Info with timing for runtime visibility
@@ -1612,7 +1626,8 @@ public sealed class AgentBackgroundService(
                 "If gather target is unavailable, choose an alternative gather goal or navigate action. " +
                 "If recipe is missing, check whether a crafting table or raw material is needed first.";
 
-            var interpretation = await chatInterpreter.InterpretAsync(
+            // Sprint 39 P1-C: InterpretAsync now returns IntentDraft?; use IntentManager for goal mapping.
+            var intent = await chatInterpreter.InterpretAsync(
                 username: "system",
                 message: prompt,
                 botName: botName,
@@ -1622,25 +1637,31 @@ public sealed class AgentBackgroundService(
                 state: _worldState,
                 ct: ct);
 
-            if (interpretation.IntentType == ChatIntentType.CreateGoal && interpretation.GoalName is not null)
+            if (intent is not null
+                && intent.Intent is "gather" or "craft" or "build"
+                && _intentManager is not null)
             {
-                if (GoalNamesMatch(interpretation.GoalName, _currentGoal?.Name))
+                var goalRequest = _intentManager.BuildGoalRequest(intent);
+                if (goalRequest is not null)
                 {
-                    logger.LogDebug(
-                        "[recovery] LLM suggested current goal '{Goal}' — no change needed",
-                        interpretation.GoalName);
-                    return;
-                }
-                if (GoalNamesMatch(interpretation.GoalName, _lastAbandonedGoalName))
-                {
-                    logger.LogWarning(
-                        "[recovery] LLM suggested '{Goal}' — same item as recently abandoned; skipping to break loop",
-                        interpretation.GoalName);
-                    return;
-                }
+                    if (GoalNamesMatch(goalRequest.GoalName, _currentGoal?.Name))
+                    {
+                        logger.LogDebug(
+                            "[recovery] LLM suggested current goal '{Goal}' — no change needed",
+                            goalRequest.GoalName);
+                        return;
+                    }
+                    if (GoalNamesMatch(goalRequest.GoalName, _lastAbandonedGoalName))
+                    {
+                        logger.LogWarning(
+                            "[recovery] LLM suggested '{Goal}' — same item as recently abandoned; skipping to break loop",
+                            goalRequest.GoalName);
+                        return;
+                    }
 
-                logger.LogInformation("Recovery interpreter suggested goal: {Goal}", interpretation.GoalName);
-                await TryCreateGoalFromChatAsync(interpretation, ct);
+                    logger.LogInformation("Recovery interpreter suggested goal: {Goal}", goalRequest.GoalName);
+                    await TryCreateGoalFromChatAsync(goalRequest, ct);
+                }
             }
         }
         catch (Exception ex)

@@ -1,1 +1,109 @@
-bmFtZXNwYWNlIEFnZW50LkNvcmU7Cgp1c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnMuQ29uY3VycmVudDsKCi8vLyA8c3VtbWFyeT4KLy8vIEZJRk8gcXVldWUgb2YgcGVuZGluZyB0b29sIGludm9jYXRpb25zIGZvciB0aGUgY3VycmVudCBwbGFuLgovLy8gVGhlIGFnZW50IGxvb3AgZGVxdWV1ZXMgb25lIGFjdGlvbiBwZXIgdGljayBhbmQgZGlzcGF0Y2hlcyBpdAovLy8gdG8gdGhlIFRvb2xEaXNwYXRjaGVyLiBDbGVhcmVkIHdoZW4gdGhlIHBsYW4gaXMgaW52YWxpZGF0ZWQuCi8vLwovLy8gU3ByaW50IDEyOiBzd2l0Y2hlZCBmcm9tIFF1ZXVle1R9IHRvIENvbmN1cnJlbnRRdWV1ZXtUfSBiZWNhdXNlIEFnZW50QmFja2dyb3VuZFNlcnZpY2UKLy8vIGFjY2Vzc2VzIHRoZSBxdWV1ZSBmcm9tIHR3byBjb25jdXJyZW50IHRhc2tzOgovLy8gICAtIERpc3BhdGNoQWN0aW9uc0FzeW5jOiBFbnF1ZXVlQWxsLCBEZXF1ZXVlLCBJc0VtcHR5Ci8vLyAgIC0gQ2hhdENvbnN1bWVyQXN5bmM6ICAgIEVucXVldWUgKGNoYXQgcmVzcG9uc2VzKSwgQ2xlYXIgKHZpYSBTZXRHb2FsIC8gQ2FuY2VsR29hbCkKLy8vIFRoZSBub24tdGhyZWFkLXNhZmUgUXVldWUgY2F1c2VkIGNvcnJ1cHRpb24gdGhhdCBtYW5pZmVzdGVkIGFzIGFuIGluZmluaXRlCi8vLyBwbGFubmluZyBsb29wIOKAlCB0aGUgcXVldWUgYXBwZWFyZWQgZW1wdHkgaW1tZWRpYXRlbHkgYWZ0ZXIgRW5xdWV1ZUFsbCBkdWUKLy8vIHRvIGNvbmN1cnJlbnQgQ2xlYXIgY2FsbHMgcmFjaW5nIHdpdGggdGhlIGVucXVldWUuCi8vLwovLy8gU3ByaW50IDIzOiBhZGRlZCA8c2VlIGNyZWY9IkNsZWFyQW5kRW5xdWV1ZSIvPiBmb3IgdGhlIGRhbWFnZSBpbnRlcnJ1cHQgcGF0aCDigJQKLy8vIGFuIGF0b21pYyBjbGVhcitlbnF1ZXVlIHRoYXQgY2Fubm90IGJlIGludGVybGVhdmVkIHdpdGggYnVsayBFbnF1ZXVlQWxsIGNhbGxzCi8vLyBmcm9tIHRoZSBwbGFubmVyIG9yIHNpbmdsZSBFbnF1ZXVlIGNhbGxzIGZyb20gdGhlIGNoYXQgY29uc3VtZXIuIEVucXVldWVBbGwKLy8vIGlzIG5vdyBhbHNvIGxvY2stcHJvdGVjdGVkIHNvIHRoZSBpbnRlcnJ1cHQgcGF0aCBvYnNlcnZlcyBhIGNvbnNpc3RlbnQgc3RhdGUuCi8vLwovLy8gU3ByaW50IDM1IFAwLUQ6IGFkZGVkIDxzZWUgY3JlZj0iQ2xlYXJBbmRFbnF1ZXVlQXN5bmMiLz4gb3ZlcmxvYWQgdGhhdCBhY2NlcHRzCi8vLyBhbiBvcHRpb25hbCBhc3luYyBzdG9wIGNhbGxiYWNrLiBXaGVuIHByb3ZpZGVkLCB0aGUgY2FsbGJhY2sgaXMgYXdhaXRlZCBCRUZPUkUKLy8vIHRoZSBxdWV1ZSBpcyBjbGVhcmVkLCBlbnN1cmluZyB0aGUgSlMgYWRhcHRlciByZWNlaXZlcyBhIHN0b3Agc2lnbmFsIGJlZm9yZQovLy8gbmV3IGFjdGlvbnMgYXJlIGRpc3BhdGNoZWQuIEFnZW50QmFja2dyb3VuZFNlcnZpY2Ugc2hvdWxkIHVzZSB0aGlzIG92ZXJsb2FkCi8vLyB3aGVuIHJlcGxhbm5pbmcgd2l0aCBhY3RpdmUgRGlzcGF0Y2hlZCBjb3JyZWxhdGlvbiBlbnRyaWVzLgovLy8gPC9zdW1tYXJ5PgpwdWJsaWMgc2VhbGVkIGNsYXNzIEFjdGlvblF1ZXVlCnsKICAgIHByaXZhdGUgcmVhZG9ubHkgQ29uY3VycmVudFF1ZXVlPEFjdGlvbkRhdGE+IF9xdWV1ZSA9IG5ldygpOwogICAgcHJpdmF0ZSByZWFkb25seSBvYmplY3QgX2xvY2sgPSBuZXcoKTsKCiAgICBwdWJsaWMgaW50ICBDb3VudCAgID0+IF9xdWV1ZS5Db3VudDsKICAgIHB1YmxpYyBib29sIElzRW1wdHkgPT4gX3F1ZXVlLklzRW1wdHk7CgogICAgcHVibGljIHZvaWQgRW5xdWV1ZShBY3Rpb25EYXRhIGFjdGlvbikgPT4gX3F1ZXVlLkVucXVldWUoYWN0aW9uKTsKCiAgICBwdWJsaWMgdm9pZCBFbnF1ZXVlQWxsKElFbnVtZXJhYmxlPEFjdGlvbkRhdGE+IGFjdGlvbnMpCiAgICB7CiAgICAgICAgbG9jayAoX2xvY2spCiAgICAgICAgewogICAgICAgICAgICBmb3JlYWNoICh2YXIgYSBpbiBhY3Rpb25zKQogICAgICAgICAgICAgICAgX3F1ZXVlLkVucXVldWUoYSk7CiAgICAgICAgfQogICAgfQoKICAgIHB1YmxpYyBBY3Rpb25EYXRhPyBEZXF1ZXVlKCkgPT4gX3F1ZXVlLlRyeURlcXVldWUob3V0IHZhciBhKSA/IGEgOiBudWxsOwogICAgcHVibGljIEFjdGlvbkRhdGE/IFBlZWsoKSAgICA9PiBfcXVldWUuVHJ5UGVlayhvdXQgdmFyIGEpICAgID8gYSA6IG51bGw7CgogICAgcHVibGljIHZvaWQgQ2xlYXIoKSA9PiBfcXVldWUuQ2xlYXIoKTsKCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gQXRvbWljYWxseSBjbGVhcnMgYW55IHBlbmRpbmcgYWN0aW9ucyBhbmQgZW5xdWV1ZXMgYSBzaW5nbGUgcHJpb3JpdHkKICAgIC8vLyBhY3Rpb24gaW4gb25lIGxvY2stcHJvdGVjdGVkIG9wZXJhdGlvbi4KICAgIC8vLyA8cGFyYT4KICAgIC8vLyBTcHJpbnQgMjMgQi0zIOKAlCB1c2VkIGJ5IHRoZSBkYW1hZ2UgaW50ZXJydXB0IHBhdGggdG8gYXRvbWljYWxseSBkaXNjYXJkCiAgICAvLy8gdGhlIGN1cnJlbnQgcGxhbidzIHJlbWFpbmluZyBhY3Rpb25zIGFuZCBpbnNlcnQgYSBwcmlvcml0eSBHZXRTdGF0dXMgc28KICAgIC8vLyB0aGUgcGxhbm5lciBjYW4gcmUtZXZhbHVhdGUgYWdhaW5zdCBmcmVzaCBoZWFsdGgvd29ybGQgc3RhdGUuCiAgICAvLy8gPC9wYXJhPgogICAgLy8vIDxwYXJhPgogICAgLy8vIFdpdGhvdXQgdGhpcyBtZXRob2QsIGEgY29uY3VycmVudCA8c2VlIGNyZWY9IkVucXVldWUiLz4gZnJvbQogICAgLy8vIDxjPkNoYXRDb25zdW1lckFzeW5jPC9jPiAob3IgYSBidWxrIDxzZWUgY3JlZj0iRW5xdWV1ZUFsbCIvPiBmcm9tIHRoZQogICAgLy8vIHBsYW5uZXIpIGNvdWxkIHNsaXAgYmV0d2VlbiBhIHNlcGFyYXRlIDxzZWUgY3JlZj0iQ2xlYXIiLz4gYW5kIHRoZQogICAgLy8vIHByaW9yaXR5IEVucXVldWUsIGRlZmVhdGluZyB0aGUgaW50ZXJydXB0IGJ5IGxlYXZpbmcgYSBzdGFsZSBjaGF0CiAgICAvLy8gcmVzcG9uc2Ugb3IgcGFydGlhbCBwbGFuIGFoZWFkIG9mIHRoZSBHZXRTdGF0dXMuCiAgICAvLy8gPC9wYXJhPgogICAgLy8vIDwvc3VtbWFyeT4KICAgIC8vLyA8cGFyYW0gbmFtZT0iYWN0aW9uIj5UaGUgcHJpb3JpdHkgYWN0aW9uIHRvIGVucXVldWUgYWZ0ZXIgY2xlYXJpbmcuPC9wYXJhbT4KICAgIHB1YmxpYyB2b2lkIENsZWFyQW5kRW5xdWV1ZShBY3Rpb25EYXRhIGFjdGlvbikKICAgIHsKICAgICAgICBsb2NrIChfbG9jaykKICAgICAgICB7CiAgICAgICAgICAgIF9xdWV1ZS5DbGVhcigpOwogICAgICAgICAgICBfcXVldWUuRW5xdWV1ZShhY3Rpb24pOwogICAgICAgIH0KICAgIH0KCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gU3ByaW50IDM1IFAwLUQ6IEFzeW5jIHZhcmlhbnQgdGhhdCBzZW5kcyBhIHN0b3Agc2lnbmFsIHRvIHRoZSBhZGFwdGVyCiAgICAvLy8gQkVGT1JFIGNsZWFyaW5nIHRoZSBxdWV1ZSwgZW5zdXJpbmcgaW4tZmxpZ2h0IEpTIGFjdGlvbnMgYXJlIGhhbHRlZAogICAgLy8vIGJlZm9yZSBuZXcgcGxhbiBhY3Rpb25zIHN0YXJ0LgogICAgLy8vIDxwYXJhPgogICAgLy8vIFdoZW4gPHBhcmFtcmVmIG5hbWU9InN0b3BDYWxsYmFjayIvPiBpcyBwcm92aWRlZCAobm9uLW51bGwpLCBpdCBpcwogICAgLy8vIGF3YWl0ZWQgYmVmb3JlIHRoZSBsb2NrIGlzIGFjcXVpcmVkLiBUaGlzIGFsbG93cyB0aGUgY2FsbGVyIHRvIHNlbmQKICAgIC8vLyBhICJzdG9wIiBXZWJTb2NrZXQgbWVzc2FnZSB0byB0aGUgYWRhcHRlciB3aXRob3V0IGJsb2NraW5nIHRoZSBsb2NrLgogICAgLy8vIDwvcGFyYT4KICAgIC8vLyA8cGFyYT4KICAgIC8vLyBVc2FnZSBpbiBBZ2VudEJhY2tncm91bmRTZXJ2aWNlIGR1cmluZyByZXBsYW4gd2l0aCBhY3RpdmUgRGlzcGF0Y2hlZCBlbnRyaWVzOgogICAgLy8vIDxjb2RlPgogICAgLy8vIGF3YWl0IF9hY3Rpb25RdWV1ZS5DbGVhckFuZEVucXVldWVBc3luYyhwcmlvcml0eUFjdGlvbiwKICAgIC8vLyAgICAgc3RvcENhbGxiYWNrOiAoKSA9PiBfYnJpZGdlLlNlbmRBc3luYyhBY3Rpb25EYXRhLlN0b3AoKSwgY3QpKTsKICAgIC8vLyA8L2NvZGU+CiAgICAvLy8gPC9wYXJhPgogICAgLy8vIDwvc3VtbWFyeT4KICAgIHB1YmxpYyBhc3luYyBUYXNrIENsZWFyQW5kRW5xdWV1ZUFzeW5jKEFjdGlvbkRhdGEgYWN0aW9uLCBGdW5jPFRhc2s+PyBzdG9wQ2FsbGJhY2sgPSBudWxsKQogICAgewogICAgICAgIC8vIFNlbmQgc3RvcCBCRUZPUkUgYWNxdWlyaW5nIHRoZSBsb2NrIHNvIHRoZSBhZGFwdGVyIHJlY2VpdmVzIHRoZSBzaWduYWwKICAgICAgICAvLyB3aGlsZSBhbnkgaW4tZmxpZ2h0IGFjdGlvbiBpcyBzdGlsbCBydW5uaW5nIG9uIHRoZSBKUyBzaWRlLgogICAgICAgIGlmIChzdG9wQ2FsbGJhY2sgaXMgbm90IG51bGwpCiAgICAgICAgICAgIGF3YWl0IHN0b3BDYWxsYmFjaygpOwoKICAgICAgICBsb2NrIChfbG9jaykKICAgICAgICB7CiAgICAgICAgICAgIF9xdWV1ZS5DbGVhcigpOwogICAgICAgICAgICBfcXVldWUuRW5xdWV1ZShhY3Rpb24pOwogICAgICAgIH0KICAgIH0KfQo=
+namespace Agent.Core;
+
+using System.Collections.Concurrent;
+
+/// <summary>
+/// FIFO queue of pending tool invocations for the current plan.
+/// The agent loop dequeues one action per tick and dispatches it
+/// to the ToolDispatcher. Cleared when the plan is invalidated.
+///
+/// Sprint 12: switched from Queue{T} to ConcurrentQueue{T} because AgentBackgroundService
+/// accesses the queue from two concurrent tasks:
+///   - DispatchActionsAsync: EnqueueAll, Dequeue, IsEmpty
+///   - ChatConsumerAsync:    Enqueue (chat responses), Clear (via SetGoal / CancelGoal)
+/// The non-thread-safe Queue caused corruption that manifested as an infinite
+/// planning loop — the queue appeared empty immediately after EnqueueAll due
+/// to concurrent Clear calls racing with the enqueue.
+///
+/// Sprint 23: added <see cref="ClearAndEnqueue"/> for the damage interrupt path —
+/// an atomic clear+enqueue that cannot be interleaved with bulk EnqueueAll calls
+/// from the planner or single Enqueue calls from the chat consumer. EnqueueAll
+/// is now also lock-protected so the interrupt path observes a consistent state.
+///
+/// Sprint 35 P0-D: added <see cref="ClearAndEnqueueAsync"/> overload that accepts
+/// an optional async stop callback. When provided, the callback is awaited BEFORE
+/// the queue is cleared, ensuring the JS adapter receives a stop signal before
+/// new actions are dispatched. AgentBackgroundService should use this overload
+/// when replanning with active Dispatched correlation entries.
+/// </summary>
+public sealed class ActionQueue
+{
+    private readonly ConcurrentQueue<ActionData> _queue = new();
+    private readonly object _lock = new();
+
+    public int  Count   => _queue.Count;
+    public bool IsEmpty => _queue.IsEmpty;
+
+    public void Enqueue(ActionData action) => _queue.Enqueue(action);
+
+    public void EnqueueAll(IEnumerable<ActionData> actions)
+    {
+        lock (_lock)
+        {
+            foreach (var a in actions)
+                _queue.Enqueue(a);
+        }
+    }
+
+    public ActionData? Dequeue() => _queue.TryDequeue(out var a) ? a : null;
+    public ActionData? Peek()    => _queue.TryPeek(out var a)    ? a : null;
+
+    public void Clear() => _queue.Clear();
+
+    /// <summary>
+    /// Atomically clears any pending actions and enqueues a single priority
+    /// action in one lock-protected operation.
+    /// <para>
+    /// Sprint 23 B-3 — used by the damage interrupt path to atomically discard
+    /// the current plan's remaining actions and insert a priority GetStatus so
+    /// the planner can re-evaluate against fresh health/world state.
+    /// </para>
+    /// <para>
+    /// Without this method, a concurrent <see cref="Enqueue"/> from
+    /// <c>ChatConsumerAsync</c> (or a bulk <see cref="EnqueueAll"/> from the
+    /// planner) could slip between a separate <see cref="Clear"/> and the
+    /// priority Enqueue, defeating the interrupt by leaving a stale chat
+    /// response or partial plan ahead of the GetStatus.
+    /// </para>
+    /// </summary>
+    /// <param name="action">The priority action to enqueue after clearing.</param>
+    public void ClearAndEnqueue(ActionData action)
+    {
+        lock (_lock)
+        {
+            _queue.Clear();
+            _queue.Enqueue(action);
+        }
+    }
+
+    /// <summary>
+    /// Sprint 35 P0-D: Async variant that sends a stop signal to the adapter
+    /// BEFORE clearing the queue, ensuring in-flight JS actions are halted
+    /// before new plan actions start.
+    /// <para>
+    /// When <paramref name="stopCallback"/> is provided (non-null), it is
+    /// awaited before the lock is acquired. This allows the caller to send
+    /// a "stop" WebSocket message to the adapter without blocking the lock.
+    /// </para>
+    /// <para>
+    /// Usage in AgentBackgroundService during replan with active Dispatched entries:
+    /// <code>
+    /// await _actionQueue.ClearAndEnqueueAsync(priorityAction,
+    ///     stopCallback: () => _bridge.SendAsync(ActionData.Stop(), ct));
+    /// </code>
+    /// </para>
+    /// </summary>
+    public async Task ClearAndEnqueueAsync(ActionData action, Func<Task>? stopCallback = null)
+    {
+        // Send stop BEFORE acquiring the lock so the adapter receives the signal
+        // while any in-flight action is still running on the JS side.
+        if (stopCallback is not null)
+            await stopCallback();
+
+        lock (_lock)
+        {
+            _queue.Clear();
+            _queue.Enqueue(action);
+        }
+    }
+}
