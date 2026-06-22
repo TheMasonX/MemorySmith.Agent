@@ -94,6 +94,7 @@ public sealed record StatusEvent(
     int Health,
     int Food,
     IReadOnlyDictionary<string, int> Inventory,
+    string? GameMode,
     DateTimeOffset Timestamp) : WorldEvent(Timestamp);
 
 public sealed record BlockPlacedEvent(int X, int Y, int Z, string Block, DateTimeOffset Timestamp)
