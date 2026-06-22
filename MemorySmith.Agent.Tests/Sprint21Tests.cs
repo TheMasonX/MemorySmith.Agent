@@ -330,7 +330,8 @@ public sealed class Sprint21TruncatedJsonGatherTests
             Assert.Ignore("TryParseTruncatedJson not found via reflection — skipping.");
             return null;
         }
-        return (ChatInterpretation?)method.Invoke(null, [json]);
+        // Sprint 38 P1-B: TryParseTruncatedJson now takes an optional IntentManager parameter.
+        return (ChatInterpretation?)method.Invoke(null, new object?[] { json, null });
     }
 
     [Test]
