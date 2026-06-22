@@ -147,6 +147,31 @@ iron pickaxe" when Ollama timed out).
 
 ---
 
+### PRINCIPLE-1 Pipeline Status (Sprint 38)
+
+As of Sprint 38 the pipeline is:
+  Chat → IChatInterpreter → ChatInterpretation → AgentBackgroundService
+       → IntentManager.BuildGoalRequest → GoalRequest → GoalFactory → IGoal
+
+- `ParseDecision` (LlmChatInterpreter): legacy goal-name switch removed (Sprint 38 P1-A).
+  When `IntentManager` is injected, goal mapping is delegated to it exclusively.
+- `TryParseTruncatedJson`: accepts optional `IntentManager?` (Sprint 38 P1-B).
+  When provided, maps partial intent to GoalRequest via IntentManager.
+- `ChatInterpretation.GoalName` field still exists for Sprint 21 backward compatibility;
+  removal deferred to Sprint 39 (requires ChatInterpreterTests + Sprint21Tests updates).
+
+**Correlation model** (Sprint 25+):
+- Every dispatched action gets a `correlationId` (Guid) stored in `ActionData.Context`.
+- `AgentBackgroundService._correlatedActions` tracks lifecycle: Dispatched → Completed/Failed/TimedOut.
+- `CompleteCorrelatedActionByTool(toolName)` transitions the first matching Dispatched action.
+- `_currentGoal?.Id` is now used as the GoalId in ActionOutcome (Sprint 38 P2; was Guid.Empty).
+
+**Observation-driven replanning** (Sprint 38 P3 stub):
+- `ActionOutcome[]` is accumulated per dispatch cycle in `_cycleOutcomes`.
+- `ILlmEvaluator.EvaluateAsync(goal, outcomes)` interface defined; concrete impl in Sprint 39.
+
+---
+
 ### IntentDraft Schema (Sprint 35 P1-A)
 
 The LLM returns a JSON object. `LlmChatInterpreter.ParseDecision` deserialises it
@@ -352,6 +377,7 @@ Full decisions in `Data/Pages/decisions.md`.
 | `ITool` | `Agent.Tools` | Name, Description, InputSchema, ExecuteAsync |
 | `IWorldAdapter` | `Agent.World.Minecraft` | Connect, SendAction, ReceiveEvents |
 | `IChatInterpreter` | `Agent.Personality` | InterpretAsync → ChatInterpretation (no goal creation) |
+| `ILlmEvaluator` | `Agent.Core` | Evaluate ActionOutcome[] → should replan? (Sprint 39 impl) |
 
 Sprint 36 will add: `IIntentManager`, `IPlanningManager`, `IExecutionManager`,
 `IRecoveryManager`, `IStateManager`, `IDashboardPublisher` (AgentRuntime decomposition).
