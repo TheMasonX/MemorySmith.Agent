@@ -12,6 +12,16 @@ public interface IGoal
     string[] Phases { get; }
 
     /// <summary>
+    /// Unique identifier for this goal instance.
+    ///
+    /// Sprint 38 P2: Used by DispatchActionsAsync.CallWithOutcomeAsync to track
+    /// ActionOutcomes per goal. The Guid.Empty default allows all existing
+    /// implementations to compile without changes; concrete goals should override
+    /// with <c>Guid.NewGuid()</c> in their constructor (assigned once, not per call).
+    /// </summary>
+    Guid Id => Guid.Empty;
+
+    /// <summary>
     /// Nullable failure reason. <see langword="null"/> means the goal hasn't
     /// failed yet or no reason was recorded. Set by the agent service when
     /// <see cref="HasFailed"/> returns <see langword="true"/>.
