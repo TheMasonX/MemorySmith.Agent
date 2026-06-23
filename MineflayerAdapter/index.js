@@ -693,6 +693,27 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           continue;
         }
 
+        // Sprint 41: equip the best available tool before digging.
+        // bot.bestHarvestTool(block) returns { item, time } or null if no tool helps.
+        // If equip fails (e.g. tool is not in hotbar), dig bare-handed.
+        try {
+          const harvestTool = bot.bestHarvestTool(fresh);
+          if (harvestTool) {
+            try {
+              await bot.equip(harvestTool.item, 'hand');
+            } catch (equipErr) {
+              logStructured('debug', 'mine', 'equip failed, digging bare-handed', {
+                tool: harvestTool.item?.name ?? 'unknown',
+                error: equipErr.message,
+              });
+            }
+          }
+        } catch (toolErr) {
+          logStructured('debug', 'mine', 'bestHarvestTool error, digging bare-handed', {
+            error: toolErr.message,
+          });
+        }
+
         try {
           await bot.dig(fresh);
           mined++;

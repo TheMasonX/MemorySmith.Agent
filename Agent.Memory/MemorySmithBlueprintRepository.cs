@@ -2,6 +2,7 @@ namespace Agent.Memory;
 
 using Agent.Construction;
 using Agent.Core;
+using Microsoft.Extensions.Logging;
 
 /// <summary>
 /// <see cref="IBlueprintRepository"/> backed by MemorySmith wiki pages.
@@ -20,7 +21,8 @@ using Agent.Core;
 /// </summary>
 public sealed class MemorySmithBlueprintRepository(
     IMemoryGateway memory,
-    string? localPagesRoot = null) : IBlueprintRepository
+    string? localPagesRoot = null,
+    ILogger<MemorySmithBlueprintRepository>? logger = null) : IBlueprintRepository
 {
     private const string PagePrefix = "blueprints/";
     private readonly string? _localPagesRoot = localPagesRoot ?? FindLocalPagesRoot();
@@ -35,20 +37,36 @@ public sealed class MemorySmithBlueprintRepository(
 
         // 1. Direct page lookup (fast, deterministic — preferred per D-003).
         var content = await memory.GetPageAsync(pageId, ct);
+        if (!string.IsNullOrWhiteSpace(content))
+            logger?.LogDebug("Blueprint '{Id}' found via gateway lookup (page={PageId})", blueprintId, pageId);
 
         // 2. Local file fallback (offline / dev runs using checked-in pages).
         if (string.IsNullOrWhiteSpace(content))
+        {
             content = LoadLocalPage(slug);
+            if (!string.IsNullOrWhiteSpace(content))
+                logger?.LogInformation("Blueprint '{Id}' found via local fallback (Data/Pages/blueprints/{Slug}.md)", blueprintId, slug);
+            else
+                logger?.LogDebug("Blueprint '{Id}' not found locally (Data/Pages/blueprints/{Slug}.md)", blueprintId, slug);
+        }
 
         // 3. Search fallback for IDs that don't match the normalisation convention.
         if (string.IsNullOrWhiteSpace(content))
         {
+            logger?.LogInformation("Blueprint '{Id}' not found via gateway or local — trying search fallback...", blueprintId);
             var results = await memory.SearchAsync($"{PagePrefix}{blueprintId}", ct);
             var hit = results.FirstOrDefault(r =>
                 string.Equals(r.Kind, "page", StringComparison.OrdinalIgnoreCase) &&
                 r.PageId.Contains("blueprints", StringComparison.OrdinalIgnoreCase));
             if (hit is not null)
+            {
+                logger?.LogInformation("Blueprint '{Id}' found via search (hit={HitPageId})", blueprintId, hit.PageId);
                 content = await memory.GetPageAsync(hit.PageId, ct);
+            }
+            else
+            {
+                logger?.LogWarning("Blueprint '{Id}' not found — gateway, local, and search all returned empty.", blueprintId);
+            }
         }
 
         if (string.IsNullOrWhiteSpace(content)) return null;

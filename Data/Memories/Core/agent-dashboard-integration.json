@@ -1,0 +1,18 @@
+{
+  "Id": "agent-dashboard-integration",
+  "Title": "MemorySmith.Agent — Blazor Dashboard & Real-Time Monitoring",
+  "Content": "The Blazor Server dashboard (WebUI.Blazor) provides real-time agent visibility via REST endpoints and SignalR. The dashboard is the primary human interface for monitoring the agent.\n\n## Architecture\n\nThe Blazor app hosts:\n- REST API (/api/agent/*, /api/goals/*, /api/tools/*)\n- SignalR Hub (/hubs/monitor)\n- AgentBackgroundService (IHostedService)\n- All in one process — no separate queue, database, or broker\n\n## REST Endpoints\n\n| Endpoint | Method | Purpose |\n|----------|--------|--------|\n| /api/agent/status | GET | Current agent state (goal, connection, inventory, position) |\n| /api/agent/plan | POST | Set a goal: {goalName, parameters} |\n| /api/agent/stop | POST | Stop agent (?emergency=true for emergency stop) |\n| /api/agent/command | POST | Execute arbitrary action |\n| /api/goals | GET | List available goal types |\n| /api/goals | DELETE | Cancel current goal |\n| /api/tools | GET | List all registered tools with schemas |\n| /about | GET | Dashboard about page |\n\n## Dashboard Push (AgentBackgroundService)\n\nAgentBackgroundService pushes updates to dashboard consumers via:\n\nPushStatusToDashboardAsync (called periodically):\n- Publishes AgentStatusModel: connection status, current goal, position, health, food, inventory summary\n\nPushChatToDashboardAsync (called on chat events):\n- Publishes chat messages with username, message, timestamp\n\nPushGoalToDashboardAsync (called on goal changes):\n- Publishes goal state: name, phases, completion status, failure reason\n\n## SignalR Hub\n\nThe SignalR hub (/hubs/monitor) provides real-time streaming of agent state without polling. Dashboard components subscribe to hub methods for:\n- StatusUpdate: periodic agent status snapshot\n- ChatMessage: in-game chat relay\n- GoalUpdate: goal lifecycle events\n- LogEntry: structured log messages\n\n## Dashboard Components (WebUI.Blazor/Components/)\n\n- AgentStatusPanel: connection status, health, food, position, game mode\n- GoalTracker: current goal, phases, progress\n- InventoryPanel: current inventory contents\n- ChatLog: real-time chat display\n- ToolConsole: command input and tool execution history\n- ActionLog: dispatched actions with status\n\n## Update Frequency\n\n- Status push: every 1-2 seconds (configurable)\n- Chat/Goal/Log push: event-driven (immediate on occurrence)\n- SignalR reconnection: automatic with retry\n\n## Sprint Planning\n\nSprint 41-42 work items related to dashboard:\n- TSK-0041: Dashboard contracts snapshot models\n- TSK-0042: Dashboard event bus\n- TSK-0043: Dashboard snapshot store\n- TSK-0044: Dashboard broadcast service\n- TSK-0045: Refactor AgentBackgroundService to event bus\n- TSK-0046: SignalR event normalization\n\nThese are part of the ongoing dashboard improvement effort to decouple dashboard publishing from the main agent loop.",
+  "Status": 2,
+  "Confidence": 0.9,
+  "Tags": ["agent", "dashboard", "blazor", "signalr", "monitoring", "rest-api", "kind:reference", "audience:agent", "scope:architecture"],
+  "References": ["agent-runtime-lifecycle", "agent-architecture-bounded-contexts"],
+  "Conflicts": [],
+  "SourceLinks": [
+    { "Label": "AgentBackgroundService.cs (dashboard push)", "Uri": "%RepoRoot%WebUI.Blazor/AgentBackgroundService.cs" },
+    { "Label": "Dashboard components", "Uri": "%RepoRoot%WebUI.Blazor/Components/" },
+    { "Label": "Dashboard improvement plan", "Uri": "%RepoRoot%Data/Pages/Tasks/blazor-dashboard-improvement.md" },
+    { "Label": "Dashboard improvement v2", "Uri": "%RepoRoot%Data/Pages/Tasks/blazor-dashboard-improvement-v2.md" }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-06-23T00:00:00Z"
+}

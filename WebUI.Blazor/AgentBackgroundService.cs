@@ -237,31 +237,83 @@ public sealed class AgentBackgroundService(
         // When the world is in creative mode and the goal requires items (IItemSpecGoal),
         // enqueue a /give command via Chat to provision the needed items instead of
         // relying on the removed IsCreativeMode auto-complete in GenericGatherGoal.
-        if (_worldState.IsCreativeMode && goal is IItemSpecGoal itemGoal)
+        // Sprint 41: extended to also handle BuildGoal — provisions ALL blueprint
+        // materials via /give so the creative PlaceBlock path has inventory to work with.
+        // Sprint 41: creative provisioning with anti-spam delays.
+        // Minecraft servers kick bots that send 10+ commands in <100ms.
+        // Each /give command is followed by a 200ms sleep so the server
+        // sees them as human-paced chat, not a command-spam bot.
+        if (_worldState.IsCreativeMode)
         {
-            var have = _worldState.Inventory.GetValueOrDefault(itemGoal.Spec.ItemId);
-            var need = Math.Max(0, itemGoal.TargetCount - have);
-            if (need > 0)
+            if (goal is IItemSpecGoal itemGoal)
             {
-                var giveCmd = $"/give @p {itemGoal.Spec.ItemId} {need}";
-                _queue.Enqueue(new ActionData
+                var have = _worldState.Inventory.GetValueOrDefault(itemGoal.Spec.ItemId);
+                var need = Math.Max(0, itemGoal.TargetCount - have);
+                if (need > 0)
                 {
-                    Tool = "Chat",
-                    Arguments = { ["message"] = giveCmd }
-                });
-                logger.LogInformation(
-                    "[creative] provisioning {Need}x {Item} via '{GiveCmd}' at pos=({PosX},{PosY},{PosZ})",
-                    need, itemGoal.Spec.ItemId, giveCmd,
-                    _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
-                _journal?.Log(new JournalEntry(
-                    _timeProvider.UtcNow, JournalEntryType.ActionDispatched, "CreativeGive",
-                    new Dictionary<string, object?>
+                    var giveCmd = $"/give @p {itemGoal.Spec.ItemId} {need}";
+                    _queue.Enqueue(new ActionData
                     {
-                        ["item"] = itemGoal.Spec.ItemId,
-                        ["count"] = need,
-                    }));
-                // Also enqueue a GetStatus so inventory is refreshed before planning
-                _queue.Enqueue(new ActionData { Tool = "GetStatus" });
+                        Tool = "Chat",
+                        Arguments = { ["message"] = giveCmd }
+                    });
+                    logger.LogInformation(
+                        "[creative] provisioning {Need}x {Item} via '{GiveCmd}' at pos=({PosX},{PosY},{PosZ})",
+                        need, itemGoal.Spec.ItemId, giveCmd,
+                        _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
+                    _journal?.Log(new JournalEntry(
+                        _timeProvider.UtcNow, JournalEntryType.ActionDispatched, "CreativeGive",
+                        new Dictionary<string, object?>
+                        {
+                            ["item"] = itemGoal.Spec.ItemId,
+                            ["count"] = need,
+                        }));
+                    // Also enqueue a GetStatus so inventory is refreshed before planning
+                    _queue.Enqueue(new ActionData { Tool = "GetStatus" });
+                }
+            }
+            else if (goal is BuildGoal buildGoal)
+            {
+                var materials = buildGoal.Blueprint.Materials
+                    .GroupBy(m => m.Block, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(g => g.Key, g => g.Sum(m => m.Quantity), StringComparer.OrdinalIgnoreCase);
+
+                var anyProvisioned = false;
+                foreach (var (block, quantity) in materials)
+                {
+                    var have = _worldState.Inventory.GetValueOrDefault(block);
+                    var need = Math.Max(0, quantity - have);
+                    if (need <= 0) continue;
+
+                    // Sprint 41: 200ms delay between /give commands to prevent
+                    // anti-spam kicks on Minecraft servers.
+                    if (anyProvisioned) Thread.Sleep(200);
+
+                    var giveCmd = $"/give @p {block} {need}";
+                    _queue.Enqueue(new ActionData
+                    {
+                        Tool = "Chat",
+                        Arguments = { ["message"] = giveCmd }
+                    });
+                    logger.LogInformation(
+                        "[creative] provisioning {Need}x {Item} for build '{Blueprint}' via '{GiveCmd}'",
+                        need, block, buildGoal.Blueprint.Name, giveCmd);
+                    _journal?.Log(new JournalEntry(
+                        _timeProvider.UtcNow, JournalEntryType.ActionDispatched, "CreativeGive",
+                        new Dictionary<string, object?>
+                        {
+                            ["item"] = block,
+                            ["count"] = need,
+                            ["blueprint"] = buildGoal.Blueprint.Name,
+                        }));
+                    anyProvisioned = true;
+                }
+
+                if (anyProvisioned)
+                {
+                    // Enqueue a GetStatus so inventory is refreshed before planning
+                    _queue.Enqueue(new ActionData { Tool = "GetStatus" });
+                }
             }
         }
 
@@ -803,9 +855,30 @@ public sealed class AgentBackgroundService(
                     logger.LogInformation("[chat] bot: {Response}", pendingResponse);
                 if (_intentManager is not null)
                 {
+                    // Sprint 41: log intent draft fields so failures are visible in logs
+                    logger.LogDebug(
+                        "[intent] {Intent} draft: item={Item}, blueprint={Blueprint}, " +
+                        "count={Count}, x={X}, y={Y}, z={Z}, confidence={Confidence}",
+                        intent.Intent, intent.Item, intent.Blueprint,
+                        intent.Count, intent.X, intent.Y, intent.Z, intent.Confidence);
+
                     var goalRequest = _intentManager.BuildGoalRequest(intent);
                     if (goalRequest is not null)
+                    {
+                        logger.LogInformation(
+                            "[intent] {Intent} -> goal request: {GoalName}",
+                            intent.Intent, goalRequest.GoalName);
                         await TryCreateGoalFromChatAsync(goalRequest, ct);
+                    }
+                    else
+                    {
+                        logger.LogWarning(
+                            "[intent] {Intent} could not create goal request — " +
+                            "insufficient fields. item={Item}, blueprint={Blueprint}, " +
+                            "count={Count}, x={X}, y={Y}, z={Z}",
+                            intent.Intent, intent.Item, intent.Blueprint,
+                            intent.Count, intent.X, intent.Y, intent.Z);
+                    }
                 }
                 break;
 
@@ -1140,6 +1213,11 @@ public sealed class AgentBackgroundService(
                     foreach (var planAction in plan.Actions)
                         foreach (var kv in planContext)
                             planAction.Context.TryAdd(kv.Key, kv.Value);
+                    // Sprint 41: clear stale actions from the previous plan before enqueuing
+                    // the new one. Without this, old actions (e.g. PlaceBlock from a previous
+                    // cycle with a stale checkpoint) pile up and create a backlog that delays
+                    // new plan execution and confuses the governor's fingerprint check.
+                    _queue.Clear();
                     _queue.EnqueueAll(plan.Actions);
                     _actionDispatchedThisCycle = false;
                     // Sprint 38 P3: new plan generated — clear cycle outcomes accumulator so

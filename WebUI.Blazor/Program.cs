@@ -117,7 +117,9 @@ if (agentEnabled)
             sp.GetRequiredService<IMemoryGateway>(),
             sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value));
     builder.Services.AddSingleton<IBlueprintRepository>(sp =>
-        new MemorySmithBlueprintRepository(sp.GetRequiredService<IMemoryGateway>()));
+        new MemorySmithBlueprintRepository(
+            sp.GetRequiredService<IMemoryGateway>(),
+            logger: sp.GetService<ILogger<MemorySmithBlueprintRepository>>()));
 
     builder.Services.AddSingleton<IKnowledgeResolver>(sp =>
         new LocalKnowledgeResolver(
@@ -250,7 +252,11 @@ if (agentEnabled)
 
     builder.Services.AddSingleton<IAgentJournal>(new AgentJournal());
 
-    builder.Services.AddSingleton<IReplanGovernor, ReplanGovernor>();
+    // Sprint 41: increased threshold from 3 to 5 to prevent false stalls under
+    // the 2-second replan interval — a 6-second stall window was too short when
+    // block placement + pathfinding can take 4-10 seconds per action.
+    builder.Services.AddSingleton<IReplanGovernor>(
+        _ => new ReplanGovernor(identicalPlanThreshold: 5));
 
     // Sprint 27 P0-C: injectable time provider for deterministic testing.
     builder.Services.AddSingleton<ITimeProvider>(SystemTimeProvider.Instance);

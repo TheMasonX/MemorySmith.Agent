@@ -111,7 +111,15 @@ public sealed class GoalFactory : IGoalFactory
             }
 
             var blueprint = await _blueprintRepository.GetAsync(blueprintId, ct);
-            if (blueprint is null) return null;
+            if (blueprint is null)
+            {
+                _logger.LogWarning(
+                    "Blueprint '{BlueprintId}' not found in repository — " +
+                    "checked gateway and local fallback (Data/Pages/blueprints/{Slug}.md). " +
+                    "Available blueprints can be listed via SearchMemory('blueprints/').",
+                    blueprintId, blueprintId);
+                return null;
+            }
 
             var (_, blocks) = BlueprintParser.Parse(blueprint.RawMarkdown);
 

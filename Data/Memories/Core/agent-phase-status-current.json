@@ -1,15 +1,33 @@
 {
-  "Id": "agent-phase-status-current",
-  "Title": "MemorySmith.Agent — Current Phase Status",
-  "Content": "Phases 0-4 complete. Sprint 40 P0/P1 fixes deployed. Phase 5 (intent reliability, adaptive execution) is the current focus.\n\nPhase 0 (Skeleton): all interfaces, wiki pages, CI baseline.\nPhase 1 (Core MVP): MinecraftAdapter.ConnectAsync with subprocess launch and port-wait, MoveToTool, StatusTool, AgentBackgroundService hosted loop.\nPhase 2 (Memory): RestMemoryGateway (IHttpClientFactory), SearchMemoryTool, GetPageTool, CreatePageTool, MockMemoryGateway. SearchResult.Kind disambiguates page slugs from memory UUIDs.\nPhase 3 (Planner): HtnPlanner (await/try-catch ReplanAsync), HtnTaskLibrary (8 task methods), GatherWoodGoal, SurviveNightGoal, IGoalFactory, GoalFactory, POST /api/agent/plan, GET /api/goals.\nPhase 4 (Sprint 40 — complete): ActionData.Context bag, WebSocketBridge with background receive loop, MineflayerAdapter/index.js with pathfinder. Block position off-by-one fixed (findBestBlock three-pass scorer + Y-penalty + grass_block alias). Dig infinite-loop fixed (MAX_DIG_FAILURES=3). Stall retry graduated from 60s fixed to [10,20,30,60]s with chat notification. build + 63 tests green.\n\nPhase 5 (started — Sprint 41): Intent parsing reliability (ollama 3B insufficient), goto() timeout safety, path_update wiring, stale-inventory guard at goal-creation.\n\nCI baseline: 63 tests passing. Last green build: Sprint 40 P0 fixes. Repo: https://github.com/TheMasonX/MemorySmith.Agent",
-  "Status": 2,
-  "Confidence": 1.0,
-  "Tags": ["agent", "phase-status", "roadmap", "kind:status", "audience:agent", "scope:project"],
-  "References": ["agent-architecture-bounded-contexts", "agent-ci-baseline-status", "agent-technology-stack"],
-  "Conflicts": [],
-  "SourceLinks": [
-    { "Label": "Roadmap wiki page", "Uri": "%RepoRoot%Data/Pages/roadmap.md", "StartLine": null, "EndLine": null }
-  ],
-  "UsageCount": 0,
-  "LastUpdated": "2026-06-15T23:30:00Z"
+    "Id":  "agent-phase-status-current",
+    "Title":  "MemorySmith.Agent — Current Phase Status",
+    "Content":  "Phases 0-4 complete. Sprint 40 P0/P1 fixes deployed. Phase 5 (intent reliability, adaptive execution) is the current focus.\n\nPhase 0 (Skeleton): all interfaces, wiki pages, CI baseline.\nPhase 1 (Core MVP): MinecraftAdapter.ConnectAsync with subprocess launch and port-wait, MoveToTool, StatusTool, AgentBackgroundService hosted loop.\nPhase 2 (Memory): RestMemoryGateway (IHttpClientFactory), SearchMemoryTool, GetPageTool, CreatePageTool, MockMemoryGateway. SearchResult.Kind disambiguates page slugs from memory UUIDs.\nPhase 3 (Planner): HtnPlanner (await/try-catch ReplanAsync), HtnTaskLibrary (8 task methods), GatherWoodGoal, SurviveNightGoal, IGoalFactory, GoalFactory, POST /api/agent/plan, GET /api/goals.\nPhase 4 (Sprint 40 — complete): ActionData.Context bag, WebSocketBridge with background receive loop, MineflayerAdapter/index.js with pathfinder. Block position off-by-one fixed (findBestBlock three-pass scorer + Y-penalty + grass_block alias). Dig infinite-loop fixed (MAX_DIG_FAILURES=3). Stall retry graduated from 60s fixed to [10,20,30,60]s with chat notification. build + 63 tests green.\n\nPhase 5 (started — Sprint 41): Intent parsing reliability (ollama 3B insufficient), goto() timeout safety, path_update wiring, stale-inventory guard at goal-creation.\n\nCI baseline: 63 tests passing. Last green build: Sprint 40 P0 fixes. Repo: https://github.com/TheMasonX/MemorySmith.Agent",
+    "Status":  2,
+    "Confidence":  1.0,
+    "Tags":  [
+                 "agent",
+                 "phase-status",
+                 "roadmap",
+                 "kind:status",
+                 "audience:agent",
+                 "scope:project"
+             ],
+    "References":  [
+                       "agent-architecture-bounded-contexts",
+                       "agent-ci-baseline-status",
+                       "agent-technology-stack"
+                   ],
+    "Conflicts":  [
+
+                  ],
+    "SourceLinks":  [
+                        {
+                            "Label":  "Roadmap wiki page",
+                            "Uri":  "%RepoRoot%Data/Pages/roadmap.md",
+                            "StartLine":  null,
+                            "EndLine":  null
+                        }
+                    ],
+    "UsageCount":  0,
+    "LastUpdated":  "2026-06-23T00:00:00Z"
 }

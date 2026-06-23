@@ -13,6 +13,22 @@ using Agent.Core;
 /// </summary>
 public sealed class IntentManager
 {
+    // ── Blueprint alias resolution ───────────────────────────────────────────
+    // Maps common user-facing names to canonical blueprint IDs.
+    // Also duplicated in ChatInterpreter.cs (fast-path) for pre-resolution;
+    // this covers the LLM path where the LLM may return common names like "house".
+    private static readonly IReadOnlyDictionary<string, string> BlueprintAliases =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["house"]           = "small-house",
+            ["small house"]     = "small-house",
+            ["cabin"]           = "small-house",
+            ["shelter"]         = "small-house",
+            ["hut"]             = "small-house",
+            ["home"]            = "small-house",
+            ["shack"]           = "small-house",
+        };
+
     /// <summary>
     /// Maps <paramref name="draft"/> to a typed <see cref="GoalRequest"/>, or null
     /// when the intent does not produce a goal (cancel, status, help, etc.).
@@ -30,10 +46,11 @@ public sealed class IntentManager
                     return new CraftGoalRequest(draft.Item, draft.Count ?? 1);
                 break;
             case "build":
-                if (draft.Blueprint is not null)
-                    return new BuildGoalRequest(
-                        draft.Blueprint,
-                        draft.X, draft.Y, draft.Z);
+                // Sprint 41: resolve common blueprint names (e.g. "house" → "small-house")
+                // via BlueprintAliases so the LLM doesn't need to know exact internal IDs.
+                var resolved = ResolveBlueprint(draft.Blueprint);
+                if (resolved is not null)
+                    return new BuildGoalRequest(resolved, draft.X, draft.Y, draft.Z);
                 break;
             case "navigate":
                 if (draft.X is not null && draft.Y is not null && draft.Z is not null)
@@ -41,6 +58,18 @@ public sealed class IntentManager
                 break;
         }
         return null;
+    }
+
+    /// <summary>
+    /// Resolves a blueprint name through the alias dictionary, or returns it as-is
+    /// if no alias exists. Returns null for null input.
+    /// </summary>
+    private static string? ResolveBlueprint(string? blueprint)
+    {
+        if (blueprint is null) return null;
+        if (BlueprintAliases.TryGetValue(blueprint, out var alias))
+            return alias;
+        return blueprint;
     }
 }
 

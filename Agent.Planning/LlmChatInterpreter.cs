@@ -119,6 +119,13 @@ public sealed class LlmChatInterpreter(
             $"{username} says: \"{effective}\"",
             ct);
 
+        // Sprint 41: log raw LLM response at Debug level for safety monitoring and debugging.
+        if (raw is not null)
+        {
+            logger?.LogDebug("[llm] raw response from {Provider} ({Model}): {RawContent}",
+                provider.ProviderName, options.LlmModel, raw);
+        }
+
         if (raw is null)
         {
             logger?.LogWarning("[llm] {Provider} returned null -- falling back to pattern for <{Username}>",
@@ -129,8 +136,19 @@ public sealed class LlmChatInterpreter(
         // 6. Parse LLM response into IntentDraft (Sprint 39 P1-C: ParseDecision now returns IntentDraft?)
         var llmResult = ParseDecision(raw, options.LlmConfidenceThreshold, logger);
         if (llmResult is null)
+        {
             logger?.LogWarning("[llm] failed to parse JSON from {Provider} response: '{Content}'",
-                provider.ProviderName, raw.Length > 100 ? raw[..100] : raw);
+                provider.ProviderName, raw.Length > 200 ? raw[..200] : raw);
+        }
+        else
+        {
+            // Sprint 41: log parsed intent at Debug level for safety monitoring and debugging.
+            logger?.LogDebug("[llm] parsed intent: {Intent}, item={Item}, blueprint={Blueprint}, " +
+                "count={Count}, confidence={Confidence}, response={Response}",
+                llmResult.Intent, llmResult.Item ?? "(null)", llmResult.Blueprint ?? "(null)",
+                llmResult.Count?.ToString() ?? "(null)", llmResult.Confidence.ToString("F2"),
+                llmResult.Response?.Length > 100 ? llmResult.Response[..100] : llmResult.Response ?? "(empty)");
+        }
 
         // If low confidence with clarifying question — log it; bot.chat will be called by AgentBackgroundService
         if (llmResult?.Intent == "clarify" && !string.IsNullOrEmpty(llmResult.Response))
@@ -201,6 +219,19 @@ public sealed class LlmChatInterpreter(
         "clarify" when intent is ambiguous — set clarificationQuestion, confidence < 0.6.
         Use Minecraft item IDs without namespace prefix (oak_log, cobblestone, diamond).
         For inventory/what-do-you-have → intent "status", list inventory in response.
+
+        BUILD COMMAND: When the user says "build <something>" (e.g. "build a house",
+        "build a tower"), you MUST provide a valid "blueprint" field with the
+        blueprint ID that matches what they want to build. Look at their exact words
+        to determine the blueprint ID. For example:
+          "build a house"      → "blueprint": "house"
+          "build a tower"      → "blueprint": "tower"
+          "build a bridge"     → "blueprint": "bridge"
+        The blueprint will be looked up in the blueprint repository. Do NOT simulate
+        building in your response — the system handles actual construction. Set
+        response to a short acknowledgement like "Starting to build a {blueprint}..."
+        instead of pretending the build is complete. Never say "House built!" or
+        similar completion messages — the system will report completion separately.
         """;
 
         // Sprint 36 P1-C: append registered tool names so the LLM knows what's available.
