@@ -70,7 +70,7 @@ public sealed class AgentBackgroundService(
     private static readonly IReadOnlyDictionary<string, int> ToolTimeoutOverrides =
         new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
     {
-        ["PlaceBlock"] = 2,
+        ["PlaceBlock"] = 5,  // Sprint 43 (P1-4): increased from 2s — pathfinding + reference placement takes 2-5s
         ["MoveTo"]     = 10,
         ["Wander"]     = 15,
     };
@@ -676,6 +676,17 @@ public sealed class AgentBackgroundService(
                     CompleteCorrelatedActionByTool("PlaceBlock");
                     break;
 
+                // Sprint 43 (P0-4): terrain collision — complete correlation so tool loop
+                // continues, but do NOT advance build checkpoint. The position is still
+                // occupied by terrain; the planner retries it on the next cycle.
+                case BlockPlaceSkippedEvent bps:
+                    logger.LogWarning(
+                        "[place] SKIPPED at ({X},{Y},{Z}) — occupied by {ExistingBlock} " +
+                        "(trying to place {Block})",
+                        bps.X, bps.Y, bps.Z, bps.ExistingBlock, bps.Block);
+                    CompleteCorrelatedActionByTool("PlaceBlock");
+                    break;
+
                 case WanderCompleteEvent:
                     CompleteCorrelatedActionByTool("Wander");
                     break;
@@ -938,7 +949,24 @@ public sealed class AgentBackgroundService(
             case "navigate":
                 if (pendingResponse is not null)
                     logger.LogInformation("[chat] bot: {Response}", pendingResponse);
-                CancelGoal();
+
+                // Sprint 43 (P0-3): Selective CancelGoal — only stop if there's an active
+                // conflicting goal (gather, build, craft). Don't stop for idle or wander.
+                // The old unconditional CancelGoal fired SendEmergencyStop(), which cleared
+                // the adapter queue and aborted pathfinder, then the MoveTo was enqueued
+                // into the now-empty queue — wasting time and confusing the bot.
+                if (_currentGoal is not null && !IsIdleOrWanderGoal(_currentGoal))
+                {
+                    CancelGoal();
+                }
+                else if (_currentGoal is not null)
+                {
+                    // Idle/wander goal — just clear the queue without emergency stop
+                    _queue.Clear();
+                    lock (_pendingLock) _pendingActions.Clear();
+                    _correlatedActions.Clear();
+                    _placeBlockContexts.Clear();
+                }
 
                 if (pendingResponse is not null)
                 {
@@ -1822,6 +1850,19 @@ public sealed class AgentBackgroundService(
 
     private static bool IsNonGoalFailureAction(string toolName) =>
         string.Equals(toolName, "Chat", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Sprint 43 (P0-3): Returns true when the current goal is idle/wander — safe to
+    /// navigate away from without an emergency stop. Goals like gather, build, and craft
+    /// have work in progress that would be lost if the queue is cleared without stop.
+    /// </summary>
+    private static bool IsIdleOrWanderGoal(IGoal? goal)
+    {
+        if (goal is null) return true;
+        var name = goal.Name;
+        return name.StartsWith("Idle", StringComparison.OrdinalIgnoreCase)
+            || name.StartsWith("Wander", StringComparison.OrdinalIgnoreCase);
+    }
 
     // ── Emergency stop ────────────────────────────────────────────────────────
 

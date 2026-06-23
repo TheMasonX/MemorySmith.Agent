@@ -43,6 +43,11 @@ public static class CommonMinecraftBlocks
         "emerald_ore",   "deepslate_emerald_ore",
         // Sprint 35 P2-B: copper ore variants
         "copper_ore",    "deepslate_copper_ore",
+        // Sprint 43 (P1-1): wool blocks — mineable in creative, or require shears in survival
+        "white_wool", "orange_wool", "magenta_wool", "light_blue_wool",
+        "yellow_wool", "lime_wool", "pink_wool", "gray_wool",
+        "light_gray_wool", "cyan_wool", "purple_wool", "blue_wool",
+        "brown_wool", "green_wool", "red_wool", "black_wool",
         // Raw ore drops (item ID differs from block ID — needed for ClassifySpec correctness)
         // Mining diamond_ore yields "diamond"; mining coal_ore yields "coal"; etc.
         "diamond", "coal", "emerald", "redstone", "lapis_lazuli",

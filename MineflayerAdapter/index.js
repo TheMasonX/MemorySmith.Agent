@@ -291,7 +291,11 @@ bot.loadPlugin(pathfinder);
 
 function botPos() {
   const p = bot.entity?.position ?? { x: 0, y: 64, z: 0 };
-  return { x: Math.round(p.x), y: Math.round(p.y), z: Math.round(p.z) };
+  // Sprint 43 (P1-3): use Math.floor() instead of Math.round() so entity coordinates
+  // map to the block the bot is actually standing ON (not the nearest block).
+  // Entity (-231.4, 65.0, 151.2) → floor to (-232, 65, 151), which matches the
+  // block the bot is standing above. round(-231.4) = -231 (off by 1).
+  return { x: Math.floor(p.x), y: Math.floor(p.y), z: Math.floor(p.z) };
 }
 
 function sendBotStatus() {
@@ -835,7 +839,10 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         logStructured('warn', 'place', 'terrain collision — skipping occupied position', {
           material: shortMat, x, y, z, existingBlock: targetBlockName,
         });
-        sendEvent('blockPlaced', { x, y, z, block: shortMat, correlationId });
+        // Sprint 43 (P0-4): emit blockPlaceSkipped instead of blockPlaced for terrain
+        // collisions. The C# side completes the correlation (so the tool loop continues)
+        // but does NOT advance the build checkpoint — preventing permanent holes.
+        sendEvent('blockPlaceSkipped', { x, y, z, block: shortMat, existingBlock: targetBlockName, correlationId });
         break;
       }
 

@@ -178,6 +178,16 @@ public sealed record StatusEvent(
 public sealed record BlockPlacedEvent(int X, int Y, int Z, string Block, DateTimeOffset Timestamp)
     : WorldEvent(Timestamp);
 
+/// <summary>
+/// Sprint 43 (P0-4): Emitted by the adapter when a PlaceBlock target position is occupied
+/// by a different block (terrain collision). Completes the correlation so the tool loop
+/// continues, but does NOT advance the build checkpoint — preventing permanent holes in
+/// the structure. The planner retries the position on the next cycle.
+/// </summary>
+public sealed record BlockPlaceSkippedEvent(
+    int X, int Y, int Z, string Block, string ExistingBlock, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
 public sealed record WanderCompleteEvent(Position Pos, int TargetX, int TargetZ, DateTimeOffset Timestamp)
     : WorldEvent(Timestamp);
 

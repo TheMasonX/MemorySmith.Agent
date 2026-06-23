@@ -29,6 +29,24 @@ public sealed class IntentManager
             ["shack"]           = "small-house",
         };
 
+    // ── Item alias resolution (Sprint 43 P1-1) ───────────────────────────────
+    // Maps common user-facing item names to canonical Minecraft item IDs.
+    // Handles cases where the LLM returns a generic name that doesn't match
+    // the exact block/item ID (e.g., "wool" → "white_wool", "planks" → "oak_planks").
+    private static readonly IReadOnlyDictionary<string, string> ItemAliases =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["wool"]        = "white_wool",
+            ["planks"]      = "oak_planks",
+            ["wood planks"] = "oak_planks",
+            ["wood plank"]  = "oak_planks",
+            ["plank"]       = "oak_planks",
+            ["stick"]       = "stick",
+            ["glass"]       = "glass",
+            ["glass pane"]  = "glass_pane",
+            ["chest"]       = "chest",
+        };
+
     /// <summary>
     /// Maps <paramref name="draft"/> to a typed <see cref="GoalRequest"/>, or null
     /// when the intent does not produce a goal (cancel, status, help, etc.).
@@ -39,11 +57,11 @@ public sealed class IntentManager
         {
             case "gather":
                 if (draft.Item is not null)
-                    return new GatherGoalRequest(draft.Item, draft.Count ?? 10);
+                    return new GatherGoalRequest(ResolveItem(draft.Item), draft.Count ?? 10);
                 break;
             case "craft":
                 if (draft.Item is not null)
-                    return new CraftGoalRequest(draft.Item, draft.Count ?? 1);
+                    return new CraftGoalRequest(ResolveItem(draft.Item), draft.Count ?? 1);
                 break;
             case "build":
                 return TryBuildGoal(draft);
@@ -78,6 +96,18 @@ public sealed class IntentManager
         if (BlueprintAliases.TryGetValue(blueprint, out var alias))
             return alias;
         return blueprint;
+    }
+
+    /// <summary>
+    /// Sprint 43 (P1-1): Resolves a user-facing item name to its canonical Minecraft ID
+    /// through the alias dictionary, or returns it as-is if no alias exists.
+    /// This handles cases like "wool" → "white_wool" that the LLM may return.
+    /// </summary>
+    private static string ResolveItem(string item)
+    {
+        if (ItemAliases.TryGetValue(item, out var alias))
+            return alias;
+        return item;
     }
 }
 

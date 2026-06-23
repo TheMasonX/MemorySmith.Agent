@@ -84,11 +84,13 @@ public sealed class LlmChatInterpreter(
             return null;
         }
 
-        // Sprint 35 P1-B: fast-path ONLY for the 4 safe deterministic operations.
+        // Sprint 35 P1-B: fast-path ONLY for the safe deterministic operations.
         // CreateGoal and NavigateTo are removed — all non-trivial chat reaches the LLM.
         // This enforces the "LLM owns intent" architecture locked in Sprint 35.
         // Sprint 39 P1-C: check by Intent string instead of ChatIntentType enum.
-        if (quick?.Intent is "cancel" or "status" or "help")
+        // Sprint 43 (P0-1): fast-path "navigate" too — "come here" is zero-risk,
+        // and the LLM may misinterpret it as "cancel" without prompt guidance.
+        if (quick?.Intent is "cancel" or "status" or "help" or "navigate")
         {
             return quick;
         }
@@ -224,6 +226,9 @@ public sealed class LlmChatInterpreter(
         • "build"  — ONLY when the player says "build", "construct", "make a" + structure
         • "gather" — ONLY when the player wants to COLLECT items ("get wood", "mine stone")
         • "craft"  — ONLY when the player wants to craft an item ("make planks", "craft a pickaxe")
+        • "navigate" — when the player says "come here", "come to me", "follow me", "go to".
+          Set coords to null — the system uses the player's current position.
+          NEVER set intent="cancel" for "come here" — that will REJECT the command.
         WRONG: setting intent="gather" for "build a house" — this will be REJECTED.
         CORRECT: "build a house" → intent="build", blueprint="house"
 

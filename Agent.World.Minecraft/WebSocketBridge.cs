@@ -310,6 +310,13 @@ public sealed class WebSocketBridge(string uri) : IDisposable
                     Block: GetString(root, "block") ?? "?",
                     Timestamp: now),
 
+                // Sprint 43 (P0-4): terrain collision skip — completes correlation but does not advance checkpoint.
+                "blockPlaceSkipped" => new BlockPlaceSkippedEvent(
+                    X: GetInt(root, "x"), Y: GetInt(root, "y"), Z: GetInt(root, "z"),
+                    Block: GetString(root, "block") ?? "?",
+                    ExistingBlock: GetString(root, "existingBlock") ?? "?",
+                    Timestamp: now),
+
                 "wanderComplete" => new WanderCompleteEvent(
                     Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
                     TargetX: GetInt(root, "targetX"),
