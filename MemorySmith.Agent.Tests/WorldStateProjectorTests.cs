@@ -208,7 +208,7 @@ public class WorldStateProjectorTests
         // The Sprint 35 change (no inventory updates) caused items to be lost when
         // ItemCollectedEvent (playerCollect) never fired (e.g. drop fell through a hole).
         // Self-dropping blocks like oak_log, dirt, cobblestone now increment inventory.
-        var ev = new BlockMinedEvent("oak_log", 5, new Position(0, 64, 0), Now);
+        var ev = new BlockMinedEvent("oak_log", 5, new Position(0, 64, 0), new Position(0, 64, 0), Now);
         var result = _projector.Apply(EmptyState, ev);
 
         Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(5),
@@ -219,7 +219,7 @@ public class WorldStateProjectorTests
     public void Apply_BlockMined_StoresBlockNameFact()
     {
         // Even though inventory is no longer updated, block name + count facts still stored.
-        var ev = new BlockMinedEvent("oak_log", 5, new Position(100, 64, 200), Now);
+        var ev = new BlockMinedEvent("oak_log", 5, new Position(100, 64, 200), new Position(100, 64, 200), Now);
         var result = _projector.Apply(EmptyState, ev);
 
         Assert.That(result.Facts.TryGetValue("event:BlockMined:Block", out var block), Is.True,
@@ -234,7 +234,7 @@ public class WorldStateProjectorTests
     {
         // Sprint 40 P0-B: Namespaced BlockMinedEvent now updates inventory.
         // The namespace is stripped and the block drop lookup is applied.
-        var ev = new BlockMinedEvent("minecraft:cobblestone", 64, new Position(0, 64, 0), Now);
+        var ev = new BlockMinedEvent("minecraft:cobblestone", 64, new Position(0, 64, 0), new Position(0, 64, 0), Now);
         var result = _projector.Apply(EmptyState, ev);
 
         Assert.That(result.Inventory.GetValueOrDefault("cobblestone"), Is.EqualTo(64),

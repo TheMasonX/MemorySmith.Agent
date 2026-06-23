@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0059-follow-command",
+  "key": "TSK-0059",
+  "title": "Follow Command",
+  "description": "Ability to follow an entity with a target distance, rechecking their position and rerouting as needed.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-23T01:06:12.9297676Z",
+  "updatedAtUtc": "2026-06-23T01:06:12.9297676Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

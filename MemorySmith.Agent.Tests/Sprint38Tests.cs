@@ -64,6 +64,7 @@ public class Sprint38Tests
             Block: "oak_log",
             Count: 1,
             Pos: new Position(0, 64, 0),
+            BlockPosition: new Position(0, 64, 0),
             Timestamp: DateTimeOffset.UtcNow);
 
         // Apply BlockMinedEvent → IsInventoryStale should remain true (projector itself
@@ -95,6 +96,7 @@ public class Sprint38Tests
             Block: "diamond_ore",
             Count: 2,
             Pos: new Position(10, 12, 20),
+            BlockPosition: new Position(10, 12, 20),
             Timestamp: DateTimeOffset.UtcNow);
 
         var result = projector.Apply(new WorldState(), ev);

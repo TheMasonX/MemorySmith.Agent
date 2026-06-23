@@ -1,0 +1,36 @@
+{
+  "id": "tsk-0067-add-stale-inventory-guard-at-goal-creation",
+  "key": "TSK-0067",
+  "title": "Add stale-inventory guard at goal-creation time in HandleChatEventAsync",
+  "description": "## Problem\nLog shows `Cannot create GatherItem goal for 'dirt:10': item not found in registry and not a built-in direct-mine block`. This happened because the inventory still showed 10 dirt (stale from previous session), and `GoalFactory` rejected the request thinking the goal was already satisfied. The stale-inventory guard (PR #1) refreshes inventory before planning, but goal creation happens in `HandleChatEventAsync` BEFORE the dispatch loop runs.\n\n## Source\nHandoff Sprint 40 P0 Fixes — Issue E: \"GatherItem Goal Creation Failed\"\n\n## Requirements\n1. Investigate the goal creation path in `HandleChatEventAsync` — identify where `GoalFactory` is called before inventory refresh\n2. Add a stale-inventory check at goal-creation time: if `IsInventoryStale` is true, enqueue `GetStatus` first before allowing goal creation\n3. If the inventory is stale and the requested item seems already sufficient, do not reject the goal; instead refresh inventory first and retry\n4. Consider adding an `InventoryStaleException` or retry mechanism in the goal creation path\n5. Add a diagnostic log when stale inventory causes a goal creation deferral\n6. Verify the fix by simulating stale inventory (connect with items from previous session, request gather, confirm goal is created correctly)\n\n## References\n- `WebUI.Blazor/AgentBackgroundService.cs` — `HandleChatEventAsync`, goal creation logic\n- `Agent.Planning/Goals/GenericGatherGoal.cs` — `IsComplete` stale-flag check\n- `Agent.Core/Models/WorldState.cs` — `IsInventoryStale` flag\n- Handoff document: Issue E",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint40",
+    "fix",
+    "inventory",
+    "goal-creation"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Tasks/handoff-sprint40-p0-fixes.md"
+  ],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-22T00:00:00Z",
+  "updatedAtUtc": "2026-06-22T00:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

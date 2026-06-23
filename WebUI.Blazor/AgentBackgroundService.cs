@@ -173,6 +173,11 @@ public sealed class AgentBackgroundService(
     // or when a new goal is set.
     private int _consecutiveZeroAreaScans;
 
+    // Sprint 40 P0-B: CancellationTokenSource for the active connection, used to
+    // force reconnection when a KickedEvent is received (the WebSocket stays alive
+    // but the Mineflayer bot is dead). Set by ExecuteAsync, read by ProcessEventsAsync.
+    private CancellationTokenSource? _connectionCts;
+
     public WorldState WorldState => _worldState;
     public IGoal? CurrentGoal => _currentGoal;
     public int ConsecutiveFailures => _consecutiveFailures;
@@ -338,6 +343,7 @@ public sealed class AgentBackgroundService(
             logger.LogInformation("AgentBackgroundService starting (attempt {N})...", attempt + 1);
 
             using var connectionCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+            _connectionCts = connectionCts;
             try
             {
                 await worldAdapter.ConnectAsync(connectionCts.Token);
@@ -459,11 +465,13 @@ public sealed class AgentBackgroundService(
 
                 case BlockMinedEvent e:
                     var itemKey = e.Block.Contains(':') ? e.Block.Split(':')[1] : e.Block;
-                    // Sprint 40 P0-B: include position in block-mined log for debugging
+                    // Sprint 40 P0-B: include BOTH bot position and block target position
                     logger.LogInformation(
-                        "Inventory +{Count} {Block} -> total {Total} at ({PosX},{PosY},{PosZ})",
+                        "Inventory +{Count} {Block} -> total {Total} " +
+                        "bot=({PosX},{PosY},{PosZ}) block=({BX},{BY},{BZ})",
                         e.Count, itemKey, _worldState.Inventory.GetValueOrDefault(itemKey),
-                        e.Pos.X, e.Pos.Y, e.Pos.Z);
+                        e.Pos.X, e.Pos.Y, e.Pos.Z,
+                        e.BlockPosition.X, e.BlockPosition.Y, e.BlockPosition.Z);
                     // Sprint 37 (Issue A): a block was mined — inventory is no longer stale.
                     // This replaces the stale-flag-clearing role formerly served by GetStatus
                     // in the gather plan. Without this, GenericGatherGoal.IsComplete defers
@@ -491,6 +499,24 @@ public sealed class AgentBackgroundService(
                 case SmeltCompleteEvent e:
                     logger.LogInformation("Smelted {Count}x {Input} -> {Output}", e.Count, e.Input, e.Result);
                     CompleteCorrelatedActionByTool("SmeltItem");
+                    break;
+
+                case KickedEvent ke:
+                    logger.LogCritical(
+                        "[kick] BOT KICKED from server! reason='{Reason}' — forcing reconnection. " +
+                        "pos=({PosX},{PosY},{PosZ}) goal='{Goal}'",
+                        ke.Reason,
+                        _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z,
+                        _currentGoal?.Name ?? "none");
+                    _journal?.Log(new JournalEntry(
+                        _timeProvider.UtcNow, JournalEntryType.AgentStopped, "Kicked",
+                        new Dictionary<string, object?> { ["reason"] = ke.Reason }));
+                    // Cancel the connection CTS to force a full reconnection cycle.
+                    // The WebSocket between C# and Node.js is still alive after a kick,
+                    // but the Mineflayer bot is dead. Without this, the C# side keeps
+                    // trying to dispatch actions to a dead bot indefinitely.
+                    try { _connectionCts?.Cancel(); }
+                    catch (ObjectDisposedException) { /* connection already disposed */ }
                     break;
 
                 case ChatEvent:
@@ -560,6 +586,24 @@ public sealed class AgentBackgroundService(
 
                 case WanderFailedEvent:
                     FailCorrelatedActionByTool("Wander");
+                    break;
+
+                // Sprint 40 P0-C: mine action aborted by stop signal.
+                case MineAbortedEvent me:
+                    logger.LogWarning(
+                        "[mine] ABORTED: {Mined}/{Target} {Block} — stop signal received" +
+                        " pos=({PosX},{PosY},{PosZ})",
+                        me.Mined, me.TargetCount, me.Block,
+                        _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
+                    // Transition the correlated MineBlock action — the abort is a terminal
+                    // state for the current mine operation. The planner will replan if more
+                    // blocks are still needed.
+                    CompleteCorrelatedActionByTool("MineBlock");
+                    break;
+
+                // Sprint 40 P0-C: emergency stop acknowledged by the adapter.
+                case StopCompleteEvent:
+                    logger.LogDebug("[stop] adapter acknowledged emergency stop");
                     break;
 
                 // Sprint 40 P0-B: reachable block query result.

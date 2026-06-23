@@ -235,6 +235,10 @@ public sealed class WebSocketBridge(string uri) : IDisposable
                     Block: GetString(root, "block") ?? "unknown",
                     Count: GetInt(root, "count", 1),
                     Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+                    BlockPosition: new Position(
+                        GetInt(root, "blockX", GetInt(root, "x")),
+                        GetInt(root, "blockY", GetInt(root, "y")),
+                        GetInt(root, "blockZ", GetInt(root, "z"))),
                     Timestamp: now),
 
                 // Sprint 35 P0-A: actual item collected by the bot (playerCollect event in Mineflayer).
@@ -246,11 +250,18 @@ public sealed class WebSocketBridge(string uri) : IDisposable
                     Timestamp: now),
 
                 // Sprint 35 P0-B: mining loop completed — definitive end-of-mine signal.
+                // Sprint 40 P0-B: includes block position from the LAST mined block.
                 "mineComplete" => new MineCompleteEvent(
                     Block: GetString(root, "block") ?? "unknown",
                     Mined: GetInt(root, "mined"),
                     TargetCount: GetInt(root, "targetCount"),
-                    Timestamp: now),
+                    Timestamp: now,
+                    BlockPosition: root.TryGetProperty("blockX", out _)
+                        ? new Position(
+                            GetInt(root, "blockX"),
+                            GetInt(root, "blockY"),
+                            GetInt(root, "blockZ"))
+                        : new Position(0, 0, 0)),
 
                 "chat" => new ChatEvent(
                     Username: GetString(root, "username") ?? "?",
@@ -322,6 +333,32 @@ public sealed class WebSocketBridge(string uri) : IDisposable
                     SearchedRadius: GetInt(root, "searchedRadius", 32),
                     Timestamp: now),
 
+                // Sprint 40 P0-C: mine action aborted by stop signal.
+                "mineAborted" => new MineAbortedEvent(
+                    Block: GetString(root, "block") ?? "unknown",
+                    Mined: GetInt(root, "mined"),
+                    TargetCount: GetInt(root, "targetCount", 0),
+                    BlockPosition: root.TryGetProperty("blockX", out _)
+                        ? new Position(
+                            GetInt(root, "blockX"),
+                            GetInt(root, "blockY"),
+                            GetInt(root, "blockZ"))
+                        : null,
+                    Timestamp: now),
+
+                // Sprint 40 P0-C: emergency stop acknowledged by the adapter.
+                "stopComplete" => new StopCompleteEvent(Timestamp: now),
+
+                // Sprint 40 P0-B: reachable block query result.
+                "reachableBlockFound" => new ReachableBlockFoundEvent(
+                    Block: GetString(root, "block") ?? "unknown",
+                    X: GetInt(root, "x"),
+                    Y: GetInt(root, "y"),
+                    Z: GetInt(root, "z"),
+                    EuclideanDistance: GetDouble(root, "euclideanDistance", 0),
+                    PathDistance: GetInt(root, "pathDistance", 0),
+                    Timestamp: now),
+
                 _ => null, // unknown event type — ignored
             };
         }
@@ -378,6 +415,13 @@ public sealed class WebSocketBridge(string uri) : IDisposable
     {
         if (!root.TryGetProperty(key, out var el)) return defaultValue;
         return el.ValueKind == JsonValueKind.String ? el.GetString() : defaultValue;
+    }
+
+    private static double GetDouble(JsonElement root, string key, double defaultValue = 0)
+    {
+        if (!root.TryGetProperty(key, out var el)) return defaultValue;
+        return el.ValueKind == JsonValueKind.Number && el.TryGetDouble(out var d)
+            ? d : defaultValue;
     }
 
     // ── Dispose ──────────────────────────────────────────────────────────────

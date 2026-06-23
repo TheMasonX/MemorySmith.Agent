@@ -69,8 +69,18 @@ public sealed record DamageTakenEvent(
 public sealed record MoveEvent(Position Pos, DateTimeOffset Timestamp)
     : WorldEvent(Timestamp);
 
-public sealed record BlockMinedEvent(string Block, int Count, Position Pos, DateTimeOffset Timestamp)
-    : WorldEvent(Timestamp);
+/// <summary>
+/// Sprint 40 P0-B: Added <see cref="BlockPosition"/> — the actual coordinates of the
+/// mined block (where the block was in the world, not where the bot was standing).
+/// Previously only <see cref="Pos"/> (bot position) was available, making it impossible
+/// to distinguish "bot at (-241,65,162) mined block at (-241,64,162)".
+/// </summary>
+public sealed record BlockMinedEvent(
+    string Block,
+    int Count,
+    Position Pos,
+    Position BlockPosition,
+    DateTimeOffset Timestamp) : WorldEvent(Timestamp);
 
 /// <summary>
 /// Sprint 35 P0-A: Emitted when the bot collects an item entity (Mineflayer playerCollect event).
@@ -89,11 +99,13 @@ public sealed record ItemCollectedEvent(
 /// Sprint 35 P0-B: Emitted at the end of the mine action loop in Mineflayer.
 /// Provides a definitive "mining is done" signal with final counts.
 /// Consumed by AgentBackgroundService to transition correlated actions to Completed state.
+/// Sprint 40 P0-B: Added <see cref="BlockPosition"/> — position of the LAST mined block.
 /// </summary>
 public sealed record MineCompleteEvent(
     string Block,
     int Mined,
     int TargetCount,
+    Position BlockPosition,
     DateTimeOffset Timestamp) : WorldEvent(Timestamp);
 
 /// <summary>
@@ -159,6 +171,26 @@ public sealed record WanderFailedEvent(string Message, Position Pos, DateTimeOff
     : WorldEvent(Timestamp);
 
 public sealed record KickedEvent(string Reason, DateTimeOffset Timestamp)
+    : WorldEvent(Timestamp);
+
+/// <summary>
+/// Sprint 40 P0-C: Emitted when the mine action loop is aborted by a stop signal.
+/// Carries partial progress information so the C# side knows how many blocks were
+/// mined before the stop signal arrived.
+/// </summary>
+public sealed record MineAbortedEvent(
+    string Block,
+    int Mined,
+    int TargetCount,
+    Position? BlockPosition,
+    DateTimeOffset Timestamp) : WorldEvent(Timestamp);
+
+/// <summary>
+/// Sprint 40 P0-C: Emitted by the adapter when handleStop() completes.
+/// Acknowledges that the emergency stop has been fully processed (pathfinder
+/// cleared, command queue drained, in-progress loops exited).
+/// </summary>
+public sealed record StopCompleteEvent(DateTimeOffset Timestamp)
     : WorldEvent(Timestamp);
 
 /// <summary>

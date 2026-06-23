@@ -97,7 +97,7 @@ public class Sprint35Tests
         var state = new WorldState();
 
         var mined = new BlockMinedEvent("diamond_ore", 1,
-            new Position(100, 64, 200), DateTimeOffset.UtcNow);
+            new Position(100, 64, 200), new Position(100, 64, 200), DateTimeOffset.UtcNow);
         var updated = projector.Apply(state, mined);
 
         // Inventory should have been updated with the mapped drop name (diamond)
@@ -119,7 +119,7 @@ public class Sprint35Tests
         var projector = new WorldStateProjector();
         var state = new WorldState();
 
-        var complete = new MineCompleteEvent("oak_log", 5, 5, DateTimeOffset.UtcNow);
+        var complete = new MineCompleteEvent("oak_log", 5, 5, new Position(0, 0, 0), DateTimeOffset.UtcNow);
         var updated = projector.Apply(state, complete);
 
         Assert.That(updated.Facts.TryGetValue("event:MineComplete:Block", out var block), Is.True);

@@ -61,6 +61,23 @@ const MINE_ITEM_PICKUP_WAIT_MS           = 1000;  // wait for auto-pickup after 
 const MINE_ITEM_PICKUP_MOVE_WAIT_MS      = 1500;  // wait after moving to block pos
 const MINE_ITEM_PICKUP_REMOVE_BLOCK_MS   = 300;   // wait after removing obstruction
 
+// Sprint 40 P0-C: block scoring for Y-level preference.
+// When findBestBlock evaluates candidates, blocks at the expected Y-level (botFeetY - 1)
+// are preferred over blocks above/below. The penalty weight controls how aggressively
+// the scorer discounts blocks at different Y-levels.
+const MINE_Y_PENALTY_WEIGHT    = 5;   // score penalty per Y-level away from expected Y
+const MINE_FIRST_PASS_COUNT    = 10;  // max candidates in same-Y-level pass
+const MINE_SECOND_PASS_COUNT   = 20;  // max candidates in nearby-Y-level pass
+
+// Sprint 40 P0-C (Fix): Block mining aliases.
+// When asked to mine a block, also accept blocks that drop the same item when mined.
+// For example, mining "dirt" should also accept "grass_block" because grass drops dirt.
+// Key = target block name, Value = array of acceptable block names (including the target).
+// Extend this map as needed for other block types.
+const BLOCK_MINING_ALIASES = Object.freeze({
+  dirt: ['dirt', 'grass_block'],
+});
+
 // Sprint 40 P0-B: reachable block search tuning.
 const REACHABLE_BLOCK_MAX_CANDIDATES     = 20;    // max blocks to reachability-check
 const REACHABLE_BLOCK_PATH_TIMEOUT_MS    = 5000;  // pathfinding timeout per candidate
@@ -445,18 +462,122 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       const _mineStart = Date.now();
       logStructured('info', 'mine', 'start', { block: shortName, targetCount: count, pos: botPos() });
 
+      /**
+       * Selects the best target block with Y-level preference and alias support.
+       * Sprint 40 P0-C: Prefers blocks at the expected Y-level (botFeetY - 1) to avoid
+       * off-by-one errors where the nearest block by Euclidean distance is at Y=62-63
+       * instead of Y=64. Also accepts alias blocks that drop the same item (e.g.
+       * grass_block for dirt, since grass drops dirt when mined without silk touch).
+       *
+       * Scoring constants are named at the top of this file for easy tuning:
+       *   MINE_Y_PENALTY_WEIGHT, MINE_FIRST_PASS_COUNT, MINE_SECOND_PASS_COUNT
+       *
+       * @returns {{x:number, y:number, z:number, blockName:string}|null}
+       *   The target position and the actual Minecraft block name at that position,
+       *   or null if no acceptable block is within range.
+       */
+      function findBestBlock() {
+        const expectedY = botPos().y - 1;
+        const pos = botPos();
+
+        // Build the set of acceptable block IDs (primary block + aliases)
+        const aliasNames = BLOCK_MINING_ALIASES[shortName] ?? [shortName];
+        const acceptableIds = aliasNames
+          .map(n => bot.registry.blocksByName[n]?.id)
+          .filter(id => id != null);
+
+        if (acceptableIds.length === 0) {
+          // No known IDs — fall back to the primary block only
+          acceptableIds.push(blockId);
+        }
+
+        /** True if the block's type ID is in the acceptable set. */
+        function isAcceptable(block) {
+          return block && acceptableIds.includes(block.type);
+        }
+
+        /** Resolve a position to the actual Minecraft block name. */
+        function actualBlockName(pos) {
+          const block = bot.blockAt(pos);
+          if (!block) return shortName;
+          return bot.registry.blocksById[block.type]?.name ?? shortName;
+        }
+
+        // ── First pass: blocks at the expected Y-level ───────────────────────
+        const sameLevelCandidates = bot.findBlocks({
+          matching: isAcceptable,
+          maxDistance: MINE_SEARCH_RADIUS_NEAR,
+          count: MINE_FIRST_PASS_COUNT,
+        });
+        const sameLevel = sameLevelCandidates?.filter(c => c.y === expectedY);
+        if (sameLevel && sameLevel.length > 0) {
+          // Sort by XZ distance only (same Y-level, so no Y penalty)
+          sameLevel.sort((a, b) => {
+            const da = (a.x - pos.x) ** 2 + (a.z - pos.z) ** 2;
+            const db = (b.x - pos.x) ** 2 + (b.z - pos.z) ** 2;
+            return da - db;
+          });
+          const block = bot.blockAt(sameLevel[0]);
+          if (block && isAcceptable(block)) {
+            return {
+              x: sameLevel[0].x, y: sameLevel[0].y, z: sameLevel[0].z,
+              blockName: actualBlockName(sameLevel[0]),
+            };
+          }
+        }
+
+        // ── Second pass: nearby Y-levels with scoring ────────────────────────
+        const nearbyCandidates = bot.findBlocks({
+          matching: isAcceptable,
+          maxDistance: MINE_SEARCH_RADIUS_NEAR,
+          count: MINE_SECOND_PASS_COUNT,
+        });
+        if (nearbyCandidates && nearbyCandidates.length > 0) {
+          // Score: Euclidean (XZ) distance + Y-penalty for each level away from expectedY
+          // Math.max(0, a.y - expectedY) penalizes only blocks BELOW the surface
+          // (blocks above won't be dirt/grass, so treat them neutrally)
+          nearbyCandidates.sort((a, b) => {
+            const scoreA = Math.sqrt(
+              (a.x - pos.x) ** 2 + Math.max(0, a.y - expectedY) ** 2 + (a.z - pos.z) ** 2
+            ) + Math.abs(a.y - expectedY) * MINE_Y_PENALTY_WEIGHT;
+            const scoreB = Math.sqrt(
+              (b.x - pos.x) ** 2 + Math.max(0, b.y - expectedY) ** 2 + (b.z - pos.z) ** 2
+            ) + Math.abs(b.y - expectedY) * MINE_Y_PENALTY_WEIGHT;
+            return scoreA - scoreB;
+          });
+          const best = nearbyCandidates[0];
+          const block = bot.blockAt(best);
+          if (block && isAcceptable(block)) {
+            return {
+              x: best.x, y: best.y, z: best.z,
+              blockName: actualBlockName(best),
+            };
+          }
+        }
+
+        // ── Fallback: original findBlock behavior (any Y-level, nearest Euclidean) ──
+        const fallback = bot.findBlock({ matching: isAcceptable, maxDistance: MINE_SEARCH_RADIUS_FAR });
+        if (fallback) {
+          return {
+            x: fallback.position.x, y: fallback.position.y, z: fallback.position.z,
+            blockName: actualBlockName(fallback.position),
+          };
+        }
+        return null;
+      }
+
       while (mined < count) {
         // Sprint 18: check stop flag at start of each iteration
         if (_stopRequested) {
           console.log(`[mine] aborted by stop signal after ${mined}/${count} ${shortName}`);
-          sendEvent('mineAborted', { block: shortName, mined, correlationId });
+          sendEvent('mineAborted', {
+            block: shortName, mined, targetCount: count, correlationId,
+          });
           return; // Exit dispatch — don't send a normal completion event
         }
 
-        let target = bot.findBlock({ matching: blockId, maxDistance: MINE_SEARCH_RADIUS_NEAR });
-        if (!target) target = bot.findBlock({ matching: blockId, maxDistance: MINE_SEARCH_RADIUS_FAR });
-
-        if (!target) {
+        const targetPos = findBestBlock();
+        if (!targetPos) {
           console.log(`[mine] no ${shortName} found (mined ${mined}/${count})`);
           logStructured('warn', 'mine', 'no blocks in range', {
             block: shortName, mined, targetCount: count,
@@ -467,14 +588,28 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           break;
         }
 
+        // Sprint 40 P0-C: capture block position and actual block name for logging
+        const blockTargetPos = {
+          bx: targetPos.x,
+          by: targetPos.y,
+          bz: targetPos.z,
+        };
+        logStructured('debug', 'mine', 'target selected', {
+          block: shortName, actualBlock: targetPos.blockName,
+          ...blockTargetPos, botPos: botPos(), correlationId,
+        });
+
         try {
           await bot.pathfinder.goto(
-            new pfGoals.GoalNear(target.position.x, target.position.y, target.position.z, 2)
+            new pfGoals.GoalNear(targetPos.x, targetPos.y, targetPos.z, 2)
           );
           pathFailures = 0;
         } catch (e) {
           if (_stopRequested) {
             console.log(`[mine] aborted during navigation after ${mined}/${count} ${shortName}`);
+            sendEvent('mineAborted', {
+              block: shortName, mined, targetCount: count, correlationId,
+            });
             return;
           }
           pathFailures++;
@@ -485,8 +620,15 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           continue;
         }
 
-        const fresh = bot.blockAt(target.position);
-        if (!fresh || fresh.type !== blockId) {
+        const fresh = bot.blockAt(toVec3(targetPos.x, targetPos.y, targetPos.z));
+        // Sprint 40 P0-C (Fix): Check against all acceptable block IDs (primary + aliases),
+        // not just the primary blockId. E.g. when mining "dirt", also accept "grass_block".
+        const aliasNames = BLOCK_MINING_ALIASES[shortName] ?? [shortName];
+        const acceptableIds = aliasNames
+          .map(n => bot.registry.blocksByName[n]?.id)
+          .filter(id => id != null);
+        if (acceptableIds.length === 0) acceptableIds.push(blockId);
+        if (!fresh || !acceptableIds.includes(fresh.type)) {
           await new Promise(r => setTimeout(r, 100));
           continue;
         }
@@ -499,7 +641,18 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           // The C# ApplyBlockMined uses e.Count as an additive delta via AddInventoryItem.
           // Sending cumulative count caused inventory ballooning (e.g. count=1, then 2, then 3
           // was interpreted as +1, +2, +3 = 6 dirt instead of +1+1+1 = 3 dirt).
-          sendEvent('blockMined', { block: shortName, count: 1, ...botPos(), correlationId });
+          // Sprint 40 P0-B: include block target position (blockPos) and bot position (pos).
+          // Previously only botPos() was sent, making it impossible to know WHICH block was mined.
+          // Sprint 40 P0-C (Fix): Report the ACTUAL mined block name (e.g. "grass_block") so
+          // the C# ApplyBlockMined can map it to the correct drop ("dirt") via BlockToItemDrop.
+          sendEvent('blockMined', {
+            block: targetPos.blockName ?? shortName, count: 1,
+            ...botPos(),                               // bot position (where the bot is standing)
+            blockX: blockTargetPos.bx,                 // block position (where the block was)
+            blockY: blockTargetPos.by,
+            blockZ: blockTargetPos.bz,
+            correlationId,
+          });
 
           // Sprint 40 P0-B: Ensure the dropped item is collected.
           // After digging, the item entity appears at the block position. Wait briefly
@@ -511,9 +664,9 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           // by looking for a dropped item entity near the dig position.
           const nearbyEntity = bot.nearestEntity(e => {
             if (!e || e.type !== 'object' || e.objectType !== 'Item') return false;
-            const dx = e.position.x - target.position.x;
-            const dy = e.position.y - target.position.y;
-            const dz = e.position.z - target.position.z;
+            const dx = e.position.x - targetPos.x;
+            const dy = e.position.y - targetPos.y;
+            const dz = e.position.z - targetPos.z;
             return Math.abs(dx) <= 2 && Math.abs(dy) <= 2 && Math.abs(dz) <= 2;
           });
           if (nearbyEntity) {
@@ -521,7 +674,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
             try {
               await bot.pathfinder.goto(
                 new pfGoals.GoalNear(
-                  target.position.x, target.position.y, target.position.z, 1)
+                  targetPos.x, targetPos.y, targetPos.z, 1)
               );
               // Wait a bit more for collection
               await new Promise(r => setTimeout(r, MINE_ITEM_PICKUP_MOVE_WAIT_MS));
@@ -531,7 +684,13 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
             }
           }
         } catch (e) {
-          if (_stopRequested) { console.log(`[mine] aborted after dig error`); return; }
+          if (_stopRequested) {
+            console.log(`[mine] aborted after dig error`);
+            sendEvent('mineAborted', {
+              block: shortName, mined, targetCount: count, correlationId,
+            });
+            return;
+          }
           console.warn(`[mine] dig failed: ${e.message}`);
           await new Promise(r => setTimeout(r, 500));
         }
@@ -541,7 +700,14 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       });
       // Sprint 35 P0-B: emit mineComplete at the end of the mining loop — definitive signal.
       // Consumed by AgentBackgroundService to transition correlated action to Completed state.
-      sendEvent('mineComplete', { block: shortName, mined, targetCount: count, correlationId });
+      // Sprint 40 P0-B: include block position from the LAST mined block.
+      sendEvent('mineComplete', {
+        block: shortName, mined, targetCount: count,
+        blockX: blockTargetPos.bx,
+        blockY: blockTargetPos.by,
+        blockZ: blockTargetPos.bz,
+        correlationId,
+      });
       break;
     }
 
@@ -917,6 +1083,18 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       break;
 
     case 'chat':
+      // Sprint 40 P0-B: guard against bot.chat() being called before bot has spawned.
+      // The startup announcement can arrive before bot.entity is initialized.
+      if (!bot.entity) {
+        console.warn('[chat] bot not spawned yet — retrying after 500ms');
+        logStructured('warn', 'chat', 'deferred — bot not spawned', { message: args.message });
+        await new Promise(r => setTimeout(r, 500));
+        if (!bot.entity) {
+          console.error('[chat] bot still not spawned after retry — dropping message');
+          sendEvent('error', { action: 'chat', message: 'bot not spawned yet', correlationId });
+          break;
+        }
+      }
       try {
         bot.chat(args.message ?? '');
       } catch (e) {

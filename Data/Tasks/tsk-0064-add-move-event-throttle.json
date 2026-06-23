@@ -1,0 +1,37 @@
+{
+  "id": "tsk-0064-add-move-event-throttle",
+  "key": "TSK-0064",
+  "title": "Add throttle/debounce for move events in Mineflayer adapter",
+  "description": "## Problem\n`bot.on('move', () => sendEvent('move', botPos()))` fires on every physics tick during pathfinding — potentially 20 times per second. Each fires a JSON payload across the WebSocket to C#, where `WorldStateProjector.ApplyMove()` creates a new `WorldState` record and writes a fact. This is already the status quo, but any new position-adjacent observations (entity positions, pathfinder position tracking) will compound the issue without rate control.\n\n## Source\nCouncil review DEF-PAPER-7 (Confidence: 95%). The research paper's Phase 1 proposal to add more movement telemetry compounds the existing issue without recommending any throttle.\n\n## Requirements\n1. Add a throttle/debounce to the existing `bot.on('move')` handler in `MineflayerAdapter/index.js`\n2. Use a named constant at the top of the file: `const MOVE_EVENT_THROTTLE_MS = 250;` (4 events/sec max)\n3. On each move tick, update an in-memory position buffer; only emit `sendEvent('move', ...)` when the throttle window has elapsed\n4. Ensure the last position is always emitted when the bot stops moving (flush on `goal_reached`, `path_update`, or action completion)\n5. Verify existing `MoveEvent` consumers in C# still work correctly with reduced event rate\n\n## Design Notes\n- Position accuracy requirement: ±1 block is acceptable for planning. 250ms throttle at walking speed (~4.3 m/s) gives ~1 block of movement uncertainty, which is within tolerance.\n- The flush-on-stop pattern ensures the C# side always gets the final position.\n\n## References\n- `MineflayerAdapter/index.js` — `bot.on('move', ...)` handler, line ~250\n- `Agent.Core/WorldStateProjector.cs` — `ApplyMove`\n- `Agent.Core/Events/WorldEvents.cs` — `MoveEvent`\n- Council review: DEF-PAPER-7",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint40",
+    "mineflayer-adapter",
+    "optimization",
+    "events",
+    "council-response"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audit/mineflayer-adapter-research.md"
+  ],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-22T00:00:00Z",
+  "updatedAtUtc": "2026-06-22T00:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

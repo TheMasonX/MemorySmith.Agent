@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0060-look-at-player",
+  "key": "TSK-0060",
+  "title": "Look at Player",
+  "description": "The agent should look at the player if they\u0027re nearby and idle",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-23T01:06:39.0526897Z",
+  "updatedAtUtc": "2026-06-23T01:06:54.8863271Z",
+  "completedAtUtc": null,
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0060-look-at-player.json"
+}

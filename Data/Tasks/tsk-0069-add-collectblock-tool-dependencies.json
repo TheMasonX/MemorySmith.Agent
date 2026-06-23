@@ -1,0 +1,37 @@
+{
+  "id": "tsk-0069-add-collectblock-tool-dependencies",
+  "key": "TSK-0069",
+  "title": "Add mineflayer-collectblock and mineflayer-tool dependencies to package.json",
+  "description": "## Problem\nThe research paper's Phase 5 proposes layering in `mineflayer-collectblock` and `mineflayer-tool` as supportive abstractions for higher-level mining, collecting, and tool-selection workflows. However, `package.json` lists only three dependencies: `mineflayer`, `mineflayer-pathfinder`, `ws`. Neither `collectblock` nor `tool` is installed, and no install step is documented.\n\n## Source\nCouncil review DEF-PAPER-6 (Confidence: 100%). The paper frames Phase 5 as purely additive, but it changes mine case semantics non-trivially.\n\n## Requirements\n1. Add `mineflayer-collectblock` and `mineflayer-tool` to `MineflayerAdapter/package.json`\n2. Run `npm install` to update lockfile\n3. Document the semantic changes: `collectblock` replaces the manual `findBlock → goto → dig` loop with a higher-level `collectBlock.collect(block)` call\n4. Ensure lower-level events (individual `blockMined` per dig, `blockNotFound`) are preserved or re-derived — the existing C# event handlers depend on these\n5. Coordinate with existing mine case semantics: `collectblock` changes how mining works, so the mine handler in `dispatch()` needs careful adaptation\n6. Do NOT wire into the active dispatch path until tested independently\n\n## References\n- `MineflayerAdapter/package.json` — current dependencies\n- PrismarineJS/mineflayer-collectblock — README\n- PrismarineJS/mineflayer-tool — README\n- Council review: DEF-PAPER-6\n- `MineflayerAdapter/index.js` — `mine` case in `dispatch()`",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Low",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint40",
+    "mineflayer-adapter",
+    "dependencies",
+    "council-response",
+    "planning"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audit/mineflayer-adapter-research.md"
+  ],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-22T00:00:00Z",
+  "updatedAtUtc": "2026-06-22T00:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}
