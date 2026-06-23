@@ -38,4 +38,8 @@ public static class ActionProtocol
 
     /// <summary>Scan for a flat, buildable area near the bot. Node.js action: <c>findFlatArea</c>.</summary>
     public const string FindFlatArea = "findFlatArea";
+
+    /// <summary>Sprint 40 P0-B: Find the nearest reachable block of a given type.
+    /// Returns position + pathfinding distance. Node.js action: <c>findReachableBlock</c>.</summary>
+    public const string FindReachableBlock = "findReachableBlock";
 }

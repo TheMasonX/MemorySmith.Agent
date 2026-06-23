@@ -1,1 +1,45 @@
-bmFtZXNwYWNlIFdlYlVJLkJsYXpvci5NYW5hZ2VyczsKCnVzaW5nIEFnZW50LkNvcmU7CnVzaW5nIEFnZW50LkNvcmUuUnVudGltZTsKdXNpbmcgTWljcm9zb2Z0LkV4dGVuc2lvbnMuTG9nZ2luZzsKCi8vLyA8c3VtbWFyeT4KLy8vIFNwcmludCAzOSBQMjogQ29uY3JldGUgaW1wbGVtZW50YXRpb24gb2YgPHNlZSBjcmVmPSJJUmVjb3ZlcnlNYW5hZ2VyIi8+LgovLy8KLy8vIFNwcmludCAzOSBzdHViOiByZWNvdmVyeSBsb2dpYyByZW1haW5zIGluCi8vLyBBZ2VudEJhY2tncm91bmRTZXJ2aWNlLlRyeVJlY292ZXJGcm9tR2FtZUVycm9yQXN5bmMgdW50aWwgdGhlIGZ1bGwgQUJTCi8vLyBkZWNvbXBvc2l0aW9uIGlzIGNvbXBsZXRlZCBpbiBTcHJpbnQgNDAuIFRoaXMgY2xhc3MgZXhpc3RzIHRvIGNvbXBsZXRlIHRoZQovLy8gQWdlbnRSdW50aW1lIHJlY29yZCBhbmQgbWFrZSBhbGwgc2l4IG1hbmFnZXIgaW50ZXJmYWNlcyByZXNvbHZhYmxlIHZpYSBESS4KLy8vCi8vLyBTcHJpbnQgNDAgdGFyZ2V0OiBleHRyYWN0IFRyeVJlY292ZXJGcm9tR2FtZUVycm9yQXN5bmMgaW50byB0aGlzIGNsYXNzLAovLy8gZWxpbWluYXRpbmcgdGhlIGNpcmN1bGFyIGRlcGVuZGVuY3kgd2hlcmUgcmVjb3ZlcnkgY2FsbHMgU2V0R29hbCBvbiBBQlMuCi8vLyBUaGUgcmVjb3ZlcnkgbG9naWMgbmVlZHM6IElDaGF0SW50ZXJwcmV0ZXIgKHRvIHBhcnNlIHJlY292ZXJ5IGludGVudCksIEdvYWxGYWN0b3J5Ci8vLyAodG8gY3JlYXRlIHRoZSByZWNvdmVyeSBnb2FsKSwgYW5kIHRoZSBhZ2VudCdzIFNldEdvYWwgZW50cnkgcG9pbnQg4oCUIGFsbCBvZiB3aGljaAovLy8gd2lsbCBiZSBhdmFpbGFibGUgdmlhIHRoZSBpbmplY3RlZCBBZ2VudFJ1bnRpbWUgb25jZSBBQlMgaXMgZnVsbHkgZGVjb21wb3NlZC4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCBjbGFzcyBSZWNvdmVyeU1hbmFnZXJJbXBsIDogSVJlY292ZXJ5TWFuYWdlcgp7CiAgICBwcml2YXRlIHJlYWRvbmx5IElMb2dnZXI8UmVjb3ZlcnlNYW5hZ2VySW1wbD4gX2xvZ2dlcjsKCiAgICBwdWJsaWMgUmVjb3ZlcnlNYW5hZ2VySW1wbChJTG9nZ2VyPFJlY292ZXJ5TWFuYWdlckltcGw+IGxvZ2dlcikKICAgIHsKICAgICAgICBfbG9nZ2VyID0gbG9nZ2VyOwogICAgfQoKICAgIC8vLyA8aW5oZXJpdGRvYy8+CiAgICAvLy8gPHJlbWFya3M+CiAgICAvLy8gU3ByaW50IDM5IHN0dWIg4oCUIGFsd2F5cyByZXR1cm5zIGZhbHNlLiBSZWNvdmVyeSBpcyBoYW5kbGVkIGJ5CiAgICAvLy8gQWdlbnRCYWNrZ3JvdW5kU2VydmljZS5UcnlSZWNvdmVyRnJvbUdhbWVFcnJvckFzeW5jIHVudGlsIFNwcmludCA0MC4KICAgIC8vLyA8L3JlbWFya3M+CiAgICBwdWJsaWMgVGFzazxib29sPiBUcnlSZWNvdmVyQXN5bmMoCiAgICAgICAgc3RyaW5nIGVycm9yTWVzc2FnZSwKICAgICAgICBXb3JsZFN0YXRlIHN0YXRlLAogICAgICAgIENhbmNlbGxhdGlvblRva2VuIGN0ID0gZGVmYXVsdCkKICAgIHsKICAgICAgICBfbG9nZ2VyLkxvZ0RlYnVnKAogICAgICAgICAgICAiW3JlY292ZXJ5XSBzdHViIGludm9rZWQgKGRlZmVycmVkIHRvIEFCUy5UcnlSZWNvdmVyRnJvbUdhbWVFcnJvckFzeW5jIHVudGlsIFNwcmludCA0MCk6IHtFcnJvcn0iLAogICAgICAgICAgICBlcnJvck1lc3NhZ2UuTGVuZ3RoID4gODAgPyBlcnJvck1lc3NhZ2VbLi44MF0gOiBlcnJvck1lc3NhZ2UpOwogICAgICAgIHJldHVybiBUYXNrLkZyb21SZXN1bHQoZmFsc2UpOwogICAgfQp9Cg==
+namespace WebUI.Blazor.Managers;
+
+using Agent.Core;
+using Agent.Core.Runtime;
+using Microsoft.Extensions.Logging;
+
+/// <summary>
+/// Sprint 39 P2: Concrete implementation of <see cref="IRecoveryManager"/>.
+///
+/// Sprint 39 stub: recovery logic remains in
+/// AgentBackgroundService.TryRecoverFromGameErrorAsync until the full ABS
+/// decomposition is completed in Sprint 40. This class exists to complete the
+/// AgentRuntime record and make all six manager interfaces resolvable via DI.
+///
+/// Sprint 40 target: extract TryRecoverFromGameErrorAsync into this class,
+/// eliminating the circular dependency where recovery calls SetGoal on ABS.
+/// The recovery logic needs: IChatInterpreter (to parse recovery intent), GoalFactory
+/// (to create the recovery goal), and the agent's SetGoal entry point — all of which
+/// will be available via the injected AgentRuntime once ABS is fully decomposed.
+/// </summary>
+public sealed class RecoveryManagerImpl : IRecoveryManager
+{
+    private readonly ILogger<RecoveryManagerImpl> _logger;
+
+    public RecoveryManagerImpl(ILogger<RecoveryManagerImpl> logger)
+    {
+        _logger = logger;
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// Sprint 39 stub — always returns false. Recovery is handled by
+    /// AgentBackgroundService.TryRecoverFromGameErrorAsync until Sprint 40.
+    /// </remarks>
+    public Task<bool> TryRecoverAsync(
+        string errorMessage,
+        WorldState state,
+        CancellationToken ct = default)
+    {
+        _logger.LogDebug(
+            "[recovery] stub invoked (deferred to ABS.TryRecoverFromGameErrorAsync until Sprint 40): {Error}",
+            errorMessage.Length > 80 ? errorMessage[..80] : errorMessage);
+        return Task.FromResult(false);
+    }
+}

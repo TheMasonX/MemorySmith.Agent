@@ -1,1 +1,70 @@
-bmFtZXNwYWNlIFdlYlVJLkJsYXpvci5NYW5hZ2VyczsKCnVzaW5nIEFnZW50LkNvcmU7CnVzaW5nIEFnZW50LkNvcmUuUnVudGltZTsKdXNpbmcgTWljcm9zb2Z0LkFzcE5ldENvcmUuU2lnbmFsUjsKdXNpbmcgTWljcm9zb2Z0LkV4dGVuc2lvbnMuTG9nZ2luZzsKCi8vLyA8c3VtbWFyeT4KLy8vIFNwcmludCAzOSBQMjogQ29uY3JldGUgaW1wbGVtZW50YXRpb24gb2YgPHNlZSBjcmVmPSJJRGFzaGJvYXJkUHVibGlzaGVyIi8+LgovLy8KLy8vIFNlbmRzIGFnZW50IHN0YXR1cyB1cGRhdGVzIHRvIGNvbm5lY3RlZCBCbGF6b3IgZGFzaGJvYXJkIGNsaWVudHMgdmlhIFNpZ25hbFIKLy8vIChjbGllbnQgbWV0aG9kOiAiYWdlbnRTdGF0dXNVcGRhdGVkIikuIFJlYWRzIHRoZSBjdXJyZW50IHdvcmxkIHN0YXRlIGZyb20KLy8vIDxzZWUgY3JlZj0iSVN0YXRlTWFuYWdlciIvPiB0byBwb3B1bGF0ZSBoZWFsdGgsIGZvb2QsIHBvc2l0aW9uLCBhbmQgaW52ZW50b3J5IGNvdW50LgovLy8KLy8vIFNwcmludCA0MCB0YXJnZXQ6IEFnZW50QmFja2dyb3VuZFNlcnZpY2UuUHVibGlzaFN0YXR1c0FzeW5jIGRlbGVnYXRlcyBoZXJlLAovLy8gZWxpbWluYXRpbmcgdGhlIGRpcmVjdCBJSHViQ29udGV4dCBkZXBlbmRlbmN5IGluIHRoZSA4MEtCIGdvZCBjbGFzcy4KLy8vIFdoZW4gdGhlIGZ1bGwgQUJTIGRlY29tcG9zaXRpb24gaXMgY29tcGxldGUsIHRoaXMgY2xhc3Mgd2lsbCBhbHNvIHJlY2VpdmUgdGhlCi8vLyBjdXJyZW50IElHb2FsIHNvIEdvYWxOYW1lIGNhbiBiZSBwb3B1bGF0ZWQgaW4gdGhlIHN0YXR1cyBwYXlsb2FkLgovLy8gPC9zdW1tYXJ5PgpwdWJsaWMgc2VhbGVkIGNsYXNzIERhc2hib2FyZFB1Ymxpc2hlckltcGwgOiBJRGFzaGJvYXJkUHVibGlzaGVyCnsKICAgIHByaXZhdGUgcmVhZG9ubHkgSUh1YkNvbnRleHQ8QWdlbnRIdWI+PyBfaHViQ29udGV4dDsKICAgIHByaXZhdGUgcmVhZG9ubHkgSVN0YXRlTWFuYWdlciAgICAgICAgICBfc3RhdGVNYW5hZ2VyOwogICAgcHJpdmF0ZSByZWFkb25seSBJTG9nZ2VyPERhc2hib2FyZFB1Ymxpc2hlckltcGw+IF9sb2dnZXI7CgogICAgcHVibGljIERhc2hib2FyZFB1Ymxpc2hlckltcGwoCiAgICAgICAgSUh1YkNvbnRleHQ8QWdlbnRIdWI+PyAgICAgICAgICBodWJDb250ZXh0LAogICAgICAgIElTdGF0ZU1hbmFnZXIgICAgICAgICAgICAgICAgICAgc3RhdGVNYW5hZ2VyLAogICAgICAgIElMb2dnZXI8RGFzaGJvYXJkUHVibGlzaGVySW1wbD4gbG9nZ2VyKQogICAgewogICAgICAgIF9odWJDb250ZXh0ICAgPSBodWJDb250ZXh0OwogICAgICAgIF9zdGF0ZU1hbmFnZXIgPSBzdGF0ZU1hbmFnZXI7CiAgICAgICAgX2xvZ2dlciAgICAgICA9IGxvZ2dlcjsKICAgIH0KCiAgICAvLy8gPGluaGVyaXRkb2MvPgogICAgcHVibGljIGFzeW5jIFRhc2sgUHVibGlzaFN0YXR1c0FzeW5jKENhbmNlbGxhdGlvblRva2VuIGN0ID0gZGVmYXVsdCkKICAgIHsKICAgICAgICBpZiAoX2h1YkNvbnRleHQgaXMgbnVsbCkKICAgICAgICB7CiAgICAgICAgICAgIF9sb2dnZXIuTG9nRGVidWcoIltkYXNoYm9hcmRdIGh1YkNvbnRleHQgaXMgbnVsbCDigJQgc2tpcHBpbmcgcHVibGlzaCIpOwogICAgICAgICAgICByZXR1cm47CiAgICAgICAgfQoKICAgICAgICB0cnkKICAgICAgICB7CiAgICAgICAgICAgIHZhciBzdGF0ZSA9IF9zdGF0ZU1hbmFnZXIuQ3VycmVudDsKCiAgICAgICAgICAgIC8vIFNwcmludCA0MDogcmVwbGFjZSBhbm9ueW1vdXMgb2JqZWN0IHdpdGggdHlwZWQgQWdlbnRTdGF0dXNVcGRhdGUgZnJvbSBEdG9zLmNzCiAgICAgICAgICAgIC8vIG9uY2UgR29hbE5hbWUgaXMgYWNjZXNzaWJsZSB2aWEgdGhlIGRlY29tcG9zZWQgcGlwZWxpbmUuCiAgICAgICAgICAgIGF3YWl0IF9odWJDb250ZXh0LkNsaWVudHMuQWxsLlNlbmRBc3luYygiYWdlbnRTdGF0dXNVcGRhdGVkIiwgbmV3CiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgIGlzUnVubmluZyAgICAgID0gdHJ1ZSwKICAgICAgICAgICAgICAgIGdvYWxOYW1lICAgICAgID0gKHN0cmluZz8pbnVsbCwgICAgICAgICAgLy8gU3ByaW50IDQwOiB3aXJlIGZyb20gSUdvYWwKICAgICAgICAgICAgICAgIGhlYWx0aCAgICAgICAgID0gc3RhdGUuSGVhbHRoLAogICAgICAgICAgICAgICAgZm9vZCAgICAgICAgICAgPSBzdGF0ZS5Gb29kLAogICAgICAgICAgICAgICAgcG9zWCAgICAgICAgICAgPSBzdGF0ZS5Qb3NpdGlvbi5YLAogICAgICAgICAgICAgICAgcG9zWSAgICAgICAgICAgPSBzdGF0ZS5Qb3NpdGlvbi5ZLAogICAgICAgICAgICAgICAgcG9zWiAgICAgICAgICAgPSBzdGF0ZS5Qb3NpdGlvbi5aLAogICAgICAgICAgICAgICAgaW52ZW50b3J5Q291bnQgPSBzdGF0ZS5JbnZlbnRvcnkuQ291bnQsCiAgICAgICAgICAgICAgICBpc0ludmVudG9yeVN0YWxlID0gc3RhdGUuSXNJbnZlbnRvcnlTdGFsZSwKICAgICAgICAgICAgfSwgY3QpOwogICAgICAgIH0KICAgICAgICBjYXRjaCAoT3BlcmF0aW9uQ2FuY2VsZWRFeGNlcHRpb24pIHsgdGhyb3c7IH0KICAgICAgICBjYXRjaCAoRXhjZXB0aW9uIGV4KQogICAgICAgIHsKICAgICAgICAgICAgX2xvZ2dlci5Mb2dXYXJuaW5nKGV4LCAiW2Rhc2hib2FyZF0gZmFpbGVkIHRvIHB1Ymxpc2ggc3RhdHVzIHVwZGF0ZSB2aWEgU2lnbmFsUiIpOwogICAgICAgIH0KICAgIH0KfQo=
+namespace WebUI.Blazor.Managers;
+
+using Agent.Core;
+using Agent.Core.Runtime;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
+
+/// <summary>
+/// Sprint 39 P2: Concrete implementation of <see cref="IDashboardPublisher"/>.
+///
+/// Sends agent status updates to connected Blazor dashboard clients via SignalR
+/// (client method: "agentStatusUpdated"). Reads the current world state from
+/// <see cref="IStateManager"/> to populate health, food, position, and inventory count.
+///
+/// Sprint 40 target: AgentBackgroundService.PublishStatusAsync delegates here,
+/// eliminating the direct IHubContext dependency in the 80KB god class.
+/// When the full ABS decomposition is complete, this class will also receive the
+/// current IGoal so GoalName can be populated in the status payload.
+/// </summary>
+public sealed class DashboardPublisherImpl : IDashboardPublisher
+{
+    private readonly IHubContext<AgentHub>? _hubContext;
+    private readonly IStateManager          _stateManager;
+    private readonly ILogger<DashboardPublisherImpl> _logger;
+
+    public DashboardPublisherImpl(
+        IHubContext<AgentHub>?          hubContext,
+        IStateManager                   stateManager,
+        ILogger<DashboardPublisherImpl> logger)
+    {
+        _hubContext   = hubContext;
+        _stateManager = stateManager;
+        _logger       = logger;
+    }
+
+    /// <inheritdoc/>
+    public async Task PublishStatusAsync(CancellationToken ct = default)
+    {
+        if (_hubContext is null)
+        {
+            _logger.LogDebug("[dashboard] hubContext is null — skipping publish");
+            return;
+        }
+
+        try
+        {
+            var state = _stateManager.Current;
+
+            // Sprint 40: replace anonymous object with typed AgentStatusUpdate from Dtos.cs
+            // once GoalName is accessible via the decomposed pipeline.
+            await _hubContext.Clients.All.SendAsync("agentStatusUpdated", new
+            {
+                isRunning      = true,
+                goalName       = (string?)null,          // Sprint 40: wire from IGoal
+                health         = state.Health,
+                food           = state.Food,
+                posX           = state.Position.X,
+                posY           = state.Position.Y,
+                posZ           = state.Position.Z,
+                inventoryCount = state.Inventory.Count,
+                isInventoryStale = state.IsInventoryStale,
+            }, ct);
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "[dashboard] failed to publish status update via SignalR");
+        }
+    }
+}

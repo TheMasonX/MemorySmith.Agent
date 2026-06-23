@@ -41,6 +41,15 @@ public interface IReplanGovernor
 
     /// <summary>True when the governor is in STALLED state.</summary>
     bool IsStalled { get; }
+
+    /// <summary>
+    /// Sprint 40 P0-B: Attempt auto-recovery if the STALLED timeout has expired.
+    /// Returns true if the governor was recovered (was stalled and timeout elapsed).
+    /// Returns false if the governor is not stalled or timeout hasn't elapsed.
+    /// Call this from the pre-plan path to avoid infinite stall when only
+    /// <see cref="IsStalled"/> is checked without calling <see cref="Evaluate"/>.
+    /// </summary>
+    bool TryAutoRecover();
 }
 
 /// <summary>Verdict returned by <see cref="IReplanGovernor.Evaluate"/>.</summary>

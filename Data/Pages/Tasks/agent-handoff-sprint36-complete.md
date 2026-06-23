@@ -1,1 +1,127 @@
-IyBBZ2VudCBIYW5kb2ZmIOKAlCBTcHJpbnQgMzYgQ29tcGxldGUgKHNlc3Npb24gMjAyNi0wNi0yMiBwYXJ0IDIpCgoqKkRhdGU6KiogMjAyNi0wNi0yMiAgCioqQnJhbmNoOioqIHNwcmludC0zNS1sbG0tZmlyc3QgKEhFQUQ6IGBjYjFjNTZmZWZhZTdlNzg1NjQwZDhmMzYwMmRjYTg0NTg4YTdjZTgyYCkgIAoqKlByZXZpb3VzIGhhbmRvZmY6KiogRGF0YS9QYWdlcy9UYXNrcy9hZ2VudC1oYW5kb2ZmLXNwcmludDM2LWltcGwubWQgIAoqKlZlcnNpb246KiogdjAuMzYuMCAoYnVtcGVkIHRoaXMgc2Vzc2lvbikKCi0tLQoKIyMgV2hhdCB0aGlzIHNlc3Npb24gZGVsaXZlcmVkCgojIyMgRXh0ZXJuYWwgYXVkaXQgdmFsaWRhdGlvbgoKUmV2aWV3ZWQgYERhdGEvUGFnZXMvQXVkaXQvTWVtb3J5U21pdGguQWdlbnRfQXVkaXRfMjAyNi0wNi0yMi5tZGAgYWdhaW5zdCBhbGwgcHJpb3IgY29tbWl0cy4KVGhyZWUgaGlnaC1zZXZlcml0eSBmaW5kaW5ncyBjb25maXJtZWQgYW5kIGFkZHJlc3NlZDoKCnwgIyB8IEZpbmRpbmcgfCBGaXggfAp8LS0tfC0tLS0tLS0tLXwtLS0tLXwKfCAxIHwgUDEtQyB3aXJlZCBpbiBMbG1DaGF0SW50ZXJwcmV0ZXIgYnV0IE5PVCBpbiBQcm9ncmFtLmNzIERJIHwgY29tbWl0IGNiMWM1NmZlIHwKfCAyIHwgVG9vbERpc3BhdGNoZXIuQWxsIG5vbmRldGVybWluaXN0aWMgKyBkcm9wcyBhbGlhc2VzIHwgY29tbWl0IDVjMjZlNGI5IFJlZ2lzdGVyZWROYW1lcyB8CnwgNCB8IENhbGxXaXRoT3V0Y29tZUFzeW5jIHdvdWxkIGRvdWJsZS1sb2cgd2hlbiB3aXJlZCBpbiBTcHJpbnQgMzcgfCBjb21taXQgNWMyNmU0YjkgcmVtb3ZlZCBMb2dPdXRjb21lIGNhbGwgfAoKQXVkaXQgZmluZGluZ3MgTk9UIGFkZHJlc3NlZCB0aGlzIHNwcmludCAoYnkgZGVzaWduKToKLSAqKkZpbmRpbmcgIzMqKiAoQ2FsbFdpdGhPdXRjb21lQXN5bmMgbm90IGluIGRpc3BhdGNoIGxvb3ApIOKAlCBTcHJpbnQgMzcgc2NvcGUuIEhhbmRvZmYgZXhwbGljaXRseSBkZWZlcnJlZC4KLSAqKkZpbmRpbmcgIzUqKiAocGFyc2VyIGNyZWF0ZXMgZ29hbCBuYW1lcykg4oCUIFNwcmludCAzNyBJbnRlbnRNYW5hZ2VyIHdvcmsuIENvbW1lbnQgaW4gTGxtQ2hhdEludGVycHJldGVyLgotICoqRmluZGluZyAjNioqIChJdGVtQ29uc3VtZWRFdmVudCBub3Qgd2lyZWQpIOKAlCBTcHJpbnQgMzcuIERvY3VtZW50ZWQgYXMgcHJvdmlzaW9uYWwgaW52ZW50b3J5LgotICoqRmluZGluZyAjOSoqIChzaWxlbnQgd29ybGQgbW9kZWwgY291cGxpbmcpIOKAlCBhcmNoaXRlY3R1cmUgbm90ZSwgU3ByaW50IDM3LgoKIyMjIENvbW1pdHMgdGhpcyBzZXNzaW9uICg0KQoKfCBTSEEgfCBXaGF0IHwKfC0tLS0tfC0tLS0tLXwKfCBgNWMyNmU0YjlgIHwgYEFnZW50LlRvb2xzL1Rvb2xEaXNwYXRjaGVyLmNzYCDigJQgYWRkIGBSZWdpc3RlcmVkTmFtZXNgIHByb3BlcnR5IChzb3J0ZWQga2V5cywgaW5jbHVkZXMgYWxpYXNlcyk7IHJlbW92ZSBgX2pvdXJuYWw/LkxvZ091dGNvbWUob3V0Y29tZSlgIGZyb20gYENhbGxXaXRoT3V0Y29tZUFzeW5jYCB0byBwcmV2ZW50IGZ1dHVyZSBkb3VibGUtbG9nZ2luZyB8CnwgYGUyMzFkNDEyYCB8IGBBZ2VudC5Db3JlL01vZGVscy9BY3Rpb25PdXRjb21lLmNzYCDigJQgYWRkIGBJT2JzZXJ2YXRpb25TdW1tYXJ5YCBpbnRlcmZhY2Ugc3R1YiAoUDItQiBwYXJ0IDEpIHwKfCBgYzFlYTBjZDdgIHwgYE1lbW9yeVNtaXRoLkFnZW50LlRlc3RzL1NwcmludDM2VGVzdHMuY3NgIOKAlCA1IG5ldy91cGRhdGVkIHRlc3RzOiBQMC1CIMOXMiwgUDEtQiDDlzIsIHVwZGF0ZWQgUDEtQyB8CnwgYGNiMWM1NmZlYCB8IGBXZWJVSS5CbGF6b3IvUHJvZ3JhbS5jc2Ag4oCUIHdpcmUgYFJlZ2lzdGVyZWROYW1lc2AgaW50byBgTGxtQ2hhdEludGVycHJldGVyYCBESTsgYnVtcCB2ZXJzaW9uIHRvIDAuMzYuMDsgZml4IGAvYXBpL2FnZW50L2NvbW1hbmRgIGVycm9yIHRvIHVzZSBgUmVnaXN0ZXJlZE5hbWVzYCB8CgojIyMgTmV3IHRlc3RzICg1KQoKfCBUZXN0IHwgVmFsaWRhdGVzIHwKfC0tLS0tLXwtLS0tLS0tLS0tLXwKfCBgQ2FsbFdpdGhPdXRjb21lQXN5bmNfU3VjY2Vzc19SZXR1cm5zT3V0Y29tZUFuZERvZXNOb3REb3VibGVMb2dgIHwgUmV0dXJucyBjb3JyZWN0IChUb29sUmVzdWx0LCBBY3Rpb25PdXRjb21lKSB0dXBsZTsgam91cm5hbCBoYXMgZXhhY3RseSAxIGVudHJ5IChubyBkdXAgZnJvbSBMb2dPdXRjb21lKSB8CnwgYENhbGxXaXRoT3V0Y29tZUFzeW5jX1Rvb2xGYWlsdXJlX1JldHVybnNGYWlsZWRPdXRjb21lYCB8IEZhaWx1cmUgcGF0aCB0aHJlYWRzIEdvYWxJZCArIFRvb2xOYW1lIGNvcnJlY3RseSB8CnwgYEl0ZW1DcmFmdGVkRXZlbnRfVXBkYXRlc0ludmVudG9yeWAgfCBBcHBseUl0ZW1DcmFmdGVkIGFkZHMgY3JhZnRlZCBpdGVtIHRvIFdvcmxkU3RhdGUuSW52ZW50b3J5IHwKfCBgSXRlbUNyYWZ0ZWRFdmVudF9TdHJpcHNNaW5lY3JhZnRQcmVmaXhgIHwgbWluZWNyYWZ0OiBwcmVmaXggc3RyaXBwZWQsIGJhcmUga2V5IHN0b3JlZCB8CnwgYFRvb2xEaXNwYXRjaGVyX1JlZ2lzdGVyZWROYW1lc19JbmNsdWRlc0FsaWFzZXNBbmRJc1NvcnRlZGAgfCBSZXBsYWNlcyBvbGQgQWxsLWJhc2VkIHNjYWZmb2xkOyB2ZXJpZmllcyAiU3RhdHVzIiBhbGlhcyArIGFscGhhYmV0aWNhbCBvcmRlciB8CgotLS0KCiMjIEZ1bGwgU3ByaW50IDM2IGNvbW1pdCBsb2cKCmBgYApjYjFjNTZmZSAgZmVhdDogUDEtQyBESSB3aXJpbmcgKyB2ZXJzaW9uIGJ1bXAgMC4zNi4wCmMxZWEwY2Q3ICB0ZXN0OiBQMC1CICsgUDEtQiArIHVwZGF0ZWQgUDEtQwplMjMxZDQxMiAgZmVhdDogUDItQiDigJQgSU9ic2VydmF0aW9uU3VtbWFyeSBzdHViIG9uIEFjdGlvbk91dGNvbWUKNWMyNmU0YjkgIGZlYXQ6IFJlZ2lzdGVyZWROYW1lcyArIGF1ZGl0IGZpeCDigJQgbm8tZHVwLWxvZyBpbiBDYWxsV2l0aE91dGNvbWVBc3luYwoyOTUzMzAyNCAgU3ByaW50IDM2IEF1ZGl0ICh1c2VyLWNvbW1pdHRlZCBleHRlcm5hbCBhdWRpdCBkb2MpCjY5MWE5ZjJhICBkb2NzOiBTcHJpbnQgMzYgaW1wbGVtZW50YXRpb24gaGFuZG9mZiAoc2Vzc2lvbiAyMDI2LTA2LTIyKQoyMGZlMDE1MSAgZmVhdDogU3ByaW50IDM2IFAyLUEg4oCUIEFnZW50UnVudGltZSByZWNvcmQKYzA5NjhkMWUgIGZlYXQ6IFNwcmludCAzNiBQMi1BIOKAlCBJQWdlbnRSdW50aW1lQ29tcG9uZW50IGludGVyZmFjZXMKYTczNzdmNTEgIGZlYXQ6IFAxLUMg4oCUIEJ1aWxkU3lzdGVtUHJvbXB0IHRvb2wgbmFtZXMKOWIyOTQ4ZjUgIGZlYXQ6IFAxLUIg4oCUIEFwcGx5SXRlbUNyYWZ0ZWQgd2lyZXMgSXRlbUNyYWZ0ZWRFdmVudCB0byBpbnZlbnRvcnkKMzJmZjhiYjkgIGZlYXQ6IFAxLUEg4oCUIEZhY3RTb3VyY2UgZXhwYW5zaW9uCmE3YmJkMWUyICBmZWF0OiBQMC1CIOKAlCBUb29sRGlzcGF0Y2hlci5DYWxsV2l0aE91dGNvbWVBc3luYwphMTM5NjQzYiAgZmVhdDogUDAtQiDigJQgSUFnZW50Sm91cm5hbC5Mb2dPdXRjb21lIERJTQo0YjQwOTk4ZiAgdGVzdDogU3ByaW50MzZUZXN0cy5jcwphMGZlNDU0NiAgZmVhdDogUDAtQyDigJQgRGVjb21wb3NlQnVpbGQgU2VhcmNoZWRSYWRpdXMgcmV0cnkgZ2F0ZQo4YjYyZjk4YiAgZmVhdDogUDAtQSDigJQgVHJ5SW50ZXJydXB0T25EYW1hZ2VBc3luYwpiYjNmMTliNSAgZG9jczogU3ByaW50IDM2IEFHRU5UUy5tZApiZTgxNDJiMCAgdGVzdDogZml4IENJIHJlZ3Jlc3Npb25zIChCTEstUzM2LTAzKQpgYGAKCi0tLQoKIyMgU2VsZi1yZWZsZWN0aW9uCgoqKldoYXQgd2VudCB3ZWxsOioqCi0gQXVkaXQgc3ludGhlc2lzIHdhcyBjbGVhbi4gVGhlIGV4dGVybmFsIGF1ZGl0IGluZGVwZW5kZW50bHkgY29uZmlybWVkIHRoZSBleGFjdCBzYW1lIGdhcHMgdGhlIHByaW9yIHNlc3Npb24ncyBoYW5kb2ZmIGFscmVhZHkgZmxhZ2dlZCDigJQgd2hpY2ggaXMgZ29vZCBzaWduYWwuIEltcGxlbWVudGluZyBmaXhlcyB3YXMgc3RyYWlnaHRmb3J3YXJkLgotIGBSZWdpc3RlcmVkTmFtZXNgIGlzIHN0cmljdGx5IGJldHRlciB0aGFuIHRoZSBoYW5kb2ZmJ3MgcHJvcG9zZWQgYEFsbC5TZWxlY3QodD0+dC5OYW1lKWA6IHNhbWUgc2luZ2xlIExJTlEgZXhwcmVzc2lvbiwgemVybyBleHRyYSBjb2RlLCBjYXRjaGVzIGFsaWFzZXMgYW5kIGlzIGRldGVybWluaXN0aWMuIEdvb2QgY2F0Y2ggaW4gdGhlIGF1ZGl0LgotIFRoZSBQcm9ncmFtLmNzIERJIHdpcmluZyB3YXMgdGhlIG9ubHkgYWN0dWFsbHkgdXNlci12aXNpYmxlIGNoYW5nZSAodGhlIExMTSBub3cgZ2V0cyB0b29sIG5hbWVzKS4gQWxsIG90aGVyIGNoYW5nZXMgd2VyZSBzYWZldHkvY29ycmVjdG5lc3MgZml4ZXMgdGhhdCBtYXR0ZXIgZm9yIFNwcmludCAzNyB3aXJpbmcuCi0gYFNweUpvdXJuYWxgIGZpbGUtbG9jYWwgdGVzdCBkb3VibGUgaXMgY2xlYW4gYW5kIHJldXNhYmxlIHdpdGhpbiB0aGUgdGVzdCBjbGFzcy4KCioqV2hhdCB3YXMgZGVsaWJlcmF0ZWx5IHNraXBwZWQ6KioKLSBgQWdlbnRCYWNrZ3JvdW5kU2VydmljZS5EaXNwYXRjaEFjdGlvbnNBc3luY2AgUDItQiBjb21tZW50IOKAlCB0aGUgZmlsZSBpcyA4MEtCLiBBIG9uZS1saW5lIGNvbW1lbnQgaXNuJ3Qgd29ydGggcmVhZGluZy9yZS1lbmNvZGluZyA4MEtCLiBTcHJpbnQgMzcgd2lsbCBtb2RpZnkgdGhpcyBmaWxlIHN1YnN0YW50aWFsbHkgKHdpcmluZyBgQ2FsbFdpdGhPdXRjb21lQXN5bmNgKSwgc28gdGhlIGNvbW1lbnQgd2lsbCBiZSBhZGRlZCB0aGVuLgotIE5vIGNvdW5jaWwgcmV2aWV3IHBlciB1c2VyIGluc3RydWN0aW9uLiBTZWxmLXJlZmxlY3Rpb24gb25seS4KCioqUmVtYWluaW5nIHJpc2s6KioKLSBgTGxtQ2hhdEludGVycHJldGVyLlBhcnNlRGVjaXNpb25gIHN0aWxsIG1hcHMgTExNIGludGVudCBzdHJpbmdzIGRpcmVjdGx5IHRvIGBnb2FsTmFtZWAgc3RyaW5ncyAoZS5nLiBgR2F0aGVySXRlbTpvYWtfbG9nYCkuIFRoaXMgdmlvbGF0ZXMgQ1JJVElDQUwgUnVsZSBBLTEgKHBhcnNlcnMgbmV2ZXIgY3JlYXRlIGdvYWxzKS4gVGhlIGNvbW1lbnQgaW4gdGhlIGNvZGUgY2FsbHMgdGhpcyB0aGUgIlNwcmludCAzNSB0cmFuc2l0aW9uIGxheWVyLiIgU3ByaW50IDM3J3MgSW50ZW50TWFuYWdlciBtdXN0IGZ1bGx5IHJlbW92ZSB0aGlzLiBEbyBOT1QgbGV0IGFub3RoZXIgc3ByaW50IHBhc3Mgd2l0aG91dCBmaXhpbmcgaXQuCi0gYENhbGxXaXRoT3V0Y29tZUFzeW5jYCBpcyBpbmZyYXN0cnVjdHVyZSBvbmx5LiBJdCByZXR1cm5zIGEgY29ycmVjdCBgQWN0aW9uT3V0Y29tZWAgYnV0IG5vdGhpbmcgY29uc3VtZXMgaXQgeWV0LiBUaGUgdmFsdWUgbWF0ZXJpYWxpemVzIGluIFNwcmludCAzNyB3aGVuIGBEaXNwYXRjaEFjdGlvbnNBc3luY2AgaXMgc3dpdGNoZWQgb3Zlci4KLSBgSU9ic2VydmF0aW9uU3VtbWFyeWAgaXMgYSBvbmUtbGluZSBzdHViLiBTcHJpbnQgMzcgc2hvdWxkIG1ha2UgYEFjdGlvbk91dGNvbWVgIGltcGxlbWVudCBpdCB2aWEgYE9ic2VydmF0aW9uU3VtbWFyeWAgcHJvcGVydHkuCgotLS0KCiMjIFNwcmludCAzNyBwcmlvcml0aWVzCgoqKlAwIOKAlCBXaXJlIHRoZSBuZXcgaW5mcmFzdHJ1Y3R1cmUqKgotIFsgXSBgRGlzcGF0Y2hBY3Rpb25zQXN5bmNgIOKGkiBgQ2FsbFdpdGhPdXRjb21lQXN5bmNgIChyZXBsYWNlIHRoZSBgdG9vbENhbGxlci5DYWxsQXN5bmNgIGNhbGwpCiAgLSBBZnRlciBzd2l0Y2hpbmc6IHJlbW92ZSB0aGUgbm93LXJlZHVuZGFudCBwZXItYWN0aW9uIGpvdXJuYWwgZW50cmllcyBmcm9tIGBDYWxsQXN5bmNgCiAgLSBJbnN0ZWFkOiBjYWxsIGBfam91cm5hbD8uTG9nT3V0Y29tZShvdXRjb21lKWAgZXhwbGljaXRseSBpbiB0aGUgZGlzcGF0Y2ggbG9vcAogIC0gQWRkIFAyLUIgY29tbWVudCBhdCBzYW1lIHRpbWUgKG5vIGxvbmdlciBuZWVkIHRvIGZldGNoIGZ1bGwgODBLQiBzZXBhcmF0ZWx5KQotIFsgXSBgQWN0aW9uT3V0Y29tZSBpbXBsZW1lbnRzIElPYnNlcnZhdGlvblN1bW1hcnlgIOKAlCBvbmUtbGluZTogYHN0cmluZyBJT2JzZXJ2YXRpb25TdW1tYXJ5LlN1bW1hcnkgPT4gT2JzZXJ2YXRpb25TdW1tYXJ5O2AKCioqUDEg4oCUIEludGVudOKGkkdvYWwgc2VwYXJhdGlvbiAoUFJJTkNJUExFLTEgZW5mb3JjZW1lbnQpKioKLSBbIF0gRXh0cmFjdCBgUGFyc2VEZWNpc2lvbmAgZ29hbC1tYXBwaW5nIGJsb2NrIGludG8gYEludGVudE1hbmFnZXJgIGNsYXNzCi0gWyBdIGBMbG1DaGF0SW50ZXJwcmV0ZXJgIHJldHVybnMgcHVyZSBgSW50ZW50RHJhZnRgIChubyBgR29hbE5hbWVgLCBubyBgUGFyYW1ldGVyc2ApCi0gWyBdIGBBZ2VudEJhY2tncm91bmRTZXJ2aWNlLkhhbmRsZUNoYXRFdmVudEFzeW5jYCByZWNlaXZlcyBgSW50ZW50RHJhZnRgLCBwYXNzZXMgdG8gYEludGVudE1hbmFnZXJgCi0gWyBdIGBJbnRlbnRBc3Nlc3NtZW50YCB3cmFwcGVyOiBgeyBJbnRlbnREcmFmdCwgUmlza0xldmVsLCBSZXF1aXJlc0NvbmZpcm1hdGlvbiwgUmVhc29uaW5nU3VtbWFyeSB9YAoKKipQMiDigJQgQWdlbnRSdW50aW1lIGRlY29tcG9zaXRpb24qKgotIFsgXSBgQWdlbnRCYWNrZ3JvdW5kU2VydmljZWAg4oaSIGBBZ2VudFJ1bnRpbWUuVGljaygpYCBwYXR0ZXJuCi0gWyBdIGBFeGVjdXRpb25NYW5hZ2VyLkV2YWx1YXRlQXN5bmMoQWN0aW9uT3V0Y29tZVtdKWAg4oaSIExMTSByZXBsYW5uaW5nCi0gWyBdIE9ic2VydmF0aW9uLWRyaXZlbiBsb29wOiBQbGFuIOKGkiBFeGVjdXRlIOKGkiBBY3Rpb25PdXRjb21lIOKGkiBMTE0gRXZhbHVhdGUg4oaSIFJlcGxhbj8KCioqSW5mcmFzdHJ1Y3R1cmUgaGVhbHRoOioqCi0gWyBdIGBJdGVtQ29uc3VtZWRFdmVudGAgZnVsbCB3aXJpbmcgKGluZ3JlZGllbnQgZGVkdWN0aW9uIGR1cmluZyBjcmFmdCkKLSBbIF0gYEFnZW50QmFja2dyb3VuZFNlcnZpY2UuY3NgIGlzIDgwS0Ig4oCUIHBsYW4gdGhlIHNwbGl0IGFzIHBhcnQgb2YgUDIgZGVjb21wb3NpdGlvbgoKLS0tCgojIyBLZXkgZmlsZSBwYXRocyBjaGFuZ2VkIHRoaXMgc2Vzc2lvbgoKfCBGaWxlIHwgQ2hhbmdlIHwKfC0tLS0tLXwtLS0tLS0tLXwKfCBgQWdlbnQuVG9vbHMvVG9vbERpc3BhdGNoZXIuY3NgIHwgYFJlZ2lzdGVyZWROYW1lc2AgcHJvcGVydHk7IHJlbW92ZWQgYF9qb3VybmFsPy5Mb2dPdXRjb21lYCBmcm9tIGBDYWxsV2l0aE91dGNvbWVBc3luY2AgfAp8IGBBZ2VudC5Db3JlL01vZGVscy9BY3Rpb25PdXRjb21lLmNzYCB8IGBJT2JzZXJ2YXRpb25TdW1tYXJ5YCBzdHViIGludGVyZmFjZSBhZGRlZCB8CnwgYE1lbW9yeVNtaXRoLkFnZW50LlRlc3RzL1NwcmludDM2VGVzdHMuY3NgIHwgKzUgdGVzdHM7IGBUb29sRGlzcGF0Y2hlcl9SZWdpc3RlcmVkTmFtZXNfSW5jbHVkZXNBbGlhc2VzQW5kSXNTb3J0ZWRgIHJlcGxhY2VzIG9sZCBzY2FmZm9sZCB8CnwgYFdlYlVJLkJsYXpvci9Qcm9ncmFtLmNzYCB8IGBJQ2hhdEludGVycHJldGVyYCBESSB1c2VzIGBSZWdpc3RlcmVkTmFtZXNgOyB2MC4zNi4wOyBgL2FwaS9hZ2VudC9jb21tYW5kYCB1c2VzIGBSZWdpc3RlcmVkTmFtZXNgIHwK
+# Agent Handoff — Sprint 36 Complete (session 2026-06-22 part 2)
+
+**Date:** 2026-06-22  
+**Branch:** sprint-35-llm-first (HEAD: `cb1c56fefae7e785640d8f3602dca84588a7ce82`)  
+**Previous handoff:** Data/Pages/Tasks/agent-handoff-sprint36-impl.md  
+**Version:** v0.36.0 (bumped this session)
+
+---
+
+## What this session delivered
+
+### External audit validation
+
+Reviewed `Data/Pages/Audit/MemorySmith.Agent_Audit_2026-06-22.md` against all prior commits.
+Three high-severity findings confirmed and addressed:
+
+| # | Finding | Fix |
+|---|---------|-----|
+| 1 | P1-C wired in LlmChatInterpreter but NOT in Program.cs DI | commit cb1c56fe |
+| 2 | ToolDispatcher.All nondeterministic + drops aliases | commit 5c26e4b9 RegisteredNames |
+| 4 | CallWithOutcomeAsync would double-log when wired in Sprint 37 | commit 5c26e4b9 removed LogOutcome call |
+
+Audit findings NOT addressed this sprint (by design):
+- **Finding #3** (CallWithOutcomeAsync not in dispatch loop) — Sprint 37 scope. Handoff explicitly deferred.
+- **Finding #5** (parser creates goal names) — Sprint 37 IntentManager work. Comment in LlmChatInterpreter.
+- **Finding #6** (ItemConsumedEvent not wired) — Sprint 37. Documented as provisional inventory.
+- **Finding #9** (silent world model coupling) — architecture note, Sprint 37.
+
+### Commits this session (4)
+
+| SHA | What |
+|-----|------|
+| `5c26e4b9` | `Agent.Tools/ToolDispatcher.cs` — add `RegisteredNames` property (sorted keys, includes aliases); remove `_journal?.LogOutcome(outcome)` from `CallWithOutcomeAsync` to prevent future double-logging |
+| `e231d412` | `Agent.Core/Models/ActionOutcome.cs` — add `IObservationSummary` interface stub (P2-B part 1) |
+| `c1ea0cd7` | `MemorySmith.Agent.Tests/Sprint36Tests.cs` — 5 new/updated tests: P0-B ×2, P1-B ×2, updated P1-C |
+| `cb1c56fe` | `WebUI.Blazor/Program.cs` — wire `RegisteredNames` into `LlmChatInterpreter` DI; bump version to 0.36.0; fix `/api/agent/command` error to use `RegisteredNames` |
+
+### New tests (5)
+
+| Test | Validates |
+|------|-----------|
+| `CallWithOutcomeAsync_Success_ReturnsOutcomeAndDoesNotDoubleLog` | Returns correct (ToolResult, ActionOutcome) tuple; journal has exactly 1 entry (no dup from LogOutcome) |
+| `CallWithOutcomeAsync_ToolFailure_ReturnsFailedOutcome` | Failure path threads GoalId + ToolName correctly |
+| `ItemCraftedEvent_UpdatesInventory` | ApplyItemCrafted adds crafted item to WorldState.Inventory |
+| `ItemCraftedEvent_StripsMinecraftPrefix` | minecraft: prefix stripped, bare key stored |
+| `ToolDispatcher_RegisteredNames_IncludesAliasesAndIsSorted` | Replaces old All-based scaffold; verifies "Status" alias + alphabetical order |
+
+---
+
+## Full Sprint 36 commit log
+
+```
+cb1c56fe  feat: P1-C DI wiring + version bump 0.36.0
+c1ea0cd7  test: P0-B + P1-B + updated P1-C
+e231d412  feat: P2-B — IObservationSummary stub on ActionOutcome
+5c26e4b9  feat: RegisteredNames + audit fix — no-dup-log in CallWithOutcomeAsync
+29533024  Sprint 36 Audit (user-committed external audit doc)
+691a9f2a  docs: Sprint 36 implementation handoff (session 2026-06-22)
+20fe0151  feat: Sprint 36 P2-A — AgentRuntime record
+c0968d1e  feat: Sprint 36 P2-A — IAgentRuntimeComponent interfaces
+a7377f51  feat: P1-C — BuildSystemPrompt tool names
+9b2948f5  feat: P1-B — ApplyItemCrafted wires ItemCraftedEvent to inventory
+32ff8bb9  feat: P1-A — FactSource expansion
+a7bbd1e2  feat: P0-B — ToolDispatcher.CallWithOutcomeAsync
+a139643b  feat: P0-B — IAgentJournal.LogOutcome DIM
+4b40998f  test: Sprint36Tests.cs
+a0fe4546  feat: P0-C — DecomposeBuild SearchedRadius retry gate
+8b62f98b  feat: P0-A — TryInterruptOnDamageAsync
+bb3f19b5  docs: Sprint 36 AGENTS.md
+be8142b0  test: fix CI regressions (BLK-S36-03)
+```
+
+---
+
+## Self-reflection
+
+**What went well:**
+- Audit synthesis was clean. The external audit independently confirmed the exact same gaps the prior session's handoff already flagged — which is good signal. Implementing fixes was straightforward.
+- `RegisteredNames` is strictly better than the handoff's proposed `All.Select(t=>t.Name)`: same single LINQ expression, zero extra code, catches aliases and is deterministic. Good catch in the audit.
+- The Program.cs DI wiring was the only actually user-visible change (the LLM now gets tool names). All other changes were safety/correctness fixes that matter for Sprint 37 wiring.
+- `SpyJournal` file-local test double is clean and reusable within the test class.
+
+**What was deliberately skipped:**
+- `AgentBackgroundService.DispatchActionsAsync` P2-B comment — the file is 80KB. A one-line comment isn't worth reading/re-encoding 80KB. Sprint 37 will modify this file substantially (wiring `CallWithOutcomeAsync`), so the comment will be added then.
+- No council review per user instruction. Self-reflection only.
+
+**Remaining risk:**
+- `LlmChatInterpreter.ParseDecision` still maps LLM intent strings directly to `goalName` strings (e.g. `GatherItem:oak_log`). This violates CRITICAL Rule A-1 (parsers never create goals). The comment in the code calls this the "Sprint 35 transition layer." Sprint 37's IntentManager must fully remove this. Do NOT let another sprint pass without fixing it.
+- `CallWithOutcomeAsync` is infrastructure only. It returns a correct `ActionOutcome` but nothing consumes it yet. The value materializes in Sprint 37 when `DispatchActionsAsync` is switched over.
+- `IObservationSummary` is a one-line stub. Sprint 37 should make `ActionOutcome` implement it via `ObservationSummary` property.
+
+---
+
+## Sprint 37 priorities
+
+**P0 — Wire the new infrastructure**
+- [ ] `DispatchActionsAsync` → `CallWithOutcomeAsync` (replace the `toolCaller.CallAsync` call)
+  - After switching: remove the now-redundant per-action journal entries from `CallAsync`
+  - Instead: call `_journal?.LogOutcome(outcome)` explicitly in the dispatch loop
+  - Add P2-B comment at same time (no longer need to fetch full 80KB separately)
+- [ ] `ActionOutcome implements IObservationSummary` — one-line: `string IObservationSummary.Summary => ObservationSummary;`
+
+**P1 — Intent→Goal separation (PRINCIPLE-1 enforcement)**
+- [ ] Extract `ParseDecision` goal-mapping block into `IntentManager` class
+- [ ] `LlmChatInterpreter` returns pure `IntentDraft` (no `GoalName`, no `Parameters`)
+- [ ] `AgentBackgroundService.HandleChatEventAsync` receives `IntentDraft`, passes to `IntentManager`
+- [ ] `IntentAssessment` wrapper: `{ IntentDraft, RiskLevel, RequiresConfirmation, ReasoningSummary }`
+
+**P2 — AgentRuntime decomposition**
+- [ ] `AgentBackgroundService` → `AgentRuntime.Tick()` pattern
+- [ ] `ExecutionManager.EvaluateAsync(ActionOutcome[])` → LLM replanning
+- [ ] Observation-driven loop: Plan → Execute → ActionOutcome → LLM Evaluate → Replan?
+
+**Infrastructure health:**
+- [ ] `ItemConsumedEvent` full wiring (ingredient deduction during craft)
+- [ ] `AgentBackgroundService.cs` is 80KB — plan the split as part of P2 decomposition
+
+---
+
+## Key file paths changed this session
+
+| File | Change |
+|------|--------|
+| `Agent.Tools/ToolDispatcher.cs` | `RegisteredNames` property; removed `_journal?.LogOutcome` from `CallWithOutcomeAsync` |
+| `Agent.Core/Models/ActionOutcome.cs` | `IObservationSummary` stub interface added |
+| `MemorySmith.Agent.Tests/Sprint36Tests.cs` | +5 tests; `ToolDispatcher_RegisteredNames_IncludesAliasesAndIsSorted` replaces old scaffold |
+| `WebUI.Blazor/Program.cs` | `IChatInterpreter` DI uses `RegisteredNames`; v0.36.0; `/api/agent/command` uses `RegisteredNames` |

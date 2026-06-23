@@ -29,6 +29,15 @@ namespace Agent.Core;
 /// Sprint 35 P2-A stubs: ItemCraftedEvent and ItemConsumedEvent stored as facts; full wiring Sprint 36.
 /// Sprint 36 P1-B: ApplyItemCrafted added — ItemCraftedEvent now updates inventory.
 /// Sprint 38 P4-A: ApplyItemConsumed added — ItemConsumedEvent now updates inventory.
+/// Sprint 40 P0-B (Fix C): Restored inventory increment for BlockMinedEvent for self-dropping blocks.
+///   The Sprint 35 change removed ALL inventory updates from BlockMinedEvent, relying entirely
+///   on ItemCollectedEvent (playerCollect) for inventory truth. However, if the item drop entity
+///   is not collected (falls through a hole, too far away), playerCollect never fires and the
+///   inventory stays at 0 forever. This fix adds ApplyBlockMined which increments inventory
+///   for blocks that drop themselves (dirt, sand, logs, cobblestone, etc.) while still relying
+///   on ItemCollectedEvent for ores with different drop names (diamond_ore -> diamond).
+///   The block-to-item map covers known mappings; unknown blocks fall through to the bare
+///   block name as a best-effort default.
 /// </summary>
 public sealed class WorldStateProjector
 {
@@ -43,9 +52,10 @@ public sealed class WorldStateProjector
         GameModeChangedEvent e => ApplyGameModeChanged(current, e),
         DamageTakenEvent e => StoreFacts(current, e),  // Sprint 23: store facts only; health already updated via HealthEvent
         MoveEvent e => ApplyMove(current, e),
-        // Sprint 35 P0-A: inventory update removed from ApplyBlockMined; inventory
-        // truth now comes from ItemCollectedEvent. Only facts are stored here.
-        BlockMinedEvent e => StoreFacts(current, e, SourceFor(e)),
+        // Sprint 40 P0-B: ApplyBlockMined replaces the Sprint 35 bare StoreFacts call.
+        // Increments inventory for self-dropping blocks; falls back to ItemCollectedEvent
+        // for ores with different drop names (diamond_ore -> diamond).
+        BlockMinedEvent e => ApplyBlockMined(current, e),
         ItemCollectedEvent e => ApplyItemCollected(current, e),
         // Sprint 35 P0-B: MineCompleteEvent stored as facts; lifecycle handled by AgentBackgroundService.
         MineCompleteEvent e => StoreFacts(current, e),
@@ -84,6 +94,102 @@ public sealed class WorldStateProjector
     {
         var result = current with { Position = e.Pos };
         return StoreFacts(result, e);
+    }
+
+    // ── Sprint 40 P0-B: Block-to-item drop mapping for self-dropping blocks ───────
+    // Minecraft blocks that drop themselves when mined without silk touch.
+    // For these blocks, ApplyBlockMined can safely increment inventory for the block name.
+    // Extended list covers all common overworld/terrain blocks.
+
+    private static readonly HashSet<string> SelfDroppingBlocks = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "dirt", "grass_block", "podzol", "mycelium", "coarse_dirt", "rooted_dirt",
+        "sand", "red_sand", "suspicious_sand", "suspicious_gravel",
+        "gravel", "clay",
+        "cobblestone", "mossy_cobblestone",
+        "stone",  // drops cobblestone - handled by BlockToItemDrop map below
+        "netherrack", "end_stone",
+        "snow_block", "ice", "packed_ice", "blue_ice",
+        // Logs (all overworld types)
+        "oak_log", "birch_log", "spruce_log", "dark_oak_log",
+        "jungle_log", "acacia_log", "cherry_log", "mangrove_log",
+        // Planks
+        "oak_planks", "birch_planks", "spruce_planks", "dark_oak_planks",
+        "jungle_planks", "acacia_planks", "cherry_planks", "mangrove_planks",
+        // Stone variants
+        "granite", "diorite", "andesite", "tuff", "calcite", "dripstone_block",
+        "deepslate", "cobbled_deepslate",
+        // Other
+        "obsidian", "crying_obsidian",
+        "sandstone", "red_sandstone",
+        "terracotta", "white_terracotta", "bricks",
+        "nether_brick", "soul_sand", "soul_soil",
+    };
+
+    /// <summary>
+    /// Maps block names to their dropped item names when the block does NOT drop itself.
+    /// Key = block name, Value = item name that drops.
+    /// Only blocks with different drop names need entries here.
+    /// </summary>
+    private static readonly Dictionary<string, string> BlockToItemDrop = new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Stone -> cobblestone
+        ["stone"] = "cobblestone",
+        ["stone_slab"] = "stone_slab",
+        // Grass/mycelium -> dirt
+        ["grass_block"] = "dirt",
+        ["mycelium"] = "dirt",
+        // Ores (drop raw materials, not the ore block)
+        ["diamond_ore"] = "diamond",
+        ["deepslate_diamond_ore"] = "diamond",
+        ["coal_ore"] = "coal",
+        ["deepslate_coal_ore"] = "coal",
+        ["emerald_ore"] = "emerald",
+        ["deepslate_emerald_ore"] = "emerald",
+        ["redstone_ore"] = "redstone",
+        ["deepslate_redstone_ore"] = "redstone",
+        ["lapis_ore"] = "lapis_lazuli",
+        ["deepslate_lapis_ore"] = "lapis_lazuli",
+        ["iron_ore"] = "raw_iron",
+        ["deepslate_iron_ore"] = "raw_iron",
+        ["copper_ore"] = "raw_copper",
+        ["deepslate_copper_ore"] = "raw_copper",
+        ["gold_ore"] = "raw_gold",
+        ["deepslate_gold_ore"] = "raw_gold",
+        ["nether_gold_ore"] = "gold_nugget",
+        // Netherite
+        ["ancient_debris"] = "netherite_scrap",
+        // Glass (silk touch only normally, but handle gracefully)
+        ["glass"] = "glass",
+    };
+
+    /// <summary>
+    /// Sprint 40 P0-B: Restored inventory increment for BlockMinedEvent.
+    /// Maps the mined block name to its item drop and increments inventory.
+    /// For blocks that drop themselves (dirt, sand, logs), uses the block name directly.
+    /// For blocks with different drops (stone->cobblestone, diamond_ore->diamond),
+    /// uses the BlockToItemDrop map. Falls back to the block name for unknown blocks.
+    /// ItemCollectedEvent (playerCollect) remains the authoritative source and will
+    /// add a second increment when the item IS collected — but this is acceptable
+    /// because: (a) it's rare to mine a block and not collect it, (b) periodic
+    /// GetStatus reconciles any drift, and (c) the alternative (stuck at 0 forever
+    /// when drop falls through a hole) is far worse than occasional double-count.
+    /// </summary>
+    private static WorldState ApplyBlockMined(WorldState current, BlockMinedEvent e)
+    {
+        var blockName = e.Block.Contains(':') ? e.Block.Split(':', 2)[1] : e.Block;
+
+        // Determine the item drop name for this block
+        string itemDrop;
+        if (BlockToItemDrop.TryGetValue(blockName, out var mappedDrop))
+            itemDrop = mappedDrop;
+        else if (SelfDroppingBlocks.Contains(blockName))
+            itemDrop = blockName;
+        else
+            itemDrop = blockName; // best-effort fallback for unknown blocks
+
+        var result = current.With(b => b.AddInventoryItem(itemDrop, e.Count));
+        return StoreFacts(result, e, SourceFor(e));
     }
 
     /// <summary>

@@ -1,1 +1,123 @@
-IyBTcHJpbnQgMzcg4oCUIENvbXBsZXRlIEhhbmRvZmYKCioqQnJhbmNoOioqIHNwcmludC0zNS1sbG0tZmlyc3QgfCAqKkhFQUQ6KiogKHRvIGJlIHVwZGF0ZWQgYWZ0ZXIgcHVzaCkgfCAqKlZlcnNpb246KiogdjAuMzcuMCAgCioqRGF0ZToqKiAyMDI2LTA2LTIyCgotLS0KCiMjIFdoYXQgV2FzIERlbGl2ZXJlZAoKIyMjIFAwLUEg4oCUIEFjdGlvbk91dGNvbWUgOiBJT2JzZXJ2YXRpb25TdW1tYXJ5CmBBZ2VudC5Db3JlL01vZGVscy9BY3Rpb25PdXRjb21lLmNzYAoKQWRkZWQgYDogSU9ic2VydmF0aW9uU3VtbWFyeWAgdG8gdGhlIGBBY3Rpb25PdXRjb21lYCByZWNvcmQgd2l0aCBhbiBleHBsaWNpdCBpbnRlcmZhY2UgaW1wbGVtZW50YXRpb246CmBgYGNzaGFycApzdHJpbmcgSU9ic2VydmF0aW9uU3VtbWFyeS5TdW1tYXJ5ID0+IE9ic2VydmF0aW9uU3VtbWFyeTsKYGBgClRoaXMgZW5hYmxlcyBBY3Rpb25PdXRjb21lIHRvIGJlIHBhc3NlZCBkaXJlY3RseSB0byBhbnkgTExNIGV2YWx1YXRvciBvciBvYnNlcnZhdGlvbiBjb25zdW1lciB0aGF0IGFjY2VwdHMgYElPYnNlcnZhdGlvblN1bW1hcnlgLCBjb21wbGV0aW5nIHRoZSBvYnNlcnZhdGlvbi1kcml2ZW4gcmVwbGFubmluZyBwaXBlbGluZSBjb250cmFjdC4KCiMjIyBQMC1CIOKAlCBEaXNwYXRjaEFjdGlvbnNBc3luYyDihpIgQ2FsbFdpdGhPdXRjb21lQXN5bmMKVGhyZWUgZmlsZXMgY2hhbmdlZDoKCjEuICoqYEFnZW50LlRvb2xzL0ludGVyZmFjZXMvSVRvb2xDYWxsZXIuY3NgKiog4oCUIEFkZGVkIGBDYWxsV2l0aE91dGNvbWVBc3luY2AgYXMgYSBkZWZhdWx0IGludGVyZmFjZSBtZXRob2QuIEV4aXN0aW5nIGltcGxlbWVudGF0aW9ucyAodGVzdCBkb3VibGVzLCBtb2NrcykgbmVlZCBubyBjaGFuZ2VzIOKAlCB0aGV5IGF1dG9tYXRpY2FsbHkgaW5oZXJpdCB0aGUgZGVmYXVsdCB0aGF0IGRlbGVnYXRlcyB0byBgQ2FsbEFzeW5jYC4KCjIuICoqYEFnZW50LlRvb2xzL1Rvb2xEaXNwYXRjaGVyLmNzYCoqIOKAlCBSZW1vdmVkIHRoZSBmaW5hbCBgX2pvdXJuYWw/LkxvZyhlbnRyeSlgIChBY3Rpb25Db21wbGV0ZWQvQWN0aW9uRmFpbGVkKSBmcm9tIGBDYWxsQXN5bmNgLiBWYWxpZGF0aW9uLWZhaWx1cmUgYW5kIGV4Y2VwdGlvbiBqb3VybmFsIGVudHJpZXMgYXJlIHByZXNlcnZlZCAoZGlmZmVyZW50IHNlbWFudGljcykuIFVwZGF0ZWQgYENhbGxXaXRoT3V0Y29tZUFzeW5jYCBYTUwgZG9jIHRvIHJlZmxlY3QgU3ByaW50IDM3IGlzIGNvbXBsZXRlLgoKMy4gKipgV2ViVUkuQmxhem9yL0FnZW50QmFja2dyb3VuZFNlcnZpY2UuY3NgKiog4oCUIEluIGBEaXNwYXRjaEFjdGlvbnNBc3luY2A6CiAgIC0gYHRvb2xDYWxsZXIuQ2FsbEFzeW5jKC4uLilgIOKGkiBgdG9vbENhbGxlci5DYWxsV2l0aE91dGNvbWVBc3luYyhHdWlkLkVtcHR5LCAuLi4pYAogICAtIEFkZGVkIGBfam91cm5hbD8uTG9nT3V0Y29tZShvdXRjb21lKWAgYWZ0ZXIgdGhlIGNhbGwKICAgLSBSZW1vdmVkIG1hbnVhbCBBY3Rpb25Db21wbGV0ZWQgLyBBY3Rpb25GYWlsZWQgam91cm5hbCBlbnRyaWVzIGZyb20gc3VjY2Vzcy9mYWlsdXJlIHBhdGhzCiAgIC0gQWRkZWQgU3ByaW50IDM3IFAyLUIgVE9ETyBjb21tZW50IGZvciBmdXR1cmUgTExNIGV2YWx1YXRvciB3aXJpbmcKCj4gKipOT1RFOioqIGBnb2FsSWQgPSBHdWlkLkVtcHR5YCBpcyBhIHBsYWNlaG9sZGVyIHVudGlsIGBJR29hbC5JZGAgaXMgZGVmaW5lZCAoU3ByaW50IDM4KS4KCiMjIyBQMS1BIOKAlCBJbnRlbnRNYW5hZ2VyIGNsYXNzIChQUklOQ0lQTEUtMSBlbmZvcmNlbWVudCkKYEFnZW50LlBsYW5uaW5nL0ludGVudE1hbmFnZXIuY3NgIChuZXcgZmlsZSkKCkV4dHJhY3RlZCB0aGUgaW50ZW504oaSZ29hbCBtYXBwaW5nIHN3aXRjaCBmcm9tIGBMbG1DaGF0SW50ZXJwcmV0ZXIuUGFyc2VEZWNpc2lvbmAgaW50bzoKLSBgSW50ZW50TWFuYWdlci5CdWlsZEdvYWxSZXF1ZXN0KEludGVudERyYWZ0KWAg4oaSIHJldHVybnMgYEdvYWxSZXF1ZXN0P2AKLSBgR29hbFJlcXVlc3RgIHJlY29yZDogYHsgR29hbE5hbWUsIFBhcmFtZXRlcnMgfWAg4oCUIHJlYWR5IGZvciBgR29hbEZhY3RvcnkuQ3JlYXRlQXN5bmNgCgpUaGlzIGlzIHRoZSBmaXJzdCBQUklOQ0lQTEUtMSBjb21wbGlhbnQgcm91dGluZyBwYXRoOiB0aGUgcGFyc2VyIG5vdyBwcm9kdWNlcyBgSW50ZW50RHJhZnRgIChzZW1hbnRpYyBkYXRhKSwgYW5kIGBJbnRlbnRNYW5hZ2VyYCBtYXBzIGl0IHRvIGdvYWwgZmFjdG9yeSBpbnB1dHMuCgojIyMgUDEtQiDigJQgTGxtQ2hhdEludGVycHJldGVyIHJlZmFjdG9yZWQKYEFnZW50LlBsYW5uaW5nL0xsbUNoYXRJbnRlcnByZXRlci5jc2AKCi0gQ29uc3RydWN0b3IgZ2FpbnMgYEludGVudE1hbmFnZXI/IGludGVudE1hbmFnZXIgPSBudWxsYCBwYXJhbWV0ZXIKLSBgUGFyc2VEZWNpc2lvbmAgZGVsZWdhdGVzIHRvIGBJbnRlbnRNYW5hZ2VyLkJ1aWxkR29hbFJlcXVlc3QoZHJhZnQpYCB3aGVuIGluamVjdGVkCi0gTGVnYWN5IGxvY2FsIHN3aXRjaCByZXRhaW5lZCBhcyBmYWxsYmFjayBmb3IgYmFja3dhcmQgY29tcGF0IChTcHJpbnQgMzggdGFyZ2V0OiByZW1vdmUgaXQpCi0gYF9pbnRlbnRNYW5hZ2VyYCBmaWVsZCB0aHJlYWRlZCBmcm9tIGNvbnN0cnVjdG9yIHRvIFBhcnNlRGVjaXNpb24gY2FsbCBpbiBgSW50ZXJwcmV0QXN5bmNgCgojIyMgUDEtQyDigJQgSW50ZW50QXNzZXNzbWVudCByZWNvcmQKYEFnZW50LlBsYW5uaW5nL0ludGVudEFzc2Vzc21lbnQuY3NgIChuZXcgZmlsZSkKCmBgYGNzaGFycApwdWJsaWMgc2VhbGVkIHJlY29yZCBJbnRlbnRBc3Nlc3NtZW50KAogICAgSW50ZW50RHJhZnQgRHJhZnQsCiAgICBSaXNrTGV2ZWwgUmlza0xldmVsLAogICAgYm9vbCBSZXF1aXJlc0NvbmZpcm1hdGlvbiwKICAgIHN0cmluZyBSZWFzb25pbmdTdW1tYXJ5KTsKCnB1YmxpYyBlbnVtIFJpc2tMZXZlbCB7IExvdywgTWVkaXVtLCBIaWdoIH0KYGBgCgpDb25maWRlbmNlIOKJoCByaXNrLiAiQnVpbGQgYSBob3VzZSIgY2FuIGJlIGhpZ2gtY29uZmlkZW5jZSArIGhpZ2gtcmlzay4gU3ByaW50IDM4IHdpbGwgd2lyZSBgSW50ZW50QXNzZXNzbWVudGAgaW50byB0aGUgY29uZmlybWF0aW9uIGdhdGUuCgojIyMgUHJvZ3JhbS5jcyDigJQgREkgd2lyaW5nCmBXZWJVSS5CbGF6b3IvUHJvZ3JhbS5jc2AKCi0gUmVnaXN0ZXJlZCBgSW50ZW50TWFuYWdlcmAgYXMgc2luZ2xldG9uCi0gSW5qZWN0ZWQgYGludGVudE1hbmFnZXI6IHNwLkdldFJlcXVpcmVkU2VydmljZTxJbnRlbnRNYW5hZ2VyPigpYCBpbnRvIGBMbG1DaGF0SW50ZXJwcmV0ZXJgCi0gVmVyc2lvbiBidW1wZWQgdG8gYHYwLjM3LjBgCgojIyMgVGVzdHMg4oCUIFNwcmludDM3VGVzdHMuY3MKYE1lbW9yeVNtaXRoLkFnZW50LlRlc3RzL1NwcmludDM3VGVzdHMuY3NgIChuZXcgZmlsZSwgMTAgdGVzdHMpCgp8IENhdGVnb3J5IHwgVGVzdHMgfAp8LS0tfC0tLXwKfCBQMC1BIElPYnNlcnZhdGlvblN1bW1hcnkgfCAzIChpbXBsZW1lbnRzIGNoZWNrLCBTdW1tYXJ54oaST2JzZXJ2YXRpb25TdW1tYXJ5IG1hcCwgZmFpbGVkIG91dGNvbWUpIHwKfCBQMC1CIElUb29sQ2FsbGVyIGRlZmF1bHQgfCAyIChzdWNjZXNzIHBhdGgsIGZhaWx1cmUgcGF0aCkgfAp8IFAxLUEgSW50ZW50TWFuYWdlciB8IDQgKGdhdGhlciwgY3JhZnQsIGJ1aWxkIHdpdGggY29vcmRzLCBuYXZpZ2F0ZSwgY29udmVyc2F0aW9u4oaSbnVsbCwgZ2F0aGVyIHdpdGhvdXQgaXRlbSkgfAp8IFAxLUMgSW50ZW50QXNzZXNzbWVudCB8IDEgKHJlY29yZCBmaWVsZCBhY2Nlc3NpYmlsaXR5KSB8CgoqKlRvdGFsIG5ldyB0ZXN0IGNvdW50OiB+MzE4KyoqCgojIyMgQ291bmNpbCBSZXZpZXcKYERhdGEvUGFnZXMvY291bmNpbC9zcHJpbnQzNy1jb3VuY2lsLTIwMjYwNjIyLm1kYAoKNi1zZWF0IHJldmlldyBwYXNzZWQgYXQgMC44OCBhdmVyYWdlIGNvbmZpZGVuY2UsIDAgYmxvY2tpbmcgZmluZGluZ3MsIDQgZGVmZXJyZWQuCgotLS0KCiMjIFNwcmludCAzOCBQcmlvcml0aWVzCgoqKlAwIOKAlCBDb21wbGV0ZSBQUklOQ0lQTEUtMSBlbmZvcmNlbWVudCoqCi0gWyBdIFJlbW92ZSB0aGUgbGVnYWN5IHN3aXRjaCBmcm9tIGBMbG1DaGF0SW50ZXJwcmV0ZXIuUGFyc2VEZWNpc2lvbmAgKGxlZ2FjeSBwYXRoIGlzIFNwcmludCAzOCB0YXJnZXQpCi0gWyBdIFJlbW92ZSB0aGUgbGVnYWN5IHN3aXRjaCBmcm9tIGBUcnlQYXJzZVRydW5jYXRlZEpzb25gIChzYW1lIG1pZ3JhdGlvbikKLSBbIF0gQ2hhbmdlIGBJQ2hhdEludGVycHJldGVyLkludGVycHJldEFzeW5jYCB0byByZXR1cm4gYEludGVudERyYWZ0YCBkaXJlY3RseSAocmVtb3ZlcyBgQ2hhdEludGVycHJldGF0aW9uLkdvYWxOYW1lYCkKCioqUDEg4oCUIElHb2FsLklkIHByb3BlcnR5KioKLSBbIF0gQWRkIGBHdWlkIElkIHsgZ2V0OyB9YCB0byBgSUdvYWxgIGludGVyZmFjZQotIFsgXSBSZXBsYWNlIGBHdWlkLkVtcHR5YCBpbiBgRGlzcGF0Y2hBY3Rpb25zQXN5bmMuQ2FsbFdpdGhPdXRjb21lQXN5bmMoR3VpZC5FbXB0eSwgLi4uKWAgd2l0aCBgX2N1cnJlbnRHb2FsLklkYAoKKipQMiDigJQgT2JzZXJ2YXRpb24tZHJpdmVuIHJlcGxhbm5pbmcgKFNwcmludCAzNyBQMi1CIFRPRE8pKioKLSBbIF0gYFBsYW4g4oaSIEV4ZWN1dGUg4oaSIEFjdGlvbk91dGNvbWVbXSDihpIgTExNIEV2YWx1YXRlIOKGkiBSZXBsYW4/YAotIFsgXSBBY2N1bXVsYXRlIGBvdXRjb21lW11gIGluIGBEaXNwYXRjaEFjdGlvbnNBc3luY2AgZGlzcGF0Y2ggbG9vcAotIFsgXSBQYXNzIHRvIGEgbmV3IGBJTGxtRXZhbHVhdG9yLkV2YWx1YXRlQXN5bmMoZ29hbCwgb3V0Y29tZXNbXSlgIOKGkiBib29sIChyZXBsYW4/KQoKKipQMyDigJQgQWdlbnRSdW50aW1lLlRpY2tBc3luYyBkZWNvbXBvc2l0aW9uKioKLSBbIF0gYEFnZW50QmFja2dyb3VuZFNlcnZpY2UuRXhlY3V0ZUFzeW5jIOKGkiBBZ2VudFJ1bnRpbWUuVGlja0FzeW5jKClgCi0gWyBdIEVhY2ggSUFnZW50UnVudGltZUNvbXBvbmVudCB3aXJlcyB0byBhIGNvbmNyZXRlIGltcGxlbWVudGF0aW9uCi0gWyBdIGBJdGVtQ29uc3VtZWRFdmVudGAgd2lyaW5nIChpbmdyZWRpZW50IGRlZHVjdGlvbiBkdXJpbmcgY3JhZnQpCgotLS0KCiMjIEtleSBBcmNoaXRlY3R1cmFsIEludmFyaWFudHMgKERPIE5PVCBWSU9MQVRFKQoKMS4gKipQUklOQ0lQTEUtMTogUGFyc2VycyBuZXZlciBjcmVhdGUgZ29hbHMuKiogYExsbUNoYXRJbnRlcnByZXRlcmAgcHJvZHVjZXMgYEludGVudERyYWZ0YC4gYEludGVudE1hbmFnZXJgIG1hcHMgdG8gYEdvYWxSZXF1ZXN0YC4gYEdvYWxGYWN0b3J5YCBjcmVhdGVzIGBJR29hbGAuIE5vIHNob3J0Y3V0cy4KCjIuICoqQWN0aW9uT3V0Y29tZSBpcyB0aGUgdW5pdmVyc2FsIHRvb2wgcmVzdWx0IGFydGlmYWN0LioqIEV2ZXJ5IGBUb29sRGlzcGF0Y2hlci5DYWxsQXN5bmNgIGV4ZWN1dGlvbiBwcm9kdWNlcyAob3IgY2FuIHByb2R1Y2UpIGFuIGBBY3Rpb25PdXRjb21lYC4gUmVjb3ZlcnksIHJlcGxhbm5pbmcsIGpvdXJuYWxpbmcsIGFuZCB3b3JsZC1zdGF0ZSB1cGRhdGVzIGFsbCBjb25zdW1lIHRoaXMuCgozLiAqKldvcmxkU3RhdGVQcm9qZWN0b3IgaXMgdGhlIHNvbGUgc3RhdGUgcmVkdWNlci4qKiBObyBkaXJlY3QgaW52ZW50b3J5IG11dGF0aW9uIG91dHNpZGUgaXQuCgo0LiAqKlRvb2xEaXNwYXRjaGVyIGlzIHRoZSBzYWZldHkgd2FsbC4qKiBTY2hlbWEgdmFsaWRhdGlvbiBoYXBwZW5zIGF0IHRoaXMgYm91bmRhcnkuIE5ldmVyIGJ5cGFzcyBpdC4K
+# Sprint 37 — Complete Handoff
+
+**Branch:** sprint-35-llm-first | **HEAD:** (to be updated after push) | **Version:** v0.37.0  
+**Date:** 2026-06-22
+
+---
+
+## What Was Delivered
+
+### P0-A — ActionOutcome : IObservationSummary
+`Agent.Core/Models/ActionOutcome.cs`
+
+Added `: IObservationSummary` to the `ActionOutcome` record with an explicit interface implementation:
+```csharp
+string IObservationSummary.Summary => ObservationSummary;
+```
+This enables ActionOutcome to be passed directly to any LLM evaluator or observation consumer that accepts `IObservationSummary`, completing the observation-driven replanning pipeline contract.
+
+### P0-B — DispatchActionsAsync → CallWithOutcomeAsync
+Three files changed:
+
+1. **`Agent.Tools/Interfaces/IToolCaller.cs`** — Added `CallWithOutcomeAsync` as a default interface method. Existing implementations (test doubles, mocks) need no changes — they automatically inherit the default that delegates to `CallAsync`.
+
+2. **`Agent.Tools/ToolDispatcher.cs`** — Removed the final `_journal?.Log(entry)` (ActionCompleted/ActionFailed) from `CallAsync`. Validation-failure and exception journal entries are preserved (different semantics). Updated `CallWithOutcomeAsync` XML doc to reflect Sprint 37 is complete.
+
+3. **`WebUI.Blazor/AgentBackgroundService.cs`** — In `DispatchActionsAsync`:
+   - `toolCaller.CallAsync(...)` → `toolCaller.CallWithOutcomeAsync(Guid.Empty, ...)`
+   - Added `_journal?.LogOutcome(outcome)` after the call
+   - Removed manual ActionCompleted / ActionFailed journal entries from success/failure paths
+   - Added Sprint 37 P2-B TODO comment for future LLM evaluator wiring
+
+> **NOTE:** `goalId = Guid.Empty` is a placeholder until `IGoal.Id` is defined (Sprint 38).
+
+### P1-A — IntentManager class (PRINCIPLE-1 enforcement)
+`Agent.Planning/IntentManager.cs` (new file)
+
+Extracted the intent→goal mapping switch from `LlmChatInterpreter.ParseDecision` into:
+- `IntentManager.BuildGoalRequest(IntentDraft)` → returns `GoalRequest?`
+- `GoalRequest` record: `{ GoalName, Parameters }` — ready for `GoalFactory.CreateAsync`
+
+This is the first PRINCIPLE-1 compliant routing path: the parser now produces `IntentDraft` (semantic data), and `IntentManager` maps it to goal factory inputs.
+
+### P1-B — LlmChatInterpreter refactored
+`Agent.Planning/LlmChatInterpreter.cs`
+
+- Constructor gains `IntentManager? intentManager = null` parameter
+- `ParseDecision` delegates to `IntentManager.BuildGoalRequest(draft)` when injected
+- Legacy local switch retained as fallback for backward compat (Sprint 38 target: remove it)
+- `_intentManager` field threaded from constructor to ParseDecision call in `InterpretAsync`
+
+### P1-C — IntentAssessment record
+`Agent.Planning/IntentAssessment.cs` (new file)
+
+```csharp
+public sealed record IntentAssessment(
+    IntentDraft Draft,
+    RiskLevel RiskLevel,
+    bool RequiresConfirmation,
+    string ReasoningSummary);
+
+public enum RiskLevel { Low, Medium, High }
+```
+
+Confidence ≠ risk. "Build a house" can be high-confidence + high-risk. Sprint 38 will wire `IntentAssessment` into the confirmation gate.
+
+### Program.cs — DI wiring
+`WebUI.Blazor/Program.cs`
+
+- Registered `IntentManager` as singleton
+- Injected `intentManager: sp.GetRequiredService<IntentManager>()` into `LlmChatInterpreter`
+- Version bumped to `v0.37.0`
+
+### Tests — Sprint37Tests.cs
+`MemorySmith.Agent.Tests/Sprint37Tests.cs` (new file, 10 tests)
+
+| Category | Tests |
+|---|---|
+| P0-A IObservationSummary | 3 (implements check, Summary→ObservationSummary map, failed outcome) |
+| P0-B IToolCaller default | 2 (success path, failure path) |
+| P1-A IntentManager | 4 (gather, craft, build with coords, navigate, conversation→null, gather without item) |
+| P1-C IntentAssessment | 1 (record field accessibility) |
+
+**Total new test count: ~318+**
+
+### Council Review
+`Data/Pages/council/sprint37-council-20260622.md`
+
+6-seat review passed at 0.88 average confidence, 0 blocking findings, 4 deferred.
+
+---
+
+## Sprint 38 Priorities
+
+**P0 — Complete PRINCIPLE-1 enforcement**
+- [ ] Remove the legacy switch from `LlmChatInterpreter.ParseDecision` (legacy path is Sprint 38 target)
+- [ ] Remove the legacy switch from `TryParseTruncatedJson` (same migration)
+- [ ] Change `IChatInterpreter.InterpretAsync` to return `IntentDraft` directly (removes `ChatInterpretation.GoalName`)
+
+**P1 — IGoal.Id property**
+- [ ] Add `Guid Id { get; }` to `IGoal` interface
+- [ ] Replace `Guid.Empty` in `DispatchActionsAsync.CallWithOutcomeAsync(Guid.Empty, ...)` with `_currentGoal.Id`
+
+**P2 — Observation-driven replanning (Sprint 37 P2-B TODO)**
+- [ ] `Plan → Execute → ActionOutcome[] → LLM Evaluate → Replan?`
+- [ ] Accumulate `outcome[]` in `DispatchActionsAsync` dispatch loop
+- [ ] Pass to a new `ILlmEvaluator.EvaluateAsync(goal, outcomes[])` → bool (replan?)
+
+**P3 — AgentRuntime.TickAsync decomposition**
+- [ ] `AgentBackgroundService.ExecuteAsync → AgentRuntime.TickAsync()`
+- [ ] Each IAgentRuntimeComponent wires to a concrete implementation
+- [ ] `ItemConsumedEvent` wiring (ingredient deduction during craft)
+
+---
+
+## Key Architectural Invariants (DO NOT VIOLATE)
+
+1. **PRINCIPLE-1: Parsers never create goals.** `LlmChatInterpreter` produces `IntentDraft`. `IntentManager` maps to `GoalRequest`. `GoalFactory` creates `IGoal`. No shortcuts.
+
+2. **ActionOutcome is the universal tool result artifact.** Every `ToolDispatcher.CallAsync` execution produces (or can produce) an `ActionOutcome`. Recovery, replanning, journaling, and world-state updates all consume this.
+
+3. **WorldStateProjector is the sole state reducer.** No direct inventory mutation outside it.
+
+4. **ToolDispatcher is the safety wall.** Schema validation happens at this boundary. Never bypass it.

@@ -1,1 +1,117 @@
-bmFtZXNwYWNlIEFnZW50LlBsYW5uaW5nOwoKdXNpbmcgQWdlbnQuQ29yZTsKCi8vLyA8c3VtbWFyeT4KLy8vIE1hcHMgPHNlZSBjcmVmPSJJbnRlbnREcmFmdCIvPiB0byBhIHR5cGVkIDxzZWUgY3JlZj0iR29hbFJlcXVlc3QiLz4gc3VpdGFibGUKLy8vIGZvciB0aGUgR29hbEZhY3RvcnkgcGlwZWxpbmUgKFBSSU5DSVBMRS0xOiBwYXJzZXJzIG5ldmVyIGNyZWF0ZSBnb2Fscykuei8vLwovLy8gU3ByaW50IDM5IFAzOiBHb2FsUmVxdWVzdCByZWZhY3RvcmVkIGZyb20gYSBzaW5nbGUgbG9vc2VseS10eXBlZCByZWNvcmQgdG8gYW4KLy8vIGFic3RyYWN0IGJhc2UgKyB0eXBlZCBzdWJjbGFzc2VzIChHYXRoZXJHb2FsUmVxdWVzdCwgQ3JhZnRHb2FsUmVxdWVzdCwKLy8vIEJ1aWxkR29hbFJlcXVlc3QsIE5hdmlnYXRlR29hbFJlcXVlc3QpLiBFYWNoIHN1YmNsYXNzIGVuY29kZXMgaXRzIG93biBwYXJhbWV0ZXJzCi8vLyBhcyB0eXBlZCBmaWVsZHMgYW5kIGV4cG9zZXMgdGhlbSBhcyBJUmVhZE9ubHlEaWN0aW9uYXJ5IHZpYSB0aGUgdmlydHVhbCBQYXJhbWV0ZXJzCi8vLyBwcm9wZXJ0eSBmb3IgYmFja3dhcmQtY29tcGF0IHdpdGggR29hbEZhY3RvcnkuQ3JlYXRlQXN5bmMuCi8vLyA8L3N1bW1hcnk+CnB1YmxpYyBzZWFsZWQgY2xhc3MgSW50ZW50TWFuYWdlcgp7CiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gTWFwcyA8cGFyYW1yZWYgbmFtZT0iZHJhZnQiLz4gdG8gYSB0eXBlZCA8c2VlIGNyZWY9IkdvYWxSZXF1ZXN0Ii8+LCBvciBudWxsCiAgICAvLy8gd2hlbiB0aGUgaW50ZW50IGRvZXMgbm90IHByb2R1Y2UgYSBnb2FsIChjYW5jZWwsIHN0YXR1cywgaGVscCwgZXRjLikuCiAgICAvLy8gPC9zdW1tYXJ5PgogICAgcHVibGljIEdvYWxSZXF1ZXN0PyBCdWlsZEdvYWxSZXF1ZXN0KEludGVudERyYWZ0IGRyYWZ0KQogICAgewogICAgICAgIHN3aXRjaCAoZHJhZnQuSW50ZW50LlRvTG93ZXJJbnZhcmlhbnQoKSkKICAgICAgICB7CiAgICAgICAgICAgIGNhc2UgImdhdGhlciI6CiAgICAgICAgICAgICAgICBpZiAoZHJhZnQuSXRlbSBpcyBub3QgbnVsbCkKICAgICAgICAgICAgICAgICAgICByZXR1cm4gbmV3IEdhdGhlckdvYWxSZXF1ZXN0KGRyYWZ0Lkl0ZW0sIGRyYWZ0LkNvdW50ID8/IDEwKTsKICAgICAgICAgICAgICAgIGJyZWFrOwogICAgICAgICAgICBjYXNlICJjcmFmdCI6CiAgICAgICAgICAgICAgICBpZiAoZHJhZnQuSXRlbSBpcyBub3QgbnVsbCkKICAgICAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENyYWZ0R29hbFJlcXVlc3QoZHJhZnQuSXRlbSwgZHJhZnQuQ291bnQgPz8gMSk7CiAgICAgICAgICAgICAgICBicmVhazsKICAgICAgICAgICAgY2FzZSAiYnVpbGQiOgogICAgICAgICAgICAgICAgaWYgKGRyYWZ0LkJsdWVwcmludCBpcyBub3QgbnVsbCkKICAgICAgICAgICAgICAgICAgICByZXR1cm4gbmV3IEJ1aWxkR29hbFJlcXVlc3QoCiAgICAgICAgICAgICAgICAgICAgICAgIGRyYWZ0LkJsdWVwcmludCwKICAgICAgICAgICAgICAgICAgICAgICAgZHJhZnQuWCwgZHJhZnQuWSwgZHJhZnQuWik7CiAgICAgICAgICAgICAgICBicmVhazsKICAgICAgICAgICAgY2FzZSAibmF2aWdhdGUiOgogICAgICAgICAgICAgICAgaWYgKGRyYWZ0LlggaXMgbm90IG51bGwgJiYgZHJhZnQuWSBpcyBub3QgbnVsbCAmJiBkcmFmdC5aIGlzIG5vdCBudWxsKQogICAgICAgICAgICAgICAgICAgIHJldHVybiBuZXcgTmF2aWdhdGVHb2FsUmVxdWVzdChkcmFmdC5YLlZhbHVlLCBkcmFmdC5ZLlZhbHVlLCBkcmFmdC5aLlZhbHVlKTsKICAgICAgICAgICAgICAgIGJyZWFrOwogICAgICAgIH0KICAgICAgICByZXR1cm4gbnVsbDsKICAgIH0KfQoKLy8g4pSA4pSAIFR5cGVkIEdvYWxSZXF1ZXN0IGhpZXJhcmNoeSAg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgovLy8gPHN1bW1hcnk+Ci8vLyBTcHJpbnQgMzkgUDM6IEFic3RyYWN0IGJhc2UgZm9yIGFsbCB0eXBlZCBnb2FsIHJlcXVlc3RzLgovLy8gRW5mb3JjZXMgUFJJTkNJUExFLTEgKHBhcnNlcnMgbmV2ZXIgY3JlYXRlIGdvYWxzKTogaW50ZXJwcmV0ZXJzIHByb2R1Y2UKLy8vIEludGVudERyYWZ0OyBCdWlsZEdvYWxSZXF1ZXN0IG1hcHMgdG8gYSB0eXBlZCBHb2FsUmVxdWVzdDsgR29hbEZhY3RvcnkKLy8vIG1hcHMgR29hbFJlcXVlc3QuR29hbE5hbWUg4oaSIElHb2FsLgovLy8KLy8vIFBhcmFtZXRlcnMgaXMgYSB2aXJ0dWFsIHByb3BlcnR5IGZvciBiYWNrd2FyZC1jb21wYXQgd2l0aAovLy8gR29hbEZhY3RvcnkuQ3JlYXRlQXN5bmMoc3RyaW5nIGdvYWxOYW1lLCBJUmVhZE9ubHlEaWN0aW9uYXJ5IHBhcmFtZXRlcnMpLgovLy8gVHlwZWQgc3ViY2xhc3NlcyBvdmVycmlkZSBpdCB0byBleHBvc2UgdGhlaXIgZmllbGRzIGFzIGEgZGljdGlvbmFyeS4KLy8vIDwvc3VtbWFyeT4KcHVibGljIGFic3RyYWN0IHJlY29yZCBHb2FsUmVxdWVzdChzdHJpbmcgR29hbE5hbWUpCnsKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBQYXJhbWV0ZXJzIGFzIGEgbG9vc2VseS10eXBlZCBkaWN0aW9uYXJ5IGZvciBHb2FsRmFjdG9yeSBiYWNrd2FyZCBjb21wYXQuCiAgICAvLy8gVHlwZWQgc3ViY2xhc3NlcyBvdmVycmlkZSB0aGlzIHRvIHByb3ZpZGUgdGhlaXIgc3BlY2lmaWMgcGFyYW1ldGVyIHNldC4KICAgIC8vLyA8L3N1bW1hcnk+CiAgICBwdWJsaWMgYWJzdHJhY3QgSVJlYWRPbmx5RGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+PyBQYXJhbWV0ZXJzIHsgZ2V0OyB9Cn0KCi8vLyA8c3VtbWFyeT5TcHJpbnQgMzkgUDM6IGdhdGhlciBOIGl0ZW1zIG9mIGEgZ2l2ZW4gdHlwZS48L3N1bW1hcnk+CnB1YmxpYyBzZWFsZWQgcmVjb3JkIEdhdGhlckdvYWxSZXF1ZXN0KHN0cmluZyBJdGVtLCBpbnQgQ291bnQgPSAxMCkKICAgIDogR29hbFJlcXVlc3QoJCJHYXRoZXJJdGVtOntJdGVtfSIpCnsKICAgIHB1YmxpYyBvdmVycmlkZSBJUmVhZE9ubHlEaWN0aW9uYXJ5PHN0cmluZywgb2JqZWN0Pz4/IFBhcmFtZXRlcnMgPT4KICAgICAgICBuZXcgRGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+IHsgWyJjb3VudCJdID0gQ291bnQgfTsKfQoKLy8vIDxzdW1tYXJ5PlNwcmludCAzOSBQMzogY3JhZnQgTiBpdGVtcyBvZiBhIGdpdmVuIHR5cGUuPC9zdW1tYXJ5PgpwdWJsaWMgc2VhbGVkIHJlY29yZCBDcmFmdEdvYWxSZXF1ZXN0KHN0cmluZyBJdGVtLCBpbnQgQ291bnQgPSAxKQogICAgOiBHb2FsUmVxdWVzdCgkIkNyYWZ0SXRlbTp7SXRlbX0iKQp7CiAgICBwdWJsaWMgb3ZlcnJpZGUgSVJlYWRPbmx5RGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+PyBQYXJhbWV0ZXJzID0+CiAgICAgICAgbmV3IERpY3Rpb25hcnk8c3RyaW5nLCBvYmplY3Q/PiB7IFsiY291bnQiXSA9IENvdW50IH07Cn0KCi8vLyA8c3VtbWFyeT4KLy8vIFNwcmludCAzOSBQMzogYnVpbGQgYSBibHVlcHJpbnQgYXQgYW4gb3B0aW9uYWwgb3JpZ2luLgovLy8gV2hlbiBPcmlnaW5YL1kvWiBhcmUgbnVsbCwgdGhlIGFnZW50IHJlc29sdmVzIHRoZSBvcmlnaW4gdmlhIEZpbmRGbGF0QXJlYQovLy8gKE9yaWdpblNvdXJjZS5BdXRvU2Nhbm5lZCkgb3IgdGhlIHBsYXllcidzIGN1cnJlbnQgcG9zaXRpb24gKE9yaWdpblNvdXJjZS5QbGF5ZXJQb3NpdGlvbikuCi8vLyA8L3N1bW1hcnk+CnB1YmxpYyBzZWFsZWQgcmVjb3JkIEJ1aWxkR29hbFJlcXVlc3QoCiAgICBzdHJpbmcgQmx1ZXByaW50LAogICAgaW50PyBPcmlnaW5YID0gbnVsbCwKICAgIGludD8gT3JpZ2luWSA9IG51bGwsCiAgICBpbnQ/IE9yaWdpblogPSBudWxsKSA6IEdvYWxSZXF1ZXN0KCQiQnVpbGQ6e0JsdWVwcmludH0iKQp7CiAgICBwdWJsaWMgb3ZlcnJpZGUgSVJlYWRPbmx5RGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+PyBQYXJhbWV0ZXJzCiAgICB7CiAgICAgICAgZ2V0CiAgICAgICAgewogICAgICAgICAgICBpZiAoT3JpZ2luWCBpcyBudWxsIHx8IE9yaWdpblogaXMgbnVsbCB8fCBPcmlnaW5aIGlzIG51bGwpCiAgICAgICAgICAgICAgICByZXR1cm4gbnVsbDsKICAgICAgICAgICAgcmV0dXJuIG5ldyBEaWN0aW9uYXJ5PHN0cmluZywgb2JqZWN0Pz4KICAgICAgICAgICAgewogICAgICAgICAgICAgICAgWyJvcmlnaW5YIl0gPSBPcmlnaW5YLAogICAgICAgICAgICAgICAgWyJvcmlnaW5ZIl0gPSBPcmlnaW5ZLAogICAgICAgICAgICAgICAgWyJvcmlnaW5aIl0gPSBPcmlnaW5aLAogICAgICAgICAgICB9OwogICAgICAgIH0KICAgIH0KfQoKLy8vIDxzdW1tYXJ5PlNwcmludCAzOSBQMzogbmF2aWdhdGUgdGhlIGJvdCB0byBhbiBleHBsaWNpdCBjb29yZGluYXRlLjwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCByZWNvcmQgTmF2aWdhdGVHb2FsUmVxdWVzdChpbnQgWCwgaW50IFksIGludCBaKQogICAgOiBHb2FsUmVxdWVzdCgiTW92ZVRvIikKewogICAgcHVibGljIG92ZXJyaWRlIElSZWFkT25seURpY3Rpb25hcnk8c3RyaW5nLCBvYmplY3Q/Pj8gUGFyYW1ldGVycyA9PgogICAgICAgIG5ldyBEaWN0aW9uYXJ5PHN0cmluZywgb2JqZWN0Pz4geyBbIngiXSA9IFgsIFsieSJdID0gWSwgWyJ6Il0gPSBaIH07Cn0K
+namespace Agent.Planning;
+
+using Agent.Core;
+
+/// <summary>
+/// Maps <see cref="IntentDraft"/> to a typed <see cref="GoalRequest"/> suitable
+/// for the GoalFactory pipeline (PRINCIPLE-1: parsers never create goals).z///
+/// Sprint 39 P3: GoalRequest refactored from a single loosely-typed record to an
+/// abstract base + typed subclasses (GatherGoalRequest, CraftGoalRequest,
+/// BuildGoalRequest, NavigateGoalRequest). Each subclass encodes its own parameters
+/// as typed fields and exposes them as IReadOnlyDictionary via the virtual Parameters
+/// property for backward-compat with GoalFactory.CreateAsync.
+/// </summary>
+public sealed class IntentManager
+{
+    /// <summary>
+    /// Maps <paramref name="draft"/> to a typed <see cref="GoalRequest"/>, or null
+    /// when the intent does not produce a goal (cancel, status, help, etc.).
+    /// </summary>
+    public GoalRequest? BuildGoalRequest(IntentDraft draft)
+    {
+        switch (draft.Intent.ToLowerInvariant())
+        {
+            case "gather":
+                if (draft.Item is not null)
+                    return new GatherGoalRequest(draft.Item, draft.Count ?? 10);
+                break;
+            case "craft":
+                if (draft.Item is not null)
+                    return new CraftGoalRequest(draft.Item, draft.Count ?? 1);
+                break;
+            case "build":
+                if (draft.Blueprint is not null)
+                    return new BuildGoalRequest(
+                        draft.Blueprint,
+                        draft.X, draft.Y, draft.Z);
+                break;
+            case "navigate":
+                if (draft.X is not null && draft.Y is not null && draft.Z is not null)
+                    return new NavigateGoalRequest(draft.X.Value, draft.Y.Value, draft.Z.Value);
+                break;
+        }
+        return null;
+    }
+}
+
+// ── Typed GoalRequest hierarchy  ─────────────────────────────────────────────
+
+/// <summary>
+/// Sprint 39 P3: Abstract base for all typed goal requests.
+/// Enforces PRINCIPLE-1 (parsers never create goals): interpreters produce
+/// IntentDraft; BuildGoalRequest maps to a typed GoalRequest; GoalFactory
+/// maps GoalRequest.GoalName → IGoal.
+///
+/// Parameters is a virtual property for backward-compat with
+/// GoalFactory.CreateAsync(string goalName, IReadOnlyDictionary parameters).
+/// Typed subclasses override it to expose their fields as a dictionary.
+/// </summary>
+public abstract record GoalRequest(string GoalName)
+{
+    /// <summary>
+    /// Parameters as a loosely-typed dictionary for GoalFactory backward compat.
+    /// Typed subclasses override this to provide their specific parameter set.
+    /// </summary>
+    public abstract IReadOnlyDictionary<string, object?>? Parameters { get; }
+}
+
+/// <summary>Sprint 39 P3: gather N items of a given type.</summary>
+public sealed record GatherGoalRequest(string Item, int Count = 10)
+    : GoalRequest($"GatherItem:{Item}")
+{
+    public override IReadOnlyDictionary<string, object?>? Parameters =>
+        new Dictionary<string, object?> { ["count"] = Count };
+}
+
+/// <summary>Sprint 39 P3: craft N items of a given type.</summary>
+public sealed record CraftGoalRequest(string Item, int Count = 1)
+    : GoalRequest($"CraftItem:{Item}")
+{
+    public override IReadOnlyDictionary<string, object?>? Parameters =>
+        new Dictionary<string, object?> { ["count"] = Count };
+}
+
+/// <summary>
+/// Sprint 39 P3: build a blueprint at an optional origin.
+/// When OriginX/Y/Z are null, the agent resolves the origin via FindFlatArea
+/// (OriginSource.AutoScanned) or the player's current position (OriginSource.PlayerPosition).
+/// </summary>
+public sealed record BuildGoalRequest(
+    string Blueprint,
+    int? OriginX = null,
+    int? OriginY = null,
+    int? OriginZ = null) : GoalRequest($"Build:{Blueprint}")
+{
+    public override IReadOnlyDictionary<string, object?>? Parameters
+    {
+        get
+        {
+            if (OriginX is null || OriginZ is null || OriginZ is null)
+                return null;
+            return new Dictionary<string, object?>
+            {
+                ["originX"] = OriginX,
+                ["originY"] = OriginY,
+                ["originZ"] = OriginZ,
+            };
+        }
+    }
+}
+
+/// <summary>Sprint 39 P3: navigate the bot to an explicit coordinate.</summary>
+public sealed record NavigateGoalRequest(int X, int Y, int Z)
+    : GoalRequest("MoveTo")
+{
+    public override IReadOnlyDictionary<string, object?>? Parameters =>
+        new Dictionary<string, object?> { ["x"] = X, ["y"] = Y, ["z"] = Z };
+}

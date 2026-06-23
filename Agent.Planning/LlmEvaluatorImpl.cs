@@ -1,1 +1,162 @@
-bmFtZXNwYWNlIEFnZW50LlBsYW5uaW5nOwoKdXNpbmcgQWdlbnQuQ29yZTsKdXNpbmcgQWdlbnQuUGxhbm5pbmcuTGxtOwp1c2luZyBNaWNyb3NvZnQuRXh0ZW5zaW9ucy5Mb2dnaW5nOwp1c2luZyBTeXN0ZW0uVGV4dDsKdXNpbmcgU3lzdGVtLlRleHQuSnNvbjsKCi8vLyA8c3VtbWFyeT4KLy8vIFNwcmludCAzOSBQMTogQ29uY3JldGUgTExNLWJhY2tlZCBpbXBsZW1lbnRhdGlvbiBvZiA8c2VlIGNyZWY9IkFnZW50LkNvcmUuSUxsbUV2YWx1YXRvciIvPi4KLy8vCi8vLyBFdmFsdWF0aW9uIHN0cmF0ZWd5OgovLy8gICAxLiBTa2lwIGlmIGZld2VyIHRoYW4gPHNlZSBjcmVmPSJNaW5PdXRjb21lc0JlZm9yZUV2YWwiLz4gb3V0Y29tZXMgKGF2b2lkcyBwZXItYWN0aW9uIExMTSBjYWxscykuCi8vLyAgIDIuIFNraXAgaWYgYWxsIG91dGNvbWVzIHN1Y2NlZWRlZCAoZmFzdC1wYXRoOiBubyByZWFzb24gdG8gcmVwbGFuIG9uIGZ1bGwgc3VjY2VzcykuCi8vLyAgIDMuIFNraXAgaWYgTExNIHByb3ZpZGVyIGlzIHVuYXZhaWxhYmxlLgovLy8gICA0LiBDYWxsIHRoZSBMTE0gd2l0aCBhIGNvbXBhY3QgcHJvbXB0OiBnb2FsIG5hbWUgKyB3b3JsZCBzbmFwc2hvdCArIGxhc3QgMTAgb3V0Y29tZXMuCi8vLyAgIDUuIFBhcnNlIHJlc3BvbnNlIEpTT046IHsgInJlcGxhbiI6IHRydWV8ZmFsc2UsICJyZWFzb24iOiAiLi4uIiB9LgovLy8gICA2LiBPbiBhbnkgZXJyb3IgKG5ldHdvcmssIHBhcnNlLCB0aW1lb3V0KSDihpIgZmFsc2UgKGNvbnNlcnZhdGl2ZTogY29udGludWUgY3VycmVudCBwbGFuKS4KLy8vCi8vLyBUaGlzIGNsb3NlcyB0aGUgb2JzZXJ2YXRpb24tZHJpdmVuIHJlcGxhbm5pbmcgbG9vcCBpbnRyb2R1Y2VkIGluIFNwcmludCAzNToKLy8vICAgUGxhbiDihpIgRXhlY3V0ZSDihpIgQWN0aW9uT3V0Y29tZSDihpIgTExNIEV2YWx1YXRlIOKGkiBSZXBsYW4/Ci8vLwovLy8gV2lyZWQgZnJvbSBBZ2VudEJhY2tncm91bmRTZXJ2aWNlLkRpc3BhdGNoQWN0aW9uc0FzeW5jIGFmdGVyIGVhY2ggQWN0aW9uT3V0Y29tZQovLy8gaXMgZW5xdWV1ZWQgaW50byBfY3ljbGVPdXRjb21lcyAoU3ByaW50IDM5IFAxIHdpcmluZywgcmVwbGFjZXMgVE9ETyBjb21tZW50KS4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCBjbGFzcyBMbG1FdmFsdWF0b3JJbXBsIDogSUxsbUV2YWx1YXRvcgp7CiAgICBwcml2YXRlIHJlYWRvbmx5IElMbG1Qcm92aWRlciBfcHJvdmlkZXI7CiAgICBwcml2YXRlIHJlYWRvbmx5IElMb2dnZXI8TGxtRXZhbHVhdG9ySW1wbD4gX2xvZ2dlcjsKCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gTWluaW11bSBhY2N1bXVsYXRlZCBvdXRjb21lcyBpbiBfY3ljbGVPdXRjb21lcyBiZWZvcmUgdGhlIGV2YWx1YXRvcgogICAgLy8vIGJvdGhlcnMgY2FsbGluZyB0aGUgTExNLiBQcmV2ZW50cyBhIHdhbGwgb2YgTExNIGNhbGxzIHdoZW4gdGhlIHBsYW4gc3RhcnRzLgogICAgLy8vIDwvc3VtbWFyeT4KICAgIHByaXZhdGUgY29uc3QgaW50IE1pbk91dGNvbWVzQmVmb3JlRXZhbCA9IDM7CgogICAgcHVibGljIExsbUV2YWx1YXRvckltcGwoSUxsbVByb3ZpZGVyIHByb3ZpZGVyLCBJTG9nZ2VyPExsbUV2YWx1YXRvckltcGw+IGxvZ2dlcikKICAgIHsKICAgICAgICBfcHJvdmlkZXIgPSBwcm92aWRlcjsKICAgICAgICBfbG9nZ2VyICAgPSBsb2dnZXI7CiAgICB9CgogICAgLy8vIDxpbmhlcml0ZG9jLz4KICAgIHB1YmxpYyBhc3luYyBUYXNrPGJvb2w+IEV2YWx1YXRlQXN5bmMoCiAgICAgICAgSUdvYWwgZ29hbCwKICAgICAgICBJUmVhZE9ubHlMaXN0PEFjdGlvbk91dGNvbWU+IG91dGNvbWVzLAogICAgICAgIFdvcmxkU3RhdGUgd29ybGRTdGF0ZSwKICAgICAgICBDYW5jZWxsYXRpb25Ub2tlbiBjdCA9IGRlZmF1bHQpCiAgICB7CiAgICAgICAgLy8gRmFzdC1wYXRoIDE6IHRvbyBmZXcgZGF0YSBwb2ludHMgdG8gbWFrZSBhIHJlbGlhYmxlIGp1ZGdlbWVudC4KICAgICAgICBpZiAob3V0Y29tZXMuQ291bnQgPCBNaW5PdXRjb21lc0JlZm9yZUV2YWwpIHJldHVybiBmYWxzZTsKCiAgICAgICAgLy8gRmFzdC1wYXRoIDI6IGFsbCBvdXRjb21lcyBzdWNjZWVkZWQg4oCUIG5vIHJlYXNvbiB0byByZXBsYW4uCiAgICAgICAgdmFyIGZhaWx1cmVDb3VudCA9IG91dGNvbWVzLkNvdW50KHN0YXRpYyBvID0+ICFvLlN1Y2Nlc3MpOwogICAgICAgIGlmIChmYWlsdXJlQ291bnQgPT0gMCkgcmV0dXJuIGZhbHNlOwoKICAgICAgICAvLyBGYXN0LXBhdGggMzogcHJvdmlkZXIgb2ZmbGluZSDigJQgc2tpcCBzaWxlbnRseS4KICAgICAgICBpZiAoIV9wcm92aWRlci5Jc0F2YWlsYWJsZSkKICAgICAgICB7CiAgICAgICAgICAgIF9sb2dnZXIuTG9nRGVidWcoCiAgICAgICAgICAgICAgICAiW2V2YWx1YXRvcl0gcHJvdmlkZXIgJ3tQcm92aWRlcn0nIHVuYXZhaWxhYmxlIOKAlCBza2lwcGluZyBldmFsdWF0aW9uIGZvciBnb2FsIHtHb2FsfSIsCiAgICAgICAgICAgICAgICBfcHJvdmlkZXIuUHJvdmlkZXJOYW1lLCBnb2FsLk5hbWUpOwogICAgICAgICAgICByZXR1cm4gZmFsc2U7CiAgICAgICAgfQoKICAgICAgICB0cnkKICAgICAgICB7CiAgICAgICAgICAgIHZhciBzeXN0ZW1Qcm9tcHQgPSBCdWlsZFN5c3RlbVByb21wdCgpOwogICAgICAgICAgICB2YXIgdXNlck1lc3NhZ2UgID0gQnVpbGRVc2VyTWVzc2FnZShnb2FsLCBvdXRjb21lcywgd29ybGRTdGF0ZSk7CgogICAgICAgICAgICB2YXIgcmF3ID0gYXdhaXQgX3Byb3ZpZGVyLkNvbXBsZXRlQXN5bmMoc3lzdGVtUHJvbXB0LCB1c2VyTWVzc2FnZSwgY3QpOwoKICAgICAgICAgICAgaWYgKHJhdyBpcyBudWxsKQogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICBfbG9nZ2VyLkxvZ1dhcm5pbmcoCiAgICAgICAgICAgICAgICAgICAgIltldmFsdWF0b3JdIHByb3ZpZGVyIHJldHVybmVkIG51bGwgZm9yIGdvYWwge0dvYWx9IOKAlCBkZWZhdWx0aW5nIHRvIG5vLXJlcGxhbiIsCiAgICAgICAgICAgICAgICAgICAgZ29hbC5OYW1lKTsKICAgICAgICAgICAgICAgIHJldHVybiBmYWxzZTsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgdmFyIHNob3VsZFJlcGxhbiA9IFBhcnNlUmVwbGFuRGVjaXNpb24ocmF3KTsKCiAgICAgICAgICAgIGlmIChzaG91bGRSZXBsYW4pCiAgICAgICAgICAgICAgICBfbG9nZ2VyLkxvZ0luZm9ybWF0aW9uKAogICAgICAgICAgICAgICAgICAgICJbZXZhbHVhdG9yXSByZWNvbW1lbmRzIHJlcGxhbiBmb3IgZ29hbCB7R29hbH0g4oCUIHtDb3VudH0gb3V0Y29tZXMsIHtGYWlsdXJlc30gZmFpbHVyZXMiLAogICAgICAgICAgICAgICAgICAgIGdvYWwuTmFtZSwgb3V0Y29tZXMuQ291bnQsIGZhaWx1cmVDb3VudCk7CiAgICAgICAgICAgIGVsc2UKICAgICAgICAgICAgICAgIF9sb2dnZXIuTG9nRGVidWcoCiAgICAgICAgICAgICAgICAgICAgIltldmFsdWF0b3JdIHNheXMgY29udGludWUgZm9yIGdvYWwge0dvYWx9IOKAlCB7Q291bnR9IG91dGNvbWVzLCB7RmFpbHVyZXN9IGZhaWx1cmVzIiwKICAgICAgICAgICAgICAgICAgICBnb2FsLk5hbWUsIG91dGNvbWVzLkNvdW50LCBmYWlsdXJlQ291bnQpOwoKICAgICAgICAgICAgcmV0dXJuIHNob3VsZFJlcGxhbjsKICAgICAgICB9CiAgICAgICAgY2F0Y2ggKE9wZXJhdGlvbkNhbmNlbGVkRXhjZXB0aW9uKQogICAgICAgIHsKICAgICAgICAgICAgdGhyb3c7IC8vIHByb3BhZ2F0ZSDigJQgY2FsbGVyIG93bnMgdGhlIGxpZmV0aW1lIHRva2VuCiAgICAgICAgfQogICAgICAgIGNhdGNoIChFeGNlcHRpb24gZXgpCiAgICAgICAgewogICAgICAgICAgICBfbG9nZ2VyLkxvZ1dhcm5pbmcoZXgsCiAgICAgICAgICAgICAgICAiW2V2YWx1YXRvcl0gdW5leHBlY3RlZCBlcnJvciBkdXJpbmcgZXZhbHVhdGlvbiDigJQgZGVmYXVsdGluZyB0byBuby1yZXBsYW4gZm9yIGdvYWwge0dvYWx9IiwKICAgICAgICAgICAgICAgIGdvYWwuTmFtZSk7CiAgICAgICAgICAgIHJldHVybiBmYWxzZTsKICAgICAgICB9CiAgICB9CgogICAgLy8g4pSA4pSAIFByb21wdCBjb25zdHJ1Y3Rpb24g4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACgogICAgcHJpdmF0ZSBzdGF0aWMgc3RyaW5nIEJ1aWxkU3lzdGVtUHJvbXB0KCkgPT4KICAgICAgICAiWW91IGFyZSBhbiBhdXRvbm9tb3VzIE1pbmVjcmFmdCBhZ2VudCBldmFsdWF0b3IuIERlY2lkZSB3aGV0aGVyIHRoZSBhZ2VudCdzICIgKwogICAgICAgICJjdXJyZW50IHBsYW4gaXMgZmFpbGluZyBhbmQgYSBuZXcgcGxhbiBzaG91bGQgYmUgcmVxdWVzdGVkLlxuXG4iICsKICAgICAgICAiUmVzcG9uZCBPTkxZIHdpdGggY29tcGFjdCBKU09OOlxuIiArCiAgICAgICAgIiAgeyBcInJlcGxhblwiOiB0cnVlIH0gICAgICAgICAgICAgICAgICAgICDigJQgYWJhbmRvbiByZW1haW5pbmcgYWN0aW9ucywgcmVxdWVzdCBmcmVzaCBwbGFuXG4iICsKICAgICAgICAiICB7IFwicmVwbGFuXCI6IGZhbHNlLCBcInJlYXNvblwiOiBcIi4uLlwiIH0gIOKAlCBjb250aW51ZSBleGVjdXRpbmcgdGhlIGN1cnJlbnQgcGxhblxuXG4iICsKICAgICAgICAiUmVjb21tZW5kIHJlcGxhbiAodHJ1ZSkgd2hlbjogbXVsdGlwbGUgY29uc2VjdXRpdmUgZmFpbHVyZXMgb24gdGhlIHNhbWUgdG9vbCwgIiArCiAgICAgICAgImEgcmVxdWlyZWQgcmVzb3VyY2UgdGhhdCBjbGVhcmx5IGRvZXMgbm90IGV4aXN0LCBvciBhIGdvYWwgdGhhdCBjYW5ub3QgYmUgY29tcGxldGVkICIgKwogICAgICAgICJnaXZlbiB0aGUgY3VycmVudCB3b3JsZCBzdGF0ZS5cbiIgKwogICAgICAgICJEbyBOT1QgcmVwbGFuIGZvciBhIHNpbmdsZSB0cmFuc2llbnQgZmFpbHVyZSBvciBtaW5vciBzZXRiYWNrcy5cbiIgKwogICAgICAgICJLZWVwIFwicmVhc29uXCIgdW5kZXIgMTUgd29yZHMuIjsKCiAgICBwcml2YXRlIHN0YXRpYyBzdHJpbmcgQnVpbGRVc2VyTWVzc2FnZSgKICAgICAgICBJR29hbCBnb2FsLAogICAgICAgIElSZWFkT25seUxpc3Q8QWN0aW9uT3V0Y29tZT4gb3V0Y29tZXMsCiAgICAgICAgV29ybGRTdGF0ZSB3b3JsZFN0YXRlKQogICAgewogICAgICAgIHZhciBzYiA9IG5ldyBTdHJpbmdCdWlsZGVyKCk7CiAgICAgICAgc2IuQXBwZW5kTGluZSgkIkdvYWw6IHtnb2FsLk5hbWV9Iik7CiAgICAgICAgc2IuQXBwZW5kTGluZSgKICAgICAgICAgICAgJCJXb3JsZDogSFA9e3dvcmxkU3RhdGUuSGVhbHRofS8yMCwgRm9vZD17d29ybGRTdGF0ZS5Gb29kfS8yMCwgIiArCiAgICAgICAgICAgICQiUG9zPSh7d29ybGRTdGF0ZS5Qb3NpdGlvbi5YfSx7d29ybGRTdGF0ZS5Qb3NpdGlvbi5ZfSx7d29ybGRTdGF0ZS5Qb3NpdGlvbi5afSksICIgKwogICAgICAgICAgICAkIkludmVudG9yeT17d29ybGRTdGF0ZS5JbnZlbnRvcnkuQ291bnR9IGRpc3RpbmN0IGl0ZW1zIik7CiAgICAgICAgc2IuQXBwZW5kTGluZSgpOwogICAgICAgIHNiLkFwcGVuZExpbmUoIlJlY2VudCBvdXRjb21lcyAob2xkZXN0IGZpcnN0KToiKTsKICAgICAgICBmb3JlYWNoICh2YXIgbyBpbiBvdXRjb21lcy5UYWtlTGFzdCgxMCkpCiAgICAgICAgICAgIHNiLkFwcGVuZExpbmUoJCIgIFt7KG8uU3VjY2VzcyA/ICJPSyAgIiA6ICJGQUlMIil9XSB7by5Ub29sTmFtZX06IHtvLk9ic2VydmF0aW9uU3VtbWFyeX0iKTsKICAgICAgICByZXR1cm4gc2IuVG9TdHJpbmcoKTsKICAgIH0KCiAgICAvLyDilIDilIAgUmVzcG9uc2UgcGFyc2luZyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKCiAgICBwcml2YXRlIHN0YXRpYyBib29sIFBhcnNlUmVwbGFuRGVjaXNpb24oc3RyaW5nIHJlc3BvbnNlKQogICAgewogICAgICAgIHRyeQogICAgICAgIHsKICAgICAgICAgICAgdmFyIGpzb24gPSBFeHRyYWN0SnNvbihyZXNwb25zZSk7CiAgICAgICAgICAgIHVzaW5nIHZhciBkb2MgPSBKc29uRG9jdW1lbnQuUGFyc2UoanNvbik7CiAgICAgICAgICAgIHJldHVybiBkb2MuUm9vdEVsZW1lbnQuVHJ5R2V0UHJvcGVydHkoInJlcGxhbiIsIG91dCB2YXIgcCkgJiYgcC5HZXRCb29sZWFuKCk7CiAgICAgICAgfQogICAgICAgIGNhdGNoCiAgICAgICAgewogICAgICAgICAgICByZXR1cm4gZmFsc2U7IC8vIHVucGFyc2VhYmxlIOKGkiBjb25zZXJ2YXRpdmUgbm8tcmVwbGFuCiAgICAgICAgfQogICAgfQoKICAgIC8vLyA8c3VtbWFyeT5FeHRyYWN0cyB0aGUgZmlyc3QgSlNPTiBvYmplY3QgZnJvbSBhbiBMTE0gcmVzcG9uc2UgdGhhdCBtYXkgY29udGFpbiBwcm9zZS48L3N1bW1hcnk+CiAgICBwcml2YXRlIHN0YXRpYyBzdHJpbmcgRXh0cmFjdEpzb24oc3RyaW5nIHRleHQpCiAgICB7CiAgICAgICAgdmFyIHN0YXJ0ID0gdGV4dC5JbmRleE9mKCd7Jyk7CiAgICAgICAgdmFyIGVuZCAgID0gdGV4dC5MYXN0SW5kZXhPZignfScpOwogICAgICAgIHJldHVybiBzdGFydCA+PSAwICYmIGVuZCA+IHN0YXJ0ID8gdGV4dFtzdGFydC4uKGVuZCArIDEpXSA6ICJ7fSI7CiAgICB9Cn0K
+namespace Agent.Planning;
+
+using Agent.Core;
+using Agent.Planning.Llm;
+using Microsoft.Extensions.Logging;
+using System.Text;
+using System.Text.Json;
+
+/// <summary>
+/// Sprint 39 P1: Concrete LLM-backed implementation of <see cref="Agent.Core.ILlmEvaluator"/>.
+///
+/// Evaluation strategy:
+///   1. Skip if fewer than <see cref="MinOutcomesBeforeEval"/> outcomes (avoids per-action LLM calls).
+///   2. Skip if all outcomes succeeded (fast-path: no reason to replan on full success).
+///   3. Skip if LLM provider is unavailable.
+///   4. Call the LLM with a compact prompt: goal name + world snapshot + last 10 outcomes.
+///   5. Parse response JSON: { "replan": true|false, "reason": "..." }.
+///   6. On any error (network, parse, timeout) → false (conservative: continue current plan).
+///
+/// This closes the observation-driven replanning loop introduced in Sprint 35:
+///   Plan → Execute → ActionOutcome → LLM Evaluate → Replan?
+///
+/// Wired from AgentBackgroundService.DispatchActionsAsync after each ActionOutcome
+/// is enqueued into _cycleOutcomes (Sprint 39 P1 wiring, replaces TODO comment).
+/// </summary>
+public sealed class LlmEvaluatorImpl : ILlmEvaluator
+{
+    private readonly ILlmProvider _provider;
+    private readonly ILogger<LlmEvaluatorImpl> _logger;
+
+    /// <summary>
+    /// Minimum accumulated outcomes in _cycleOutcomes before the evaluator
+    /// bothers calling the LLM. Prevents a wall of LLM calls when the plan starts.
+    /// </summary>
+    private const int MinOutcomesBeforeEval = 3;
+
+    public LlmEvaluatorImpl(ILlmProvider provider, ILogger<LlmEvaluatorImpl> logger)
+    {
+        _provider = provider;
+        _logger   = logger;
+    }
+
+    /// <inheritdoc/>
+    public async Task<bool> EvaluateAsync(
+        IGoal goal,
+        IReadOnlyList<ActionOutcome> outcomes,
+        WorldState worldState,
+        CancellationToken ct = default)
+    {
+        // Fast-path 1: too few data points to make a reliable judgement.
+        if (outcomes.Count < MinOutcomesBeforeEval) return false;
+
+        // Fast-path 2: all outcomes succeeded — no reason to replan.
+        var failureCount = outcomes.Count(static o => !o.Success);
+        if (failureCount == 0) return false;
+
+        // Fast-path 3: provider offline — skip silently.
+        if (!_provider.IsAvailable)
+        {
+            _logger.LogDebug(
+                "[evaluator] provider '{Provider}' unavailable — skipping evaluation for goal {Goal}",
+                _provider.ProviderName, goal.Name);
+            return false;
+        }
+
+        try
+        {
+            var systemPrompt = BuildSystemPrompt();
+            var userMessage  = BuildUserMessage(goal, outcomes, worldState);
+
+            var raw = await _provider.CompleteAsync(systemPrompt, userMessage, ct);
+
+            if (raw is null)
+            {
+                _logger.LogWarning(
+                    "[evaluator] provider returned null for goal {Goal} — defaulting to no-replan",
+                    goal.Name);
+                return false;
+            }
+
+            var shouldReplan = ParseReplanDecision(raw);
+
+            if (shouldReplan)
+                _logger.LogInformation(
+                    "[evaluator] recommends replan for goal {Goal} — {Count} outcomes, {Failures} failures",
+                    goal.Name, outcomes.Count, failureCount);
+            else
+                _logger.LogDebug(
+                    "[evaluator] says continue for goal {Goal} — {Count} outcomes, {Failures} failures",
+                    goal.Name, outcomes.Count, failureCount);
+
+            return shouldReplan;
+        }
+        catch (OperationCanceledException)
+        {
+            throw; // propagate — caller owns the lifetime token
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex,
+                "[evaluator] unexpected error during evaluation — defaulting to no-replan for goal {Goal}",
+                goal.Name);
+            return false;
+        }
+    }
+
+    // ── Prompt construction ───────────────────────────────────────────────────
+
+    private static string BuildSystemPrompt() =>
+        "You are an autonomous Minecraft agent evaluator. Decide whether the agent's " +
+        "current plan is failing and a new plan should be requested.\n\n" +
+        "Respond ONLY with compact JSON:\n" +
+        "  { \"replan\": true }                     — abandon remaining actions, request fresh plan\n" +
+        "  { \"replan\": false, \"reason\": \"...\" }  — continue executing the current plan\n\n" +
+        "Recommend replan (true) when: multiple consecutive failures on the same tool, " +
+        "a required resource that clearly does not exist, or a goal that cannot be completed " +
+        "given the current world state.\n" +
+        "Do NOT replan for a single transient failure or minor setbacks.\n" +
+        "Keep \"reason\" under 15 words.";
+
+    private static string BuildUserMessage(
+        IGoal goal,
+        IReadOnlyList<ActionOutcome> outcomes,
+        WorldState worldState)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"Goal: {goal.Name}");
+        sb.AppendLine(
+            $"World: HP={worldState.Health}/20, Food={worldState.Food}/20, " +
+            $"Pos=({worldState.Position.X},{worldState.Position.Y},{worldState.Position.Z}), " +
+            $"Inventory={worldState.Inventory.Count} distinct items");
+        sb.AppendLine();
+        sb.AppendLine("Recent outcomes (oldest first):");
+        foreach (var o in outcomes.TakeLast(10))
+            sb.AppendLine($"  [{(o.Success ? "OK  " : "FAIL")}] {o.ToolName}: {o.ObservationSummary}");
+        return sb.ToString();
+    }
+
+    // ── Response parsing ──────────────────────────────────────────────────────
+
+    private static bool ParseReplanDecision(string response)
+    {
+        try
+        {
+            var json = ExtractJson(response);
+            using var doc = JsonDocument.Parse(json);
+            return doc.RootElement.TryGetProperty("replan", out var p) && p.GetBoolean();
+        }
+        catch
+        {
+            return false; // unparseable → conservative no-replan
+        }
+    }
+
+    /// <summary>Extracts the first JSON object from an LLM response that may contain prose.</summary>
+    private static string ExtractJson(string text)
+    {
+        var start = text.IndexOf('{');
+        var end   = text.LastIndexOf('}');
+        return start >= 0 && end > start ? text[start..(end + 1)] : "{}";
+    }
+}

@@ -88,10 +88,11 @@ public class Sprint35Tests
     }
 
     [Test]
-    public void BlockMinedEvent_NoLongerUpdatesInventory()
+    public void BlockMinedEvent_UpdatesInventoryWithMappedDrop()
     {
-        // Sprint 35 P0-A: ApplyBlockMined should ONLY store facts, NOT update inventory
-        // Inventory truth now comes exclusively from ItemCollectedEvent
+        // Sprint 40 P0-B: BlockMinedEvent now updates inventory using the block-to-item
+        // drop map. diamond_ore maps to diamond via BlockToItemDrop. This ensures items
+        // are credited even when the drop entity is not collected (playerCollect miss).
         var projector = new WorldStateProjector();
         var state = new WorldState();
 
@@ -99,13 +100,13 @@ public class Sprint35Tests
             new Position(100, 64, 200), DateTimeOffset.UtcNow);
         var updated = projector.Apply(state, mined);
 
-        // Inventory should NOT have been updated by BlockMined
+        // Inventory should have been updated with the mapped drop name (diamond)
         Assert.That(updated.Inventory.ContainsKey("diamond_ore"), Is.False,
-            "BlockMined should not update inventory with block name (BUG-1 fix)");
-        Assert.That(updated.Inventory.ContainsKey("diamond"), Is.False,
-            "BlockMined should not add any inventory — that is ItemCollectedEvent's job");
+            "BlockMined should not update inventory with block name (diamond_ore) — uses mapped drop");
+        Assert.That(updated.Inventory.GetValueOrDefault("diamond"), Is.EqualTo(1),
+            "BlockMined should add mapped drop (diamond) to inventory via BlockToItemDrop");
 
-        // But the fact should be stored
+        // The fact should still be stored for diagnostics
         Assert.That(updated.Facts.ContainsKey("event:BlockMined:Block"), Is.True,
             "BlockMined fact should still be stored for diagnostics");
     }

@@ -1,1 +1,61 @@
-bmFtZXNwYWNlIFdlYlVJLkJsYXpvci5NYW5hZ2VyczsKCnVzaW5nIEFnZW50LkNvcmU7CnVzaW5nIEFnZW50LkNvcmUuUnVudGltZTsKdXNpbmcgTWljcm9zb2Z0LkV4dGVuc2lvbnMuTG9nZ2luZzsKCi8vLyA8c3VtbWFyeT4KLy8vIFNwcmludCAzOSBQMjogQ29uY3JldGUgaW1wbGVtZW50YXRpb24gb2YgPHNlZSBjcmVmPSJJU3RhdGVNYW5hZ2VyIi8+LgovLy8KLy8vIE93bnMgYSA8c2VlIGNyZWY9IldvcmxkU3RhdGUiLz4gcmVhZC1tb2RlbCBhbmQgYXBwbGllcyA8c2VlIGNyZWY9IldvcmxkRXZlbnQiLz4KLy8vIHVwZGF0ZXMgdmlhIDxzZWUgY3JlZj0iV29ybGRTdGF0ZVByb2plY3RvciIvPi4gVGhyZWFkLXNhZmU6IEFwcGx5IGFuZCBDdXJyZW50Ci8vLyBhcmUgcHJvdGVjdGVkIGJ5IGEgbG9jay4KLy8vCi8vLyBEZXNpZ24gbm90ZTogV29ybGRTdGF0ZSBpcyBhbiBpbW11dGFibGUgcmVjb3JkOyA8c2VlIGNyZWY9IkFwcGx5Ii8+IHByb2R1Y2VzIGEgbmV3Ci8vLyBpbnN0YW5jZSByYXRoZXIgdGhhbiBtdXRhdGluZyBpbiBwbGFjZSwgc28gdGhlIGxvY2sgc2NvcGUgaXMgbWluaW1hbCAoYXNzaWdubWVudCBvbmx5KS4KLy8vCi8vLyBTcHJpbnQgNDAgdGFyZ2V0OiBBZ2VudEJhY2tncm91bmRTZXJ2aWNlLlByb2Nlc3NFdmVudHNBc3luYyBkZWxlZ2F0ZXMgQXBwbHkgY2FsbHMKLy8vIGhlcmUsIG1ha2luZyBfd29ybGRTdGF0ZSBhIHJlYWQtdGhyb3VnaCBwcm9wZXJ0eSBvbiB0aGlzIG1hbmFnZXIuCi8vLyA8L3N1bW1hcnk+CnB1YmxpYyBzZWFsZWQgY2xhc3MgU3RhdGVNYW5hZ2VySW1wbCA6IElTdGF0ZU1hbmFnZXIKewogICAgcHJpdmF0ZSByZWFkb25seSBXb3JsZFN0YXRlUHJvamVjdG9yIF9wcm9qZWN0b3IgPSBuZXcoKTsKICAgIHByaXZhdGUgcmVhZG9ubHkgSUxvZ2dlcjxTdGF0ZU1hbmFnZXJJbXBsPiBfbG9nZ2VyOwogICAgcHJpdmF0ZSByZWFkb25seSBvYmplY3QgX2xvY2sgPSBuZXcoKTsKCiAgICBwcml2YXRlIFdvcmxkU3RhdGUgX2N1cnJlbnQgPSBuZXcgV29ybGRTdGF0ZSgpOwoKICAgIHB1YmxpYyBTdGF0ZU1hbmFnZXJJbXBsKElMb2dnZXI8U3RhdGVNYW5hZ2VySW1wbD4gbG9nZ2VyKQogICAgewogICAgICAgIF9sb2dnZXIgPSBsb2dnZXI7CiAgICB9CgogICAgLy8vIDxpbmhlcml0ZG9jLz4KICAgIHB1YmxpYyBXb3JsZFN0YXRlIEN1cnJlbnQKICAgIHsKICAgICAgICBnZXQgeyBsb2NrIChfbG9jaykgcmV0dXJuIF9jdXJyZW50OyB9CiAgICB9CgogICAgLy8vIDxpbmhlcml0ZG9jLz4KICAgIHB1YmxpYyB2b2lkIEFwcGx5KFdvcmxkRXZlbnQgZXYpCiAgICB7CiAgICAgICAgbG9jayAoX2xvY2spCiAgICAgICAgewogICAgICAgICAgICBfY3VycmVudCA9IF9wcm9qZWN0b3IuQXBwbHkoX2N1cnJlbnQsIGV2KTsKICAgICAgICB9CiAgICAgICAgX2xvZ2dlci5Mb2dEZWJ1ZygiW3N0YXRlXSBhcHBsaWVkIHtFdmVudFR5cGV9IiwgZXYuR2V0VHlwZSgpLk5hbWUpOwogICAgfQoKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBSZXBsYWNlcyB0aGUgZW50aXJlIHN0YXRlIHNuYXBzaG90IChlLmcuIG9uIGFnZW50IHJlY29ubmVjdCBvciBnb2FsIHRyYW5zaXRpb24pLgogICAgLy8vIFNwcmludCA0MDogQUJTLlNldEdvYWwgd2lsbCBjYWxsIHRoaXMgd2hlbiBJc0ludmVudG9yeVN0YWxlIG5lZWRzIHJlc2V0dGluZy4KICAgIC8vLyA8L3N1bW1hcnk+CiAgICBwdWJsaWMgdm9pZCBSZXNldChXb3JsZFN0YXRlIHN0YXRlKQogICAgewogICAgICAgIGxvY2sgKF9sb2NrKQogICAgICAgIHsKICAgICAgICAgICAgX2N1cnJlbnQgPSBzdGF0ZTsKICAgICAgICB9CiAgICAgICAgX2xvZ2dlci5Mb2dEZWJ1ZygiW3N0YXRlXSByZXNldCB0byBwcm92aWRlZCBXb3JsZFN0YXRlIChBZ2VudElkPXtBZ2VudElkfSkiLCBzdGF0ZS5BZ2VudElkKTsKICAgIH0KfQo=
+namespace WebUI.Blazor.Managers;
+
+using Agent.Core;
+using Agent.Core.Runtime;
+using Microsoft.Extensions.Logging;
+
+/// <summary>
+/// Sprint 39 P2: Concrete implementation of <see cref="IStateManager"/>.
+///
+/// Owns a <see cref="WorldState"/> read-model and applies <see cref="WorldEvent"/>
+/// updates via <see cref="WorldStateProjector"/>. Thread-safe: Apply and Current
+/// are protected by a lock.
+///
+/// Design note: WorldState is an immutable record; <see cref="Apply"/> produces a new
+/// instance rather than mutating in place, so the lock scope is minimal (assignment only).
+///
+/// Sprint 40 target: AgentBackgroundService.ProcessEventsAsync delegates Apply calls
+/// here, making _worldState a read-through property on this manager.
+/// </summary>
+public sealed class StateManagerImpl : IStateManager
+{
+    private readonly WorldStateProjector _projector = new();
+    private readonly ILogger<StateManagerImpl> _logger;
+    private readonly object _lock = new();
+
+    private WorldState _current = new WorldState();
+
+    public StateManagerImpl(ILogger<StateManagerImpl> logger)
+    {
+        _logger = logger;
+    }
+
+    /// <inheritdoc/>
+    public WorldState Current
+    {
+        get { lock (_lock) return _current; }
+    }
+
+    /// <inheritdoc/>
+    public void Apply(WorldEvent ev)
+    {
+        lock (_lock)
+        {
+            _current = _projector.Apply(_current, ev);
+        }
+        _logger.LogDebug("[state] applied {EventType}", ev.GetType().Name);
+    }
+
+    /// <summary>
+    /// Replaces the entire state snapshot (e.g. on agent reconnect or goal transition).
+    /// Sprint 40: ABS.SetGoal will call this when IsInventoryStale needs resetting.
+    /// </summary>
+    public void Reset(WorldState state)
+    {
+        lock (_lock)
+        {
+            _current = state;
+        }
+        _logger.LogDebug("[state] reset to provided WorldState (AgentId={AgentId})", state.AgentId);
+    }
+}

@@ -54,6 +54,18 @@ const FURNACE_SEARCH_RADIUS      = 16;
 const FURNACE_REACH_DISTANCE     = 2;
 const SMELT_TIMEOUT_MS           = 40_000;
 
+// Sprint 40 P0-B: item pickup tuning.
+// After mining a block, the bot waits this long for the item entity to appear
+// and be auto-collected. Then moves to the block position and waits again.
+const MINE_ITEM_PICKUP_WAIT_MS           = 1000;  // wait for auto-pickup after dig
+const MINE_ITEM_PICKUP_MOVE_WAIT_MS      = 1500;  // wait after moving to block pos
+const MINE_ITEM_PICKUP_REMOVE_BLOCK_MS   = 300;   // wait after removing obstruction
+
+// Sprint 40 P0-B: reachable block search tuning.
+const REACHABLE_BLOCK_MAX_CANDIDATES     = 20;    // max blocks to reachability-check
+const REACHABLE_BLOCK_PATH_TIMEOUT_MS    = 5000;  // pathfinding timeout per candidate
+const REACHABLE_BLOCK_GOTO_TOLERANCE     = 2;     // pathfinder GoalNear tolerance
+
 // Sprint 9: flat-area scan defaults.
 // Sprint 19: increased default radius from 20 to 32 for better initial coverage.
 // C# planner sends radius=48 on retry after a zero-area result.
@@ -344,28 +356,6 @@ function isSystemMessage(username, message) {
   return SYSTEM_MESSAGE_PATTERNS.some(re => re.test(message));
 }
 
-/** Sprint 37: handles numeric game mode values (0=survival, 1=creative, etc.) */
-const GAME_MODE_NUMBERS = Object.freeze({
-  0: 'survival',
-  1: 'creative',
-  2: 'adventure',
-  3: 'spectator',
-});
-
-function normalizeGameMode(rawValue) {
-  if (rawValue === undefined || rawValue === null) return null;
-  // Handle numeric game mode (Mineflayer stores as number in MC 1.21+)
-  if (typeof rawValue === 'number') return GAME_MODE_NUMBERS[rawValue] ?? null;
-  // Handle string game mode (older Mineflayer or chat-detected)
-  const mode = String(rawValue).trim().toLowerCase();
-  if (!mode) return null;
-  if (mode.includes('creative')) return 'creative';
-  if (mode.includes('survival')) return 'survival';
-  if (mode.includes('adventure')) return 'adventure';
-  if (mode.includes('spectator')) return 'spectator';
-  return null;
-}
-
 bot.on('chat', (username, message) => {
   // Sprint 38 P0-D (BUG-D): defensive try/catch — any uncaught error in the
   // chat handler would crash the adapter process. Errors are logged and the
@@ -510,6 +500,36 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           // Sending cumulative count caused inventory ballooning (e.g. count=1, then 2, then 3
           // was interpreted as +1, +2, +3 = 6 dirt instead of +1+1+1 = 3 dirt).
           sendEvent('blockMined', { block: shortName, count: 1, ...botPos(), correlationId });
+
+          // Sprint 40 P0-B: Ensure the dropped item is collected.
+          // After digging, the item entity appears at the block position. Wait briefly
+          // for auto-pickup (bot within ~1 block range). If not collected, move to the
+          // block position to force pickup. This prevents items falling through holes
+          // or landing out of reach from being lost forever.
+          await new Promise(r => setTimeout(r, MINE_ITEM_PICKUP_WAIT_MS));
+          // Check if the item at this block position is still an entity (not collected)
+          // by looking for a dropped item entity near the dig position.
+          const nearbyEntity = bot.nearestEntity(e => {
+            if (!e || e.type !== 'object' || e.objectType !== 'Item') return false;
+            const dx = e.position.x - target.position.x;
+            const dy = e.position.y - target.position.y;
+            const dz = e.position.z - target.position.z;
+            return Math.abs(dx) <= 2 && Math.abs(dy) <= 2 && Math.abs(dz) <= 2;
+          });
+          if (nearbyEntity) {
+            // Item entity still present — move closer to collect it
+            try {
+              await bot.pathfinder.goto(
+                new pfGoals.GoalNear(
+                  target.position.x, target.position.y, target.position.z, 1)
+              );
+              // Wait a bit more for collection
+              await new Promise(r => setTimeout(r, MINE_ITEM_PICKUP_MOVE_WAIT_MS));
+            } catch {
+              // Movement failed — item may still be picked up if bot is close enough
+              await new Promise(r => setTimeout(r, MINE_ITEM_PICKUP_REMOVE_BLOCK_MS));
+            }
+          }
         } catch (e) {
           if (_stopRequested) { console.log(`[mine] aborted after dig error`); return; }
           console.warn(`[mine] dig failed: ${e.message}`);
@@ -1002,6 +1022,101 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         sendBotStatus(); // Sprint 35 P0-A: refresh inventory after smelting
       } finally {
         furnace.close();
+      }
+      break;
+    }
+
+    case 'findReachableBlock': {
+      // Sprint 40 P0-B: Find the nearest DirtBlock that the bot can pathfind to.
+      // Returns position + reachability info so the planner can make informed decisions.
+      const { block: blockName, maxDistance = MINE_SEARCH_RADIUS_NEAR } = args;
+      if (!blockName) throw new Error('findReachableBlock requires block name');
+
+      const shortName  = blockName.replace('minecraft:', '');
+      const blockEntry = bot.registry.blocksByName[shortName];
+      if (!blockEntry) throw new Error(`Unknown block: ${blockName}`);
+      const blockId = blockEntry.id;
+
+      const botPosObj = botPos();
+      const movements = new Movements(bot);
+      bot.pathfinder.setMovements(movements);
+
+      // Find all matching blocks within range
+      const candidates = bot.findBlocks({
+        matching: blockId,
+        maxDistance: Math.min(maxDistance, MINE_SEARCH_RADIUS_FAR),
+        count: REACHABLE_BLOCK_MAX_CANDIDATES,
+      });
+
+      if (!candidates || candidates.length === 0) {
+        sendEvent('blockNotFound', { block: blockName, mined: 0, correlationId });
+        throw new Error(`No ${shortName} found within ${maxDistance} blocks`);
+      }
+
+      // Sort by Euclidean distance from bot
+      candidates.sort((a, b) => {
+        const da = Math.sqrt(
+          (a.x - botPosObj.x) ** 2 + (a.y - botPosObj.y) ** 2 + (a.z - botPosObj.z) ** 2);
+        const db = Math.sqrt(
+          (b.x - botPosObj.x) ** 2 + (b.y - botPosObj.y) ** 2 + (b.z - botPosObj.z) ** 2);
+        return da - db;
+      });
+
+      // Check each candidate for pathfinding reachability (up to the limit)
+      let reachableBlock = null;
+      let reachableDistance = Infinity;
+      let reachablePathDist = Infinity;
+
+      for (const candidate of candidates) {
+        if (_stopRequested) break;
+
+        try {
+          const pathResult = await bot.pathfinder.getPathTo(
+            movements,
+            new pfGoals.GoalNear(candidate.x, candidate.y, candidate.z, REACHABLE_BLOCK_GOTO_TOLERANCE),
+            { timeout: REACHABLE_BLOCK_PATH_TIMEOUT_MS }
+          );
+
+          if (pathResult && pathResult.status === 'success') {
+            const euclideanDist = Math.sqrt(
+              (candidate.x - botPosObj.x) ** 2 +
+              (candidate.y - botPosObj.y) ** 2 +
+              (candidate.z - botPosObj.z) ** 2);
+            const pathDist = pathResult.path.length;
+
+            if (pathDist < reachablePathDist) {
+              reachableBlock = candidate;
+              reachableDistance = euclideanDist;
+              reachablePathDist = pathDist;
+            }
+          }
+        } catch {
+          // Pathfinding failed for this candidate — try next
+          continue;
+        }
+      }
+
+      if (reachableBlock) {
+        sendEvent('reachableBlockFound', {
+          block: shortName,
+          x: reachableBlock.x,
+          y: reachableBlock.y,
+          z: reachableBlock.z,
+          euclideanDistance: Math.round(reachableDistance * 100) / 100,
+          pathDistance: reachablePathDist,
+          correlationId,
+        });
+        logStructured('info', 'findReachableBlock', 'found', {
+          block: shortName,
+          x: reachableBlock.x,
+          y: reachableBlock.y,
+          z: reachableBlock.z,
+          euclideanDistance: Math.round(reachableDistance * 100) / 100,
+          pathDistance: reachablePathDist,
+        });
+      } else {
+        sendEvent('blockNotFound', { block: blockName, mined: 0, reason: 'unreachable', correlationId });
+        throw new Error(`${shortName} found but none reachable within ${maxDistance} blocks`);
       }
       break;
     }

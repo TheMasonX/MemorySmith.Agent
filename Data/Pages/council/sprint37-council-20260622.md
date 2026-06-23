@@ -1,1 +1,133 @@
-IyBTcHJpbnQgMzcgQ291bmNpbCBSZXZpZXcg4oCUIDIwMjYtMDYtMjIKCioqQnJhbmNoOioqIHNwcmludC0zNS1sbG0tZmlyc3QgfCAqKlZlcnNpb24gdGFyZ2V0OioqIHYwLjM3LjAgIAoqKkNvdW5jaWwgc2VhdHM6KiogU291cmNlLUdyb3VuZGVkIEFyY2hpdmlzdCwgRGF0YSBNb2RlbCBBcmNoaXRlY3QsIFJldHJpZXZhbCBTcGVjaWFsaXN0LApIdW1hbiBMZWFybmluZyBBZHZvY2F0ZSwgU2tlcHRpY2FsIFJldmlld2VyLCBTeW50aGVzaXplcgoKLS0tCgojIyBDaGFuZ2VzIFVuZGVyIFJldmlldwoKKipQMC1BKiogQWN0aW9uT3V0Y29tZSBpbXBsZW1lbnRzIElPYnNlcnZhdGlvblN1bW1hcnkgKG9uZS1saW5lcikgIAoqKlAwLUIqKiBXaXJlIERpc3BhdGNoQWN0aW9uc0FzeW5jIOKGkiBDYWxsV2l0aE91dGNvbWVBc3luYzsgYWRkIElUb29sQ2FsbGVyLkNhbGxXaXRoT3V0Y29tZUFzeW5jIGRlZmF1bHQ7IHJlbW92ZSByZWR1bmRhbnQgam91cm5hbCBlbnRyeSBmcm9tIFRvb2xEaXNwYXRjaGVyLkNhbGxBc3luYyAgCioqUDEtQSoqIEludGVudE1hbmFnZXIgY2xhc3M6IGV4dHJhY3RlZCBpbnRlbnTihpJnb2FsIG1hcHBpbmcgZnJvbSBQYXJzZURlY2lzaW9uICAKKipQMS1CKiogTGxtQ2hhdEludGVycHJldGVyLlBhcnNlRGVjaXNpb24gZGVsZWdhdGVzIHRvIEludGVudE1hbmFnZXIgd2hlbiBpbmplY3RlZCAgCioqUDEtQyoqIEludGVudEFzc2Vzc21lbnQgcmVjb3JkOiB7IEludGVudERyYWZ0LCBSaXNrTGV2ZWwsIFJlcXVpcmVzQ29uZmlybWF0aW9uLCBSZWFzb25pbmdTdW1tYXJ5IH0gIAoqKlRlc3RzKiogU3ByaW50MzdUZXN0cy5jcyDigJQgMTAgbmV3IHRlc3RzCgotLS0KCiMjIFNlYXQgUmV2aWV3cwoKIyMjIDEuIFNvdXJjZS1Hcm91bmRlZCBBcmNoaXZpc3QgKGNvbmZpZGVuY2U6IDAuOTIpCgoqKlZlcmRpY3Q6IEFQUFJPVkUqKgoKQWxsIGNsYWltcyB2ZXJpZmllZCBhZ2FpbnN0IHNvdXJjZToKCi0gYEFjdGlvbk91dGNvbWUgOiBJT2JzZXJ2YXRpb25TdW1tYXJ5YCDigJQgb25lLWxpbmVyLCBjb3JyZWN0LiBgSU9ic2VydmF0aW9uU3VtbWFyeS5TdW1tYXJ5ID0+IE9ic2VydmF0aW9uU3VtbWFyeWAgaXMgZXhwbGljaXQgaW50ZXJmYWNlIGltcGxlbWVudGF0aW9uLCB3b24ndCBwb2xsdXRlIHRoZSByZWNvcmQncyBwdWJsaWMgc3VyZmFjZS4g4pyTCi0gYElUb29sQ2FsbGVyLkNhbGxXaXRoT3V0Y29tZUFzeW5jYCBkZWZhdWx0IG1ldGhvZCDigJQgdXNlcyBgYXN5bmMgVGFzazwoLi4uKT5gIHdoaWNoIGlzIHZhbGlkIEMjIDgrIGRlZmF1bHQgaW50ZXJmYWNlIG1ldGhvZCBzeW50YXguIEFsbCBleGlzdGluZyBpbXBsZW1lbnRvcnMgYXV0b21hdGljYWxseSBpbmhlcml0IHRoZSBkZWZhdWx0LiDinJMKLSBUb29sRGlzcGF0Y2hlci5DYWxsQXN5bmM6IHJlbW92aW5nIHRoZSBmaW5hbCBgX2pvdXJuYWw/LkxvZyhlbnRyeSlgIChBY3Rpb25Db21wbGV0ZWQvQWN0aW9uRmFpbGVkKSBpcyBzYWZlLiBFcnJvciBlbnRyaWVzICh2YWxpZGF0aW9uIGZhaWx1cmUsIGV4Y2VwdGlvbiwgdW5rbm93biB0b29sKSBhcmUgdW50b3VjaGVkLiDinJMKLSBEaXNwYXRjaEFjdGlvbnNBc3luYzogcmVwbGFjaW5nIGB0b29sQ2FsbGVyLkNhbGxBc3luY2Agd2l0aCBgdG9vbENhbGxlci5DYWxsV2l0aE91dGNvbWVBc3luYyhHdWlkLkVtcHR5LCAuLi4pYCArIGBfam91cm5hbD8uTG9nT3V0Y29tZShvdXRjb21lKWAgZWxpbWluYXRlcyB0aGUgdHdvIG1hbnVhbCBqb3VybmFsIGVudHJpZXMgKEFjdGlvbkNvbXBsZXRlZCBmcm9tIHN1Y2Nlc3MgcGF0aCwgQWN0aW9uRmFpbGVkIGZyb20gZmFpbHVyZSBwYXRoKS4gVGltZW91dC9leGNlcHRpb24gam91cm5hbCBlbnRyaWVzIGFyZSBwcmVzZXJ2ZWQgc2luY2UgdGhleSBvY2N1ciBvdXRzaWRlIENhbGxBc3luYy4g4pyTCi0gSW50ZW50TWFuYWdlcjogc3dpdGNoIHN0YXRlbWVudCBtYXRjaGVzIGV4YWN0bHkgd2hhdCB3YXMgaW4gUGFyc2VEZWNpc2lvbi4gR29hbFJlcXVlc3QgcmVjb3JkIGlzIG5ldyBhbmQgY2xlYW4uIOKckwotIEludGVudEFzc2Vzc21lbnQ6IHJlY29yZCBmaWVsZHMgbWF0Y2ggU3ByaW50IDM2IGxvY2tlZCBhcmNoaXRlY3R1cmUuIOKckwoKKipDb25jZXJuIChkZWZlcnJlZCk6KiogYEd1aWQuRW1wdHlgIGFzIGdvYWxJZCBpcyBhIHBsYWNlaG9sZGVyLiBUcmFja2VkOiBJR29hbC5JZCBwcm9wZXJ0eSBuZWVkZWQgaW4gU3ByaW50IDM4LgoKLS0tCgojIyMgMi4gRGF0YSBNb2RlbCBBcmNoaXRlY3QgKGNvbmZpZGVuY2U6IDAuOTApCgoqKlZlcmRpY3Q6IEFQUFJPVkUqKgoKUDAtQSBpcyBjb3JyZWN0LiBUaGUgZXhwbGljaXQgaW50ZXJmYWNlIGltcGxlbWVudGF0aW9uIGBzdHJpbmcgSU9ic2VydmF0aW9uU3VtbWFyeS5TdW1tYXJ5ID0+IE9ic2VydmF0aW9uU3VtbWFyeTtgIGlzIHRoZSByaWdodCBwYXR0ZXJuIHdoZW4gdGhlIHByb3BlcnR5IG5hbWUgZGlmZmVycyAoT2JzZXJ2YXRpb25TdW1tYXJ5IOKJoCBTdW1tYXJ5KS4gVGhpcyBhdm9pZHMgcG9sbHV0aW5nIGBBY3Rpb25PdXRjb21lYCdzIHB1YmxpYyBBUEkgd2l0aCBhIHNlY29uZCBgU3VtbWFyeWAgcHJvcGVydHkuCgpQMC1CIElUb29sQ2FsbGVyIGludGVyZmFjZSBjaGFuZ2UgaXMgbm9uLWJyZWFraW5nLiBUaGUgZGVmYXVsdCBtZXRob2QgcGF0dGVybiBtZWFuczoKLSBFeGlzdGluZyB0ZXN0IGRvdWJsZXMgKFN0dWJUb29sQ2FsbGVyLCBNb2NrV29ybGRBZGFwdGVyKSBjb21waWxlIHVuY2hhbmdlZC4KLSBUb29sRGlzcGF0Y2hlci5DYWxsV2l0aE91dGNvbWVBc3luYyBhbHJlYWR5IG1hdGNoZXMgdGhlIGludGVyZmFjZSBzaWduYXR1cmUgZXhhY3RseSDihpIgaW1wbGljaXQgaW1wbGVtZW50YXRpb24uIE5vIGBvdmVycmlkZWAga2V5d29yZCBuZWVkZWQgZm9yIHJlY29yZHMvY2xhc3NlcyB3aXRoIG1hdGNoaW5nIHNpZ25hdHVyZXMuCgpQMS1BOiBHb2FsUmVxdWVzdCBpcyBhIHByb3BlciB2YWx1ZSBvYmplY3QuIFBhcmFtZXRlcnMgYXMgYElSZWFkT25seURpY3Rpb25hcnk8c3RyaW5nLCBvYmplY3Q/Pj9gIGlzIGNvbnNpc3RlbnQgd2l0aCBleGlzdGluZyBHb2FsRmFjdG9yeSAvIENoYXRJbnRlcnByZXRhdGlvbiBwYXR0ZXJucy4g4pyTCgpQMS1DOiBJbnRlbnRBc3Nlc3NtZW50IHVzZXMgYHNlYWxlZCByZWNvcmRgIOKAlCBjb3JyZWN0IGZvciBhbiBpbW11dGFibGUgdmFsdWUgb2JqZWN0LiBSaXNrTGV2ZWwgZW51bSBpcyBzaW1wbGUgYW5kIHN1ZmZpY2llbnQgZm9yIFNwcmludCAzNy4g4pyTCgoqKkRlZmVycmVkIGZpbmRpbmcgRC0xOioqIEdvYWxSZXF1ZXN0IGNvdWxkIGV2ZW50dWFsbHkgcmVwbGFjZSBgKHN0cmluZyBHb2FsTmFtZSwgSVJlYWRPbmx5RGljdGlvbmFyeTxzdHJpbmcsIG9iamVjdD8+PylgIHVzZWQgaW4gQ2hhdEludGVycHJldGF0aW9uIOKAlCBjb25zaWRlcmVkIG91dCBvZiBzY29wZSBmb3IgU3ByaW50IDM3LgoKLS0tCgojIyMgMy4gUmV0cmlldmFsIFNwZWNpYWxpc3QgKGNvbmZpZGVuY2U6IDAuODgpCgoqKlZlcmRpY3Q6IEFQUFJPVkUqKgoKTGxtQ2hhdEludGVycHJldGVyIGNoYW5nZSBpcyB3ZWxsLXN0cnVjdHVyZWQuIFRoZSB0d28tcGF0aCBhcHByb2FjaCAoSW50ZW50TWFuYWdlciB3aGVuIGluamVjdGVkLCBsZWdhY3kgbG9jYWwgc3dpdGNoIHdoZW4gbm90KSBnaXZlcyBhIGNsZWFuIG1pZ3JhdGlvbiBwYXRoIHdpdGhvdXQgYnJlYWtpbmcgZXhpc3RpbmcgdGVzdHMuCgpDb25maXJtZWQ6IExsbUNoYXRJbnRlcnByZXRlclRlc3RzLmNzIGRvZXMgbm90IGluamVjdCBJbnRlbnRNYW5hZ2VyIChpdCB0ZXN0cyBDaGF0SW50ZXJwcmV0ZXIgYW5kIExsbUNoYXRJbnRlcnByZXRlciB3aXRob3V0IHRoaXMgcGFyYW1ldGVyKSDihpIgYWxsIGV4aXN0aW5nIHRlc3RzIGV4ZXJjaXNlIHRoZSBsZWdhY3kgcGF0aCDihpIgbm8gcmVncmVzc2lvbi4KClNwcmludDM3VGVzdHMuY3MgdmVyaWZpZXMgdGhlIG5ldyBwYXRoIGRpcmVjdGx5IGJ5IGluamVjdGluZyBhbiBJbnRlbnRNYW5hZ2VyIGluc3RhbmNlLgoKKipDb25jZXJuIChub24tYmxvY2tpbmcpOioqIFRyeVBhcnNlVHJ1bmNhdGVkSnNvbiBzdGlsbCBoYXMgdGhlIGlubGluZSBzd2l0Y2guIFRoaXMgaXMgZXhwbGljaXRseSBkb2N1bWVudGVkIGFzICJTcHJpbnQgMzggdGFyZ2V0IiBpbiB0aGUgY29kZS4gQWNjZXB0YWJsZSBmb3IgU3ByaW50IDM3LgoKLS0tCgojIyMgNC4gSHVtYW4gTGVhcm5pbmcgQWR2b2NhdGUgKGNvbmZpZGVuY2U6IDAuODcpCgoqKlZlcmRpY3Q6IEFQUFJPVkUqKgoKUFJJTkNJUExFLTEgZW5mb3JjZW1lbnQgaXMgc2lnbmlmaWNhbnQuIFRoZSBrZXkgaW5zaWdodCB0aGUgY29kZSBjb21tdW5pY2F0ZXMgd2VsbDoKLSBQYXJzZURlY2lzaW9uIG5vIGxvbmdlciAia25vd3MiIHdoYXQgYSBnb2FsIGlzIOKAlCBpdCBhc2tzIEludGVudE1hbmFnZXIKLSBUaGUgbGVnYWN5IHBhdGggaXMgY2xlYXJseSBsYWJlbGVkIGFuZCBoYXMgYSB0YXJnZXQgcmVtb3ZhbCBzcHJpbnQKLSBJbnRlbnRBc3Nlc3NtZW50IHByb3ZpZGVzIHRoZSBzZW1hbnRpYyBzY2FmZm9sZGluZyBmb3IgZnV0dXJlIGNvbmZpcm1hdGlvbiBnYXRlcwoKT25lIHJlYWRhYmlsaXR5IGltcHJvdmVtZW50IChkZWZlcnJlZCwgbm90IGJsb2NraW5nKTogYEd1aWQuRW1wdHlgIGFzIGdvYWxJZCBpbiBEaXNwYXRjaEFjdGlvbnNBc3luYyBpcyBub3Qgc2VsZi1kb2N1bWVudGluZy4gVGhlIGNvbW1lbnQgYC8vIFNwcmludCAzNzogZ29hbElkIHBsYWNlaG9sZGVyIHVudGlsIElHb2FsLklkIGlzIGRlZmluZWRgIGlzIHN1ZmZpY2llbnQgZm9yIG5vdy4KCi0tLQoKIyMjIDUuIFNrZXB0aWNhbCBSZXZpZXdlciAoY29uZmlkZW5jZTogMC44MykKCioqVmVyZGljdDogQVBQUk9WRSB3aXRoIGRlZmVycmVkIGZpbmRpbmdzKioKCioqRC0yIChkZWZlcnJlZCk6KiogVGhlIElUb29sQ2FsbGVyIGRlZmF1bHQgbWV0aG9kIGNvdWxkIGZhaWwgc2lsZW50bHkgaWYgYW4gaW1wbGVtZW50b3IgZG9lc24ndCBvdmVycmlkZSBpdCBhbmQgQ2FsbEFzeW5jIHJldHVybnMgYSBub24tc3RhbmRhcmQgVG9vbFJlc3VsdCAobnVsbCBNZXNzYWdlKS4gVGhlIGRlZmF1bHQgdXNlcyBgcmVzdWx0Lk1lc3NhZ2UgPz8gIlN1Y2Nlc3MiYCAvIGByZXN1bHQuTWVzc2FnZSA/PyAiRmFpbGVkImAg4oCUIGFjY2VwdGFibGUgZmFsbGJhY2suCgoqKkQtMyAoZGVmZXJyZWQpOioqIFRoZSBzcHJpbnQgbm90ZXMgc2F5ICJSZW1vdmUgcmVkdW5kYW50IGpvdXJuYWwgZW50cmllcyBmcm9tIENhbGxBc3luYyBwZXItdG9vbCBwYXRoLiIgU3RyaWN0bHksIHRoaXMgbWVhbnMgcmVtb3ZpbmcgdGhlIFNVQ0NFU1MvRkFJTFVSRSBlbnRyeS4gQnV0IENhbGxBc3luYydzIGV4Y2VwdGlvbiBhbmQgdmFsaWRhdGlvbi1mYWlsdXJlIGpvdXJuYWwgZW50cmllcyBhcmUgTk9UIHJlbW92ZWQg4oCUIHRoaXMgaXMgSU5URU5USU9OQUwgYmVjYXVzZSB0aGV5IGxvZyBkaWZmZXJlbnQgc2VtYW50aWNzIChlcnJvciBkZXRhaWwgdnMuIHN0cnVjdHVyZWQgb3V0Y29tZSkuIENvbmZpcm0gdGhlIGRpc3RpbmN0aW9uIGlzIHVuZGVyc3Rvb2Q6IGV4Y2VwdGlvbiBwYXRoIGtlZXBzIGBfam91cm5hbD8uTG9nKGV4RW50cnkpYCBiZWNhdXNlIExvZ091dGNvbWUgb25seSBmaXJlcyBmb3IgY29tcGxldGVkIGNhbGxzLCBub3QgdGhyb3duIGV4Y2VwdGlvbnMuIOKckwoKKipELTQgKG5vbi1ibG9ja2luZyk6KiogYEdvYWxSZXF1ZXN0LlBhcmFtZXRlcnNgIGFzIGBJUmVhZE9ubHlEaWN0aW9uYXJ5PHN0cmluZywgb2JqZWN0Pz4/YCB1c2VzIHRoZSBzYW1lIHBhdHRlcm4gYXMgZXhpc3RpbmcgY29kZSBidXQgYG9iamVjdD9gIGlzIHdlYWtseSB0eXBlZC4gRnV0dXJlIGNvbnNpZGVyYXRpb246IHR5cGVkIHBhcmFtZXRlciByZWNvcmRzLgoKLS0tCgojIyMgNi4gU3ludGhlc2l6ZXIgKGNvbmZpZGVuY2U6IDAuOTApCgoqKlZlcmRpY3Q6IEFQUFJPVkUg4oCUIFNQUklOVCAzNyBSRUFEWSoqCgpBdmVyYWdlIGNvbmZpZGVuY2UgYWNyb3NzIDYgc2VhdHM6ICoqMC44OCoqIChhYm92ZSAwLjg1IHRocmVzaG9sZCkuICAKKiowIGJsb2NraW5nIGZpbmRpbmdzLioqICAKKio0IGRlZmVycmVkIGZpbmRpbmdzIChELTEgdGhyb3VnaCBELTQpKiog4oCUIGFsbCBjb25maXJtZWQgbm9uLWJsb2NraW5nLgoKVGhlIHNwcmludCBkZWxpdmVyczoKMS4gQWN0aW9uT3V0Y29tZSA6IElPYnNlcnZhdGlvblN1bW1hcnkg4oCUIGNsb3NlcyBQMC1BLCBlbmFibGVzIExMTSBvYnNlcnZhdGlvbiBwaXBlbGluZQoyLiBDYWxsV2l0aE91dGNvbWVBc3luYyBvbiBJVG9vbENhbGxlciArIERpc3BhdGNoQWN0aW9uc0FzeW5jIHdpcmluZyDigJQgY2xvc2VzIFAwLUIsIGVsaW1pbmF0ZXMgZG91YmxlLWpvdXJuYWwKMy4gSW50ZW50TWFuYWdlciDigJQgY2xvc2VzIFAxLUEsIGZpcnN0IFBSSU5DSVBMRS0xIGNvbXBsaWFudCBpbnRlbnQgcm91dGluZwo0LiBQYXJzZURlY2lzaW9uIGRlbGVnYXRpb24g4oCUIGNsb3NlcyBQMS1CLCBiYWNrd2FyZHMtY29tcGF0aWJsZSBtaWdyYXRpb24KNS4gSW50ZW50QXNzZXNzbWVudCDigJQgY2xvc2VzIFAxLUMsIHJpc2sgYXNzZXNzbWVudCBzY2FmZm9sZGluZyBmb3IgU3ByaW50IDM4CjYuIDEwIG5ldyB0ZXN0cwoKKipTcHJpbnQgMzggcHJpb3JpdGllcyAoZnJvbSBkZWZlcnJlZCBmaW5kaW5ncyk6KioKLSBJR29hbC5JZCBwcm9wZXJ0eSAoRC1nb2FsSWQpCi0gUmVtb3ZlIFRyeVBhcnNlVHJ1bmNhdGVkSnNvbiBsZWdhY3kgc3dpdGNoIChELTMgZm9sbG93LXVwKQotIFJlbW92ZSBQYXJzZURlY2lzaW9uIGxlZ2FjeSBwYXRoIChELTIgZm9sbG93LXVwKQotIFdpcmUgSW50ZW50TWFuYWdlciBpbnRvIFByb2dyYW0uY3MgREkKCi0tLQoKIyMgQWNjZXB0YW5jZSBDcml0ZXJpYQoKQWxsIGl0ZW1zIG11c3QgYmUgdmVyaWZpZWQgYmVmb3JlIG1hcmtpbmcgU3ByaW50IDM3IGNvbXBsZXRlOgoKLSBbIF0gQnVpbGQgcGFzc2VzIGxvY2FsbHkgKGBkb3RuZXQgYnVpbGRgIG9uIHNwcmludC0zNS1sbG0tZmlyc3QpCi0gWyBdIGBkb3RuZXQgdGVzdGAg4oCUIDEwIG5ldyBTcHJpbnQzN1Rlc3RzIGFsbCBwYXNzLCBubyByZWdyZXNzaW9ucwotIFsgXSBgQWN0aW9uT3V0Y29tZWAgaW1wbGVtZW50cyBgSU9ic2VydmF0aW9uU3VtbWFyeWAg4oCUIGBpc2AgY2hlY2sgcGFzc2VzCi0gWyBdIGBJVG9vbENhbGxlci5DYWxsV2l0aE91dGNvbWVBc3luY2Ag4oCUIGRlZmF1bHQgaW1wbGVtZW50YXRpb24gY29tcGlsZXMgb24gc3R1YiBpbXBsZW1lbnRvcgotIFsgXSBgSW50ZW50TWFuYWdlci5CdWlsZEdvYWxSZXF1ZXN0KCJnYXRoZXIiLCBpdGVtPSJvYWtfbG9nIilgIHJldHVybnMgYEdhdGhlckl0ZW06b2FrX2xvZ2AKLSBbIF0gYEludGVudE1hbmFnZXIuQnVpbGRHb2FsUmVxdWVzdCgiY29udmVyc2F0aW9uIilgIHJldHVybnMgbnVsbAotIFsgXSBgRGlzcGF0Y2hBY3Rpb25zQXN5bmNgIG5vIGxvbmdlciBjb250YWlucyBkdXBsaWNhdGUgQWN0aW9uQ29tcGxldGVkL0FjdGlvbkZhaWxlZCBqb3VybmFsIGVudHJpZXMKLSBbIF0gYFRvb2xEaXNwYXRjaGVyLkNhbGxBc3luY2Agbm8gbG9uZ2VyIGVtaXRzIGl0cyBvd24gc3VjY2Vzcy9mYWlsdXJlIGpvdXJuYWwgZW50cnkKLSBbIF0gVmVyc2lvbjogYC9hcGkvYWJvdXRgIHJlcG9ydHMgdjAuMzcuMAotIFsgXSBDSSBncmVlbiBvbiBzcHJpbnQtMzUtbGxtLWZpcnN0Cg==
+# Sprint 37 Council Review — 2026-06-22
+
+**Branch:** sprint-35-llm-first | **Version target:** v0.37.0  
+**Council seats:** Source-Grounded Archivist, Data Model Architect, Retrieval Specialist,
+Human Learning Advocate, Skeptical Reviewer, Synthesizer
+
+---
+
+## Changes Under Review
+
+**P0-A** ActionOutcome implements IObservationSummary (one-liner)  
+**P0-B** Wire DispatchActionsAsync → CallWithOutcomeAsync; add IToolCaller.CallWithOutcomeAsync default; remove redundant journal entry from ToolDispatcher.CallAsync  
+**P1-A** IntentManager class: extracted intent→goal mapping from ParseDecision  
+**P1-B** LlmChatInterpreter.ParseDecision delegates to IntentManager when injected  
+**P1-C** IntentAssessment record: { IntentDraft, RiskLevel, RequiresConfirmation, ReasoningSummary }  
+**Tests** Sprint37Tests.cs — 10 new tests
+
+---
+
+## Seat Reviews
+
+### 1. Source-Grounded Archivist (confidence: 0.92)
+
+**Verdict: APPROVE**
+
+All claims verified against source:
+
+- `ActionOutcome : IObservationSummary` — one-liner, correct. `IObservationSummary.Summary => ObservationSummary` is explicit interface implementation, won't pollute the record's public surface. ✓
+- `IToolCaller.CallWithOutcomeAsync` default method — uses `async Task<(...)>` which is valid C# 8+ default interface method syntax. All existing implementors automatically inherit the default. ✓
+- ToolDispatcher.CallAsync: removing the final `_journal?.Log(entry)` (ActionCompleted/ActionFailed) is safe. Error entries (validation failure, exception, unknown tool) are untouched. ✓
+- DispatchActionsAsync: replacing `toolCaller.CallAsync` with `toolCaller.CallWithOutcomeAsync(Guid.Empty, ...)` + `_journal?.LogOutcome(outcome)` eliminates the two manual journal entries (ActionCompleted from success path, ActionFailed from failure path). Timeout/exception journal entries are preserved since they occur outside CallAsync. ✓
+- IntentManager: switch statement matches exactly what was in ParseDecision. GoalRequest record is new and clean. ✓
+- IntentAssessment: record fields match Sprint 36 locked architecture. ✓
+
+**Concern (deferred):** `Guid.Empty` as goalId is a placeholder. Tracked: IGoal.Id property needed in Sprint 38.
+
+---
+
+### 2. Data Model Architect (confidence: 0.90)
+
+**Verdict: APPROVE**
+
+P0-A is correct. The explicit interface implementation `string IObservationSummary.Summary => ObservationSummary;` is the right pattern when the property name differs (ObservationSummary ≠ Summary). This avoids polluting `ActionOutcome`'s public API with a second `Summary` property.
+
+P0-B IToolCaller interface change is non-breaking. The default method pattern means:
+- Existing test doubles (StubToolCaller, MockWorldAdapter) compile unchanged.
+- ToolDispatcher.CallWithOutcomeAsync already matches the interface signature exactly → implicit implementation. No `override` keyword needed for records/classes with matching signatures.
+
+P1-A: GoalRequest is a proper value object. Parameters as `IReadOnlyDictionary<string, object?>?` is consistent with existing GoalFactory / ChatInterpretation patterns. ✓
+
+P1-C: IntentAssessment uses `sealed record` — correct for an immutable value object. RiskLevel enum is simple and sufficient for Sprint 37. ✓
+
+**Deferred finding D-1:** GoalRequest could eventually replace `(string GoalName, IReadOnlyDictionary<string, object?>?)` used in ChatInterpretation — considered out of scope for Sprint 37.
+
+---
+
+### 3. Retrieval Specialist (confidence: 0.88)
+
+**Verdict: APPROVE**
+
+LlmChatInterpreter change is well-structured. The two-path approach (IntentManager when injected, legacy local switch when not) gives a clean migration path without breaking existing tests.
+
+Confirmed: LlmChatInterpreterTests.cs does not inject IntentManager (it tests ChatInterpreter and LlmChatInterpreter without this parameter) → all existing tests exercise the legacy path → no regression.
+
+Sprint37Tests.cs verifies the new path directly by injecting an IntentManager instance.
+
+**Concern (non-blocking):** TryParseTruncatedJson still has the inline switch. This is explicitly documented as "Sprint 38 target" in the code. Acceptable for Sprint 37.
+
+---
+
+### 4. Human Learning Advocate (confidence: 0.87)
+
+**Verdict: APPROVE**
+
+PRINCIPLE-1 enforcement is significant. The key insight the code communicates well:
+- ParseDecision no longer "knows" what a goal is — it asks IntentManager
+- The legacy path is clearly labeled and has a target removal sprint
+- IntentAssessment provides the semantic scaffolding for future confirmation gates
+
+One readability improvement (deferred, not blocking): `Guid.Empty` as goalId in DispatchActionsAsync is not self-documenting. The comment `// Sprint 37: goalId placeholder until IGoal.Id is defined` is sufficient for now.
+
+---
+
+### 5. Skeptical Reviewer (confidence: 0.83)
+
+**Verdict: APPROVE with deferred findings**
+
+**D-2 (deferred):** The IToolCaller default method could fail silently if an implementor doesn't override it and CallAsync returns a non-standard ToolResult (null Message). The default uses `result.Message ?? "Success"` / `result.Message ?? "Failed"` — acceptable fallback.
+
+**D-3 (deferred):** The sprint notes say "Remove redundant journal entries from CallAsync per-tool path." Strictly, this means removing the SUCCESS/FAILURE entry. But CallAsync's exception and validation-failure journal entries are NOT removed — this is INTENTIONAL because they log different semantics (error detail vs. structured outcome). Confirm the distinction is understood: exception path keeps `_journal?.Log(exEntry)` because LogOutcome only fires for completed calls, not thrown exceptions. ✓
+
+**D-4 (non-blocking):** `GoalRequest.Parameters` as `IReadOnlyDictionary<string, object?>?` uses the same pattern as existing code but `object?` is weakly typed. Future consideration: typed parameter records.
+
+---
+
+### 6. Synthesizer (confidence: 0.90)
+
+**Verdict: APPROVE — SPRINT 37 READY**
+
+Average confidence across 6 seats: **0.88** (above 0.85 threshold).  
+**0 blocking findings.**  
+**4 deferred findings (D-1 through D-4)** — all confirmed non-blocking.
+
+The sprint delivers:
+1. ActionOutcome : IObservationSummary — closes P0-A, enables LLM observation pipeline
+2. CallWithOutcomeAsync on IToolCaller + DispatchActionsAsync wiring — closes P0-B, eliminates double-journal
+3. IntentManager — closes P1-A, first PRINCIPLE-1 compliant intent routing
+4. ParseDecision delegation — closes P1-B, backwards-compatible migration
+5. IntentAssessment — closes P1-C, risk assessment scaffolding for Sprint 38
+6. 10 new tests
+
+**Sprint 38 priorities (from deferred findings):**
+- IGoal.Id property (D-goalId)
+- Remove TryParseTruncatedJson legacy switch (D-3 follow-up)
+- Remove ParseDecision legacy path (D-2 follow-up)
+- Wire IntentManager into Program.cs DI
+
+---
+
+## Acceptance Criteria
+
+All items must be verified before marking Sprint 37 complete:
+
+- [ ] Build passes locally (`dotnet build` on sprint-35-llm-first)
+- [ ] `dotnet test` — 10 new Sprint37Tests all pass, no regressions
+- [ ] `ActionOutcome` implements `IObservationSummary` — `is` check passes
+- [ ] `IToolCaller.CallWithOutcomeAsync` — default implementation compiles on stub implementor
+- [ ] `IntentManager.BuildGoalRequest("gather", item="oak_log")` returns `GatherItem:oak_log`
+- [ ] `IntentManager.BuildGoalRequest("conversation")` returns null
+- [ ] `DispatchActionsAsync` no longer contains duplicate ActionCompleted/ActionFailed journal entries
+- [ ] `ToolDispatcher.CallAsync` no longer emits its own success/failure journal entry
+- [ ] Version: `/api/about` reports v0.37.0
+- [ ] CI green on sprint-35-llm-first

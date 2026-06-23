@@ -202,18 +202,17 @@ public class WorldStateProjectorTests
     // from ItemCollectedEvent (Mineflayer playerCollect). GetStatus reconciles drift.
 
     [Test]
-    public void Apply_BlockMined_DoesNotUpdateInventory()
+    public void Apply_BlockMined_UpdatesInventoryForSelfDroppingBlocks()
     {
-        // Sprint 35 P0-A: BlockMinedEvent must NOT update inventory.
-        // diamond_ore → "diamond" mismatch (BUG-1) was the motivation.
-        // ItemCollectedEvent is now the sole inventory authority.
+        // Sprint 40 P0-B: BlockMinedEvent now updates inventory for self-dropping blocks.
+        // The Sprint 35 change (no inventory updates) caused items to be lost when
+        // ItemCollectedEvent (playerCollect) never fired (e.g. drop fell through a hole).
+        // Self-dropping blocks like oak_log, dirt, cobblestone now increment inventory.
         var ev = new BlockMinedEvent("oak_log", 5, new Position(0, 64, 0), Now);
         var result = _projector.Apply(EmptyState, ev);
 
-        Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(0),
-            "Sprint 35: BlockMinedEvent must NOT add to inventory — ItemCollectedEvent is the authority");
-        Assert.That(result.Inventory, Is.Empty,
-            "No inventory changes from BlockMinedEvent");
+        Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(5),
+            "Sprint 40: Self-dropping block (oak_log) should update inventory");
     }
 
     [Test]
@@ -231,14 +230,15 @@ public class WorldStateProjectorTests
     }
 
     [Test]
-    public void Apply_BlockMined_NamespacedId_DoesNotUpdateInventory()
+    public void Apply_BlockMined_NamespacedId_UpdatesInventory()
     {
-        // Sprint 35 P0-A: namespaced ids also produce no inventory update
+        // Sprint 40 P0-B: Namespaced BlockMinedEvent now updates inventory.
+        // The namespace is stripped and the block drop lookup is applied.
         var ev = new BlockMinedEvent("minecraft:cobblestone", 64, new Position(0, 64, 0), Now);
         var result = _projector.Apply(EmptyState, ev);
 
-        Assert.That(result.Inventory, Is.Empty,
-            "Sprint 35: namespaced BlockMinedEvent must not update inventory");
+        Assert.That(result.Inventory.GetValueOrDefault("cobblestone"), Is.EqualTo(64),
+            "Sprint 40: Namespaced BlockMinedEvent should update inventory");
     }
 
     [Test]

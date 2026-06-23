@@ -19,8 +19,13 @@ public sealed class GenericGatherGoal(ItemSpec item, int targetCount) : IGoal, I
 
     public bool IsComplete(WorldState state)
     {
-        if (state.IsCreativeMode)
-            return true;
+        // Sprint 40 P0-B: Removed the creative-mode auto-complete shortcut.
+        // Previously: if (state.IsCreativeMode) return true;
+        // This caused the goal to instantly complete with 0 items in inventory,
+        // because creative mode was detected before any items were actually obtained.
+        // Now creative mode is handled by AgentBackgroundService which enqueues
+        // a /give command via the Chat tool to provision items.
+        // See AgentBackgroundService.SetGoal for the creative provisioning logic.
 
         if (state.IsInventoryStale)
             return false;

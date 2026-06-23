@@ -1,1 +1,60 @@
-bmFtZXNwYWNlIFdlYlVJLkJsYXpvci5NYW5hZ2VyczsKCnVzaW5nIEFnZW50LkNvcmU7CnVzaW5nIEFnZW50LkNvcmUuUnVudGltZTsKdXNpbmcgTWljcm9zb2Z0LkV4dGVuc2lvbnMuTG9nZ2luZzsKCi8vLyA8c3VtbWFyeT4KLy8vIFNwcmludCAzOSBQMjogQ29uY3JldGUgaW1wbGVtZW50YXRpb24gb2YgPHNlZSBjcmVmPSJJUGxhbm5pbmdNYW5hZ2VyIi8+LgovLy8KLy8vIFdyYXBzIDxzZWUgY3JlZj0iSVBsYW5uZXIiLz4gYW5kIDxzZWUgY3JlZj0iSVJlcGxhbkdvdmVybm9yIi8+IGluIGEgc2luZ2xlCi8vLyBpbmplY3RhYmxlIHBsYW5uaW5nIGNvbXBvbmVudC4gTWFpbnRhaW5zIGEgPGM+X3JlcGxhblJlcXVlc3RlZDwvYz4gZmxhZyBzbwovLy8gdGhlIGV4ZWN1dGlvbiBwaXBlbGluZSBjYW4gc2lnbmFsICJwbGVhc2UgcmVwbGFuIiB3aXRob3V0IGNvdXBsaW5nIHRvIHRoZSBwbGFubmVyLgovLy8KLy8vIFNwcmludCA0MCB0YXJnZXQ6IEFnZW50QmFja2dyb3VuZFNlcnZpY2UuRGlzcGF0Y2hBY3Rpb25zQXN5bmMgZGVsZWdhdGVzIFBsYW5Bc3luYwovLy8gYW5kIHN0YWxsLWRldGVjdGlvbiBoZXJlLCByZWR1Y2luZyBBQlMgdG8gYSB0aGluIGxvb3Agc2hlbGwuCi8vLyA8L3N1bW1hcnk+CnB1YmxpYyBzZWFsZWQgY2xhc3MgUGxhbm5pbmdNYW5hZ2VySW1wbCA6IElQbGFubmluZ01hbmFnZXIKewogICAgcHJpdmF0ZSByZWFkb25seSBJUGxhbm5lciAgICAgICAgIF9wbGFubmVyOwogICAgcHJpdmF0ZSByZWFkb25seSBJUmVwbGFuR292ZXJub3I/IF9yZXBsYW5Hb3Zlcm5vcjsKICAgIHByaXZhdGUgcmVhZG9ubHkgSUxvZ2dlcjxQbGFubmluZ01hbmFnZXJJbXBsPiBfbG9nZ2VyOwoKICAgIHByaXZhdGUgdm9sYXRpbGUgYm9vbCBfcmVwbGFuUmVxdWVzdGVkOwoKICAgIHB1YmxpYyBQbGFubmluZ01hbmFnZXJJbXBsKAogICAgICAgIElQbGFubmVyIHBsYW5uZXIsCiAgICAgICAgSVJlcGxhbkdvdmVybm9yPyByZXBsYW5Hb3Zlcm5vciwKICAgICAgICBJTG9nZ2VyPFBsYW5uaW5nTWFuYWdlckltcGw+IGxvZ2dlcikKICAgIHsKICAgICAgICBfcGxhbm5lciAgICAgICAgPSBwbGFubmVyOwogICAgICAgIF9yZXBsYW5Hb3Zlcm5vciA9IHJlcGxhbkdvdmVybm9yOwogICAgICAgIF9sb2dnZXIgICAgICAgICA9IGxvZ2dlcjsKICAgIH0KCiAgICAvLy8gPGluaGVyaXRkb2MvPgogICAgcHVibGljIGFzeW5jIFRhc2s8QWN0aW9uUGxhbj4gUGxhbkFzeW5jKAogICAgICAgIElHb2FsIGdvYWwsCiAgICAgICAgV29ybGRTdGF0ZSBzdGF0ZSwKICAgICAgICBDYW5jZWxsYXRpb25Ub2tlbiBjdCA9IGRlZmF1bHQpCiAgICB7CiAgICAgICAgX3JlcGxhblJlcXVlc3RlZCA9IGZhbHNlOyAvLyBjbGVhciBmbGFnIGF0IGVhY2ggcGxhbiBib3VuZGFyeQogICAgICAgIF9sb2dnZXIuTG9nRGVidWcoIltwbGFubmluZ10gUGxhbkFzeW5jIGZvciBnb2FsIHtHb2FsfSIsIGdvYWwuTmFtZSk7CiAgICAgICAgcmV0dXJuIGF3YWl0IF9wbGFubmVyLlBsYW5Bc3luYyhnb2FsLCBzdGF0ZSwgY3QpOwogICAgfQoKICAgIC8vLyA8aW5oZXJpdGRvYy8+CiAgICBwdWJsaWMgdm9pZCBSZXF1ZXN0UmVwbGFuKCkKICAgIHsKICAgICAgICBfcmVwbGFuUmVxdWVzdGVkID0gdHJ1ZTsKICAgICAgICBfbG9nZ2VyLkxvZ0RlYnVnKCJbcGxhbm5pbmddIHJlcGxhbiByZXF1ZXN0ZWQgdmlhIFJlcXVlc3RSZXBsYW4oKSIpOwogICAgfQoKICAgIC8vLyA8c3VtbWFyeT4KICAgIC8vLyBUcnVlIGlmIDxzZWUgY3JlZj0iUmVxdWVzdFJlcGxhbiIvPiBoYXMgYmVlbiBjYWxsZWQgc2luY2UgdGhlIGxhc3QgPHNlZSBjcmVmPSJQbGFuQXN5bmMiLz4uCiAgICAvLy8gUmVhZCBieSB0aGUgZXhlY3V0aW9uIHBpcGVsaW5lIHRvIGJyZWFrIHRoZSBhY3Rpb24gZGlzcGF0Y2ggbG9vcC4KICAgIC8vLyA8L3N1bW1hcnk+CiAgICBwdWJsaWMgYm9vbCBJc1JlcGxhblJlcXVlc3RlZCA9PiBfcmVwbGFuUmVxdWVzdGVkOwp9Cg==
+namespace WebUI.Blazor.Managers;
+
+using Agent.Core;
+using Agent.Core.Runtime;
+using Agent.Planning;
+using Microsoft.Extensions.Logging;
+
+/// <summary>
+/// Sprint 39 P2: Concrete implementation of <see cref="IPlanningManager"/>.
+///
+/// Wraps <see cref="IPlanner"/> and <see cref="IReplanGovernor"/> in a single
+/// injectable planning component. Maintains a <c>_replanRequested</c> flag so
+/// the execution pipeline can signal "please replan" without coupling to the planner.
+///
+/// Sprint 40 target: AgentBackgroundService.DispatchActionsAsync delegates PlanAsync
+/// and stall-detection here, reducing ABS to a thin loop shell.
+/// </summary>
+public sealed class PlanningManagerImpl : IPlanningManager
+{
+    private readonly IPlanner         _planner;
+    private readonly IReplanGovernor? _replanGovernor;
+    private readonly ILogger<PlanningManagerImpl> _logger;
+
+    private volatile bool _replanRequested;
+
+    public PlanningManagerImpl(
+        IPlanner planner,
+        IReplanGovernor? replanGovernor,
+        ILogger<PlanningManagerImpl> logger)
+    {
+        _planner        = planner;
+        _replanGovernor = replanGovernor;
+        _logger         = logger;
+    }
+
+    /// <inheritdoc/>
+    public async Task<ActionPlan> PlanAsync(
+        IGoal goal,
+        WorldState state,
+        CancellationToken ct = default)
+    {
+        _replanRequested = false; // clear flag at each plan boundary
+        _logger.LogDebug("[planning] PlanAsync for goal {Goal}", goal.Name);
+        var plan = await _planner.PlanAsync(goal, state, ct);
+        return (ActionPlan)plan;
+    }
+
+    /// <inheritdoc/>
+    public void RequestReplan()
+    {
+        _replanRequested = true;
+        _logger.LogDebug("[planning] replan requested via RequestReplan()");
+    }
+
+    /// <summary>
+    /// True if <see cref="RequestReplan"/> has been called since the last <see cref="PlanAsync"/>.
+    /// Read by the execution pipeline to break the action dispatch loop.
+    /// </summary>
+    public bool IsReplanRequested => _replanRequested;
+}

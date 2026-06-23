@@ -116,4 +116,21 @@ public sealed class ReplanGovernor : IReplanGovernor
             _stalledAt = DateTimeOffset.MinValue;
         }
     }
+
+    /// <inheritdoc/>
+    public bool TryAutoRecover()
+    {
+        lock (_lock)
+        {
+            if (!_isStalled) return false;
+            if ((DateTimeOffset.UtcNow - _stalledAt) >= _recoveryTimeout)
+            {
+                _isStalled = false;
+                _identicalPlanCount = 1; // start at 1 so first retry doesn't immediately re-stall
+                _lastFingerprint = null; // clear fingerprint so Evaluate starts fresh
+                return true;
+            }
+            return false;
+        }
+    }
 }

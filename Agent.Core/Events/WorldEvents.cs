@@ -162,6 +162,20 @@ public sealed record KickedEvent(string Reason, DateTimeOffset Timestamp)
     : WorldEvent(Timestamp);
 
 /// <summary>
+/// Sprint 40 P0-B: Emitted when Mineflayer's <c>findReachableBlock</c> action finds
+/// a block that the bot can pathfind to. Contains position and distance metrics so
+/// the planner can make informed decisions about which block to target.
+/// </summary>
+public sealed record ReachableBlockFoundEvent(
+    string Block,
+    int X,
+    int Y,
+    int Z,
+    double EuclideanDistance,
+    int PathDistance,
+    DateTimeOffset Timestamp) : WorldEvent(Timestamp);
+
+/// <summary>
 /// Result of a findFlatArea tool dispatch. Contains the best candidate's center
 /// coordinates, total flat area in blocks, and bounding box extents.
 /// <c>Area</c> is 0 when no suitable flat region was found.

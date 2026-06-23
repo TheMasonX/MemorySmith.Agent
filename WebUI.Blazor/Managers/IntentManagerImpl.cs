@@ -1,1 +1,74 @@
-bmFtZXNwYWNlIFdlYlVJLkJsYXpvci5NYW5hZ2VyczsKCnVzaW5nIEFnZW50LkNvcmU7CnVzaW5nIEFnZW50LkNvcmUuUnVudGltZTsKdXNpbmcgQWdlbnQuUGxhbm5pbmc7CnVzaW5nIE1pY3Jvc29mdC5FeHRlbnNpb25zLkxvZ2dpbmc7CgovLy8gPHN1bW1hcnk+Ci8vLyBTcHJpbnQgMzkgUDI6IENvbmNyZXRlIGltcGxlbWVudGF0aW9uIG9mIDxzZWUgY3JlZj0iSUludGVudE1hbmFnZXIiLz4uCi8vLwovLy8gQnJpZGdlcyB0aGUgZ2VuZXJhbC1wdXJwb3NlIDxzZWUgY3JlZj0iSUNoYXRJbnRlcnByZXRlciIvPiB3aXRoIHRoZSB0eXBlZAovLy8gPHNlZSBjcmVmPSJJbnRlbnRNYW5hZ2VyIi8+IGdvYWwtcmVxdWVzdCBidWlsZGVyLiBUaGlzIGlzIHN0ZXAgMSBvZiB0aGUKLy8vIGRlY29tcG9zZWQgQWdlbnRSdW50aW1lIHBpcGVsaW5lOgovLy8gICBQcm9jZXNzQ2hhdEFzeW5jIOKGkiBJbnRlbnREcmFmdCDihpIgUGxhbm5pbmdNYW5hZ2VyIOKGkiBFeGVjdXRpb25NYW5hZ2VyCi8vLwovLy8gTm90ZSBvbiBwYXJhbWV0ZXIgbWlzbWF0Y2g6IDxzZWUgY3JlZj0iSUludGVudE1hbmFnZXIuUHJvY2Vzc0NoYXRBc3luYyIvPiBleHBvc2VzCi8vLyBhIHNsaW0gKHVzZXJuYW1lLCBtZXNzYWdlLCBzdGF0ZSkgc2lnbmF0dXJlLCB3aGlsZSA8c2VlIGNyZWY9IklDaGF0SW50ZXJwcmV0ZXIuSW50ZXJwcmV0QXN5bmMiLz4KLy8vIG5lZWRzIGJvdE5hbWUsIG9ubGluZVBsYXllcnMsIGFuZCBwbGF5ZXJQb3NpdGlvbi4gVGhpcyBjbGFzcyBicmlkZ2VzIHRoYXQgZ2FwOgovLy8gICBib3ROYW1lICAgICAgICAgIOKAlCBzdG9yZWQgZnJvbSBESSBjb25maWd1cmF0aW9uIChNaW5lY3JhZnRBZGFwdGVyQ29uZmlnLkJvdFVzZXJuYW1lKQovLy8gICBvbmxpbmVQbGF5ZXJzICAgIOKAlCBkZWZhdWx0ZWQgdG8gMSAoU3ByaW50IDQwOiB3aXJlIGxpdmUgY291bnRlciBmcm9tIElXb3JsZEFkYXB0ZXIpCi8vLyAgIHBsYXllclBvc2l0aW9uICAg4oCUIG51bGwgKGRpc3RhbmNlLWdhdGUgZGVncmFkZXMgZ3JhY2VmdWxseSB0byBuYW1lLWJhc2VkIGFkZHJlc3NpbmcpCi8vLwovLy8gU3ByaW50IDQwIHRhcmdldDogQWdlbnRCYWNrZ3JvdW5kU2VydmljZS5IYW5kbGVDaGF0RXZlbnRBc3luYyBkZWxlZ2F0ZXMgaGVyZS4KLy8vIDwvc3VtbWFyeT4KcHVibGljIHNlYWxlZCBjbGFzcyBJbnRlbnRNYW5hZ2VySW1wbCA6IElJbnRlbnRNYW5hZ2VyCnsKICAgIHByaXZhdGUgcmVhZG9ubHkgSUNoYXRJbnRlcnByZXRlciBfY2hhdEludGVycHJldGVyOwogICAgcHJpdmF0ZSByZWFkb25seSBJbnRlbnRNYW5hZ2VyICAgIF9nb2FsTWFwcGVyOwogICAgcHJpdmF0ZSByZWFkb25seSBzdHJpbmcgICAgICAgICAgIF9ib3ROYW1lOwogICAgcHJpdmF0ZSByZWFkb25seSBJTG9nZ2VyPEludGVudE1hbmFnZXJJbXBsPiBfbG9nZ2VyOwoKICAgIC8vLyBEZWZhdWx0IHBsYXllciBjb3VudCB3aGVuIGV4YWN0IGxpdmUgY291bnQgaXMgdW5hdmFpbGFibGUuCiAgICAvLy8gU3ByaW50IDQwOiByZXBsYWNlIHdpdGggSVdvcmxkQWRhcHRlci5PbmxpbmVQbGF5ZXJDb3VudC4KICAgIHByaXZhdGUgY29uc3QgaW50IERlZmF1bHRPbmxpbmVQbGF5ZXJzID0gMTsKCiAgICBwdWJsaWMgSW50ZW50TWFuYWdlckltcGwoCiAgICAgICAgSUNoYXRJbnRlcnByZXRlciBjaGF0SW50ZXJwcmV0ZXIsCiAgICAgICAgSW50ZW50TWFuYWdlciAgICBnb2FsTWFwcGVyLAogICAgICAgIHN0cmluZyAgICAgICAgICAgYm90TmFtZSwKICAgICAgICBJTG9nZ2VyPEludGVudE1hbmFnZXJJbXBsPiBsb2dnZXIpCiAgICB7CiAgICAgICAgX2NoYXRJbnRlcnByZXRlciA9IGNoYXRJbnRlcnByZXRlcjsKICAgICAgICBfZ29hbE1hcHBlciAgICAgID0gZ29hbE1hcHBlcjsKICAgICAgICBfYm90TmFtZSAgICAgICAgID0gYm90TmFtZTsKICAgICAgICBfbG9nZ2VyICAgICAgICAgID0gbG9nZ2VyOwogICAgfQoKICAgIC8vLyA8aW5oZXJpdGRvYy8+CiAgICBwdWJsaWMgVGFzazxJbnRlbnREcmFmdD8+IFByb2Nlc3NDaGF0QXN5bmMoCiAgICAgICAgc3RyaW5nIHVzZXJuYW1lLAogICAgICAgIHN0cmluZyBtZXNzYWdlLAogICAgICAgIFdvcmxkU3RhdGUgc3RhdGUsCiAgICAgICAgQ2FuY2VsbGF0aW9uVG9rZW4gY3QgPSBkZWZhdWx0KQogICAgewogICAgICAgIF9sb2dnZXIuTG9nRGVidWcoIltpbnRlbnRdIFByb2Nlc3NDaGF0QXN5bmMgdXNlcj17VXNlcn0gYm90PXtCb3R9IiwgdXNlcm5hbWUsIF9ib3ROYW1lKTsKCiAgICAgICAgcmV0dXJuIF9jaGF0SW50ZXJwcmV0ZXIuSW50ZXJwcmV0QXN5bmMoCiAgICAgICAgICAgIHVzZXJuYW1lLAogICAgICAgICAgICBtZXNzYWdlLAogICAgICAgICAgICBfYm90TmFtZSwKICAgICAgICAgICAgRGVmYXVsdE9ubGluZVBsYXllcnMsCiAgICAgICAgICAgIHN0YXRlLlBvc2l0aW9uLAogICAgICAgICAgICBwbGF5ZXJQb3NpdGlvbjogbnVsbCwKICAgICAgICAgICAgc3RhdGUsCiAgICAgICAgICAgIGN0KTsKICAgIH0KCiAgICAvLy8gPHN1bW1hcnk+CiAgICAvLy8gTWFwcyBhbiA8c2VlIGNyZWY9IkludGVudERyYWZ0Ii8+IHRvIGEgdHlwZWQgPHNlZSBjcmVmPSJHb2FsUmVxdWVzdCIvPiBmb3IgdGhlIHBsYW5uZXIsCiAgICAvLy8gb3IgbnVsbCBmb3IgaW50ZW50cyB0aGF0IHByb2R1Y2Ugbm8gZ29hbCAoY2FuY2VsLCBzdGF0dXMsIGhlbHAsIGV0Yy4pLgogICAgLy8vIDwvc3VtbWFyeT4KICAgIHB1YmxpYyBHb2FsUmVxdWVzdD8gTWFwVG9Hb2FsUmVxdWVzdChJbnRlbnREcmFmdCBkcmFmdCkgPT4KICAgICAgICBfZ29hbE1hcHBlci5CdWlsZEdvYWxSZXF1ZXN0KGRyYWZ0KTsKfQo=
+namespace WebUI.Blazor.Managers;
+
+using Agent.Core;
+using Agent.Core.Runtime;
+using Agent.Planning;
+using Microsoft.Extensions.Logging;
+
+/// <summary>
+/// Sprint 39 P2: Concrete implementation of <see cref="IIntentManager"/>.
+///
+/// Bridges the general-purpose <see cref="IChatInterpreter"/> with the typed
+/// <see cref="IntentManager"/> goal-request builder. This is step 1 of the
+/// decomposed AgentRuntime pipeline:
+///   ProcessChatAsync → IntentDraft → PlanningManager → ExecutionManager
+///
+/// Note on parameter mismatch: <see cref="IIntentManager.ProcessChatAsync"/> exposes
+/// a slim (username, message, state) signature, while <see cref="IChatInterpreter.InterpretAsync"/>
+/// needs botName, onlinePlayers, and playerPosition. This class bridges that gap:
+///   botName          — stored from DI configuration (MinecraftAdapterConfig.BotUsername)
+///   onlinePlayers    — defaulted to 1 (Sprint 40: wire live counter from IWorldAdapter)
+///   playerPosition   — null (distance-gate degrades gracefully to name-based addressing)
+///
+/// Sprint 40 target: AgentBackgroundService.HandleChatEventAsync delegates here.
+/// </summary>
+public sealed class IntentManagerImpl : IIntentManager
+{
+    private readonly IChatInterpreter _chatInterpreter;
+    private readonly IntentManager    _goalMapper;
+    private readonly string           _botName;
+    private readonly ILogger<IntentManagerImpl> _logger;
+
+    /// Default player count when exact live count is unavailable.
+    /// Sprint 40: replace with IWorldAdapter.OnlinePlayerCount.
+    private const int DefaultOnlinePlayers = 1;
+
+    public IntentManagerImpl(
+        IChatInterpreter chatInterpreter,
+        IntentManager    goalMapper,
+        string           botName,
+        ILogger<IntentManagerImpl> logger)
+    {
+        _chatInterpreter = chatInterpreter;
+        _goalMapper      = goalMapper;
+        _botName         = botName;
+        _logger          = logger;
+    }
+
+    /// <inheritdoc/>
+    public Task<IntentDraft?> ProcessChatAsync(
+        string username,
+        string message,
+        WorldState state,
+        CancellationToken ct = default)
+    {
+        _logger.LogDebug("[intent] ProcessChatAsync user={User} bot={Bot}", username, _botName);
+
+        return _chatInterpreter.InterpretAsync(
+            username,
+            message,
+            _botName,
+            DefaultOnlinePlayers,
+            state.Position,
+            playerPosition: null,
+            state,
+            ct);
+    }
+
+    /// <summary>
+    /// Maps an <see cref="IntentDraft"/> to a typed <see cref="GoalRequest"/> for the planner,
+    /// or null for intents that produce no goal (cancel, status, help, etc.).
+    /// </summary>
+    public GoalRequest? MapToGoalRequest(IntentDraft draft) =>
+        _goalMapper.BuildGoalRequest(draft);
+}

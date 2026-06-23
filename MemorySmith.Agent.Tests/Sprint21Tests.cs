@@ -418,6 +418,7 @@ file sealed class AlwaysStalledGovernor : IReplanGovernor
     public ReplanVerdict Evaluate(string _) => ReplanVerdict.Stalled;
     public void RecordProgress() { }
     public void Reset() { }
+    public bool TryAutoRecover() => false;
 }
 
 /// <summary>Sprint 21: local no-op tool (avoids name conflict with AgentBackgroundServiceTests).</summary>
