@@ -212,21 +212,30 @@ public sealed class LlmChatInterpreter(
         }
 
         Rules:
-        "yes" when your name is used or only 1 player is online.
-        "maybe" when it could be a command but your name is not mentioned.
-        "no" when players are talking to each other, not you.
-        "conversation" when the player is just chatting (greetings, questions, small-talk).
-        "clarify" when intent is ambiguous — set clarificationQuestion, confidence < 0.6.
+        
+        ADDRESSING RULES — choose EXACTLY ONE:
+        - "yes" when your name is used or only 1 player is online.
+        - "maybe" when it could be a command but your name is not mentioned.
+        - "no" when players are talking to each other, not you.
+        - "conversation" when the player is just chatting (greetings, questions, small-talk).
+        - "clarify" when intent is ambiguous — set clarificationQuestion, confidence < 0.6.
+
+        INTENT RULES — choose EXACTLY ONE:
+        • "build"  — ONLY when the player says "build", "construct", "make a" + structure
+        • "gather" — ONLY when the player wants to COLLECT items ("get wood", "mine stone")
+        • "craft"  — ONLY when the player wants to craft an item ("make planks", "craft a pickaxe")
+        WRONG: setting intent="gather" for "build a house" — this will be REJECTED.
+        CORRECT: "build a house" → intent="build", blueprint="house"
+
         Use Minecraft item IDs without namespace prefix (oak_log, cobblestone, diamond).
         For inventory/what-do-you-have → intent "status", list inventory in response.
 
         BUILD COMMAND: When the user says "build <something>" (e.g. "build a house",
-        "build a tower"), you MUST provide a valid "blueprint" field with the
-        blueprint ID that matches what they want to build. Look at their exact words
-        to determine the blueprint ID. For example:
-          "build a house"      → "blueprint": "house"
-          "build a tower"      → "blueprint": "tower"
-          "build a bridge"     → "blueprint": "bridge"
+        "build a tower"), you MUST use intent "build" AND provide a valid "blueprint".
+        Look at their exact words to determine the blueprint ID. For example:
+          "build a house"      → "build", "blueprint": "house"
+          "build a tower"      → "build", "blueprint": "tower"
+          "build a bridge"     → "build", "blueprint": "bridge"
         The blueprint will be looked up in the blueprint repository. Do NOT simulate
         building in your response — the system handles actual construction. Set
         response to a short acknowledgement like "Starting to build a {blueprint}..."

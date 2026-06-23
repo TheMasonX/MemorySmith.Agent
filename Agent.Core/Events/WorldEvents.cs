@@ -133,8 +133,22 @@ public sealed record ChatEvent(
     Position? PlayerPos,
     DateTimeOffset Timestamp) : WorldEvent(Timestamp);
 
-public sealed record ErrorEvent(string Action, string Message, DateTimeOffset Timestamp)
-    : WorldEvent(Timestamp);
+/// <summary>
+/// Sprint 41: added optional position fields (X, Y, Z, Block, Item, Material) so
+/// the JS adapter can include the exact context of a failed action (e.g. which block
+/// position a PlaceBlock was targeting). Previously only Action and Message were sent,
+/// making it impossible to trace which specific operation failed.
+/// </summary>
+public sealed record ErrorEvent(
+    string Action,
+    string Message,
+    DateTimeOffset Timestamp,
+    int? X = null,
+    int? Y = null,
+    int? Z = null,
+    string? Block = null,
+    string? Material = null,
+    string? Item = null) : WorldEvent(Timestamp);
 
 /// <summary>
 /// Emitted when the bot cannot find a requested block within its search radius.

@@ -192,8 +192,19 @@ async function drainQueue() {
   while (cmdQueue.length > 0) {
     const msg = cmdQueue.shift();
     await dispatch(msg).catch(e => {
-      console.error(`[dispatch] ${msg.action} failed:`, e.message);
-      sendEvent('error', { action: msg.action, message: e.message });
+      // Sprint 41: include action args (position, block, etc.) in the error event
+      // so C# can log the exact context of the failure, not just the error message.
+      const errorData = { action: msg.action, message: e.message };
+      if (msg.arguments) {
+        if (msg.arguments.x != null) errorData.x = msg.arguments.x;
+        if (msg.arguments.y != null) errorData.y = msg.arguments.y;
+        if (msg.arguments.z != null) errorData.z = msg.arguments.z;
+        if (msg.arguments.block)   errorData.block = msg.arguments.block;
+        if (msg.arguments.material) errorData.material = msg.arguments.material;
+        if (msg.arguments.item)    errorData.item = msg.arguments.item;
+      }
+      console.error(`[dispatch] ${msg.action} failed at`, errorData);
+      sendEvent('error', errorData);
     });
   }
   dispatching = false;
@@ -805,6 +816,8 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       const { x, y, z, material } = args;
       if (x == null || !material) throw new Error('place requires x, y, z, material');
 
+      logStructured('info', 'place', 'start', { material, x, y, z, pos: botPos() });
+
       const movements = new Movements(bot);
       bot.pathfinder.setMovements(movements);
       await bot.pathfinder.goto(new pfGoals.GoalNear(x, y, z, 3));
@@ -814,35 +827,63 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       if (!item) throw new Error(`${material} not in inventory`);
       await bot.equip(item, 'hand');
 
-      const offsets = [
-        { dx: 0, dy: -1, dz: 0,  fx: 0,  fy: 1,  fz: 0  },
-        { dx: 0, dy: 1,  dz: 0,  fx: 0,  fy: -1, fz: 0  },
-        { dx: -1, dy: 0, dz: 0,  fx: 1,  fy: 0,  fz: 0  },
-        { dx: 1,  dy: 0, dz: 0,  fx: -1, fy: 0,  fz: 0  },
-        { dx: 0,  dy: 0, dz: -1, fx: 0,  fy: 0,  fz: 1  },
-        { dx: 0,  dy: 0, dz: 1,  fx: 0,  fy: 0,  fz: -1 },
+      // Sprint 41: use target-relative reference block detection.
+      // Check each of the 6 faces adjacent to the TARGET (not relative to bot position).
+      // The old code computed refPos from botPos + offset + (target - botPos), which was
+      // mathematically correct (simplifies to target + offset) but fragile when the bot's
+      // entity.position changed between goto() and the blockAt() calls.
+      const refFaces = [
+        { rx: 0, ry: -1, rz: 0,  fx: 0,  fy: 1,  fz: 0  },  // ground below target
+        { rx: 0, ry: 1,  rz: 0,  fx: 0,  fy: -1, fz: 0  },  // ceiling above target
+        { rx: -1, ry: 0, rz: 0,  fx: 1,  fy: 0,  fz: 0  },  // west
+        { rx: 1,  ry: 0, rz: 0,  fx: -1, fy: 0,  fz: 0  },  // east
+        { rx: 0,  ry: 0, rz: -1, fx: 0,  fy: 0,  fz: 1  },  // north
+        { rx: 0,  ry: 0, rz: 1,  fx: 0,  fy: 0,  fz: -1 },  // south
       ];
 
       let placed = false;
-      for (const { dx, dy, dz, fx, fy, fz } of offsets) {
-        const ref = bot.blockAt(bot.entity.position.offset(
-          dx + (x - Math.round(bot.entity.position.x)),
-          dy + (y - Math.round(bot.entity.position.y)),
-          dz + (z - Math.round(bot.entity.position.z))));
-        if (!ref || ref.type === 0) continue;
+      let lastRefError = '';
+      for (const { rx, ry, rz, fx, fy, fz } of refFaces) {
+        const refPos = toVec3(x + rx, y + ry, z + rz);
+        const ref = bot.blockAt(refPos);
+        if (!ref || ref.type === 0) {
+          logStructured('debug', 'place', 'ref face empty', {
+            target: { x, y, z }, refPos: { x: refPos.x, y: refPos.y, z: refPos.z },
+            face: { fx, fy, fz },
+          });
+          continue;
+        }
         try {
+          logStructured('debug', 'place', 'attempt ref face', {
+            target: { x, y, z },
+            refBlock: { name: ref.name, pos: { x: ref.position.x, y: ref.position.y, z: ref.position.z } },
+            face: { fx, fy, fz },
+            botPos: botPos(),
+          });
           // Sprint 41: use toVec3 for the face vector to match the Vec3 type
-          // contract. Mineflayer's generic_place.js currently only reads .x/.y/.z
-          // from faceVec (no method calls), so plain {x,y,z} works today — but a
-          // future version might call .floored() or .clone(), causing the same
-          // "point.minus is not a function" crash pattern we fixed in bot.dig().
+          // contract.
           await bot.placeBlock(ref, toVec3(fx, fy, fz));
           placed = true;
+          logStructured('info', 'place', 'success', {
+            material: shortMat, x, y, z, refBlock: ref.name,
+          });
           break;
-        } catch { /* try next face */ }
+        } catch (e) {
+          lastRefError = e.message;
+          logStructured('debug', 'place', 'ref face failed', {
+            target: { x, y, z },
+            refBlock: ref.name,
+            face: { fx, fy, fz },
+            error: e.message,
+          });
+        }
       }
 
-      if (!placed) throw new Error(`Cannot place ${material} at (${x},${y},${z}) — no solid reference block`);
+      if (!placed) {
+        throw new Error(
+          `Cannot place ${material} at (${x},${y},${z}) — no solid reference block` +
+          (lastRefError ? ` (last face error: ${lastRefError})` : ''));
+      }
       sendEvent('blockPlaced', { x, y, z, block: shortMat, correlationId });
       break;
     }

@@ -35,20 +35,30 @@ All tools available to the agent are registered in `ToolDispatcher` via `Registe
 |---|---|---|---|
 | `Chat` | `{message: string}` | `{sent: bool}` | Send a chat message in-game |
 
-## Tool Dispatch & Validation (Sprint 5)
+## Tool Dispatch & Validation (Sprint 5+)
 
 `ToolDispatcher.CallAsync` performs these steps before execution:
 
-1. **Name lookup** — if the tool name is not registered, returns `ToolNotFound` error.
+1. **Name lookup** — if the tool name is not registered, returns `ToolNotFound` error. Supports alias names via `Register(string name, ITool tool)` (Sprint 25 P0-B, Sprint 38 P4-C — LogWarning on overwrite).
 2. **Schema validation** — checks all args against `ITool.InputSchema`:
    - `"type"` constraints (string, integer, number, boolean, object, array)
    - `"required"` field presence
    - `"properties"` structure
    - Extra properties not in schema raise a validation error.
-3. **Execution** — calls `tool.ExecuteAsync(args, ct)` with a 30-second action timeout.
-4. **Journal** — records success or failure in `IAgentJournal`.
+   - Extended validation (Sprint 39 P3): `minimum`/`maximum` for numbers, `enum` for strings, `minLength`/`maxLength`.
+3. **CallWithOutcomeAsync** (Sprint 36 P0-B) — wraps `CallAsync` and produces an `ActionOutcome` record used for recovery/replanning/ILlmEvaluator.
+4. **Execution** — calls `tool.ExecuteAsync(args, ct)` (timeout configured by caller, not hardcoded 30s in dispatcher).
+5. **Journal** — Sprint 37 P0-B moved journal entry emission from `CallAsync` to `DispatchActionsAsync`.
 
 Validation errors are returned as structured `ToolValidationError` responses, not exceptions.
+
+### RegisteredNames (Sprint 36 P1-C)
+
+`ToolDispatcher.RegisteredNames` returns all registration keys (including aliases) in sorted order. Used by `LlmChatInterpreter` to inject available tool names into the LLM system prompt.
+
+## Missing Tools from Lockdown List
+
+The `/api/agent/command` lockdown list in this file may be outdated. The authoritative source of all registered tools is `ToolDispatcher` at runtime. Tools registered include: `GetStatus`, `MoveTo`, `MineBlock`, `PlaceBlock`, `SearchMemory`, `GetPage`, `CreatePage`, `CraftItem`, `SmeltItem`, `Chat`, `Wander`, `FindFlatArea`, `FindReachableBlock`.
 
 ## FailureReason Enum
 
@@ -56,7 +66,7 @@ When a tool fails, `IGoal.FailureReason` is set to one of:
 
 | Value | Meaning |
 |---|---|
-| `ToolTimeout` | Action exceeded 30-second timeout |
+| `ToolTimeout` | Action exceeded timeout (caller-configured) |
 | `TargetUnreachable` | Pathfinder could not reach target |
 | `InventoryFull` | No room for gathered items |
 | `RecipeMissing` | Crafting recipe not known / ingredients not available |
@@ -71,11 +81,11 @@ When a tool fails, `IGoal.FailureReason` is set to one of:
 ```json
 {
   "error": "Unknown tool 'FlyToMoon'.",
-  "available": ["GetStatus", "MoveTo", "MineBlock", "SearchMemory", "GetPage", "CreatePage", "CraftItem", "SmeltItem", "Chat", "Wander", "FindFlatArea"]
+  "available": ["GetStatus", "MoveTo", "MineBlock", "SearchMemory", "GetPage", "CreatePage", "CraftItem", "SmeltItem", "Chat", "Wander", "FindFlatArea", "PlaceBlock", "FindReachableBlock"]
 }
 ```
 
-## Tool Schema Sample
+## Tool Schema Samples
 
 ```json
 {
@@ -84,9 +94,25 @@ When a tool fails, `IGoal.FailureReason` is set to one of:
   "inputSchema": {
     "type": "object",
     "properties": {
-      "query": { "type": "string" }
+      "query": { "type": "string" },
+      "limit": { "type": "integer" }
     },
     "required": ["query"]
+  }
+}
+```
+
+```json
+{
+  "name": "Wander",
+  "description": "Wander randomly within a radius from spawn.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "radius": { "type": "integer" },
+      "maxDistanceFromSpawn": { "type": "integer" }
+    },
+    "required": ["radius"]
   }
 }
 ```
@@ -96,5 +122,7 @@ When a tool fails, `IGoal.FailureReason` is set to one of:
 See [Adding a Tool](guides/adding-a-tool.md) for the step-by-step guide. All tools must:
 1. Implement `ITool` with a descriptive `Description` (visible to LLM)
 2. Define a complete `InputSchema` (JSON Schema)
-3. Be registered via `ToolDispatcher.RegisterTool(tool)` in `Program.cs`
-4. Have at least one unit test covering the happy path and one error case
+3. Implement `ExecuteAsync` returning `ToolResult`
+4. Set `ActionData.Tool` to the appropriate `ActionProtocol` constant for wire dispatch
+5. Be registered via `ToolDispatcher.RegisterTool(tool)` in `Program.cs`
+6. Have at least one unit test covering the happy path and one error case

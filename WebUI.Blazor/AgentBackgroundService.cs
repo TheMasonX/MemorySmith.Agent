@@ -62,6 +62,27 @@ public sealed class AgentBackgroundService(
     private const int DefaultActionTimeoutSeconds = 30;
 
     /// <summary>
+    /// Sprint 41: Per-tool action timeout overrides (seconds).
+    /// PlaceBlock should fail fast — if a block can't be placed within 5 seconds
+    /// (pathfinding + reference check + place), something is wrong. Don't wait 30s.
+    /// Tools not listed here use <see cref="DefaultActionTimeoutSeconds"/>.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, int> ToolTimeoutOverrides =
+        new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["PlaceBlock"] = 2,
+        ["MoveTo"]     = 10,
+        ["Wander"]     = 15,
+    };
+
+    /// <summary>
+    /// Gets the effective timeout in seconds for a given tool name.
+    /// Uses the per-tool override if defined, otherwise falls back to the default.
+    /// </summary>
+    private static int GetActionTimeoutSeconds(string toolName) =>
+        ToolTimeoutOverrides.TryGetValue(toolName, out var t) ? t : DefaultActionTimeoutSeconds;
+
+    /// <summary>
     /// Minimum flat area (in cells) for a FlatAreaFoundEvent to trigger auto build-origin
     /// assignment. 25 = a 5x5 footprint — the smallest structure the HTN library can build.
     /// </summary>
@@ -632,6 +653,16 @@ public sealed class AgentBackgroundService(
                     CompleteCorrelatedActionByTool("MoveTo");
                     break;
 
+                // Sprint 41: BlockPlacedEvent from Node.js — complete the PlaceBlock
+                // correlation. Without this, PlaceBlock stays Dispatched until the 30s
+                // sweep timeout, causing every subsequent PlaceBlock to queue behind the
+                // stale timeout (2 blocks per minute max).
+                case BlockPlacedEvent bpe:
+                    logger.LogDebug("[place] block placed: {Block} @ ({X},{Y},{Z})",
+                        bpe.Block, bpe.X, bpe.Y, bpe.Z);
+                    CompleteCorrelatedActionByTool("PlaceBlock");
+                    break;
+
                 case WanderCompleteEvent:
                     CompleteCorrelatedActionByTool("Wander");
                     break;
@@ -663,7 +694,16 @@ public sealed class AgentBackgroundService(
                     CompleteCorrelatedActionByTool("FindReachableBlock");
                     break;
 
+                // Sprint 41 (E-3): log unhandled events so missing handlers are visible.
+                // TryRouteAsError only handles BlockNotFoundEvent and ErrorEvent — all other
+                // unhandled types must be logged for post-hoc debugging.
+                // Events that are handled purely by WorldStateProjector (no correlation/completion
+                // needed) should be logged at Debug, not Warning, to avoid false positives.
                 default:
+                    logger.LogDebug(
+                        "Event type {Type} has no handler in ProcessEventsAsync switch " +
+                        "(handled by projector or ignored): {@Event}",
+                        worldEvent.GetType().Name, worldEvent);
                     TryRouteAsError(worldEvent);
                     break;
             }
@@ -1020,8 +1060,18 @@ public sealed class AgentBackgroundService(
         }
         else if (worldEvent is ErrorEvent err)
         {
-            errMsg = $"{err.Action}:{err.Message}";
-            logger.LogWarning("Game error [{Action}]: {Message}", err.Action, err.Message);
+            // Sprint 41: include position/block context in the log line when available.
+            var posContext = err.X.HasValue
+                ? $" at ({err.X},{err.Y},{err.Z})"
+                : "";
+            var blockContext = err.Block ?? err.Material ?? err.Item;
+            var detail = blockContext is not null
+                ? $" block={blockContext}{posContext}"
+                : posContext;
+            errMsg = $"{err.Action}:{err.Message}{detail}";
+            logger.LogWarning(
+                "Game error [{Action}]: {Message}{Detail}",
+                err.Action, err.Message, detail);
         }
         if (errMsg is not null)
         {
@@ -1280,8 +1330,9 @@ public sealed class AgentBackgroundService(
                     var argsJson = JsonSerializer.Serialize(action.Arguments);
                     using var doc = JsonDocument.Parse(argsJson);
 
+                    var actionTimeoutSec = GetActionTimeoutSeconds(action.Tool);
                     using var timeoutCts = new CancellationTokenSource(
-                        TimeSpan.FromSeconds(DefaultActionTimeoutSeconds));
+                        TimeSpan.FromSeconds(actionTimeoutSec));
                     using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
                         ct, timeoutCts.Token);
 
@@ -1406,9 +1457,10 @@ public sealed class AgentBackgroundService(
                 catch (OperationCanceledException oce)
                     when (!ct.IsCancellationRequested)
                 {
+                    var timedOutSec = GetActionTimeoutSeconds(action.Tool);
                     logger.LogWarning(oce,
                         "Tool {Tool} timed out after {Seconds}s (failure {N}/{Max})",
-                        action.Tool, DefaultActionTimeoutSeconds,
+                        action.Tool, timedOutSec,
                         _consecutiveFailures + 1, maxConsecutiveFailures);
                     _journal?.Log(new JournalEntry(
                         _timeProvider.UtcNow, JournalEntryType.ActionFailed, action.Tool,
@@ -1584,10 +1636,13 @@ public sealed class AgentBackgroundService(
     /// </summary>
     private void SweepTimedOutActions()
     {
-        var cutoff = _timeProvider.UtcNow.AddSeconds(-DefaultActionTimeoutSeconds);
         foreach (var kv in _correlatedActions)
         {
-            if (kv.Value.State == ActionLifecycle.Dispatched && kv.Value.DispatchedAt < cutoff)
+            if (kv.Value.State != ActionLifecycle.Dispatched) continue;
+
+            var toolTimeoutSec = GetActionTimeoutSeconds(kv.Value.ToolName);
+            var cutoff = kv.Value.DispatchedAt.AddSeconds(toolTimeoutSec);
+            if (_timeProvider.UtcNow >= cutoff)
             {
                 var timedOut = kv.Value.WithState(ActionLifecycle.TimedOut);
                 // BLK-1 fix: use TryUpdate so a concurrent result-event transition

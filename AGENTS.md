@@ -118,6 +118,62 @@ params = {
 
 ---
 
+## Rule E-3: Never Swallow Exceptions or Drop Events Silently
+
+Every event-handling switch, catch block, and error-handling path **must** log a
+warning or error when it discards or ignores an event/exception. Silent dropping
+("this can't happen" with no log) is a P0 defect pattern.
+
+**Background:** Sprint 41's `BlockPlacedEvent` had NO handler in
+`AgentBackgroundService.ProcessEventsAsync`. It fell through to `default:` and
+was silently dropped — no log, no trace. The correlated `PlaceBlock` action
+remained in `Dispatched` state until the 30-second sweep timeout fired. The bot
+could place only 2 blocks per minute despite the adapter successfully placing
+every block and sending the event.
+
+**Rules:**
+1. Every `switch` on a discriminated union / event type **must** have a `default`
+   branch that logs `LogWarning` with the unhandled type name.
+   ```csharp
+   // ✅  correct — unhandled events are visible in logs
+   default:
+       logger?.LogWarning("Unhandled world event type: {Type}", worldEvent.GetType().Name);
+       break;
+   ```
+2. Every `catch` block that does not rethrow **must** log at `LogWarning` or higher.
+   ```csharp
+   // ✅  correct — silent catch logs the error
+   catch (Exception ex) when (IsRecoverable(ex))
+   {
+       logger?.LogWarning(ex, "Recoverable error in {Context}: {Message}", name, ex.Message);
+   }
+
+   // ❌  WRONG — silent catch hides failures
+   catch { /* best-effort — never crash */ }
+   ```
+3. Event-handling code **must** log the event identity (type, position, correlation)
+   so post-hoc debugging can trace the path. For `default`-branch drops, log the
+   type name and the raw event data at `LogDebug` level.
+4. Exception to rule 1: `TryRouteAsError` in `AgentBackgroundService` is exempt
+   because it explicitly re-dispatches recognized errors to `_gameErrors` channel.
+   Events that reach its fallthrough already pass through the `default` branch
+   above and are logged there.
+
+**Safe catch pattern** (when you must swallow to keep the loop alive):
+```csharp
+try
+{
+    // fallible operation
+}
+catch (Exception ex) when (!ct.IsCancellationRequested)
+{
+    logger?.LogWarning(ex, "Non-fatal error in {Context}: {Message}", contextName, ex.Message);
+    // Continue — loop must survive individual failures
+}
+```
+
+---
+
 ## CRITICAL — LLM-First Architecture (Sprint 35+)
 
 These rules encode architectural decisions locked in Sprint 35. Violations require

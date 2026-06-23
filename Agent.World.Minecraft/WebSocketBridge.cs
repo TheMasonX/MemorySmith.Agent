@@ -275,7 +275,13 @@ public sealed class WebSocketBridge(string uri) : IDisposable
                 "error" => new ErrorEvent(
                     Action: GetString(root, "action") ?? "?",
                     Message: GetString(root, "message") ?? "unknown",
-                    Timestamp: now),
+                    Timestamp: now,
+                    X: GetIntOrNull(root, "x"),
+                    Y: GetIntOrNull(root, "y"),
+                    Z: GetIntOrNull(root, "z"),
+                    Block: GetString(root, "block"),
+                    Material: GetString(root, "material"),
+                    Item: GetString(root, "item")),
 
                 "blockNotFound" => new BlockNotFoundEvent(
                     Block: GetString(root, "block") ?? "?",
@@ -415,6 +421,18 @@ public sealed class WebSocketBridge(string uri) : IDisposable
     {
         if (!root.TryGetProperty(key, out var el)) return defaultValue;
         return el.ValueKind == JsonValueKind.String ? el.GetString() : defaultValue;
+    }
+
+    /// <summary>
+    /// Sprint 41: returns null when the key is missing or not a number (unlike
+    /// <see cref="GetInt"/> which returns a default). Used for optional fields
+    /// like error event position coordinates.
+    /// </summary>
+    private static int? GetIntOrNull(JsonElement root, string key)
+    {
+        if (!root.TryGetProperty(key, out var el)) return null;
+        return el.ValueKind == JsonValueKind.Number && el.TryGetInt32(out var i)
+            ? i : null;
     }
 
     private static double GetDouble(JsonElement root, string key, double defaultValue = 0)

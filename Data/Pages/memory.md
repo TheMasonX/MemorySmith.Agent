@@ -107,15 +107,29 @@ public enum FactSource { Observed, Inferred, Durable }
 
 This allows the agent to reuse recent world knowledge without a network call.
 
-## Knowledge Resolver Pipeline
+## IKnowledgeResolver Interface
 
-`LocalKnowledgeResolver.SearchAsync` resolves items in order:
+`IKnowledgeResolver` (implemented by `LocalKnowledgeResolver`) provides a unified item resolution pipeline used by `GoalFactory` and other components.
 
-1. **CraftingRecipes** — returns `Craftable` (confidence 0.95)
-2. **DirectMineBlocks** — returns `DirectMineable` (confidence 0.90)
-3. **SourceBlocks** — returns `DirectMineable` (confidence 0.85)
-4. **WorldFacts** — scans `StructuredFacts` (confidence 0.70 or 0.50 by age)
-5. **Fallback** — returns `Unknown` (confidence 0.0)
+```csharp
+public interface IKnowledgeResolver
+{
+    Task<ResolutionResult?> ResolveAsync(string query, WorldState? state = null, CancellationToken ct = default);
+}
+```
+
+## Knowledge Resolver Pipeline (Phase 7-B)
+
+`LocalKnowledgeResolver.ResolveAsync` resolves items in order:
+
+1. **Normalize query** — lowercase, trim, strip pluralization
+2. **IItemRegistry.GetAsync** — exact match against item registry wiki pages (confidence **0.95**)
+3. **IMemoryGateway.SearchAsync** — wiki search results from MemorySmith (confidence **0.60 × search score**)
+4. **WorldState.StructuredFacts scan** — recent world facts matching the item (confidence **0.70** if < 60s old, **0.50** if older)
+5. **Type filter + confidence cap + TopN sort** — results filtered by `CandidateType` (Smeltable, DirectMineable, Craftable, WikiItem, WorldFact, WikiPage) and capped
+6. **Ambiguity detection** — if top-2 candidates are within 0.05 confidence → `WasAmbiguous` flag set
+
+The old Phase 5 pipeline (CraftingRecipes → DirectMineBlocks → SourceBlocks → WorldFacts → Unknown) used hardcoded dictionaries. The Phase 7-B pipeline uses `IItemRegistry` for exact matches and `IMemoryGateway.SearchAsync` for wiki-driven resolution.
 
 ## Context Preservation Across Replans
 
@@ -134,6 +148,15 @@ MemorySmith uses a hybrid search pipeline:
 1. **BM25 (Lucene)** — fast keyword full-text index. Live from day one.
 2. **Vector embeddings** — semantic similarity (Ollama local or OpenAI). Phase 5.
 3. **Graph relations** — page link graph for related-page traversal. Future.
+
+## SearchResult.Kind Disambiguation
+
+`SearchResult.Kind` distinguishes between two result types — critical to check before passing a PageId to `GetPageAsync`:
+
+| Kind | Meaning | PageId Usage |
+|------|---------|-------------|
+| `"page"` | Standard wiki page | ✅ Safe to pass to `GetPageAsync` as slug |
+| `"memory"` | Structured memory record (UUID) | ❌ PageId is a UUID, NOT a valid page slug |
 
 ## API Reference
 

@@ -86,7 +86,7 @@ public sealed class ChatInterpreter : IChatInterpreter
             ["rocks"]       = "cobblestone",
             ["stone"]       = "stone",
             // Ores and drops
-            ["coal"]        = "coal",
+            ["coal"]        = "coal", 
             ["iron"]        = "raw_iron",
             ["gold"]        = "raw_gold",
             ["diamond"]     = "diamond",

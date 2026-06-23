@@ -46,17 +46,25 @@ public sealed class IntentManager
                     return new CraftGoalRequest(draft.Item, draft.Count ?? 1);
                 break;
             case "build":
-                // Sprint 41: resolve common blueprint names (e.g. "house" → "small-house")
-                // via BlueprintAliases so the LLM doesn't need to know exact internal IDs.
-                var resolved = ResolveBlueprint(draft.Blueprint);
-                if (resolved is not null)
-                    return new BuildGoalRequest(resolved, draft.X, draft.Y, draft.Z);
-                break;
+                return TryBuildGoal(draft);
             case "navigate":
                 if (draft.X is not null && draft.Y is not null && draft.Z is not null)
                     return new NavigateGoalRequest(draft.X.Value, draft.Y.Value, draft.Z.Value);
                 break;
         }
+        return null;
+    }
+
+    /// <summary>
+    /// Sprint 41: extracted build goal creation so it can be reused without goto.
+    /// Resolves common blueprint names (e.g. "house" → "small-house") via
+    /// BlueprintAliases so the LLM doesn't need to know exact internal IDs.
+    /// </summary>
+    private static GoalRequest? TryBuildGoal(IntentDraft draft)
+    {
+        var resolved = ResolveBlueprint(draft.Blueprint);
+        if (resolved is not null)
+            return new BuildGoalRequest(resolved, draft.X, draft.Y, draft.Z);
         return null;
     }
 
