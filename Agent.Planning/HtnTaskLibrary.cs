@@ -211,7 +211,6 @@ public sealed class HtnTaskLibrary
                 var needOre  = Math.Max(0, needIngots - haveOre);
                 if (needOre > 0)
                 {
-                    actions.Add(MakeAction("SearchMemory", ("query", "iron ore mine location")));
                     actions.Add(MakeAction("Wander",
                         ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)150)));
                     actions.Add(MakeAction("MineBlock",
@@ -225,7 +224,6 @@ public sealed class HtnTaskLibrary
                 if (haveCoal < coalNeeded)
                 {
                     var coalToMine = coalNeeded - haveCoal;
-                    actions.Add(MakeAction("SearchMemory", ("query", "coal ore location nearby")));
                     actions.Add(MakeAction("MineBlock",
                         ("block", "coal_ore"), ("count", (object?)coalToMine)));
                 }
@@ -242,7 +240,6 @@ public sealed class HtnTaskLibrary
             var needCobble = cobbleCount - haveCobble;
             if (needCobble > 0)
             {
-                actions.Add(MakeAction("SearchMemory", ("query", "stone cobblestone mine location")));
                 actions.Add(MakeAction("MineBlock",
                     ("block", "stone"), ("count", (object?)needCobble)));
             }
@@ -258,7 +255,6 @@ public sealed class HtnTaskLibrary
             var logsToMine = logsNeeded - haveLogs;
             if (logsToMine > 0)
             {
-                actions.Add(MakeAction("SearchMemory", ("query", $"{logType} nearby source tree")));
                 actions.Add(MakeAction("MineBlock",
                     ("block", logType), ("count", (object?)logsToMine)));
             }
@@ -274,6 +270,74 @@ public sealed class HtnTaskLibrary
         actions.Add(MakeAction("CraftItem", ("item", itemId), ("count", (object?)count)));
         actions.Add(MakeAction("GetStatus"));
         return actions;
+    }
+
+    /// <summary>
+    /// Sprint 44 (TSK-0079): Decomposes a <see cref="Goals.SmeltGoal"/> into a sequence
+    /// of prerequisite and smelting actions.
+    ///
+    /// Previously, smelt intents were routed through <c>DecomposeCraftItem</c>, which
+    /// emitted <c>CraftItem</c> actions — never exercising the adapter's dedicated
+    /// <c>case 'smelt':</c> handler. This method emits <c>SmeltItem</c> actions.
+    ///
+    /// Pre-gathers fuel (coal) and ensures the input item is available before smelting.
+    /// The adapter's smelt handler handles furnace interaction and item output.
+    /// </summary>
+    public IReadOnlyList<ActionData> DecomposeSmeltItem(
+        string inputItem, int count, WorldState state)
+    {
+        var actions = new List<ActionData>();
+
+        // Sprint 44: pre-gather fuel (coal) — 1 coal smelts up to 8 items.
+        var coalNeeded = Math.Max(1, (count + 7) / 8);
+        var haveCoal   = state.Inventory.GetValueOrDefault("coal");
+        if (haveCoal < coalNeeded)
+        {
+            var coalToMine = coalNeeded - haveCoal;
+            actions.Add(MakeAction("MineBlock",
+                ("block", "coal_ore"), ("count", (object?)coalToMine)));
+        }
+
+        // Sprint 44: pre-gather the input item if it's a mineable block.
+        var inputBlock = inputItem switch
+        {
+            "iron_ingot"    => "iron_ore",
+            "gold_ingot"    => "gold_ore",
+            "copper_ingot"  => "copper_ore",
+            "netherite_scrap" => "ancient_debris",
+            _               => inputItem,
+        };
+
+        var haveInput = state.Inventory.GetValueOrDefault(inputBlock);
+        var needInput = count - haveInput;
+        if (needInput > 0 && IsMineableBlock(inputBlock))
+        {
+            actions.Add(MakeAction("MineBlock",
+                ("block", inputBlock), ("count", (object?)needInput)));
+        }
+
+        // Sprint 44: the actual smelt action.
+        actions.Add(MakeAction("SmeltItem",
+            ("item", inputBlock), ("count", (object?)count), ("fuel", "coal")));
+        actions.Add(MakeAction("GetStatus"));
+        return actions;
+    }
+
+    /// <summary>
+    /// Sprint 44 (TSK-0079): Returns true if the given block ID can be mined directly.
+    /// </summary>
+    private static bool IsMineableBlock(string block)
+    {
+        if (DirectMineBlocks.Contains(block)) return true;
+        return block switch
+        {
+            "iron_ore" or "deepslate_iron_ore" or
+            "gold_ore" or "deepslate_gold_ore" or
+            "copper_ore" or "deepslate_copper_ore" or
+            "ancient_debris" or "nether_gold_ore" or
+            "coal_ore" or "deepslate_coal_ore" => true,
+            _ => false,
+        };
     }
 
     /// <summary>
@@ -370,7 +434,6 @@ public sealed class HtnTaskLibrary
         {
             // Creative mode grants the agent the requested materials up front, so skip
             // mining, smelting, and crafting pre-gather actions entirely.
-            actions.Add(MakeAction("SearchMemory", ("query", $"flat area build location {blueprint.Name}")));
             actions.Add(MakeAction("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)));
 
             var creativeProgressKey     = BuildFactKeys.BuildProgressIndex(blueprint.Name);
@@ -404,7 +467,6 @@ public sealed class HtnTaskLibrary
                 var have   = state.Inventory.GetValueOrDefault(block);
                 var needed = quantity - have;
                 if (needed <= 0) continue;
-                actions.Add(MakeAction("SearchMemory", ("query", $"{block} nearby source location")));
                 actions.Add(MakeAction("Wander", ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)150)));
                 actions.Add(MakeAction("MineBlock", ("block", block), ("count", (object?)needed)));
             }
@@ -419,7 +481,6 @@ public sealed class HtnTaskLibrary
                     var haveCoal   = state.Inventory.GetValueOrDefault("coal");
                     if (haveCoal < coalNeeded)
                     {
-                        actions.Add(MakeAction("SearchMemory", ("query", "coal ore location nearby")));
                         actions.Add(MakeAction("MineBlock", ("block", "coal_ore"), ("count", (object?)(coalNeeded - haveCoal))));
                     }
                 }
@@ -431,7 +492,6 @@ public sealed class HtnTaskLibrary
                 var toSmelt  = ironNeeded - haveIron;
                 if (toSmelt > 0)
                 {
-                    actions.Add(MakeAction("SearchMemory", ("query", "furnace iron ore location")));
                     actions.Add(MakeAction("MineBlock", ("block", "iron_ore"), ("count", (object?)toSmelt)));
                     actions.Add(MakeAction("SmeltItem", ("item", "iron_ore"), ("count", (object?)toSmelt), ("fuel", "coal")));
                 }
@@ -441,7 +501,6 @@ public sealed class HtnTaskLibrary
                 hasTorch: torchEntry is not null, torchNeeded: torchEntry ?? 0));
         }
 
-        actions.Add(MakeAction("SearchMemory", ("query", $"flat area build location {blueprint.Name}")));
         actions.Add(MakeAction("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)));
 
         var progressKey     = BuildFactKeys.BuildProgressIndex(blueprint.Name);
@@ -577,7 +636,6 @@ public sealed class HtnTaskLibrary
         var count = parameters.Length > 0 && int.TryParse(parameters[0], out var c) ? c : 10;
         var actions = new List<ActionData>
         {
-            MakeAction("SearchMemory", ("query", $"{spec.ItemId} location nearby source")),
         };
 
         // TSK-0021: progressive wander — check if any source block was recently not found
@@ -635,7 +693,6 @@ public sealed class HtnTaskLibrary
 
     private static IReadOnlyList<ActionData> FindTreeDecompose(string[] _, WorldState state) =>
     [
-        MakeAction("SearchMemory", ("query", "nearest oak birch spruce tree coordinates")),
         MakeAction("GetStatus"),
     ];
 
@@ -656,14 +713,12 @@ public sealed class HtnTaskLibrary
     private static IReadOnlyList<ActionData> SurviveNightDecompose(
         string[] _, WorldState state) =>
     [
-        MakeAction("SearchMemory", ("query", "shelter cave house location safe night")),
         MakeAction("GetStatus"),
     ];
 
     private static IReadOnlyList<ActionData> FindShelterDecompose(
         string[] _, WorldState state) =>
     [
-        MakeAction("SearchMemory", ("query", "shelter cave house night safe")),
         MakeAction("GetStatus"),
     ];
 
@@ -691,7 +746,6 @@ public sealed class HtnTaskLibrary
         var maxDist = parameters.Length > 0 && int.TryParse(parameters[0], out var m) ? m : 100;
         return
         [
-            MakeAction("SearchMemory", ("query", "unexplored areas points of interest biome")),
             MakeAction("Wander",       ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)maxDist)),
             MakeAction("GetStatus"),
             MakeAction("Wander",       ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)maxDist)),

@@ -37,16 +37,9 @@ public class HtnPlannerTests
 
         Assert.That(plan.Actions.Any(a => a.Tool == "MineBlock"), Is.True,
             "Plan should contain a MineBlock tool call.");
-    }
-
-    [Test]
-    public async Task PlanAsync_GatherWoodGoal_ContainsSearchMemoryAction()
-    {
-        var goal = new GatherWoodGoal(10);
-        var plan = await _planner.PlanAsync(goal, new WorldState());
-
-        Assert.That(plan.Actions.Any(a => a.Tool == "SearchMemory"), Is.True,
-            "Plan should contain a SearchMemory tool call.");
+        // Sprint 44 (TSK-0080): SearchMemory was removed from gather plan.
+        Assert.That(plan.Actions.Any(a => a.Tool == "SearchMemory"), Is.False,
+            "Sprint 44: SearchMemory removed from gather plan (results never consumed).");
     }
 
     // ── SurviveNightGoal ──────────────────────────────────────────────────────

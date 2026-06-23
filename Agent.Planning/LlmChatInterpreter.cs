@@ -200,7 +200,7 @@ public sealed class LlmChatInterpreter(
 
         {
           "addressed": "yes" | "maybe" | "no",
-          "intent": "gather" | "build" | "craft" | "navigate" | "cancel" | "status"
+          "intent": "gather" | "build" | "craft" | "smelt" | "navigate" | "cancel" | "status"
                   | "help" | "conversation" | "clarify" | "ignore",
           "item": "<minecraft_id or null>",
           "blueprint": "<blueprint_id or null>",
@@ -226,6 +226,11 @@ public sealed class LlmChatInterpreter(
         • "build"  — ONLY when the player says "build", "construct", "make a" + structure
         • "gather" — ONLY when the player wants to COLLECT items ("get wood", "mine stone")
         • "craft"  — ONLY when the player wants to craft an item ("make planks", "craft a pickaxe")
+        • "smelt"  — ONLY when the player wants to smelt ore in a furnace ("smelt iron", "cook food").
+          Set item to the ore/input (e.g. "iron_ore", "raw_iron", "copper_ore").
+          NEVER use "craft" for smelting requests — that bypasses the furnace.
+          CORRECT: "smelt 5 iron ore" → intent="smelt", item="iron_ore", count=5
+          CORRECT: "smelt iron" → intent="smelt", item="raw_iron", count=1
         • "navigate" — when the player says "come here", "come to me", "follow me", "go to".
           Set coords to null — the system uses the player's current position.
           NEVER set intent="cancel" for "come here" — that will REJECT the command.

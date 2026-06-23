@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0084-add-worldstateprojector-applysmeltcomplete-for-real-time-inventory-updates",
+  "key": "TSK-0084",
+  "title": "Add WorldStateProjector.ApplySmeltComplete for real-time inventory updates",
+  "description": "SmeltCompleteEvent only completes the correlated action and logs; it does NOT update _worldState.Inventory with the smelted output items. The inventory is only refreshed on the next GetStatus/StatusEvent cycle, causing delayed goal completion (up to 2s). Add ApplySmeltComplete to WorldStateProjector that adds e.Result items to inventory, mirroring how BlockMinedEvent handles inventory updates.\n\nCouncil confidence: 100%. Severity: Medium (P1).",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "improvement",
+    "sprint-45",
+    "council"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-23T14:31:12.6328944Z",
+  "updatedAtUtc": "2026-06-23T14:31:12.6328944Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

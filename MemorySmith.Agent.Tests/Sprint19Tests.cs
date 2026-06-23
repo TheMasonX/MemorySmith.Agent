@@ -34,7 +34,10 @@ public sealed class Sprint19Tests
         Assert.That(toolNames, Does.Not.Contain("Wander"),
             "Default gather plan should not include Wander — findBlock handles nearby blocks");
         Assert.That(toolNames, Does.Contain("MineBlock"));
-        Assert.That(toolNames, Does.Contain("SearchMemory"));
+        // Sprint 44 (TSK-0080): SearchMemory removed — results were never consumed downstream.
+        // The adapter's bot.findBlock() handles spatial search locally.
+        Assert.That(toolNames, Does.Not.Contain("SearchMemory"),
+            "Sprint 44 TSK-0080: SearchMemory removed from gather plan — results were never consumed.");
         // Sprint 38 P0-A: GetStatus removed from GatherItemDecompose to fix the inventory reset
         // bug where GetStatus overwrote incremental collection. Verify it is NOT in the plan.
         Assert.That(toolNames, Does.Not.Contain("GetStatus"),

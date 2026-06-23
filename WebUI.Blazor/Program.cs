@@ -241,6 +241,7 @@ if (agentEnabled)
         reg.Register(new GatherGoalDecomposer(lib));
         reg.Register(new SurviveNightGoalDecomposer(lib));
         reg.Register(new CraftItemGoalDecomposer(lib)); // Sprint 27 P0-D
+        reg.Register(new SmeltGoalDecomposer(lib)); // Sprint 44 (TSK-0079)
         return reg;
     });
     builder.Services.AddSingleton<PlannerRouter>(sp =>

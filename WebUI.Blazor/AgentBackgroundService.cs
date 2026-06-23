@@ -73,6 +73,8 @@ public sealed class AgentBackgroundService(
         ["PlaceBlock"] = 5,  // Sprint 43 (P1-4): increased from 2s — pathfinding + reference placement takes 2-5s
         ["MoveTo"]     = 10,
         ["Wander"]     = 15,
+        // Sprint 44 council: SmeltItem timeout must be longer than JS adapter's SMELT_TIMEOUT_MS (40s)
+        ["SmeltItem"]  = 45,
     };
 
     /// <summary>
@@ -914,7 +916,7 @@ public sealed class AgentBackgroundService(
                     logger.LogInformation("[chat] bot: {Response}", pendingResponse);
                 break;
 
-            case "gather" or "build" or "craft":
+            case "gather" or "build" or "craft" or "smelt":
                 if (pendingResponse is not null)
                     logger.LogInformation("[chat] bot: {Response}", pendingResponse);
                 if (_intentManager is not null)
@@ -1705,9 +1707,16 @@ public sealed class AgentBackgroundService(
     /// Sweeps all PendingActions in Dispatched state that have exceeded the action timeout.
     /// Transitions them to TimedOut and logs a warning. Called from the idle branch of
     /// DispatchActionsAsync to catch orphaned actions when the adapter crashes or events are lost.
+    ///
+    /// Sprint 44 (P1-2): Also cleans up <see cref="_placeBlockContexts"/> entries whose
+    /// correlationId no longer exists in <see cref="_correlatedActions"/> (timed out or
+    /// manually removed). Prevents stale context entries from leaking across goals.
     /// </summary>
     private void SweepTimedOutActions()
     {
+        // Sprint 44 (P1-2): collect stale correlationIds that are no longer tracked
+        var staleContextIds = new List<Guid>();
+
         foreach (var kv in _correlatedActions)
         {
             if (kv.Value.State != ActionLifecycle.Dispatched) continue;
@@ -1725,9 +1734,59 @@ public sealed class AgentBackgroundService(
                         "[correlation] {Tool} {Id} TIMED OUT after {Elapsed}s — no result event received",
                         kv.Value.ToolName, kv.Key.ToString()[..8],
                         (_timeProvider.UtcNow - kv.Value.DispatchedAt).TotalSeconds);
+
+                    // Sprint 44 (P1-2): timed-out PlaceBlock → clean up context
+                    if (kv.Value.ToolName.Equals("PlaceBlock", StringComparison.OrdinalIgnoreCase))
+                        staleContextIds.Add(kv.Key);
                 }
                 // If TryUpdate returns false, another thread already transitioned the action
                 // (e.g., result event arrived just before the sweep) — that's correct behavior.
+            }
+        }
+
+        // Sprint 44 (P1-2): remove stale PlaceBlock contexts no longer in _correlatedActions
+        if (staleContextIds.Count > 0)
+        {
+            foreach (var id in staleContextIds)
+            {
+                if (_placeBlockContexts.TryRemove(id, out var ctx))
+                {
+                    logger.LogDebug(
+                        "[place] cleaned up stale context for {Blueprint} block {Index} (timed out)",
+                        ctx.BlueprintId, ctx.BlockIndex);
+                }
+            }
+        }
+
+        // Sprint 44 (P1-2): also sweep _placeBlockContexts entries whose correlationId
+        // no longer exists in _correlatedActions at all (e.g. cleared by CancelGoal/SetGoal
+        // but the context dictionary was missed). This is a safety net for edge cases.
+        // Sprint 44 council fix: require the entry to exist for at least 1 second before
+        // treating it as orphaned. This prevents a race where a newly-dispatched PlaceBlock
+        // creates a _placeBlockContexts entry whose correlationId hasn't yet appeared in
+        // _correlatedActions (between the Keys snapshot and ContainsKey check).
+        var orphanCutoff = _timeProvider.UtcNow.AddSeconds(-1);
+        var orphanedIds = _placeBlockContexts
+            .Where(kv => !_correlatedActions.ContainsKey(kv.Key))
+            .Select(kv => kv.Key)
+            .ToList();
+        if (orphanedIds.Count > 0)
+        {
+            foreach (var id in orphanedIds)
+            {
+                // Only remove if the context entry looks genuinely old by checking
+                // whether the correlated action was dispatched long enough ago.
+                if (_correlatedActions.TryGetValue(id, out var pending))
+                {
+                    if (pending.DispatchedAt > orphanCutoff)
+                        continue; // too recent — skip
+                }
+                if (_placeBlockContexts.TryRemove(id, out var ctx))
+                {
+                    logger.LogDebug(
+                        "[place] cleaned up orphaned context for {Blueprint} block {Index} (no correlated action)",
+                        ctx.BlueprintId, ctx.BlockIndex);
+                }
             }
         }
     }

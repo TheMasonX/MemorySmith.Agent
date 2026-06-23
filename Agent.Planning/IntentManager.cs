@@ -45,15 +45,36 @@ public sealed class IntentManager
             ["glass"]       = "glass",
             ["glass pane"]  = "glass_pane",
             ["chest"]       = "chest",
+            // Sprint 44 council: smeltable ore aliases — LLM may return short names
+            ["iron"]        = "iron_ore",
+            ["gold"]        = "gold_ore",
+            ["copper"]      = "copper_ore",
+            ["netherite"]   = "ancient_debris",
         };
 
     /// <summary>
     /// Maps <paramref name="draft"/> to a typed <see cref="GoalRequest"/>, or null
     /// when the intent does not produce a goal (cancel, status, help, etc.).
+    ///
+    /// Sprint 44 (TSK-0079): added "smelt" case — routes to <see cref="SmeltGoalRequest"/>
+    /// instead of falling through to <c>CraftItemGoal</c>. The adapter has a dedicated
+    /// <c>case 'smelt':</c> handler that was never exercised because every smelt intent
+    /// was previously mapped to CraftItemGoal → CraftItemTool.
     /// </summary>
     public GoalRequest? BuildGoalRequest(IntentDraft draft)
     {
-        switch (draft.Intent.ToLowerInvariant())
+        var intent = draft.Intent.ToLowerInvariant();
+
+        // Sprint 44 (TSK-0079): "smelt" intent maps to SmeltGoalRequest (separate from craft).
+        // The LLM may return "smelt" intent with item="iron_ore" or item="raw_iron".
+        if (intent == "smelt")
+        {
+            if (draft.Item is not null)
+                return new SmeltGoalRequest(ResolveItem(draft.Item), draft.Count ?? 1);
+            return null;
+        }
+
+        switch (intent)
         {
             case "gather":
                 if (draft.Item is not null)
@@ -181,4 +202,17 @@ public sealed record NavigateGoalRequest(int X, int Y, int Z)
 {
     public override IReadOnlyDictionary<string, object?>? Parameters =>
         new Dictionary<string, object?> { ["x"] = X, ["y"] = Y, ["z"] = Z };
+}
+
+/// <summary>
+/// Sprint 44 (TSK-0079): smelt N units of an item.
+/// Maps to <see cref="SmeltGoal"/> via GoalFactory → <see cref="SmeltGoalDecomposer"/>.
+/// Separated from <c>CraftGoalRequest</c> so the planner emits <c>SmeltItem</c> actions
+/// instead of <c>CraftItem</c>, exercising the adapter's dedicated smelt handler.
+/// </summary>
+public sealed record SmeltGoalRequest(string InputItem, int Count = 1)
+    : GoalRequest($"SmeltItem:{InputItem}")
+{
+    public override IReadOnlyDictionary<string, object?>? Parameters =>
+        new Dictionary<string, object?> { ["count"] = Count };
 }

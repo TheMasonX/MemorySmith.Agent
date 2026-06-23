@@ -185,6 +185,7 @@
   },
   "active": "0c33cff0340edb73",
   "lastOpenFiles": [
+    "council/sprint44-post-fix-council-20260623.md",
     "Audit/msa_build_plan_audit_alt_6-23.md",
     "Audit/memorysmith_agent_audit_report_2026-06-23.md",
     "Audit/msa_build_plan_audit_6-23.md",
@@ -210,7 +211,6 @@
     "Features",
     "Tasks/memories-gap-analysis-handoff.md",
     "Tasks/sprint-41-post-dig-fixes-plan.md",
-    "Tasks/agent-god-class-decomposition-plan.md",
-    "Tasks/handoff-sprint41-dig-fixes.md"
+    "Tasks/agent-god-class-decomposition-plan.md"
   ]
 }

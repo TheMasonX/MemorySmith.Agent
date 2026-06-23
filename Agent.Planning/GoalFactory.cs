@@ -53,7 +53,7 @@ public sealed class GoalFactory : IGoalFactory
     }
 
     public IReadOnlyList<string> RegisteredGoals =>
-        [.. Creators.Keys, "GatherItem:{itemId}", "Build:{blueprintId}", "CraftItem:{itemId}"];
+        [.. Creators.Keys, "GatherItem:{itemId}", "Build:{blueprintId}", "CraftItem:{itemId}", "SmeltItem:{inputItem}"];
 
     public IGoal? Create(
         string goalName,
@@ -139,6 +139,16 @@ public sealed class GoalFactory : IGoalFactory
             if (string.IsNullOrWhiteSpace(itemId)) return null;
             var count = GetInt(parameters, "count", 1);
             return new CraftItemGoal(itemId, count);
+        }
+
+        // ── SmeltItem:{inputItem} (Sprint 44 TSK-0079) ────────────────────────
+        const string SmeltItemPrefix = "SmeltItem:";
+        if (goalName.StartsWith(SmeltItemPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            var inputItem = goalName[SmeltItemPrefix.Length..];
+            if (string.IsNullOrWhiteSpace(inputItem)) return null;
+            var count = GetInt(parameters, "count", 1);
+            return new Goals.SmeltGoal(inputItem, count);
         }
 
         return Create(goalName, parameters);

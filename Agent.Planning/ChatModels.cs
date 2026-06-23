@@ -1,14 +1,11 @@
 namespace Agent.Planning;
 
 /// <summary>
-/// The interpreted result of an in-game chat message, produced by
-/// <see cref="IChatInterpreter"/> and consumed by <c>AgentBackgroundService</c>.
+/// Sprint 44 (P1-1): Removed — this type has been superseded by <see cref="IntentDraft"/>.
+/// The <c>GoalName</c> zombie field was kept for backward compatibility through Sprint 43.
+/// All callers now use <see cref="IntentDraft"/>? (null = not addressed).
 /// </summary>
-public record ChatInterpretation(
-    ChatIntentType IntentType,
-    string? GoalName = null,
-    IReadOnlyDictionary<string, object?>? GoalParameters = null,
-    string Response = "");
+// public record ChatInterpretation(...) — removed. Use IntentDraft instead.
 
 /// <summary>Classified intent of a chat message.</summary>
 public enum ChatIntentType

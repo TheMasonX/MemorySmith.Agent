@@ -92,15 +92,17 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
         return Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases.ToArray(), actions));
     }
 
+    // Sprint 44 (TSK-0080): SearchMemory: removed — results were never consumed.
+    // PreservedContextPrefixes keeps CraftItem:, FindFlatArea:, Build:, MoveTo: results.
     private static readonly string[] PreservedContextPrefixes =
-        ["SearchMemory:", "CraftItem:", "FindFlatArea:", "Build:", "MoveTo:"];
+        ["CraftItem:", "FindFlatArea:", "Build:", "MoveTo:"];
 
     private static IReadOnlyList<ActionData> CreateCreativeBuildActions(
         BuildGoal buildGoal, WorldState state, int originX, int originY, int originZ)
     {
         var actions = new List<ActionData>
         {
-            MakeAction("SearchMemory", ("query", $"flat area build location {buildGoal.Blueprint.Name}")),
+            // Sprint 44 (TSK-0080): SearchMemory removed — results were never consumed downstream.
             MakeAction("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)),
         };
 

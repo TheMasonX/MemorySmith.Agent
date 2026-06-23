@@ -173,17 +173,49 @@ Chat → LlmChatInterpreter → IntentDraft → IntentManager → GoalRequest
 
 ## Test Strategy
 
-- **608 unit tests** — all pass. Strong core abstraction coverage.
-- **Critical gaps:** No tests for `AdvanceBuildCheckpoint`, `BlockPlaceSkippedEvent`, `_placeBlockContexts`, `BlockPlacedEvent` handler, terrain occupancy skip path, `IsIdleOrWanderGoal`, `IntentManager.ResolveItem`
+- **638 unit tests** — all pass. Strong core abstraction coverage.
+- **New Sprint 44 tests:** 31 tests in `Sprint44Tests.cs` covering SmeltGoal, IntentManager.ResolveItem, IsIdleOrWanderGoal, SearchMemory removal, SmeltGoalDecomposer, ChatInterpretation removal, IntentDraft.GoalName check.
+- **Critical gaps:** No tests for `AdvanceBuildCheckpoint`, `BlockPlaceSkippedEvent`, `_placeBlockContexts`, `BlockPlacedEvent` handler, terrain occupancy skip path. Tracked as TSK-0083.
 - **No E2E tests** — all tests are unit-level in simulated environment. Nothing exercises against a real Minecraft server.
 - **Chronic risk:** BlockPlacedEvent correlation was missing for 10+ sprints before Sprint 41 caught it. The current test suite would not catch a similar missing-handler regression.
 
 ---
 
-## Council Recommendations Summary
+## Sprint 44 Completed ✅
 
-1. **Sprint 44: Correctness sprint** — fix smelt, SearchMemory, GoalName, test gaps. Do NOT add new features.
-2. **Sprint 45: Architecture sprint** — AgentRuntime decomposition, fact store unification
+| Task | Status | Details |
+|---|---|---|
+| **TSK-0079**: Smelt→CraftItem routing | ✅ Done | SmeltGoal, SmeltGoalDecomposer, SmeltGoalRequest, DecomposeSmeltItem, GoalFactory, LLM prompt, ABS handler |
+| **TSK-0080**: SearchMemory dead weight | ✅ Done | Stripped all 15 dead SearchMemory calls from decompositions. Tool remains registered for LLM use. |
+| **TSK-0081**: Add tests | 🟡 50% | 31 tests added for SmeltGoal, IsIdleOrWanderGoal, ResolveItem, SearchMemory removal. Checkpoint tests tracked as TSK-0083. |
+| **P1-1**: Remove ChatInterpretation.GoalName | ✅ Done | Record removed from ChatModels.cs; reflection test confirms |
+| **P1-2**: _placeBlockContexts cleanup | ✅ Done | SweepTimedOutActions cleans up stale + orphaned entries |
+
+### Council-Identified Critical Fixes (Applied Inline)
+
+| Issue | Fix |
+|---|---|
+| SmeltGoal.OutputItem wild-card `_ore → _ingot` produces `redstone_ingot` etc. | Removed wildcard; only explicit mappings |
+| IntentManager missing `"iron"→"iron_ore"` aliases | Added 4 ore aliases |
+| DecomposeSmeltItem can't mine raw_iron (1.17+) | Added raw_iron → iron_ore mapping + IsMineableBlock |
+| HtnPlanner creative path emits dead SearchMemory | Removed; only MoveTo remains |
+| SweepTimedOutActions orphaned check races with new dispatches | Added 1-second age threshold |
+| SmeltItem timeout (30s) < JS adapter timeout (40s) | Added SmeltItem=45s override |
+
+### Council-Identified New Tasks
+
+| Key | Title | Priority | Status |
+|---|---|---|---|
+| **TSK-0082** | Extract shared SmeltableMapping class | P1 | Backlog |
+| **TSK-0083** | Add checkpoint tests (AdvanceBuildCheckpoint, BlockPlacedEvent, etc.) | P1 | Backlog |
+| **TSK-0084** | Add WorldStateProjector.ApplySmeltComplete | P1 | Backlog |
+| **TSK-0085** | Fix SmeltGoal.HasFailed dead code | P2 | Backlog |
+| **TSK-0086** | Fix stale doc comments across 5 files | P2 | Backlog |
+
+## Updated Council Recommendations
+
+1. ✅ **Sprint 44: Correctness sprint** — COMPLETE (638 tests, 0 failures)
+2. **Sprint 45: Architecture + remaining tests sprint** — TSK-0082, TSK-0083, TSK-0084, AgentRuntime decomposition, fact store unification
 3. **Sprint 46+: Feature sprint** — scaffolding, terrain clearance, new goals
 
 ---

@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0083-add-tests-for-advancebuildcheckpoint-blockplacedevent-blockplaceskippedevent-placeblockcontexts",
+  "key": "TSK-0083",
+  "title": "Add tests for AdvanceBuildCheckpoint, BlockPlacedEvent, BlockPlaceSkippedEvent, _placeBlockContexts",
+  "description": "Sprint44Tests.cs class doc comment promises tests for these checkpoint-related components, but the test methods don\u0027t exist. Need to add:\n- AdvanceBuildCheckpoint: happy path, missing context, duplicate event\n- BlockPlacedEvent handler: normal placement advances checkpoint\n- BlockPlaceSkippedEvent handler: checkpoint NOT advanced, correlation completed\n- _placeBlockContexts: entry creation, cleanup on goal completion/cancel/timeout\n\nThese are the remaining ~50% of TSK-0081 that was documented but not implemented.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "tests",
+    "sprint-45",
+    "council"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-23T14:31:12.6036778Z",
+  "updatedAtUtc": "2026-06-23T14:31:12.6036778Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}
