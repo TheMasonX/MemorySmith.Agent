@@ -150,6 +150,11 @@ public sealed class AgentBackgroundService(
     // Key = correlationId (Guid generated at dispatch time). Value = PendingAction with lifecycle state.
     private readonly ConcurrentDictionary<Guid, PendingAction> _correlatedActions = new();
 
+    // Sprint 42 (TSK-0075): PlaceBlock build context by correlationId.
+    // Stores the blueprint ID and block index so the BlockPlacedEvent handler can
+    // advance the build checkpoint on confirmed placement (not on fire-and-forget dispatch).
+    private readonly ConcurrentDictionary<Guid, (string BlueprintId, int BlockIndex)> _placeBlockContexts = new();
+
     // Sprint 38 P3 / Sprint 39 D-S38-04: accumulate ActionOutcomes per dispatch cycle for
     // observation-driven replanning. ConcurrentQueue is safe for concurrent Enqueue from
     // DispatchActionsAsync and Clear from SetGoal/plan generation without an extra lock.
@@ -249,6 +254,7 @@ public sealed class AgentBackgroundService(
         lock (_pendingLock) _pendingActions.Clear();
         // Sprint 25 P0-D: clear correlation tracking for new goal.
         _correlatedActions.Clear();
+        _placeBlockContexts.Clear();
         // Sprint 39 D-S38-01: clear cycle outcomes so the ILlmEvaluator only sees outcomes
         // from the active goal, not carry-over from a previous one.
         _cycleOutcomes.Clear();
@@ -370,6 +376,7 @@ public sealed class AgentBackgroundService(
         lock (_pendingLock) _pendingActions.Clear();
         // Sprint 25 P0-D: clear correlation tracking on cancel.
         _correlatedActions.Clear();
+        _placeBlockContexts.Clear();
         // Sprint 4b: push goal clear to dashboard
         _ = PushGoalToDashboardAsync();
     }
@@ -657,9 +664,15 @@ public sealed class AgentBackgroundService(
                 // correlation. Without this, PlaceBlock stays Dispatched until the 30s
                 // sweep timeout, causing every subsequent PlaceBlock to queue behind the
                 // stale timeout (2 blocks per minute max).
+                //
+                // Sprint 42 (TSK-0075): Advance the build checkpoint only on confirmed
+                // BlockPlacedEvent, not on fire-and-forget dispatch success. Previously the
+                // checkpoint was set when the tool dispatched (which always "succeeds" since
+                // it's fire-and-forget), causing failed placements to be skipped permanently.
                 case BlockPlacedEvent bpe:
                     logger.LogDebug("[place] block placed: {Block} @ ({X},{Y},{Z})",
                         bpe.Block, bpe.X, bpe.Y, bpe.Z);
+                    AdvanceBuildCheckpoint("PlaceBlock");
                     CompleteCorrelatedActionByTool("PlaceBlock");
                     break;
 
@@ -1009,6 +1022,7 @@ public sealed class AgentBackgroundService(
         lock (_pendingLock) _pendingActions.Clear();
         // Sprint 25 P0-D: clear correlation tracking on goal completion.
         _correlatedActions.Clear();
+        _placeBlockContexts.Clear();
         // Sprint 18: emit stop so Node.js also aborts the in-progress mine action.
         SendEmergencyStop();
         _ = PushGoalToDashboardAsync();
@@ -1343,6 +1357,19 @@ public sealed class AgentBackgroundService(
                         _timeProvider.UtcNow, ActionLifecycle.Dispatched);
                     _correlatedActions[correlationId] = pending;
 
+                    // Sprint 42 (TSK-0075): store PlaceBlock build context for checkpoint advancement
+                    // on confirmed BlockPlacedEvent, not on fire-and-forget dispatch success.
+                    if (action.Tool.Equals("PlaceBlock", StringComparison.OrdinalIgnoreCase)
+                        && action.Context.TryGetValue(
+                            BuildFactKeys.PlaceBlockProgressBlueprintId, out var bpId)
+                        && action.Context.TryGetValue(
+                            BuildFactKeys.PlaceBlockProgressBlockIndex, out var bpIdx)
+                        && bpId is not null && bpIdx is not null
+                        && int.TryParse(bpIdx.ToString(), out var parsedIdx))
+                    {
+                        _placeBlockContexts[correlationId] = (bpId.ToString()!, parsedIdx);
+                    }
+
                     // Sprint 19: log args at Debug level (file only) for diagnostics
                     logger.LogDebug("[dispatch] {Tool} args: {Args} correlationId={CorrelationId}",
                         action.Tool, argsJson, correlationId);
@@ -1422,21 +1449,8 @@ public sealed class AgentBackgroundService(
                             foreach (var kv in result.Data)
                                 planContext[kv.Key] = kv.Value;
 
-                        if (action.Tool.Equals("PlaceBlock", StringComparison.OrdinalIgnoreCase)
-                            && action.Context.TryGetValue(
-                                BuildFactKeys.PlaceBlockProgressBlueprintId, out var bpId)
-                            && action.Context.TryGetValue(
-                                BuildFactKeys.PlaceBlockProgressBlockIndex, out var bpIdx))
-                        {
-                            var progressFactKey = BuildFactKeys.BuildProgressIndex(
-                                bpId?.ToString() ?? string.Empty);
-                            _worldState = _worldState.With(b => b.SetFact(
-                                progressFactKey,
-                                bpIdx?.ToString() ?? string.Empty,
-                                FactSource.Observed));
-                            logger.LogDebug("[build] checkpoint: {Blueprint} block {Index} placed",
-                                bpId, bpIdx);
-                        }
+                        // Sprint 42 (TSK-0075): Checkpoint advancement moved to
+                        // BlockPlacedEvent handler — only advance on confirmed placement.
                     }
                     else
                     {
@@ -1575,6 +1589,36 @@ public sealed class AgentBackgroundService(
             // Another thread updated first — spin and retry with the fresh value.
         }
         // Key not present — no-op (action already removed by goal reset or cancel).
+    }
+
+    /// <summary>
+    /// Sprint 42 (TSK-0075): Advances the build checkpoint when a BlockPlacedEvent confirms
+    /// that a block was actually placed. Looks up the stored PlaceBlock build context by
+    /// correlationId to find the blueprint ID and block index, then writes the checkpoint fact.
+    /// Previously checkpoint was advanced at dispatch time (fire-and-forget "success"),
+    /// which caused failed placements to be skipped permanently.
+    /// </summary>
+    private void AdvanceBuildCheckpoint(string toolName)
+    {
+        foreach (var kv in _correlatedActions)
+        {
+            if (kv.Value.State == ActionLifecycle.Dispatched &&
+                kv.Value.ToolName.Equals(toolName, StringComparison.OrdinalIgnoreCase))
+            {
+                if (_placeBlockContexts.TryRemove(kv.Key, out var ctx))
+                {
+                    var progressFactKey = BuildFactKeys.BuildProgressIndex(ctx.BlueprintId);
+                    _worldState = _worldState.With(b => b.SetFact(
+                        progressFactKey,
+                        ctx.BlockIndex.ToString(),
+                        FactSource.Observed));
+                    logger.LogDebug(
+                        "[build] checkpoint advanced: {Blueprint} block {Index} (confirmed by BlockPlacedEvent)",
+                        ctx.BlueprintId, ctx.BlockIndex);
+                }
+                return; // only advance for the first matching action
+            }
+        }
     }
 
     /// <summary>

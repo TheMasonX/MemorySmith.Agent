@@ -241,3 +241,74 @@ PlaceBlock correlation no longer shows "TIMED OUT after 30s" in logs.
 | `WorldEvents.cs` | ErrorEvent position fields |
 | `WebSocketBridge.cs` | ErrorEvent parsing, GetIntOrNull helper |
 | `ReplanGovernor.cs` | (Tests only) |
+
+---
+
+## Sprint 42 — Council Findings & Improved Directions (2026-06-23)
+
+### What Sprint 42 Implemented (SteveBot)
+- **TSK-0074**: Added terrain occupancy check in `MineflayerAdapter/index.js` `case 'place'` — skips occupied positions instead of 5-27s blockUpdate timeout
+- **TSK-0075**: Moved build checkpoint advancement from dispatch-time to `BlockPlacedEvent`-confirmed via new `AdvanceBuildCheckpoint()` method and `_placeBlockContexts` dictionary
+- **TSK-0076**: Reduced MoveTo tolerance from 3 to 2 blocks for tighter placement positioning
+- **Task records**: TSK-0074 through TSK-0078 created with Done/Backlog status
+
+### 6-Seat Council Review Findings
+
+A full 6-seat LLM council review was conducted on 2026-06-23 (see `Data/Pages/council/sprint42-placement-hygiene-council-20260623.md`). Five seats were run via subagent with explicit permission, plus in-process synthesis.
+
+**Overall confidence: 0.84** — Direction is sound; 4 P0 items must be fixed before next feature work.
+
+#### P0 Items (Fix Immediately)
+
+| # | Issue | Detail |
+|---|---|---|
+| **P0-1** | **TSK-0074/TSK-0075 interaction: silent wrong-build** | Terrain-occupied positions emit `blockPlaced` event → checkpoint advances → blueprint has holes. MUST emit a distinct event or not advance checkpoint for skips. |
+| **P0-2** | **Smelt→CraftItem routing (7 sprints old)** | "Smelt iron ore" produces a craft plan, not furnace execution. Furnace handler exists in `index.js` but C# planner never routes to it. |
+| **P0-3** | **SearchMemory dead weight** | ~15 HTTP calls per gather cycle, results NEVER consumed by any downstream action. Either wire TSK-0004 (SearchMemory → MoveTo) or remove calls from decompositions. |
+| **P0-4** | **Zero tests for Sprint 42 changes** | `AdvanceBuildCheckpoint`, `BlockPlacedEvent` handler, `_placeBlockContexts` lifecycle, terrain skip — 0% test coverage. |
+
+#### P1 Items (This Sprint)
+
+| # | Issue | Detail |
+|---|---|---|
+| P1-1 | PlaceBlock timeout: code=2s, docs=5s | Race condition: C# cancels at 2s while Node.js adapter may still be placing. Reconcile. |
+| P1-2 | `_placeBlockContexts` dictionary leak | Entries not cleaned up on duplicate events or goal failure paths. |
+| P1-3 | User-facing stall/progress messages | Bot silently stalls for 6-27s. Add chat messages for long operations. |
+
+#### Deferred Items (Sprint 43+)
+
+| # | Item | Gate |
+|---|---|---|
+| D1 | Decompose `AgentBackgroundService` (13+ responsibilities) | Extract event routing + goal management first |
+| D2 | Deprecate `WorldState.Facts`, unify with `StructuredFacts` | Migrate all goal IsComplete/HasFailed readers |
+| D3 | Type `ActionData.Context` — extract `correlationId: Guid` | Reduce implicit string-keyed coupling |
+| D4 | Remove `ChatInterpretation.GoalName` (zombie field) | Verify no unbilled consumers; update Sprint21Tests |
+| D5 | Wire `IKnowledgeResolver` into planning | Has zero consumers — dead code risk |
+| D6 | Add E2E tests (simulated or real Minecraft) | Unit-test ceiling reached |
+
+### Updated Sprint Priority
+
+```
+Sprint 43: CORRECTNESS SPRINT — fix P0/P1 items, close test gaps
+Sprint 44: ARCHITECTURE SPRINT — AgentRuntime decomposition, fact store unification
+Sprint 45+: FEATURE SPRINT — scaffolding, terrain clearance, new goals
+```
+
+### Critical Risk: TSK-0074 Occupancy Skip + Checkpoint Advance
+
+The TSK-0074 fix (Sprint 42) replaces a 5-27 second stall with a **silent skip** that advances the checkpoint. When the bot encounters a position occupied by terrain:
+
+1. `index.js` checks `bot.blockAt(targetPos)` → occupied by different block
+2. Logs "terrain collision — skipping occupied position"
+3. **Emits `blockPlaced` event** with success status
+4. C# `BlockPlacedEvent` handler calls `AdvanceBuildCheckpoint`
+5. Checkpoint advances past this position
+6. Blueprint has a hole permanently — the position is never retried
+
+**Resolution path:**
+- Option A: Emit new `BlockSkippedEvent` (not `blockPlaced`) that completes correlation but does NOT advance checkpoint
+- Option B: Add `Skipped` state to checkpoint that the planner can retry on next cycle
+- Option C: Keep skipping but add pre-build terrain clearance (TSK-0078, backlogged) to mine terrain blocks before placement phase begins
+
+**Preferred: Option A** — cleanest separation of concerns. Requires new event type, C# handler, and test coverage.
+

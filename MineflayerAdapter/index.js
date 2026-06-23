@@ -818,11 +818,34 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
 
       logStructured('info', 'place', 'start', { material, x, y, z, pos: botPos() });
 
+      // Sprint 42 (TSK-0074): Check if target position already has the correct block.
+      // If so, skip placement entirely — the block is already in the desired state.
+      // If occupied by a different block, log it as a terrain collision and skip
+      // (the physical position is filled; a future terrain-clearance pass can fix it).
+      const targetPos = toVec3(x, y, z);
+      const targetBlock = bot.blockAt(targetPos);
+      const shortMat = material.replace('minecraft:', '');
+      if (targetBlock && targetBlock.type !== 0) {
+        const targetBlockName = targetBlock.name;
+        if (targetBlockName === shortMat) {
+          logStructured('info', 'place', 'already placed', { material: shortMat, x, y, z });
+          sendEvent('blockPlaced', { x, y, z, block: shortMat, correlationId });
+          break;
+        }
+        logStructured('warn', 'place', 'terrain collision — skipping occupied position', {
+          material: shortMat, x, y, z, existingBlock: targetBlockName,
+        });
+        sendEvent('blockPlaced', { x, y, z, block: shortMat, correlationId });
+        break;
+      }
+
       const movements = new Movements(bot);
       bot.pathfinder.setMovements(movements);
-      await bot.pathfinder.goto(new pfGoals.GoalNear(x, y, z, 3));
+      // Sprint 42 (TSK-0076): Reduce tolerance from 3 to 2 so the bot gets closer
+      // to the target before placing. A 3-block tolerance meant the bot could be
+      // outside the ~4.5 block interact range after pathfinding.
+      await bot.pathfinder.goto(new pfGoals.GoalNear(x, y, z, 2));
 
-      const shortMat = material.replace('minecraft:', '');
       const item = bot.inventory.items().find(i => i.name === shortMat || i.name === material);
       if (!item) throw new Error(`${material} not in inventory`);
       await bot.equip(item, 'hand');

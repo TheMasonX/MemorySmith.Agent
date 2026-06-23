@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0075-build-checkpoint-only-advances-on-confirmed-blockplacedevent",
+  "key": "TSK-0075",
+  "title": "Build checkpoint only advances on confirmed BlockPlacedEvent",
+  "description": "## Problem\nThe build checkpoint was advanced at **dispatch time** (fire-and-forget PlaceBlock \u0022success\u0022), not when the \u0060BlockPlacedEvent\u0060 confirmation arrived from the adapter. Since PlaceBlock dispatches always \u0022succeed\u0022 (they just send the command to the adapter), the checkpoint advanced past every position regardless of actual placement result. Failed placements (terrain collision, out of reach) were permanently skipped and never retried.\n\n## Fix Applied\n1. **Removed** checkpoint advancement from the dispatch success path in \u0060AgentBackgroundService.DispatchActionsAsync\u0060 (the \u0060if (action.Tool.Equals(\u0022PlaceBlock\u0022...\u0060 block).\n2. **Added** checkpoint advancement to the \u0060BlockPlacedEvent\u0060 handler in \u0060ProcessEventsAsync\u0060. Uses new \u0060AdvanceBuildCheckpoint(\u0022PlaceBlock\u0022)\u0060 method.\n3. **Added** \u0060_placeBlockContexts\u0060 dictionary to store blueprint ID \u002B block index per correlationId at dispatch time, since \u0060PendingAction\u0060 doesn\u0027t carry action context.\n4. **Added** \u0060_placeBlockContexts.Clear()\u0060 in all three places where \u0060_correlatedActions.Clear()\u0060 is called (new goal, cancel, goal completion).\n\n## Files Changed\n- \u0060WebUI.Blazor/AgentBackgroundService.cs\u0060\n\n## Priority: P0",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "anonymous",
+  "labels": [
+    "placement",
+    "sprint-42",
+    "TSK-0075"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-23T06:11:45.0920526Z",
+  "updatedAtUtc": "2026-06-23T06:11:45.0920526Z",
+  "completedAtUtc": "2026-06-23T06:11:45.0920526Z",
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}
