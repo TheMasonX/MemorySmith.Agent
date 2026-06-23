@@ -4,7 +4,7 @@
   "title": "Investigate and fix block position off-by-one in gather-dirt",
   "description": "## Problem\nThe bot is digging at Y=62-63 instead of Y=64 (surface at Y=65 feet level). This causes the bot to mine incorrect blocks and fail to gather the intended resource. The root cause is unknown.\n\n## Source\nHandoff Sprint 40 P0 Fixes — Issue C: \"Block Position Confusion (Off-By-One?)\"\n\n## Possible Causes (from handoff)\n1. `bot.findBlock()` returns the nearest block by Euclidean distance, not by reachability path. If blocks at Y=64 are already mined, the nearest remaining dirt might be at Y=63.\n2. The bot might be falling through mined blocks and `botPos()` reflects the lower Y.\n3. The `GoalNear` tolerance (2 blocks) might be too large, causing the bot to target blocks below feet level.\n4. Block selection logic in the adapter's mine handler may be off by one in Y-level calculation.\n\n## Requirements\n1. PR #2 coordinate logging must be completed first (adds `block=(bx,by,bz)` to `BlockMinedEvent` and `pos=(x,y,z)` to all goal/action logs)\n2. Deploy coordinate logging to a test server and gather dirt — examine logs to determine actual target vs mined Y-levels\n3. Based on log evidence, implement the specific fix:\n   - If Euclidean distance: add Y-level priority to `findBlock` query\n   - If falling through: add ground-check before dig or reduce `GoalNear` tolerance\n   - If `GoalNear` tolerance: reduce from 2 to 1 or use `bot.entity.position` offset\n   - If block selection logic: fix Y calculation in mine handler\n4. Verify fix by running same test and confirming `block=(x,64,z)` in logs\n\n## References\n- `MineflayerAdapter/index.js` — mine handler, `findBlock` calls, `GoalNear` configuration\n- `Agent.Core/Events/WorldEvents.cs` — `BlockMinedEvent.BlockPosition` (PR #2)\n- Handoff document: Issue C\n- Council review: related to DEF-PAPER-3 (pathfinding quality)",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "Critical",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -22,7 +22,7 @@
   "linkedPages": [
     "Data/Pages/Tasks/handoff-sprint40-p0-fixes.md"
   ],
-  "comments": [],
+  "comments": [{"author":"Agent","text":"Completed Sprint 40 P0. Root cause confirmed: bot.findBlock() uses Euclidean distance. When surface grass at Y=64 isn't dirt, nearest dirt at Y=63 gets selected. Fix: findBestBlock() three-pass scorer — (1) same Y-level, (2) nearby Y with MINE_Y_PENALTY_WEIGHT=5 per level offset, (3) fallback. Also added BLOCK_MINING_ALIASES so mining 'dirt' also accepts 'grass_block' (grass drops dirt). All scoring constants extracted to named constants at top of index.js."}],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,

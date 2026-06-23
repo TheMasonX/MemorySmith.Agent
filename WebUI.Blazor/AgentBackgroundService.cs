@@ -1117,9 +1117,22 @@ public sealed class AgentBackgroundService(
                         if (verdict == ReplanVerdict.Stalled)
                         {
                             _lastReplanAt = _timeProvider.UtcNow;
+                            var stallDelaySec = (int)replanGovernor.CurrentStallDelay.TotalSeconds;
                             logger.LogWarning(
-                                "[governor] STALLED: goal '{Goal}' — plan repeated with no inventory change (Σ={InvSum}). Auto-retry in {TimeoutSec}s.",
-                                _currentGoal.Name, _worldState.Inventory.Values.Sum(), 60);
+                                "[governor] STALLED: goal '{Goal}' — plan repeated with no inventory change (Σ={InvSum}). Auto-retry in {RetrySec}s.",
+                                _currentGoal.Name, _worldState.Inventory.Values.Sum(), stallDelaySec);
+                            // Sprint 40 P0-C (Fix): notify in chat so the user knows
+                            // the agent is aware of the stall rather than appearing frozen.
+                            _queue.Enqueue(new ActionData
+                            {
+                                Tool = "Chat",
+                                Arguments =
+                                {
+                                    ["message"] =
+                                        $"I'm stuck on {_currentGoal.Name} — no progress detected. " +
+                                        $"Waiting {stallDelaySec}s before retrying."
+                                }
+                            });
                             continue;
                         }
                     }

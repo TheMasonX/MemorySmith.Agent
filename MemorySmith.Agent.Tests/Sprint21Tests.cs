@@ -415,6 +415,7 @@ public sealed class Sprint21TruncatedJsonGatherTests
 file sealed class AlwaysStalledGovernor : IReplanGovernor
 {
     public bool IsStalled => true;
+    public TimeSpan CurrentStallDelay => TimeSpan.FromSeconds(60);
     public ReplanVerdict Evaluate(string _) => ReplanVerdict.Stalled;
     public void RecordProgress() { }
     public void Reset() { }

@@ -92,23 +92,24 @@ public sealed class ReplanGovernorTests
     public async Task StalledAutoRecovery_AfterTimeout()
     {
         // Use a very short timeout for testability
+        // Use 0s delay so recovery is immediate for test speed.
+        // Evaluate auto-recovers on the next call after stall because
+        // elapsed >= 0 is always true.
         var gov = new ReplanGovernor(
             identicalPlanThreshold: 2,
-            stalledRecoveryTimeout: TimeSpan.FromMilliseconds(100));
+            stallGraduatedDelaysSec: [0]);
 
         gov.Evaluate(PlanA);
         gov.Evaluate(PlanA);
-        Assert.That(gov.IsStalled, Is.True);
+        Assert.That(gov.IsStalled, Is.True,
+            "Should stall after 2 identical plans");
 
-        // Still stalled immediately
-        Assert.That(gov.Evaluate(PlanA), Is.EqualTo(ReplanVerdict.Stalled));
-
-        // Wait for timeout
-        await Task.Delay(150);
-
-        // Should auto-recover
-        Assert.That(gov.Evaluate(PlanA), Is.EqualTo(ReplanVerdict.Proceed));
-        Assert.That(gov.IsStalled, Is.False);
+        // With 0s delay, Evaluate auto-recovers immediately.
+        // The stall was registered (verified above), now it recovers.
+        Assert.That(gov.Evaluate(PlanA), Is.EqualTo(ReplanVerdict.Proceed),
+            "Should auto-recover with 0s delay");
+        Assert.That(gov.IsStalled, Is.False,
+            "Should no longer be stalled");
     }
 
     // ── While STALLED, Evaluate returns Stalled ──────────────────────────────

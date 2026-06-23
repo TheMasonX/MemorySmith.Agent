@@ -19,7 +19,7 @@ public sealed class Sprint20GovernorProgressTests
 
     private static ReplanGovernor MakeGovernor(int threshold = 3, int timeoutSeconds = 60)
         => new(identicalPlanThreshold: threshold,
-               stalledRecoveryTimeout: TimeSpan.FromSeconds(timeoutSeconds));
+               stallGraduatedDelaysSec: [timeoutSeconds]);
 
     private const string Fp = "Gather:sand:SearchMemory,MineBlock,GetStatus";
 

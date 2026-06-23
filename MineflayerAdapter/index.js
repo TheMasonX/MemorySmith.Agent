@@ -33,6 +33,7 @@ const { pathfinder, Movements, goals: pfGoals } = mflPathfinder;
 import { WebSocketServer } from 'ws';
 import { appendFileSync, mkdirSync, existsSync } from 'node:fs';
 import { emitGameModeEvent, normalizeGameMode } from './gameModeState.js';
+import { toVec3 } from './vec3.js';
 
 // ── Environment / connection ──────────────────────────────────────────────────
 
@@ -48,6 +49,7 @@ const WS_TOKEN = process.env.WS_TOKEN ?? null;
 const MINE_SEARCH_RADIUS_NEAR    = 64;
 const MINE_SEARCH_RADIUS_FAR     = 128;
 const MAX_MINE_PATH_FAILURES     = 3;
+const MAX_DIG_FAILURES          = 3;   // consecutive dig failures before skipping block
 const CRAFT_TABLE_SEARCH_RADIUS  = 8;
 const CRAFT_TABLE_REACH_DISTANCE = 2;
 const FURNACE_SEARCH_RADIUS      = 16;
@@ -128,7 +130,7 @@ function logStructured(level, category, message, data = {}) {
   });
   const dateStr = new Date().toISOString().split('T')[0];
   try {
-    appendFileSync(`${LOG_DIR}/adapter-${dateStr}.log`, entry + '\\n');
+    appendFileSync(`${LOG_DIR}/adapter-${dateStr}.log`, entry + '\n');
   } catch { /* best-effort — never crash the bot on log I/O failure */ }
 }
 
@@ -157,21 +159,11 @@ function handleStop() {
   console.log('[stop] done');
 }
 
-// ── Sprint 18: Vec3 compatibility helper ──────────────────────────────────────
-// Mineflayer's bot.blockAt() and world.getBlock() call pos.floored() internally.
-// Plain {x,y,z} objects no longer work in current Mineflayer versions.
-// This helper creates a minimal Vec3-compatible object for integer coordinates.
-// .floored() is a no-op (values are already integers from Math.round/Math.floor).
-// .offset() returns another toVec3 so chained calls also work.
-
-function toVec3(x, y, z) {
-  const ix = Math.floor(x), iy = Math.floor(y), iz = Math.floor(z);
-  return {
-    x: ix, y: iy, z: iz,
-    floored() { return this; },
-    offset(dx, dy, dz) { return toVec3(ix + dx, iy + dy, iz + dz); },
-  };
-}
+// ── Vec3 compatibility — see vec3.js for the full implementation ────────────
+// toVec3(x,y,z) is imported from ./vec3.js. It creates a plain JS object
+// implementing the complete Mineflayer/prismarine-vector Vec3 API (46 methods).
+// Without it, bot.dig(block) crashes with "point.minus is not a function"
+// because Mineflayer internally calls block.position.minus(otherVec).
 
 // ── WebSocket server ─────────────────────────────────────────────────────────
 
@@ -480,7 +472,9 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         const expectedY = botPos().y - 1;
         const pos = botPos();
 
-        // Build the set of acceptable block IDs (primary block + aliases)
+        // Build the set of acceptable block IDs (primary block + aliases).
+        // Uses an array of IDs for findBlocks/findBlock matching — more widely
+        // supported across Mineflayer versions than function matching.
         const aliasNames = BLOCK_MINING_ALIASES[shortName] ?? [shortName];
         const acceptableIds = aliasNames
           .map(n => bot.registry.blocksByName[n]?.id)
@@ -491,26 +485,33 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           acceptableIds.push(blockId);
         }
 
-        /** True if the block's type ID is in the acceptable set. */
-        function isAcceptable(block) {
-          return block && acceptableIds.includes(block.type);
-        }
-
-        /** Resolve a position to the actual Minecraft block name. */
+        /**
+         * Resolve a position to the actual Minecraft block name by checking which
+         * alias name matches the block's type ID at that position.
+         * Uses bot.registry.blocksByName (confirmed working) rather than the
+         * nonexistent blocksById to avoid "Cannot read properties of undefined"
+         * crashes in Mineflayer 4.x.
+         */
         function actualBlockName(pos) {
           const block = bot.blockAt(pos);
           if (!block) return shortName;
-          return bot.registry.blocksById[block.type]?.name ?? shortName;
+          const match = aliasNames.find(n => bot.registry.blocksByName[n]?.id === block.type);
+          return match ?? shortName;
+        }
+
+        // ── Helper: filter out positions that have exhausted dig retries ─────
+        function excludeExhausted(candidates) {
+          return candidates?.filter(c => !isDigExhausted(c)) ?? [];
         }
 
         // ── First pass: blocks at the expected Y-level ───────────────────────
         const sameLevelCandidates = bot.findBlocks({
-          matching: isAcceptable,
+          matching: [...acceptableIds],
           maxDistance: MINE_SEARCH_RADIUS_NEAR,
           count: MINE_FIRST_PASS_COUNT,
         });
-        const sameLevel = sameLevelCandidates?.filter(c => c.y === expectedY);
-        if (sameLevel && sameLevel.length > 0) {
+        let sameLevel = excludeExhausted(sameLevelCandidates?.filter(c => c.y === expectedY));
+        if (sameLevel.length > 0) {
           // Sort by XZ distance only (same Y-level, so no Y penalty)
           sameLevel.sort((a, b) => {
             const da = (a.x - pos.x) ** 2 + (a.z - pos.z) ** 2;
@@ -518,7 +519,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
             return da - db;
           });
           const block = bot.blockAt(sameLevel[0]);
-          if (block && isAcceptable(block)) {
+          if (block && acceptableIds.includes(block.type)) {
             return {
               x: sameLevel[0].x, y: sameLevel[0].y, z: sameLevel[0].z,
               blockName: actualBlockName(sameLevel[0]),
@@ -528,15 +529,16 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
 
         // ── Second pass: nearby Y-levels with scoring ────────────────────────
         const nearbyCandidates = bot.findBlocks({
-          matching: isAcceptable,
+          matching: [...acceptableIds],
           maxDistance: MINE_SEARCH_RADIUS_NEAR,
           count: MINE_SECOND_PASS_COUNT,
         });
-        if (nearbyCandidates && nearbyCandidates.length > 0) {
+        let nearby = excludeExhausted(nearbyCandidates);
+        if (nearby.length > 0) {
           // Score: Euclidean (XZ) distance + Y-penalty for each level away from expectedY
           // Math.max(0, a.y - expectedY) penalizes only blocks BELOW the surface
           // (blocks above won't be dirt/grass, so treat them neutrally)
-          nearbyCandidates.sort((a, b) => {
+          nearby.sort((a, b) => {
             const scoreA = Math.sqrt(
               (a.x - pos.x) ** 2 + Math.max(0, a.y - expectedY) ** 2 + (a.z - pos.z) ** 2
             ) + Math.abs(a.y - expectedY) * MINE_Y_PENALTY_WEIGHT;
@@ -545,9 +547,9 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
             ) + Math.abs(b.y - expectedY) * MINE_Y_PENALTY_WEIGHT;
             return scoreA - scoreB;
           });
-          const best = nearbyCandidates[0];
+          const best = nearby[0];
           const block = bot.blockAt(best);
-          if (block && isAcceptable(block)) {
+          if (block && acceptableIds.includes(block.type)) {
             return {
               x: best.x, y: best.y, z: best.z,
               blockName: actualBlockName(best),
@@ -556,15 +558,59 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         }
 
         // ── Fallback: original findBlock behavior (any Y-level, nearest Euclidean) ──
-        const fallback = bot.findBlock({ matching: isAcceptable, maxDistance: MINE_SEARCH_RADIUS_FAR });
-        if (fallback) {
-          return {
-            x: fallback.position.x, y: fallback.position.y, z: fallback.position.z,
-            blockName: actualBlockName(fallback.position),
-          };
+        // Also excludes exhausted positions.
+        const fallbackCandidates = bot.findBlocks({
+          matching: [...acceptableIds],
+          maxDistance: MINE_SEARCH_RADIUS_FAR,
+          count: MINE_FIRST_PASS_COUNT,
+        });
+        const fallbackFiltered = excludeExhausted(fallbackCandidates);
+        if (fallbackFiltered.length > 0) {
+          fallbackFiltered.sort((a, b) => {
+            const da = (a.x - pos.x) ** 2 + (a.z - pos.z) ** 2;
+            const db = (b.x - pos.x) ** 2 + (b.z - pos.z) ** 2;
+            return da - db;
+          });
+          const block = bot.blockAt(fallbackFiltered[0]);
+          if (block && acceptableIds.includes(block.type)) {
+            return {
+              x: fallbackFiltered[0].x, y: fallbackFiltered[0].y, z: fallbackFiltered[0].z,
+              blockName: actualBlockName(fallbackFiltered[0]),
+            };
+          }
         }
+
+        // ── No valid (non-exhausted) blocks found ───────────────────────────
+        // Returns null to trigger blockNotFound → mine loop exit.
+        // Without this, returning an exhausted position causes an infinite loop:
+        //   findBestBlock → skip exhausted → continue → findBestBlock (same pos) → ...
         return null;
       }
+
+      // Sprint 40 P0-C (Fix): track dig failures per block position to prevent
+      // infinite retry loops when bot.dig() encounters an unrecoverable error.
+      // Key = "x,y,z", value = consecutive failure count.
+      // Sprint 41 FIX: Defined BEFORE findBestBlock so it's accessible in the
+      // closure. findBestBlock uses this to exclude positions that have already
+      // exhausted MAX_DIG_FAILURES, preventing an infinite loop where the same
+      // unbreakable block is selected → skipped → selected → skipped ...
+      const digFailures = new Map();
+
+      /**
+       * Returns true if the given position has already exhausted its dig retries.
+       * Used by findBestBlock to exclude positions that can't be mined.
+       */
+      function isDigExhausted(pos) {
+        const key = `${pos.x},${pos.y},${pos.z}`;
+        return (digFailures.get(key) ?? 0) >= MAX_DIG_FAILURES;
+      }
+
+      // Sprint 41 FIX: blockTargetPos declared OUTSIDE the while loop with
+      // let (not const) so it's accessible in the mineComplete event below.
+      // Previously it was const inside the while body — block-scoped to each
+      // iteration and invisible outside the loop, causing "blockTargetPos is
+      // not defined" ReferenceError after the loop completed.
+      let blockTargetPos = null;
 
       while (mined < count) {
         // Sprint 18: check stop flag at start of each iteration
@@ -589,7 +635,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         }
 
         // Sprint 40 P0-C: capture block position and actual block name for logging
-        const blockTargetPos = {
+        blockTargetPos = {
           bx: targetPos.x,
           by: targetPos.y,
           bz: targetPos.z,
@@ -633,10 +679,26 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           continue;
         }
 
+        // Sprint 40 P0-C (Fix): skip this block if we've failed to dig it
+        // too many times (prevents infinite retry loop).
+        const digKey = `${targetPos.x},${targetPos.y},${targetPos.z}`;
+        const prevDigFailures = digFailures.get(digKey) ?? 0;
+        if (prevDigFailures >= MAX_DIG_FAILURES) {
+          console.warn(`[mine] dig failed ${prevDigFailures}x at (${digKey}) — skipping block`);
+          logStructured('warn', 'mine', 'dig retries exhausted, skipping block', {
+            block: shortName, pos: digKey, failures: prevDigFailures, correlationId,
+          });
+          // Advance to next block — don't count this as mined
+          await new Promise(r => setTimeout(r, 100));
+          continue;
+        }
+
         try {
           await bot.dig(fresh);
           mined++;
           pathFailures = 0;
+          // Reset dig failure count on success
+          digFailures.delete(digKey);
           // Sprint 36: send delta count (1 per dig) instead of cumulative mined counter.
           // The C# ApplyBlockMined uses e.Count as an additive delta via AddInventoryItem.
           // Sending cumulative count caused inventory ballooning (e.g. count=1, then 2, then 3
@@ -691,7 +753,14 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
             });
             return;
           }
-          console.warn(`[mine] dig failed: ${e.message}`);
+          // Sprint 40 P0-C (Fix): track dig failures per position so we don't
+          // retry the same unbreakable block forever.
+          digFailures.set(digKey, (digFailures.get(digKey) ?? 0) + 1);
+          console.warn(`[mine] dig failed (${digFailures.get(digKey)}/${MAX_DIG_FAILURES}): ${e.message}`);
+          logStructured('warn', 'mine', 'dig failed', {
+            block: shortName, pos: digKey, failures: digFailures.get(digKey),
+            error: e.message, correlationId,
+          });
           await new Promise(r => setTimeout(r, 500));
         }
       }
@@ -741,7 +810,12 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           dz + (z - Math.round(bot.entity.position.z))));
         if (!ref || ref.type === 0) continue;
         try {
-          await bot.placeBlock(ref, { x: fx, y: fy, z: fz });
+          // Sprint 41: use toVec3 for the face vector to match the Vec3 type
+          // contract. Mineflayer's generic_place.js currently only reads .x/.y/.z
+          // from faceVec (no method calls), so plain {x,y,z} works today — but a
+          // future version might call .floored() or .clone(), causing the same
+          // "point.minus is not a function" crash pattern we fixed in bot.dig().
+          await bot.placeBlock(ref, toVec3(fx, fy, fz));
           placed = true;
           break;
         } catch { /* try next face */ }

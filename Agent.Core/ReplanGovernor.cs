@@ -28,27 +28,51 @@ namespace Agent.Core;
 public sealed class ReplanGovernor : IReplanGovernor
 {
     private const int Default_threshold = 3;
-    private static readonly TimeSpan Default_recoveryTimeout = TimeSpan.FromSeconds(60);
+
+    /// <summary>
+    /// Graduated stall recovery delays in seconds.
+    /// Sprint 40 P0-C (Fix): replaced single 60s timeout with graduated retry.
+    /// First stall retries after 10s, then 20s, then 30s, then caps at 60s.
+    /// </summary>
+    private static readonly int[] DefaultStallGraduatedDelaysSec = [10, 20, 30, 60];
 
     private readonly int _threshold;
-    private readonly TimeSpan _recoveryTimeout;
+    private readonly int[] _graduatedDelaysSec;
     private readonly object _lock = new();
 
     private string? _lastFingerprint;
     private int _identicalPlanCount;
     private bool _isStalled;
     private DateTimeOffset _stalledAt = DateTimeOffset.MinValue;
+    private int _stallAttempt; // counts consecutive stalls for graduated backoff
 
     /// <summary>
     /// Creates a governor with configurable thresholds. Defaults are suitable for
-    /// production (3 identical plans, 60s recovery). Tests can override for speed.
+    /// production (3 identical plans, graduated 10→20→30→60s recovery).
+    /// Tests can override for speed.
     /// </summary>
     public ReplanGovernor(
         int identicalPlanThreshold = Default_threshold,
-        TimeSpan? stalledRecoveryTimeout = null)
+        int[]? stallGraduatedDelaysSec = null)
     {
         _threshold = identicalPlanThreshold;
-        _recoveryTimeout = stalledRecoveryTimeout ?? Default_recoveryTimeout;
+        _graduatedDelaysSec = stallGraduatedDelaysSec ?? DefaultStallGraduatedDelaysSec;
+    }
+
+    /// <summary>
+    /// Current stall recovery delay based on attempt count.
+    /// Returns the graduated delay for the current stall attempt, capped at the last value.
+    /// </summary>
+    public TimeSpan CurrentStallDelay
+    {
+        get
+        {
+            lock (_lock)
+            {
+                var idx = Math.Min(_stallAttempt, _graduatedDelaysSec.Length - 1);
+                return TimeSpan.FromSeconds(_graduatedDelaysSec[idx]);
+            }
+        }
     }
 
     /// <inheritdoc/>
@@ -64,12 +88,15 @@ public sealed class ReplanGovernor : IReplanGovernor
         {
             if (_isStalled)
             {
-                // Auto-recovery: allow one retry after timeout
-                if ((DateTimeOffset.UtcNow - _stalledAt) >= _recoveryTimeout)
+                // Auto-recovery: allow one retry after graduated timeout
+                var idx = Math.Min(_stallAttempt, _graduatedDelaysSec.Length - 1);
+                var timeout = TimeSpan.FromSeconds(_graduatedDelaysSec[idx]);
+                if ((DateTimeOffset.UtcNow - _stalledAt) >= timeout)
                 {
                     _isStalled = false;
                     _identicalPlanCount = 1;
                     _lastFingerprint = planFingerprint;
+                    _stallAttempt = 0;
                     return ReplanVerdict.Proceed;
                 }
                 return ReplanVerdict.Stalled;
@@ -82,6 +109,7 @@ public sealed class ReplanGovernor : IReplanGovernor
                 {
                     _isStalled = true;
                     _stalledAt = DateTimeOffset.UtcNow;
+                    _stallAttempt++; // increment so next recovery uses longer delay
                     return ReplanVerdict.Stalled;
                 }
             }
@@ -102,6 +130,7 @@ public sealed class ReplanGovernor : IReplanGovernor
         {
             _identicalPlanCount = 0;
             _isStalled = false;
+            _stallAttempt = 0;
         }
     }
 
@@ -114,6 +143,7 @@ public sealed class ReplanGovernor : IReplanGovernor
             _identicalPlanCount = 0;
             _isStalled = false;
             _stalledAt = DateTimeOffset.MinValue;
+            _stallAttempt = 0;
         }
     }
 
@@ -123,11 +153,14 @@ public sealed class ReplanGovernor : IReplanGovernor
         lock (_lock)
         {
             if (!_isStalled) return false;
-            if ((DateTimeOffset.UtcNow - _stalledAt) >= _recoveryTimeout)
+            var idx = Math.Min(_stallAttempt, _graduatedDelaysSec.Length - 1);
+            var timeout = TimeSpan.FromSeconds(_graduatedDelaysSec[idx]);
+            if ((DateTimeOffset.UtcNow - _stalledAt) >= timeout)
             {
                 _isStalled = false;
                 _identicalPlanCount = 1; // start at 1 so first retry doesn't immediately re-stall
                 _lastFingerprint = null; // clear fingerprint so Evaluate starts fresh
+                _stallAttempt = 0;       // reset attempt counter on recovery
                 return true;
             }
             return false;

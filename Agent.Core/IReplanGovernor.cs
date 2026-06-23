@@ -50,6 +50,13 @@ public interface IReplanGovernor
     /// <see cref="IsStalled"/> is checked without calling <see cref="Evaluate"/>.
     /// </summary>
     bool TryAutoRecover();
+
+    /// <summary>
+    /// Sprint 40 P0-C (Fix): Current stall recovery delay based on graduated backoff.
+    /// Returns the delay for the current stall attempt (10s, 20s, 30s, then 60s cap).
+    /// Useful for logging the actual retry time to the user.
+    /// </summary>
+    TimeSpan CurrentStallDelay { get; }
 }
 
 /// <summary>Verdict returned by <see cref="IReplanGovernor.Evaluate"/>.</summary>
