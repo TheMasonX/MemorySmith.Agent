@@ -86,6 +86,10 @@ public sealed class IntentManager
                 break;
             case "build":
                 return TryBuildGoal(draft);
+            // Navigate is handled directly in HandleChatEventAsync (case "navigate")
+            // with player-position fallback for null coords. This case is a secondary
+            // path for callers that require a GoalRequest; it returns null when coords
+            // are missing, which is correct since NavigateGoalRequest requires all 3.
             case "navigate":
                 if (draft.X is not null && draft.Y is not null && draft.Z is not null)
                     return new NavigateGoalRequest(draft.X.Value, draft.Y.Value, draft.Z.Value);

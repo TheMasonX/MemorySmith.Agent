@@ -112,6 +112,14 @@ public sealed class MemorySmithBlueprintRepository(
         if (string.IsNullOrWhiteSpace(content)) return null;
 
         var (blueprint, _) = BlueprintParser.Parse(content);
+
+        // Sprint 45 (TSK-0094): reject blueprints with empty Id — matches SearchAsync pattern.
+        if (string.IsNullOrEmpty(blueprint.Id))
+        {
+            logger?.LogWarning("Blueprint '{Id}' parsed but has empty Id — rejecting.", blueprintId);
+            return null;
+        }
+
         // Preserve the raw markdown so GoalFactory can re-parse blocks later.
         return blueprint with { RawMarkdown = content };
     }

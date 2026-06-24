@@ -21,6 +21,14 @@ public sealed record RestMemoryGatewayOptions
     /// <summary>TTL for MemorySmithItemRegistry in-memory cache, in seconds.</summary>
     public int ItemCacheTtlSeconds { get; init; } = 60;
 
+    /// <summary>
+    /// Sprint 45 (TSK-0092): Separate TTL for null (not-found) cache entries, in seconds.
+    /// Shorter than <see cref="ItemCacheTtlSeconds"/> so transient outages don't
+    /// permanently mask items that exist. Default 5s.
+    /// Set to 0 to disable null-caching entirely (same as ItemCacheTtlSeconds=0 disables all caching).
+    /// </summary>
+    public int NullCacheTtlSeconds { get; init; } = 5;
+
     // ── World KB (Sprint 22) ──
     /// <summary>
     /// Base URL of the world-specific MemorySmith instance.

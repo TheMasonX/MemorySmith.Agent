@@ -1,5 +1,7 @@
 namespace MemorySmith.Agent.Tests;
 
+using global::Agent.Construction;
+using global::Agent.Memory;
 using global::Agent.Core;
 using global::Agent.Planning;
 using global::Agent.Planning.Goals;
@@ -422,6 +424,38 @@ public class Sprint44Tests
     /// Replicates the IsIdleOrWanderGoal logic from AgentBackgroundService for testing.
     /// The original method is private; this test implementation mirrors the logic exactly.
     /// </summary>
+    // ── TSK-0094: Blueprint validation ─────────────────────────────────────────
+
+    [Test]
+    public async Task MemorySmithBlueprintRepository_MissingId_ReturnsNull()
+    {
+        var gateway = new MockMemoryGateway();
+        // Blueprint page with no "id:" in frontmatter and no heading line
+        gateway.AddPage("blueprints/no-id",
+            "name: No ID Blueprint\ndimensions: 1x1x1\nmaterials: dirt x 1\n---\n\n## Layers\n\n### Y=0\nD\n");
+        var repo = new MemorySmithBlueprintRepository(gateway);
+
+        var result = await repo.GetAsync("no-id");
+
+        Assert.That(result, Is.Null,
+            "Blueprint with missing id should return null.");
+    }
+
+    [Test]
+    public async Task MemorySmithBlueprintRepository_EmptyHeading_ReturnsNull()
+    {
+        var gateway = new MockMemoryGateway();
+        // Blueprint page with only a heading but no id field
+        gateway.AddPage("blueprints/heading-only",
+            "# heading-only\ndimensions: 1x1x1\n---\n\n## Layers\n\n### Y=0\nD\n");
+        var repo = new MemorySmithBlueprintRepository(gateway);
+
+        var result = await repo.GetAsync("heading-only");
+
+        Assert.That(result, Is.Null,
+            "Blueprint with heading-only (no frontmatter id) should return null.");
+    }
+
     private static bool TestIsIdleOrWanderGoal(IGoal? goal)
     {
         if (goal is null) return true;

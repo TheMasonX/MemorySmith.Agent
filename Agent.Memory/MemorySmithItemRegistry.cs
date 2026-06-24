@@ -57,8 +57,15 @@ public sealed class MemorySmithItemRegistry(
         var spec = await FetchAsync(slug, itemId, ct);
 
         // Sprint 2c: store result (including null — avoids hammering the API for missing items).
+        // Sprint 45 (TSK-0092): null entries use a shorter TTL (NullCacheTtlSeconds, default 5s)
+        // so transient outages don't permanently mask items that exist.
         if (CachingEnabled)
-            _cache[slug] = (spec, DateTimeOffset.UtcNow.Add(CacheTtl));
+        {
+            var ttl = spec is null
+                ? TimeSpan.FromSeconds(options.NullCacheTtlSeconds)
+                : CacheTtl;
+            _cache[slug] = (spec, DateTimeOffset.UtcNow.Add(ttl));
+        }
 
         return spec;
     }
