@@ -20,22 +20,20 @@ using Agent.Core;
 /// HasFailed: world-state fact "goal:Build:{blueprintId}:failed" = true.
 ///
 /// Origin resolution priority (Sprint 35):
-///   1. Explicit origin passed via constructor (<see cref="OriginX"/>, <see cref="OriginY"/>,
-///      <see cref="OriginZ"/>) — e.g. from chat "build a house at 100 64 200".
+///   1. Explicit origin passed via constructor (<see cref="BuildOrigin"/>) —
+///      e.g. from chat "build a house at 100 64 200".
 ///   2. World-state facts: "build:{blueprintId}:origin:{axis}" — e.g. from REST API or prior run.
 ///   3. Auto-detect: FindFlatArea action emitted to locate the nearest suitable flat spot.
 ///
-/// Sprint 35 P0-C: <see cref="OriginSource"/> tracks HOW the origin was determined.
-/// Log a warning when OriginSource == AutoScanned before construction begins.
-///
-/// Note: OriginSource is a preview of Sprint 36's full Fact.Source enum:
-///   (PlayerInstruction | Observation | Memory | Inference | Scan | Recovery).
-/// Design maps cleanly: Explicit → PlayerInstruction, AutoScanned → Scan.
+/// TSK-0103: Origin coordinates consolidated into <see cref="BuildOrigin"/> value object.
+/// Partial coordinates are rejected (all three or none). <see cref="BuildOrigin.Source"/>
+/// tracks how the origin was determined.
 ///
 /// Blueprints are "stamps" — they never store absolute positions. All coordinates
 /// are relative offsets applied on top of the resolved origin.
 ///
 /// Introduced in TSK-0011 Phase 4b. Sprint 35: explicit origin support + OriginSource enum.
+/// TSK-0103: BuildOrigin value object consolidation.
 /// </summary>
 public sealed class BuildGoal : IGoal
 {
@@ -45,27 +43,15 @@ public sealed class BuildGoal : IGoal
     /// <summary>Flat ordered list of blocks to place, relative to the build origin.</summary>
     public IReadOnlyList<PlacementBlock> Blocks { get; }
 
-    /// <summary>Explicit world-coordinate origin from chat (e.g. "build a house at 100 64 200").</summary>
-    public int? OriginX { get; }
-    /// <summary>Explicit world-coordinate origin from chat.</summary>
-    public int? OriginY { get; }
-    /// <summary>Explicit world-coordinate origin from chat.</summary>
-    public int? OriginZ { get; }
-
-    /// <summary>True when the builder explicitly supplied a build origin.</summary>
-    public bool HasExplicitOrigin => OriginX.HasValue || OriginY.HasValue || OriginZ.HasValue;
-
     /// <summary>
-    /// Sprint 35 P0-C: How the build origin was determined.
-    /// Explicit: origin supplied by chat/REST. AutoScanned: FindFlatArea result.
-    /// PlayerPosition: origin taken from bot's current position as fallback.
-    ///
-    /// Sprint 36 mapping:
-    ///   Explicit       → Fact.Source.PlayerInstruction
-    ///   AutoScanned    → Fact.Source.Scan
-    ///   PlayerPosition → Fact.Source.Observation
+    /// Resolved build origin, or <c>null</c> when no explicit origin is set.
+    /// When null, the planner resolves the origin via auto-scan or player position.
+    /// TSK-0103: Consolidates previous OriginX/OriginY/OriginZ + OriginSource fields.
     /// </summary>
-    public BuildOriginSource OriginSource { get; }
+    public BuildOrigin? Origin { get; }
+
+    /// <summary>True when a build origin was supplied (all three coordinates present).</summary>
+    public bool HasExplicitOrigin => Origin is not null;
 
     /// <inheritdoc/>
     public string Name { get; }
@@ -76,27 +62,21 @@ public sealed class BuildGoal : IGoal
     public BuildGoal(
         Blueprint blueprint,
         IReadOnlyList<PlacementBlock> blocks,
-        int? originX = null,
-        int? originY = null,
-        int? originZ = null,
-        BuildOriginSource originSource = BuildOriginSource.AutoScanned)
+        BuildOrigin? origin = null)
     {
         Blueprint = blueprint;
         Blocks = blocks;
+        Origin = origin;
         Name = $"Build:{blueprint.Id}";
-        OriginX = originX;
-        OriginY = originY;
-        OriginZ = originZ;
-        OriginSource = originSource;
         // TSK-0020: include material resource counts in the description.
         var materialSummary = blueprint.Materials.Length > 0
             ? " | " + string.Join(", ", blueprint.Materials
                 .OrderByDescending(m => m.Quantity)
                 .Select(m => $"{m.Block} x {m.Quantity}"))
             : "";
-        var originDesc = originX.HasValue
-            ? $" at ({originX},{originY},{originZ}) [{originSource}]"
-            : $" [{originSource}]";
+        var originDesc = origin is not null
+            ? $" at ({origin.X},{origin.Y},{origin.Z}) [{origin.Source}]"
+            : " [AutoScanned]";
         Description = $"Build {blueprint.Name} ({blocks.Count} blocks, {blueprint.Dimensions.X}x{blueprint.Dimensions.Y}x{blueprint.Dimensions.Z}){originDesc}.{materialSummary}";
     }
 

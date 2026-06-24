@@ -27,12 +27,13 @@ public sealed class BuildGoalDecomposer(HtnTaskLibrary taskLibrary, ILogger<Buil
         // Sprint 37: when explicit origin is given, it's used as the scan center for
         // FindFlatArea to find the nearest flat ground near those coordinates, rather
         // than building directly at the specified position.
+        // TSK-0103: origin consolidated into BuildOrigin value object.
         int ox, oy, oz;
         if (bg.HasExplicitOrigin)
         {
-            ox = bg.OriginX ?? 0;
-            oy = bg.OriginY ?? 0;
-            oz = bg.OriginZ ?? 0;
+            ox = bg.Origin!.X;
+            oy = bg.Origin!.Y;
+            oz = bg.Origin!.Z;
             logger.LogInformation(
                 "Using explicit build origin ({X},{Y},{Z}) for '{Blueprint}' from chat parameters " +
                 "— scanning for flat ground near this location.",

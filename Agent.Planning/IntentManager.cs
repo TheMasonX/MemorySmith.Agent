@@ -1,6 +1,7 @@
 namespace Agent.Planning;
 
 using Agent.Core;
+using Agent.Planning.Goals;
 
 /// <summary>
 /// Maps <see cref="IntentDraft"/> to a typed <see cref="GoalRequest"/> suitable
@@ -13,44 +14,12 @@ using Agent.Core;
 /// </summary>
 public sealed class IntentManager
 {
-    // ── Blueprint alias resolution ───────────────────────────────────────────
-    // Maps common user-facing names to canonical blueprint IDs.
-    // Also duplicated in ChatInterpreter.cs (fast-path) for pre-resolution;
-    // this covers the LLM path where the LLM may return common names like "house".
-    private static readonly IReadOnlyDictionary<string, string> BlueprintAliases =
-        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["house"]           = "small-house",
-            ["small house"]     = "small-house",
-            ["cabin"]           = "small-house",
-            ["shelter"]         = "small-house",
-            ["hut"]             = "small-house",
-            ["home"]            = "small-house",
-            ["shack"]           = "small-house",
-        };
-
-    // ── Item alias resolution (Sprint 43 P1-1) ───────────────────────────────
-    // Maps common user-facing item names to canonical Minecraft item IDs.
-    // Handles cases where the LLM returns a generic name that doesn't match
-    // the exact block/item ID (e.g., "wool" → "white_wool", "planks" → "oak_planks").
-    private static readonly IReadOnlyDictionary<string, string> ItemAliases =
-        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["wool"]        = "white_wool",
-            ["planks"]      = "oak_planks",
-            ["wood planks"] = "oak_planks",
-            ["wood plank"]  = "oak_planks",
-            ["plank"]       = "oak_planks",
-            ["stick"]       = "stick",
-            ["glass"]       = "glass",
-            ["glass pane"]  = "glass_pane",
-            ["chest"]       = "chest",
-            // Sprint 44 council: smeltable ore aliases — LLM may return short names
-            ["iron"]        = "iron_ore",
-            ["gold"]        = "gold_ore",
-            ["copper"]      = "copper_ore",
-            ["netherite"]   = "ancient_debris",
-        };
+    // ── Alias dictionaries ───────────────────────────────────────────────────
+    // TSK-0099: consolidated in AliasRegistry. Item and blueprint aliases are
+    // sourced from AliasRegistry.ItemAliases and AliasRegistry.BlueprintAliases.
+    // Blueprint aliases map common user-facing names to canonical blueprint IDs.
+    // Item aliases merge ChatInterpreter player-shorthand mappings with
+    // IntentManager LLM-output normalization entries (wool→white_wool, etc.).
 
     /// <summary>
     /// Maps <paramref name="draft"/> to a typed <see cref="GoalRequest"/>, or null
@@ -107,30 +76,30 @@ public sealed class IntentManager
     {
         var resolved = ResolveBlueprint(draft.Blueprint);
         if (resolved is not null)
-            return new BuildGoalRequest(resolved, draft.X, draft.Y, draft.Z);
+            return new BuildGoalRequest(resolved, BuildOrigin.FromNullable(draft.X, draft.Y, draft.Z));
         return null;
     }
 
     /// <summary>
-    /// Resolves a blueprint name through the alias dictionary, or returns it as-is
-    /// if no alias exists. Returns null for null input.
+    /// Resolves a blueprint name through <see cref="AliasRegistry.BlueprintAliases"/>,
+    /// or returns it as-is if no alias exists. Returns null for null input.
     /// </summary>
     private static string? ResolveBlueprint(string? blueprint)
     {
         if (blueprint is null) return null;
-        if (BlueprintAliases.TryGetValue(blueprint, out var alias))
+        if (AliasRegistry.BlueprintAliases.TryGetValue(blueprint, out var alias))
             return alias;
         return blueprint;
     }
 
     /// <summary>
     /// Sprint 43 (P1-1): Resolves a user-facing item name to its canonical Minecraft ID
-    /// through the alias dictionary, or returns it as-is if no alias exists.
+    /// through <see cref="AliasRegistry.ItemAliases"/>, or returns it as-is if no alias exists.
     /// This handles cases like "wool" → "white_wool" that the LLM may return.
     /// </summary>
     private static string ResolveItem(string item)
     {
-        if (ItemAliases.TryGetValue(item, out var alias))
+        if (AliasRegistry.ItemAliases.TryGetValue(item, out var alias))
             return alias;
         return item;
     }
@@ -175,26 +144,25 @@ public sealed record CraftGoalRequest(string Item, int Count = 1)
 
 /// <summary>
 /// Sprint 39 P3: build a blueprint at an optional origin.
-/// When OriginX/Y/Z are null, the agent resolves the origin via FindFlatArea
-/// (OriginSource.AutoScanned) or the player's current position (OriginSource.PlayerPosition).
+/// TSK-0103: Origin consolidated into <see cref="BuildOrigin"/> value object.
+/// When Origin is null, the agent resolves the origin via FindFlatArea
+/// (BuildOriginSource.AutoScanned) or the player's current position.
 /// </summary>
 public sealed record BuildGoalRequest(
     string Blueprint,
-    int? OriginX = null,
-    int? OriginY = null,
-    int? OriginZ = null) : GoalRequest($"Build:{Blueprint}")
+    BuildOrigin? Origin = null) : GoalRequest($"Build:{Blueprint}")
 {
     public override IReadOnlyDictionary<string, object?>? Parameters
     {
         get
         {
-            if (OriginX is null || OriginY is null || OriginZ is null)
+            if (Origin is null)
                 return null;
             return new Dictionary<string, object?>
             {
-                ["originX"] = OriginX,
-                ["originY"] = OriginY,
-                ["originZ"] = OriginZ,
+                ["originX"] = Origin.X,
+                ["originY"] = Origin.Y,
+                ["originZ"] = Origin.Z,
             };
         }
     }

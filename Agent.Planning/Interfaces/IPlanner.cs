@@ -9,5 +9,12 @@ using Agent.Core;
 public interface IPlanner
 {
     Task<IPlan> PlanAsync(IGoal goal, WorldState state, CancellationToken cancellationToken = default);
-    Task<IPlan?> ReplanAsync(IPlan currentPlan, WorldState state, string failureReason, CancellationToken cancellationToken = default, IGoal? originalGoal = null);
+
+    /// <summary>
+    /// Replans using a structured context. Returns a <see cref="ReplanResult"/>
+    /// that distinguishes success (with plan) from failure (with error message).
+    ///
+    /// TSK-0104: replaced nullable-IPlan return with typed ReplanResult.
+    /// </summary>
+    Task<ReplanResult> ReplanAsync(ReplanGoalContext context, CancellationToken cancellationToken = default);
 }

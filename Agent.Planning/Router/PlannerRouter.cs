@@ -121,19 +121,22 @@ public sealed class PlannerRouter(DecomposerRegistry registry, IPlanner htnPlann
     /// Sprint 28 P1-A: uses originalGoal to preserve the concrete goal type (IItemSpecGoal,
     /// BuildGoal, CraftItemGoal) for correct decomposer routing. Previously reconstructed a
     /// SimpleGoal shell which silently fell through to HtnPlanner for all decomposer-handled goals.
+    ///
+    /// TSK-0104: accepts <see cref="ReplanGoalContext"/> and returns <see cref="ReplanResult"/>.
     /// </summary>
-    public Task<IPlan?> ReplanAsync(IPlan currentPlan, WorldState state,
-        string failureReason, CancellationToken ct = default, IGoal? originalGoal = null)
+    public Task<ReplanResult> ReplanAsync(ReplanGoalContext context,
+        CancellationToken ct = default)
     {
         // Sprint 28 P1-A: use the original goal object when available to preserve
         // concrete type (IItemSpecGoal, BuildGoal, CraftItemGoal) for decomposer routing.
         // Reconstructing SimpleGoal from plan data silently routes all decomposer-handled
         // goals to HtnPlanner fallback instead.
-        var routingGoal = originalGoal ?? new SimpleGoal(
-            currentPlan.GoalName, "",
-            [.. currentPlan.Phases],
+        var routingGoal = context.OriginalGoal ?? new SimpleGoal(
+            context.CurrentPlan.GoalName, "",
+            [.. context.CurrentPlan.Phases],
             _ => false);
-        return Select(routingGoal, state).ReplanAsync(currentPlan, state, failureReason, ct, originalGoal);
+        return Select(routingGoal, context.State)
+            .ReplanAsync(context, ct);
     }
 
     // ── Private adapter ──────────────────────────────────────────────────────
@@ -150,17 +153,17 @@ public sealed class PlannerRouter(DecomposerRegistry registry, IPlanner htnPlann
             return Task.FromResult<IPlan>(plan);
         }
 
-        public Task<IPlan?> ReplanAsync(IPlan currentPlan, WorldState state,
-            string failureReason, CancellationToken ct = default, IGoal? originalGoal = null)
+        public Task<ReplanResult> ReplanAsync(ReplanGoalContext context,
+            CancellationToken ct = default)
         {
             // Use the original goal (with concrete type) if available; fall back to
             // reconstructing a SimpleGoal shell from the plan metadata.
-            var goalToDecompose = originalGoal ?? new SimpleGoal(
-                currentPlan.GoalName, "",
-                [.. currentPlan.Phases],
+            var goalToDecompose = context.OriginalGoal ?? new SimpleGoal(
+                context.CurrentPlan.GoalName, "",
+                [.. context.CurrentPlan.Phases],
                 _ => false);
-            var plan = decomposer.Decompose(goalToDecompose, state);
-            return Task.FromResult<IPlan?>(plan);
+            var plan = decomposer.Decompose(goalToDecompose, context.State);
+            return Task.FromResult(ReplanResult.Success(plan));
         }
     }
 }

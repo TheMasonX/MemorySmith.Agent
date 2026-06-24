@@ -66,7 +66,7 @@ file sealed class MinimalNullPlanner : IPlanner
         CancellationToken ct = default)
         => Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases.ToArray(), []));
 
-    public Task<IPlan?> ReplanAsync(IPlan currentPlan, WorldState state,
-        string failureReason, CancellationToken ct = default, IGoal? originalGoal = null)
-        => Task.FromResult<IPlan?>(null);
+    public Task<ReplanResult> ReplanAsync(ReplanGoalContext context,
+        CancellationToken ct = default)
+        => Task.FromResult(ReplanResult.Failure("Mock: no plan"));
 }

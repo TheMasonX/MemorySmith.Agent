@@ -511,7 +511,12 @@ public sealed class Sprint39TypedGoalRequestTests
     [Test]
     public void BuildGoalRequest_WithOrigin_ExposesCoordinates()
     {
-        var req = new BuildGoalRequest("cabin", 10, 64, 20);
+        var origin = new BuildOrigin(10, 64, 20, BuildOriginSource.Explicit);
+        var req = new BuildGoalRequest("cabin", origin);
+        Assert.That(req.Origin, Is.Not.Null);
+        Assert.That(req.Origin!.X, Is.EqualTo(10));
+        Assert.That(req.Origin.Y, Is.EqualTo(64));
+        Assert.That(req.Origin.Z, Is.EqualTo(20));
         Assert.That(req.Parameters!["originX"], Is.EqualTo(10));
         Assert.That(req.Parameters!["originY"], Is.EqualTo(64));
         Assert.That(req.Parameters!["originZ"], Is.EqualTo(20));
@@ -521,6 +526,7 @@ public sealed class Sprint39TypedGoalRequestTests
     public void BuildGoalRequest_WithoutOrigin_ParametersIsNull()
     {
         var req = new BuildGoalRequest("cabin"); // no origin
+        Assert.That(req.Origin, Is.Null);
         Assert.That(req.Parameters, Is.Null, "Null origin should produce null Parameters.");
     }
 
@@ -566,7 +572,10 @@ public sealed class Sprint39TypedGoalRequestTests
         Assert.That(req, Is.InstanceOf<BuildGoalRequest>());
         var b = (BuildGoalRequest)req!;
         Assert.That(b.Blueprint, Is.EqualTo("small-house"));
-        Assert.That(b.OriginX,   Is.EqualTo(50));
+        Assert.That(b.Origin, Is.Not.Null);
+        Assert.That(b.Origin!.X, Is.EqualTo(50));
+        Assert.That(b.Origin.Y, Is.EqualTo(64));
+        Assert.That(b.Origin.Z, Is.EqualTo(100));
     }
 
     [Test]

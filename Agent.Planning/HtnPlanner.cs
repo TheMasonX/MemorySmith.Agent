@@ -1,4 +1,4 @@
-namespace Agent.Planning;
+﻿namespace Agent.Planning;
 
 using System.Text.Json;
 using Agent.Construction;
@@ -22,7 +22,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 ///   2. Phase-by-phase decomposition.
 ///   3. Throw if no actions result (caller falls back to LLM).
 ///
-/// In production the agent loop uses <see cref="IPlanner"/> → <see cref="PlannerRouter"/>
+/// In production the agent loop uses <see cref="IPlanner"/> â†’ <see cref="PlannerRouter"/>
 /// which routes typed goals to their decomposers before reaching <see cref="HtnPlanner"/>.
 /// <see cref="HtnPlanner"/> therefore only receives goals with no registered decomposer.
 /// </summary>
@@ -31,7 +31,7 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
     private readonly ILogger<HtnPlanner> _logger = logger ??
         Microsoft.Extensions.Logging.Abstractions.NullLogger<HtnPlanner>.Instance;
 
-    // ── PlanAsync ─────────────────────────────────────────────────────────────
+    // â”€â”€ PlanAsync â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public Task<IPlan> PlanAsync(
         IGoal goal, WorldState state, CancellationToken cancellationToken = default)
     {
@@ -92,7 +92,7 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
         return Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases.ToArray(), actions));
     }
 
-    // Sprint 44 (TSK-0080): SearchMemory: removed — results were never consumed.
+    // Sprint 44 (TSK-0080): SearchMemory: removed â€” results were never consumed.
     // PreservedContextPrefixes keeps CraftItem:, FindFlatArea:, Build:, MoveTo: results.
     private static readonly string[] PreservedContextPrefixes =
         ["CraftItem:", "FindFlatArea:", "Build:", "MoveTo:"];
@@ -102,7 +102,7 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
     {
         var actions = new List<ActionData>
         {
-            // Sprint 44 (TSK-0080): SearchMemory removed — results were never consumed downstream.
+            // Sprint 44 (TSK-0080): SearchMemory removed â€” results were never consumed downstream.
             MakeAction("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)),
         };
 
@@ -165,47 +165,47 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
         };
     }
 
-    // ── ReplanAsync ───────────────────────────────────────────────────────────
-    public async Task<IPlan?> ReplanAsync(
-        IPlan currentPlan, WorldState state, string failureReason,
-        CancellationToken cancellationToken = default, IGoal? originalGoal = null)
+    // â”€â”€ ReplanAsync (TSK-0104: ReplanResult + ReplanGoalContext) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    public async Task<ReplanResult> ReplanAsync(
+        ReplanGoalContext context, CancellationToken cancellationToken = default)
     {
         // Sprint 32 P2-2: thread failureReason to log so it is visible in telemetry.
         // Two independent audits (Sprint 25 deep-code-audit + Sprint 32 refinement-audit)
         // both flagged this parameter as accepted but unused. Adaptive replanning that
         // acts on the reason (e.g. choose alternative decomposer) is future scope.
-        if (!string.IsNullOrWhiteSpace(failureReason))
+        if (!string.IsNullOrWhiteSpace(context.FailureReason))
             _logger.LogInformation(
                 "ReplanAsync triggered for goal '{GoalName}' with reason: {FailureReason}",
-                currentPlan.GoalName, failureReason);
+                context.CurrentPlan.GoalName, context.FailureReason);
 
         var preservedContext = new Dictionary<string, object?>();
-        foreach (var action in currentPlan.Actions)
+        foreach (var action in context.CurrentPlan.Actions)
             foreach (var (key, value) in action.Context)
                 if (Array.Exists(PreservedContextPrefixes,
                         prefix => key.StartsWith(prefix, StringComparison.Ordinal)))
                     preservedContext.TryAdd(key, value);
 
         var goal = new SimpleGoal(
-            currentPlan.GoalName, "",
-            [.. currentPlan.Phases],
+            context.CurrentPlan.GoalName, "",
+            [.. context.CurrentPlan.Phases],
             _ => false);
 
         try
         {
-            var newPlan = await PlanAsync(goal, state, cancellationToken);
+            var newPlan = await PlanAsync(goal, context.State, cancellationToken);
 
             if (preservedContext.Count > 0)
                 foreach (var newAction in (newPlan as ActionPlan)?.Actions ?? newPlan.Actions)
                     foreach (var (key, value) in preservedContext)
                         newAction.Context.TryAdd(key, value);
 
-            return newPlan;
+            return ReplanResult.Success(newPlan);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "HtnPlanner.ReplanAsync: Planner error for goal '{Goal}'", currentPlan.GoalName);
-            return null;
+            _logger.LogWarning(ex, "HtnPlanner.ReplanAsync: Planner error for goal '{Goal}'",
+                context.CurrentPlan.GoalName);
+            return ReplanResult.Failure($"Planner error: {ex.Message}");
         }
     }
 }

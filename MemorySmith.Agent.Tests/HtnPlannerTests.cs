@@ -84,10 +84,10 @@ public class HtnPlannerTests
         var originalPlan = await _planner.PlanAsync(goal, new WorldState());
 
         var replan = await _planner.ReplanAsync(
-            originalPlan, new WorldState(), "path blocked");
+            new ReplanGoalContext(originalPlan, new WorldState(), "path blocked"));
 
-        Assert.That(replan, Is.Not.Null);
-        Assert.That(replan!.GoalName, Is.EqualTo("GatherWood"));
+        Assert.That(replan.IsSuccess, Is.True);
+        Assert.That(replan.Plan!.GoalName, Is.EqualTo("GatherWood"));
     }
 
     [Test]
@@ -95,8 +95,10 @@ public class HtnPlannerTests
     {
         // An action plan for an unknown goal
         var plan = new ActionPlan("NoSuchGoal", [], [new ActionData { Tool = "GetStatus" }]);
-        var result = await _planner.ReplanAsync(plan, new WorldState(), "failure");
-        Assert.That(result, Is.Null);
+        var result = await _planner.ReplanAsync(
+            new ReplanGoalContext(plan, new WorldState(), "failure"));
+        Assert.That(result.IsSuccess, Is.False);
+        Assert.That(result.Plan, Is.Null);
     }
 
     // ── HtnTaskLibrary ────────────────────────────────────────────────────────

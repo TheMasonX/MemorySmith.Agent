@@ -57,109 +57,7 @@ public sealed class ChatInterpreter : IChatInterpreter
         @"\b(go\s+to|goto|move\s+to|walk\s+to|navigate\s+to|teleport\s+to|tp\s+to)\b\s+(?<x>-?\d+)\s+(?<y>-?\d+)\s+(?<z>-?\d+)",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    // ── Alias dictionaries ────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Maps common player shorthand to canonical Minecraft item IDs.
-    /// Used by LlmChatInterpreter item normalization (Sprint 36) and
-    /// preserved from the original pattern-matching implementation.
-    /// </summary>
-    private static readonly IReadOnlyDictionary<string, string> ItemAliases =
-        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            // Wood
-            ["wood"]        = "oak_log",
-            ["log"]         = "oak_log",
-            ["logs"]        = "oak_log",
-            ["oak"]         = "oak_log",
-            ["birch"]       = "birch_log",
-            ["spruce"]      = "spruce_log",
-            ["pine"]        = "spruce_log",
-            ["dark oak"]    = "dark_oak_log",
-            ["jungle"]      = "jungle_log",
-            ["acacia"]      = "acacia_log",
-            ["cherry"]      = "cherry_log",
-            ["mangrove"]    = "mangrove_log",
-            // Stone
-            ["cobble"]      = "cobblestone",
-            ["rock"]        = "cobblestone",
-            ["rocks"]       = "cobblestone",
-            ["stone"]       = "stone",
-            // Ores and drops
-            ["coal"]        = "coal", 
-            ["iron"]        = "raw_iron",
-            ["gold"]        = "raw_gold",
-            ["diamond"]     = "diamond",
-            ["diamonds"]    = "diamond",
-            ["emerald"]     = "emerald",
-            ["emeralds"]    = "emerald",
-            ["redstone"]    = "redstone",
-            ["lapis"]       = "lapis_lazuli",
-            ["copper"]      = "raw_copper",
-            // Terrain
-            ["dirt"]        = "dirt",
-            ["sand"]        = "sand",
-            ["gravel"]      = "gravel",
-            ["clay"]        = "clay",
-            ["snow"]        = "snow_block",
-        };
-
-    /// <summary>
-    /// Maps common blueprint shorthand to canonical blueprint IDs.
-    /// </summary>
-    private static readonly IReadOnlyDictionary<string, string> BlueprintAliases =
-        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["house"]           = "small-house",
-            ["small house"]     = "small-house",
-            ["cabin"]           = "small-house",
-            ["shelter"]         = "small-house",
-            ["hut"]             = "small-house",
-            ["home"]            = "small-house",
-            ["shack"]           = "small-house",
-        };
-
-    /// <summary>
-    /// Maps common craft shorthand to canonical Minecraft item IDs.
-    /// </summary>
-    private static readonly IReadOnlyDictionary<string, string> CraftAliases =
-        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["plank"]           = "oak_planks",
-            ["planks"]          = "oak_planks",
-            ["oak plank"]       = "oak_planks",
-            ["oak planks"]      = "oak_planks",
-            ["stick"]           = "stick",
-            ["sticks"]          = "stick",
-            ["chest"]           = "chest",
-            ["table"]           = "crafting_table",
-            ["crafting table"]  = "crafting_table",
-            ["workbench"]       = "crafting_table",
-            ["furnace"]         = "furnace",
-            ["torch"]           = "torch",
-            ["torches"]         = "torch",
-            ["pickaxe"]         = "wooden_pickaxe",
-            ["axe"]             = "wooden_axe",
-            ["shovel"]          = "wooden_shovel",
-            ["sword"]           = "wooden_sword",
-            ["iron pickaxe"]    = "iron_pickaxe",
-            ["iron axe"]        = "iron_axe",
-            ["iron shovel"]     = "iron_shovel",
-            ["iron sword"]      = "iron_sword",
-            ["iron helmet"]     = "iron_helmet",
-            ["iron chestplate"] = "iron_chestplate",
-            ["iron leggings"]   = "iron_leggings",
-            ["iron boots"]      = "iron_boots",
-            ["bread"]           = "bread",
-            ["bowl"]            = "bowl",
-            ["sign"]            = "oak_sign",
-            ["ladder"]          = "ladder",
-            ["fence"]           = "oak_fence",
-            ["door"]            = "oak_door",
-            ["trapdoor"]        = "oak_trapdoor",
-            ["slab"]            = "oak_slab",
-            ["stairs"]          = "oak_stairs",
-        };
+    // ── Alias dictionaries (TSK-0099: consolidated in AliasRegistry) ───────────
 
     // ── State ─────────────────────────────────────────────────────────────────
 
@@ -324,37 +222,40 @@ public sealed class ChatInterpreter : IChatInterpreter
     // ── Item / blueprint resolution helpers ───────────────────────────────────
 
     /// <summary>
-    /// Resolves a raw item token (from regex capture) to a canonical Minecraft item ID.
-    /// Checks ItemAliases first, then returns the token as-is (lowercased, spaces → underscores).
+    /// Resolves a raw item token to a canonical Minecraft item ID.
+    /// Checks <see cref="AliasRegistry.ItemAliases"/> first, then returns the token as-is
+    /// (lowercased, spaces → underscores).
     /// </summary>
     public static string ResolveItem(string raw)
     {
         var normalized = raw.Trim().ToLowerInvariant();
-        if (ItemAliases.TryGetValue(normalized, out var alias))
+        if (AliasRegistry.ItemAliases.TryGetValue(normalized, out var alias))
             return alias;
         return normalized.Replace(' ', '_');
     }
 
     /// <summary>
     /// Resolves a raw blueprint token to a canonical blueprint ID.
-    /// Checks BlueprintAliases first, then returns the token as-is (lowercased, spaces → hyphens).
+    /// Checks <see cref="AliasRegistry.BlueprintAliases"/> first, then returns the token
+    /// as-is (lowercased, spaces → hyphens).
     /// </summary>
     public static string ResolveBlueprint(string raw)
     {
         var normalized = raw.Trim().ToLowerInvariant();
-        if (BlueprintAliases.TryGetValue(normalized, out var alias))
+        if (AliasRegistry.BlueprintAliases.TryGetValue(normalized, out var alias))
             return alias;
         return normalized.Replace(' ', '-');
     }
 
     /// <summary>
     /// Resolves a raw craft item token to a canonical Minecraft item ID.
-    /// Checks CraftAliases first, then falls back to ResolveItem.
+    /// Checks <see cref="AliasRegistry.CraftAliases"/> first, then falls back to
+    /// <see cref="ResolveItem"/>.
     /// </summary>
     public static string ResolveCraftItem(string raw)
     {
         var normalized = raw.Trim().ToLowerInvariant();
-        if (CraftAliases.TryGetValue(normalized, out var alias))
+        if (AliasRegistry.CraftAliases.TryGetValue(normalized, out var alias))
             return alias;
         return ResolveItem(raw);
     }

@@ -28,11 +28,13 @@ public sealed class MockPlanner : IPlanner
         return Task.FromResult(plan);
     }
 
-    public Task<IPlan?> ReplanAsync(IPlan currentPlan, WorldState state,
-        string failureReason, CancellationToken cancellationToken = default,
-        IGoal? originalGoal = null)
+    public Task<ReplanResult> ReplanAsync(ReplanGoalContext context,
+        CancellationToken cancellationToken = default)
     {
-        ReplanCalls.Add((currentPlan, state, failureReason));
-        return Task.FromResult(ReplanToReturn);
+        ReplanCalls.Add((context.CurrentPlan, context.State, context.FailureReason));
+        return Task.FromResult(
+            ReplanToReturn is not null
+                ? ReplanResult.Success(ReplanToReturn)
+                : ReplanResult.Failure("Mock: no plan to return"));
     }
 }

@@ -123,13 +123,15 @@ public sealed class GoalFactory : IGoalFactory
 
             var (_, blocks) = BlueprintParser.Parse(blueprint.RawMarkdown);
 
-            // Sprint 35: extract optional origin coordinates from chat parameters
-            // e.g. "build a house at 100 64 200" → originX=100, originY=64, originZ=200
+            // TSK-0103: extract optional origin coordinates from chat parameters
+            // e.g. "build a house at 100 64 200" → BuildOrigin(100, 64, 200, Explicit)
+            // When any coordinate is missing, Origin is null (auto-detect).
             var ox = GetInt(parameters, "originX", null);
             var oy = GetInt(parameters, "originY", null);
             var oz = GetInt(parameters, "originZ", null);
+            var origin = BuildOrigin.FromNullable(ox, oy, oz, BuildOriginSource.Explicit);
 
-            return new BuildGoal(blueprint, blocks, ox, oy, oz);
+            return new BuildGoal(blueprint, blocks, origin);
         }
 
         // ── CraftItem:{itemId} ────────────────────────────────────────────────

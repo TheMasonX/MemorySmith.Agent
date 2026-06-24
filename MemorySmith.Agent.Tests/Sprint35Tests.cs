@@ -175,16 +175,16 @@ public class Sprint35Tests
             Name = "Small House",
             Dimensions = new global::Agent.Construction.Dimensions(5, 4, 5),
         };
-        var goal = new BuildGoal(blueprint, [],
-            originX: 100, originY: 64, originZ: 200,
-            originSource: BuildOriginSource.Explicit);
+        var origin = new BuildOrigin(100, 64, 200, BuildOriginSource.Explicit);
+        var goal = new BuildGoal(blueprint, [], origin);
 
-        Assert.That(goal.OriginSource, Is.EqualTo(BuildOriginSource.Explicit));
+        Assert.That(goal.Origin, Is.Not.Null);
+        Assert.That(goal.Origin!.Source, Is.EqualTo(BuildOriginSource.Explicit));
         Assert.That(goal.HasExplicitOrigin, Is.True);
     }
 
     [Test]
-    public void BuildGoal_NoOrigin_DefaultsToAutoScanned()
+    public void BuildGoal_NoOrigin_OriginIsNull()
     {
         var blueprint = new global::Agent.Construction.Blueprint
         {
@@ -194,8 +194,8 @@ public class Sprint35Tests
         };
         var goal = new BuildGoal(blueprint, []);
 
-        Assert.That(goal.OriginSource, Is.EqualTo(BuildOriginSource.AutoScanned));
-        Assert.That(goal.HasExplicitOrigin, Is.False);
+        Assert.That(goal.Origin, Is.Null);
+        Assert.That(goal.HasExplicitOrigin, Is.False, "No origin → HasExplicitOrigin should be false");
     }
 
     // ── P0-D: ActionQueue.ClearAndEnqueueAsync stopCallback ─────────────────────
