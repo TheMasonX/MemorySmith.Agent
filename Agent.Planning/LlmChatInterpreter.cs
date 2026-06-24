@@ -327,7 +327,11 @@ public sealed class LlmChatInterpreter(
                 item, blueprint, count, x, y, z,
                 confidence, clarifyQ, response);
         }
-        catch { return null; }
+        catch (Exception ex)
+        {
+            logger?.LogWarning(ex, "LlmChatInterpreter.ParseDecision: Failed to parse LLM response");
+            return null;
+        }
     }
 
     private static string? GetStr(JsonElement root, string key)
@@ -367,7 +371,7 @@ public sealed class LlmChatInterpreter(
     /// Now a pure JSON-fragment → IntentDraft converter; IntentManager and goal-name strings
     /// are gone. Callers (Sprint21Tests) now assert on IntentDraft fields (Item, Count, Intent).
     /// </summary>
-    private static IntentDraft? TryParseTruncatedJson(string json)
+    private static IntentDraft? TryParseTruncatedJson(string json, ILogger? logger = null)
     {
         try
         {
@@ -400,7 +404,11 @@ public sealed class LlmChatInterpreter(
                 null, null, null,
                 1.0, null, response);
         }
-        catch { return null; }
+        catch (Exception ex)
+        {
+            logger?.LogWarning(ex, "LlmChatInterpreter.TryParseTruncatedJson: Failed to salvage truncated JSON");
+            return null;
+        }
     }
 
     private static double Distance(Position a, Position b)

@@ -2,6 +2,8 @@ namespace Agent.Planning.Llm;
 
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 /// <summary>
 /// <see cref="ILlmProvider"/> for the Google Gemini API.
@@ -15,8 +17,11 @@ using System.Text.Json.Serialization;
 ///   LlmModel: "gemini-2.0-flash"  (or gemini-1.5-pro for stronger reasoning)
 ///   LlmApiKey: "AIza..."  (from https://aistudio.google.com/apikey)
 /// </summary>
-public sealed class GeminiProvider(HttpClient http, ChatOptions options) : ILlmProvider
+public sealed class GeminiProvider(HttpClient http, ChatOptions options,
+    ILogger<GeminiProvider>? logger = null) : ILlmProvider
 {
+    private readonly ILogger<GeminiProvider> _logger = logger ?? NullLogger<GeminiProvider>.Instance;
+
     public string ProviderName => "gemini";
     public bool IsAvailable    => options.LlmEnabled
                                && string.Equals(options.LlmProvider, "gemini",
@@ -56,9 +61,9 @@ public sealed class GeminiProvider(HttpClient http, ChatOptions options) : ILlmP
 
             return result?.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text;
         }
-        catch (OperationCanceledException) { return null; }
-        catch (HttpRequestException)        { return null; }
-        catch                               { return null; }
+        catch (OperationCanceledException ex) { _logger.LogWarning(ex, "GeminiProvider.CompleteAsync: Operation cancelled"); return null; }
+        catch (HttpRequestException ex)        { _logger.LogWarning(ex, "GeminiProvider.CompleteAsync: HTTP error"); return null; }
+        catch (Exception ex)                   { _logger.LogWarning(ex, "GeminiProvider.CompleteAsync: Unexpected error"); return null; }
     }
 
     // ── Wire types ────────────────────────────────────────────────────────────

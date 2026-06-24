@@ -19,7 +19,7 @@ namespace Agent.Core;
 /// <list type="number">
 ///   <item><see cref="RecordProgress"/> — inventory/position change resets the governor.</item>
 ///   <item><see cref="Reset"/> — new goal or user command resets the governor.</item>
-///   <item>60-second timeout — auto-retry with one permitted plan attempt.</item>
+///   <item>Graduated retry delay [10, 20, 30, 60]s — Sprint 40 P0-C replaced single 60s timeout.</item>
 /// </list></para>
 ///
 /// <para>Council confidence: 70% (Seat 3: 85%, Seat 1: 55%).

@@ -333,8 +333,9 @@ public sealed class Sprint21TruncatedJsonGatherTests
             Assert.Ignore("TryParseTruncatedJson not found via reflection — skipping.");
             return null;
         }
-        // Sprint 39 P1-C: TryParseTruncatedJson takes only the json string (no IntentManager).
-        return (IntentDraft?)method.Invoke(null, new object?[] { json });
+        // Sprint 39 P1-C: TryParseTruncatedJson takes json string + optional ILogger.
+        // Sprint 46 P0 (TSK-0101): Added optional ILogger parameter — pass null for test.
+        return (IntentDraft?)method.Invoke(null, new object?[] { json, null });
     }
 
     [Test]

@@ -202,8 +202,9 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
 
             return newPlan;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogWarning(ex, "HtnPlanner.ReplanAsync: Planner error for goal '{Goal}'", currentPlan.GoalName);
             return null;
         }
     }

@@ -265,7 +265,8 @@ public sealed class Sprint39TruncatedJsonTests
             .GetMethod("TryParseTruncatedJson",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
         if (method is null) { Assert.Ignore("TryParseTruncatedJson not found."); return null; }
-        return (IntentDraft?)method.Invoke(null, new object?[] { json });
+        // Sprint 46 P0 (TSK-0101): Added optional ILogger parameter — pass null for test.
+        return (IntentDraft?)method.Invoke(null, new object?[] { json, null });
     }
 
     [Test]

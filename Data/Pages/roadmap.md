@@ -28,13 +28,17 @@ AgentHost, WebSocket bridge, basic movement tools, goal/action loop, Blazor stat
 
 ActionData.Context bag, WebSocketBridge background receive loop, findBestBlock three-pass scorer, BLOCK_MINING_ALIASES, graduated stall retry [10,20,30,60]s, kick→reconnect verified E2E, emergency stop, stopComplete/MineAborted events, ReachableBlockFoundEvent parsing.
 
-### Phase 5 — Intent Reliability & Adaptive Execution 🔄 IN PROGRESS (Sprint 41)
+### Phase 5 — Intent Reliability & Adaptive Execution ✅ COMPLETE (Sprint 45)
 
 Intent parsing reliability (ollama 3B insufficient), goto() timeout safety, path_update wiring, stale-inventory guard at goal-creation, blueprint alias resolution in LLM path, MemorySmithBlueprintRepository logging.
 
+### Phase 6 — Observability First 🔄 IN PROGRESS (Sprint 46)
+
+Silent-failure hardening: structured logging across all catch→null paths, WebSocketBridge receive loop resilience with auto-reconnect, BuildOrigin consolidation, ReplanResult typed outcomes, documentation drift repair. Theme: "make every failure observable."
+
 ---
 
-## Sprint History (Sprints 5–41)
+## Sprint History (Sprints 5–46)
 
 | Sprint | Date | Theme | Key Deliverables |
 |--------|------|-------|-----------------|
@@ -64,6 +68,12 @@ Intent parsing reliability (ollama 3B insufficient), goto() timeout safety, path
 | **38** | 2026-06-22 | LLM-First Architecture, ActionOutcome, Correlation | Chat→IntentDraft→Planner→Goal pipeline locked (AGENTS.md Rule A-1), ParseDecision goal-name switch removed, IntentManager maps intents to GoalRequests, ActionOutcome universal result type, _cycleOutcomes, ILlmEvaluator interface stub, IItemSpecGoal/SurviveNightGoal cleanup, ItemConsumedEvent (P4-A) |
 | **39** | 2026-06-22 | Build Pipeline Fixes + Blueprint Alias Resolution | BlueprintAliases added to IntentManager (Sprint 41 P1 fix), MemorySmithBlueprintRepository ILogger + per-stage logging, GoalFactory blueprint-not-found warnings, HandleChatEventAsync intent logging |
 | **40** | 2026-06-23 | P0/P1 Fix Package — Adapter Stability | findBestBlock() three-pass scorer (same-Y→nearby→fallback), BLOCK_MINING_ALIASES (dirt←grass_block), MAX_DIG_FAILURES=3, graduated stall retry [10,20,30,60]s, kick→reconnect E2E verified, stopComplete/MineAborted/ReachableBlockFoundEvent wiring, configurable constants in index.js |
+| **41** | 2026-06-23 | Placement Hygiene | Block placement quality fixes (blockUpdate timeout, scaffolding prep, terrain clearance, hill detection). Sprint 41 P1-4 deferred. |
+| **42** | 2026-06-23 | Checkpoint Verification | Build checkpoint only advances on confirmed BlockPlacedEvent, terrain occupancy skip, BlockPlaceSkipped event, Sprint 42 checkpoint/occupancy tests |
+| **43** | 2026-06-23 | Smelt Goal + SearchMemory Removal | SmeltGoal, SmeltGoalDecomposer, SmeltGoalRequest, GoalFactory routing, LLM prompt, ABS handler — full end-to-end smelt route. 15 dead SearchMemory calls stripped from decompositions. |
+| **44** | 2026-06-23 | Correctness Sprint | ChatInterpretation.GoalName removed (7-sprint-old zombie), _placeBlockContexts cleanup, 31 new tests (638 total), 5 new tasks (TSK-0082 through TSK-0086) |
+| **45** | 2026-06-24 | Audit-Fix Sprint | TSK-0087 (origin typo), TSK-0090 (GetPageTool guard), TSK-0091 (Thread.Sleep→await), TSK-0088 (gateway try/catch), TSK-0094 (blueprint validation), TSK-0092 (null cache TTL), TSK-0089 (nav contract). 644 tests. |
+| **46** | 2026-06-24 | Observability First 🔄 | TSK-0100 (WebSocketBridge resilience), TSK-0101 (7 catch→null fixes with logging), TSK-0102 (cross-repo request), TSK-0103 (BuildOrigin), TSK-0104 (ReplanResult), TSK-0105 (doc drift), TSK-0106 (error-path tests) |
 | **41** | 2026-06-23 (active) | Intent Reliability + Goto Safety | Intent parsing reliability (ollama 3B insufficient), goto() timeout safety, path_update wiring, stale-inventory guard at goal-creation, 28 core memories, 10 feature wiki pages |
 
 ---

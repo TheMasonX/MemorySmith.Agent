@@ -6,6 +6,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 /// <summary>
 /// WebSocket bridge between the C# agent host and the Node.js/Mineflayer process.
@@ -35,11 +37,14 @@ using System.Threading.Channels;
 /// correct Node.js action name via <see cref="ActionProtocol"/> constants.
 /// This bridge forwards the value as-is (no lowercasing). See ADR-010.
 /// </summary>
-public sealed class WebSocketBridge(string uri) : IDisposable
+public sealed class WebSocketBridge(string uri,
+    ILogger<WebSocketBridge>? logger = null) : IDisposable
 {
+    private readonly ILogger<WebSocketBridge> _logger = logger ?? NullLogger<WebSocketBridge>.Instance;
     private ClientWebSocket? _ws;
     private readonly Uri _uri = new(uri);
     private CancellationTokenSource? _receiveCts;
+    private string? _adapterSecret;
 
     // Inbound events buffered from the background receive loop
     private readonly Channel<WorldEvent> _inbound =
@@ -57,6 +62,7 @@ public sealed class WebSocketBridge(string uri) : IDisposable
     public async Task ConnectAsync(CancellationToken cancellationToken = default,
         string? adapterSecret = null)
     {
+        _adapterSecret = adapterSecret;
         _ws = new ClientWebSocket();
         await _ws.ConnectAsync(_uri, cancellationToken);
 
@@ -78,7 +84,7 @@ public sealed class WebSocketBridge(string uri) : IDisposable
 
         // Start background receive loop
         _receiveCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        _ = ReceiveLoopAsync(_receiveCts.Token);
+        _ = RunReceiveLoopWithRetryAsync(_receiveCts.Token);
     }
 
     public async Task CloseAsync(CancellationToken cancellationToken = default)
@@ -154,37 +160,109 @@ public sealed class WebSocketBridge(string uri) : IDisposable
 
     // ── Background receive loop ───────────────────────────────────────────────
 
+    private async Task RunReceiveLoopWithRetryAsync(CancellationToken ct)
+    {
+        const int maxRetries = 3;
+        const int retryDelayMs = 5000;
+
+        for (var attempt = 0; attempt <= maxRetries; attempt++)
+        {
+            if (ct.IsCancellationRequested) return;
+
+            try
+            {
+                await ReceiveLoopAsync(ct);
+                return; // Normal completion (connection closed cleanly)
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("WebSocketBridge: Receive loop cancelled (normal shutdown)");
+                return;
+            }
+            catch (WebSocketException ex) when (attempt < maxRetries)
+            {
+                _logger.LogWarning(ex,
+                    "WebSocketBridge: Receive loop crashed (attempt {Attempt}/{MaxRetries}). Reconnecting in {DelayMs}ms...",
+                    attempt + 1, maxRetries, retryDelayMs);
+            }
+            catch (Exception ex) when (attempt < maxRetries)
+            {
+                _logger.LogWarning(ex,
+                    "WebSocketBridge: Receive loop crashed with unexpected error (attempt {Attempt}/{MaxRetries}). Reconnecting in {DelayMs}ms...",
+                    attempt + 1, maxRetries, retryDelayMs);
+            }
+
+            // Attempt reconnection
+            try
+            {
+                await Task.Delay(retryDelayMs, ct);
+
+                // Dispose old socket and reconnect
+                if (_ws is not null)
+                {
+                    try { _ws.Dispose(); } catch { /* best-effort cleanup */ }
+                }
+
+                _ws = new ClientWebSocket();
+                await _ws.ConnectAsync(_uri, ct);
+
+                // Re-send handshake if previously configured
+                if (!string.IsNullOrWhiteSpace(_adapterSecret))
+                {
+                    using var ms = new System.IO.MemoryStream();
+                    using var writer = new Utf8JsonWriter(ms);
+                    writer.WriteStartObject();
+                    writer.WriteString("type", "handshake");
+                    writer.WriteString("secret", _adapterSecret);
+                    writer.WriteEndObject();
+                    await writer.FlushAsync(ct);
+                    await _ws.SendAsync(ms.ToArray(), WebSocketMessageType.Text,
+                        endOfMessage: true, ct);
+                }
+
+                _logger.LogInformation("WebSocketBridge: Reconnect succeeded (attempt {Attempt})", attempt + 1);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex,
+                    "WebSocketBridge: Reconnect failed (attempt {Attempt}/{MaxRetries})",
+                    attempt + 1, maxRetries);
+            }
+        }
+
+        // All retries exhausted — permanent failure
+        _logger.LogError(
+            "WebSocketBridge: All {MaxRetries} reconnect attempts failed. Agent is permanently deaf.",
+            maxRetries);
+        _inbound.Writer.TryComplete();
+    }
+
     private async Task ReceiveLoopAsync(CancellationToken ct)
     {
         var buffer = new byte[32_768];
         var sb = new StringBuilder(4096);
 
-        try
+        while (_ws is { State: WebSocketState.Open } && !ct.IsCancellationRequested)
         {
-            while (_ws is { State: WebSocketState.Open } && !ct.IsCancellationRequested)
+            sb.Clear();
+            WebSocketReceiveResult result;
+
+            // Reassemble multi-frame messages
+            do
             {
-                sb.Clear();
-                WebSocketReceiveResult result;
-
-                // Reassemble multi-frame messages
-                do
-                {
-                    result = await _ws.ReceiveAsync(buffer, ct);
-                    if (result.MessageType == WebSocketMessageType.Close) return;
-                    sb.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
-                }
-                while (!result.EndOfMessage);
-
-                var ev = ParseEvent(sb.ToString());
-                if (ev is not null)
-                    _inbound.Writer.TryWrite(ev);
+                result = await _ws.ReceiveAsync(buffer, ct);
+                if (result.MessageType == WebSocketMessageType.Close) return;
+                sb.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
             }
-        }
-        catch (OperationCanceledException) { /* normal shutdown */ }
-        catch (WebSocketException) { /* connection dropped */ }
-        finally
-        {
-            _inbound.Writer.TryComplete();
+            while (!result.EndOfMessage);
+
+            var ev = ParseEvent(sb.ToString());
+            if (ev is not null)
+                _inbound.Writer.TryWrite(ev);
         }
     }
 
@@ -375,8 +453,11 @@ public sealed class WebSocketBridge(string uri) : IDisposable
                 _ => null, // unknown event type — ignored
             };
         }
-        catch
+        catch (Exception ex)
         {
+            // WebSocketBridge has no ILogger dependency; exceptions are returned as null
+            // and logged upstream by the caller (ReceiveLoopAsync / MinecraftAdapter)
+            System.Diagnostics.Debug.WriteLine($"WebSocketBridge.ParseEvent: {ex.GetType().Name}: {ex.Message}");
             return null;
         }
     }

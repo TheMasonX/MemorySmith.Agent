@@ -37,7 +37,8 @@ Persistent facts about the codebase for agents working in this repo.
 - Phase 2: Complete — RestMemoryGateway, memory tools, DI wiring
 - Phase 3: Complete — HTN planner, GatherWoodGoal, SurviveNightGoal, GoalFactory
 - Phase 4: Complete — ActionData.Context bag, findBestBlock, BLOCK_MINING_ALIASES, graduated stall, emergency stop, kick→reconnect
-- Phase 5: In progress (Sprint 41) — intent reliability, LLM model upgrade, goto safety, dashboard decoupling
+- Phase 5: Complete (Sprint 45) — intent reliability, LLM model upgrade, goto safety, dashboard decoupling, smelt goal, checkpoint verification
+- Phase 6: In progress (Sprint 46) — Observability First: silent-failure hardening, structured logging across all catch→null paths, WebSocketBridge resilience, BuildOrigin consolidation, ReplanResult, documentation drift repair
 
 ## Core memory count: 28 files (all critical areas covered)
 

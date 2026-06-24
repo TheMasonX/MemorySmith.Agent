@@ -252,7 +252,8 @@ public sealed class Sprint20LlmTruncationTests
                 Assert.Ignore("TryParseTruncatedJson method not found via reflection — skipping.");
                 return null;
             }
-            return (IntentDraft?)_method.Invoke(null, [json]);
+            // Sprint 46 P0 (TSK-0101): Added optional ILogger parameter — pass null for test.
+            return (IntentDraft?)_method.Invoke(null, [json, null]);
         }
     }
 }

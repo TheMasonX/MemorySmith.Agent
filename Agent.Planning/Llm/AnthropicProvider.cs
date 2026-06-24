@@ -2,6 +2,8 @@ namespace Agent.Planning.Llm;
 
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 /// <summary>
 /// <see cref="ILlmProvider"/> for the Anthropic Claude API.
@@ -16,8 +18,11 @@ using System.Text.Json.Serialization;
 ///   LlmModel: "claude-3-5-sonnet-20241022"  (or claude-3-haiku-20240307 for speed)
 ///   LlmApiKey: "sk-ant-..."  (from https://console.anthropic.com)
 /// </summary>
-public sealed class AnthropicProvider(HttpClient http, ChatOptions options) : ILlmProvider
+public sealed class AnthropicProvider(HttpClient http, ChatOptions options,
+    ILogger<AnthropicProvider>? logger = null) : ILlmProvider
 {
+    private readonly ILogger<AnthropicProvider> _logger = logger ?? NullLogger<AnthropicProvider>.Instance;
+
     public string ProviderName => "anthropic";
     public bool IsAvailable    => options.LlmEnabled
                                && string.Equals(options.LlmProvider, "anthropic",
@@ -59,9 +64,9 @@ public sealed class AnthropicProvider(HttpClient http, ChatOptions options) : IL
             return result?.Content?.FirstOrDefault(c =>
                 string.Equals(c.Type, "text", StringComparison.OrdinalIgnoreCase))?.Text;
         }
-        catch (OperationCanceledException) { return null; }
-        catch (HttpRequestException)        { return null; }
-        catch                               { return null; }
+        catch (OperationCanceledException ex) { _logger.LogWarning(ex, "AnthropicProvider.CompleteAsync: Operation cancelled"); return null; }
+        catch (HttpRequestException ex)        { _logger.LogWarning(ex, "AnthropicProvider.CompleteAsync: HTTP error"); return null; }
+        catch (Exception ex)                   { _logger.LogWarning(ex, "AnthropicProvider.CompleteAsync: Unexpected error"); return null; }
     }
 
     // ── Wire types ────────────────────────────────────────────────────────────
