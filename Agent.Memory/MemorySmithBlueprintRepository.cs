@@ -36,7 +36,22 @@ public sealed class MemorySmithBlueprintRepository(
         var pageId = $"{PagePrefix}{slug}";
 
         // 1. Direct page lookup (fast, deterministic — preferred per D-003).
-        var content = await memory.GetPageAsync(pageId, ct);
+        string? content;
+        try
+        {
+            content = await memory.GetPageAsync(pageId, ct);
+        }
+        catch (HttpRequestException ex)
+        {
+            logger?.LogWarning(ex, "Gateway unavailable for blueprint '{Id}' (page={PageId}, HTTP: {Status})",
+                blueprintId, pageId, ex.StatusCode);
+            content = null;
+        }
+        catch (TaskCanceledException ex)
+        {
+            logger?.LogWarning(ex, "Gateway timeout for blueprint '{Id}' (page={PageId})", blueprintId, pageId);
+            content = null;
+        }
         if (!string.IsNullOrWhiteSpace(content))
             logger?.LogDebug("Blueprint '{Id}' found via gateway lookup (page={PageId})", blueprintId, pageId);
 
@@ -54,18 +69,43 @@ public sealed class MemorySmithBlueprintRepository(
         if (string.IsNullOrWhiteSpace(content))
         {
             logger?.LogInformation("Blueprint '{Id}' not found via gateway or local — trying search fallback...", blueprintId);
-            var results = await memory.SearchAsync($"{PagePrefix}{blueprintId}", ct);
-            var hit = results.FirstOrDefault(r =>
-                string.Equals(r.Kind, "page", StringComparison.OrdinalIgnoreCase) &&
-                r.PageId.Contains("blueprints", StringComparison.OrdinalIgnoreCase));
-            if (hit is not null)
+            try
             {
-                logger?.LogInformation("Blueprint '{Id}' found via search (hit={HitPageId})", blueprintId, hit.PageId);
-                content = await memory.GetPageAsync(hit.PageId, ct);
+                var results = await memory.SearchAsync($"{PagePrefix}{blueprintId}", ct);
+                var hit = results.FirstOrDefault(r =>
+                    string.Equals(r.Kind, "page", StringComparison.OrdinalIgnoreCase) &&
+                    r.PageId.Contains("blueprints", StringComparison.OrdinalIgnoreCase));
+                if (hit is not null)
+                {
+                    logger?.LogInformation("Blueprint '{Id}' found via search (hit={HitPageId})", blueprintId, hit.PageId);
+                    try
+                    {
+                        content = await memory.GetPageAsync(hit.PageId, ct);
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        logger?.LogWarning(ex, "Gateway unavailable fetching search hit for blueprint '{Id}' (hit={HitPageId}, HTTP: {Status})",
+                            blueprintId, hit.PageId, ex.StatusCode);
+                    }
+                    catch (TaskCanceledException ex)
+                    {
+                        logger?.LogWarning(ex, "Gateway timeout fetching search hit for blueprint '{Id}' (hit={HitPageId})",
+                            blueprintId, hit.PageId);
+                    }
+                }
+                else
+                {
+                    logger?.LogWarning("Blueprint '{Id}' not found — gateway, local, and search all returned empty.", blueprintId);
+                }
             }
-            else
+            catch (HttpRequestException ex)
             {
-                logger?.LogWarning("Blueprint '{Id}' not found — gateway, local, and search all returned empty.", blueprintId);
+                logger?.LogWarning(ex, "Gateway unavailable for blueprint search '{Id}' (HTTP: {Status})",
+                    blueprintId, ex.StatusCode);
+            }
+            catch (TaskCanceledException ex)
+            {
+                logger?.LogWarning(ex, "Gateway timeout for blueprint search '{Id}'", blueprintId);
             }
         }
 
@@ -80,14 +120,45 @@ public sealed class MemorySmithBlueprintRepository(
     public async Task<IReadOnlyList<Blueprint>> SearchAsync(
         string query, CancellationToken ct = default)
     {
-        var results    = await memory.SearchAsync(query, ct);
+        IReadOnlyList<SearchResult> results;
+        try
+        {
+            results = await memory.SearchAsync(query, ct);
+        }
+        catch (HttpRequestException ex)
+        {
+            logger?.LogWarning(ex, "Gateway unavailable for blueprint search query '{Query}' (HTTP: {Status})",
+                query, ex.StatusCode);
+            results = [];
+        }
+        catch (TaskCanceledException ex)
+        {
+            logger?.LogWarning(ex, "Gateway timeout for blueprint search query '{Query}'", query);
+            results = [];
+        }
+
         var blueprints = new List<Blueprint>();
 
         foreach (var result in results.Where(r =>
             string.Equals(r.Kind, "page", StringComparison.OrdinalIgnoreCase) &&
             r.PageId.Contains("blueprints", StringComparison.OrdinalIgnoreCase)))
         {
-            var content = await memory.GetPageAsync(result.PageId, ct);
+            string? content;
+            try
+            {
+                content = await memory.GetPageAsync(result.PageId, ct);
+            }
+            catch (HttpRequestException ex)
+            {
+                logger?.LogWarning(ex, "Gateway unavailable fetching blueprint page '{Page}' (HTTP: {Status})",
+                    result.PageId, ex.StatusCode);
+                continue;
+            }
+            catch (TaskCanceledException ex)
+            {
+                logger?.LogWarning(ex, "Gateway timeout fetching blueprint page '{Page}'", result.PageId);
+                continue;
+            }
             if (content is null) continue;
 
             var (blueprint, _) = BlueprintParser.Parse(content);

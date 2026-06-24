@@ -184,7 +184,7 @@ public sealed record BuildGoalRequest(
     {
         get
         {
-            if (OriginX is null || OriginZ is null || OriginZ is null)
+            if (OriginX is null || OriginY is null || OriginZ is null)
                 return null;
             return new Dictionary<string, object?>
             {

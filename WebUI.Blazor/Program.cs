@@ -115,7 +115,8 @@ if (agentEnabled)
     builder.Services.AddSingleton<IItemRegistry>(sp =>
         new MemorySmithItemRegistry(
             sp.GetRequiredService<IMemoryGateway>(),
-            sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value));
+            sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value,
+            logger: sp.GetService<ILogger<MemorySmithItemRegistry>>()));
     builder.Services.AddSingleton<IBlueprintRepository>(sp =>
         new MemorySmithBlueprintRepository(
             sp.GetRequiredService<IMemoryGateway>(),

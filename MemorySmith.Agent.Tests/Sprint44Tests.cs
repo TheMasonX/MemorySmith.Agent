@@ -291,6 +291,58 @@ public class Sprint44Tests
         Assert.That(gatherReq.Item, Is.EqualTo("stone"));
     }
 
+    // ── TSK-0087: BuildGoalRequest origin axis validation ──────────────────────
+
+    [Test]
+    public void IntentManager_BuildGoalRequest_WithAllThreeAxes_SetsParameters()
+    {
+        var mgr = new IntentManager();
+        var draft = new IntentDraft("yes", "build",
+            null, "small-house", null, 10, 64, 20,
+            1.0, null, "Building at origin...");
+
+        var req = mgr.BuildGoalRequest(draft);
+        Assert.That(req, Is.Not.Null);
+        Assert.That(req, Is.TypeOf<BuildGoalRequest>());
+        var buildReq = (BuildGoalRequest)req!;
+        Assert.That(buildReq.Parameters, Is.Not.Null, "Parameters should not be null when all 3 axes are present.");
+        Assert.That(buildReq.Parameters!["originX"], Is.EqualTo(10));
+        Assert.That(buildReq.Parameters!["originY"], Is.EqualTo(64));
+        Assert.That(buildReq.Parameters!["originZ"], Is.EqualTo(20));
+    }
+
+    [Test]
+    public void IntentManager_BuildGoalRequest_MissingOneAxis_ParametersIsNull()
+    {
+        var mgr = new IntentManager();
+        // IntentDraft with only X and Z but no Y → Parameters should be null
+        var draft = new IntentDraft("yes", "build",
+            null, "small-house", null, 10, null, 20,
+            1.0, null, "Building at incomplete origin...");
+
+        var req = mgr.BuildGoalRequest(draft);
+        Assert.That(req, Is.Not.Null);
+        var buildReq = (BuildGoalRequest)req!;
+        Assert.That(buildReq.Parameters, Is.Null,
+            "Parameters should be null when one axis is missing.");
+    }
+
+    [Test]
+    public void IntentManager_BuildGoalRequest_AllAxesNull_ParametersIsNull()
+    {
+        var mgr = new IntentManager();
+        // IntentDraft with no X, Y, Z → Parameters should be null
+        var draft = new IntentDraft("yes", "build",
+            null, "small-house", null, null, null, null,
+            1.0, null, "Building with auto origin...");
+
+        var req = mgr.BuildGoalRequest(draft);
+        Assert.That(req, Is.Not.Null);
+        var buildReq = (BuildGoalRequest)req!;
+        Assert.That(buildReq.Parameters, Is.Null,
+            "Parameters should be null when all axes are null.");
+    }
+
     // ── SmeltGoalDecomposer test ───────────────────────────────────────────
 
     [Test]

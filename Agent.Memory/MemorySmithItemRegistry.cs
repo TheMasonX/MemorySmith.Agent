@@ -1,6 +1,7 @@
 namespace Agent.Memory;
 
 using Agent.Core;
+using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
 /// <summary>
@@ -31,7 +32,8 @@ using System.Collections.Concurrent;
 public sealed class MemorySmithItemRegistry(
     IMemoryGateway memory,
     RestMemoryGatewayOptions options,
-    string? localPagesRoot = null) : IItemRegistry
+    string? localPagesRoot = null,
+    ILogger<MemorySmithItemRegistry>? logger = null) : IItemRegistry
 {
     private const string PagePrefix = "item-registry/";
     private readonly string? _localPagesRoot = localPagesRoot ?? FindLocalPagesRoot();
@@ -68,7 +70,22 @@ public sealed class MemorySmithItemRegistry(
         var pageId = $"{PagePrefix}{slug}";
 
         // 1. Direct page lookup (deterministic, fast — preferred path per D-003).
-        var content = await memory.GetPageAsync(pageId, ct);
+        string? content;
+        try
+        {
+            content = await memory.GetPageAsync(pageId, ct);
+        }
+        catch (HttpRequestException ex)
+        {
+            logger?.LogWarning(ex, "Gateway unavailable for item '{ItemId}' (page={PageId}, HTTP: {Status})",
+                itemId, pageId, ex.StatusCode);
+            content = null;
+        }
+        catch (TaskCanceledException ex)
+        {
+            logger?.LogWarning(ex, "Gateway timeout for item '{ItemId}' (page={PageId})", itemId, pageId);
+            content = null;
+        }
 
         // 2. Local file fallback for offline / dev runs using the repo's checked-in pages.
         if (string.IsNullOrWhiteSpace(content))
@@ -78,12 +95,39 @@ public sealed class MemorySmithItemRegistry(
         //    slug doesn't match the normalisation convention).
         if (content is null)
         {
-            var results = await memory.SearchAsync($"{PagePrefix}{itemId}", ct);
-            var hit = results.FirstOrDefault(r =>
-                string.Equals(r.Kind, "page", StringComparison.OrdinalIgnoreCase) &&
-                r.PageId.Contains("item-registry", StringComparison.OrdinalIgnoreCase));
-            if (hit is not null)
-                content = await memory.GetPageAsync(hit.PageId, ct);
+            try
+            {
+                var results = await memory.SearchAsync($"{PagePrefix}{itemId}", ct);
+                var hit = results.FirstOrDefault(r =>
+                    string.Equals(r.Kind, "page", StringComparison.OrdinalIgnoreCase) &&
+                    r.PageId.Contains("item-registry", StringComparison.OrdinalIgnoreCase));
+                if (hit is not null)
+                {
+                    try
+                    {
+                        content = await memory.GetPageAsync(hit.PageId, ct);
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        logger?.LogWarning(ex, "Gateway unavailable fetching search hit for item '{ItemId}' (hit={HitPageId}, HTTP: {Status})",
+                            itemId, hit.PageId, ex.StatusCode);
+                    }
+                    catch (TaskCanceledException ex)
+                    {
+                        logger?.LogWarning(ex, "Gateway timeout fetching search hit for item '{ItemId}' (hit={HitPageId})",
+                            itemId, hit.PageId);
+                    }
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                logger?.LogWarning(ex, "Gateway unavailable for item search '{ItemId}' (HTTP: {Status})",
+                    itemId, ex.StatusCode);
+            }
+            catch (TaskCanceledException ex)
+            {
+                logger?.LogWarning(ex, "Gateway timeout for item search '{ItemId}'", itemId);
+            }
         }
 
         return content is null ? null : ParseItemSpec(content);

@@ -262,89 +262,16 @@ public sealed class AgentBackgroundService(
         _cycleOutcomes.Clear();
         // Sprint 37: reset zero-area scan counter for new goal.
         _consecutiveZeroAreaScans = 0;
-        // Sprint 40 P0-B: creative mode provisioning.
-        // When the world is in creative mode and the goal requires items (IItemSpecGoal),
-        // enqueue a /give command via Chat to provision the needed items instead of
-        // relying on the removed IsCreativeMode auto-complete in GenericGatherGoal.
+        // Sprint 40 P0-B / Sprint 45 (TSK-0091): creative mode provisioning.
+        // When the world is in creative mode, provision items via /give commands.
+        // Minecraft servers kick bots that send 10+ commands in <100ms — the
+        // async method uses Task.Delay(200) between /give commands to prevent
+        // anti-spam kicks. Fire-and-forget because SetGoal is void; the
+        // ActionQueue is thread-safe so enqueues from the async method are safe.
         // Sprint 41: extended to also handle BuildGoal — provisions ALL blueprint
         // materials via /give so the creative PlaceBlock path has inventory to work with.
-        // Sprint 41: creative provisioning with anti-spam delays.
-        // Minecraft servers kick bots that send 10+ commands in <100ms.
-        // Each /give command is followed by a 200ms sleep so the server
-        // sees them as human-paced chat, not a command-spam bot.
         if (_worldState.IsCreativeMode)
-        {
-            if (goal is IItemSpecGoal itemGoal)
-            {
-                var have = _worldState.Inventory.GetValueOrDefault(itemGoal.Spec.ItemId);
-                var need = Math.Max(0, itemGoal.TargetCount - have);
-                if (need > 0)
-                {
-                    var giveCmd = $"/give @p {itemGoal.Spec.ItemId} {need}";
-                    _queue.Enqueue(new ActionData
-                    {
-                        Tool = "Chat",
-                        Arguments = { ["message"] = giveCmd }
-                    });
-                    logger.LogInformation(
-                        "[creative] provisioning {Need}x {Item} via '{GiveCmd}' at pos=({PosX},{PosY},{PosZ})",
-                        need, itemGoal.Spec.ItemId, giveCmd,
-                        _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
-                    _journal?.Log(new JournalEntry(
-                        _timeProvider.UtcNow, JournalEntryType.ActionDispatched, "CreativeGive",
-                        new Dictionary<string, object?>
-                        {
-                            ["item"] = itemGoal.Spec.ItemId,
-                            ["count"] = need,
-                        }));
-                    // Also enqueue a GetStatus so inventory is refreshed before planning
-                    _queue.Enqueue(new ActionData { Tool = "GetStatus" });
-                }
-            }
-            else if (goal is BuildGoal buildGoal)
-            {
-                var materials = buildGoal.Blueprint.Materials
-                    .GroupBy(m => m.Block, StringComparer.OrdinalIgnoreCase)
-                    .ToDictionary(g => g.Key, g => g.Sum(m => m.Quantity), StringComparer.OrdinalIgnoreCase);
-
-                var anyProvisioned = false;
-                foreach (var (block, quantity) in materials)
-                {
-                    var have = _worldState.Inventory.GetValueOrDefault(block);
-                    var need = Math.Max(0, quantity - have);
-                    if (need <= 0) continue;
-
-                    // Sprint 41: 200ms delay between /give commands to prevent
-                    // anti-spam kicks on Minecraft servers.
-                    if (anyProvisioned) Thread.Sleep(200);
-
-                    var giveCmd = $"/give @p {block} {need}";
-                    _queue.Enqueue(new ActionData
-                    {
-                        Tool = "Chat",
-                        Arguments = { ["message"] = giveCmd }
-                    });
-                    logger.LogInformation(
-                        "[creative] provisioning {Need}x {Item} for build '{Blueprint}' via '{GiveCmd}'",
-                        need, block, buildGoal.Blueprint.Name, giveCmd);
-                    _journal?.Log(new JournalEntry(
-                        _timeProvider.UtcNow, JournalEntryType.ActionDispatched, "CreativeGive",
-                        new Dictionary<string, object?>
-                        {
-                            ["item"] = block,
-                            ["count"] = need,
-                            ["blueprint"] = buildGoal.Blueprint.Name,
-                        }));
-                    anyProvisioned = true;
-                }
-
-                if (anyProvisioned)
-                {
-                    // Enqueue a GetStatus so inventory is refreshed before planning
-                    _queue.Enqueue(new ActionData { Tool = "GetStatus" });
-                }
-            }
-        }
+            _ = ProvisionGoalIfCreativeAsync(goal, _connectionCts?.Token ?? CancellationToken.None);
 
         // TSK-0021: report task-relevant inventory instead of generic top-5 summary.
         var taskInv = SummarizeTaskRelevantInventory(goal);
@@ -398,6 +325,99 @@ public sealed class AgentBackgroundService(
     {
         lock (_pendingLock)
             return [.. _pendingActions];
+    }
+
+    // ── TSK-0091: Creative provisioning (async, fire-and-forget from SetGoal) ──
+
+    /// <summary>
+    /// Sprint 45 (TSK-0091): Enqueues /give commands for creative-mode goals
+    /// with a 200ms delay between commands to prevent anti-spam kicks.
+    /// Called fire-and-forget from <see cref="SetGoal"/> because SetGoal is void.
+    /// The <see cref="ActionQueue"/> is thread-safe so concurrent enqueues are safe.
+    /// </summary>
+    private async Task ProvisionGoalIfCreativeAsync(IGoal goal, CancellationToken ct)
+    {
+        try
+        {
+            if (goal is IItemSpecGoal itemGoal)
+            {
+                var have = _worldState.Inventory.GetValueOrDefault(itemGoal.Spec.ItemId);
+                var need = Math.Max(0, itemGoal.TargetCount - have);
+                if (need > 0)
+                {
+                    var giveCmd = $"/give @p {itemGoal.Spec.ItemId} {need}";
+                    _queue.Enqueue(new ActionData
+                    {
+                        Tool = "Chat",
+                        Arguments = { ["message"] = giveCmd }
+                    });
+                    logger.LogInformation(
+                        "[creative] provisioning {Need}x {Item} via '{GiveCmd}' at pos=({PosX},{PosY},{PosZ})",
+                        need, itemGoal.Spec.ItemId, giveCmd,
+                        _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
+                    _journal?.Log(new JournalEntry(
+                        _timeProvider.UtcNow, JournalEntryType.ActionDispatched, "CreativeGive",
+                        new Dictionary<string, object?>
+                        {
+                            ["item"] = itemGoal.Spec.ItemId,
+                            ["count"] = need,
+                        }));
+                    // Also enqueue a GetStatus so inventory is refreshed before planning
+                    _queue.Enqueue(new ActionData { Tool = "GetStatus" });
+                }
+            }
+            else if (goal is BuildGoal buildGoal)
+            {
+                var materials = buildGoal.Blueprint.Materials
+                    .GroupBy(m => m.Block, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(g => g.Key, g => g.Sum(m => m.Quantity), StringComparer.OrdinalIgnoreCase);
+
+                var anyProvisioned = false;
+                foreach (var (block, quantity) in materials)
+                {
+                    var have = _worldState.Inventory.GetValueOrDefault(block);
+                    var need = Math.Max(0, quantity - have);
+                    if (need <= 0) continue;
+
+                    // Sprint 45 (TSK-0091): await Task.Delay instead of Thread.Sleep
+                    if (anyProvisioned)
+                        await Task.Delay(200, ct);
+
+                    var giveCmd = $"/give @p {block} {need}";
+                    _queue.Enqueue(new ActionData
+                    {
+                        Tool = "Chat",
+                        Arguments = { ["message"] = giveCmd }
+                    });
+                    logger.LogInformation(
+                        "[creative] provisioning {Need}x {Item} for build '{Blueprint}' via '{GiveCmd}'",
+                        need, block, buildGoal.Blueprint.Name, giveCmd);
+                    _journal?.Log(new JournalEntry(
+                        _timeProvider.UtcNow, JournalEntryType.ActionDispatched, "CreativeGive",
+                        new Dictionary<string, object?>
+                        {
+                            ["item"] = block,
+                            ["count"] = need,
+                            ["blueprint"] = buildGoal.Blueprint.Name,
+                        }));
+                    anyProvisioned = true;
+                }
+
+                if (anyProvisioned)
+                {
+                    // Enqueue a GetStatus so inventory is refreshed before planning
+                    _queue.Enqueue(new ActionData { Tool = "GetStatus" });
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogDebug("[creative] provisioning cancelled.");
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "[creative] provisioning failed: {Message}", ex.Message);
+        }
     }
 
     // ── BackgroundService ─────────────────────────────────────────────────────
