@@ -18,16 +18,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-06ebc1d2e8fb4a78a342e391f190791d",
+      "author": "anonymous",
+      "body": "Audit verification (2026-06-23): Confirmed as a valid finding. The audits identified that \u0060SmeltGoal.HasFailed\u0060 checks a fact key that no code path writes. This is correctly tracked as TSK-0085.",
+      "createdAtUtc": "2026-06-24T04:21:21.9317491Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-23T14:31:12.6542996Z",
-  "updatedAtUtc": "2026-06-23T14:31:12.6542996Z",
+  "updatedAtUtc": "2026-06-24T04:21:21.9317491Z",
   "completedAtUtc": null,
-  "revision": 1,
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0085-fix-smeltgoal-hasfailed-dead-code-never-returns-true.json"
 }

@@ -18,16 +18,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-85e4e952c16f4706bffad25d8566103b",
+      "author": "anonymous",
+      "body": "Audit verification (2026-06-23): This task overlaps with the Sprint44Tests which already cover AdvanceBuildCheckpoint, BlockPlacedEvent, and BlockPlaceSkippedEvent. The audit confirms more tests would be valuable, especially for: (1) the BlockPlaceSkipped \u2192 no checkpoint advance path, (2) duplicate BlockPlacedEvent, (3) missing _placeBlockContexts entry.",
+      "createdAtUtc": "2026-06-24T04:21:21.9879198Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-23T14:31:12.6036778Z",
-  "updatedAtUtc": "2026-06-23T14:31:12.6036778Z",
+  "updatedAtUtc": "2026-06-24T04:21:21.9879198Z",
   "completedAtUtc": null,
-  "revision": 1,
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0083-add-tests-for-advancebuildcheckpoint-blockplacedevent-blockplaceskippedevent-placeblockcontexts.json"
 }
