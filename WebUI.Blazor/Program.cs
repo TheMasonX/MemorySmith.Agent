@@ -392,8 +392,8 @@ app.MapGet("/", () => "MemorySmith.Agent is running.");
 app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
 {
     Name    = "MemorySmith.Agent",
-    Version = "0.37.0",
-    Phase   = "Sprint 36 — AgentRuntime + Observation-Driven Replanning",
+    Version = "0.46.0",
+    Phase   = "Sprint 46 — Tightening the Contracts",
     License = "MIT",
     Repository  = "https://github.com/TheMasonX/MemorySmith.Agent",
     Dashboard   = "/",

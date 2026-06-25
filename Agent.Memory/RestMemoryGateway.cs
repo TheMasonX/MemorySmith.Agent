@@ -5,6 +5,8 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 /// <summary>
 /// IMemoryGateway implementation that calls MemorySmith's REST API.
@@ -17,13 +19,15 @@ using System.Text.Json.Serialization;
 ///
 /// Auth: optional X-Api-Key header when MemorySmith is configured with ApiKey.
 /// </summary>
-public sealed class RestMemoryGateway(HttpClient http, RestMemoryGatewayOptions options) : IMemoryGateway
+public sealed class RestMemoryGateway(HttpClient http, RestMemoryGatewayOptions options, ILogger<RestMemoryGateway>? logger = null) : IMemoryGateway
 {
     private static readonly JsonSerializerOptions JsonOpts = new()
     {
         PropertyNameCaseInsensitive = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
     };
+
+    private readonly ILogger<RestMemoryGateway> _logger = logger ?? NullLogger<RestMemoryGateway>.Instance;
 
     // ── Search ────────────────────────────────────────────────────────────────
 
@@ -79,7 +83,7 @@ public sealed class RestMemoryGateway(HttpClient http, RestMemoryGatewayOptions 
         {
             existing = await http.GetFromJsonAsync<PageResponse>(url, JsonOpts, cancellationToken);
         }
-        catch { /* 404 or parse error — proceed with fallback title */ }
+        catch (Exception ex) { _logger.LogWarning(ex, "RestMemoryGateway.UpsertPageAsync: 404 or parse error for {PageId}", pageId); }
 
         var title = existing?.Title ?? pageId.Replace("-", " ");
         var req = new PageSaveRequest(pageId, title, content, options.DefaultPageRole);

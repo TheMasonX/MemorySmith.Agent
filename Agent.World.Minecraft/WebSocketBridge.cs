@@ -93,7 +93,7 @@ public sealed class WebSocketBridge(string uri,
         if (_ws?.State == WebSocketState.Open)
         {
             try { await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Disconnect", cancellationToken); }
-            catch { /* best effort */ }
+            catch (Exception ex) { _logger.LogWarning(ex, "WebSocketBridge.CloseAsync: {Message}", ex.Message); }
         }
     }
 
@@ -260,7 +260,7 @@ public sealed class WebSocketBridge(string uri,
             }
             while (!result.EndOfMessage);
 
-            var ev = ParseEvent(sb.ToString());
+            var ev = ParseEvent(sb.ToString(), _logger);
             if (ev is not null)
                 _inbound.Writer.TryWrite(ev);
         }
@@ -275,7 +275,7 @@ public sealed class WebSocketBridge(string uri,
     /// Sprint 35 P0-B: Added mineComplete → MineCompleteEvent.
     /// Sprint 35 P0-C: FlatAreaFoundEvent now includes SearchedRadius.
     /// </summary>
-    private static WorldEvent? ParseEvent(string json)
+    private static WorldEvent? ParseEvent(string json, ILogger<WebSocketBridge> instanceLogger)
     {
         try
         {
@@ -381,7 +381,7 @@ public sealed class WebSocketBridge(string uri,
                     Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
                     Timestamp: now),
 
-                "status" => ParseStatus(root, now),
+                "status" => ParseStatus(root, now, instanceLogger),
 
                 "blockPlaced" => new BlockPlacedEvent(
                     X: GetInt(root, "x"), Y: GetInt(root, "y"), Z: GetInt(root, "z"),
@@ -455,14 +455,12 @@ public sealed class WebSocketBridge(string uri,
         }
         catch (Exception ex)
         {
-            // WebSocketBridge has no ILogger dependency; exceptions are returned as null
-            // and logged upstream by the caller (ReceiveLoopAsync / MinecraftAdapter)
-            System.Diagnostics.Debug.WriteLine($"WebSocketBridge.ParseEvent: {ex.GetType().Name}: {ex.Message}");
+            instanceLogger.LogWarning(ex, "WebSocketBridge.ParseEvent: {Message}", ex.Message);
             return null;
         }
     }
 
-    private static StatusEvent ParseStatus(JsonElement root, DateTimeOffset now)
+    private static StatusEvent ParseStatus(JsonElement root, DateTimeOffset now, ILogger<WebSocketBridge> instanceLogger)
     {
         var inv = new Dictionary<string, int>();
         if (root.TryGetProperty("inventory", out var invEl))
@@ -477,7 +475,7 @@ public sealed class WebSocketBridge(string uri,
                         if (prop.Value.TryGetInt32(out var qty) && qty > 0)
                             inv[prop.Name] = qty;
                 }
-                catch { /* malformed inventory — leave empty */ }
+                catch (Exception ex) { instanceLogger.LogWarning(ex, "WebSocketBridge.ParseEvent malformed inventory: {Message}", ex.Message); }
             }
             else if (invEl.ValueKind == JsonValueKind.Object)
             {

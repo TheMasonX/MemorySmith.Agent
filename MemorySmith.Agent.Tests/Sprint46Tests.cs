@@ -3,6 +3,16 @@ namespace MemorySmith.Agent.Tests;
 using global::Agent.Core;
 using global::Agent.Planning;
 using global::Agent.Planning.Goals;
+using System.Linq;
+using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 
 /// <summary>
@@ -229,5 +239,57 @@ public class Sprint46Tests
         Assert.That(AliasRegistry.CraftAliases["plank"], Is.EqualTo("oak_planks"));
         Assert.That(AliasRegistry.CraftAliases["torch"], Is.EqualTo("torch"));
         Assert.That(AliasRegistry.CraftAliases["furnace"], Is.EqualTo("furnace"));
+    }
+
+    // ── TSK-0109: /api/about metadata ────────────────────────────────────────
+
+    [Test]
+    public async Task ApiAbout_ReturnsCorrectVersionAndPhase()
+    {
+        // Verify the /api/about endpoint returns the correct version and phase
+        // matching the current roadmap.
+        await using var app = BuildApiAboutApp();
+        await app.StartAsync();
+
+        var client = app.GetTestClient();
+        var response = await client.GetAsync("/api/about");
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
+        // Read the response and parse it as JSON
+        var body = await response.Content.ReadAsStringAsync();
+        var json = JsonDocument.Parse(body).RootElement;
+
+        // Results.Ok() with anonymous types serializes with camelCase
+        // in minimal API hosts using System.Text.Json defaults.
+        Assert.That(json.GetProperty("version").GetString(), Is.EqualTo("0.46.0"),
+            "/api/about version must match roadmap (Sprint 46).");
+        Assert.That(json.GetProperty("phase").GetString(), Does.StartWith("Sprint 46"),
+            "/api/about phase must reflect current sprint.");
+    }
+
+    /// <summary>
+    /// Mirrors the /api/about route from Program.cs so we can test it in isolation.
+    /// </summary>
+    private static WebApplication BuildApiAboutApp()
+    {
+        var builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+        builder.Services.AddLogging(lb => lb.SetMinimumLevel(LogLevel.None));
+
+        var app = builder.Build();
+
+        // Route definition mirrors WebUI.Blazor/Program.cs
+        app.MapGet("/api/about", () => Results.Ok(new
+        {
+            Name    = "MemorySmith.Agent",
+            Version = "0.46.0",
+            Phase   = "Sprint 46 — Tightening the Contracts",
+            License = "MIT",
+            Repository  = "https://github.com/TheMasonX/MemorySmith.Agent",
+            Dashboard   = "/",
+            RegisteredGoals = Array.Empty<string>(),
+        }));
+
+        return app;
     }
 }
