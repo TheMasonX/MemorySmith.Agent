@@ -299,14 +299,8 @@ public sealed class HtnTaskLibrary
         }
 
         // Sprint 44: pre-gather the input item if it's a mineable block.
-        var inputBlock = inputItem switch
-        {
-            "iron_ingot"    => "iron_ore",
-            "gold_ingot"    => "gold_ore",
-            "copper_ingot"  => "copper_ore",
-            "netherite_scrap" => "ancient_debris",
-            _               => inputItem,
-        };
+        // TSK-0082: uses shared SmeltableMapping instead of inline switch.
+        var inputBlock = SmeltableMapping.GetInputBlock(inputItem);
 
         var haveInput = state.Inventory.GetValueOrDefault(inputBlock);
         var needInput = count - haveInput;
@@ -329,15 +323,7 @@ public sealed class HtnTaskLibrary
     private static bool IsMineableBlock(string block)
     {
         if (DirectMineBlocks.Contains(block)) return true;
-        return block switch
-        {
-            "iron_ore" or "deepslate_iron_ore" or
-            "gold_ore" or "deepslate_gold_ore" or
-            "copper_ore" or "deepslate_copper_ore" or
-            "ancient_debris" or "nether_gold_ore" or
-            "coal_ore" or "deepslate_coal_ore" => true,
-            _ => false,
-        };
+        return SmeltableMapping.IsSmeltableMineableBlock(block);
     }
 
     /// <summary>

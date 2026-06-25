@@ -64,22 +64,44 @@ public sealed class ChatInterpreter : IChatInterpreter
     private readonly string _botName;
     private DateTimeOffset _lastBotSpoke = DateTimeOffset.MinValue;
     private readonly int _conversationWindowSeconds;
+    private readonly double _maxResponseDistanceBlocks;
+
+    // TSK-0105: compiled regex for whole-word bot name matching (avoids substring false positives)
+    private Regex? _botNameRegex;
 
     // ── Constructor ───────────────────────────────────────────────────────────
 
-    public ChatInterpreter(string botName, int conversationWindowSeconds = 60)
+    public ChatInterpreter(string botName, int conversationWindowSeconds = 60,
+        double maxResponseDistanceBlocks = 64.0)
     {
         _botName = botName;
         _conversationWindowSeconds = conversationWindowSeconds;
+        _maxResponseDistanceBlocks = maxResponseDistanceBlocks;
+        if (!string.IsNullOrEmpty(botName))
+            _botNameRegex = BuildBotNameRegex(botName);
     }
 
     /// <summary>
     /// Sprint 39 P1-C: convenience constructor that takes <see cref="ChatOptions"/>.
     /// Bot name is not stored here — it arrives via the <c>botName</c> parameter of
     /// <see cref="InterpretAsync"/> at call time.
+    /// TSK-0103: also extracts MaxResponseDistanceBlocks for distance-based gating.
     /// </summary>
     public ChatInterpreter(ChatOptions opts)
-        : this(string.Empty, opts.ConversationWindowSeconds) { }
+        : this(string.Empty, opts.ConversationWindowSeconds, opts.MaxResponseDistanceBlocks) { }
+
+    /// <summary>
+    /// TSK-0105: Builds a compiled word-boundary regex for bot name matching.
+    /// Uses \b word boundaries to prevent substring false positives
+    /// (e.g. "Leo" won't match "helios").
+    /// RegexOptions.IgnoreCase for case-insensitive matching.
+    /// </summary>
+    private static Regex BuildBotNameRegex(string botName)
+    {
+        var escaped = Regex.Escape(botName);
+        return new Regex($@"\b{escaped}\b",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    }
 
     // ── IChatInterpreter ──────────────────────────────────────────────────────
 
@@ -104,16 +126,19 @@ public sealed class ChatInterpreter : IChatInterpreter
     /// <summary>
     /// Determines whether this message is directed at the bot.
     /// Criteria (any of):
-    ///   - Bot name appears in the message
+    ///   - Bot name appears in the message (whole-word match, TSK-0105)
     ///   - Only 1 player is online (must be talking to the bot)
     ///   - Bot spoke recently (within conversation window) — continuation heuristic
+    ///
+    /// TSK-0103: When none of the above apply, also checks distance gate:
+    /// if the player is too far away, the message is not considered addressed.
     /// </summary>
     private bool IsDirectedAtBot(
         string message, string botName,
         int onlinePlayers, Position? playerPosition, Position botPosition)
     {
-        // Explicit name mention
-        if (message.Contains(botName, StringComparison.OrdinalIgnoreCase))
+        // TSK-0105: whole-word match instead of substring Contains
+        if (MatchesBotName(message, botName))
             return true;
 
         // Solo player — must be talking to the bot
@@ -125,7 +150,32 @@ public sealed class ChatInterpreter : IChatInterpreter
         if (elapsed.TotalSeconds <= _conversationWindowSeconds)
             return true;
 
+        // TSK-0103: distance gate — if player is far away, not addressed
+        if (playerPosition is not null
+            && Distance(botPosition, playerPosition) > _maxResponseDistanceBlocks)
+            return false;
+
         return false;
+    }
+
+    /// <summary>
+    /// TSK-0105: Checks if the bot name appears as a whole word in the message.
+    /// Uses a compiled word-boundary regex to avoid substring false positives.
+    /// Falls back to ordinal case-insensitive Contains if no regex is built
+    /// (e.g. when bot name changes across calls via InterpretAsync's botName param).
+    /// </summary>
+    private static bool MatchesBotName(string message, string botName)
+    {
+        var escaped = Regex.Escape(botName);
+        return Regex.IsMatch(message, $@"\b{escaped}\b",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+    }
+
+    private static double Distance(Position a, Position b)
+    {
+        var dx = a.X - b.X;
+        var dz = a.Z - b.Z;
+        return Math.Sqrt(dx * dx + dz * dz);
     }
 
     /// <summary>

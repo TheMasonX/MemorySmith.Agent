@@ -11,6 +11,8 @@ using Agent.Core;
 /// <c>CraftItemGoalDecomposer</c> → <c>CraftItemTool</c>, which never exercised
 /// the adapter's <c>case 'smelt':</c> handler. This is the fix for the 7-sprint-old
 /// smelt→CraftItem routing bug.
+///
+/// TSK-0082: OutputItem now delegates to the shared <see cref="SmeltableMapping"/>.
 /// </summary>
 public sealed class SmeltGoal(string inputItem, int count = 1) : IGoal
 {
@@ -18,23 +20,12 @@ public sealed class SmeltGoal(string inputItem, int count = 1) : IGoal
     public int    Count     => count;
 
     /// <summary>
-    /// Output item: derived from the smeltable input. Returns known outputs for recognized
-    /// smeltable ores/items; returns InputItem as-is for all others (identity passthrough).
-    ///
-    /// NOTE: The wild-card "*_ore → *_ingot" pattern is intentionally avoided because it
-    /// produces invalid item IDs for non-smeltable ores (redstone_ore → "redstone_ingot",
-    /// emerald_ore → "emerald_ingot", etc.). Only explicitly listed mappings are valid.
-    /// Extend this list when new smeltable items are added.
+    /// Output item: derived from the smeltable input via the shared
+    /// <see cref="SmeltableMapping.GetOutput"/> method.
+    /// Returns known outputs for recognized smeltable ores/items;
+    /// returns InputItem as-is for all others (identity passthrough).
     /// </summary>
-    public string OutputItem => InputItem switch
-    {
-        "iron_ore" or "raw_iron"        => "iron_ingot",
-        "gold_ore" or "raw_gold"        => "gold_ingot",
-        "copper_ore" or "raw_copper"    => "copper_ingot",
-        "nether_gold_ore"               => "gold_ingot",
-        "ancient_debris"                => "netherite_scrap",
-        _                               => InputItem,
-    };
+    public string OutputItem => SmeltableMapping.GetOutput(inputItem);
 
     public string   Name        => $"SmeltItem:{inputItem}";
     public string   Description => $"Smelt {count}x {inputItem.Replace('_', ' ')} into {OutputItem.Replace('_', ' ')}.";
