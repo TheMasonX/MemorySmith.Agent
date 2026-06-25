@@ -47,14 +47,11 @@ public sealed class SmeltGoal(string inputItem, int count = 1) : IGoal
         return state.Inventory.GetValueOrDefault(OutputItem) >= count;
     }
 
-    /// <inheritdoc/>
-    public bool HasFailed(WorldState state) =>
-        state.Facts.TryGetValue($"goal:SmeltItem:{inputItem}:failed", out var v) && IsTruthy(v);
-
-    private static bool IsTruthy(object? value) => value switch
-    {
-        bool b => b,
-        string s when bool.TryParse(s, out var parsed) => parsed,
-        _ => false,
-    };
+    /// <summary>
+    /// TSK-0085: Always returns false. The fact key <c>goal:SmeltItem:{inputItem}:failed</c>
+    /// is never written by any code path — AgentBackgroundService uses a consecutive-failure
+    /// counter for abort detection instead. This method exists to satisfy the <see cref="IGoal"/>
+    /// interface contract. If a failure-write site is added later, restore the fact-key lookup.
+    /// </summary>
+    public bool HasFailed(WorldState state) => false;
 }

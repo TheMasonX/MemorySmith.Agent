@@ -4,7 +4,7 @@
   "title": "Fix bot name detection \u2014 use whole-word matching",
   "description": "From audit: ChatInterpreter uses message.Contains(botName, OrdinalIgnoreCase) which matches substrings. A bot named \u0022Leo\u0022 triggers on \u0022helios\u0022. Replace with compiled word-boundary regex (\\\\b{botName}\\\\b) for accurate mention detection.\n\nSource: msa_audit_ad2215e-6-24-26.md (Finding 3, 92% confidence), memorysmith_agent_extended_audit (Finding 7, 92% confidence)",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "Medium",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,11 +23,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-25T04:20:54.8371851Z",
-  "updatedAtUtc": "2026-06-25T04:20:54.8371851Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-06-25T13:39:03.8243869Z",
+  "completedAtUtc": "2026-06-25T13:39:03.8243869Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0105-fix-bot-name-detection-use-whole-word-matching.json"
 }

@@ -4,9 +4,8 @@
   "title": "Extract shared alias dictionaries to eliminate drift risk",
   "description": "## Evidence\n\u0060IntentManager.cs\u0060 has two alias dictionaries (\u0060BlueprintAliases\u0060 and \u0060ItemAliases\u0060) with a comment noting they\u0027re \u0022also duplicated in ChatInterpreter.cs (fast-path).\u0022 When aliases change in one file, the other can drift.\n\n## Impact\nThe LLM path (via IntentManager) and the fast-path (via ChatInterpreter) could resolve the same user request differently.\n\n## Fix\nExtract shared static alias dictionaries to a single location (e.g. \u0060Agent.Core/Aliases.cs\u0060) and reference from both consumers.\n\n## Verification\nOverlooked by all audits. See \u0060Data/Pages/audits/msa-audit-verification-6-23.md\u0060 section O3.",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "Medium",
-  "councilPromotion": "Promoted from P3 to P2 by audit-validation-sprint46-plan-council-2026-06-24",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
   "assigneeCustomText": "Agent",
@@ -27,11 +26,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-24T04:21:21.9890858Z",
-  "updatedAtUtc": "2026-06-24T04:21:21.9890858Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-06-25T13:38:58.4288364Z",
+  "completedAtUtc": "2026-06-25T13:38:58.4288364Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0099-extract-shared-alias-dictionaries-to-eliminate-drift-risk.json"
 }
