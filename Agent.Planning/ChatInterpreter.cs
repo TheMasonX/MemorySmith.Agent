@@ -161,22 +161,34 @@ public sealed class ChatInterpreter : IChatInterpreter
     /// <summary>
     /// TSK-0105: Checks if the bot name appears as a whole word in the message.
     /// Uses a compiled word-boundary regex to avoid substring false positives.
-    /// Falls back to ordinal case-insensitive Contains if no regex is built
-    /// (e.g. when bot name changes across calls via InterpretAsync's botName param).
+    ///
+    /// AUD-48-002: Uses the cached compiled regex (when available and matching)
+    /// instead of creating a new regex on every call. When the bot name differs
+    /// from the constructor parameter (e.g. via <see cref="InterpretAsync"/>'s
+    /// <c>botName</c> override), falls back to inline <see cref="Regex.IsMatch"/>.
     /// </summary>
-    private static bool MatchesBotName(string message, string botName)
+    private bool MatchesBotName(string message, string botName)
     {
+        if (_botNameRegex is not null
+            && string.Equals(_botName, botName, StringComparison.OrdinalIgnoreCase))
+        {
+            return _botNameRegex.IsMatch(message);
+        }
+
         var escaped = Regex.Escape(botName);
         return Regex.IsMatch(message, $@"\b{escaped}\b",
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
     }
 
-    private static double Distance(Position a, Position b)
-    {
-        var dx = a.X - b.X;
-        var dz = a.Z - b.Z;
-        return Math.Sqrt(dx * dx + dz * dz);
-    }
+    /// <summary>
+    /// Horizontal distance (X/Z only) between two positions.
+    /// AUD-48-003: delegates to shared <see cref="ChatDistance.Horizontal"/> so
+    /// deterministic and LLM chat paths use the same calculation.
+    /// Vertical separation (Y) is intentionally excluded — it does not affect
+    /// whether a player is within chat-hearing range in Minecraft.
+    /// </summary>
+    private static double Distance(Position a, Position b) =>
+        ChatDistance.Horizontal(a, b);
 
     /// <summary>
     /// Core pattern-matching parser. Returns a <see cref="ChatInterpretation"/>

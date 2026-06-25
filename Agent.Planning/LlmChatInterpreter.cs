@@ -290,7 +290,7 @@ public sealed class LlmChatInterpreter(
             if (!m.Success)
             {
                 // Sprint 20: try to salvage intent from truncated JSON (no closing brace).
-                return TryParseTruncatedJson(json);
+                return TryParseTruncatedJson(json, logger);
             }
 
             using var doc  = JsonDocument.Parse(m.Value);
@@ -411,9 +411,12 @@ public sealed class LlmChatInterpreter(
         }
     }
 
-    private static double Distance(Position a, Position b)
-    {
-        var dx = a.X - b.X; var dy = a.Y - b.Y; var dz = a.Z - b.Z;
-        return Math.Sqrt(dx * dx + dy * dy + dz * dz);
-    }
+    /// <summary>
+    /// Horizontal distance (X/Z only). AUD-48-003: delegates to shared
+    /// <see cref="ChatDistance.Horizontal"/> so deterministic and LLM chat
+    /// paths use the same calculation — vertical separation does not affect
+    /// whether a player is within chat-hearing range in Minecraft.
+    /// </summary>
+    private static double Distance(Position a, Position b) =>
+        ChatDistance.Horizontal(a, b);
 }

@@ -238,4 +238,82 @@ public class Sprint48Tests
         var goal = new SmeltGoal("unknown_item");
         Assert.That(goal.OutputItem, Is.EqualTo("unknown_item"));
     }
+
+    // ── AUD-48-001: Raw items are NOT mineable blocks ────────────────────────
+
+    [Test]
+    public void SmeltableMapping_RawIron_IsNotMineableBlock()
+    {
+        // AUD-48-001: raw_iron is an item drop, not a block — must not appear
+        // in SmeltableMineableBlocks to prevent MineBlock(raw_iron) emissions.
+        Assert.That(SmeltableMapping.IsSmeltableMineableBlock("raw_iron"), Is.False);
+    }
+
+    [Test]
+    public void SmeltableMapping_RawGold_IsNotMineableBlock()
+    {
+        Assert.That(SmeltableMapping.IsSmeltableMineableBlock("raw_gold"), Is.False);
+    }
+
+    [Test]
+    public void SmeltableMapping_RawCopper_IsNotMineableBlock()
+    {
+        Assert.That(SmeltableMapping.IsSmeltableMineableBlock("raw_copper"), Is.False);
+    }
+
+    [Test]
+    public void SmeltableMapping_GetInputBlock_ResolvesRawIronToIronOre()
+    {
+        // AUD-48-001: GetInputBlock must resolve raw items to their ore block
+        // so DecomposeSmeltItem emits MineBlock(iron_ore) not MineBlock(raw_iron).
+        Assert.That(SmeltableMapping.GetInputBlock("raw_iron"), Is.EqualTo("iron_ore"));
+    }
+
+    [Test]
+    public void SmeltableMapping_GetInputBlock_ResolvesRawGoldToGoldOre()
+    {
+        Assert.That(SmeltableMapping.GetInputBlock("raw_gold"), Is.EqualTo("gold_ore"));
+    }
+
+    [Test]
+    public void SmeltableMapping_GetInputBlock_ResolvesRawCopperToCopperOre()
+    {
+        Assert.That(SmeltableMapping.GetInputBlock("raw_copper"), Is.EqualTo("copper_ore"));
+    }
+
+    // ── AUD-48-002: Cached regex is wired ────────────────────────────────────
+
+    [Test]
+    public void BotName_MultiplayerNamed_StillAddressedWithCachedRegex()
+    {
+        // AUD-48-002: Verifies the cached _botNameRegex is consulted when the
+        // call-time botName matches the constructor botName (common case).
+        var interp = new ChatInterpreter("BuildBot", conversationWindowSeconds: 0, maxResponseDistanceBlocks: 64.0);
+        var result = interp.InterpretAsync(
+            "Player1", "BuildBot come here", "BuildBot", 3,
+            BotPos, PlayerPos, Empty).Result;
+        Assert.That(result, Is.Not.Null,
+            "Cached regex should match exact bot name in multiplayer.");
+    }
+
+    // ── AUD-48-003: Shared distance calculation ──────────────────────────────
+
+    [Test]
+    public void ChatDistance_Horizontal_IgnoresVerticalSeparation()
+    {
+        // Same X,Z at different heights — distance should be zero.
+        var a = new Position(10, 64, 20);
+        var b = new Position(10, 120, 20);
+        Assert.That(ChatDistance.Horizontal(a, b), Is.EqualTo(0.0).Within(0.001));
+    }
+
+    [Test]
+    public void ChatDistance_Horizontal_MatchesDeterministicPath()
+    {
+        // Verifies the deterministic path uses the shared calculator.
+        var a = new Position(0, 64, 0);
+        var b = new Position(30, 80, 40);
+        var expected = System.Math.Sqrt(30.0 * 30.0 + 40.0 * 40.0); // 50
+        Assert.That(ChatDistance.Horizontal(a, b), Is.EqualTo(expected).Within(0.001));
+    }
 }

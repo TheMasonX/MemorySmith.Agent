@@ -50,9 +50,28 @@ public static class SmeltableMapping
         };
 
     /// <summary>
-    /// Set of all mineable smeltable ore/raw blocks (including deepslate variants).
+    /// Maps raw item drops to the ore block that must be mined to obtain them.
+    /// AUD-48-001: separates smelt-input items from mineable source blocks so
+    /// DecomposeSmeltItem never emits MineBlock(raw_iron) — an invalid action.
+    /// Checked before OutputToInput in <see cref="GetInputBlock"/>.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, string> RawInputToBlock =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["raw_iron"]   = "iron_ore",
+            ["raw_gold"]   = "gold_ore",
+            ["raw_copper"] = "copper_ore",
+        };
+
+    /// <summary>
+    /// Set of all mineable smeltable ore blocks (including deepslate variants).
     /// Used by DecomposeSmeltItem.IsMineableBlock to decide whether a MineBlock
     /// action should be emitted.
+    ///
+    /// AUD-48-001: raw item drops (raw_iron, raw_gold, raw_copper) removed from
+    /// this set. They are items, not blocks, and cannot be valid MineBlock targets.
+    /// Raw items are resolved to their ore block equivalents via
+    /// <see cref="RawInputToBlock"/> in <see cref="GetInputBlock"/>.
     /// </summary>
     public static readonly IReadOnlySet<string> SmeltableMineableBlocks =
         new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -62,7 +81,6 @@ public static class SmeltableMapping
             "copper_ore", "deepslate_copper_ore",
             "ancient_debris", "nether_gold_ore",
             "coal_ore", "deepslate_coal_ore",
-            "raw_iron", "raw_gold", "raw_copper",
         };
 
     /// <summary>
@@ -72,10 +90,16 @@ public static class SmeltableMapping
         InputToOutput.TryGetValue(inputItem, out var output) ? output : inputItem;
 
     /// <summary>
-    /// Returns the raw input block for a given smelted output, or the output itself if unknown.
+    /// Returns the mineable source block for a given item.
+    /// Resolution order:
+    ///   1. RawInputToBlock — raw item drops (raw_iron → iron_ore)  [AUD-48-001]
+    ///   2. OutputToInput   — smelted output (iron_ingot → iron_ore)
+    ///   3. Identity        — already an ore block or unknown
     /// </summary>
-    public static string GetInputBlock(string outputItem) =>
-        OutputToInput.TryGetValue(outputItem, out var input) ? input : outputItem;
+    public static string GetInputBlock(string item) =>
+        RawInputToBlock.TryGetValue(item, out var rawBlock) ? rawBlock
+        : OutputToInput.TryGetValue(item, out var oreBlock) ? oreBlock
+        : item;
 
     /// <summary>
     /// Returns true if the given block is a known mineable smeltable ore or raw material.
