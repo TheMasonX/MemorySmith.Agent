@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0101-apikeymiddleware-safety-hardening-with-explicit-allowunauthenticatedapi-flag",
+  "key": "TSK-0101",
+  "title": "ApiKeyMiddleware safety hardening with explicit AllowUnauthenticatedApi flag",
+  "description": "Add \u0060Agent:AllowUnauthenticatedApi\u0060 bool configuration option (default false). When false AND \u0060Agent:ApiKey\u0060 is missing/empty, block all \u0060/api/*\u0060 requests with 401. When true, preserve existing dev-convenience pass-through. Emit \u0060LogWarning\u0060 on startup whenever auth is disabled (either via explicit flag or missing key). Keep backward compatibility for local dev.\n\nFiles: \u0060WebUI.Blazor/ApiKeyMiddleware.cs\u0060, \u0060WebUI.Blazor/appsettings*.json\u0060\n\nEvidence: deep-dive audit Finding #5 \u2014 auth can be disabled by configuration omission. This is a P1 deployment safety fix.\n\n**Note:** Auto-generated key TSK-0101 conflicts with existing Sprint 46 Wave A task. Correct key is **TSK-0110**.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-46",
+    "wave-c",
+    "security"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-25T01:45:19.6328297Z",
+  "updatedAtUtc": "2026-06-25T01:45:29.8958689Z",
+  "completedAtUtc": null,
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0101-apikeymiddleware-safety-hardening-with-explicit-allowunauthenticatedapi-flag.json"
+}
