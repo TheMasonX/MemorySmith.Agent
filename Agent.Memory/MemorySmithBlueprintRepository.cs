@@ -41,6 +41,11 @@ public sealed class MemorySmithBlueprintRepository(
         {
             content = await memory.GetPageAsync(pageId, ct);
         }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            // TSK-0109: caller-initiated cancellation — propagate immediately.
+            throw;
+        }
         catch (HttpRequestException ex)
         {
             logger?.LogWarning(ex, "Gateway unavailable for blueprint '{Id}' (page={PageId}, HTTP: {Status})",
@@ -82,6 +87,10 @@ public sealed class MemorySmithBlueprintRepository(
                     {
                         content = await memory.GetPageAsync(hit.PageId, ct);
                     }
+                    catch (OperationCanceledException) when (ct.IsCancellationRequested)
+                    {
+                        throw;
+                    }
                     catch (HttpRequestException ex)
                     {
                         logger?.LogWarning(ex, "Gateway unavailable fetching search hit for blueprint '{Id}' (hit={HitPageId}, HTTP: {Status})",
@@ -97,6 +106,10 @@ public sealed class MemorySmithBlueprintRepository(
                 {
                     logger?.LogWarning("Blueprint '{Id}' not found — gateway, local, and search all returned empty.", blueprintId);
                 }
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                throw;
             }
             catch (HttpRequestException ex)
             {
@@ -133,6 +146,10 @@ public sealed class MemorySmithBlueprintRepository(
         {
             results = await memory.SearchAsync(query, ct);
         }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            throw;
+        }
         catch (HttpRequestException ex)
         {
             logger?.LogWarning(ex, "Gateway unavailable for blueprint search query '{Query}' (HTTP: {Status})",
@@ -155,6 +172,10 @@ public sealed class MemorySmithBlueprintRepository(
             try
             {
                 content = await memory.GetPageAsync(result.PageId, ct);
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                throw;
             }
             catch (HttpRequestException ex)
             {

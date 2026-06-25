@@ -1117,7 +1117,9 @@ public sealed class AgentBackgroundService(
             logger.LogWarning("No {Block} found in range — will count as failure.", bnf.Block);
             // TSK-0021: track per-block failure count for progressive wander radius.
             var countKey = $"event:BlockNotFound:Count:{bnf.Block}";
-            var prevCount = _worldState.Facts.TryGetValue(countKey, out var pc) && pc is int pci
+            // TSK-0106: value is stored as string via .ToString(); read as string and parse.
+            var prevCount = _worldState.Facts.TryGetValue(countKey, out var pc)
+                && pc is string pcs && int.TryParse(pcs, out var pci)
                 ? pci : 0;
             _worldState = _worldState.With(b =>
                 b.SetFact(countKey, (prevCount + 1).ToString(), FactSource.Observed));

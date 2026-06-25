@@ -4,7 +4,7 @@
 
 A modular autonomous agent framework that treats Minecraft as a *world adapter* and uses the [MemorySmith](https://github.com/TheMasonX/MemorySmith) wiki as long-term memory.
 
-**v0.35.0** — Sprint 35 complete — 501+ tests
+**v0.49.0** — Sprint 49 complete — 722+ tests
 
 ---
 

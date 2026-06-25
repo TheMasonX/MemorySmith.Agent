@@ -78,12 +78,17 @@ public sealed class RestMemoryGateway(HttpClient http, RestMemoryGatewayOptions 
         // Fetch existing page to preserve its title on update.
         // If the page doesn't exist we fall back to pageId as a reasonable title
         // (the PUT will create it as an upsert on MemorySmith's side).
+        // TSK-0111: only HttpRequestException with 404 triggers the upsert fallback.
+        // Auth failures, timeouts, and 500s propagate to avoid silent data loss.
         PageResponse? existing = null;
         try
         {
             existing = await http.GetFromJsonAsync<PageResponse>(url, JsonOpts, cancellationToken);
         }
-        catch (Exception ex) { _logger.LogWarning(ex, "RestMemoryGateway.UpsertPageAsync: 404 or parse error for {PageId}", pageId); }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            _logger?.LogInformation("RestMemoryGateway.UpdatePageAsync: page '{PageId}' not found — will upsert.", pageId);
+        }
 
         var title = existing?.Title ?? pageId.Replace("-", " ");
         var req = new PageSaveRequest(pageId, title, content, options.DefaultPageRole);

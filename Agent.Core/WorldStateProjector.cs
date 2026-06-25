@@ -104,72 +104,10 @@ public sealed class WorldStateProjector
         return StoreFacts(result, e);
     }
 
-    // ── Sprint 40 P0-B: Block-to-item drop mapping for self-dropping blocks ───────
-    // Minecraft blocks that drop themselves when mined without silk touch.
-    // For these blocks, ApplyBlockMined can safely increment inventory for the block name.
-    // Extended list covers all common overworld/terrain blocks.
-
-    private static readonly HashSet<string> SelfDroppingBlocks = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "dirt", "grass_block", "podzol", "mycelium", "coarse_dirt", "rooted_dirt",
-        "sand", "red_sand", "suspicious_sand", "suspicious_gravel",
-        "gravel", "clay",
-        "cobblestone", "mossy_cobblestone",
-        "stone",  // drops cobblestone - handled by BlockToItemDrop map below
-        "netherrack", "end_stone",
-        "snow_block", "ice", "packed_ice", "blue_ice",
-        // Logs (all overworld types)
-        "oak_log", "birch_log", "spruce_log", "dark_oak_log",
-        "jungle_log", "acacia_log", "cherry_log", "mangrove_log",
-        // Planks
-        "oak_planks", "birch_planks", "spruce_planks", "dark_oak_planks",
-        "jungle_planks", "acacia_planks", "cherry_planks", "mangrove_planks",
-        // Stone variants
-        "granite", "diorite", "andesite", "tuff", "calcite", "dripstone_block",
-        "deepslate", "cobbled_deepslate",
-        // Other
-        "obsidian", "crying_obsidian",
-        "sandstone", "red_sandstone",
-        "terracotta", "white_terracotta", "bricks",
-        "nether_brick", "soul_sand", "soul_soil",
-    };
-
-    /// <summary>
-    /// Maps block names to their dropped item names when the block does NOT drop itself.
-    /// Key = block name, Value = item name that drops.
-    /// Only blocks with different drop names need entries here.
-    /// </summary>
-    private static readonly Dictionary<string, string> BlockToItemDrop = new(StringComparer.OrdinalIgnoreCase)
-    {
-        // Stone -> cobblestone
-        ["stone"] = "cobblestone",
-        ["stone_slab"] = "stone_slab",
-        // Grass/mycelium -> dirt
-        ["grass_block"] = "dirt",
-        ["mycelium"] = "dirt",
-        // Ores (drop raw materials, not the ore block)
-        ["diamond_ore"] = "diamond",
-        ["deepslate_diamond_ore"] = "diamond",
-        ["coal_ore"] = "coal",
-        ["deepslate_coal_ore"] = "coal",
-        ["emerald_ore"] = "emerald",
-        ["deepslate_emerald_ore"] = "emerald",
-        ["redstone_ore"] = "redstone",
-        ["deepslate_redstone_ore"] = "redstone",
-        ["lapis_ore"] = "lapis_lazuli",
-        ["deepslate_lapis_ore"] = "lapis_lazuli",
-        ["iron_ore"] = "raw_iron",
-        ["deepslate_iron_ore"] = "raw_iron",
-        ["copper_ore"] = "raw_copper",
-        ["deepslate_copper_ore"] = "raw_copper",
-        ["gold_ore"] = "raw_gold",
-        ["deepslate_gold_ore"] = "raw_gold",
-        ["nether_gold_ore"] = "gold_nugget",
-        // Netherite
-        ["ancient_debris"] = "netherite_scrap",
-        // Glass (silk touch only normally, but handle gracefully)
-        ["glass"] = "glass",
-    };
+    // ── TSK-0108: Shared block-to-item drop mapping ─────────────────────────────
+    // SelfDroppingBlocks and BlockToItemDrop moved to CommonMinecraftBlocks.cs
+    // so WorldModel.PredictMine uses the same mapping. Use CommonMinecraftBlocks.ResolveBlockDrop
+    // for the canonical item drop name given a block name.
 
     /// <summary>
     /// Sprint 40 P0-B: Restored inventory increment for BlockMinedEvent.
@@ -185,17 +123,9 @@ public sealed class WorldStateProjector
     /// </summary>
     private static WorldState ApplyBlockMined(WorldState current, BlockMinedEvent e)
     {
-        var blockName = e.Block.Contains(':') ? e.Block.Split(':', 2)[1] : e.Block;
-
-        // Determine the item drop name for this block
-        string itemDrop;
-        if (BlockToItemDrop.TryGetValue(blockName, out var mappedDrop))
-            itemDrop = mappedDrop;
-        else if (SelfDroppingBlocks.Contains(blockName))
-            itemDrop = blockName;
-        else
-            itemDrop = blockName; // best-effort fallback for unknown blocks
-
+        // TSK-0108: use shared resolver from CommonMinecraftBlocks for consistency
+        // with WorldModel.PredictMine.
+        var itemDrop = CommonMinecraftBlocks.ResolveBlockDrop(e.Block);
         var result = current.With(b => b.AddInventoryItem(itemDrop, e.Count));
         return StoreFacts(result, e, SourceFor(e));
     }
