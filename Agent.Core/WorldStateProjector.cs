@@ -29,6 +29,8 @@ namespace Agent.Core;
 /// Sprint 35 P2-A stubs: ItemCraftedEvent and ItemConsumedEvent stored as facts; full wiring Sprint 36.
 /// Sprint 36 P1-B: ApplyItemCrafted added — ItemCraftedEvent now updates inventory.
 /// Sprint 38 P4-A: ApplyItemConsumed added — ItemConsumedEvent now updates inventory.
+/// TSK-0117: ApplyCraftComplete and ApplySmeltComplete added — CraftCompleteEvent and
+/// SmeltCompleteEvent from the Node.js adapter now update inventory post-craft/post-smelt.
 /// Sprint 40 P0-B (Fix C): Restored inventory increment for BlockMinedEvent for self-dropping blocks.
 ///   The Sprint 35 change removed ALL inventory updates from BlockMinedEvent, relying entirely
 ///   on ItemCollectedEvent (playerCollect) for inventory truth. However, if the item drop entity
@@ -64,8 +66,14 @@ public sealed class WorldStateProjector
         ItemCraftedEvent e => ApplyItemCrafted(current, e),
         ItemConsumedEvent e => ApplyItemConsumed(current, e),
         StatusEvent e => ApplyStatus(current, e),
-        // All other events (Chat, Error, BlockNotFound, CraftComplete, SmeltComplete,
-        // Death, BlockPlaced, WanderComplete, WanderFailed, Kicked, FlatAreaFound):
+        // TSK-0117: Post-craft/post-smelt inventory reconciliation.
+        // CraftCompleteEvent and SmeltCompleteEvent arrive from the Node.js adapter
+        // when crafting/smelting finishes. Ingredients are consumed server-side;
+        // we add the output to our C#-side inventory to keep it in sync.
+        CraftCompleteEvent e => ApplyCraftComplete(current, e),
+        SmeltCompleteEvent e => ApplySmeltComplete(current, e),
+        // All other events (Chat, Error, BlockNotFound, Death, BlockPlaced,
+        // WanderComplete, WanderFailed, Kicked, FlatAreaFound):
         // no structured state change; store raw facts for debugging only.
         _ => StoreFacts(current, ev, SourceFor(ev)),
     };
@@ -244,6 +252,32 @@ public sealed class WorldStateProjector
             newInv[itemKey] = after;
 
         var result = current.With(b => b.SetInventory(newInv));
+        return StoreFacts(result, e);
+    }
+
+    /// <summary>
+    /// TSK-0117: Post-craft inventory reconciliation.
+    /// When CraftCompleteEvent arrives from the adapter, the crafted items have
+    /// been added server-side. This method syncs our C#-side inventory by adding
+    /// the crafted item count. Ingredients were already consumed server-side.
+    /// </summary>
+    private static WorldState ApplyCraftComplete(WorldState current, CraftCompleteEvent e)
+    {
+        var itemKey = e.Item.Contains(':') ? e.Item.Split(':', 2)[1] : e.Item;
+        var result = current.With(b => b.AddInventoryItem(itemKey, e.Count));
+        return StoreFacts(result, e);
+    }
+
+    /// <summary>
+    /// TSK-0117: Post-smelt inventory reconciliation.
+    /// When SmeltCompleteEvent arrives from the adapter, the input has been
+    /// consumed and the output added server-side. This method syncs our C#-side
+    /// inventory by adding the result item. Input was already consumed server-side.
+    /// </summary>
+    private static WorldState ApplySmeltComplete(WorldState current, SmeltCompleteEvent e)
+    {
+        var resultKey = e.Result.Contains(':') ? e.Result.Split(':', 2)[1] : e.Result;
+        var result = current.With(b => b.AddInventoryItem(resultKey, e.Count));
         return StoreFacts(result, e);
     }
 
@@ -481,6 +515,7 @@ public sealed class WorldStateProjector
                     b.SetFact(BuildFactKeys.LastFlatArea, e.Area.ToString(), source);
                 });
                 break;
+            // TSK-0117: store diagnostic facts for craft/smelt completion events
         }
 
         return result;

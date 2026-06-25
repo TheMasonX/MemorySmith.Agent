@@ -203,7 +203,7 @@ public sealed class HtnTaskLibrary
         if (IronIngotRequirements.TryGetValue(itemId, out var ingotCount))
         {
             var haveIngots = state.Inventory.GetValueOrDefault("iron_ingot");
-            var needIngots = ingotCount - haveIngots;
+            var needIngots = (ingotCount * count) - haveIngots; // TSK-0112: scale by count
             if (needIngots > 0)
             {
                 var haveOre  = state.Inventory.GetValueOrDefault("iron_ore")
@@ -237,7 +237,7 @@ public sealed class HtnTaskLibrary
         if (CobblestoneRequirements.TryGetValue(itemId, out var cobbleCount))
         {
             var haveCobble = state.Inventory.GetValueOrDefault("cobblestone");
-            var needCobble = cobbleCount - haveCobble;
+            var needCobble = (cobbleCount * count) - haveCobble; // TSK-0112: scale by count
             if (needCobble > 0)
             {
                 actions.Add(MakeAction("MineBlock",

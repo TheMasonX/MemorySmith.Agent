@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0104-design-observation-layer-gap-analysis",
+  "key": "TSK-0104",
+  "title": "Design observation layer gap analysis",
+  "description": "From all 3 audits: the architecture lacks an explicit Observe \u2192 Verify \u2192 Replan cycle. Actions complete but world state may disagree. This is a major architectural gap requiring planning before implementation. Create a design document with options, risks, and implementation phases.\n\nSource: All 3 audit reports (Finding #3 in extended audit, F2/F3 in synthesized report)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Low",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "audit",
+    "architecture",
+    "planning"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-25T04:20:54.8098639Z",
+  "updatedAtUtc": "2026-06-25T04:20:54.8098639Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

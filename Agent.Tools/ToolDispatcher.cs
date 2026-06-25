@@ -140,12 +140,24 @@ public sealed class ToolDispatcher : IToolCaller
         }
         catch (Exception ex)
         {
+            // TSK-0114: preserve structured exception metadata (type, stack, inner)
+            _logger?.LogWarning(ex, "Tool '{ToolName}' threw {ExceptionType}: {Message}",
+                toolName, ex.GetType().Name, ex.Message);
+            var details = new Dictionary<string, object?>
+            {
+                ["exceptionType"] = ex.GetType().Name,
+                ["message"] = ex.Message,
+                ["stackTrace"] = ex.StackTrace,
+                ["innerException"] = ex.InnerException?.Message,
+            };
             var exEntry = new JournalEntry(
                 DateTimeOffset.UtcNow,
                 JournalEntryType.ActionFailed,
-                $"Tool '{toolName}' threw: {ex.Message}");
+                $"Tool '{toolName}' threw {ex.GetType().Name}: {ex.Message}",
+                details);
             _journal?.Log(exEntry);
-            return new ToolResult(false, $"Tool '{toolName}' threw: {ex.Message}");
+            return new ToolResult(false,
+                $"Tool '{toolName}' failed ({ex.GetType().Name}): {ex.Message}");
         }
 
         // Sprint 37 P0-B: success/failure journal entry removed here. Callers using

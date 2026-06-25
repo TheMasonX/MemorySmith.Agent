@@ -106,7 +106,8 @@ public sealed class Sprint25Tests
 
         Assert.That(result.Success, Is.False);
         Assert.That(result.Message, Does.Contain("Explode"));
-        Assert.That(result.Message, Does.Contain("threw"));
+        // TSK-0114: message now includes exception type name instead of "threw"
+        Assert.That(result.Message, Does.Contain("InvalidOperationException"));
         Assert.That(result.Message, Does.Contain("Kaboom"));
         // Journal should record the failure
         Assert.That(journal.Entries, Has.Count.GreaterThan(0));
