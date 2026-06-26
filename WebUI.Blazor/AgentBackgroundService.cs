@@ -1400,16 +1400,36 @@ public sealed class AgentBackgroundService(
                 Guid correlationId = Guid.Empty;
                 try
                 {
-                    // TSK-0004: merge non-internal Context entries into Arguments so tools
-                    // can read values written by upstream tools in the same plan (e.g.
-                    // SearchMemory writes nearestWoodX to Context, MoveTo reads it as an argument).
+                    // Sprint 51 (Wave B): merge only context keys that are declared in the
+                    // target tool's InputSchema properties. This prevents schema validation
+                    // failures from undeclared properties (audit finding: the old code copied
+                    // ALL non-internal context into Arguments, which could cause
+                    // ToolDispatcher.ValidateAgainstSchema to reject valid dispatches).
                     // Internal keys (prefixed with underscore or correlationId) are excluded.
+                    // ToolResult.Data from previous actions is already fed back into planContext
+                    // (line 1520), so context carry works end-to-end: SearchMemory writes
+                    // nearestX/Y/Z → planContext → action.Context → Arguments (here) → MoveTo.
+                    var schemaProps = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    if (toolCaller is ToolDispatcher dispatcher)
+                    {
+                        var tool = dispatcher.Get(action.Tool);
+                        if (tool?.InputSchema.ValueKind == JsonValueKind.Object)
+                        {
+                            var schema = tool.InputSchema;
+                            if (schema.TryGetProperty("properties", out var props))
+                            {
+                                foreach (var prop in props.EnumerateObject())
+                                    schemaProps.Add(prop.Name);
+                            }
+                        }
+                    }
                     foreach (var kv in action.Context)
                     {
                         if (kv.Key.StartsWith('_') ||
                             kv.Key.Equals("correlationId", StringComparison.OrdinalIgnoreCase))
                             continue;
-                        action.Arguments.TryAdd(kv.Key, kv.Value);
+                        if (schemaProps.Contains(kv.Key))
+                            action.Arguments.TryAdd(kv.Key, kv.Value);
                     }
                     var argsJson = JsonSerializer.Serialize(action.Arguments);
                     using var doc = JsonDocument.Parse(argsJson);
