@@ -79,7 +79,7 @@ Dashboard infrastructure (log sink, publisher, REST endpoints, static HTML UI), 
 | **45** | 2026-06-24 | Audit-Fix Sprint | TSK-0087 (origin typo), TSK-0090 (GetPageTool guard), TSK-0091 (Thread.Sleep→await), TSK-0088 (gateway try/catch), TSK-0094 (blueprint validation), TSK-0092 (null cache TTL), TSK-0089 (nav contract). 644 tests. |
 | **46** | 2026-06-24 | Observability First 🔄 | TSK-0100 (WebSocketBridge resilience), TSK-0101 (7 catch→null fixes with logging), TSK-0102 (cross-repo request), TSK-0103 (BuildOrigin), TSK-0104 (ReplanResult), TSK-0105 (doc drift), TSK-0106 (error-path tests) |
 | **41** | 2026-06-23 | Intent Reliability + Goto Safety | Intent parsing reliability (ollama 3B insufficient), goto() timeout safety, path_update wiring, stale-inventory guard at goal-creation, 28 core memories, 10 feature wiki pages |
-| **49** | 2026-06-25 | Dashboard Wave 1 + Audit Hardening | Dashboard log sink, publisher, REST endpoints, static HTML UI; ActionQueue lock protection; WebSocket clean shutdown; structured tool outcomes (TSK-0110); emergency stop decoupling (TSK-0119); logger wiring (TSK-0120); version drift repair (722+ tests) |
+| **49** | 2026-06-25 | Dashboard Wave 1 + Audit Hardening | Dashboard log sink, publisher, REST endpoints, static HTML UI; ActionQueue lock protection; WebSocket clean shutdown; structured tool outcomes (TSK-0110); emergency stop decoupling (TSK-0119); logger wiring (TSK-0120); version drift repair; TSK-0114/0115 test verification (731+ tests) |
 
 ---
 
@@ -87,7 +87,7 @@ Dashboard infrastructure (log sink, publisher, REST endpoints, static HTML UI), 
 
 | Version | Sprint | Tests | Status |
 |---------|--------|-------|--------|
-| v0.50.0 | 49 | 722+ | ✅ green |
+| v0.50.0 | 49 | 731+ | ✅ green |
 | v0.49.0 | 49 | 722 | ✅ green |
 | v0.40.0 | 40 | 63+ | ✅ green |
 | v0.35.0 | 35 | 501 (498 passed, 3 pre-existing fails) | ✅ green |
