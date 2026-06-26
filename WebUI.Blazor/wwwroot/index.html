@@ -92,6 +92,44 @@ select:focus, input:focus { border-color: var(--accent); }
 .queue-item .args { color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .queue-empty { color: var(--dim); font-size: 11px; text-align: center; padding: 16px; }
 
+/* ── Tabs ── */
+.tab-bar { display: flex; gap: 2px; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 14px; }
+.tab { padding: 8px 16px; font-size: 12px; font-weight: 500; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; user-select: none; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.view { display: none; }
+.view.active { display: contents; }
+
+/* ── Log viewer ── */
+.log-controls { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
+.log-controls select, .log-controls input { width: auto; min-width: 100px; }
+.log-list { max-height: 500px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+.log-row { font-size: 11px; padding: 4px 8px; border-radius: 3px; background: var(--bg); border-left: 3px solid var(--border); font-family: 'SF Mono', 'Fira Code', monospace; line-height: 1.5; }
+.log-row.Warning { border-left-color: var(--yellow); }
+.log-row.Error, .log-row.Fatal { border-left-color: var(--red); }
+.log-row.Information { border-left-color: var(--accent); }
+.log-row .log-time { color: var(--dim); margin-right: 8px; }
+.log-row .log-level { font-weight: 600; margin-right: 8px; width: 24px; display: inline-block; }
+.log-row .log-level.Warning { color: var(--yellow); }
+.log-row .log-level.Error { color: var(--red); }
+.log-row .log-source { color: var(--purple); margin-right: 8px; }
+.log-row .log-msg { color: var(--text); }
+
+/* ── Timeline ── */
+.timeline { max-height: 600px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+.tl-entry { font-size: 11px; padding: 6px 10px; border-radius: 3px; background: var(--bg); border-left: 3px solid var(--border); display: flex; gap: 10px; align-items: flex-start; }
+.tl-entry.tl-journal { border-left-color: var(--accent); }
+.tl-entry.tl-log.Warning { border-left-color: var(--yellow); }
+.tl-entry.tl-log.Error { border-left-color: var(--red); }
+.tl-entry .tl-time { color: var(--dim); white-space: nowrap; min-width: 140px; }
+.tl-entry .tl-type { font-weight: 600; min-width: 60px; font-size: 10px; text-transform: uppercase; }
+.tl-entry .tl-type.tl-journal { color: var(--accent); }
+.tl-entry .tl-type.tl-log.Warning { color: var(--yellow); }
+.tl-entry .tl-type.tl-log.Error { color: var(--red); }
+.tl-entry .tl-source { color: var(--purple); min-width: 100px; }
+.tl-entry .tl-summary { color: var(--text); flex: 1; }
+.tl-empty { color: var(--dim); font-size: 11px; text-align: center; padding: 24px; }
+
 /* ── Chat ── */
 .chat-log { height: 200px; overflow-y: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 8px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; }
 .chat-msg { font-size: 12px; line-height: 1.4; }
@@ -126,7 +164,15 @@ a:hover { text-decoration: underline; }
   </div>
 </header>
 
+<div class="tab-bar">
+  <span class="tab active" data-view="overview" onclick="switchView('overview')">📊 Overview</span>
+  <span class="tab" data-view="logs" onclick="switchView('logs')">📋 Logs</span>
+  <span class="tab" data-view="timeline" onclick="switchView('timeline')">⏱ Timeline</span>
+</div>
+
 <main>
+  <!-- ═══ Overview View ═══ -->
+  <div id="view-overview" class="view active">
   <!-- ── Left column ── -->
   <div style="display:flex;flex-direction:column;gap:12px">
 
@@ -255,6 +301,52 @@ a:hover { text-decoration: underline; }
     </div>
 
   </div>
+</div><!-- /view-overview -->
+
+<!-- ═══ Logs View ═══ -->
+<div id="view-logs" class="view">
+  <div style="grid-column:1/-1;display:flex;flex-direction:column;gap:12px;">
+
+    <div class="panel">
+      <h2>📋 Log Viewer</h2>
+      <div class="log-controls">
+        <select id="logLevelFilter" onchange="fetchLogs()">
+          <option value="">All Levels</option>
+          <option value="Information">Information</option>
+          <option value="Warning">Warning</option>
+          <option value="Error">Error</option>
+          <option value="Fatal">Fatal</option>
+        </select>
+        <input id="logSourceFilter" type="text" placeholder="Filter by source…" oninput="fetchLogs()">
+        <button class="btn btn-secondary btn-sm" onclick="fetchLogs()">⟳ Refresh</button>
+        <span style="font-size:11px;color:var(--dim);margin-left:auto" id="logCount">0 entries</span>
+      </div>
+      <div class="log-list" id="logList">
+        <div class="tl-empty">No log entries yet. Logs appear here as the agent runs.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ Timeline View ═══ -->
+<div id="view-timeline" class="view">
+  <div style="grid-column:1/-1;display:flex;flex-direction:column;gap:12px;">
+
+    <div class="panel">
+      <h2>⏱ Activity Timeline</h2>
+      <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+        <button class="btn btn-secondary btn-sm" onclick="fetchTimeline()">⟳ Refresh</button>
+        <span style="font-size:11px;color:var(--dim)" id="tlCount">0 entries</span>
+      </div>
+      <div class="timeline" id="timelineList">
+        <div class="tl-empty">No activity yet. Timeline entries appear as the agent runs.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 </main>
 
 <script>
@@ -262,6 +354,8 @@ a:hover { text-decoration: underline; }
 
 let lastStatus = null;
 let registeredGoals = [];
+let logPollInterval = null;
+let timelinePollInterval = null;
 let chatMessages = [];
 let signalRConnected = false;
 let signalRConn = null;
@@ -655,6 +749,105 @@ function addChatMsg(type, who, text) {
 
 function escapeHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── View switching ───────────────────────────────────────────────────────────
+
+function switchView(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === name));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+
+  if (name === 'logs') { fetchLogs(); startLogPolling(); }
+  else { stopLogPolling(); }
+
+  if (name === 'timeline') { fetchTimeline(); startTimelinePolling(); }
+  else { stopTimelinePolling(); }
+}
+
+function startLogPolling() {
+  stopLogPolling();
+  logPollInterval = setInterval(fetchLogs, 3000);
+}
+
+function stopLogPolling() {
+  if (logPollInterval) { clearInterval(logPollInterval); logPollInterval = null; }
+}
+
+function startTimelinePolling() {
+  stopTimelinePolling();
+  timelinePollInterval = setInterval(fetchTimeline, 4000);
+}
+
+function stopTimelinePolling() {
+  if (timelinePollInterval) { clearInterval(timelinePollInterval); timelinePollInterval = null; }
+}
+
+// ── Logs ─────────────────────────────────────────────────────────────────────
+
+async function fetchLogs() {
+  try {
+    const level = document.getElementById('logLevelFilter').value;
+    const source = document.getElementById('logSourceFilter').value.trim();
+    let url = '/api/dashboard/logs?limit=200';
+    if (level) url += '&level=' + encodeURIComponent(level);
+    if (source) url += '&source=' + encodeURIComponent(source);
+
+    const res = await fetch(url);
+    if (!res.ok) return;
+    const data = await res.json();
+    renderLogs(data.entries || []);
+    document.getElementById('logCount').textContent = data.count + ' entries (' + data.returned + ' shown)';
+  } catch(e) { /* silent */ }
+}
+
+function renderLogs(entries) {
+  const list = document.getElementById('logList');
+  if (!entries || entries.length === 0) {
+    list.innerHTML = '<div class="tl-empty">No matching log entries.</div>';
+    return;
+  }
+  list.innerHTML = entries.map(e => {
+    const ts = new Date(e.timestampUtc).toLocaleTimeString();
+    const level = e.level || 'Information';
+    return `<div class="log-row ${level}">
+      <span class="log-time">${ts}</span>
+      <span class="log-level ${level}">${level.substring(0,4)}</span>
+      <span class="log-source">${escapeHtml(e.source || '')}</span>
+      <span class="log-msg">${escapeHtml(e.message || '')}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── Timeline ─────────────────────────────────────────────────────────────────
+
+async function fetchTimeline() {
+  try {
+    const res = await fetch('/api/dashboard/timeline?limit=100');
+    if (!res.ok) return;
+    const data = await res.json();
+    renderTimeline(data.entries || []);
+    document.getElementById('tlCount').textContent = data.count + ' entries';
+  } catch(e) { /* silent */ }
+}
+
+function renderTimeline(entries) {
+  const list = document.getElementById('timelineList');
+  if (!entries || entries.length === 0) {
+    list.innerHTML = '<div class="tl-empty">No timeline entries yet.</div>';
+    return;
+  }
+  list.innerHTML = entries.map(e => {
+    const ts = new Date(e.timestamp).toLocaleTimeString();
+    const type = e.type || 'journal';
+    const source = e.source || '';
+    const level = type === 'log' ? (e.level || 'Information') : '';
+    return `<div class="tl-entry tl-${type} ${level}">
+      <span class="tl-time">${ts}</span>
+      <span class="tl-type tl-${type} ${level}">${type}</span>
+      <span class="tl-source">${escapeHtml(source)}</span>
+      <span class="tl-summary">${escapeHtml(e.summary || '')}</span>
+    </div>`;
+  }).join('');
 }
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────

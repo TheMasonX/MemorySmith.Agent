@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
 using WebUI.Blazor;
+using WebUI.Blazor.Dashboard.Logging;
 using WebUI.Blazor.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,6 +49,12 @@ builder.Host.UseSerilog((context, services, loggerConfig) =>
             shared: true,
             restrictedToMinimumLevel: LogEventLevel.Debug,
             outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {SourceContext}: {Message:lj} {Properties:j}{NewLine}{Exception}");
+
+    // Wire the live dashboard log buffer sink.
+    // Registered as a singleton below so the same buffer is shared between
+    // the Serilog sink, REST endpoints, and SignalR push.
+    var buffer = services.GetRequiredService<LiveLogBuffer>();
+    loggerConfig.WriteTo.Sink(new DashboardLogSink(buffer));
 });
 
 
@@ -65,6 +72,10 @@ builder.Services.Configure<RestMemoryGatewayOptions>(
     builder.Configuration.GetSection("Agent:Memory"));
 builder.Services.Configure<MinecraftAdapterConfig>(
     builder.Configuration.GetSection("Agent:Minecraft"));
+
+// Live log buffer for the dashboard — must be registered before the Serilog
+// config lambda above so the DashboardLogSink can resolve it.
+builder.Services.AddSingleton<LiveLogBuffer>();
 
 var agentEnabled = builder.Configuration.GetValue<bool>("Agent:Enabled");
 
@@ -511,6 +522,85 @@ app.MapGet("/api/agent/journal", (
     )).ToList();
 
     return Results.Ok(new { count = journal.Count, returned = dtos.Count, entries = dtos });
+});
+
+app.MapGet("/api/dashboard/logs", (
+    LiveLogBuffer? buffer,
+    int limit = 100,
+    string? level = null,
+    string? source = null) =>
+{
+    if (buffer is null)
+        return Results.Ok(new { count = 0, returned = 0, entries = Array.Empty<object>() });
+
+    var entries = buffer.GetLatest(limit);
+
+    if (!string.IsNullOrWhiteSpace(level))
+        entries = entries.Where(e =>
+            e.Level.Equals(level, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    if (!string.IsNullOrWhiteSpace(source))
+        entries = entries.Where(e =>
+            e.Source.Contains(source, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    return Results.Ok(new { count = buffer.Count, returned = entries.Count, entries });
+});
+
+app.MapGet("/api/dashboard/timeline", (
+    IAgentJournal? journal,
+    LiveLogBuffer? buffer,
+    int limit = 50) =>
+{
+    // Merge recent journal entries and log events into a unified timeline,
+    // newest first.
+    var timeline = new List<object>();
+
+    if (journal is not NullAgentJournal && journal is not null)
+    {
+        var journalEntries = journal.Query(null).Take(limit).ToList();
+        foreach (var je in journalEntries)
+        {
+            timeline.Add(new
+            {
+                timestamp = je.Timestamp.ToString("O"),
+                type = "journal",
+                source = je.Type.ToString(),
+                summary = je.Summary,
+                details = (je.Details ?? new Dictionary<string, object?>())
+                    .ToDictionary(kv => kv.Key, kv => kv.Value?.ToString())
+            });
+        }
+    }
+
+    if (buffer is not null)
+    {
+        var logEntries = buffer.GetLatest(limit);
+        foreach (var le in logEntries)
+        {
+            timeline.Add(new
+            {
+                timestamp = le.TimestampUtc.ToString("O"),
+                type = "log",
+                source = le.Source,
+                summary = le.Message,
+                details = le.Exception is not null
+                    ? new Dictionary<string, string?> { ["exception"] = le.Exception }
+                    : null
+            });
+        }
+    }
+
+    // Sort by timestamp descending, take limit
+    var merged = timeline
+        .OrderByDescending(e =>
+        {
+            var ts = e.GetType().GetProperty("timestamp")?.GetValue(e) as string;
+            return ts is not null && DateTimeOffset.TryParse(ts, out var dt) ? dt : DateTimeOffset.MinValue;
+        })
+        .Take(limit)
+        .ToList();
+
+    return Results.Ok(new { count = merged.Count, entries = merged });
 });
 
 app.MapGet("/api/agent/worldmodel", (IWorldModel? model, bool detail = true) =>
