@@ -1,40 +1,45 @@
 namespace Agent.Core;
 
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 /// <summary>
 /// FIFO queue of pending tool invocations for the current plan.
 /// The agent loop dequeues one action per tick and dispatches it
 /// to the ToolDispatcher. Cleared when the plan is invalidated.
 ///
-/// Sprint 12: switched from Queue{T} to ConcurrentQueue{T} because AgentBackgroundService
-/// accesses the queue from two concurrent tasks:
-///   - DispatchActionsAsync: EnqueueAll, Dequeue, IsEmpty
-///   - ChatConsumerAsync:    Enqueue (chat responses), Clear (via SetGoal / CancelGoal)
-/// The non-thread-safe Queue caused corruption that manifested as an infinite
-/// planning loop — the queue appeared empty immediately after EnqueueAll due
-/// to concurrent Clear calls racing with the enqueue.
+/// TSK-0113: all operations now use the same lock for consistent semantics.
+/// Previously, <c>ConcurrentQueue</c> was used with mixed lock coverage —
+/// some operations were lock-free while others (EnqueueAll, ClearAndEnqueue)
+/// held a lock. This meant <c>ClearAndEnqueue</c>'s atomicity guarantee was
+/// weaker than callers assumed, since a concurrent <c>Enqueue</c> or <c>Clear</c>
+/// could observe stale state between the clear and enqueue steps.
 ///
-/// Sprint 23: added <see cref="ClearAndEnqueue"/> for the damage interrupt path —
-/// an atomic clear+enqueue that cannot be interleaved with bulk EnqueueAll calls
-/// from the planner or single Enqueue calls from the chat consumer. EnqueueAll
-/// is now also lock-protected so the interrupt path observes a consistent state.
-///
-/// Sprint 35 P0-D: added <see cref="ClearAndEnqueueAsync"/> overload that accepts
-/// an optional async stop callback. When provided, the callback is awaited BEFORE
-/// the queue is cleared, ensuring the JS adapter receives a stop signal before
-/// new actions are dispatched. AgentBackgroundService should use this overload
-/// when replanning with active Dispatched correlation entries.
+/// Fix: replaced <c>ConcurrentQueue</c> with a plain <c>Queue</c> protected
+/// by a single lock for all operations. This makes every read and write
+/// consistently ordered under the same lock.
 /// </summary>
 public sealed class ActionQueue
 {
-    private readonly ConcurrentQueue<ActionData> _queue = new();
+    private readonly Queue<ActionData> _queue = new();
     private readonly object _lock = new();
 
-    public int  Count   => _queue.Count;
-    public bool IsEmpty => _queue.IsEmpty;
+    public int Count
+    {
+        get { lock (_lock) return _queue.Count; }
+    }
 
-    public void Enqueue(ActionData action) => _queue.Enqueue(action);
+    public bool IsEmpty
+    {
+        get { lock (_lock) return _queue.Count == 0; }
+    }
+
+    public void Enqueue(ActionData action)
+    {
+        lock (_lock)
+        {
+            _queue.Enqueue(action);
+        }
+    }
 
     public void EnqueueAll(IEnumerable<ActionData> actions)
     {
@@ -45,10 +50,31 @@ public sealed class ActionQueue
         }
     }
 
-    public ActionData? Dequeue() => _queue.TryDequeue(out var a) ? a : null;
-    public ActionData? Peek()    => _queue.TryPeek(out var a)    ? a : null;
+    public ActionData? Dequeue()
+    {
+        lock (_lock)
+        {
+            if (_queue.Count == 0) return null;
+            return _queue.Dequeue();
+        }
+    }
 
-    public void Clear() => _queue.Clear();
+    public ActionData? Peek()
+    {
+        lock (_lock)
+        {
+            if (_queue.Count == 0) return null;
+            return _queue.Peek();
+        }
+    }
+
+    public void Clear()
+    {
+        lock (_lock)
+        {
+            _queue.Clear();
+        }
+    }
 
     /// <summary>
     /// Atomically clears any pending actions and enqueues a single priority
@@ -59,11 +85,9 @@ public sealed class ActionQueue
     /// the planner can re-evaluate against fresh health/world state.
     /// </para>
     /// <para>
-    /// Without this method, a concurrent <see cref="Enqueue"/> from
-    /// <c>ChatConsumerAsync</c> (or a bulk <see cref="EnqueueAll"/> from the
-    /// planner) could slip between a separate <see cref="Clear"/> and the
-    /// priority Enqueue, defeating the interrupt by leaving a stale chat
-    /// response or partial plan ahead of the GetStatus.
+    /// TSK-0113: all mutate operations now share the same lock, so this
+    /// clear+enqueue is truly atomic relative to <see cref="Enqueue"/>,
+    /// <see cref="Clear"/>, and all other operations.
     /// </para>
     /// </summary>
     /// <param name="action">The priority action to enqueue after clearing.</param>
