@@ -6,6 +6,10 @@
     <Nullable>enable</Nullable>
     <RootNamespace>WebUI.Blazor</RootNamespace>
     <AssemblyName>WebUI.Blazor</AssemblyName>
+    <!-- TSK-0014: NU1903 is a transitive vulnerability in SQLitePCLRaw.lib.e_sqlite3 2.1.6
+         (known high-severity CVE). Suppressed because the CVE is in the SQLite native
+         library, not in Serilog's sink logic. Revisit when Serilog.Sinks.SQLite updates. -->
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +25,7 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.EventLog" Version="4.0.0" />
+    <PackageReference Include="Serilog.Sinks.SQLite" Version="7.0.0" />
   </ItemGroup>
 
   <!-- Sprint 4a/4b: SignalR push for StatusUpdated, ChatMessage, GoalUpdate events -->

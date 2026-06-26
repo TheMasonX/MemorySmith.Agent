@@ -1,5 +1,5 @@
 // MemorySmith.Agent — Web UI & Agent Host
-// v0.50.1  Sprint 50 — Dashboard Wave C: Landing Page, Navigation & Status Panel Enhancement
+// v0.50.2  Sprint 50 — Dashboard Wave D: Context Wiring, Chat Cleanup, SQLite Telemetry
 
 using Agent.Construction;
 using Agent.Core;
@@ -55,6 +55,23 @@ builder.Host.UseSerilog((context, services, loggerConfig) =>
     // the Serilog sink, REST endpoints, and SignalR push.
     var buffer = services.GetRequiredService<LiveLogBuffer>();
     loggerConfig.WriteTo.Sink(new DashboardLogSink(buffer));
+
+    // TSK-0014: Serilog SQLite sink for runtime telemetry persistence.
+    // Writes all logs (Warning+) to a local SQLite database for offline analysis.
+    // Configure via Agent:Logging:Sqlite section in appsettings.json.
+    var sqliteEnabled = loggingConfig.GetValue<bool>("Sqlite:Enabled");
+    if (sqliteEnabled)
+    {
+        var sqlitePath = loggingConfig.GetValue<string>("Sqlite:Path") ?? "logs/agent-telemetry.db";
+        var sqliteLevelName = loggingConfig.GetValue<string>("Sqlite:Level") ?? "Warning";
+        if (Enum.TryParse<LogEventLevel>(sqliteLevelName, true, out var sqliteLevel))
+        {
+            loggerConfig.WriteTo.SQLite(
+                sqlitePath,
+                restrictedToMinimumLevel: sqliteLevel,
+                batchSize: 50);
+        }
+    }
 });
 
 
@@ -411,8 +428,8 @@ app.MapGet("/", (HttpContext ctx) =>
 app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
 {
     Name    = "MemorySmith.Agent",
-    Version = "0.50.1",
-    Phase   = "Sprint 50 — Dashboard Wave C: Landing Page, Navigation & Status Panels",
+    Version = "0.50.2",
+    Phase   = "Sprint 50 — Dashboard Wave D: Context Wiring, Chat Cleanup, SQLite Telemetry",
     License = "MIT",
     Repository  = "https://github.com/TheMasonX/MemorySmith.Agent",
     Dashboard   = "/index.html",

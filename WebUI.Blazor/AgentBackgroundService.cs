@@ -1400,6 +1400,17 @@ public sealed class AgentBackgroundService(
                 Guid correlationId = Guid.Empty;
                 try
                 {
+                    // TSK-0004: merge non-internal Context entries into Arguments so tools
+                    // can read values written by upstream tools in the same plan (e.g.
+                    // SearchMemory writes nearestWoodX to Context, MoveTo reads it as an argument).
+                    // Internal keys (prefixed with underscore or correlationId) are excluded.
+                    foreach (var kv in action.Context)
+                    {
+                        if (kv.Key.StartsWith('_') ||
+                            kv.Key.Equals("correlationId", StringComparison.OrdinalIgnoreCase))
+                            continue;
+                        action.Arguments.TryAdd(kv.Key, kv.Value);
+                    }
                     var argsJson = JsonSerializer.Serialize(action.Arguments);
                     using var doc = JsonDocument.Parse(argsJson);
 

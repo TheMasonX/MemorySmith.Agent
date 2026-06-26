@@ -1,7 +1,7 @@
 # Sprint 50 Complete — Handoff & Next Steps
 
 **Date:** 2026-06-26
-**Branch:** `sprint-35-llm-first` (Wave A: `153fbd6`, Wave B: `3da01c1`, Wave C: latest)
+**Branch:** `sprint-35-llm-first` (Wave A: `153fbd6`, Wave B: `3da01c1`, Wave C/D: latest)
 **Author:** SteveBot
 **Tests:** 731 passing, 0 failing (0 warnings, 0 errors)
 
@@ -20,6 +20,17 @@
 | — | Dashboard Overview UI | — | Persistent live log strip, error/warning badges, position trail, current action display, auto-scroll toggle |
 
 **Files:** `WebUI.Blazor/wwwroot/index.html`, `HtnTaskLibrary.cs`, `Program.cs`, `AgentBackgroundService.cs`
+
+### Wave D — Context Wiring, Chat Cleanup & SQLite Telemetry
+*Commit (latest on `sprint-35-llm-first`)*
+
+| Task | Title | Priority | Change |
+|:----:|:------|:--------:|:-------|
+| TSK-0004 | MoveToTool context wiring | High | Context entries (non-internal) merged into Arguments before tool dispatch. Upstream tools like SearchMemory can write coordinates to Context, and downstream MoveToTool reads them automatically. |
+| TSK-0118 | Chat split-brain cleanup | P2 | Removed 3 dead regex fields (`GatherRegex`, `BuildRegex`, `CraftRegex`) from `ChatInterpreter` — unused since Sprint 35. Cleaned up associated doc comments. |
+| TSK-0014 | Serilog SQLite sink | Med | Added `Serilog.Sinks.SQLite` package. Writes Warning+ logs to `logs/agent-telemetry.db` (configurable via `Agent:Logging:Sqlite`). NU1903 suppressed (transitive SQLite CVE, not in sink logic). |
+
+**Files changed:** `AgentBackgroundService.cs`, `ChatInterpreter.cs`, `WebUI.Blazor.csproj`, `Program.cs`, `appsettings.json`, `README.md`, `Data/Pages/roadmap.md`, `wwwroot/about.html`, `wwwroot/index.html`, handoff
 
 ### Wave C — Dashboard Landing Page, Navigation & Status Panels
 *Commit (latest on `sprint-35-llm-first`)*
@@ -61,7 +72,7 @@
 Build:   0 warnings, 0 errors
 Tests:   731 passing, 0 failing, 0 skipped
 Branch:  sprint-35-llm-first (pushed to origin)
-Version: v0.50.1  Sprint 50 — Dashboard Wave C: Landing Page, Navigation & Status Panels
+Version: v0.50.2  Sprint 50 — Dashboard Wave D: Context Wiring, Chat Cleanup, SQLite Telemetry
 ```
 
 ### Active Agent Capabilities

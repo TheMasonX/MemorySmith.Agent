@@ -12,52 +12,28 @@ using System.Text.RegularExpressions;
 /// safe, zero-risk operations (cancel, status, inventory, help) and as the fallback
 /// when the LLM provider is unavailable or rate-limited.
 ///
-/// Sprint 35 P1-D: GatherRegex, BuildRegex, and CraftRegex match blocks have been
-/// removed from <see cref="ParseIntent"/>. All gather/build/craft intent is now handled
-/// exclusively by <see cref="LlmChatInterpreter"/> → LLM → IntentDraft pipeline.
-/// The regex field definitions and alias dictionaries are preserved for use by
-/// LlmChatInterpreter's item normalization in Sprint 36.
+/// Sprint 35 P1-D: GatherRegex, BuildRegex, and CraftRegex match blocks removed.
+/// TSK-0118: dead regex field definitions removed (TSK-0118). All gather/build/craft
+/// intent is handled by LlmChatInterpreter → LLM → IntentDraft pipeline.
+/// Item aliases consolidated in <see cref="AliasRegistry"/> (TSK-0099).
 ///
 /// Sprint 39 P1-C: <see cref="InterpretAsync"/> return type changed to
 /// <see cref="IntentDraft"/>? — null means "not addressed" (replaces NotAddressed enum value).
 /// </summary>
 public sealed class ChatInterpreter : IChatInterpreter
 {
-    // ── Regex field definitions (preserved for test and Sprint 36 use) ────────
+    // ── Regex field definitions ──────────────────────────────────────────────
 
-    /// <summary>
-    /// Matches gather/mine/collect commands.
-    /// Sprint 35 P1-D: no longer used in ParseIntent; match block removed.
-    /// Preserved for test coverage and Sprint 36 item normalization.
-    /// </summary>
-    private static readonly Regex GatherRegex = new(
-        @"\b(get|mine|gather|collect|fetch|bring|chop|cut|dig)\b\s+(?<count>\d+\s+)?(?<item>[a-z_]+(\s+[a-z_]+)?)",
-        RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-    /// <summary>
-    /// Matches build commands with optional blueprint and coordinates.
-    /// Sprint 35 P1-D: no longer used in ParseIntent; match block removed.
-    /// Preserved for test coverage and Sprint 36 item normalization.
-    /// </summary>
-    private static readonly Regex BuildRegex = new(
-        @"\b(build|construct|make|place|create)\b\s+(?<blueprint>[a-z_\-]+(\s+[a-z_\-]+)?)(\s+at\s+(?<x>-?\d+)\s+(?<y>-?\d+)\s+(?<z>-?\d+))?",
-        RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-    /// <summary>
-    /// Matches craft commands.
-    /// Sprint 35 P1-D: no longer used in ParseIntent; match block removed.
-    /// Preserved for test coverage and Sprint 36 item normalization.
-    /// </summary>
-    private static readonly Regex CraftRegex = new(
-        @"\b(craft|smelt|cook|brew)\b\s+(?<count>\d+\s+)?(?<item>[a-z_]+(\s+[a-z_]+)?)",
-        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    // TSK-0118: GatherRegex, BuildRegex, and CraftRegex removed — dead code since
+    // Sprint 35 P1-D removed their match blocks from ParseIntent. All gather/build/craft
+    // intent is handled by LlmChatInterpreter → LLM → IntentDraft pipeline.
+    // Item alias dictionaries were consolidated into AliasRegistry (TSK-0099).
+    // GoToRegex is preserved for deterministic coordinate navigation.
 
     /// <summary>Matches explicit coordinate navigation commands.</summary>
     private static readonly Regex GoToRegex = new(
         @"\b(go\s+to|goto|move\s+to|walk\s+to|navigate\s+to|teleport\s+to|tp\s+to)\b\s+(?<x>-?\d+)\s+(?<y>-?\d+)\s+(?<z>-?\d+)",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-    // ── Alias dictionaries (TSK-0099: consolidated in AliasRegistry) ───────────
 
     // ── State ─────────────────────────────────────────────────────────────────
 
@@ -197,16 +173,16 @@ public sealed class ChatInterpreter : IChatInterpreter
     /// Sprint 35 P1-D: GatherRegex, BuildRegex, and CraftRegex match blocks removed.
     /// All gather/build/craft intent is now handled by LlmChatInterpreter → LLM → IntentDraft.
     /// The alias dictionaries (ItemAliases, BlueprintAliases, CraftAliases) and resolver methods
-    /// are preserved for use by LlmChatInterpreter's item normalization in Sprint 36.
-    /// ChatInterpreter (pattern-only fallback) returns Unknown for these commands so the
-    /// LlmChatInterpreter always routes them to the LLM.
+    /// ChatInterpreter (pattern-only fallback) returns "clarify" so LlmChatInterpreter
+    /// always routes these to the LLM.
     /// </summary>
     /// <summary>
     /// Core pattern-matching parser. Returns an <see cref="IntentDraft"/> for each
     /// recognised command category.
     ///
     /// Sprint 35 P1-D: GatherRegex, BuildRegex, and CraftRegex match blocks removed.
-    /// All gather/build/craft intent is now handled by LlmChatInterpreter → LLM → IntentDraft.
+    /// TSK-0118: dead regex field definitions removed. All gather/build/craft intent
+    /// is handled by LlmChatInterpreter → LLM → IntentDraft.
     ///
     /// Sprint 39 P1-C: return type changed from <see cref="ChatInterpretation"/> to
     /// <see cref="IntentDraft"/>. navigate/come-here uses null X/Y/Z to signal "follow player".
