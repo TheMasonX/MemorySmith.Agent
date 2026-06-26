@@ -2,7 +2,7 @@
 
 MemorySmith.Agent uses a sprint-based delivery model. Each sprint is council-reviewed by a 6-seat panel before merge.
 
-**Current version: v0.40.0** | **Latest: Sprint 41 (in progress)**
+**Current version: v0.50.0** | **Latest: Sprint 49 — Dashboard Wave 1 + Audit-Driven Hardening**
 
 ---
 
@@ -32,9 +32,13 @@ ActionData.Context bag, WebSocketBridge background receive loop, findBestBlock t
 
 Intent parsing reliability (ollama 3B insufficient), goto() timeout safety, path_update wiring, stale-inventory guard at goal-creation, blueprint alias resolution in LLM path, MemorySmithBlueprintRepository logging.
 
-### Phase 6 — Observability First 🔄 IN PROGRESS (Sprint 46)
+### Phase 6 — Observability First ✅ COMPLETE (Sprint 49)
 
 Silent-failure hardening: structured logging across all catch→null paths, WebSocketBridge receive loop resilience with auto-reconnect, BuildOrigin consolidation, ReplanResult typed outcomes, documentation drift repair. Theme: "make every failure observable."
+
+### Phase 7 — Dashboard & Audit Hardening ✅ COMPLETE (Sprint 49)
+
+Dashboard infrastructure (log sink, publisher, REST endpoints, static HTML UI), ActionQueue lock protection, WebSocket clean shutdown, structured tool outcomes (TSK-0110), emergency stop delivery resilience (TSK-0119).
 
 ---
 
@@ -74,7 +78,8 @@ Silent-failure hardening: structured logging across all catch→null paths, WebS
 | **44** | 2026-06-23 | Correctness Sprint | ChatInterpretation.GoalName removed (7-sprint-old zombie), _placeBlockContexts cleanup, 31 new tests (638 total), 5 new tasks (TSK-0082 through TSK-0086) |
 | **45** | 2026-06-24 | Audit-Fix Sprint | TSK-0087 (origin typo), TSK-0090 (GetPageTool guard), TSK-0091 (Thread.Sleep→await), TSK-0088 (gateway try/catch), TSK-0094 (blueprint validation), TSK-0092 (null cache TTL), TSK-0089 (nav contract). 644 tests. |
 | **46** | 2026-06-24 | Observability First 🔄 | TSK-0100 (WebSocketBridge resilience), TSK-0101 (7 catch→null fixes with logging), TSK-0102 (cross-repo request), TSK-0103 (BuildOrigin), TSK-0104 (ReplanResult), TSK-0105 (doc drift), TSK-0106 (error-path tests) |
-| **41** | 2026-06-23 (active) | Intent Reliability + Goto Safety | Intent parsing reliability (ollama 3B insufficient), goto() timeout safety, path_update wiring, stale-inventory guard at goal-creation, 28 core memories, 10 feature wiki pages |
+| **41** | 2026-06-23 | Intent Reliability + Goto Safety | Intent parsing reliability (ollama 3B insufficient), goto() timeout safety, path_update wiring, stale-inventory guard at goal-creation, 28 core memories, 10 feature wiki pages |
+| **49** | 2026-06-25 | Dashboard Wave 1 + Audit Hardening | Dashboard log sink, publisher, REST endpoints, static HTML UI; ActionQueue lock protection; WebSocket clean shutdown; structured tool outcomes (TSK-0110); emergency stop decoupling (TSK-0119); logger wiring (TSK-0120); version drift repair (722+ tests) |
 
 ---
 
@@ -82,6 +87,8 @@ Silent-failure hardening: structured logging across all catch→null paths, WebS
 
 | Version | Sprint | Tests | Status |
 |---------|--------|-------|--------|
+| v0.50.0 | 49 | 722+ | ✅ green |
+| v0.49.0 | 49 | 722 | ✅ green |
 | v0.40.0 | 40 | 63+ | ✅ green |
 | v0.35.0 | 35 | 501 (498 passed, 3 pre-existing fails) | ✅ green |
 | v0.28.0 | 33 | 276+ | ✅ green |

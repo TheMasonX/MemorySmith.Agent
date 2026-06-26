@@ -106,8 +106,14 @@ public sealed class ActionQueue
     /// before new plan actions start.
     /// <para>
     /// When <paramref name="stopCallback"/> is provided (non-null), it is
-    /// awaited before the lock is acquired. This allows the caller to send
+    /// invoked before the lock is acquired. This allows the caller to send
     /// a "stop" WebSocket message to the adapter without blocking the lock.
+    /// </para>
+    /// <para>
+    /// TSK-0119: The stop callback is best-effort. If it throws (e.g. WebSocket
+    /// send failure), a warning is logged but the queue clear and priority enqueue
+    /// are guaranteed to happen via <c>try/finally</c>. This ensures the bot can
+    /// always recover from damage interrupts even under transient network issues.
     /// </para>
     /// <para>
     /// Usage in AgentBackgroundService during replan with active Dispatched entries:
@@ -121,8 +127,19 @@ public sealed class ActionQueue
     {
         // Send stop BEFORE acquiring the lock so the adapter receives the signal
         // while any in-flight action is still running on the JS side.
-        if (stopCallback is not null)
-            await stopCallback();
+        // TSK-0119: use try/catch so queue clear is guaranteed even if stop fails.
+        try
+        {
+            if (stopCallback is not null)
+                await stopCallback();
+        }
+        catch (Exception ex)
+        {
+            // Best-effort: log and continue — queue clear must not be blocked
+            // by a transient WebSocket send failure.
+            System.Diagnostics.Debug.WriteLine(
+                $"[ActionQueue] Stop callback failed: {ex.GetType().Name}: {ex.Message}");
+        }
 
         lock (_lock)
         {

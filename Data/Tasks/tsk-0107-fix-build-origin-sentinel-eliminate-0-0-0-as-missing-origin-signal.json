@@ -20,16 +20,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-372e16096bdf44f1a84333c80099a360",
+      "author": "anonymous",
+      "body": "Deferred from Sprint 49 Wave B \u2014 requires deeper refactor threading BuildOrigin? through HtnTaskLibrary.DecomposeBuild pipeline. See handoff at Data/Pages/Handoffs/sprint-49-waveb-handoff-2026-06-25.md.",
+      "createdAtUtc": "2026-06-25T23:00:35.0186732Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-25T19:24:12.5892284Z",
-  "updatedAtUtc": "2026-06-25T19:24:12.5892284Z",
+  "updatedAtUtc": "2026-06-25T23:00:35.0186732Z",
   "completedAtUtc": null,
-  "revision": 1,
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0107-fix-build-origin-sentinel-eliminate-0-0-0-as-missing-origin-signal.json"
 }

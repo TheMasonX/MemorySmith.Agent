@@ -199,15 +199,45 @@ public sealed class ToolDispatcher : IToolCaller
     {
         var result = await CallAsync(toolName, arguments, cancellationToken);
 
-        var outcome = result.Success
-            ? ActionOutcome.Succeeded(goalId, toolName, result.Message ?? "Success")
-            : ActionOutcome.Failed(goalId, toolName, result.Message ?? "Failed");
+        // TSK-0110: Preserve ActionOutcome semantics by mapping the ToolResult's OutcomeType
+        // to the corresponding ActionOutcome factory method. This ensures that Blocked,
+        // Unreachable, TimedOut, and NoProgress outcomes are preserved for the LLM evaluator
+        // and replan governor, rather than collapsing everything to Succeeded/Failed.
+        var outcome = MapResultToOutcome(result, goalId, toolName);
 
         // Sprint 37 P0-B: CallAsync no longer emits its own ActionCompleted / ActionFailed
         // journal entry (removed to prevent double-logging with DispatchActionsAsync's
         // explicit _journal?.LogOutcome(outcome) call). Do NOT add LogOutcome here.
         // The outer dispatch loop logs the structured outcome explicitly.
         return (result, outcome);
+    }
+
+    /// <summary>
+    /// TSK-0110: Maps a <see cref="ToolResult"/> to the corresponding <see cref="ActionOutcome"/>
+    /// factory method, preserving rich outcome semantics.
+    /// <para>
+    /// When the tool sets <see cref="ToolResult.Outcome"/> explicitly, that value is used directly.
+    /// When it's the default <see cref="OutcomeType.Completed"/>, we infer from
+    /// <see cref="ToolResult.Success"/>: success → Succeeded, failure → Failed.
+    /// </para>
+    /// </summary>
+    private static ActionOutcome MapResultToOutcome(ToolResult result, Guid goalId, string toolName)
+    {
+        var outcome = result.Outcome;
+
+        // If the tool didn't explicitly set an outcome, infer from Success flag
+        if (outcome == OutcomeType.Completed && !result.Success)
+            outcome = OutcomeType.Failed;
+
+        return outcome switch
+        {
+            OutcomeType.Completed => ActionOutcome.Succeeded(goalId, toolName, result.Message ?? "Success"),
+            OutcomeType.NoProgress => ActionOutcome.NoProgress(goalId, toolName, result.Message ?? "No progress"),
+            OutcomeType.Blocked => ActionOutcome.Blocked(goalId, toolName, result.Message ?? "Blocked"),
+            OutcomeType.Unreachable => ActionOutcome.Unreachable(goalId, toolName, result.Message ?? "Unreachable"),
+            OutcomeType.TimedOut => ActionOutcome.TimedOut(goalId, toolName, result.Message ?? "Timed out"),
+            _ => ActionOutcome.Failed(goalId, toolName, result.Message ?? "Failed"),
+        };
     }
 
     // ── Schema validation ─────────────────────────────────────────────────────

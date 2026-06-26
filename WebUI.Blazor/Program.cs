@@ -1,5 +1,5 @@
 // MemorySmith.Agent — Web UI & Agent Host
-// v0.37.0  Sprint 37 — ActionOutcome: IObservationSummary, Dispatch Wiring, IntentManager (PRINCIPLE-1)
+// v0.50.0  Sprint 49 — Dashboard Wave 1 + Audit-Driven Hardening (Wave D)
 
 using Agent.Construction;
 using Agent.Core;
@@ -216,7 +216,8 @@ if (agentEnabled)
         // Sprint 23 P0-B: SearchMemory + CreatePage route to world KB; GetPage uses agent KB.
         var worldMemory = sp.GetKeyedService<IMemoryGateway>("world") ?? memory;
         var journal = sp.GetRequiredService<IAgentJournal>();
-        var d = new ToolDispatcher(journal);
+        // TSK-0120: pass ILogger<ToolDispatcher> so duplicate-registration warnings emit correctly.
+        var d = new ToolDispatcher(journal, sp.GetRequiredService<ILogger<ToolDispatcher>>());
         d.Register(new MoveToTool(world));
         // Sprint 25 P0-B: StatusTool deleted (duplicate of GetStatusTool).
         // GetStatusTool is registered under its canonical name "GetStatus" and aliased as "Status"
@@ -403,8 +404,8 @@ app.MapGet("/", () => "MemorySmith.Agent is running.");
 app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
 {
     Name    = "MemorySmith.Agent",
-    Version = "0.46.0",
-    Phase   = "Sprint 46 — Tightening the Contracts",
+    Version = "0.50.0",
+    Phase   = "Sprint 49 — Dashboard Wave 1 + Audit-Driven Hardening",
     License = "MIT",
     Repository  = "https://github.com/TheMasonX/MemorySmith.Agent",
     Dashboard   = "/",

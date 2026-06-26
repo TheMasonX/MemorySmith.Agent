@@ -22,7 +22,18 @@ public record ActionData
 }
 
 /// <summary>Result returned by a tool after execution.</summary>
-public record ToolResult(bool Success, string? Message = null, Dictionary<string, object?>? Data = null);
+/// <param name="Success">Whether the tool call succeeded at the transport level.</param>
+/// <param name="Message">Human-readable result description.</param>
+/// <param name="Data">Optional structured data returned by the tool.</param>
+/// <param name="Outcome">
+/// Rich outcome type providing semantic detail about WHY an action succeeded or failed.
+/// Defaults to <see cref="OutcomeType.Completed"/> for backward compatibility;
+/// tools that need to report Blocked, Unreachable, TimedOut, or NoProgress should set this explicitly.
+/// <c>CallWithOutcomeAsync</c> maps this value to the corresponding <see cref="ActionOutcome"/> factory method.
+/// </param>
+public record ToolResult(bool Success, string? Message = null,
+    Dictionary<string, object?>? Data = null,
+    OutcomeType Outcome = OutcomeType.Completed);
 
 /// <summary>
 /// A search hit from MemorySmith.
