@@ -130,6 +130,37 @@ select:focus, input:focus { border-color: var(--accent); }
 .tl-entry .tl-summary { color: var(--text); flex: 1; }
 .tl-empty { color: var(--dim); font-size: 11px; text-align: center; padding: 24px; }
 
+/* ── Live Log Strip (Overview) ── */
+.live-log { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 1px; font-size: 10px; font-family: 'SF Mono', 'Fira Code', monospace; }
+.live-log .log-row { padding: 2px 6px; border-left-width: 2px; font-size: 10px; line-height: 1.4; }
+.live-log .log-row .log-time { color: var(--dim); margin-right: 4px; min-width: 70px; display: inline-block; }
+.live-log .log-row .log-level { width: 18px; font-size: 9px; }
+.live-log .log-row .log-source { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: middle; }
+.live-log .log-row .log-msg { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.live-log-controls { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; flex-wrap: wrap; }
+.live-log-controls .filter-btn { padding: 2px 8px; font-size: 10px; border-radius: 3px; border: 1px solid var(--border); background: var(--surface2); color: var(--dim); cursor: pointer; }
+.live-log-controls .filter-btn.active { background: var(--accent); color: #0d1117; border-color: var(--accent); }
+.live-log-controls .filter-btn.err.active { background: var(--red); color: #fff; border-color: var(--red); }
+.live-log-controls .filter-btn.warn.active { background: var(--yellow); color: #0d1117; border-color: var(--yellow); }
+
+/* ── Position History ── */
+.pos-history { display: flex; gap: 4px; flex-wrap: wrap; max-height: 48px; overflow-y: auto; margin-top: 6px; }
+.pos-history .pos-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: 0.3; flex-shrink: 0; }
+.pos-history .pos-dot.current { opacity: 1; background: var(--green); }
+.pos-history .pos-dot.old { opacity: 0.15; }
+
+/* ── Current Action Detail ── */
+.current-action { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; margin-bottom: 6px; font-size: 11px; }
+.current-action .ca-tool { color: var(--green); font-weight: 600; }
+.current-action .ca-args { color: var(--dim); font-size: 10px; margin-top: 2px; word-break: break-all; }
+.current-action .ca-elapsed { color: var(--yellow); font-size: 10px; }
+
+/* ── Error Badge ── */
+.err-badge { font-size: 10px; background: rgba(248,81,73,.15); border: 1px solid var(--red); color: var(--red); padding: 1px 6px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+.err-badge.zero { border-color: var(--border); color: var(--dim); background: transparent; }
+.warn-badge { font-size: 10px; background: rgba(210,153,34,.15); border: 1px solid var(--yellow); color: var(--yellow); padding: 1px 6px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+.warn-badge.zero { border-color: var(--border); color: var(--dim); background: transparent; }
+
 /* ── Chat ── */
 .chat-log { height: 200px; overflow-y: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 8px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; }
 .chat-msg { font-size: 12px; line-height: 1.4; }
@@ -160,6 +191,8 @@ a:hover { text-decoration: underline; }
       <span class="dot" id="statusDot"></span>
       <span id="statusLabel">Connecting…</span>
     </span>
+    <span class="warn-badge zero" id="warnBadge" title="Warnings" onclick="switchView('logs');document.getElementById('logLevelFilter').value='Warning';fetchLogs()">⚠ 0</span>
+    <span class="err-badge zero" id="errBadge" title="Errors" onclick="switchView('logs');document.getElementById('logLevelFilter').value='Error';fetchLogs()">✗ 0</span>
     <a href="/about.html" class="btn btn-secondary btn-sm">About</a>
   </div>
 </header>
@@ -260,11 +293,23 @@ a:hover { text-decoration: underline; }
         <span class="pos-coord">Z <span id="posZ">—</span></span>
       </div>
 
+      <!-- Current action detail -->
+      <div id="currentActionBox" class="current-action" style="display:none">
+        <span class="ca-tool" id="currentActionTool">—</span>
+        <span class="ca-elapsed" id="currentActionElapsed"></span>
+        <div class="ca-args" id="currentActionArgs"></div>
+      </div>
+
       <div style="display:flex;gap:8px;margin-top:8px;font-size:11px;color:var(--dim)">
         <span>Queue: <b id="queueCount">0</b> actions</span>
         <span>•</span>
         <span>Failures: <b id="failCount">0</b></span>
+        <span>•</span>
+        <span>Errors: <b id="liveErrCount">0</b></span>
       </div>
+
+      <!-- Position history trail -->
+      <div class="pos-history" id="posHistory"></div>
     </div>
 
     <!-- Inventory Panel -->
@@ -285,6 +330,24 @@ a:hover { text-decoration: underline; }
       <h2>📋 Action Queue <span class="badge blue" id="queueBadge">0</span></h2>
       <div class="queue-list" id="queueList">
         <div class="queue-empty">Queue is empty.</div>
+      </div>
+    </div>
+
+    <!-- Live Log Strip (persistent mini-log) -->
+    <div class="panel" style="flex:2">
+      <h2>📋 Live Log
+        <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--dim);margin-left:8px" id="liveLogCount">0 entries</span>
+      </h2>
+      <div class="live-log-controls">
+        <button class="filter-btn active" data-filter="all" onclick="setLiveLogFilter('all')">All</button>
+        <button class="filter-btn warn" data-filter="Warning" onclick="setLiveLogFilter('Warning')">⚠ Warnings</button>
+        <button class="filter-btn err" data-filter="Error" onclick="setLiveLogFilter('Error')">✗ Errors</button>
+        <label style="margin-left:auto;font-size:10px;color:var(--dim);display:flex;align-items:center;gap:4px;cursor:pointer">
+          <input type="checkbox" id="autoScrollLog" checked> Auto-scroll
+        </label>
+      </div>
+      <div class="live-log" id="liveLogList">
+        <div class="tl-empty">Waiting for log entries…</div>
       </div>
     </div>
 
@@ -356,9 +419,15 @@ let lastStatus = null;
 let registeredGoals = [];
 let logPollInterval = null;
 let timelinePollInterval = null;
+let liveLogInterval = null;
 let chatMessages = [];
 let signalRConnected = false;
 let signalRConn = null;
+let liveLogFilter = 'all';
+let liveLogEntries = [];
+let errCount = 0;
+let warnCount = 0;
+let posHistory = [];
 
 // ── Init ───────────────────────────────────────────────────────────────────────
 
@@ -369,6 +438,7 @@ async function init() {
   connectSignalR();
   setInterval(refreshStatus, 2000);   // fallback if WebSocket disconnects
   setInterval(refreshQueue,  3000);
+  startLiveLogPolling();              // Sprint 50: persistent mini-log on Overview
 }
 
 // ── SignalR real-time push — Sprint 4a/4b ─────────────────────────────────
@@ -661,6 +731,17 @@ function applyStatus(s) {
   document.getElementById('queueCount').textContent = s.queuedActions ?? 0;
   document.getElementById('failCount').textContent  = s.consecutiveFailures ?? 0;
   document.getElementById('queueBadge').textContent = s.queuedActions ?? 0;
+  document.getElementById('liveErrCount').textContent = errCount;
+
+  // Current action tracking
+  updateCurrentAction(s);
+
+  // Position history (keep last 30)
+  if (s.position) {
+    posHistory.push({ x: s.position.x, y: s.position.y, z: s.position.z });
+    if (posHistory.length > 30) posHistory.shift();
+    renderPosHistory();
+  }
 
   // Current goal
   const goalBox   = document.getElementById('currentGoalBox');
@@ -762,6 +843,8 @@ function switchView(name) {
 
   if (name === 'timeline') { fetchTimeline(); startTimelinePolling(); }
   else { stopTimelinePolling(); }
+
+  // Live-log is always on — no action needed on view switch
 }
 
 function startLogPolling() {
@@ -848,6 +931,111 @@ function renderTimeline(entries) {
       <span class="tl-summary">${escapeHtml(e.summary || '')}</span>
     </div>`;
   }).join('');
+}
+
+// ── Live Log (persistent mini-log on Overview) ─────────────────────────────
+
+function startLiveLogPolling() {
+  stopLiveLogPolling();
+  fetchLiveLog(); // immediate first fetch
+  liveLogInterval = setInterval(fetchLiveLog, 2000);
+}
+
+function stopLiveLogPolling() {
+  if (liveLogInterval) { clearInterval(liveLogInterval); liveLogInterval = null; }
+}
+
+function setLiveLogFilter(filter) {
+  liveLogFilter = filter;
+  document.querySelectorAll('.live-log-controls .filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === filter);
+  });
+  renderLiveLog();
+}
+
+async function fetchLiveLog() {
+  try {
+    let url = '/api/dashboard/logs?limit=100';
+    if (liveLogFilter !== 'all') url += '&level=' + encodeURIComponent(liveLogFilter);
+    const res = await fetch(url);
+    if (!res.ok) return;
+    const data = await res.json();
+    liveLogEntries = data.entries || [];
+    renderLiveLog();
+
+    // Update error/warning counts
+    errCount = (data.entries || []).filter(e => (e.level === 'Error' || e.level === 'Fatal')).length;
+    warnCount = (data.entries || []).filter(e => e.level === 'Warning').length;
+    updateErrorBadges();
+
+    document.getElementById('liveLogCount').textContent = data.count + ' entries';
+  } catch(e) { /* silent */ }
+}
+
+function renderLiveLog() {
+  const list = document.getElementById('liveLogList');
+  const autoScroll = document.getElementById('autoScrollLog').checked;
+  if (!liveLogEntries || liveLogEntries.length === 0) {
+    list.innerHTML = '<div class="tl-empty">Waiting for log entries…</div>';
+    return;
+  }
+  list.innerHTML = liveLogEntries.slice(-50).map(e => {
+    const ts = new Date(e.timestampUtc).toLocaleTimeString();
+    const level = e.level || 'Information';
+    const src = (e.source || '').split('.').pop() || '';
+    return `<div class="log-row ${level}">
+      <span class="log-time">${ts}</span>
+      <span class="log-level ${level}">${level.substring(0,4)}</span>
+      <span class="log-source">${escapeHtml(src)}</span>
+      <span class="log-msg">${escapeHtml(e.message || '')}</span>
+    </div>`;
+  }).join('');
+  if (autoScroll) list.scrollTop = list.scrollHeight;
+}
+
+function updateErrorBadges() {
+  const errBadge = document.getElementById('errBadge');
+  const warnBadge = document.getElementById('warnBadge');
+  errBadge.textContent = '✗ ' + errCount;
+  errBadge.className = 'err-badge' + (errCount === 0 ? ' zero' : '');
+  warnBadge.textContent = '⚠ ' + warnCount;
+  warnBadge.className = 'warn-badge' + (warnCount === 0 ? ' zero' : '');
+}
+
+// ── Current Action Display ──────────────────────────────────────────────────
+
+function updateCurrentAction(s) {
+  const box = document.getElementById('currentActionBox');
+  if (!s.currentAction && !s.goal) {
+    box.style.display = 'none';
+    return;
+  }
+  box.style.display = '';
+  const action = s.currentAction || { tool: s.goal || '—', args: {} };
+  document.getElementById('currentActionTool').textContent = action.tool || '—';
+  const args = action.args || {};
+  const argStr = Object.entries(args).map(([k,v]) => `${k}=${v}`).join(', ');
+  document.getElementById('currentActionArgs').textContent = argStr || '(no args)';
+  if (s.actionElapsedMs) {
+    document.getElementById('currentActionElapsed').textContent = ` (${s.actionElapsedMs}ms)`;
+  } else {
+    document.getElementById('currentActionElapsed').textContent = '';
+  }
+}
+
+// ── Position History ────────────────────────────────────────────────────────
+
+function renderPosHistory() {
+  const container = document.getElementById('posHistory');
+  if (posHistory.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  container.innerHTML = posHistory.map((p, i) => {
+    const cls = i === posHistory.length - 1 ? 'current' : (i < posHistory.length - 5 ? 'old' : '');
+    return `<span class="pos-dot ${cls}" title="(${p.x},${p.y},${p.z})"></span>`;
+  }).join('') + 
+    `<span style="font-size:9px;color:var(--dim);margin-left:4px">(${posHistory[posHistory.length-1].x}, ${posHistory[posHistory.length-1].y}, ${posHistory[posHistory.length-1].z})</span>`;
 }
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────

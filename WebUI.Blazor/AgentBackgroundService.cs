@@ -327,6 +327,13 @@ public sealed class AgentBackgroundService(
             return [.. _pendingActions];
     }
 
+    /// <summary>
+    /// Returns the next action in the queue (the one that will be dispatched next),
+    /// or null if the queue is empty. Used by the status endpoint to show live
+    /// current action in the dashboard.
+    /// </summary>
+    public ActionData? GetCurrentAction() => _queue.Peek();
+
     // ── TSK-0091: Creative provisioning (async, fire-and-forget from SetGoal) ──
 
     /// <summary>

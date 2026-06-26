@@ -413,7 +413,9 @@ app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
 }));
 
 app.MapGet("/api/agent/status", (AgentBackgroundService? agent, IWorldModel? worldModel) =>
-    Results.Ok(new
+{
+    var currentAction = agent?.GetCurrentAction();
+    return Results.Ok(new
     {
         Status              = agentEnabled ? (agent?.CurrentGoal != null ? "active" : "idle") : "disabled",
         Goal                = agent?.CurrentGoal?.Name,
@@ -422,11 +424,15 @@ app.MapGet("/api/agent/status", (AgentBackgroundService? agent, IWorldModel? wor
         Health              = agent?.WorldState.Health  ?? 0,
         Food                = agent?.WorldState.Food    ?? 0,
         Position            = agent?.WorldState.Position,
+        CurrentAction       = currentAction is not null
+            ? new { tool = currentAction.Tool, args = currentAction.Arguments }
+            : null,
         Inventory           = agent?.WorldState.Inventory,
         QueuedActions       = agent?.GetPendingActions().Count ?? 0,
         ConsecutiveFailures = agent?.ConsecutiveFailures ?? 0,
         Uncertainty         = worldModel?.Uncertainty ?? 0.0,
-    }));
+    });
+});
 
 app.MapGet("/api/goals", (IGoalFactory? factory) =>
     Results.Ok(factory?.RegisteredGoals ?? []));
