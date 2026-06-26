@@ -2,7 +2,7 @@
 
 MemorySmith.Agent uses a sprint-based delivery model. Each sprint is council-reviewed by a 6-seat panel before merge.
 
-**Current version: v0.50.0** | **Latest: Sprint 49 — Dashboard Wave 1 + Audit-Driven Hardening**
+**Current version: v0.50.1** | **Latest: Sprint 50 — Dashboard Wave C: Landing Page, Navigation & Status Panels**
 
 ---
 
@@ -39,6 +39,10 @@ Silent-failure hardening: structured logging across all catch→null paths, WebS
 ### Phase 7 — Dashboard & Audit Hardening ✅ COMPLETE (Sprint 49)
 
 Dashboard infrastructure (log sink, publisher, REST endpoints, static HTML UI), ActionQueue lock protection, WebSocket clean shutdown, structured tool outcomes (TSK-0110), emergency stop delivery resilience (TSK-0119).
+
+### Phase 8 — Dashboard Usability ✅ COMPLETE (Sprint 50)
+
+Dashboard Wave A (build placement fixes + overview UI), Wave B (BuildOrigin migration + creative cleanup + council review), Wave C (landing page, navigation, status panel enhancement, version bump to v0.50.1).
 
 ---
 
@@ -80,6 +84,7 @@ Dashboard infrastructure (log sink, publisher, REST endpoints, static HTML UI), 
 | **46** | 2026-06-24 | Observability First 🔄 | TSK-0100 (WebSocketBridge resilience), TSK-0101 (7 catch→null fixes with logging), TSK-0102 (cross-repo request), TSK-0103 (BuildOrigin), TSK-0104 (ReplanResult), TSK-0105 (doc drift), TSK-0106 (error-path tests) |
 | **41** | 2026-06-23 | Intent Reliability + Goto Safety | Intent parsing reliability (ollama 3B insufficient), goto() timeout safety, path_update wiring, stale-inventory guard at goal-creation, 28 core memories, 10 feature wiki pages |
 | **49** | 2026-06-25 | Dashboard Wave 1 + Audit Hardening | Dashboard log sink, publisher, REST endpoints, static HTML UI; ActionQueue lock protection; WebSocket clean shutdown; structured tool outcomes (TSK-0110); emergency stop decoupling (TSK-0119); logger wiring (TSK-0120); version drift repair; TSK-0114/0115 test verification (731+ tests) |
+| **50** | 2026-06-26 | Dashboard Usability — Waves A/B/C | **Wave A:** Rehome-to-origin removed, terrain clearance, self-position block skip, overview UI (live log strip, error/warning badges, position trail, current action, auto-scroll) — commit `153fbd6`<br>**Wave B:** BuildOrigin sentinel elimination (TSK-0107), creative dead code removal (TSK-0116), 7-seat council review — commit `3da01c1`<br>**Wave C:** Landing page redirect, header nav, version badge, SignalR status indicator, uptime counter, uncertainty display, enhanced metrics, about page update, docs update — v0.50.1 |
 
 ---
 
@@ -87,6 +92,7 @@ Dashboard infrastructure (log sink, publisher, REST endpoints, static HTML UI), 
 
 | Version | Sprint | Tests | Status |
 |---------|--------|-------|--------|
+| v0.50.1 | 50 | 731+ | ✅ green |
 | v0.50.0 | 49 | 731+ | ✅ green |
 | v0.49.0 | 49 | 722 | ✅ green |
 | v0.40.0 | 40 | 63+ | ✅ green |

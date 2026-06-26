@@ -185,15 +185,21 @@ a:hover { text-decoration: underline; }
 <body>
 
 <header>
-  <h1>MemorySmith.<span>Agent</span></h1>
+  <div style="display:flex;align-items:center;gap:12px">
+    <h1>MemorySmith.<span>Agent</span></h1>
+    <span style="font-size:10px;color:var(--dim);background:var(--surface2);padding:2px 8px;border-radius:10px;border:1px solid var(--border)">v0.50.1</span>
+  </div>
   <div style="display:flex;align-items:center;gap:16px">
+    <nav style="display:flex;gap:4px;font-size:12px">
+      <a href="/index.html" class="btn btn-secondary btn-sm" style="text-decoration:none">📊 Dashboard</a>
+      <a href="/about.html" class="btn btn-secondary btn-sm" style="text-decoration:none">ℹ️ About</a>
+    </nav>
     <span class="status-badge">
       <span class="dot" id="statusDot"></span>
       <span id="statusLabel">Connecting…</span>
     </span>
     <span class="warn-badge zero" id="warnBadge" title="Warnings" onclick="switchView('logs');document.getElementById('logLevelFilter').value='Warning';fetchLogs()">⚠ 0</span>
     <span class="err-badge zero" id="errBadge" title="Errors" onclick="switchView('logs');document.getElementById('logLevelFilter').value='Error';fetchLogs()">✗ 0</span>
-    <a href="/about.html" class="btn btn-secondary btn-sm">About</a>
   </div>
 </header>
 
@@ -264,7 +270,14 @@ a:hover { text-decoration: underline; }
 
     <!-- Status Panel -->
     <div class="panel">
-      <h2>📊 Status</h2>
+      <h2>📊 Agent Status</h2>
+
+      <!-- System Connection Status -->
+      <div style="display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-size:11px;color:var(--dim)">🟢 SignalR: <b id="signalRStatus" style="color:var(--green)">Connected</b></span>
+        <span style="font-size:11px;color:var(--dim)">🔄 Polling: <b id="pollingStatus" style="color:var(--dim)">Fallback</b></span>
+        <span style="font-size:11px;color:var(--dim)">⏱ Uptime: <b id="uptimeDisplay">—</b></span>
+      </div>
 
       <!-- Current goal -->
       <div id="currentGoalBox" class="current-goal" style="display:none">
@@ -286,7 +299,7 @@ a:hover { text-decoration: underline; }
       </div>
 
       <!-- Position -->
-      <div class="pos-row" id="posDisplay" style="margin-top:10px">
+      <div class="pos-row" id="posDisplay">
         <span>📍</span>
         <span class="pos-coord">X <span id="posX">—</span></span>
         <span class="pos-coord">Y <span id="posY">—</span></span>
@@ -300,12 +313,13 @@ a:hover { text-decoration: underline; }
         <div class="ca-args" id="currentActionArgs"></div>
       </div>
 
-      <div style="display:flex;gap:8px;margin-top:8px;font-size:11px;color:var(--dim)">
-        <span>Queue: <b id="queueCount">0</b> actions</span>
-        <span>•</span>
-        <span>Failures: <b id="failCount">0</b></span>
-        <span>•</span>
-        <span>Errors: <b id="liveErrCount">0</b></span>
+      <!-- Metrics row -->
+      <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;font-size:11px;color:var(--dim)">
+        <span title="Actions in dispatch queue">📋 Queue: <b id="queueCount">0</b></span>
+        <span title="Consecutive action failures">❌ Failures: <b id="failCount">0</b></span>
+        <span title="Total log errors in current view">✗ Errors: <b id="liveErrCount">0</b></span>
+        <span title="Total log warnings">⚠ Warnings: <b id="liveWarnCount">0</b></span>
+        <span title="World model uncertainty score">🔮 Uncertainty: <b id="uncertaintyDisplay">—</b></span>
       </div>
 
       <!-- Position history trail -->
@@ -314,7 +328,7 @@ a:hover { text-decoration: underline; }
 
     <!-- Inventory Panel -->
     <div class="panel" style="flex:1">
-      <h2>🎒 Inventory</h2>
+      <h2>🎒 Inventory <span class="badge blue" id="invCountBadge">0 items</span></h2>
       <div class="inv-grid" id="invGrid">
         <div class="queue-empty">No inventory data yet.</div>
       </div>
@@ -428,6 +442,8 @@ let liveLogEntries = [];
 let errCount = 0;
 let warnCount = 0;
 let posHistory = [];
+let startTime = Date.now();
+let uptimeInterval = null;
 
 // ── Init ───────────────────────────────────────────────────────────────────────
 
@@ -439,6 +455,23 @@ async function init() {
   setInterval(refreshStatus, 2000);   // fallback if WebSocket disconnects
   setInterval(refreshQueue,  3000);
   startLiveLogPolling();              // Sprint 50: persistent mini-log on Overview
+  startUptimeCounter();               // Sprint 50 Wave C: uptime display
+}
+
+// ── Uptime Counter ──────────────────────────────────────────────────────────
+
+function startUptimeCounter() {
+  updateUptime();
+  uptimeInterval = setInterval(updateUptime, 1000);
+}
+
+function updateUptime() {
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const h = Math.floor(elapsed / 3600);
+  const m = Math.floor((elapsed % 3600) / 60);
+  const s = elapsed % 60;
+  const el = document.getElementById('uptimeDisplay');
+  if (el) el.textContent = h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`;
 }
 
 // ── SignalR real-time push — Sprint 4a/4b ─────────────────────────────────
@@ -484,18 +517,35 @@ async function connectSignalR() {
       signalRConnected = false;
       document.getElementById('statusDot').className = 'dot';
       document.getElementById('statusLabel').textContent = 'Reconnecting…';
+      updateConnectionStatus(false);
     });
 
     signalRConn.onclose(() => {
       signalRConnected = false;
+      updateConnectionStatus(false);
     });
 
     await signalRConn.start();
     signalRConnected = true;
+    updateConnectionStatus(true);
     console.log('SignalR connected to /agent-hub');
   } catch (e) {
     console.warn('SignalR unavailable, falling back to polling:', e.message);
     signalRConnected = false;
+    updateConnectionStatus(false);
+  }
+}
+
+function updateConnectionStatus(connected) {
+  const el = document.getElementById('signalRStatus');
+  if (el) {
+    el.textContent = connected ? 'Connected' : 'Disconnected';
+    el.style.color = connected ? 'var(--green)' : 'var(--red)';
+  }
+  const polling = document.getElementById('pollingStatus');
+  if (polling) {
+    polling.textContent = connected ? 'Standby' : 'Active (polling)';
+    polling.style.color = connected ? 'var(--dim)' : 'var(--yellow)';
   }
 }
 
@@ -684,10 +734,15 @@ async function setOrigin() {
 }
 
 function useCurrentPos() {
-  if (!lastStatus?.position) return;
-  document.getElementById('originX').value = lastStatus.position.x ?? 0;
-  document.getElementById('originY').value = lastStatus.position.y ?? 64;
-  document.getElementById('originZ').value = lastStatus.position.z ?? 0;
+  if (!lastStatus) return;
+  // Handle both flat (SignalR push) and nested (HTTP poll) position formats
+  const pos = lastStatus.position || lastStatus;
+  const x = pos.x ?? lastStatus.x ?? 0;
+  const y = pos.y ?? lastStatus.y ?? 64;
+  const z = pos.z ?? lastStatus.z ?? 0;
+  document.getElementById('originX').value = x;
+  document.getElementById('originY').value = y;
+  document.getElementById('originZ').value = z;
 }
 
 // ── Status refresh ─────────────────────────────────────────────────────────────
@@ -732,6 +787,11 @@ function applyStatus(s) {
   document.getElementById('failCount').textContent  = s.consecutiveFailures ?? 0;
   document.getElementById('queueBadge').textContent = s.queuedActions ?? 0;
   document.getElementById('liveErrCount').textContent = errCount;
+  document.getElementById('liveWarnCount').textContent = warnCount;
+
+  // Uncertainty
+  const uncEl = document.getElementById('uncertaintyDisplay');
+  if (uncEl) uncEl.textContent = s.uncertainty != null ? (s.uncertainty * 100).toFixed(0) + '%' : '—';
 
   // Current action tracking
   updateCurrentAction(s);
@@ -760,9 +820,13 @@ function applyStatus(s) {
   const inv = s.inventory ?? {};
   const grid = document.getElementById('invGrid');
   const keys = Object.keys(inv).sort();
+  const invBadge = document.getElementById('invCountBadge');
   if (keys.length === 0) {
     grid.innerHTML = '<div class="queue-empty">Inventory empty.</div>';
+    if (invBadge) invBadge.textContent = '0 items';
   } else {
+    const totalItems = Object.values(inv).reduce((sum, c) => sum + c, 0);
+    if (invBadge) invBadge.textContent = keys.length + ' types, ' + totalItems + ' total';
     grid.innerHTML = keys.map(k =>
       `<div class="inv-item"><span class="name" title="${k}">${k}</span><span class="count">${inv[k]}</span></div>`
     ).join('');

@@ -1,5 +1,5 @@
 // MemorySmith.Agent — Web UI & Agent Host
-// v0.50.0  Sprint 49 — Dashboard Wave 1 + Audit-Driven Hardening (Wave D)
+// v0.50.1  Sprint 50 — Dashboard Wave C: Landing Page, Navigation & Status Panel Enhancement
 
 using Agent.Construction;
 using Agent.Core;
@@ -399,16 +399,23 @@ if (agentEnabled)
 if (agentEnabled)
     app.MapHub<AgentHub>("/agent-hub");
 
-app.MapGet("/", () => "MemorySmith.Agent is running.");
+// Sprint 50 Wave C: root / now redirects to dashboard HTML.
+// UseDefaultFiles + UseStaticFiles serve index.html from wwwroot/.
+// This MapGet is a fallback in case static file middleware doesn't match.
+app.MapGet("/", (HttpContext ctx) =>
+{
+    ctx.Response.Redirect("/index.html");
+    return Task.CompletedTask;
+});
 
 app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
 {
     Name    = "MemorySmith.Agent",
-    Version = "0.50.0",
-    Phase   = "Sprint 49 — Dashboard Wave 1 + Audit-Driven Hardening",
+    Version = "0.50.1",
+    Phase   = "Sprint 50 — Dashboard Wave C: Landing Page, Navigation & Status Panels",
     License = "MIT",
     Repository  = "https://github.com/TheMasonX/MemorySmith.Agent",
-    Dashboard   = "/",
+    Dashboard   = "/index.html",
     RegisteredGoals = factory?.RegisteredGoals ?? [],
 }));
 

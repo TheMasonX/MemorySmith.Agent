@@ -4,7 +4,7 @@
 
 A modular autonomous agent framework that treats Minecraft as a *world adapter* and uses the [MemorySmith](https://github.com/TheMasonX/MemorySmith) wiki as long-term memory.
 
-**v0.50.0** — Sprint 49 complete — 731+ tests
+**v0.50.1** — Sprint 50 complete — 731+ tests
 
 ---
 
@@ -163,8 +163,9 @@ This repo is self-documenting — `Data/Pages/` contains wiki pages served by th
 | Sprints 5-27 | Tool safety, journal, world model, logging, governors, damage interrupt, World KB, planner routing, ITimeProvider | ✅ Done |
 | Sprints 28-33 | Action lifecycle, SEC-01/02 auth, base64 sweep, build restore, DI logger wiring, Program.cs restore | ✅ Done |
 | Sprints 34-35 | Build origin coords, API auth fix, chat announcement, live build gate | ✅ Done |
-| Phase 4 — Vision | Spatial analysis, aesthetic critique | ⬜ Planned |
-| Phase 5 — Advanced | Multi-agent, vector search, CI/CD | ⬜ Planned |
+| Sprints 49-50 | Dashboard Wave 1-3: SignalR push, log sink, live log, status panels, landing page, navigation | ✅ Done |
+| Phase 5 — Vision | Spatial analysis, aesthetic critique | ⬜ Planned |
+| Phase 6 — Advanced | Multi-agent, vector search, CI/CD | ⬜ Planned |
 
 See [roadmap.md](Data/Pages/roadmap.md) for the full sprint-by-sprint history.
 

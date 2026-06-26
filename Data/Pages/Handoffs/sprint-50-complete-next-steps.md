@@ -1,7 +1,7 @@
 # Sprint 50 Complete — Handoff & Next Steps
 
 **Date:** 2026-06-26
-**Branch:** `sprint-35-llm-first` (`3da01c1`)
+**Branch:** `sprint-35-llm-first` (Wave A: `153fbd6`, Wave B: `3da01c1`, Wave C: latest)
 **Author:** SteveBot
 **Tests:** 731 passing, 0 failing (0 warnings, 0 errors)
 
@@ -20,6 +20,24 @@
 | — | Dashboard Overview UI | — | Persistent live log strip, error/warning badges, position trail, current action display, auto-scroll toggle |
 
 **Files:** `WebUI.Blazor/wwwroot/index.html`, `HtnTaskLibrary.cs`, `Program.cs`, `AgentBackgroundService.cs`
+
+### Wave C — Dashboard Landing Page, Navigation & Status Panels
+*Commit (latest on `sprint-35-llm-first`)*
+
+| Area | Change |
+|:-----|:-------|
+| **Landing page** | Root `/` now redirects to `/index.html` (dashboard) instead of showing a plain text message |
+| **Header nav** | Added Dashboard/About nav links in header; version badge (`v0.50.1`) shown next to title |
+| **SignalR status** | New connection status indicators in Status panel: live SignalR connected/disconnected state, polling fallback indicator |
+| **Uptime counter** | Real-time uptime display (h:m:s) since page load |
+| **Uncertainty display** | World model uncertainty score shown as percentage in metrics row |
+| **Enhanced metrics** | Metrics row now includes: Queue, Failures, Errors, Warnings, Uncertainty — each with tooltips |
+| **Inventory badge** | Shows "N types, M total" count above inventory grid |
+| **About page** | Updated to v0.50.1 with Sprint 50 Wave C feature list; Phase 4 renamed to "Dashboard & Observability" |
+| **Version bump** | v0.50.0 → v0.50.1 (wave = minor version) |
+| **Docs update** | README.md, roadmap.md, handoff document all updated with Sprint 50 Wave C |
+
+**Files changed:** `Program.cs`, `wwwroot/index.html`, `wwwroot/about.html`, `README.md`, `Data/Pages/roadmap.md`, `Data/Pages/Handoffs/sprint-50-complete-next-steps.md`
 
 ### Wave B — BuildOrigin Migration + Creative Cleanup + Council Review
 *Commit `3da01c1`*
@@ -43,7 +61,7 @@
 Build:   0 warnings, 0 errors
 Tests:   731 passing, 0 failing, 0 skipped
 Branch:  sprint-35-llm-first (pushed to origin)
-Version: v0.50.0  Sprint 49 — Dashboard Wave 1 + Audit-Driven Hardening (Wave D)
+Version: v0.50.1  Sprint 50 — Dashboard Wave C: Landing Page, Navigation & Status Panels
 ```
 
 ### Active Agent Capabilities
@@ -51,7 +69,7 @@ Version: v0.50.0  Sprint 49 — Dashboard Wave 1 + Audit-Driven Hardening (Wave 
 - **Craft/Smelt**: Full crafting chain with prerequisite gathering, smelting, tool ensures
 - **Gather**: MineBlock with direct-mine and smeltable resolution via `CommonMinecraftBlocks`
 - **Chat**: LLM-first interpretation with IntentDraft → IntentManager → GoalFactory pipeline
-- **Dashboard**: Tabbed UI (Overview/Logs/Timeline), real-time live log, error badges, position trail
+- **Dashboard**: Tabbed UI (Overview/Logs/Timeline), landing page, header navigation, real-time live log, error/warning badges, position trail, connection status, uptime counter, uncertainty display, enhanced metrics
 - **Replan**: Graduated retry with stall detection, failure reason logging
 - **Recovery**: Emergency stop (damage interrupt), action timeout sweep
 
