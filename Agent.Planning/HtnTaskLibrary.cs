@@ -2,6 +2,7 @@ namespace Agent.Planning;
 
 using Agent.Construction;
 using Agent.Core;
+using Agent.Planning.Goals;
 using System.Text.Json;
 
 /// <summary>
@@ -369,18 +370,55 @@ public sealed class HtnTaskLibrary
     /// origin is resolvable, returns a single FindFlatArea action.
     /// Sprint 10 B2: resumes from checkpoint.
     /// Sprint 36 P0-C: retry gated on SearchedRadius &lt; FlatAreaRetryRadius.
+    /// TSK-0107: accepts <see cref="BuildOrigin"/> value object instead of raw
+    /// <c>int originX/originY/originZ</c>. Uses nullable <see cref="BuildOrigin"/> to
+    /// distinguish "no origin supplied" (null) from "origin at (0,0,0)" (Explicit).
+    /// The sentinel <c>(0,0,0) == missing</c> pattern is eliminated.
     /// </summary>
     public IReadOnlyList<ActionData> DecomposeBuild(
         Blueprint blueprint,
         IReadOnlyList<PlacementBlock> blocks,
-        int originX, int originY, int originZ,
+        BuildOrigin? origin,
         WorldState state,
         bool requireOrigin = false)
     {
-        if (originX == 0 && originY == 0 && originZ == 0)
+        // TSK-0107: resolve coordinates from BuildOrigin, using Source to distinguish
+        // explicit origin from missing (eliminates the (0,0,0) sentinel ambiguity).
+        // - Explicit origin: use coordinates as-is, even if all zero.
+        // - Non-explicit origin with non-zero coords: caller resolved them, use verbatim.
+        // - Non-explicit origin with all-zero coords: same as null — fall back to shared
+        //   auto-origin facts. This preserves backward compatibility for direct test
+        //   callers that pass (0,0,0) with AutoScanned to mean "resolve from facts".
+        // - Null origin: try auto-origin facts from world state, defaulting to (0,0,0).
+        int originX, originY, originZ;
+        if (origin is not null && origin.Source == BuildOriginSource.Explicit)
+        {
+            originX = origin.X;
+            originY = origin.Y;
+            originZ = origin.Z;
+        }
+        else if (origin is not null && (origin.X != 0 || origin.Y != 0 || origin.Z != 0))
+        {
+            // Non-zero, non-explicit origin: caller resolved coordinates (e.g. from
+            // blueprint-specific facts). Use verbatim without ResolveAutoOrigin overlay.
+            originX = origin.X;
+            originY = origin.Y;
+            originZ = origin.Z;
+        }
+        else
+        {
+            // Null or all-zero origin: try auto-origin facts from world state.
+            originX = 0; originY = 0; originZ = 0;
             ResolveAutoOrigin(state, ref originX, ref originY, ref originZ);
+        }
 
-        if (requireOrigin && originX == 0 && originY == 0 && originZ == 0)
+        // Sprint 37: when requireOrigin is true, check if we already have an
+        // auto-detected flat area. If not, emit FindFlatArea (with scanOrigin when
+        // explicit coords were given, or auto-detect centered on bot when missing).
+        // TSK-0107: sentinel eliminated — explicit origin at (0,0,0) is no longer
+        // conflated with "no origin supplied" thanks to BuildOriginSource.Explicit.
+        if (requireOrigin && originX == 0 && originY == 0 && originZ == 0
+            && origin?.Source != BuildOriginSource.Explicit)
         {
             var lastAreaStr = state.Facts.TryGetValue(BuildFactKeys.LastFlatArea, out var la) ? la : null;
             var lastArea = lastAreaStr is string las && int.TryParse(las, out var parsed) ? parsed : -1;

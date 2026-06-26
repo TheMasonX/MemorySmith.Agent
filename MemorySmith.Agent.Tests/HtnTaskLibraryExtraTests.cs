@@ -1,6 +1,7 @@
 using Agent.Construction;
 using Agent.Core;
 using Agent.Planning;
+using Agent.Planning.Goals;
 
 namespace MemorySmith.Agent.Tests;
 
@@ -59,7 +60,7 @@ public sealed class HtnTaskLibraryExtraTests
     {
         var progressKey = BuildFactKeys.BuildProgressIndex("test");
         var state = new WorldState().With(b => b.SetFact(progressKey, 1.ToString(), FactSource.Observed)); // int
-        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, 0, 64, 0, state);
+        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
         Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1),
             "Checkpoint=1 means blocks 0 and 1 were placed; only block 2 remains.");
     }
@@ -70,7 +71,7 @@ public sealed class HtnTaskLibraryExtraTests
     {
         var progressKey = BuildFactKeys.BuildProgressIndex("test");
         var state = new WorldState().With(b => b.SetFact(progressKey, 1L.ToString(), FactSource.Observed)); // long
-        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, 0, 64, 0, state);
+        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
         Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1));
     }
 
@@ -80,7 +81,7 @@ public sealed class HtnTaskLibraryExtraTests
     {
         var progressKey = BuildFactKeys.BuildProgressIndex("test");
         var state = new WorldState().With(b => b.SetFact(progressKey, 1.0.ToString(), FactSource.Observed)); // double
-        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, 0, 64, 0, state);
+        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
         Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1));
     }
 
@@ -90,7 +91,7 @@ public sealed class HtnTaskLibraryExtraTests
     {
         var progressKey = BuildFactKeys.BuildProgressIndex("test");
         var state = new WorldState().With(b => b.SetFact(progressKey, "1", FactSource.Observed)); // string
-        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, 0, 64, 0, state);
+        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
         Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1));
     }
 
@@ -108,7 +109,7 @@ public sealed class HtnTaskLibraryExtraTests
         ]);
 
         Assert.DoesNotThrow(() =>
-            _library.DecomposeBuild(blueprint, ThreeBlocks, 0, 64, 0, new WorldState()),
+            _library.DecomposeBuild(blueprint, ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), new WorldState()),
             "Duplicate blueprint materials should be merged via GroupBy.Sum, not throw.");
     }
 
@@ -122,7 +123,7 @@ public sealed class HtnTaskLibraryExtraTests
             new MaterialEntry("cobblestone", 2),
             new MaterialEntry("cobblestone", 1),
         ]);
-        var actions = _library.DecomposeBuild(blueprint, ThreeBlocks, 0, 64, 0, new WorldState());
+        var actions = _library.DecomposeBuild(blueprint, ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), new WorldState());
         var mineAction = actions.FirstOrDefault(a =>
             a.Tool == "MineBlock" &&
             a.Arguments.TryGetValue("block", out var b) &&
@@ -142,8 +143,8 @@ public sealed class HtnTaskLibraryExtraTests
     {
         var actions = _library.DecomposeBuild(
             MakeBlueprint(), ThreeBlocks,
-            originX: 0, originY: 0, originZ: 0,
-            state: new WorldState(),
+            new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned),
+            new WorldState(),
             requireOrigin: true);
 
         Assert.That(actions, Has.Count.EqualTo(1),
@@ -165,8 +166,8 @@ public sealed class HtnTaskLibraryExtraTests
 
         var actions = _library.DecomposeBuild(
             MakeBlueprint(), ThreeBlocks,
-            originX: 0, originY: 0, originZ: 0,
-            state: state,
+            new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned),
+            state,
             requireOrigin: true);
 
         Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(3),
@@ -180,8 +181,8 @@ public sealed class HtnTaskLibraryExtraTests
         // requireOrigin defaults to false — existing callers (HtnPlanner) are not affected.
         var actions = _library.DecomposeBuild(
             MakeBlueprint(), ThreeBlocks,
-            originX: 0, originY: 0, originZ: 0,
-            state: new WorldState());
+            new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned),
+            new WorldState());
 
         Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(3),
             "With requireOrigin=false (default), the plan proceeds even without a stored origin.");

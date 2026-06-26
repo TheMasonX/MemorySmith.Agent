@@ -1,4 +1,4 @@
-﻿namespace Agent.Planning;
+namespace Agent.Planning;
 
 using System.Text.Json;
 using Agent.Construction;
@@ -39,24 +39,21 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
 
         if (goal is BuildGoal buildGoal)
         {
-            var originX = ReadOriginFact(state, buildGoal.Blueprint.Id, "x");
-            var originY = ReadOriginFact(state, buildGoal.Blueprint.Id, "y");
-            var originZ = ReadOriginFact(state, buildGoal.Blueprint.Id, "z");
+            // TSK-0107: construct BuildOrigin from facts for the decomposer.
+            // TSK-0116: removed IsCreativeMode branch — HtnTaskLibrary.DecomposeBuild
+            // already handles creative mode internally. The PlannerRouter prefers
+            // BuildGoalDecomposer first, making this HtnPlanner path a fallback.
+            var origin = new BuildOrigin(
+                ReadOriginFact(state, buildGoal.Blueprint.Id, "x"),
+                ReadOriginFact(state, buildGoal.Blueprint.Id, "y"),
+                ReadOriginFact(state, buildGoal.Blueprint.Id, "z"),
+                BuildOriginSource.AutoScanned);
 
-            if (state.IsCreativeMode)
-            {
-                actions.AddRange(CreateCreativeBuildActions(buildGoal, state, originX, originY, originZ));
-            }
-            else
-            {
-                actions.AddRange(library.DecomposeBuild(
-                    buildGoal.Blueprint,
-                    buildGoal.Blocks,
-                    originX,
-                    originY,
-                    originZ,
-                    state));
-            }
+            actions.AddRange(library.DecomposeBuild(
+                buildGoal.Blueprint,
+                buildGoal.Blocks,
+                origin,
+                state));
         }
         else if (goal is CraftItemGoal craftGoal)
         {

@@ -177,7 +177,7 @@ public class Sprint36Tests
         };
 
         // DecomposeBuild with requireOrigin=true and no stored origin
-        var actions = library.DecomposeBuild(blueprint, [], 0, 0, 0, state, requireOrigin: true);
+        var actions = library.DecomposeBuild(blueprint, [], new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), state, requireOrigin: true);
 
         // Assert: emits a FindFlatArea with radius >= 48
         var findFlat = actions.FirstOrDefault(a =>
@@ -210,7 +210,7 @@ public class Sprint36Tests
             Id = "test-house", Name = "Test House", Materials = []
         };
 
-        var actions = library.DecomposeBuild(blueprint, [], 0, 0, 0, state, requireOrigin: true);
+        var actions = library.DecomposeBuild(blueprint, [], new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), state, requireOrigin: true);
 
         // When SearchedRadius >= 48 and Area = 0, plan must be empty (no more retry).
         var retryFindFlat = actions.Any(a =>
@@ -243,7 +243,7 @@ public class Sprint36Tests
             Id = "test-house", Name = "Test House", Materials = []
         };
 
-        var actions = library.DecomposeBuild(blueprint, [], 0, 0, 0, state, requireOrigin: true);
+        var actions = library.DecomposeBuild(blueprint, [], new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), state, requireOrigin: true);
 
         // Should still retry since lastSearchedRadius defaults to 0 < 48
         var findFlat = actions.FirstOrDefault(a =>

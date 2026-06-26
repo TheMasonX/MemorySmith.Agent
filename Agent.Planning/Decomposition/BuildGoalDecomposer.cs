@@ -55,10 +55,14 @@ public sealed class BuildGoalDecomposer(HtnTaskLibrary taskLibrary, ILogger<Buil
 
         // Sprint 37: always requireOrigin=true when explicit origin is given, so
         // DecomposeBuild emits FindFlatArea with scanOrigin set to those coords.
+        // TSK-0107: construct BuildOrigin instead of passing raw ints to eliminate
+        // the (0,0,0) sentinel ambiguity. The source is derived from origin provenance.
+        var source = bg.HasExplicitOrigin ? BuildOriginSource.Explicit : BuildOriginSource.AutoScanned;
+        var buildOrigin = new BuildOrigin(ox, oy, oz, source);
         var requireOrigin = true;
 
         var actions = taskLibrary.DecomposeBuild(
-            bg.Blueprint, bg.Blocks, ox, oy, oz, state, requireOrigin);
+            bg.Blueprint, bg.Blocks, buildOrigin, state, requireOrigin);
 
         return new ActionPlan(bg.Name, bg.Phases, actions);
     }

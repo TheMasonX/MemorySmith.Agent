@@ -1,6 +1,7 @@
 using Agent.Construction;
 using Agent.Core;
 using Agent.Planning;
+using Agent.Planning.Goals;
 
 namespace MemorySmith.Agent.Tests;
 
@@ -33,7 +34,7 @@ public sealed class HtnTaskLibraryCraftingTests
     public void DecomposeBuild_BlueprintHasPlanks_EmitsCraftItemPlanks()
     {
         var bp      = MakeBlueprint(new MaterialEntry("oak_planks", 32));
-        var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, new WorldState());
+        var actions = Library().DecomposeBuild(bp, SingleBlock, new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), new WorldState());
 
         var craft = actions.Where(a => ToolIs(a, "CraftItem")).ToList();
         Assert.That(craft, Has.Some.Matches<ActionData>(a =>
@@ -47,7 +48,7 @@ public sealed class HtnTaskLibraryCraftingTests
         var bp    = MakeBlueprint(new MaterialEntry("oak_planks", 16));
         var state = new WorldState().With(b => b.AddInventoryItem("oak_planks", 16));
 
-        var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, state);
+        var actions = Library().DecomposeBuild(bp, SingleBlock, new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), state);
 
         Assert.That(
             actions.Where(a => ToolIs(a, "CraftItem") && ArgIs(a, "item", "oak_planks")),
@@ -61,7 +62,7 @@ public sealed class HtnTaskLibraryCraftingTests
         var bp    = MakeBlueprint(new MaterialEntry("oak_planks", 20));
         var state = new WorldState().With(b => b.AddInventoryItem("oak_planks", 12));
 
-        var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, state);
+        var actions = Library().DecomposeBuild(bp, SingleBlock, new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), state);
         var craft   = actions.FirstOrDefault(a => ToolIs(a, "CraftItem") && ArgIs(a, "item", "oak_planks"));
 
         Assert.That(craft, Is.Not.Null, "Should emit CraftItem(oak_planks) for the deficit.");
@@ -75,7 +76,7 @@ public sealed class HtnTaskLibraryCraftingTests
     public void DecomposeBuild_BlueprintHasCraftingTable_EmitsCraftTable()
     {
         var bp      = MakeBlueprint(new MaterialEntry("crafting_table", 1));
-        var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, new WorldState());
+        var actions = Library().DecomposeBuild(bp, SingleBlock, new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), new WorldState());
 
         Assert.That(
             actions.Where(a => ToolIs(a, "CraftItem") && ArgIs(a, "item", "crafting_table")),
@@ -89,7 +90,7 @@ public sealed class HtnTaskLibraryCraftingTests
         // oak_slab requires a crafting table (3x1 recipe); the chain must emit
         // crafting_table before oak_slab even when crafting_table is not in blueprint Materials.
         var bp      = MakeBlueprint(new MaterialEntry("oak_slab", 12));
-        var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, new WorldState());
+        var actions = Library().DecomposeBuild(bp, SingleBlock, new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), new WorldState());
 
         var craftItems = actions.Where(a => ToolIs(a, "CraftItem"))
                                 .Select(a => a.Arguments["item"]?.ToString())
@@ -113,7 +114,7 @@ public sealed class HtnTaskLibraryCraftingTests
     public void DecomposeBuild_BlueprintHasChest_NoExplicitTable_AutoEmitsCraftTable()
     {
         var bp      = MakeBlueprint(new MaterialEntry("chest", 2));
-        var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, new WorldState());
+        var actions = Library().DecomposeBuild(bp, SingleBlock, new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), new WorldState());
 
         var craftItems = actions.Where(a => ToolIs(a, "CraftItem"))
                                 .Select(a => a.Arguments["item"]?.ToString())
@@ -132,7 +133,7 @@ public sealed class HtnTaskLibraryCraftingTests
         var bp    = MakeBlueprint(new MaterialEntry("chest", 2));
         var state = new WorldState().With(b => b.AddInventoryItem("crafting_table", 1));
 
-        var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, state);
+        var actions = Library().DecomposeBuild(bp, SingleBlock, new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), state);
 
         Assert.That(
             actions.Where(a => ToolIs(a, "CraftItem") && ArgIs(a, "item", "crafting_table")),
@@ -146,7 +147,7 @@ public sealed class HtnTaskLibraryCraftingTests
     public void DecomposeBuild_BlueprintHasTorch_EmitsCraftStickThenTorch()
     {
         var bp      = MakeBlueprint(new MaterialEntry("torch", 8));
-        var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, new WorldState());
+        var actions = Library().DecomposeBuild(bp, SingleBlock, new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), new WorldState());
 
         var craftItems = actions.Where(a => ToolIs(a, "CraftItem"))
                                 .Select(a => a.Arguments["item"]?.ToString())
@@ -167,7 +168,7 @@ public sealed class HtnTaskLibraryCraftingTests
         // When torch is in the blueprint and coal is not in inventory, a
         // MineBlock("coal_ore") action must be emitted during the gather phase.
         var bp      = MakeBlueprint(new MaterialEntry("torch", 4));
-        var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, new WorldState());
+        var actions = Library().DecomposeBuild(bp, SingleBlock, new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), new WorldState());
 
         var mineCoal = actions.FirstOrDefault(a =>
             ToolIs(a, "MineBlock") && ArgIs(a, "block", "coal_ore"));
@@ -183,7 +184,7 @@ public sealed class HtnTaskLibraryCraftingTests
         var bp    = MakeBlueprint(new MaterialEntry("torch", 4));
         var state = new WorldState().With(b => b.AddInventoryItem("coal", 1));
 
-        var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, state);
+        var actions = Library().DecomposeBuild(bp, SingleBlock, new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), state);
 
         Assert.That(
             actions.Where(a => ToolIs(a, "MineBlock") && ArgIs(a, "block", "coal_ore")),
@@ -197,7 +198,7 @@ public sealed class HtnTaskLibraryCraftingTests
     public void DecomposeBuild_BlueprintHasPlanks_NoMineBlockForPlanks()
     {
         var bp      = MakeBlueprint(new MaterialEntry("oak_planks", 64));
-        var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, new WorldState());
+        var actions = Library().DecomposeBuild(bp, SingleBlock, new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), new WorldState());
 
         Assert.That(
             actions.Where(a => ToolIs(a, "MineBlock") && ArgIs(a, "block", "oak_planks")),
@@ -211,7 +212,7 @@ public sealed class HtnTaskLibraryCraftingTests
     public void DecomposeBuild_WithCraftingItems_StillEndsWithGetStatus()
     {
         var bp      = MakeBlueprint(new MaterialEntry("oak_planks", 4), new MaterialEntry("torch", 4));
-        var actions = Library().DecomposeBuild(bp, SingleBlock, 0, 0, 0, new WorldState());
+        var actions = Library().DecomposeBuild(bp, SingleBlock, new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned), new WorldState());
 
         Assert.That(actions.Last().Tool, Is.EqualTo("GetStatus"),
             "Plan must end with GetStatus regardless of crafting chain.");
