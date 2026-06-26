@@ -21,9 +21,11 @@ using System.Text.RegularExpressions;
 ///   7. Fallback: use pattern-matcher result if LLM fails.
 ///   8. Truncation recovery: TryParseTruncatedJson extracts intent from cut-off JSON. (Sprint 20)
 ///
-/// Sprint 35 P1-B: removed fast-path for ChatIntentType.CreateGoal and NavigateTo.
-/// All non-trivial chat now reaches the LLM. Only stop/cancel, status, inventory, help
-/// are fast-pathed deterministically (safe, zero-risk operations).
+/// Sprint 35 P1-B: removed fast-path for ChatIntentType.CreateGoal.
+/// Sprint 43 (P0-1): re-added fast-path for NavigateTo — "come here" is zero-risk
+/// and the LLM may misinterpret it as "cancel" without prompt guidance.
+/// Current deterministic fast-paths: stop/cancel, status, inventory, help, navigate.
+/// All other non-trivial chat reaches the LLM.
 ///
 /// Sprint 35 P1-A: LLM prompt requests IntentDraft schema (confidence, clarificationQuestion).
 /// Sprint 35 P1-C: BuildSystemPrompt enriched with inventory, HP, active goal, tool names.
@@ -84,12 +86,12 @@ public sealed class LlmChatInterpreter(
             return null;
         }
 
-        // Sprint 35 P1-B: fast-path ONLY for the safe deterministic operations.
-        // CreateGoal and NavigateTo are removed — all non-trivial chat reaches the LLM.
-        // This enforces the "LLM owns intent" architecture locked in Sprint 35.
-        // Sprint 39 P1-C: check by Intent string instead of ChatIntentType enum.
-        // Sprint 43 (P0-1): fast-path "navigate" too — "come here" is zero-risk,
+        // Sprint 35 P1-B: fast-path ONLY for safe deterministic operations.
+        // CreateGoal fast-path removed — all non-trivial chat reaches the LLM.
+        // Sprint 43 (P0-1): re-added fast-path for "navigate" — "come here" is zero-risk
         // and the LLM may misinterpret it as "cancel" without prompt guidance.
+        // Sprint 39 P1-C: check by Intent string instead of ChatIntentType enum.
+        // Deterministic fast-paths: cancel, status, help, navigate.
         if (quick?.Intent is "cancel" or "status" or "help" or "navigate")
         {
             return quick;

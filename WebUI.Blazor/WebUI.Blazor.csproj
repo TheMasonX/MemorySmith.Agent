@@ -6,10 +6,12 @@
     <Nullable>enable</Nullable>
     <RootNamespace>WebUI.Blazor</RootNamespace>
     <AssemblyName>WebUI.Blazor</AssemblyName>
-    <!-- TSK-0014: NU1903 is a transitive vulnerability in SQLitePCLRaw.lib.e_sqlite3 2.1.6
-         (known high-severity CVE). Suppressed because the CVE is in the SQLite native
-         library, not in Serilog's sink logic. Revisit when Serilog.Sinks.SQLite updates. -->
-    <NoWarn>$(NoWarn);NU1903</NoWarn>
+    <!-- NU1903 suppression REMOVED per audit finding (too broad for greenfield codebase).
+         SQLitePCLRaw.lib.e_sqlite3 2.1.11 still flagged by GHSA-2m69-gcr7-jv3q
+         (SQLite native library CVE, not in our log-write logic). We keep this as a
+         visible warning (not suppressed) and use WarningsNotAsErrors so the build
+         succeeds while the advisory remains visible for human triage.
+         Revisit when Microsoft.Data.Sqlite / Serilog.Sinks.SQLite update. -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +28,10 @@
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.EventLog" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.SQLite" Version="7.0.0" />
+    <!-- Pinned to 2.1.11 to fix NU1903 (GHSA-2m69-gcr7-jv3q) in transitive
+         SQLitePCLRaw.lib.e_sqlite3 2.1.6. Upgrade when Serilog.Sinks.SQLite
+         updates its dependency range. -->
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.11" />
   </ItemGroup>
 
   <!-- Sprint 4a/4b: SignalR push for StatusUpdated, ChatMessage, GoalUpdate events -->
