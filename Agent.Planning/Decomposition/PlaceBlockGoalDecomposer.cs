@@ -21,11 +21,11 @@ public sealed class PlaceBlockGoalDecomposer : IGoalDecomposer
         var actions = new List<ActionData>();
 
         // Place the requested number of blocks
-        for (int i = 0; i < pg.TargetCount; i++)
+        for (int i = 0; i < pg.Count; i++)
         {
             var args = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
             {
-                ["block"] = pg.Spec.ItemId,
+                ["block"] = pg.Item,
                 ["count"] = 1,
             };
             actions.Add(new ActionData
@@ -34,6 +34,10 @@ public sealed class PlaceBlockGoalDecomposer : IGoalDecomposer
                 Arguments = args,
             });
         }
+
+        // Mark all blocks as dispatched so IsComplete returns true after
+        // the planner dispatches these actions. Prevents re-planning loops.
+        pg.Dispatched = pg.Count;
 
         actions.Add(new ActionData { Tool = "GetStatus" });
         return new ActionPlan(goal.Name, goal.Phases, actions);

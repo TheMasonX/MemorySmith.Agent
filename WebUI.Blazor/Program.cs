@@ -274,11 +274,15 @@ if (agentEnabled)
         var lf  = sp.GetRequiredService<ILoggerFactory>(); // Sprint 32 BLK-01: BuildGoalDecomposer requires ILogger
         var reg = new DecomposerRegistry();
         reg.Register(new BuildGoalDecomposer(lib, lf.CreateLogger<BuildGoalDecomposer>()));
+        // Sprint 54: PlaceBlockGoalDecomposer MUST be registered before
+        // GatherGoalDecomposer. GatherGoalDecomposer.CanHandle matches IItemSpecGoal
+        // which would also match PlaceBlockGoal if it implemented that interface.
+        // Registration order ensures PlaceBlockGoal reaches the right decomposer.
+        reg.Register(new PlaceBlockGoalDecomposer()); // Sprint 54
         reg.Register(new GatherGoalDecomposer(lib));
         reg.Register(new SurviveNightGoalDecomposer(lib));
         reg.Register(new CraftItemGoalDecomposer(lib)); // Sprint 27 P0-D
         reg.Register(new SmeltGoalDecomposer(lib)); // Sprint 44 (TSK-0079)
-        reg.Register(new PlaceBlockGoalDecomposer()); // Sprint 54
         return reg;
     });
     builder.Services.AddSingleton<PlannerRouter>(sp =>
