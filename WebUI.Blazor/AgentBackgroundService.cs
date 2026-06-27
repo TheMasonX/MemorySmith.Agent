@@ -52,7 +52,9 @@ public sealed class AgentBackgroundService(
     ILlmEvaluator? llmEvaluator = null,
     // Sprint 52: ChatHistory for recording bot responses so conversational context
     // flows into the LLM system prompt on subsequent turns.
-    ChatHistory? chatHistory = null) : BackgroundService
+    ChatHistory? chatHistory = null,
+    // Sprint 52: max concurrent PlaceBlock dispatches per cycle (configurable via appsettings).
+    int maxConcurrentPlaceBlock = 8) : BackgroundService
 {
     // Sprint 1b: default exponential backoff delays
     private static readonly TimeSpan[] DefaultReconnectDelays =
@@ -137,6 +139,8 @@ public sealed class AgentBackgroundService(
     private readonly IntentManager? _intentManager = intentManager;
     // Sprint 39 P1+P2: LLM evaluator for observation-driven replanning.
     private readonly ILlmEvaluator? _llmEvaluator = llmEvaluator;
+    // Sprint 52: max concurrent PlaceBlock dispatches per cycle.
+    private readonly int _maxConcurrentPlaceBlock = maxConcurrentPlaceBlock;
 
     private readonly Channel<string> _gameErrors =
         Channel.CreateUnbounded<string>(new UnboundedChannelOptions { SingleWriter = true });
@@ -334,97 +338,23 @@ public sealed class AgentBackgroundService(
     /// </summary>
     public ActionData? GetCurrentAction() => _queue.Peek();
 
-    // ── TSK-0091: Creative provisioning (async, fire-and-forget from SetGoal) ──
+    // ── Creative provisioning (Sprint 52: delegated to adapter) ──────────────
 
     /// <summary>
-    /// Sprint 45 (TSK-0091): Enqueues /give commands for creative-mode goals
-    /// with a 200ms delay between commands to prevent anti-spam kicks.
-    /// Called fire-and-forget from <see cref="SetGoal"/> because SetGoal is void.
-    /// The <see cref="ActionQueue"/> is thread-safe so concurrent enqueues are safe.
+    /// Sprint 52: Creative mode inventory provisioning is handled entirely by the
+    /// MineflayerAdapter via creativeProvider.js. The adapter uses
+    /// bot.creative.setInventorySlot() (version-agnostic, no OP required) with
+    /// /give fallback for servers that don't support the creative API.
+    ///
+    /// This method is retained as a no-op anchor — the adapter provisions items
+    /// on-demand during PlaceBlock execution, not up-front.
     /// </summary>
-    private async Task ProvisionGoalIfCreativeAsync(IGoal goal, CancellationToken ct)
+    private Task ProvisionGoalIfCreativeAsync(IGoal goal, CancellationToken ct)
     {
-        try
-        {
-            if (goal is IItemSpecGoal itemGoal)
-            {
-                var have = _worldState.Inventory.GetValueOrDefault(itemGoal.Spec.ItemId);
-                var need = Math.Max(0, itemGoal.TargetCount - have);
-                if (need > 0)
-                {
-                    var giveCmd = $"/give @p {itemGoal.Spec.ItemId} {need}";
-                    _queue.Enqueue(new ActionData
-                    {
-                        Tool = "Chat",
-                        Arguments = { ["message"] = giveCmd }
-                    });
-                    logger.LogInformation(
-                        "[creative] provisioning {Need}x {Item} via '{GiveCmd}' at pos=({PosX},{PosY},{PosZ})",
-                        need, itemGoal.Spec.ItemId, giveCmd,
-                        _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
-                    _journal?.Log(new JournalEntry(
-                        _timeProvider.UtcNow, JournalEntryType.ActionDispatched, "CreativeGive",
-                        new Dictionary<string, object?>
-                        {
-                            ["item"] = itemGoal.Spec.ItemId,
-                            ["count"] = need,
-                        }));
-                    // Also enqueue a GetStatus so inventory is refreshed before planning
-                    _queue.Enqueue(new ActionData { Tool = "GetStatus" });
-                }
-            }
-            else if (goal is BuildGoal buildGoal)
-            {
-                var materials = buildGoal.Blueprint.Materials
-                    .GroupBy(m => m.Block, StringComparer.OrdinalIgnoreCase)
-                    .ToDictionary(g => g.Key, g => g.Sum(m => m.Quantity), StringComparer.OrdinalIgnoreCase);
-
-                var anyProvisioned = false;
-                foreach (var (block, quantity) in materials)
-                {
-                    var have = _worldState.Inventory.GetValueOrDefault(block);
-                    var need = Math.Max(0, quantity - have);
-                    if (need <= 0) continue;
-
-                    // Sprint 45 (TSK-0091): await Task.Delay instead of Thread.Sleep
-                    if (anyProvisioned)
-                        await Task.Delay(200, ct);
-
-                    var giveCmd = $"/give @p {block} {need}";
-                    _queue.Enqueue(new ActionData
-                    {
-                        Tool = "Chat",
-                        Arguments = { ["message"] = giveCmd }
-                    });
-                    logger.LogInformation(
-                        "[creative] provisioning {Need}x {Item} for build '{Blueprint}' via '{GiveCmd}'",
-                        need, block, buildGoal.Blueprint.Name, giveCmd);
-                    _journal?.Log(new JournalEntry(
-                        _timeProvider.UtcNow, JournalEntryType.ActionDispatched, "CreativeGive",
-                        new Dictionary<string, object?>
-                        {
-                            ["item"] = block,
-                            ["count"] = need,
-                            ["blueprint"] = buildGoal.Blueprint.Name,
-                        }));
-                    anyProvisioned = true;
-                }
-
-                if (anyProvisioned)
-                {
-                    // Enqueue a GetStatus so inventory is refreshed before planning
-                    _queue.Enqueue(new ActionData { Tool = "GetStatus" });
-                }
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            logger.LogDebug("[creative] provisioning cancelled.");
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning(ex, "[creative] provisioning failed: {Message}", ex.Message);
-        }
+        logger.LogDebug(
+            "[creative] adapter handles inventory provisioning — skipping C# /give for goal '{Goal}'",
+            goal.Name);
+        return Task.CompletedTask;
     }
 
     // ── BackgroundService ─────────────────────────────────────────────────────
@@ -1856,11 +1786,11 @@ public sealed class AgentBackgroundService(
     /// Maximum number of concurrently in-flight actions allowed per tool type.
     /// PlaceBlock benefits from batching (adapter queues sequentially), while
     /// MineBlock/GetStatus should stay at 1 to avoid flooding the adapter.
-    /// Sprint 52: increased PlaceBlock from 1 → 5 for ~5x build speedup.
+    /// Sprint 52: increased PlaceBlock from 1 → configurable (default 8) for faster builds.
     /// </summary>
-    private static int MaxConcurrentForTool(string toolName) => toolName switch
+    private int MaxConcurrentForTool(string toolName) => toolName switch
     {
-        "PlaceBlock" => 5,
+        "PlaceBlock" => _maxConcurrentPlaceBlock,
         _ => 1,
     };
 

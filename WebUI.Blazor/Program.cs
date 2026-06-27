@@ -348,7 +348,9 @@ if (agentEnabled)
             llmEvaluator:    sp.GetRequiredService<ILlmEvaluator>(),
             // Sprint 52: ChatHistory for recording bot responses so LLM has
             // conversational context across turns.
-            chatHistory:     sp.GetRequiredService<ChatHistory>());
+            chatHistory:              sp.GetRequiredService<ChatHistory>(),
+            // Sprint 52: configurable max concurrent PlaceBlock dispatches.
+            maxConcurrentPlaceBlock:  builder.Configuration.GetValue<int>("Agent:Build:MaxConcurrentPlaceBlock", 8));
     });
     builder.Services.AddHostedService(sp => sp.GetRequiredService<AgentBackgroundService>());
 }

@@ -831,26 +831,13 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       await bot.pathfinder.goto(new pfGoals.GoalNear(x, y, z, 2));
 
       let item = bot.inventory.items().find(i => i.name === shortMat || i.name === material);
-      // Sprint 51: creative mode fallback — when the bot is in creative mode but the
-      // item is not in inventory (e.g. /give didn't work or wasn't used), use the
-      // creative inventory to select the item. Without this, creative builds fail
-      // with "not in inventory" on every block placement.
+      // Sprint 52: creative inventory provisioned via reusable provider module.
+      // Handles version-agnostic creative API (setInventorySlot) with /give fallback.
       if (!item && bot.game?.gameMode === 1) {
-        const itemByName = bot.registry.itemsByName[shortMat] || bot.registry.itemsByName[material];
-        if (itemByName) {
-          try {
-            await bot.creative.setInventorySlot(36, itemByName); // hotbar slot 1 (0-indexed)
-            item = bot.inventory.items().find(i => i.name === shortMat || i.name === material);
-            if (item) {
-              logStructured('info', 'place', 'creative inventory fallback', {
-                material: shortMat, slot: 36,
-              });
-            }
-          } catch (e) {
-            logStructured('warn', 'place', 'creative setInventorySlot failed', {
-              material: shortMat, error: e.message,
-            });
-          }
+        const { ensureCreativeItem } = require('./creativeProvider');
+        const ok = await ensureCreativeItem(bot, shortMat || material, 1);
+        if (ok) {
+          item = bot.inventory.items().find(i => i.name === shortMat || i.name === material);
         }
       }
       if (!item) throw new Error(`${material} not in inventory`);
