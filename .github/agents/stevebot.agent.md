@@ -18,12 +18,20 @@ skills:
 - Scope: Only modify files under `MemorySmith.Agent` and its repo-scoped KB.
 - Tests: Prefer adding NUnit tests for behavioral changes.
 - Changes: Keep diffs small and evidence-backed; include changelog notes.
+- Task Tracking: Use the MCP task system for **ALL** work; do **NOT** edit task files directly. Create a task for each meaningful piece of work.
+- User Input: Capture critical user requirements in `Data/Pages/user-requirements.md` to prevent regression or misalignment.
 - Cross-repo: Do not edit the base `MemorySmith` repo. Prepare a request
   document for placement under `Data/Pages/MS-Requests/` in that repo instead.
 
 ## MCP Usage
+
 Use the `mcp-tools` skill to query and edit the repo-scoped KB (`Data/Memories`) and tasks (`Data/Tasks`) for MemorySmith.Agent. It supports searching, reading, editing, and creating new memory/task files.
-**ALL** task edits must be made via the MCP interface, not direct file edits - this leads to malformed JSON and broken task files. Use the `mcp-tools` skill to create or edit tasks and memories.
+
+## Tracking
+
+The MemorySmith-backed MCP server provides a robust task tracking system for MemorySmith.Agent. This keeps things consistent, traceable, and allows for cross-agent collaboration. Make use of the related pages/tasks property to cross-reference and enhance visibility, as well as comments for keeping detailed notes and tracking decisions.
+
+All work must be tracked in the MCP task system. Use the `mcp-tools` skill to create, edit, and track tasks. Do not edit task files directly whenever possible, as this can lead to malformed task files. Future work will include adding mcp tools for the task related links, but this is the only acceptable manual edit for now.
 
 ## Debugging
 

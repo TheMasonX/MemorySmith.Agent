@@ -344,7 +344,7 @@ public sealed class Sprint39LlmEvaluatorImplTests
         var outcomes = new[] { Fail(), Fail() };
         var result = await evaluator.EvaluateAsync(MakeGoal(), outcomes, AnyState());
 
-        Assert.That(result, Is.False, "Should skip LLM when fewer than 3 outcomes.");
+        Assert.That(result.ShouldReplan, Is.False, "Should skip LLM when fewer than 3 outcomes.");
         Assert.That(provider.CallCount, Is.Zero, "Should not call LLM at all.");
     }
 
@@ -358,7 +358,7 @@ public sealed class Sprint39LlmEvaluatorImplTests
         var outcomes = new[] { Ok(), Ok(), Ok() }; // 3 successes, 0 failures
         var result = await evaluator.EvaluateAsync(MakeGoal(), outcomes, AnyState());
 
-        Assert.That(result, Is.False, "Should skip LLM when all outcomes succeeded.");
+        Assert.That(result.ShouldReplan, Is.False, "Should skip LLM when all outcomes succeeded.");
         Assert.That(provider.CallCount, Is.Zero, "Should not call LLM when no failures.");
     }
 
@@ -372,7 +372,7 @@ public sealed class Sprint39LlmEvaluatorImplTests
         var outcomes = new[] { Ok(), Fail(), Fail() };
         var result = await evaluator.EvaluateAsync(MakeGoal(), outcomes, AnyState());
 
-        Assert.That(result, Is.False, "Should return false when provider is unavailable.");
+        Assert.That(result.ShouldReplan, Is.False, "Should return false when provider is unavailable.");
         Assert.That(provider.CallCount, Is.Zero, "Should not call unavailable provider.");
     }
 
@@ -386,7 +386,7 @@ public sealed class Sprint39LlmEvaluatorImplTests
         var outcomes = new[] { Ok(), Fail(), Fail() };
         var result = await evaluator.EvaluateAsync(MakeGoal(), outcomes, AnyState());
 
-        Assert.That(result, Is.True,  "Should return true when LLM says replan.");
+        Assert.That(result.ShouldReplan, Is.True,  "Should return true when LLM says replan.");
         Assert.That(provider.CallCount, Is.EqualTo(1), "Should call LLM exactly once.");
     }
 
@@ -400,7 +400,7 @@ public sealed class Sprint39LlmEvaluatorImplTests
         var outcomes = new[] { Ok(), Fail(), Ok() };
         var result = await evaluator.EvaluateAsync(MakeGoal(), outcomes, AnyState());
 
-        Assert.That(result, Is.False, "Should return false when LLM says continue.");
+        Assert.That(result.ShouldReplan, Is.False, "Should return false when LLM says continue.");
     }
 
     [Test]
@@ -413,7 +413,7 @@ public sealed class Sprint39LlmEvaluatorImplTests
         var outcomes = new[] { Fail(), Fail(), Fail() };
         var result = await evaluator.EvaluateAsync(MakeGoal(), outcomes, AnyState());
 
-        Assert.That(result, Is.False, "Null LLM response should default to no-replan.");
+        Assert.That(result.ShouldReplan, Is.False, "Null LLM response should default to no-replan.");
     }
 
     [Test]
@@ -426,7 +426,7 @@ public sealed class Sprint39LlmEvaluatorImplTests
         var outcomes = new[] { Fail(), Fail(), Fail() };
         var result = await evaluator.EvaluateAsync(MakeGoal(), outcomes, AnyState());
 
-        Assert.That(result, Is.False, "Unparseable response should default to no-replan.");
+        Assert.That(result.ShouldReplan, Is.False, "Unparseable response should default to no-replan.");
     }
 
     [Test]
@@ -440,7 +440,7 @@ public sealed class Sprint39LlmEvaluatorImplTests
         var outcomes = new[] { Fail(), Fail(), Fail() };
         var result = await evaluator.EvaluateAsync(MakeGoal(), outcomes, AnyState());
 
-        Assert.That(result, Is.True, "Should extract JSON embedded in prose.");
+        Assert.That(result.ShouldReplan, Is.True, "Should extract JSON embedded in prose.");
     }
 
     [Test]

@@ -72,6 +72,16 @@ public static class BuildFactKeys
         $"build:{blueprintId}:block:{blockIndex}:status";
 
     /// <summary>
+    /// Returns the fact key for the skip reason of a specific block.
+    /// Format: build:{blueprintId}:block:{index}:skipReason
+    ///
+    /// Sprint 54: Stores WHY a block was skipped (botPosition, occupiedBy_X, noReference).
+    /// Read by BuildStallDetail() and LlmEvaluatorImpl for LLM-aware replanning.
+    /// </summary>
+    public static string SkipReason(string blueprintId, int blockIndex) =>
+        $"build:{blueprintId}:block:{blockIndex}:skipReason";
+
+    /// <summary>
     /// Returns the fact key prefix for all blocks in a blueprint.
     /// Used by ClearFactsByPrefix to remove all build facts for a blueprint.
     /// </summary>

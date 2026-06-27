@@ -10,7 +10,7 @@ description: A compact 9x5x7 survival starter home with door, windows, torches, 
 # Small Survival House
 
 A compact, fully-functional survival starter home built from oak planks and cobblestone.
-Features a front door (south face), glass-pane windows, two torches for lighting,
+Features a front door (south face), glass-pane windows, four torches for lighting,
 a crafting bench, double chest storage, and a bed for setting your spawn point.
 
 **Footprint:** 9 × 7 blocks  
@@ -33,20 +33,20 @@ CCCCCCCCC
 
 ### Y=1 (Lower walls + furniture)
 LPPPPPPPL
-P.......P
-P..B....P
-P..XX...P
-P.......P
-P.......P
+P...H...P
+P...F...P
+PB......P
+PX......P
+PX......P
 PPPPDPPPP
 
-### Y=2 (Mid walls + windows + interior items)
+### Y=2 (Mid walls + windows + torches)
 LPGPPPGPL
-G.......G
-P.T.....P
-P..HF...P
-P.....T.P
-G.......G
+G.T...T.G
+P.......P
+P.......P
+P.......P
+G..T.T..G
 PPPP.PPPP
 
 ### Y=3 (Upper walls)
@@ -127,7 +127,7 @@ SSSSSSSSS
 | Crafting Table | 1 | 4 planks |
 | Chest | 2 | 8 planks each (16 total) |
 | Oak Door | 1 | 6 planks |
-| Torch | 2 | 1 stick + 1 coal (or charcoal) |
+| Torch | 4 | 1 stick + 1 coal (or charcoal) |
 | Glass Pane | 6 | 3 sand → smelt to 3 glass → 8 glass panes |
 | Red Bed | 1 | 3 planks + 3 wool |
 

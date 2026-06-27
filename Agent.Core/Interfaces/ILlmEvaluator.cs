@@ -9,6 +9,9 @@ namespace Agent.Core;
 ///
 /// Sprint 38 introduces the interface and wires a null stub in DispatchActionsAsync.
 /// Sprint 39 will provide a concrete LLM-backed implementation.
+///
+/// Sprint 54 (TSK-0220): Replaced <c>Task&lt;bool&gt;</c> return with <see cref="EvaluationResult"/>
+/// so the LLM can suggest a specific remediation action (skip block #N, step back, retry).
 /// </summary>
 public interface ILlmEvaluator
 {
@@ -25,9 +28,22 @@ public interface ILlmEvaluator
     /// </param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>
-    /// <see langword="true"/> to trigger replanning (agent discards remaining actions and
-    /// calls <see cref="IPlanner.PlanAsync"/> again); <see langword="false"/> to continue.
+    /// <see cref="EvaluationResult"/> with <see cref="EvaluationResult.ShouldReplan"/> set to
+    /// <see langword="true"/> to trigger replanning and an optional <see cref="EvaluationResult.Suggestion"/>
+    /// for specific remediation.
     /// </returns>
-    Task<bool> EvaluateAsync(IGoal goal, IReadOnlyList<ActionOutcome> outcomes,
+    Task<EvaluationResult> EvaluateAsync(IGoal goal, IReadOnlyList<ActionOutcome> outcomes,
         WorldState worldState, CancellationToken ct = default);
 }
+
+/// <summary>
+/// Sprint 54 (TSK-0220): Result of LLM evaluation with optional remediation suggestion.
+/// </summary>
+/// <param name="ShouldReplan">True to abandon remaining actions and request a fresh plan.</param>
+/// <param name="Reason">Short explanation of the recommendation.</param>
+/// <param name="Suggestion">
+/// Optional specific remediation action the LLM recommends.
+/// Examples: "skip block #9 (occupiedBy_stone)", "step back 3 blocks and retry block #187",
+/// "clear plan and move to origin before rebuilding".
+/// </param>
+public sealed record EvaluationResult(bool ShouldReplan, string Reason = "", string Suggestion = "");

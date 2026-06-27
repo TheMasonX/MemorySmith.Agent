@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0216-idle-agent-wake-up-auto-run",
+  "key": "TSK-0216",
+  "title": "Idle Agent Wake-Up Auto Run",
+  "description": "Configurable settings (\u0060enabled\u0060 flag \u002B \u0060interval_seconds\u0060) to query the llm on a timer (e.g. every 60s) depending on the status. Idle for sure, but probably not during tasks or active chatting. Perhaps wandering if that\u0027s not related to a larger goal like finding materials, but this needs consideration. This should tie into the personality system, which really can be driven by a folder of pages in the wiki. e.g. \u0060Data/Pages/Agents/Leo/leo.md\u0060",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T19:48:44.348184Z",
+  "updatedAtUtc": "2026-06-27T19:48:44.348184Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

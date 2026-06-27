@@ -78,6 +78,12 @@ public sealed class AgentBackgroundService(
         new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
     {
         ["place"] = 5,  // Sprint 43 (P1-4): increased from 2s — pathfinding + reference placement takes 2-5s
+        // Sprint 54 (TSK-0221): GetStatus used to default to 30s. A timed-out GetStatus
+        // blocks the stale-inventory guard, causing the agent to operate on stale inventory
+        // for the full 30s. 10s is plenty for a StatusEvent round-trip; if the adapter
+        // can't respond in 10s it's probably overwhelmed, and we should proceed anyway.
+        ["GetStatus"] = 10,
+        ["Status"] = 10,
         ["MoveTo"]     = 10,
         ["Wander"]     = 15,
         // Sprint 44 council: SmeltItem timeout must be longer than JS adapter's SMELT_TIMEOUT_MS (40s)
@@ -216,6 +222,11 @@ public sealed class AgentBackgroundService(
     // or when a new goal is set.
     private int _consecutiveZeroAreaScans;
 
+    // Sprint 54 (TSK-0221): tracks consecutive GetStatus timeouts.
+    // After 2 consecutive timeouts, IsInventoryStale is cleared so the agent
+    // proceeds instead of blocking indefinitely on an unresponsive adapter.
+    private int _consecutiveGetStatusTimeouts;
+
     // Sprint 40 P0-B: CancellationTokenSource for the active connection, used to
     // force reconnection when a KickedEvent is received (the WebSocket stays alive
     // but the Mineflayer bot is dead). Set by ExecuteAsync, read by ProcessEventsAsync.
@@ -281,6 +292,8 @@ public sealed class AgentBackgroundService(
         _cycleOutcomes.Clear();
         // Sprint 37: reset zero-area scan counter for new goal.
         _consecutiveZeroAreaScans = 0;
+        // Sprint 54 (TSK-0221): reset GetStatus timeout gate.
+        _consecutiveGetStatusTimeouts = 0;
         // Sprint 52: Creative provisioning via /give. The adapter's creative API
         // (setInventorySlot) may not work on all versions. /give provides a reliable
         // fallback — works without OP on LAN worlds in 1.16.5.
@@ -578,6 +591,8 @@ public sealed class AgentBackgroundService(
                     // Sprint 25 P0-D: GetStatus/Status result received.
                     CompleteCorrelatedActionByTool("GetStatus");
                     CompleteCorrelatedActionByTool("Status");
+                    // Sprint 54 (TSK-0221): reset timeout gate on successful GetStatus.
+                    _consecutiveGetStatusTimeouts = 0;
                     break;
 
                 case BlockMinedEvent e:
@@ -736,8 +751,9 @@ public sealed class AgentBackgroundService(
                     logger.LogWarning(
                         "[place] SKIPPED at ({X},{Y},{Z}) — {Reason} (trying to place {Block}, existing={ExistingBlock})",
                         bps.X, bps.Y, bps.Z, skipReason, bps.Block, bps.ExistingBlock);
-                    // TSK-0125: write per-block "skipped" status via the first matching context
-                    MarkSkippedBlock();
+                    // TSK-0125: write per-block "skipped" status via the first matching context.
+                    // Sprint 54 (TSK-0218): also store skip reason as world fact.
+                    MarkSkippedBlock(skipReason);
                     CompleteCorrelatedActionByTool("place");
                     break;
 
@@ -1690,10 +1706,10 @@ public sealed class AgentBackgroundService(
                     if (_llmEvaluator is not null && _currentGoal is not null)
                     {
                         var evalSnapshot = _cycleOutcomes.ToArray();
-                        bool shouldReplan;
+                        EvaluationResult evalResult;
                         try
                         {
-                            shouldReplan = await _llmEvaluator.EvaluateAsync(
+                            evalResult = await _llmEvaluator.EvaluateAsync(
                                 _currentGoal, evalSnapshot, _worldState, ct);
                         }
                         catch (OperationCanceledException) { throw; }
@@ -1702,13 +1718,13 @@ public sealed class AgentBackgroundService(
                             logger.LogWarning(evalEx,
                                 "[evaluator] threw during EvaluateAsync — skipping replan for goal {Goal}",
                                 _currentGoal.Name);
-                            shouldReplan = false;
+                            evalResult = new EvaluationResult(false, $"error: {evalEx.Message}");
                         }
-                        if (shouldReplan)
+                        if (evalResult.ShouldReplan)
                         {
                             logger.LogInformation(
-                                "[evaluator] LLM recommends replan for goal {Goal} after {Count} outcomes — breaking action loop",
-                                _currentGoal.Name, evalSnapshot.Length);
+                                "[evaluator] LLM recommends replan for goal {Goal} after {Count} outcomes — breaking action loop. Suggestion: {Suggestion}",
+                                _currentGoal.Name, evalSnapshot.Length, evalResult.Suggestion);
                             break; // exit action dispatch loop → outer while calls PlanAsync again
                         }
                     }
@@ -2024,8 +2040,11 @@ public sealed class AgentBackgroundService(
     /// <summary>
     /// TSK-0125: Marks the first matching PlaceBlock context as "skipped" for
     /// per-block tracking. Called from the BlockPlaceSkippedEvent handler.
+    ///
+    /// Sprint 54 (TSK-0218): Now also stores the skip reason as a world fact
+    /// so BuildStallDetail() and LlmEvaluatorImpl can report WHY blocks were skipped.
     /// </summary>
-    private void MarkSkippedBlock()
+    private void MarkSkippedBlock(string? skipReason = null)
     {
         foreach (var kv in _correlatedActions)
         {
@@ -2035,6 +2054,12 @@ public sealed class AgentBackgroundService(
                 if (_placeBlockContexts.TryGetValue(kv.Key, out var ctx))
                 {
                     SetBlockStatus(ctx.BlueprintId, ctx.BlockIndex, BuildFactKeys.BlockStatusSkipped);
+                    // Sprint 54: store skip reason for LLM-aware replanning
+                    if (!string.IsNullOrEmpty(skipReason))
+                    {
+                        var reasonKey = BuildFactKeys.SkipReason(ctx.BlueprintId, ctx.BlockIndex);
+                        _worldState = _worldState.With(b => b.SetFact(reasonKey, skipReason, FactSource.Observed));
+                    }
                 }
                 return;
             }
@@ -2178,6 +2203,23 @@ public sealed class AgentBackgroundService(
                         "[correlation] {Tool} {Id} TIMED OUT after {Elapsed}s — no result event received",
                         kv.Value.ToolName, kv.Key.ToString()[..8],
                         (_timeProvider.UtcNow - kv.Value.DispatchedAt).TotalSeconds);
+
+                    // Sprint 54 (TSK-0221): track consecutive GetStatus timeouts.
+                    // After 2 consecutive failures, clear IsInventoryStale so the
+                    // agent proceeds instead of blocking indefinitely on the adapter.
+                    if (kv.Value.ToolName.Equals("GetStatus", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _consecutiveGetStatusTimeouts++;
+                        if (_consecutiveGetStatusTimeouts >= 2 && _worldState.IsInventoryStale)
+                        {
+                            logger.LogWarning(
+                                "[correlation] GetStatus timed out {Count} consecutive times — " +
+                                "clearing IsInventoryStale to prevent indefinite blocking",
+                                _consecutiveGetStatusTimeouts);
+                            _worldState = _worldState.With(b => b.SetInventoryStale(false));
+                            _consecutiveGetStatusTimeouts = 0;
+                        }
+                    }
 
                     // TSK-0128: do NOT remove _placeBlockContexts for timed-out PlaceBlock.
                     // Late BlockPlacedEvents arrive 5-15s after dispatch and need the
@@ -2510,36 +2552,59 @@ public sealed class AgentBackgroundService(
 
     /// <summary>
     /// Builds a human-readable detail string about what the current goal is
-    /// stuck on. For build goals, reports placed/total blocks and recent
-    /// timeouts. For other goals, reports general state.
+    /// stuck on. For build goals, reports placed/total blocks, recent
+    /// timeouts with block indices, and skip reasons from world facts.
+    /// For other goals, reports general state.
+    ///
+    /// Sprint 54 (TSK-0219): enriched with per-block skip reasons and timeout indices
+    /// so the chat message gives actionable detail instead of just correlation GUIDs.
     /// </summary>
     private string BuildStallDetail()
     {
         if (_currentGoal is IBuildGoal buildGoal)
         {
             var blueprint = buildGoal.Blueprint;
-            var totalBlocks = blueprint.Materials.Sum(m => m.Quantity);
+            var totalBlocks = buildGoal.Blocks.Count;
             var placedBlocks = 0;
+            var skippedBlocks = 0;
             for (int i = 0; i < totalBlocks; i++)
             {
                 var key = BuildFactKeys.BlockStatus(blueprint.Name, i);
-                if (_worldState.Facts.TryGetValue(key, out var sv)
-                    && sv?.ToString() == BuildFactKeys.BlockStatusPlaced)
-                    placedBlocks++;
+                if (_worldState.Facts.TryGetValue(key, out var sv))
+                {
+                    var s = sv?.ToString();
+                    if (s == BuildFactKeys.BlockStatusPlaced) placedBlocks++;
+                    else if (s == BuildFactKeys.BlockStatusSkipped) skippedBlocks++;
+                }
             }
 
-            var recentTimeouts = _correlatedActions
-                .Where(kv => kv.Value.ToolName == "place"
-                    && kv.Value.State == ActionLifecycle.TimedOut)
-                .Take(3)
-                .Select(kv => kv.Key.ToString()[..8])
-                .ToList();
-
-            var timeoutNote = recentTimeouts.Count > 0
-                ? $" Recent place timeouts: {string.Join(", ", recentTimeouts)}."
+            // Find timeout block indices from correlated actions
+            var timedOutIndices = new List<int>();
+            foreach (var kv in _correlatedActions)
+            {
+                if (kv.Value.ToolName == "place" && kv.Value.State == ActionLifecycle.TimedOut)
+                {
+                    if (_placeBlockContexts.TryGetValue(kv.Key, out var ctx))
+                        timedOutIndices.Add(ctx.BlockIndex);
+                }
+            }
+            var timeoutNote = timedOutIndices.Count > 0
+                ? $" {timedOutIndices.Count} timed out (blocks: {string.Join(", ", timedOutIndices.OrderBy(x => x).Take(5))}{(timedOutIndices.Count > 5 ? "…" : "")})."
                 : "";
 
-            return $"no progress. {placedBlocks}/{totalBlocks} blocks placed.{timeoutNote}";
+            // Sprint 54: collect unique skip reasons from world facts
+            var skipReasons = new HashSet<string>();
+            for (int i = 0; i < totalBlocks; i++)
+            {
+                var reasonKey = BuildFactKeys.SkipReason(blueprint.Name, i);
+                if (_worldState.Facts.TryGetValue(reasonKey, out var rv) && rv?.ToString() is string reason && reason.Length > 0)
+                    skipReasons.Add(reason);
+            }
+            var skipNote = skipReasons.Count > 0
+                ? $" Skip reasons: {string.Join(", ", skipReasons)}."
+                : "";
+
+            return $"no progress. {placedBlocks}/{totalBlocks} placed, {skippedBlocks} skipped.{timeoutNote}{skipNote}";
         }
 
         return "no progress detected.";
@@ -2547,7 +2612,13 @@ public sealed class AgentBackgroundService(
 
     /// <summary>
     /// When stalled, asks the LLM to analyze the current world state and
-    /// suggest remediation. The LLM response is logged and sent to chat.
+    /// suggest remediation. If the LLM recommends replanning, acts on its
+    /// suggestion: clears stale actions, logs the recommendation, and sends
+    /// the suggestion to chat so the player sees what's happening.
+    ///
+    /// Sprint 54 (TSK-0220): Now acts on the LLM's recommendation instead
+    /// of just logging it. When replan=true, logs the suggestion and sends it
+    /// to chat. The outer loop will pick up the replan on the next cycle.
     /// </summary>
     private async Task TryLlmReplanOnStallAsync(CancellationToken ct)
     {
@@ -2556,14 +2627,29 @@ public sealed class AgentBackgroundService(
         try
         {
             var outcomes = _cycleOutcomes.ToArray();
-            var shouldReplan = await _llmEvaluator.EvaluateAsync(
+            var evalResult = await _llmEvaluator.EvaluateAsync(
                 _currentGoal!, outcomes, _worldState, ct);
 
-            if (shouldReplan)
+            if (evalResult.ShouldReplan)
             {
                 logger.LogInformation(
-                    "[llm-replan] LLM evaluator recommends replan for '{Goal}'",
-                    _currentGoal!.Name);
+                    "[llm-replan] LLM recommends replan for '{Goal}': {Reason}. Suggestion: {Suggestion}",
+                    _currentGoal!.Name, evalResult.Reason, evalResult.Suggestion);
+
+                // Sprint 54: send the LLM's suggestion to chat so the player
+                // knows what remediation is being attempted.
+                if (!string.IsNullOrEmpty(evalResult.Suggestion))
+                {
+                    _queue.Enqueue(new ActionData
+                    {
+                        Tool = "Chat",
+                        Arguments = { ["message"] = $"[LLM] {evalResult.Suggestion}" }
+                    });
+                }
+
+                // Sprint 54: clear the action queue so the outer loop replans
+                // fresh instead of retrying the same stale actions.
+                _queue.Clear();
             }
         }
         catch (OperationCanceledException) { /* shutdown */ }
