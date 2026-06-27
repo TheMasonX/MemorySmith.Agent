@@ -47,65 +47,9 @@ const MC_VER   = process.env.MC_VERSION;
 const WS_TOKEN = process.env.WS_TOKEN ?? null;
 
 // ── Tunable constants ─────────────────────────────────────────────────────────
-
-const MINE_SEARCH_RADIUS_NEAR    = 64;
-const MINE_SEARCH_RADIUS_FAR     = 128;
-const MAX_MINE_PATH_FAILURES     = 3;
-const MAX_DIG_FAILURES          = 3;   // consecutive dig failures before skipping block
-const CRAFT_TABLE_SEARCH_RADIUS  = 8;
-const CRAFT_TABLE_REACH_DISTANCE = 2;
-const FURNACE_SEARCH_RADIUS      = 16;
-const FURNACE_REACH_DISTANCE     = 2;
-const SMELT_TIMEOUT_MS           = 40_000;
-
-// Sprint 40 P0-B: item pickup tuning.
-// After mining a block, the bot waits this long for the item entity to appear
-// and be auto-collected. Then moves to the block position and waits again.
-const MINE_ITEM_PICKUP_WAIT_MS           = 1000;  // wait for auto-pickup after dig
-const MINE_ITEM_PICKUP_MOVE_WAIT_MS      = 1500;  // wait after moving to block pos
-const MINE_ITEM_PICKUP_REMOVE_BLOCK_MS   = 300;   // wait after removing obstruction
-
-// Sprint 40 P0-C: block scoring for Y-level preference.
-// When findBestBlock evaluates candidates, blocks at the expected Y-level (botFeetY - 1)
-// are preferred over blocks above/below. The penalty weight controls how aggressively
-// the scorer discounts blocks at different Y-levels.
-const MINE_Y_PENALTY_WEIGHT    = 5;   // score penalty per Y-level away from expected Y
-const MINE_FIRST_PASS_COUNT    = 10;  // max candidates in same-Y-level pass
-const MINE_SECOND_PASS_COUNT   = 20;  // max candidates in nearby-Y-level pass
-
-// Sprint 40 P0-C (Fix): Block mining aliases.
-// When asked to mine a block, also accept blocks that drop the same item when mined.
-// For example, mining "dirt" should also accept "grass_block" because grass drops dirt.
-// Key = target block name, Value = array of acceptable block names (including the target).
-// Extend this map as needed for other block types.
-const BLOCK_MINING_ALIASES = Object.freeze({
-  dirt: ['dirt', 'grass_block'],
-});
-
-// Sprint 40 P0-B: reachable block search tuning.
-const REACHABLE_BLOCK_MAX_CANDIDATES     = 20;    // max blocks to reachability-check
-const REACHABLE_BLOCK_PATH_TIMEOUT_MS    = 5000;  // pathfinding timeout per candidate
-const REACHABLE_BLOCK_GOTO_TOLERANCE     = 2;     // pathfinder GoalNear tolerance
-
-// Sprint 9: flat-area scan defaults.
-// Sprint 19: increased default radius from 20 to 32 for better initial coverage.
-// C# planner sends radius=48 on retry after a zero-area result.
-const FLAT_AREA_SCAN_RADIUS      = 32;
-const FLAT_AREA_MIN_SIZE         = 25;
-const FLAT_AREA_Y_ABOVE          = 10;
-const FLAT_AREA_Y_BELOW          = 16;
-const FLAT_AREA_MAX_SLOPE        = 3;
-
-// Sprint 37: added proximity weight so closer flat areas (ground-level) are
-// preferred over far-away ones (tower tops, distant platforms).
-const FLAT_SCORE_WEIGHTS = Object.freeze({
-  area:        0.35,
-  compactness: 0.20,
-  flatness:    0.15,
-  proximity:   0.30,
-});
-
-const LIQUID_BLOCK_NAMES = new Set(['water', 'lava', 'flowing_water', 'flowing_lava']);
+// Sprint 52 modularization: all constants live in ./config.js.
+// Imported as `C` at the top of this file — reference as C.CONSTANT_NAME.
+// See config.js for full documentation of each constant.
 
 // ── Sprint 19: Structured file logging ────────────────────────────────────────
 // Sprint 52 modularization: logStructured() lives in ./logger.js.
@@ -464,7 +408,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
        * grass_block for dirt, since grass drops dirt when mined without silk touch).
        *
        * Scoring constants are named at the top of this file for easy tuning:
-       *   MINE_Y_PENALTY_WEIGHT, MINE_FIRST_PASS_COUNT, MINE_SECOND_PASS_COUNT
+       *   C.MINE_Y_PENALTY_WEIGHT, C.MINE_FIRST_PASS_COUNT, C.MINE_SECOND_PASS_COUNT
        *
        * @returns {{x:number, y:number, z:number, blockName:string}|null}
        *   The target position and the actual Minecraft block name at that position,
@@ -477,7 +421,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         // Build the set of acceptable block IDs (primary block + aliases).
         // Uses an array of IDs for findBlocks/findBlock matching — more widely
         // supported across Mineflayer versions than function matching.
-        const aliasNames = BLOCK_MINING_ALIASES[shortName] ?? [shortName];
+        const aliasNames = C.BLOCK_MINING_ALIASES[shortName] ?? [shortName];
         const acceptableIds = aliasNames
           .map(n => bot.registry.blocksByName[n]?.id)
           .filter(id => id != null);
@@ -509,8 +453,8 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         // ── First pass: blocks at the expected Y-level ───────────────────────
         const sameLevelCandidates = bot.findBlocks({
           matching: [...acceptableIds],
-          maxDistance: MINE_SEARCH_RADIUS_NEAR,
-          count: MINE_FIRST_PASS_COUNT,
+          maxDistance: C.MINE_SEARCH_RADIUS_NEAR,
+          count: C.MINE_FIRST_PASS_COUNT,
         });
         let sameLevel = excludeExhausted(sameLevelCandidates?.filter(c => c.y === expectedY));
         if (sameLevel.length > 0) {
@@ -532,8 +476,8 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         // ── Second pass: nearby Y-levels with scoring ────────────────────────
         const nearbyCandidates = bot.findBlocks({
           matching: [...acceptableIds],
-          maxDistance: MINE_SEARCH_RADIUS_NEAR,
-          count: MINE_SECOND_PASS_COUNT,
+          maxDistance: C.MINE_SEARCH_RADIUS_NEAR,
+          count: C.MINE_SECOND_PASS_COUNT,
         });
         let nearby = excludeExhausted(nearbyCandidates);
         if (nearby.length > 0) {
@@ -543,10 +487,10 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           nearby.sort((a, b) => {
             const scoreA = Math.sqrt(
               (a.x - pos.x) ** 2 + Math.max(0, a.y - expectedY) ** 2 + (a.z - pos.z) ** 2
-            ) + Math.abs(a.y - expectedY) * MINE_Y_PENALTY_WEIGHT;
+            ) + Math.abs(a.y - expectedY) * C.MINE_Y_PENALTY_WEIGHT;
             const scoreB = Math.sqrt(
               (b.x - pos.x) ** 2 + Math.max(0, b.y - expectedY) ** 2 + (b.z - pos.z) ** 2
-            ) + Math.abs(b.y - expectedY) * MINE_Y_PENALTY_WEIGHT;
+            ) + Math.abs(b.y - expectedY) * C.MINE_Y_PENALTY_WEIGHT;
             return scoreA - scoreB;
           });
           const best = nearby[0];
@@ -563,8 +507,8 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         // Also excludes exhausted positions.
         const fallbackCandidates = bot.findBlocks({
           matching: [...acceptableIds],
-          maxDistance: MINE_SEARCH_RADIUS_FAR,
-          count: MINE_FIRST_PASS_COUNT,
+          maxDistance: C.MINE_SEARCH_RADIUS_FAR,
+          count: C.MINE_FIRST_PASS_COUNT,
         });
         const fallbackFiltered = excludeExhausted(fallbackCandidates);
         if (fallbackFiltered.length > 0) {
@@ -594,7 +538,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       // Key = "x,y,z", value = consecutive failure count.
       // Sprint 41 FIX: Defined BEFORE findBestBlock so it's accessible in the
       // closure. findBestBlock uses this to exclude positions that have already
-      // exhausted MAX_DIG_FAILURES, preventing an infinite loop where the same
+      // exhausted C.MAX_DIG_FAILURES, preventing an infinite loop where the same
       // unbreakable block is selected → skipped → selected → skipped ...
       const digFailures = new Map();
 
@@ -604,7 +548,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
        */
       function isDigExhausted(pos) {
         const key = `${pos.x},${pos.y},${pos.z}`;
-        return (digFailures.get(key) ?? 0) >= MAX_DIG_FAILURES;
+        return (digFailures.get(key) ?? 0) >= C.MAX_DIG_FAILURES;
       }
 
       // Sprint 41 FIX: blockTargetPos declared OUTSIDE the while loop with
@@ -629,10 +573,10 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           console.log(`[mine] no ${shortName} found (mined ${mined}/${count})`);
           logStructured('warn', 'mine', 'no blocks in range', {
             block: shortName, mined, targetCount: count,
-            searchRadius: MINE_SEARCH_RADIUS_FAR, elapsedMs: Date.now() - _mineStart,
+            searchRadius: C.MINE_SEARCH_RADIUS_FAR, elapsedMs: Date.now() - _mineStart,
           });
           sendEvent('blockNotFound', { block: blockName, mined, correlationId });
-          if (mined === 0) throw new Error(`No ${shortName} found within ${MINE_SEARCH_RADIUS_FAR} blocks`);
+          if (mined === 0) throw new Error(`No ${shortName} found within ${C.MINE_SEARCH_RADIUS_FAR} blocks`);
           break;
         }
 
@@ -661,9 +605,9 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
             return;
           }
           pathFailures++;
-          console.warn(`[mine] nav to ${shortName} failed (${pathFailures}/${MAX_MINE_PATH_FAILURES}): ${e.message}`);
-          if (pathFailures >= MAX_MINE_PATH_FAILURES)
-            throw new Error(`Pathfinding to ${shortName} failed ${MAX_MINE_PATH_FAILURES} times: ${e.message}`);
+          console.warn(`[mine] nav to ${shortName} failed (${pathFailures}/${C.MAX_MINE_PATH_FAILURES}): ${e.message}`);
+          if (pathFailures >= C.MAX_MINE_PATH_FAILURES)
+            throw new Error(`Pathfinding to ${shortName} failed ${C.MAX_MINE_PATH_FAILURES} times: ${e.message}`);
           await new Promise(r => setTimeout(r, 500));
           continue;
         }
@@ -671,7 +615,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         const fresh = bot.blockAt(toVec3(targetPos.x, targetPos.y, targetPos.z));
         // Sprint 40 P0-C (Fix): Check against all acceptable block IDs (primary + aliases),
         // not just the primary blockId. E.g. when mining "dirt", also accept "grass_block".
-        const aliasNames = BLOCK_MINING_ALIASES[shortName] ?? [shortName];
+        const aliasNames = C.BLOCK_MINING_ALIASES[shortName] ?? [shortName];
         const acceptableIds = aliasNames
           .map(n => bot.registry.blocksByName[n]?.id)
           .filter(id => id != null);
@@ -685,7 +629,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         // too many times (prevents infinite retry loop).
         const digKey = `${targetPos.x},${targetPos.y},${targetPos.z}`;
         const prevDigFailures = digFailures.get(digKey) ?? 0;
-        if (prevDigFailures >= MAX_DIG_FAILURES) {
+        if (prevDigFailures >= C.MAX_DIG_FAILURES) {
           console.warn(`[mine] dig failed ${prevDigFailures}x at (${digKey}) — skipping block`);
           logStructured('warn', 'mine', 'dig retries exhausted, skipping block', {
             block: shortName, pos: digKey, failures: prevDigFailures, correlationId,
@@ -744,7 +688,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           // for auto-pickup (bot within ~1 block range). If not collected, move to the
           // block position to force pickup. This prevents items falling through holes
           // or landing out of reach from being lost forever.
-          await new Promise(r => setTimeout(r, MINE_ITEM_PICKUP_WAIT_MS));
+          await new Promise(r => setTimeout(r, C.MINE_ITEM_PICKUP_WAIT_MS));
           // Check if the item at this block position is still an entity (not collected)
           // by looking for a dropped item entity near the dig position.
           const nearbyEntity = bot.nearestEntity(e => {
@@ -762,10 +706,10 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
                   targetPos.x, targetPos.y, targetPos.z, 1)
               );
               // Wait a bit more for collection
-              await new Promise(r => setTimeout(r, MINE_ITEM_PICKUP_MOVE_WAIT_MS));
+              await new Promise(r => setTimeout(r, C.MINE_ITEM_PICKUP_MOVE_WAIT_MS));
             } catch {
               // Movement failed — item may still be picked up if bot is close enough
-              await new Promise(r => setTimeout(r, MINE_ITEM_PICKUP_REMOVE_BLOCK_MS));
+              await new Promise(r => setTimeout(r, C.MINE_ITEM_PICKUP_REMOVE_BLOCK_MS));
             }
           }
         } catch (e) {
@@ -779,7 +723,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           // Sprint 40 P0-C (Fix): track dig failures per position so we don't
           // retry the same unbreakable block forever.
           digFailures.set(digKey, (digFailures.get(digKey) ?? 0) + 1);
-          console.warn(`[mine] dig failed (${digFailures.get(digKey)}/${MAX_DIG_FAILURES}): ${e.message}`);
+          console.warn(`[mine] dig failed (${digFailures.get(digKey)}/${C.MAX_DIG_FAILURES}): ${e.message}`);
           logStructured('warn', 'mine', 'dig failed', {
             block: shortName, pos: digKey, failures: digFailures.get(digKey),
             error: e.message, correlationId,
@@ -1052,11 +996,11 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
     case 'findFlatArea': {
       // Sprint 9: all tuning values are named constants with per-call overrides.
       const {
-        radius      = FLAT_AREA_SCAN_RADIUS,
-        minFlatArea = FLAT_AREA_MIN_SIZE,
-        yAbove      = FLAT_AREA_Y_ABOVE,
-        yBelow      = FLAT_AREA_Y_BELOW,
-        maxSlope    = FLAT_AREA_MAX_SLOPE,
+        radius      = C.FLAT_AREA_SCAN_RADIUS,
+        minFlatArea = C.FLAT_AREA_MIN_SIZE,
+        yAbove      = C.FLAT_AREA_Y_ABOVE,
+        yBelow      = C.FLAT_AREA_Y_BELOW,
+        maxSlope    = C.FLAT_AREA_MAX_SLOPE,
         scanOriginX, scanOriginY, scanOriginZ,
       } = args;
 
@@ -1100,7 +1044,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
               const cx = Math.floor(columnCorner.x / 16);
               const cz = Math.floor(columnCorner.z / 16);
               chunkPosToCheck.delete(`${cx},${cz}`);
-              if (chunkPosToCheck.size === 0) {
+              if (chunkPosToCheck.size === 0 || _stopRequested) {
                 clearTimeout(timeout);
                 bot.world.off('chunkColumnLoad', waitForLoad);
                 resolve();
@@ -1143,7 +1087,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       // aren't fully loaded yet. Prevents false "area=0" on flat ground.
       const groundCheckPos = toVec3(botPosObj.x, botPosObj.y - 1, botPosObj.z);
       const groundBlock = bot.blockAt(groundCheckPos);
-      if (groundBlock && groundBlock.boundingBox === 'block' && !LIQUID_BLOCK_NAMES.has(groundBlock.name)) {
+      if (groundBlock && groundBlock.boundingBox === 'block' && !C.LIQUID_BLOCK_NAMES.has(groundBlock.name)) {
         const aboveGround = bot.blockAt(toVec3(botPosObj.x, botPosObj.y, botPosObj.z));
         if (!aboveGround || aboveGround.name === 'air' || aboveGround.boundingBox === 'empty') {
           heightMap.set(`${botPosObj.x},${botPosObj.z}`, {
@@ -1180,11 +1124,11 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
 
             if (block.name !== 'air'
                 && block.boundingBox === 'block'
-                && !LIQUID_BLOCK_NAMES.has(block.name)) {
+                && !C.LIQUID_BLOCK_NAMES.has(block.name)) {
               // Sprint 18: use toVec3 for the above-block check too
               const above = bot.blockAt(toVec3(cx, cy + 1, cz));
               if ((!above || above.name === 'air' || above.boundingBox === 'empty')
-                  && !LIQUID_BLOCK_NAMES.has(above?.name ?? '')) {
+                  && !C.LIQUID_BLOCK_NAMES.has(above?.name ?? '')) {
                 heightMap.set(`${cx},${cz}`, { x: cx, z: cz, y: cy + 1 });
                 break;
               }
@@ -1254,10 +1198,10 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         const maxPossibleDist  = Math.sqrt(2) * r;
         const proximity        = Math.max(0, 1 - distFromCenter / maxPossibleDist);
         const score       = component.length * (
-          FLAT_SCORE_WEIGHTS.area        +
-          FLAT_SCORE_WEIGHTS.compactness * compactness +
-          FLAT_SCORE_WEIGHTS.flatness    * flatness +
-          FLAT_SCORE_WEIGHTS.proximity   * proximity
+          C.FLAT_SCORE_WEIGHTS.area        +
+          C.FLAT_SCORE_WEIGHTS.compactness * compactness +
+          C.FLAT_SCORE_WEIGHTS.flatness    * flatness +
+          C.FLAT_SCORE_WEIGHTS.proximity   * proximity
         );
 
         if (score > bestScore) {
@@ -1354,7 +1298,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       break;
 
     case 'craft': {
-      const { item: itemName, count = 1, tableSearchRadius = CRAFT_TABLE_SEARCH_RADIUS } = args;
+      const { item: itemName, count = 1, tableSearchRadius = C.CRAFT_TABLE_SEARCH_RADIUS } = args;
       if (!itemName) throw new Error('craft requires item');
 
       const itemEntry = bot.registry.itemsByName[itemName];
@@ -1381,7 +1325,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           craftingTable.position.x,
           craftingTable.position.y,
           craftingTable.position.z,
-          CRAFT_TABLE_REACH_DISTANCE
+          C.CRAFT_TABLE_REACH_DISTANCE
         ));
 
         craftingTable = bot.blockAt(craftingTable.position);
@@ -1403,14 +1347,14 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       const furnaceId = bot.registry.blocksByName['furnace']?.id;
       if (furnaceId == null) throw new Error('furnace not found in registry');
 
-      let furnaceBlock = bot.findBlock({ matching: furnaceId, maxDistance: FURNACE_SEARCH_RADIUS });
-      if (!furnaceBlock) throw new Error(`No furnace found within ${FURNACE_SEARCH_RADIUS} blocks`);
+      let furnaceBlock = bot.findBlock({ matching: furnaceId, maxDistance: C.FURNACE_SEARCH_RADIUS });
+      if (!furnaceBlock) throw new Error(`No furnace found within ${C.FURNACE_SEARCH_RADIUS} blocks`);
 
       const movements = new Movements(bot);
       bot.pathfinder.setMovements(movements);
       await bot.pathfinder.goto(new pfGoals.GoalNear(
         furnaceBlock.position.x, furnaceBlock.position.y, furnaceBlock.position.z,
-        FURNACE_REACH_DISTANCE
+        C.FURNACE_REACH_DISTANCE
       ));
 
       furnaceBlock = bot.blockAt(furnaceBlock.position);
@@ -1433,8 +1377,8 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
 
         const outputName = await new Promise((resolve, reject) => {
           const timeout = setTimeout(
-            () => reject(new Error(`Smelting timed out after ${SMELT_TIMEOUT_MS}ms`)),
-            SMELT_TIMEOUT_MS
+            () => reject(new Error(`Smelting timed out after ${C.SMELT_TIMEOUT_MS}ms`)),
+            C.SMELT_TIMEOUT_MS
           );
           const check = () => {
             const out = furnace.outputItem();
@@ -1457,7 +1401,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
     case 'findReachableBlock': {
       // Sprint 40 P0-B: Find the nearest DirtBlock that the bot can pathfind to.
       // Returns position + reachability info so the planner can make informed decisions.
-      const { block: blockName, maxDistance = MINE_SEARCH_RADIUS_NEAR } = args;
+      const { block: blockName, maxDistance = C.MINE_SEARCH_RADIUS_NEAR } = args;
       if (!blockName) throw new Error('findReachableBlock requires block name');
 
       const shortName  = blockName.replace('minecraft:', '');
@@ -1472,8 +1416,8 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       // Find all matching blocks within range
       const candidates = bot.findBlocks({
         matching: blockId,
-        maxDistance: Math.min(maxDistance, MINE_SEARCH_RADIUS_FAR),
-        count: REACHABLE_BLOCK_MAX_CANDIDATES,
+        maxDistance: Math.min(maxDistance, C.MINE_SEARCH_RADIUS_FAR),
+        count: C.REACHABLE_BLOCK_MAX_CANDIDATES,
       });
 
       if (!candidates || candidates.length === 0) {
@@ -1501,8 +1445,8 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         try {
           const pathResult = await bot.pathfinder.getPathTo(
             movements,
-            new pfGoals.GoalNear(candidate.x, candidate.y, candidate.z, REACHABLE_BLOCK_GOTO_TOLERANCE),
-            { timeout: REACHABLE_BLOCK_PATH_TIMEOUT_MS }
+            new pfGoals.GoalNear(candidate.x, candidate.y, candidate.z, C.REACHABLE_BLOCK_GOTO_TOLERANCE),
+            { timeout: C.REACHABLE_BLOCK_PATH_TIMEOUT_MS }
           );
 
           if (pathResult && pathResult.status === 'success') {
