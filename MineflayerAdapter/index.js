@@ -859,15 +859,20 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
 
       let item = bot.inventory.items().find(i => i.name === shortMat || i.name === material);
       // Sprint 52: creative inventory provisioned via reusable provider module.
-      // Handles version-agnostic creative API (setInventorySlot) with /give fallback.
       if (!item && bot.game?.gameMode === 1) {
+        console.error(`[place] creative check: item=${shortMat} gameMode=${bot.game?.gameMode} inventorySize=${bot.inventory.items().length}`);
         const { ensureCreativeItem } = require('./creativeProvider');
         const ok = await ensureCreativeItem(bot, shortMat || material, 1);
+        console.error(`[place] creative result: item=${shortMat} ok=${ok}`);
         if (ok) {
           item = bot.inventory.items().find(i => i.name === shortMat || i.name === material);
+          console.error(`[place] creative recheck: item=${shortMat} found=${!!item}`);
         }
       }
-      if (!item) throw new Error(`${material} not in inventory`);
+      if (!item) {
+        console.error(`[place] FAIL: ${material} not in inventory (gameMode=${bot.game?.gameMode}, inventory=[${bot.inventory.items().map(i=>i.name).join(',')}])`);
+        throw new Error(`${material} not in inventory`);
+      }
       await bot.equip(item, 'hand');
 
       // Sprint 41: use target-relative reference block detection.

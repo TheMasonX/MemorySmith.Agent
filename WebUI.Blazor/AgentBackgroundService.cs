@@ -269,13 +269,11 @@ public sealed class AgentBackgroundService(
         _cycleOutcomes.Clear();
         // Sprint 37: reset zero-area scan counter for new goal.
         _consecutiveZeroAreaScans = 0;
-        // Sprint 51: creative provisioning is now handled by the MineflayerAdapter.
-        // When in creative mode, the adapter's PlaceBlock handler uses
-        // bot.creative.setInventorySlot() to pull blocks from creative inventory.
-        // The old /give command approach required OP permissions and was unreliable.
-        // See MineflayerAdapter/index.js place handler for creative fallback.
+        // Sprint 52: Creative provisioning via /give. The adapter's creative API
+        // (setInventorySlot) may not work on all versions. /give provides a reliable
+        // fallback — works without OP on LAN worlds in 1.16.5.
         if (_worldState.IsCreativeMode)
-            logger.LogDebug("[creative] adapter handles inventory — skipping /give provisioning");
+            _ = ProvisionGoalIfCreativeAsync(goal, CancellationToken.None);
 
         // TSK-0021: report task-relevant inventory instead of generic top-5 summary.
         var taskInv = SummarizeTaskRelevantInventory(goal);

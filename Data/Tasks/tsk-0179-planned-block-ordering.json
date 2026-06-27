@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0179-planned-block-ordering",
+  "key": "TSK-0179",
+  "title": "Planned Block Ordering",
+  "description": "Order and group planned block placements spatially rather than simply in blueprint order. That has discontinuities as it completes each row (e.g. he runs back and forth to build the walls one block on each side, rather than finishing one wall and moving to the other). Will need to consider placeability",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T06:30:19.8786873Z",
+  "updatedAtUtc": "2026-06-27T06:30:19.8786873Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

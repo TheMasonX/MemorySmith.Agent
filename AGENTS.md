@@ -359,6 +359,21 @@ Sprint 35 added the records and stubs; Sprint 36 wires `CallWithOutcomeAsync` in
   announcements). Never remove existing patterns without verifying they don't filter
   real player chat.
 
+### `/op` and `/give` on LAN worlds (Sprint 52)
+
+The `/op` command does NOT work in "Open to LAN" singleplayer worlds.
+There is no permissions system in LAN mode — all players have equal rights.
+This means `/give @p` also does not function via chat on LAN worlds
+(the server ignores commands from non-OP players, and `/op` can't grant OP).
+
+**Creative inventory fallback:** Use `bot.creative.setInventorySlot()` (Mineflayer
+creative API) which works on all versions and requires no permissions.
+The `creativeProvider.js` module handles this with a `/give` fallback for
+dedicated servers where OP is available.
+
+Do NOT rely on `/op` or `/give` as the primary creative provisioning mechanism
+for LAN testing — they will silently fail.
+
 ### playerCollect guard (Sprint 35 P0-A)
 
 The `bot.on('playerCollect', ...)` listener must guard against items collected by
