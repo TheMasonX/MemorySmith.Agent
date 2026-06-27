@@ -957,15 +957,30 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
               groundY, groundBlock: groundBlock.name,
             });
 
-            // Now place the target block against the scaffold's top face
+            // Now place the target block against the scaffold.
+            // Try top face first, then side faces (needed for torches, levers, etc.)
             const scaffoldBlock = bot.blockAt(toVec3(x, scaffoldY, z));
             if (scaffoldBlock && scaffoldBlock.type !== 0) {
               await bot.equip(item, 'hand');
-              await bot.placeBlock(scaffoldBlock, toVec3(0, 1, 0));
-              placed = true;
-              logStructured('info', 'place', 'success via scaffold', {
-                material: shortMat, x, y, z, scaffoldY,
-              });
+              const scaffoldFaces = [
+                { fx: 0, fy: 1, fz: 0,  label: 'top' },
+                { fx: 1, fy: 0, fz: 0,  label: 'east' },
+                { fx: -1, fy: 0, fz: 0, label: 'west' },
+                { fx: 0, fy: 0, fz: 1,  label: 'south' },
+                { fx: 0, fy: 0, fz: -1, label: 'north' },
+              ];
+              for (const { fx, fy, fz, label } of scaffoldFaces) {
+                try {
+                  await bot.placeBlock(scaffoldBlock, toVec3(fx, fy, fz));
+                  placed = true;
+                  logStructured('info', 'place', 'success via scaffold', {
+                    material: shortMat, x, y, z, scaffoldY, face: label,
+                  });
+                  break;
+                } catch (e) {
+                  // Try next face
+                }
+              }
             }
           } catch (e) {
             lastRefError = e.message;
