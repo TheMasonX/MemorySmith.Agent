@@ -1450,7 +1450,7 @@ public sealed class AgentBackgroundService(
                 // flooding the Node.js command queue faster than the bot can dig.
                 // This prevents redundant commands while still allowing the in-flight
                 // action to report progress via blockMined events.
-                if (IsFireAndForgetTool(action.Tool) && HasPendingActionOfTool(action.Tool))
+                if (IsFireAndForgetTool(action.Tool) && PendingCountOfTool(action.Tool) >= MaxConcurrentForTool(action.Tool))
                 {
                     // Sprint 52: reduce "skipped - already in-flight" log spam.
                     // PlaceBlock is dispatched ~200 times per cycle; only the first
@@ -1689,8 +1689,8 @@ public sealed class AgentBackgroundService(
                             _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
                         _blocksPlacedThisCycle = 0;
                     }
-                    logger.LogDebug("Plan cycle complete — settling for 300 ms");
-                    await Task.Delay(300, ct);
+                    logger.LogDebug("Plan cycle complete — settling for 100 ms");
+                    await Task.Delay(100, ct);
                     _actionDispatchedThisCycle = false;
                     // Sprint 20: compare inventory sum before/after cycle to detect real game progress.
                     // blockMined events have up to 300ms to arrive before this check.
@@ -1852,7 +1852,37 @@ public sealed class AgentBackgroundService(
     /// <summary>
     /// Returns true when there is at least one PendingAction in Dispatched state
     /// matching the given tool name. Used by the dispatch loop to skip redundant
-    /// MineBlock/GetStatus commands that are already in-flight on the Node.js side.
+    /// <summary>
+    /// Maximum number of concurrently in-flight actions allowed per tool type.
+    /// PlaceBlock benefits from batching (adapter queues sequentially), while
+    /// MineBlock/GetStatus should stay at 1 to avoid flooding the adapter.
+    /// Sprint 52: increased PlaceBlock from 1 → 5 for ~5x build speedup.
+    /// </summary>
+    private static int MaxConcurrentForTool(string toolName) => toolName switch
+    {
+        "PlaceBlock" => 5,
+        _ => 1,
+    };
+
+    /// <summary>
+    /// Counts actions of the given tool name currently in Dispatched state.
+    /// </summary>
+    private int PendingCountOfTool(string toolName)
+    {
+        var count = 0;
+        foreach (var kv in _correlatedActions)
+        {
+            if (kv.Value.State == ActionLifecycle.Dispatched &&
+                kv.Value.ToolName.Equals(toolName, StringComparison.OrdinalIgnoreCase))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /// <summary>
+    /// Returns true if at least one action of the given tool name is in Dispatched state.
     /// </summary>
     private bool HasPendingActionOfTool(string toolName)
     {

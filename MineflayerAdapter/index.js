@@ -786,15 +786,39 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       const dy = Math.abs(y - botPos2.y);
       const dz = Math.abs(z - botPos2.z);
       if (dx < 0.6 && dy < 0.6 && dz < 0.6) {
-        logStructured('info', 'place', 'stepping aside from target to place', {
-          x, y, z, botX: botPos2.x, botY: botPos2.y, botZ: botPos2.z,
-          dx, dy, dz, material: shortMat,
-          reason: 'bot too close to target — moving to adjacent position',
-        });
-        // Move to an adjacent X position so we can approach from the side.
-        // GoalNear(x,y,z,2) won't move if already at the target (distance=0),
-        // so we first move outside the near threshold, then fall through.
-        await bot.pathfinder.goto(new pfGoals.GoalNear(x + 2, y, z, 1));
+        // Try cardinal offsets perpendicular to the build direction first
+        // (Z axis), then fall back to X axis. This avoids stepping into the
+        // line of the next block, which is typically along X.
+        const offsets = [
+          { dx: 0, dz: 2,  label: 'z+2' },
+          { dx: 0, dz: -2, label: 'z-2' },
+          { dx: -2, dz: 0, label: 'x-2' },
+          { dx: 2,  dz: 0, label: 'x+2' },
+        ];
+        let steppedAside = false;
+        for (const { dx: ox, dz: oz, label } of offsets) {
+          const sx = x + ox;
+          const sz = z + oz;
+          const groundBelow = bot.blockAt(toVec3(sx, y - 1, sz));
+          if (groundBelow && groundBelow.type !== 0 && groundBelow.name !== 'air') {
+            logStructured('info', 'place', 'stepping aside from target to place', {
+              x, y, z, botX: botPos2.x, botY: botPos2.y, botZ: botPos2.z,
+              dx, dy, dz, stepTo: { x: sx, z: sz }, direction: label, material: shortMat,
+              groundBlock: groundBelow.name,
+              reason: 'bot too close to target — moving perpendicular to build direction',
+            });
+            await bot.pathfinder.goto(new pfGoals.GoalNear(sx, y, sz, 1));
+            steppedAside = true;
+            break;
+          }
+        }
+        if (!steppedAside) {
+          // All preferred offsets have no walkable ground — fall back to x+2
+          logStructured('warn', 'place', 'stepping aside — no walkable ground, using fallback', {
+            x, y, z, material: shortMat,
+          });
+          await bot.pathfinder.goto(new pfGoals.GoalNear(x + 2, y, z, 1));
+        }
         // Fall through to normal placement below — GoalNear(x,y,z,2) will
         // position us correctly from the side.
       }
