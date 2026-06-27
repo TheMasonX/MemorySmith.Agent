@@ -189,7 +189,9 @@ public sealed class ChatInterpreter : IChatInterpreter
     /// </summary>
     private static IntentDraft ParseIntent(string message, WorldState state)
     {
-        if (Regex.IsMatch(message, @"\b(stop|cancel|enough|quit|abort|nevermind|never mind)\b",
+        // Sprint 54 (TSK-0200): removed "enough" — too many false positives in everyday language.
+        // Canonical stop commands only: stop, cancel, quit, abort, nevermind.
+        if (Regex.IsMatch(message, @"\b(stop|cancel|quit|abort|nevermind|never mind)\b",
             RegexOptions.IgnoreCase))
             return new IntentDraft("yes", "cancel",
                 null, null, null, null, null, null,
@@ -219,8 +221,11 @@ public sealed class ChatInterpreter : IChatInterpreter
                 1.0, null, $"{goal} HP: {state.Health}/20, Food: {state.Food}/20.");
         }
 
-        if (Regex.IsMatch(message, @"\b(help|commands|what can you do|usage)\b",
-            RegexOptions.IgnoreCase))
+        // Sprint 54 (TSK-0200): only match "help"/"commands"/"usage" in short messages
+        // (≤ 40 chars) to prevent false positives when these words appear incidentally
+        // in longer sentences. Multi-word "what can you do" is unrestricted.
+        if ((message.Length <= 40 && Regex.IsMatch(message, @"\b(help|commands|usage)\b", RegexOptions.IgnoreCase))
+            || Regex.IsMatch(message, @"\bwhat can you do\b", RegexOptions.IgnoreCase))
             return new IntentDraft("yes", "help",
                 null, null, null, null, null, null,
                 1.0, null,

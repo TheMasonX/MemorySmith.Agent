@@ -54,7 +54,9 @@ public sealed class AgentBackgroundService(
     // flows into the LLM system prompt on subsequent turns.
     ChatHistory? chatHistory = null,
     // Sprint 52: max concurrent PlaceBlock dispatches per cycle (configurable via appsettings).
-    int maxConcurrentPlaceBlock = 8) : BackgroundService
+    int maxConcurrentPlaceBlock = 8,
+    // Sprint 54 (TSK-0199): max character length for chat responses before splitting.
+    int chatMaxResponseLength = 500) : BackgroundService
 {
     // Sprint 1b: default exponential backoff delays
     private static readonly TimeSpan[] DefaultReconnectDelays =
@@ -141,6 +143,8 @@ public sealed class AgentBackgroundService(
     private readonly ILlmEvaluator? _llmEvaluator = llmEvaluator;
     // Sprint 52: max concurrent PlaceBlock dispatches per cycle.
     private readonly int _maxConcurrentPlaceBlock = maxConcurrentPlaceBlock;
+    // Sprint 54 (TSK-0199): max character length for chat responses before splitting.
+    private readonly int _chatMaxResponseLength = chatMaxResponseLength > 0 ? chatMaxResponseLength : int.MaxValue;
 
     private readonly Channel<string> _gameErrors =
         Channel.CreateUnbounded<string>(new UnboundedChannelOptions { SingleWriter = true });
@@ -169,7 +173,7 @@ public sealed class AgentBackgroundService(
     // Read by ILlmEvaluator (Sprint 39).
     private readonly ConcurrentQueue<ActionOutcome> _cycleOutcomes = new();
 
-    private WorldState _worldState = new();
+    private volatile WorldState _worldState = new();
     private IGoal? _currentGoal;
     private int _consecutiveFailures;
     private FailureReason? _lastFailureReason;
@@ -300,6 +304,9 @@ public sealed class AgentBackgroundService(
             logger.LogInformation("[goal] cancelled: {Goal} | pending actions: {PendingCount}",
                 _currentGoal.Name, _queue.Count);
         var previousGoalName = _currentGoal?.Name;
+        // TSK-0125 fix: capture build goal before nulling so ClearBuildFacts
+        // can use Blueprint.Name (not the goal suffix slug) for fact key prefix matching.
+        var previousBuildGoal = _currentGoal as IBuildGoal;
         _currentGoal = null;
         _journal?.Log(new JournalEntry(
             _timeProvider.UtcNow, JournalEntryType.GoalCancel, previousGoalName ?? "unknown"));
@@ -313,7 +320,9 @@ public sealed class AgentBackgroundService(
         _correlatedActions.Clear();
         _placeBlockContexts.Clear();
         // TSK-0125: clear per-block status facts for cancelled build.
-        if (previousGoalName?.StartsWith("Build:") == true)
+        if (previousBuildGoal is not null)
+            ClearBuildFacts(previousBuildGoal.Blueprint.Name);
+        else if (previousGoalName?.StartsWith("Build:") == true)
             ClearBuildFacts(previousGoalName["Build:".Length..]);
         // Sprint 4b: push goal clear to dashboard
         _ = PushGoalToDashboardAsync();
@@ -1027,12 +1036,23 @@ public sealed class AgentBackgroundService(
 
                 if (pendingResponse is not null)
                 {
-                    _queue.Enqueue(new ActionData
+                    // Sprint 54 (TSK-0199): split long responses into multiple in-game chat messages
+                    var chunks = SplitResponse(pendingResponse, _chatMaxResponseLength);
+                    foreach (var chunk in chunks)
                     {
-                        Tool = "Chat",
-                        Arguments = { ["message"] = pendingResponse }
-                    });
-                    _ = PushChatToDashboardAsync("bot", botName, pendingResponse);
+                        _queue.Enqueue(new ActionData
+                        {
+                            Tool = "Chat",
+                            Arguments = { ["message"] = chunk }
+                        });
+                        _ = PushChatToDashboardAsync("bot", botName, chunk);
+                    }
+                    if (chunks.Count > 1)
+                    {
+                        logger.LogInformation(
+                            "[chat] response split into {Count} messages (limit={Limit} chars)",
+                            chunks.Count, _chatMaxResponseLength);
+                    }
                     pendingResponse = null;
                 }
 
@@ -1071,12 +1091,23 @@ public sealed class AgentBackgroundService(
 
         if (pendingResponse is not null)
         {
-            _queue.Enqueue(new ActionData
+            // Sprint 54 (TSK-0199): split long responses into multiple in-game chat messages
+            var chunks = SplitResponse(pendingResponse, _chatMaxResponseLength);
+            foreach (var chunk in chunks)
             {
-                Tool = "Chat",
-                Arguments = { ["message"] = pendingResponse }
-            });
-            _ = PushChatToDashboardAsync("bot", botName, pendingResponse);
+                _queue.Enqueue(new ActionData
+                {
+                    Tool = "Chat",
+                    Arguments = { ["message"] = chunk }
+                });
+                _ = PushChatToDashboardAsync("bot", botName, chunk);
+            }
+            if (chunks.Count > 1)
+            {
+                logger.LogInformation(
+                    "[chat] response split into {Count} messages (limit={Limit} chars)",
+                    chunks.Count, _chatMaxResponseLength);
+            }
         }
     }
 
@@ -1842,10 +1873,15 @@ public sealed class AgentBackgroundService(
 
     /// <summary>
     /// TSK-0125: Extracts the blueprint ID from a BuildGoal and clears its facts.
+    /// TSK-0125 fix: uses Blueprint.Name (e.g. "Small Survival House") for fact key
+    /// prefix matching, not the goal suffix (e.g. "small-house"). The goal name uses
+    /// blueprint.Id (slug) while fact keys use blueprint.Name (display name).
     /// </summary>
     private void ClearBuildFacts(IGoal goal)
     {
-        if (goal.Name.StartsWith("Build:"))
+        if (goal is IBuildGoal bg)
+            ClearBuildFacts(bg.Blueprint.Name);
+        else if (goal.Name.StartsWith("Build:"))
             ClearBuildFacts(goal.Name["Build:".Length..]);
     }
 
@@ -2550,5 +2586,69 @@ public sealed class AgentBackgroundService(
             }
         }
         await base.StopAsync(cancellationToken);
+    }
+
+    // ── Response splitting (TSK-0199) ────────────────────────────────────────────
+
+    /// <summary>
+    /// Splits a long chat response into chunks of at most <paramref name="maxLength"/>
+    /// characters, breaking at sentence boundaries where possible.
+    /// If splitting is disabled (maxLength &lt;= 0), returns the original as a single chunk.
+    /// If a single sentence exceeds maxLength, it is hard-truncated at maxLength with "...".
+    /// </summary>
+    internal static IReadOnlyList<string> SplitResponse(string response, int maxLength)
+    {
+        if (maxLength <= 0 || response.Length <= maxLength)
+            return [response];
+
+        var result = new List<string>();
+        var remaining = response.AsSpan();
+
+        while (remaining.Length > 0)
+        {
+            if (remaining.Length <= maxLength)
+            {
+                result.Add(remaining.ToString());
+                break;
+            }
+
+            // Try to find a sentence boundary before maxLength
+            var chunk = remaining[..maxLength];
+            var splitAt = -1;
+
+            // Prefer ". " (period + space), then "! ", "? ", then ".  " (period + 2 spaces)
+            foreach (var sep in new[] { ". ", "! ", "? ", ".  ", "\n" })
+            {
+                var lastBoundary = chunk.LastIndexOf(sep.AsSpan(), StringComparison.Ordinal);
+                if (lastBoundary > 0)
+                {
+                    // Include the separator in the chunk
+                    splitAt = lastBoundary + sep.Length;
+                    break;
+                }
+            }
+
+            // Also try mid-sentence comma + space as a softer break
+            if (splitAt < 0)
+            {
+                var lastComma = chunk.LastIndexOf(", ".AsSpan(), StringComparison.Ordinal);
+                if (lastComma > 0)
+                    splitAt = lastComma + 2;
+            }
+
+            if (splitAt <= 0)
+            {
+                // No sentence boundary found — hard truncate at maxLength with ellipsis
+                result.Add(remaining[..maxLength].ToString());
+                remaining = remaining[maxLength..];
+            }
+            else
+            {
+                result.Add(remaining[..splitAt].ToString());
+                remaining = remaining[splitAt..];
+            }
+        }
+
+        return result;
     }
 }

@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0204-add-visual-screenshot-feedback-via-existing-vision-pipeline",
+  "key": "TSK-0204",
+  "title": "Add visual screenshot feedback via existing vision pipeline",
+  "description": "## Problem\nThe agent can see the Minecraft world (Agent.Vision exists) but has no way to share what it sees with the player via chat. A \u0022show me\u0022 command would let the player request a screenshot of the bot\u0027s current view.\n\n## Agent Request\nFrom session log: the agent\u0027s responses often describe what it sees (\u0022there\u0027s a creeper 20 blocks away\u0022), but the player can\u0027t see the bot\u0027s perspective without switching screens.\n\n## Scope\n- Add a \u0060ShowMe\u0060 / \u0060Look\u0060 / \u0060WhatDoYouSee\u0060 chat command\n- Uses existing Agent.Vision pipeline to capture a screenshot from the Mineflayer adapter\n- For now, just describe the scene via LLM (\u0022I see a forest with oak trees to the north and a mountain to the east\u0022)\n- Future: send actual screenshot data through the dashboard/WebSocket for display in a browser UI\n\n## Implementation sketch\n1. Add a Vision capture action protocol to the Mineflayer adapter (screenshot via \u0060bot.screenshot\u0060 or similar)\n2. Add \u0060DescribeViewTool\u0060 in \u0060Agent.Tools\u0060 that captures \u2192 LLM summarizes \u2192 returns description\n3. Wire into chat interpreter: \u0022show me\u0022, \u0022look around\u0022, \u0022what do you see\u0022 route to this tool\n4. LLM system prompt updated to mention the capability\n\n## Complexity\nMedium. Requires Mineflayer screenshot capability \u002B LLM vision analysis \u002B chat response.\n\n## Priority\nLow \u2014 nice-to-have immersion feature.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Low",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:vision",
+    "domain:chat",
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T15:26:30.3057767Z",
+  "updatedAtUtc": "2026-06-27T15:26:30.3057767Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

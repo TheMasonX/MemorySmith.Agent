@@ -1,0 +1,32 @@
+﻿{
+  "id": "tsk-0199-add-configurable-chat-response-length-limit-with-multi-message-splitting",
+  "key": "TSK-0199",
+  "title": "Add configurable chat response length limit with multi-message splitting",
+  "description": "## Problem\nThe bot\u0027s in-game chat responses have no configurable length limit. Minecraft\u0027s chat has a ~256 character limit, but the agent frequently produces longer responses (e.g. inventory listings \u002B explanations). Currently, responses over the limit get silently truncated by Minecraft with no feedback.\n\nAdditionally, there\u0027s no mechanism to auto-split long responses across multiple chat messages to preserve the full response.\n\n## Desired Outcome\n- Configurable \u0060ChatMaxResponseLength\u0060 in \u0060ChatOptions\u0060 (default 500 characters)\n- Responses longer than \u0060ChatMaxResponseLength\u0060 are split into multiple Chat actions, each at most \u0060ChatMaxResponseLength\u0060 chars\n- The split preserves whole sentences where possible (split on \u0022. \u0022 or \u0022.  \u0022 or sentence boundary)\n- Logging indicates when splitting occurs\n\n## Implementation Plan\n1. Add \u0060ChatMaxResponseLength\u0060 to \u0060ChatOptions\u0060 (default 500)\n2. Add a helper method to split long strings into chunks at sentence boundaries\n3. In \u0060AgentBackgroundService.ProcessChatResultAsync\u0060, use the helper to split \u0060pendingResponse\u0060 into multiple Chat actions instead of one\n4. Update \u0060appsettings.json\u0060 example and doc comments in \u0060ChatOptions.cs\u0060\n5. Update \u0060appsettings.Development.json\u0060 if needed\n6. Update \u0060ChatOptions\u0060 XML doc example in \u0060ChatOptions.cs\u0060\n\n## Files\n- \u0060Agent.Planning/Llm/ChatOptions.cs\u0060 \u2014 add \u0060ChatMaxResponseLength\u0060 option\n- \u0060WebUI.Blazor/AgentBackgroundService.cs\u0060 \u2014 use splitter when dispatching chat responses\n- \u0060WebUI.Blazor/appsettings.json\u0060 \u2014 document new option\n\n## Priority\nMedium",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:chat",
+    "sprint-54"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T15:13:23.7373615Z",
+  "updatedAtUtc": "2026-06-27T15:16:06.3185222Z",
+  "completedAtUtc": "2026-06-27T15:16:06.3185222Z",
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0199-add-configurable-chat-response-length-limit-with-multi-message-splitting.json"
+}

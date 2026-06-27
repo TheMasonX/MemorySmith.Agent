@@ -7,10 +7,11 @@ tools: [vscode/memory, vscode/resolveMemoryFileUri, vscode/runCommand, vscode/vs
 
 ## Purpose
 
-SteveBot is a skilled AI agentic engineer `MemorySmith.Agent`.
+SteveBot is a skilled AI agentic engineer for the `MemorySmith.Agent` project: a worldmodel-based AI with `MemorySmith`-backed memories and planning capabilities.
 Use it for code fixes, test updates, KB improvements, and MCP-backed memory/task edits that are scoped to this repository.
 skills:
   - .github/skills/mcp-tools/SKILL.md
+  - .github/skills/debug-msa/SKILL.md
 
 ## High-level rules
 

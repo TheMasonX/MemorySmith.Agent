@@ -73,6 +73,15 @@ if (!string.IsNullOrEmpty(memorysmithApiKey))
     builder.Configuration["Agent:Memory:ApiKey"] = memorysmithApiKey;
 }
 
+// Map MSA_LLM_API_KEY env var → Agent:Chat:LlmApiKey so cloud LLM providers
+// (DeepSeek, OpenAI, Anthropic, etc.) can use credentials without hardcoding
+// them in appsettings.json.
+var llmApiKey = Environment.GetEnvironmentVariable("MSA_LLM_API_KEY");
+if (!string.IsNullOrEmpty(llmApiKey))
+{
+    builder.Configuration["Agent:Chat:LlmApiKey"] = llmApiKey;
+}
+
 builder.Services.Configure<RestMemoryGatewayOptions>(
     builder.Configuration.GetSection("Agent:Memory"));
 builder.Services.Configure<MinecraftAdapterConfig>(
@@ -353,7 +362,9 @@ if (agentEnabled)
             // conversational context across turns.
             chatHistory:              sp.GetRequiredService<ChatHistory>(),
             // Sprint 52: configurable max concurrent PlaceBlock dispatches.
-            maxConcurrentPlaceBlock:  builder.Configuration.GetValue<int>("Agent:Build:MaxConcurrentPlaceBlock", 8));
+            maxConcurrentPlaceBlock:  builder.Configuration.GetValue<int>("Agent:Build:MaxConcurrentPlaceBlock", 8),
+            // Sprint 54 (TSK-0199): max chat response length before splitting.
+            chatMaxResponseLength:    chatOpts.ChatMaxResponseLength);
     });
     builder.Services.AddHostedService(sp => sp.GetRequiredService<AgentBackgroundService>());
 }

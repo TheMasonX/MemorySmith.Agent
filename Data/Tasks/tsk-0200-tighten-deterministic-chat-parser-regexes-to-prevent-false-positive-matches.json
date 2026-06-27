@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0200-tighten-deterministic-chat-parser-regexes-to-prevent-false-positive-matches",
+  "key": "TSK-0200",
+  "title": "Tighten deterministic chat parser regexes to prevent false positive matches",
+  "description": "## Problem\nThe deterministic \u0060ChatInterpreter.ParseIntent\u0060 regexes are too broad, causing false positive matches when keywords appear incidentally in longer messages.\n\n### False positive #1: \u0022enough\u0022 \u2192 cancel\nMessage: \u0022What do you have access to? Is this enough to play minecraft?\u0022\nPattern: \u0060\\b(stop|cancel|enough|quit|abort|nevermind|never mind)\\b\u0060\nThe word \u0022enough\u0022 in \u0022Is this enough\u0022 triggers an emergency stop.\n\n### False positive #2: \u0022help\u0022 \u2192 help response\nMessage: \u0022What other chat harness -\u003E msa agent utilities would help?\u0022\nPattern: \u0060\\b(help|commands|what can you do|usage)\\b\u0060\nThe word \u0022help\u0022 appearing at the end of a longer question triggers the canned help response instead of reaching the LLM.\n\n## Fix\n1. **Cancel pattern**: Remove \u0022enough\u0022 \u2014 it\u0027s too common in everyday language to be a reliable cancel signal. Keep \u0060stop|cancel|quit|abort|nevermind|never mind\u0060 which are unambiguous.\n2. **Help pattern**: Add a message length gate so \u0022help\u0022/\u0022commands\u0022/\u0022usage\u0022 only match when the message is short (\u2264 40 chars), preventing incidental word matches in longer sentences. Multi-word patterns like \u0022what can you do\u0022 are less prone to false positives and remain length-unrestricted.\n\n## Files\n- \u0060Agent.Planning/ChatInterpreter.cs\u0060 \u2014 cancel regex \u002B help regex \u002B message length check\n\n## Evidence\nFrom session log 2026-06-27:\n\u0060\u0060\u0060\n[10:02:37] [chat] \u003CTheMasonX23\u003E What do you have access to? Is this enough to play minecraft? \u2192 cancel (emergency stop)\n[10:13:18] [chat] \u003CTheMasonX23\u003E What other chat harness -\u003E msa agent utilities would help? \u2192 help (canned response)\n\u0060\u0060\u0060\n\n## Priority\nHigh \u2014 these false positives disrupt user conversation and bypass the LLM.",
+  "type": "Bug",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "type:bug",
+    "domain:chat",
+    "sprint-54"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T15:22:26.9576312Z",
+  "updatedAtUtc": "2026-06-27T15:23:26.2889079Z",
+  "completedAtUtc": "2026-06-27T15:23:26.2889079Z",
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0200-tighten-deterministic-chat-parser-regexes-to-prevent-false-positive-matches.json"
+}

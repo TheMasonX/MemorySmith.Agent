@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0201-add-chest-deposit-withdraw-interaction-capability",
+  "key": "TSK-0201",
+  "title": "Add chest/deposit-withdraw interaction capability",
+  "description": "## Problem\nThe agent has no ability to interact with containers (chests, barrels, etc.) in the world. It cannot deposit items, withdraw items, or manage inventory across storage.\n\n## Agent Request\nFrom session log: \u0022deposit/withdraw\u0022 and \u0022trade\u0022 commands were suggested by the agent as useful chat harness utilities.\n\n## Scope\n- Define a \u0060DepositItem\u0060 / \u0060WithdrawItem\u0060 action protocol for the Mineflayer adapter\n- Add chest interaction handling in \u0060index.js\u0060 (open chest, deposit items, withdraw items)\n- Add C# tool (\u0060DepositItemTool\u0060, \u0060WithdrawItemTool\u0060) in \u0060Agent.Tools\u0060\n- Wire into chat interpreter via LLM (not deterministic regex)\n- Handle edge cases: chest not found, chest already open, inventory full\n\n## Future expansion\n- Trade with villagers would build on this container interaction foundation\n- Automated material storage during build projects\n\n## Complexity\nMedium. Requires Mineflayer adapter changes \u002B C# tooling \u002B testing.\n\n## Priority\nLow \u2014 nice to have after core gathering/building/crafting flows are solid.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Low",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:inventory",
+    "domain:chat",
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T15:23:48.7703993Z",
+  "updatedAtUtc": "2026-06-27T15:23:48.7703993Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

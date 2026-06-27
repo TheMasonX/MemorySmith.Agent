@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0203-add-cross-session-memory-recall-via-wiki-page-persistence",
+  "key": "TSK-0203",
+  "title": "Add cross-session memory recall via wiki page persistence",
+  "description": "## Problem\nThe agent has no mechanism to persist notable discoveries or facts between play sessions. When the bot restarts, all chat-learned knowledge (locations, passwords, player preferences) is lost.\n\n## Agent Request\nFrom session log: \u0022ability to remember more context in memory\u0022 and \u0022memory recall for past session context\u0022 and \u0022remember/save commands\u0022.\n\n## Scope\n- Add a \u0060RememberFact\u0060 / \u0060RecallFact\u0060 chat command that persists facts to the MemorySmith wiki via \u0060IMemoryGateway\u0060\n- Facts stored as structured memory records with: key, value, position, timestamp, session ID\n- On startup, the agent can recall relevant facts into its chat context\n- LLM prompt updated to explain the remember/recall capability\n- Deterministic fast-path for short recall commands\n\n## Examples\n- Player: \u0022Remember the password is taco\u0022 \u2192 agent stores fact: {key:\u0022password\u0022, value:\u0022taco\u0022}\n- Player: \u0022The diamond vein is at (-200, 12, 300)\u0022 \u2192 agent stores fact: {key:\u0022diamond_vein_location\u0022, value:\u0022(-200,12,300)\u0022, position:Position}\n- Player: \u0022Recall the password\u0022 \u2192 agent retrieves and responds with the stored value\n- Cross-session: bot restarts, player asks \u0022Where is the base?\u0022 \u2192 agent recalls from persisted memory\n\n## Implementation sketch\n1. Define \u0060StoredFact\u0060 model (key, value, position?, tags, timestamp, sessionId)\n2. Add \u0060RememberTool\u0060 and \u0060RecallTool\u0060 in \u0060Agent.Tools\u0060\n3. Store/retrieve via \u0060RestMemoryGateway\u0060 with search\n4. On startup, load recent facts into \u0060ChatHistory\u0060 context\n\n## Complexity\nLow-Medium. Mostly integrates existing MemoryGateway with new tool wrappers.\n\n## Priority\nMedium \u2014 addresses the most common user complaint about agent forgetfulness.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:memory",
+    "domain:chat",
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T15:26:22.692031Z",
+  "updatedAtUtc": "2026-06-27T15:26:22.692031Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

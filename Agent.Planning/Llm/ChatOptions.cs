@@ -17,6 +17,7 @@ namespace Agent.Planning.Llm;
 ///     "GlobalPerMinuteMax": 5,
 ///     "MaxMessageLength": 1024,
 ///     "MaxResponseDistanceBlocks": 64.0,
+///     "ChatMaxResponseLength": 500,
 ///     "ChatHistoryMaxTurns": 30,
 ///     "ConversationWindowSeconds": 60,
 ///     "LlmConfidenceThreshold": 0.6
@@ -94,6 +95,14 @@ public sealed record ChatOptions
     /// Prevents excessively long prompts from being sent to the LLM. Default: 1024.
     /// </summary>
     public int MaxMessageLength { get; init; } = 1024;
+
+    /// <summary>
+    /// Maximum character length for bot chat responses sent to Minecraft.
+    /// Responses longer than this are split into multiple in-game chat messages
+    /// at sentence boundaries. A value &lt;= 0 disables splitting.
+    /// Default: 500.
+    /// </summary>
+    public int ChatMaxResponseLength { get; init; } = 500;
 
     /// <summary>
     /// Distance (blocks) beyond which the bot ignores messages not directed at it by name.
