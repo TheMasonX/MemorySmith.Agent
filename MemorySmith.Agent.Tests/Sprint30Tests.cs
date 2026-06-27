@@ -157,7 +157,7 @@ public class Sprint30Tests
         Assert.That(method, Is.Not.Null, "ParseIntent must exist as a private static method.");
 
         var state = new WorldState();
-        var result = method!.Invoke(null, new object[] { "doing", state });
+        var result = method!.Invoke(null, new object?[] { "doing", state, null });
         Assert.That(result, Is.Not.Null);
 
         // Use reflection to read the IntentType property generically.

@@ -2,7 +2,7 @@
   "id": "tsk-0179-planned-block-ordering",
   "key": "TSK-0179",
   "title": "Planned Block Ordering",
-  "description": "Order and group planned block placements spatially rather than simply in blueprint order. That has discontinuities as it completes each row (e.g. he runs back and forth to build the walls one block on each side, rather than finishing one wall and moving to the other). Will need to consider placeability",
+  "description": "Order and group planned block placements spatially rather than simply in blueprint order. That has discontinuities as it completes each row (e.g. he runs back and forth to build the walls one block on each side, rather than finishing one wall and moving to the other). Will need to consider placeability.\n\n## Context (2026-06-27)\nThis task is linked to the roof-confinement problem. Current Y-ascending ordering places ALL wall blocks before roof blocks, sealing the bot inside at Y=3 (solid layer with no door opening). Spatial reordering could help by:\n- Completing one wall face entirely (including its roof-edge blocks) before starting the next face\n- Leaving the door face for LAST, so the bot has a clear exit path\n\nHowever, TSK-0215 (MoveTo exterior before roof phase) handles confinement prevention at the action-injection level, which is simpler and more reliable than solving confinement via ordering alone.\n\nSee `Data/Pages/Analysis/goalnear-tolerance-analysis-20260627.md` for analysis of GoalNear tolerance vs. placeBlock interaction distance.",
   "type": "Task",
   "status": "Backlog",
   "priority": "Medium",

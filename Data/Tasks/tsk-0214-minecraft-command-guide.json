@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0214-minecraft-command-guide",
+  "key": "TSK-0214",
+  "title": "Minecraft Command Guide",
+  "description": "Need a detailed minecraft command guide and probably some helpful parser/validators",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future",
+    "domain:minecraft",
+    "type:documentation"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T17:09:30.5857011Z",
+  "updatedAtUtc": "2026-06-27T17:09:30.5857011Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

@@ -3,6 +3,7 @@ namespace Agent.Planning;
 using Agent.Construction;
 using Agent.Core;
 using Agent.Planning.Goals;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 /// <summary>
@@ -30,6 +31,14 @@ public delegate IReadOnlyList<ActionData> TaskDecomposer(
 /// </summary>
 public sealed class HtnTaskLibrary
 {
+    private readonly ILogger<HtnTaskLibrary>? _logger;
+
+    public HtnTaskLibrary(ILogger<HtnTaskLibrary>? logger = null)
+    {
+        _logger = logger;
+        _methods = new Dictionary<string, TaskDecomposer>(StringComparer.OrdinalIgnoreCase);
+    }
+
     // ── Crafting constants ────────────────────────────────────────────────────
 
     /// <summary>Vanilla: 1 stick + 1 coal -> 4 torches.</summary>
@@ -144,7 +153,7 @@ public sealed class HtnTaskLibrary
 
     private readonly Dictionary<string, TaskDecomposer> _methods;
 
-    public HtnTaskLibrary()
+    public HtnTaskLibrary() : this(null)
     {
         _methods = new Dictionary<string, TaskDecomposer>(StringComparer.OrdinalIgnoreCase)
         {
@@ -459,18 +468,46 @@ public sealed class HtnTaskLibrary
             // Creative mode grants the agent the requested materials up front, so skip
             // mining, smelting, and crafting pre-gather actions entirely.
             // TSK-0121: NO MoveTo(origin) in creative mode — adapter navigates per-block via pathfinder.goto()
-
-            var creativeProgressKey     = BuildFactKeys.BuildProgressIndex(blueprint.Name);
-            var creativeCheckpointIndex = 0;
-            if (TryGetIntFact(state, creativeProgressKey, out var creativeLastPlaced))
-                creativeCheckpointIndex = creativeLastPlaced + 1;
+            // TSK-0125: per-block status filtering replaces linear checkpoint.
 
             var creativeExecutor     = new BlueprintExecutor();
             var creativeBlockActions = creativeExecutor.Execute(blocks, originX, originY, originZ);
+            var creativeBotPos = state.Position;
 
-            for (int i = creativeCheckpointIndex; i < creativeBlockActions.Count; i++)
+            // TSK-0125 diagnostic: count placed blocks in state.Facts
+            int placedCount = 0;
+            for (int i = 0; i < creativeBlockActions.Count; i++)
             {
+                var sk = BuildFactKeys.BlockStatus(blueprint.Name, i);
+                if (state.Facts.TryGetValue(sk, out var sv) && sv?.ToString() == BuildFactKeys.BlockStatusPlaced)
+                    placedCount++;
+            }
+            _logger?.LogWarning(
+                "[HtnTaskLibrary] TSK-0125 creative diag: blueprint.Name='{Name}', " +
+                "totalBlocks={Total}, placedInFacts={Placed}, sampleBuildKeys=[{Keys}]",
+                blueprint.Name, creativeBlockActions.Count, placedCount,
+                string.Join(", ", state.Facts.Keys.Where(k => k.StartsWith("build:", StringComparison.OrdinalIgnoreCase)).Take(5)));
+
+            for (int i = 0; i < creativeBlockActions.Count; i++)
+            {
+                // TSK-0125: skip blocks already marked as placed
+                var statusKey = BuildFactKeys.BlockStatus(blueprint.Name, i);
+                if (state.Facts.TryGetValue(statusKey, out var statusVal) &&
+                    statusVal?.ToString() == BuildFactKeys.BlockStatusPlaced)
+                    continue;
+
                 var placeAction = creativeBlockActions[i];
+
+                // TSK-0123: skip PlaceBlock at bot's current position —
+                // the bot is standing where the block goes, no reference surface.
+                if (placeAction.Arguments.TryGetValue("x", out var px) && px is int placeX &&
+                    placeAction.Arguments.TryGetValue("y", out var py) && py is int placeY &&
+                    placeAction.Arguments.TryGetValue("z", out var pz) && pz is int placeZ)
+                {
+                    if (placeX == creativeBotPos.X && placeZ == creativeBotPos.Z && placeY == creativeBotPos.Y)
+                        continue;
+                }
+
                 placeAction.Context[BuildFactKeys.PlaceBlockProgressBlueprintId] = blueprint.Name;
                 placeAction.Context[BuildFactKeys.PlaceBlockProgressBlockIndex]  = i;
                 actions.Add(placeAction);
@@ -526,18 +563,32 @@ public sealed class HtnTaskLibrary
         }
 
         // TSK-0121: NO MoveTo(origin) — adapter navigates to each target via pathfinder.goto() before placing
-
-        var progressKey     = BuildFactKeys.BuildProgressIndex(blueprint.Name);
-        var checkpointIndex = 0;
-        if (TryGetIntFact(state, progressKey, out var lastPlaced))
-            checkpointIndex = lastPlaced + 1;
+        // TSK-0125: per-block status filtering replaces linear checkpoint.
 
         var executor     = new BlueprintExecutor();
         var blockActions = executor.Execute(blocks, originX, originY, originZ);
+        var botPos = state.Position;
 
-        for (int i = checkpointIndex; i < blockActions.Count; i++)
+        for (int i = 0; i < blockActions.Count; i++)
         {
+            // TSK-0125: skip blocks already marked as placed
+            var statusKey = BuildFactKeys.BlockStatus(blueprint.Name, i);
+            if (state.Facts.TryGetValue(statusKey, out var statusVal) &&
+                statusVal?.ToString() == BuildFactKeys.BlockStatusPlaced)
+                continue;
+
             var placeAction = blockActions[i];
+
+            // TSK-0123: skip PlaceBlock at bot's current position —
+            // the bot is standing where the block goes, no reference surface.
+            if (placeAction.Arguments.TryGetValue("x", out var px) && px is int placeX &&
+                placeAction.Arguments.TryGetValue("y", out var py) && py is int placeY &&
+                placeAction.Arguments.TryGetValue("z", out var pz) && pz is int placeZ)
+            {
+                if (placeX == botPos.X && placeZ == botPos.Z && placeY == botPos.Y)
+                    continue;
+            }
+
             placeAction.Context[BuildFactKeys.PlaceBlockProgressBlueprintId] = blueprint.Name;
             placeAction.Context[BuildFactKeys.PlaceBlockProgressBlockIndex]  = i;
             actions.Add(placeAction);

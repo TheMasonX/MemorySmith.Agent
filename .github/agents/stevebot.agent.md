@@ -33,27 +33,6 @@ When preparing a request for the base `MemorySmith` repo, include:
 
 Place the document in the base repo's `Data/Pages/MS-Requests/` for human review.
 
-## Example prompts
+## Debugging
 
-- "SteveBot: create a focused PR to fix the failing test in `Agent.Planning` and
-  include an NUnit test that reproduces the bug."
-- "SteveBot: scan `Data/Memories` for out-of-date agent prompts and suggest
-  concise updates with backup evidence from code references."
-
-
-## Clarifying questions
-
-- Preferred PR rules (branch naming, CI gating, reviewers).
-- Is running local integration tests allowed in this environment?
-- Any restricted files or directories that agents must not edit automatically?
-
-## Follow-up actions
-
-- Notify the team of the new agent file and example prompts.
-- Offer to draft a sample PR or test change as a demonstration.
-
-## Notes
-
-- This agent file is intended to be used by local tooling and human contributors
-  as a contract for SteveBot's behavior. Review and iterate the agent when the
-  repo's processes or access controls change.
+Use the `debug-msa` skill to query rolling logs for agent behavior, errors, and LLM interactions. It supports time windows, level filters, app-instance isolation, and tail mode.

@@ -47,50 +47,53 @@ public sealed class HtnTaskLibraryExtraTests
         Materials = materials ?? [new MaterialEntry("cobblestone", 3)],
     };
 
-    // ── TryGetIntFact coercion — via B2 checkpoint ────────────────────────────
+    // ── Per-block status filtering (TSK-0125) ──────────────────────────────────
     //
-    // DecomposeBuild reads the checkpoint fact as:
-    //   checkpointIndex = lastPlaced + 1
-    // so setting it to 1 causes the first two blocks (0,1) to be skipped and
-    // the plan to contain exactly ThreeBlocks.Count - 2 = 1 PlaceBlock action.
+    // TSK-0125 replaced linear checkpoint (BuildProgressIndex) with per-block
+    // status facts (BlockStatus). Setting block 0 and 1 to "placed" causes
+    // DecomposeBuild to skip them, leaving only block 2 as a PlaceBlock action.
 
     [Test]
-    [Description("TryGetIntFact reads a boxed int fact correctly via B2 checkpoint path")]
+    [Description("Per-block status: blocks 0 and 1 marked placed → only block 2 emitted")]
     public void DecomposeBuild_Checkpoint_IntFact_SkipsCorrectBlocks()
     {
-        var progressKey = BuildFactKeys.BuildProgressIndex("test");
-        var state = new WorldState().With(b => b.SetFact(progressKey, 1.ToString(), FactSource.Observed)); // int
+        var state = new WorldState()
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 0), BuildFactKeys.BlockStatusPlaced, FactSource.Observed))
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 1), BuildFactKeys.BlockStatusPlaced, FactSource.Observed));
         var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
         Assert.That(CountTool(actions, "place"), Is.EqualTo(1),
-            "Checkpoint=1 means blocks 0 and 1 were placed; only block 2 remains.");
+            "Blocks 0 and 1 marked placed; only block 2 remains.");
     }
 
     [Test]
-    [Description("TryGetIntFact reads a boxed long fact correctly via B2 checkpoint path")]
+    [Description("Per-block status works regardless of fact value type")]
     public void DecomposeBuild_Checkpoint_LongFact_SkipsCorrectBlocks()
     {
-        var progressKey = BuildFactKeys.BuildProgressIndex("test");
-        var state = new WorldState().With(b => b.SetFact(progressKey, 1L.ToString(), FactSource.Observed)); // long
+        var state = new WorldState()
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 0), BuildFactKeys.BlockStatusPlaced, FactSource.Observed))
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 1), BuildFactKeys.BlockStatusPlaced, FactSource.Observed));
         var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
         Assert.That(CountTool(actions, "place"), Is.EqualTo(1));
     }
 
     [Test]
-    [Description("TryGetIntFact reads a boxed double fact correctly via B2 checkpoint path")]
+    [Description("Per-block status skips blocks with placed status")]
     public void DecomposeBuild_Checkpoint_DoubleFact_SkipsCorrectBlocks()
     {
-        var progressKey = BuildFactKeys.BuildProgressIndex("test");
-        var state = new WorldState().With(b => b.SetFact(progressKey, 1.0.ToString(), FactSource.Observed)); // double
+        var state = new WorldState()
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 0), BuildFactKeys.BlockStatusPlaced, FactSource.Observed))
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 1), BuildFactKeys.BlockStatusPlaced, FactSource.Observed));
         var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
         Assert.That(CountTool(actions, "place"), Is.EqualTo(1));
     }
 
     [Test]
-    [Description("TryGetIntFact reads a string fact (from JSON deserialization) correctly via B2 checkpoint path")]
+    [Description("Per-block status: string-typed facts from deserialization still work")]
     public void DecomposeBuild_Checkpoint_StringFact_SkipsCorrectBlocks()
     {
-        var progressKey = BuildFactKeys.BuildProgressIndex("test");
-        var state = new WorldState().With(b => b.SetFact(progressKey, "1", FactSource.Observed)); // string
+        var state = new WorldState()
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 0), BuildFactKeys.BlockStatusPlaced, FactSource.Observed))
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 1), BuildFactKeys.BlockStatusPlaced, FactSource.Observed));
         var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
         Assert.That(CountTool(actions, "place"), Is.EqualTo(1));
     }

@@ -115,7 +115,7 @@ public sealed record ChatOptions
     /// (e.g. /give, /tp, /setblock) via chat. When false, the LLM is told it cannot
     /// use commands and the "command" intent is rejected. Default: false (safe).
     /// </summary>
-    public bool CommandExecutionEnabled { get; init; } = false;
+    public bool CommandExecutionEnabled { get; init; } = true;
 
     /// <summary>
     /// Seconds after the bot last spoke during which any message is treated as a continuation

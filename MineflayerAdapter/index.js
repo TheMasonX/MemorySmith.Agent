@@ -36,6 +36,7 @@ import { toVec3 } from './vec3.js';
 // Sprint 52 modularization (TSK-0166): extracted to separate modules.
 import * as C from './config.js';
 import { logStructured } from './logger.js';
+import { createMovements } from './movements.js';
 
 // ── Environment / connection ──────────────────────────────────────────────────
 
@@ -373,7 +374,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         break;
       }
       logStructured('info', 'move', 'navigating', { x, y, z, botX: bx, botY: by, botZ: bz, dist: dist.toFixed(1) });
-      const movements = new Movements(bot);
+      const movements = createMovements(bot);
       bot.pathfinder.setMovements(movements);
       await bot.pathfinder.goto(new pfGoals.GoalNear(x, y, z, 1));
       sendEvent('moveComplete', { ...botPos(), correlationId });
@@ -389,7 +390,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       if (!blockEntry) throw new Error(`Unknown block: ${blockName}`);
       const blockId = blockEntry.id;
 
-      const movements = new Movements(bot);
+      const movements = createMovements(bot);
       bot.pathfinder.setMovements(movements);
 
       let mined = 0;
@@ -888,7 +889,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         // position us correctly from the side.
       }
 
-      const movements = new Movements(bot);
+      const movements = createMovements(bot);
       bot.pathfinder.setMovements(movements);
       // Sprint 42 (TSK-0076): Reduce tolerance from 3 to 2 so the bot gets closer
       // to the target before placing. A 3-block tolerance meant the bot could be
@@ -1073,7 +1074,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         fromPos: botPos(),
       });
 
-      const movements = new Movements(bot);
+      const movements = createMovements(bot);
       bot.pathfinder.setMovements(movements);
       try {
         await bot.pathfinder.goto(
@@ -1417,7 +1418,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         if (!craftingTable)
           throw new Error(`No crafting_table within ${tableSearchRadius} blocks`);
 
-        const movements = new Movements(bot);
+        const movements = createMovements(bot);
         bot.pathfinder.setMovements(movements);
         await bot.pathfinder.goto(new pfGoals.GoalNear(
           craftingTable.position.x,
@@ -1448,7 +1449,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       let furnaceBlock = bot.findBlock({ matching: furnaceId, maxDistance: C.FURNACE_SEARCH_RADIUS });
       if (!furnaceBlock) throw new Error(`No furnace found within ${C.FURNACE_SEARCH_RADIUS} blocks`);
 
-      const movements = new Movements(bot);
+      const movements = createMovements(bot);
       bot.pathfinder.setMovements(movements);
       await bot.pathfinder.goto(new pfGoals.GoalNear(
         furnaceBlock.position.x, furnaceBlock.position.y, furnaceBlock.position.z,
@@ -1508,7 +1509,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       const blockId = blockEntry.id;
 
       const botPosObj = botPos();
-      const movements = new Movements(bot);
+      const movements = createMovements(bot);
       bot.pathfinder.setMovements(movements);
 
       // Find all matching blocks within range
