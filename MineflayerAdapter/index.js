@@ -833,16 +833,22 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         break;
       }
 
-      // Sprint 51: skip PlaceBlock at bot's own position. Placing a block where
-      // the bot is standing has no adjacent reference block to click against.
-      // The adapter skips it and lets the next replan handle it after the bot moves.
+      // Sprint 52 (TSK-0123): When the bot is standing at the target position,
+      // step aside instead of permanently skipping. The bot navigates to an
+      // adjacent position, then the normal GoalNear+placement flow takes over.
+      // This prevents the "trail of empty spots" where blocks at the bot's
+      // origin are never placed.
       const botPos2 = botPos();
       if (x === botPos2.x && y === botPos2.y && z === botPos2.z) {
-        logStructured('warn', 'place', 'SKIPPING PlaceBlock at bot position', {
-          x, y, z, material: shortMat, reason: 'no reference block — bot standing here',
+        logStructured('info', 'place', 'stepping aside from target to place', {
+          x, y, z, material: shortMat, reason: 'bot standing on target — moving to adjacent position',
         });
-        sendEvent('blockPlaceSkipped', { x, y, z, block: shortMat, correlationId, reason: 'botPosition' });
-        break;
+        // Move to an adjacent X position so we can approach from the side.
+        // GoalNear(x,y,z,2) won't move if already at the target (distance=0),
+        // so we first move outside the near threshold, then fall through.
+        await bot.pathfinder.goto(new pfGoals.GoalNear(x + 2, y, z, 1));
+        // Fall through to normal placement below — GoalNear(x,y,z,2) will
+        // position us correctly from the side.
       }
 
       const movements = new Movements(bot);
