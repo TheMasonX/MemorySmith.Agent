@@ -551,19 +551,6 @@ public sealed class HtnTaskLibrary
         for (int i = checkpointIndex; i < blockActions.Count; i++)
         {
             var placeAction = blockActions[i];
-            // TSK-0123: skip PlaceBlock when bot is standing at target position
-            if (placeAction.Arguments.TryGetValue("x", out var px) && px is int ppx &&
-                placeAction.Arguments.TryGetValue("y", out var py) && py is int ppy &&
-                placeAction.Arguments.TryGetValue("z", out var pz) && pz is int ppz)
-            {
-                var botPos = state.Position;
-                if (ppx == botPos.X && ppy == botPos.Y && ppz == botPos.Z)
-                {
-                    System.Console.Error.WriteLine(
-                        $"[HtnTaskLibrary] skipping block {i} at ({ppx},{ppy},{ppz}) — bot is standing there (TSK-0123)");
-                    continue;
-                }
-            }
             placeAction.Context[BuildFactKeys.PlaceBlockProgressBlueprintId] = blueprint.Name;
             placeAction.Context[BuildFactKeys.PlaceBlockProgressBlockIndex]  = i;
             actions.Add(placeAction);
