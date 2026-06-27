@@ -91,7 +91,7 @@ public sealed class ChatInterpreter : IChatInterpreter
         if (!directed)
             return Task.FromResult<IntentDraft?>(null);
 
-        IntentDraft? result = ParseIntent(message, state);
+        IntentDraft? result = ParseIntent(message, state, botName);
         return Task.FromResult<IntentDraft?>(result);
     }
 
@@ -187,7 +187,7 @@ public sealed class ChatInterpreter : IChatInterpreter
     /// Sprint 39 P1-C: return type changed from <see cref="ChatInterpretation"/> to
     /// <see cref="IntentDraft"/>. navigate/come-here uses null X/Y/Z to signal "follow player".
     /// </summary>
-    private static IntentDraft ParseIntent(string message, WorldState state)
+    private static IntentDraft ParseIntent(string message, WorldState state, string? botName = null)
     {
         // Sprint 54 (TSK-0200): removed "enough" — too many false positives in everyday language.
         // Canonical stop commands only: stop, cancel, quit, abort, nevermind.
@@ -198,6 +198,7 @@ public sealed class ChatInterpreter : IChatInterpreter
                 1.0, null, "Ok, stopping.");
 
         // TSK-0015: inventory report command
+        // Sprint 54 (TSK-0210): enriched with goal context and suggestions.
         if (Regex.IsMatch(message, @"\b(inventory|what do you have|what are you carrying|items)\b",
             RegexOptions.IgnoreCase))
         {
@@ -205,32 +206,69 @@ public sealed class ChatInterpreter : IChatInterpreter
                 ? "Inventory is empty."
                 : string.Join(", ", state.Inventory
                     .OrderByDescending(kv => kv.Value)
+                    .Take(10)
                     .Select(kv => $"{kv.Value}x {kv.Key}"));
+            var goal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s
+                ? $" (Working on: {s})" : "";
+            var suggestion = state.Inventory.Count == 0
+                ? " Try 'get wood' to start gathering."
+                : "";
             return new IntentDraft("yes", "status",
                 null, null, null, null, null, null,
-                1.0, null, $"Inventory: {inv}");
+                1.0, null, $"Inventory{goal}: {inv}.{suggestion}");
         }
 
         if (Regex.IsMatch(message, @"\b(status|what.?re you doing|what are you doing|report)\b",
             RegexOptions.IgnoreCase))
         {
-            var goal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s
-                ? $"Working on: {s}." : "Idle.";
+            // Sprint 54 (TSK-0210): enriched status with build progress, inventory summary,
+            // and contextual suggestions instead of raw dumps.
+            var goalStatus = state.Facts.TryGetValue("currentGoal", out var cg2) && cg2 is string gs
+                ? gs : "Idle";
+
+            // Top 5 inventory items for quick context
+            var topItems = state.Inventory.Count > 0
+                ? string.Join(", ", state.Inventory
+                    .OrderByDescending(kv => kv.Value)
+                    .Take(5)
+                    .Select(kv => $"{kv.Value}x {kv.Key}"))
+                : "nothing";
+
+            var statusMsg = goalStatus == "Idle"
+                ? $"Idle. HP: {state.Health}/20, Food: {state.Food}/20. Carrying: {topItems}."
+                : $"Working on: {goalStatus}. HP: {state.Health}/20, Food: {state.Food}/20. Carrying: {topItems}.";
+
             return new IntentDraft("yes", "status",
                 null, null, null, null, null, null,
-                1.0, null, $"{goal} HP: {state.Health}/20, Food: {state.Food}/20.");
+                1.0, null, statusMsg);
         }
 
-        // Sprint 54 (TSK-0200): only match "help"/"commands"/"usage" in short messages
-        // (≤ 40 chars) to prevent false positives when these words appear incidentally
+        // Sprint 54 (TSK-0200): only match "help"/"commands"/"usage" when the message is
+        // essentially JUST the command, optionally preceded/followed by the bot name or
+        // a casual prefix. Prevents false positives when these words appear incidentally
         // in longer sentences. Multi-word "what can you do" is unrestricted.
-        if ((message.Length <= 40 && Regex.IsMatch(message, @"\b(help|commands|usage)\b", RegexOptions.IgnoreCase))
+        var namePattern = string.IsNullOrEmpty(botName) ? @"\S+" : Regex.Escape(botName);
+        if (Regex.IsMatch(message, $@"^(?:hey\s+|ok\s+)?(?:{namePattern}\s+)?(help|commands|usage)(?:\s+{namePattern})?\s*$", RegexOptions.IgnoreCase)
             || Regex.IsMatch(message, @"\bwhat can you do\b", RegexOptions.IgnoreCase))
             return new IntentDraft("yes", "help",
                 null, null, null, null, null, null,
                 1.0, null,
                 "Commands: 'get/mine <item> [n]', 'craft <item>', 'build <blueprint> [at X Y Z]', " +
                 "'go to X Y Z', 'come here', 'stop', 'status', 'inventory', 'help'");
+
+        // Sprint 54 (TSK-0203): "remember X is Y" / "recall X" — deterministic fast-path
+        // for explicit memory commands. Conversation-path remembers are handled by the LLM.
+        var rememberMatch = Regex.Match(message,
+            @"\bremember\s+(?:the\s+)?(?<key>.+?)\s+is\s+(?<value>.+?)(?:[.!]?\s*$)",
+            RegexOptions.IgnoreCase);
+        if (rememberMatch.Success)
+        {
+            var key = rememberMatch.Groups["key"].Value.Trim();
+            var value = rememberMatch.Groups["value"].Value.Trim();
+            return new IntentDraft("yes", "remember",
+                key, null, null, null, null, null,
+                1.0, null, $"Got it — I'll remember that {key} is {value}.");
+        }
 
         // "come here" / "follow me" — null X/Y/Z signals "follow player" to the caller
         if (Regex.IsMatch(message, @"\b(come here|come to me|follow me|follow)\b",

@@ -212,10 +212,16 @@ public sealed class LlmChatInterpreter(
             ? $"\nRecent conversation:\n{chatHistory}\n"
             : "";
 
+        // Sprint 54 (TSK-0205/0208/0203): enriched prompt with compound commands,
+        // tool auto-crafting, memory recall, and deterministic parser caveats.
+        var toolList = toolNames is { Count: > 0 }
+            ? $"\nAvailable bot tools: {string.Join(", ", toolNames)}."
+            : "";
+
         var basePrompt = $$"""
         You are {{botName}}, an autonomous Minecraft bot at ({{botPos.X}},{{botPos.Y}},{{botPos.Z}}).
         Status: {{goalStatus}}. HP: {{health}}/20. Food: {{food}}/20. Players online: {{onlinePlayers}}.
-        Inventory: {{invSummary}}.{{historyBlock}}
+        Inventory: {{invSummary}}.{{historyBlock}}{{toolList}}
         Decide if the next message is for you and what to do.
         Reply ONLY with valid JSON — no markdown, no prose:
 
@@ -231,11 +237,12 @@ public sealed class LlmChatInterpreter(
           "z": <integer or null>,
           "confidence": <0.0-1.0>,
           "clarificationQuestion": "<question to ask if confidence is low, or null>",
-          "response": "<in-game reply, max 50 words, empty if intent is ignore>"
+          "response": "<in-game reply, max 50 words, empty if intent is ignore>",
+          "nextSteps": ["<optional subsequent commands the player wants, or empty array>"]
         }
 
         Rules:
-        
+
         ADDRESSING RULES — choose EXACTLY ONE:
         - "yes" when your name is used or only 1 player is online.
         - "maybe" when it could be a command but your name is not mentioned.
@@ -272,11 +279,33 @@ public sealed class LlmChatInterpreter(
         response to a short acknowledgement like "Starting to build a {blueprint}..."
         instead of pretending the build is complete. Never say "House built!" or
         similar completion messages — the system will report completion separately.
+
+        COMPOUND COMMANDS: When the player chains multiple commands with "then", "and",
+        or "after that" (e.g. "gather 5 oak_log then craft 20 planks then build a house"):
+        - Parse the FIRST actionable step as the intent/item/blueprint/count.
+        - List the REMAINING steps in "nextSteps" as an array of strings.
+        - The system handles step sequencing automatically.
+        - Example: "mine 10 stone then smelt it then craft a furnace"
+          → intent="gather", item="stone", count=10,
+            nextSteps=["smelt stone", "craft furnace"]
+
+        TOOL AUTO-CRAFTING: The system automatically crafts required tools before
+        gathering. If a player says "mine 10 stone" and no pickaxe exists, the bot
+        will auto-craft a wooden pickaxe first. You do NOT need to issue a separate
+        "craft pickaxe" intent — just return the gather intent and the system handles
+        tool prerequisites.
+
+        MEMORY: You can remember facts across sessions. If a player says "remember
+        the password is taco" or "the base is at -200, 70, 300", the system stores
+        it. If a player asks about previously stored facts, the system recalls them.
+        Use intent="conversation" with a natural response for memory-related chat.
+
+        CAVEAT: The deterministic command parser (non-LLM fallback) has known bugs.
+        It may misinterpret messages containing "help" or "stop" in longer sentences.
+        If you see unexpected behavior (e.g. emergency stop when none was requested),
+        use intent="conversation" to explain what happened to the player.
         """;
 
-        // Sprint 36 P1-C: append registered tool names so the LLM knows what's available.
-        if (toolNames is { Count: > 0 })
-            return basePrompt + $"\nRegistered tools: {string.Join(", ", toolNames)}.";
         return basePrompt;
     }
 
@@ -334,6 +363,19 @@ public sealed class LlmChatInterpreter(
             var confidence = GetDouble(root, "confidence") ?? 1.0;
             var clarifyQ   = GetStr(root, "clarificationQuestion");
 
+            // Sprint 54 (TSK-0205): parse nextSteps for compound command chaining
+            IReadOnlyList<string>? nextSteps = null;
+            if (root.TryGetProperty("nextSteps", out var ns) && ns.ValueKind == JsonValueKind.Array)
+            {
+                var steps = new List<string>();
+                foreach (var step in ns.EnumerateArray())
+                {
+                    if (step.ValueKind == JsonValueKind.String)
+                        steps.Add(step.GetString()!);
+                }
+                if (steps.Count > 0) nextSteps = steps;
+            }
+
             // Low confidence → override intent to "clarify" (bot sends the question as response)
             if (confidence < confidenceThreshold && !string.IsNullOrWhiteSpace(clarifyQ))
             {
@@ -341,12 +383,12 @@ public sealed class LlmChatInterpreter(
                     confidence, confidenceThreshold);
                 return new IntentDraft(addressed, "clarify",
                     item, blueprint, count, x, y, z,
-                    confidence, clarifyQ, clarifyQ);
+                    confidence, clarifyQ, clarifyQ, nextSteps);
             }
 
             return new IntentDraft(addressed, intent,
                 item, blueprint, count, x, y, z,
-                confidence, clarifyQ, response);
+                confidence, clarifyQ, response, nextSteps);
         }
         catch (Exception ex)
         {

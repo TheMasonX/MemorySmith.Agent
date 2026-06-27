@@ -103,6 +103,69 @@ public sealed class IntentManager
             return alias;
         return item;
     }
+
+    // ── Command string parsing for multi-step chaining (TSK-0205) ────────────
+
+    /// <summary>
+    /// Parses a simple command string from <see cref="IntentDraft.NextSteps"/>
+    /// into a typed <see cref="GoalRequest"/>. Supports basic patterns like
+    /// "craft 20 planks", "gather 5 oak_log", "build small-house", "smelt 3 iron_ore".
+    /// Returns null for unrecognized commands.
+    /// </summary>
+    public static GoalRequest? ParseCommandString(string command)
+    {
+        var trimmed = command.Trim();
+        if (string.IsNullOrEmpty(trimmed)) return null;
+
+        // "craft N item" or "craft item"
+        var craftMatch = System.Text.RegularExpressions.Regex.Match(trimmed,
+            @"^craft\s+(?:(?<count>\d+)\s+)?(?<item>.+)$",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (craftMatch.Success)
+        {
+            var item = ResolveItem(craftMatch.Groups["item"].Value.Trim());
+            var count = craftMatch.Groups["count"].Success
+                ? int.Parse(craftMatch.Groups["count"].Value) : 1;
+            return new CraftGoalRequest(item, count);
+        }
+
+        // "gather N item" / "mine N item" / "get N item"
+        var gatherMatch = System.Text.RegularExpressions.Regex.Match(trimmed,
+            @"^(?:gather|mine|get)\s+(?:(?<count>\d+)\s+)?(?<item>.+)$",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (gatherMatch.Success)
+        {
+            var item = ResolveItem(gatherMatch.Groups["item"].Value.Trim());
+            var count = gatherMatch.Groups["count"].Success
+                ? int.Parse(gatherMatch.Groups["count"].Value) : 10;
+            return new GatherGoalRequest(item, count);
+        }
+
+        // "build blueprint"
+        var buildMatch = System.Text.RegularExpressions.Regex.Match(trimmed,
+            @"^build\s+(?:a\s+)?(?<blueprint>.+)$",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (buildMatch.Success)
+        {
+            var bp = ResolveBlueprint(buildMatch.Groups["blueprint"].Value.Trim());
+            if (bp is not null)
+                return new BuildGoalRequest(bp, null);
+        }
+
+        // "smelt N item" / "smelt item"
+        var smeltMatch = System.Text.RegularExpressions.Regex.Match(trimmed,
+            @"^smelt\s+(?:(?<count>\d+)\s+)?(?<item>.+)$",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (smeltMatch.Success)
+        {
+            var item = ResolveItem(smeltMatch.Groups["item"].Value.Trim());
+            var count = smeltMatch.Groups["count"].Success
+                ? int.Parse(smeltMatch.Groups["count"].Value) : 1;
+            return new SmeltGoalRequest(item, count);
+        }
+
+        return null;
+    }
 }
 
 // ── Typed GoalRequest hierarchy  ─────────────────────────────────────────────

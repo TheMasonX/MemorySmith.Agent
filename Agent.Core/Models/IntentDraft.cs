@@ -36,6 +36,10 @@ namespace Agent.Core;
 /// <param name="ClarificationQuestion">Non-null when Confidence &lt; threshold; the bot should
 ///   ask this question in-game before proceeding.</param>
 /// <param name="Response">In-game reply text (max ~50 words). Empty for "ignore".</param>
+/// <param name="NextSteps">Optional subsequent commands for multi-step chaining (TSK-0205).
+///   When the player says "gather wood then build a house", the first step is parsed
+///   as the primary intent and remaining steps appear here as strings like
+///   ["craft 20 planks", "build small-house"].</param>
 public record IntentDraft(
     string Addressed,
     string Intent,
@@ -47,4 +51,5 @@ public record IntentDraft(
     int? Z,
     double Confidence,
     string? ClarificationQuestion,
-    string Response);
+    string Response,
+    IReadOnlyList<string>? NextSteps = null);

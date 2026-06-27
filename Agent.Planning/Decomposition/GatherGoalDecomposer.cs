@@ -20,6 +20,10 @@ using Agent.Planning.Goals;
 /// Since <see cref="GenericGatherGoal"/> implements <see cref="IItemSpecGoal"/>, the
 /// <see cref="IItemSpecGoal"/> arm catches it correctly via class-member-wins-over-DIM
 /// semantics. The <see cref="CanHandle"/> predicate is simplified accordingly.
+///
+/// Sprint 54 (TSK-0208): auto-tool crafting — before gathering, checks if a tool
+/// (pickaxe/axe/shovel) is required for the target blocks. If no suitable tool is
+/// in inventory, inserts a CraftItem action for the wooden-tier version first.
 /// </summary>
 public sealed class GatherGoalDecomposer(HtnTaskLibrary taskLibrary) : IGoalDecomposer
 {
@@ -53,7 +57,19 @@ public sealed class GatherGoalDecomposer(HtnTaskLibrary taskLibrary) : IGoalDeco
                 $"GatherGoalDecomposer cannot handle {goal.GetType().Name}")
         };
 
-        var actions = taskLibrary.DecomposeGatherItem(spec, parameters, state);
+        // Sprint 54 (TSK-0208): auto-craft the required tool if missing from inventory.
+        // Uses DecomposeCraftItem which handles the full chain: craft table bootstrap,
+        // material pre-gathering (planks, sticks), and the craft itself.
+        var actions = new List<ActionData>();
+        var requiredToolType = ToolRequirements.GetRequiredToolType(spec);
+        if (requiredToolType is not null
+            && !ToolRequirements.HasAnyToolOfType(state.Inventory, requiredToolType))
+        {
+            var woodenTool = ToolRequirements.GetWoodenTool(requiredToolType);
+            actions.AddRange(taskLibrary.DecomposeCraftItem(woodenTool, 1, state));
+        }
+
+        actions.AddRange(taskLibrary.DecomposeGatherItem(spec, parameters, state));
         return new ActionPlan(goal.Name, goal.Phases, actions);
     }
 }

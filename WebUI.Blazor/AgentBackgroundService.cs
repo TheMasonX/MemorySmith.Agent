@@ -53,6 +53,8 @@ public sealed class AgentBackgroundService(
     // Sprint 52: ChatHistory for recording bot responses so conversational context
     // flows into the LLM system prompt on subsequent turns.
     ChatHistory? chatHistory = null,
+    // Sprint 54 (TSK-0203): IMemoryGateway for cross-session fact persistence and recall.
+    IMemoryGateway? memoryGateway = null,
     // Sprint 52: max concurrent PlaceBlock dispatches per cycle (configurable via appsettings).
     int maxConcurrentPlaceBlock = 8,
     // Sprint 54 (TSK-0199): max character length for chat responses before splitting.
@@ -136,6 +138,8 @@ public sealed class AgentBackgroundService(
     private readonly IAgentJournal? _journal = journal;
     private readonly Logging.IChatLogger? _chatLogger = chatLogger;
     private readonly ChatHistory? _chatHistory = chatHistory;
+    // Sprint 54 (TSK-0203): memory gateway for cross-session fact persistence.
+    private readonly IMemoryGateway? _memoryGateway = memoryGateway;
     private readonly ITimeProvider _timeProvider = timeProvider ?? SystemTimeProvider.Instance;
     // Sprint 39 P1-C: maps IntentDraft → GoalRequest in HandleChatEventAsync.
     private readonly IntentManager? _intentManager = intentManager;
@@ -439,9 +443,17 @@ public sealed class AgentBackgroundService(
                 await worldAdapter.ConnectAsync(connectionCts.Token);
                 _connectionStatus = "connected";
                 logger.LogInformation("World adapter connected.");
-                LogBuildIdentity();
+                LogBuildIdentity(logger);
                 _journal?.Log(new JournalEntry(
                     _timeProvider.UtcNow, JournalEntryType.AgentStarted, "Agent connected"));
+
+                // Sprint 54 (TSK-0203): load cross-session facts from MemorySmith wiki
+                // into chat history so the LLM recalls passwords, locations, and player
+                // preferences from previous sessions.
+                if (_memoryGateway is not null && _chatHistory is not null)
+                {
+                    await LoadSessionFactsAsync(connectionCts.Token);
+                }
 
                 // Announce presence in Minecraft chat so players know the bot is online.
                 _queue.Enqueue(new ActionData
@@ -948,6 +960,24 @@ public sealed class AgentBackgroundService(
                 CancelGoal();
                 break;
 
+            case "remember":
+                // Sprint 54 (TSK-0203): persist a fact to MemorySmith wiki.
+                // Item = key, Response already contains the confirmation message.
+                // The LLM sets item=key and response="I'll remember X is Y."
+                if (intent.Item is not null && pendingResponse is not null)
+                {
+                    // Extract the value from the chat message (after "is")
+                    var rememberMsg = chat.Message;
+                    var isIdx = rememberMsg.LastIndexOf(" is ", StringComparison.OrdinalIgnoreCase);
+                    var factValue = isIdx >= 0
+                        ? rememberMsg[(isIdx + 4)..].Trim().TrimEnd('.', '!', '?')
+                        : "(stored)";
+                    _ = RememberFactAsync(intent.Item, factValue, chat.PlayerPos);
+                }
+                if (pendingResponse is not null)
+                    logger.LogInformation("[chat] bot: {Response}", pendingResponse);
+                break;
+
             case "status" or "help":
                 _worldState = _worldState.With(b =>
                     b.SetFact("currentGoal", _currentGoal?.Name ?? "idle", FactSource.Observed));
@@ -998,7 +1028,49 @@ public sealed class AgentBackgroundService(
                         logger.LogInformation(
                             "[intent] {Intent} -> goal request: {GoalName}",
                             intent.Intent, goalRequest.GoalName);
-                        await TryCreateGoalFromChatAsync(goalRequest, ct);
+
+                        // Sprint 54 (TSK-0205): multi-step chaining via nextSteps.
+                        // When the LLM returns subsequent commands, create a
+                        // TaskSequenceGoal that executes them in order.
+                        if (intent.NextSteps is { Count: > 0 } && goalFactory is not null)
+                        {
+                            var allSteps = new List<IGoal>();
+                            var firstGoal = await goalFactory.CreateAsync(
+                                goalRequest.GoalName, goalRequest.Parameters, ct);
+                            if (firstGoal is not null)
+                                allSteps.Add(firstGoal);
+
+                            foreach (var stepCmd in intent.NextSteps.Take(
+                                TaskSequenceGoal.MaxSteps - 1))
+                            {
+                                var stepRequest = IntentManager.ParseCommandString(stepCmd);
+                                if (stepRequest is not null)
+                                {
+                                    var stepGoal = await goalFactory.CreateAsync(
+                                        stepRequest.GoalName, stepRequest.Parameters, ct);
+                                    if (stepGoal is not null)
+                                        allSteps.Add(stepGoal);
+                                }
+                            }
+
+                            if (allSteps.Count > 1)
+                            {
+                                var sequence = new TaskSequenceGoal(allSteps);
+                                logger.LogInformation(
+                                    "[intent] created sequence: {Count} steps [{Steps}]",
+                                    allSteps.Count,
+                                    string.Join(" → ", allSteps.Select(g => g.Name)));
+                                SetGoal(sequence);
+                            }
+                            else if (allSteps.Count == 1)
+                            {
+                                SetGoal(allSteps[0]);
+                            }
+                        }
+                        else
+                        {
+                            await TryCreateGoalFromChatAsync(goalRequest, ct);
+                        }
                     }
                     else
                     {
@@ -1278,6 +1350,21 @@ public sealed class AgentBackgroundService(
 
                     logger.LogInformation("[goal] completed: {Goal} | inventory: [{Inventory}]",
                         _currentGoal.Name, SummarizeTaskRelevantInventory(_currentGoal));
+
+                    // Sprint 54 (TSK-0205): multi-step sequence advancement.
+                    // When a step in a TaskSequenceGoal completes, advance to the next step.
+                    if (TryAdvanceSequence())
+                    {
+                        logger.LogInformation(
+                            "[sequence] advanced to step {Step}/{Total}: {Goal}",
+                            ((TaskSequenceGoal)_currentGoal!).CurrentStepIndex + 1,
+                            ((TaskSequenceGoal)_currentGoal!).TotalSteps,
+                            _currentGoal!.Name);
+                        planContext.Clear();
+                        lock (_pendingLock) _pendingActions.Clear();
+                        continue;
+                    }
+
                     _currentGoal = null; _consecutiveFailures = 0; planContext.Clear();
                     lock (_pendingLock) _pendingActions.Clear();
                     continue;
@@ -1289,6 +1376,16 @@ public sealed class AgentBackgroundService(
                         : (_lastFailureReason ?? FailureReason.ConsecutiveFailures).ToString();
                     _currentGoal.FailureReason = reason;
                     _lastAbandonedGoalName = _currentGoal.Name;
+
+                    // Sprint 54 (TSK-0205): if a sequence step fails, report which step
+                    // and stop the entire sequence (don't continue to next step).
+                    if (_currentGoal is TaskSequenceGoal seq)
+                    {
+                        logger.LogWarning(
+                            "[sequence] step {Step}/{Total} failed: {Goal} (reason={Reason})",
+                            seq.CurrentStepIndex + 1, seq.TotalSteps, seq.CurrentStep.Name, reason);
+                    }
+
                     _journal?.Log(new JournalEntry(
                         _timeProvider.UtcNow, JournalEntryType.ReplanTriggered, _currentGoal.Name));
                     logger.LogWarning("[goal] failed: {Goal} (failures={FailureCount}, reason={Reason}) | inventory: [{Inventory}]",
@@ -2235,7 +2332,7 @@ public sealed class AgentBackgroundService(
     /// Provides definitive proof of which binary is running — critical for diagnosing
     /// stale-DLL issues where an old cached build persists despite clean/rebuild.
     /// </summary>
-    private static void LogBuildIdentity()
+    private static void LogBuildIdentity(ILogger logger)
     {
         try
         {
@@ -2250,11 +2347,12 @@ public sealed class AgentBackgroundService(
                     if (ma.Key == "GitHash") hash = ma.Value;
                 }
             }
-            Console.Error.WriteLine($"[build] BuildTimestamp={ts ?? "unknown"} GitHash={hash ?? "unknown"}");
+            logger.LogInformation("[build] BuildTimestamp={Timestamp} GitHash={GitHash}",
+                ts ?? "unknown", hash ?? "unknown");
         }
-        catch
+        catch (Exception ex)
         {
-            Console.Error.WriteLine("[build] BuildTimestamp=unknown (reflection failed)");
+            logger.LogWarning(ex, "[build] BuildTimestamp=unknown (reflection failed)");
         }
     }
 
@@ -2279,6 +2377,155 @@ public sealed class AgentBackgroundService(
     /// The "stop" action is handled in index.js before entering cmdQueue (bypasses the command
     /// queue), so it takes effect immediately regardless of pending commands.
     ///
+    /// Sprint 18: resolves "leo stop" not stopping Node.js and goal completion not aborting
+    /// in-progress mine loops.
+    ///
+    /// Sprint 54 (TSK-0203): memory methods for cross-session fact persistence follow.
+    /// </summary>
+
+    // ── Cross-session memory (TSK-0203) ───────────────────────────────────────
+
+    /// <summary>Page slug prefix for agent fact pages in the MemorySmith wiki.</summary>
+    private const string AgentFactsPrefix = "agent-facts/";
+
+    /// <summary>Maximum number of recent facts to load on startup.</summary>
+    private const int MaxSessionFacts = 20;
+
+    /// <summary>
+    /// Loads previously stored agent facts from the MemorySmith wiki and injects
+    /// them into the chat history so the LLM has context across sessions.
+    /// </summary>
+    private async Task LoadSessionFactsAsync(CancellationToken ct)
+    {
+        try
+        {
+            var results = await _memoryGateway!.SearchAsync(
+                $"slug:{AgentFactsPrefix}", ct);
+            if (results.Count == 0)
+            {
+                logger.LogDebug("[memory] no session facts found on startup");
+                return;
+            }
+
+            var facts = new List<string>();
+            foreach (var r in results.Take(MaxSessionFacts))
+            {
+                var content = await _memoryGateway.GetPageAsync(r.PageId, ct);
+                if (content is not null)
+                    facts.Add(content);
+            }
+
+            if (facts.Count > 0)
+            {
+                var summary = string.Join("\n", facts);
+                _chatHistory?.Record("System",
+                    $"[Recall from previous sessions]\n{summary}");
+                logger.LogInformation(
+                    "[memory] loaded {Count} session facts into chat context", facts.Count);
+            }
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            // shutdown — don't log as error
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex,
+                "[memory] failed to load session facts: {Message}", ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Persists a fact to the MemorySmith wiki for cross-session recall.
+    /// Format: page slug = agent-facts/{key}, content = markdown with key/value/timestamp.
+    /// </summary>
+    private async Task RememberFactAsync(string key, string value, Position? pos = null)
+    {
+        if (_memoryGateway is null) return;
+
+        try
+        {
+            var slug = $"{AgentFactsPrefix}{key.ToLowerInvariant().Replace(' ', '-')}";
+            var content = $"# {key}\n\n**Value:** {value}\n\n" +
+                (pos is not null ? $"- **Position:** ({pos.X}, {pos.Y}, {pos.Z})\n" : "") +
+                $"- **Timestamp:** {_timeProvider.UtcNow:O}";
+            await _memoryGateway.CreatePageAsync(slug, content, "markdown");
+            logger.LogInformation("[memory] stored fact '{Key}' = '{Value}'", key, value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex,
+                "[memory] failed to store fact '{Key}': {Message}", key, ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// <summary>
+    /// Sprint 18: resolves "leo stop" not stopping Node.js and goal completion not aborting
+    /// in-progress mine loops.
+    ///
+    /// Sprint 54 (TSK-0205): TryAdvanceSequence for multi-step chaining follows.
+    /// </summary>
+
+    // ── Multi-step sequence advancement (TSK-0205) ────────────────────────────
+
+    /// <summary>
+    /// If the current goal is a <see cref="TaskSequenceGoal"/> and the active step
+    /// has just completed, advances to the next step. Resets the queue, governor,
+    /// and failure counters so the next step starts fresh.
+    /// Returns true if the sequence was advanced, false otherwise.
+    /// </summary>
+    private bool TryAdvanceSequence()
+    {
+        if (_currentGoal is not TaskSequenceGoal seq)
+            return false;
+
+        // Check if the current step is actually complete (safety guard).
+        // The caller should have already verified this, but double-check.
+        if (!seq.CurrentStep.IsComplete(_worldState))
+            return false;
+
+        if (!seq.TryAdvance())
+        {
+            // No more steps — sequence is fully complete.
+            logger.LogInformation(
+                "[sequence] all {Total} steps completed", seq.TotalSteps);
+            return false;
+        }
+
+        // Reset state for the next step, but keep the sequence goal alive.
+        _consecutiveFailures = 0;
+        _lastFailureReason = null;
+        _lastAbandonedGoalName = null;
+        _lastRecoveredGoalName = null;
+        _lastActionDispatchedAt = _timeProvider.UtcNow;
+        _lastStallWarnedAt = DateTimeOffset.MinValue;
+        _lastReplanAt = DateTimeOffset.MinValue;
+        replanGovernor?.Reset();
+        _cycleInventorySnapshot = -1;
+        _correlatedActions.Clear();
+        _placeBlockContexts.Clear();
+        _cycleOutcomes.Clear();
+        _consecutiveZeroAreaScans = 0;
+        _queue.Clear();
+        lock (_pendingLock) _pendingActions.Clear();
+
+        // Announce the next step in chat
+        var nextStep = seq.CurrentStep;
+        _queue.Enqueue(new ActionData
+        {
+            Tool = "Chat",
+            Arguments =
+            {
+                ["message"] = $"Step {seq.CurrentStepIndex + 1}/{seq.TotalSteps}: " +
+                              $"{nextStep.Description}"
+            }
+        });
+
+        return true;
+    }
+
+    /// <summary>
     /// Sprint 18: resolves "leo stop" not stopping Node.js and goal completion not aborting
     /// in-progress mine loops.
     /// </summary>

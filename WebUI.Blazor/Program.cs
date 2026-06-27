@@ -361,6 +361,8 @@ if (agentEnabled)
             // Sprint 52: ChatHistory for recording bot responses so LLM has
             // conversational context across turns.
             chatHistory:              sp.GetRequiredService<ChatHistory>(),
+            // Sprint 54 (TSK-0203): IMemoryGateway for cross-session fact persistence.
+            memoryGateway:            sp.GetService<IMemoryGateway>(),
             // Sprint 52: configurable max concurrent PlaceBlock dispatches.
             maxConcurrentPlaceBlock:  builder.Configuration.GetValue<int>("Agent:Build:MaxConcurrentPlaceBlock", 8),
             // Sprint 54 (TSK-0199): max chat response length before splitting.
