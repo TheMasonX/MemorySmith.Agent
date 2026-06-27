@@ -1,8 +1,23 @@
 # Handoff: Sprint Wave — LLM-Driven Chat Harness Steering
 
 **Date:** 2026-06-27
-**Branch:** `main`
+**Branch:** `sprint-35-llm-first`
 **Build:** 742 tests passing, 0 warnings
+
+> **Status (2026-06-27):** All P0 tasks + TSK-0210 (contextual status) implemented.
+> Commit: `ffe8ab6` on `sprint-35-llm-first`. Ready for battle-testing in-game.
+
+---
+
+## ✅ Implemented (P0 Wave)
+
+| Task | Files |
+|---|---|
+| **LLM Prompt Enhancement** | `LlmChatInterpreter.cs` — `nextSteps` schema, compound commands, tool auto-crafting note, memory capability, parser caveat |
+| **TSK-0208 Auto-tool crafting** | `ToolRequirements.cs`, `GatherGoalDecomposer.cs` — pickaxe/axe/shovel mapping, pre-gather tool check, HasAnyToolOfType |
+| **TSK-0203 Cross-session memory** | `AgentBackgroundService.cs` — `IMemoryGateway` injection, `LoadSessionFactsAsync`, `RememberFactAsync`; `ChatInterpreter.cs` — "remember X is Y" fast-path |
+| **TSK-0205 Multi-step chaining** | `TaskSequenceGoal.cs`, `IntentManager.cs` (`ParseCommandString`), `AgentBackgroundService.cs` (`TryAdvanceSequence`), `IntentDraft.NextSteps` |
+| **TSK-0210 Contextual status** | `ChatInterpreter.cs` — enriched status/inventory with goal context, top-N items, suggestions |
 
 ---
 
