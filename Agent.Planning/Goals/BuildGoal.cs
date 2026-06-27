@@ -35,7 +35,7 @@ using Agent.Core;
 /// Introduced in TSK-0011 Phase 4b. Sprint 35: explicit origin support + OriginSource enum.
 /// TSK-0103: BuildOrigin value object consolidation.
 /// </summary>
-public sealed class BuildGoal : IGoal
+public sealed class BuildGoal : IBuildGoal
 {
     /// <summary>Blueprint metadata (id, name, materials, dimensions).</summary>
     public Blueprint Blueprint { get; }

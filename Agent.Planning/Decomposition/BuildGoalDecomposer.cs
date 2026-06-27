@@ -17,11 +17,11 @@ using Microsoft.Extensions.Logging;
 /// </summary>
 public sealed class BuildGoalDecomposer(HtnTaskLibrary taskLibrary, ILogger<BuildGoalDecomposer> logger) : IGoalDecomposer
 {
-    public bool CanHandle(IGoal goal) => goal is BuildGoal;
+    public bool CanHandle(IGoal goal) => goal is IBuildGoal;
 
     public ActionPlan Decompose(IGoal goal, WorldState state)
     {
-        var bg = (BuildGoal)goal;
+        var bg = (IBuildGoal)goal;
 
         // Sprint 35: explicit origin from chat takes precedence over stored facts.
         // Sprint 37: when explicit origin is given, it's used as the scan center for

@@ -61,7 +61,7 @@ public sealed class HtnTaskLibraryExtraTests
         var progressKey = BuildFactKeys.BuildProgressIndex("test");
         var state = new WorldState().With(b => b.SetFact(progressKey, 1.ToString(), FactSource.Observed)); // int
         var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
-        Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1),
+        Assert.That(CountTool(actions, "place"), Is.EqualTo(1),
             "Checkpoint=1 means blocks 0 and 1 were placed; only block 2 remains.");
     }
 
@@ -72,7 +72,7 @@ public sealed class HtnTaskLibraryExtraTests
         var progressKey = BuildFactKeys.BuildProgressIndex("test");
         var state = new WorldState().With(b => b.SetFact(progressKey, 1L.ToString(), FactSource.Observed)); // long
         var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
-        Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1));
+        Assert.That(CountTool(actions, "place"), Is.EqualTo(1));
     }
 
     [Test]
@@ -82,7 +82,7 @@ public sealed class HtnTaskLibraryExtraTests
         var progressKey = BuildFactKeys.BuildProgressIndex("test");
         var state = new WorldState().With(b => b.SetFact(progressKey, 1.0.ToString(), FactSource.Observed)); // double
         var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
-        Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1));
+        Assert.That(CountTool(actions, "place"), Is.EqualTo(1));
     }
 
     [Test]
@@ -92,7 +92,7 @@ public sealed class HtnTaskLibraryExtraTests
         var progressKey = BuildFactKeys.BuildProgressIndex("test");
         var state = new WorldState().With(b => b.SetFact(progressKey, "1", FactSource.Observed)); // string
         var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
-        Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1));
+        Assert.That(CountTool(actions, "place"), Is.EqualTo(1));
     }
 
     // ── GroupBy.Sum with duplicate materials — D3 fix ─────────────────────────
@@ -170,7 +170,7 @@ public sealed class HtnTaskLibraryExtraTests
             state,
             requireOrigin: true);
 
-        Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(3),
+        Assert.That(CountTool(actions, "place"), Is.EqualTo(3),
             "When auto-origin is available, requireOrigin=true proceeds to the full 3-block build.");
     }
 
@@ -184,7 +184,7 @@ public sealed class HtnTaskLibraryExtraTests
             new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned),
             new WorldState());
 
-        Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(3),
+        Assert.That(CountTool(actions, "place"), Is.EqualTo(3),
             "With requireOrigin=false (default), the plan proceeds even without a stored origin.");
     }
 

@@ -96,7 +96,8 @@ if (agentEnabled)
         http.Timeout     = TimeSpan.FromSeconds(opts.TimeoutSeconds);
         if (!string.IsNullOrEmpty(opts.ApiKey))
             http.DefaultRequestHeaders.Add("X-Api-Key", opts.ApiKey);
-    });
+    })
+    .AddStandardResilienceHandler(); // Sprint 53 (TSK-0194): retry with backoff + circuit breaker
     builder.Services.AddSingleton<IMemoryGateway>(sp =>
     {
         var factory = sp.GetRequiredService<IHttpClientFactory>();
@@ -113,7 +114,8 @@ if (agentEnabled)
         var apiKey   = opts.WorldApiKey ?? opts.ApiKey;
         if (!string.IsNullOrEmpty(apiKey))
             http.DefaultRequestHeaders.Add("X-Api-Key", apiKey);
-    });
+    })
+    .AddStandardResilienceHandler(); // Sprint 53 (TSK-0194): retry with backoff + circuit breaker
     builder.Services.AddKeyedSingleton<IMemoryGateway>("world", (sp, _) =>
     {
         var factory  = sp.GetRequiredService<IHttpClientFactory>();

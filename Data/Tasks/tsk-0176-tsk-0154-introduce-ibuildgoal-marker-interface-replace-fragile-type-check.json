@@ -4,7 +4,7 @@
   "title": "TSK-0154: Introduce IBuildGoal marker interface (replace fragile type-check)",
   "description": "## Background\nMultiple places in the codebase use \u0060goal is BuildGoal\u0060 type-checks to determine if a goal is a build goal. This is fragile because:\n- \u0060BuildGoalDecomposer.CanHandle\u0060 uses \u0060goal is BuildGoal\u0060\n- \u0060HtnPlanner.PlanAsync\u0060 uses \u0060goal is BuildGoal\u0060\n- Various recovery/governor paths check for build-specific behavior\n\n## Proposed Interface\n\u0060\u0060\u0060csharp\npublic interface IBuildGoal : IGoal\n{\n    Blueprint Blueprint { get; }\n    IReadOnlyList\u003CPlacementBlock\u003E Blocks { get; }\n    BuildOrigin? Origin { get; }\n    bool HasExplicitOrigin { get; }\n}\n\u0060\u0060\u0060\n\n## Implementation\n1. Make \u0060BuildGoal\u0060 implement \u0060IBuildGoal\u0060\n2. Update \u0060BuildGoalDecomposer.CanHandle\u0060 to \u0060goal is IBuildGoal\u0060\n3. Update \u0060HtnPlanner.PlanAsync\u0060 type-check\n4. Search codebase for all \u0060is BuildGoal\u0060 checks and update\n\n## Files\n- New: \u0060Agent.Planning/Goals/IBuildGoal.cs\u0060\n- Modified: \u0060Agent.Planning/Goals/BuildGoal.cs\u0060\n- Modified: \u0060Agent.Planning/Decomposition/BuildGoalDecomposer.cs\u0060\n- Modified: \u0060Agent.Planning/HtnPlanner.cs\u0060\n- Any other files with \u0060is BuildGoal\u0060 checks",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "Medium",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -24,11 +24,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-27T04:04:52.5314225Z",
-  "updatedAtUtc": "2026-06-27T04:04:52.5314225Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-06-27T13:30:21.7554245Z",
+  "completedAtUtc": "2026-06-27T13:30:21.7554245Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0176-tsk-0154-introduce-ibuildgoal-marker-interface-replace-fragile-type-check.json"
 }

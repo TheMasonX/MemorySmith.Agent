@@ -7,7 +7,7 @@ using Agent.Core;
 /// block in the blueprint, sorted floor-first (Y ascending) to ensure structural integrity.
 ///
 /// Each <see cref="ActionData"/> uses:
-/// - <c>Tool = "PlaceBlock"</c> (matches <c>PlaceBlockTool.Name</c>)
+/// - <c>Tool = "place"</c> (wire protocol name; see <c>ActionProtocol.Place</c>)
 /// - Arguments: <c>material</c> (block ID), <c>x</c>, <c>y</c>, <c>z</c> (absolute world coords)
 ///
 /// The Mineflayer adapter handles bot navigation and block placement against the nearest
@@ -16,7 +16,9 @@ using Agent.Core;
 /// </summary>
 public sealed class BlueprintExecutor : IBlueprintExecutor
 {
-    private const string PlaceBlockToolName = "PlaceBlock";
+    // Wire protocol name (Agent.Tools.ActionProtocol.Place). Agent.Construction
+    // does not reference Agent.Tools, so the literal is used directly.
+    private const string PlaceBlockToolName = "place";
 
     /// <inheritdoc/>
     public IReadOnlyList<ActionData> Execute(

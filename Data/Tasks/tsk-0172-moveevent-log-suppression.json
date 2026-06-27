@@ -1,10 +1,10 @@
-{
+﻿{
   "id": "tsk-0172-moveevent-log-suppression",
   "key": "TSK-0172",
   "title": "MoveEvent Log Suppression",
-  "description": "MoveEvent fires ~10x/second (every bot position update from Mineflayer) and floods the debug log with 'World event: MoveEvent' lines. This drowns out all other useful log output. \n\nFix: Log MoveEvent at LogTrace instead of LogDebug so it's available via trace-level config but invisible by default. All other world events remain at Debug.",
+  "description": "MoveEvent fires ~10x/second (every bot position update from Mineflayer) and floods the debug log with \u0027World event: MoveEvent\u0027 lines. This drowns out all other useful log output. \n\nFix: Log MoveEvent at LogTrace instead of LogDebug so it\u0027s available via trace-level config but invisible by default. All other world events remain at Debug.",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,7 +23,7 @@
     {
       "id": "c-tsk0172-01",
       "author": "SteveBot",
-      "body": "Implemented in Sprint 51 Wave B+. ProcessEventsAsync now checks `worldEvent is MoveEvent` and logs at Trace for MoveEvent, Debug for all others.",
+      "body": "Implemented in Sprint 51 Wave B\u002B. ProcessEventsAsync now checks \u0060worldEvent is MoveEvent\u0060 and logs at Trace for MoveEvent, Debug for all others.",
       "createdAtUtc": "2026-06-27T04:00:00Z"
     }
   ],
@@ -31,9 +31,9 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-27T04:00:00Z",
-  "updatedAtUtc": "2026-06-27T04:00:00Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-06-27T08:43:59.9139443Z",
+  "completedAtUtc": "2026-06-27T08:43:59.9139443Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,

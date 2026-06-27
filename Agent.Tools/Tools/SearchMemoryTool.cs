@@ -45,6 +45,24 @@ public sealed class SearchMemoryTool : ITool
 
     public async Task<ToolResult> ExecuteAsync(JsonElement arguments, CancellationToken ct = default)
     {
+        // Sprint 53 (TSK-0193): wrap search in try/catch so transient failures
+        // return a graceful ToolResult rather than crashing the tool loop.
+        try
+        {
+            return await ExecuteSearchAsync(arguments, ct).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            throw; // cooperative cancellation — propagate
+        }
+        catch (Exception ex)
+        {
+            return new ToolResult(false, $"Search failed: {ex.Message}");
+        }
+    }
+
+    private async Task<ToolResult> ExecuteSearchAsync(JsonElement arguments, CancellationToken ct)
+    {
         var query = arguments.TryGetProperty("query", out var q) ? q.GetString()
                     : throw new ArgumentException("SearchMemory requires a 'query' parameter.");
         var limit = arguments.TryGetProperty("limit", out var l) && l.TryGetInt32(out var parsedLimit)

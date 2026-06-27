@@ -1,10 +1,10 @@
-{
+﻿{
   "id": "tsk-0171-creative-gather-bypass-guard",
   "key": "TSK-0171",
   "title": "Creative Mode Gather Bypass Guard",
-  "description": "The recovery handler's fast-path for 'not in inventory' errors creates Gather:missingBlock goals even in creative mode. In creative mode the adapter should handle inventory via creative.setInventorySlot() — gathering raw materials (e.g. mining sand for glass_pane) is unnecessary and causes the bot to wander hundreds of blocks away from the build site. \n\nFix: Add IsCreativeMode guard before the gather recovery path in TryRecoverFromGameErrorAsync. In creative mode, log a debug message and return early instead of creating a gather sub-goal.",
+  "description": "The recovery handler\u0027s fast-path for \u0027not in inventory\u0027 errors creates Gather:missingBlock goals even in creative mode. In creative mode the adapter should handle inventory via creative.setInventorySlot() \u2014 gathering raw materials (e.g. mining sand for glass_pane) is unnecessary and causes the bot to wander hundreds of blocks away from the build site. \n\nFix: Add IsCreativeMode guard before the gather recovery path in TryRecoverFromGameErrorAsync. In creative mode, log a debug message and return early instead of creating a gather sub-goal.",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "Critical",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,7 +23,7 @@
     {
       "id": "c-tsk0171-01",
       "author": "SteveBot",
-      "body": "Implemented in Sprint 51 Wave B+. Fix adds _worldState.IsCreativeMode guard before TryExtractMissingMaterial gather path. See AgentBackgroundService.cs TryRecoverFromGameErrorAsync.",
+      "body": "Implemented in Sprint 51 Wave B\u002B. Fix adds _worldState.IsCreativeMode guard before TryExtractMissingMaterial gather path. See AgentBackgroundService.cs TryRecoverFromGameErrorAsync.",
       "createdAtUtc": "2026-06-27T04:00:00Z"
     }
   ],
@@ -31,9 +31,9 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-27T04:00:00Z",
-  "updatedAtUtc": "2026-06-27T04:00:00Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-06-27T08:43:59.8747682Z",
+  "completedAtUtc": "2026-06-27T08:43:59.8747682Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,

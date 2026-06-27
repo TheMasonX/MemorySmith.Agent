@@ -73,7 +73,7 @@ public sealed class AgentBackgroundService(
     private static readonly IReadOnlyDictionary<string, int> ToolTimeoutOverrides =
         new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
     {
-        ["PlaceBlock"] = 5,  // Sprint 43 (P1-4): increased from 2s — pathfinding + reference placement takes 2-5s
+        ["place"] = 5,  // Sprint 43 (P1-4): increased from 2s — pathfinding + reference placement takes 2-5s
         ["MoveTo"]     = 10,
         ["Wander"]     = 15,
         // Sprint 44 council: SmeltItem timeout must be longer than JS adapter's SMELT_TIMEOUT_MS (40s)
@@ -352,7 +352,7 @@ public sealed class AgentBackgroundService(
     {
         try
         {
-            if (goal is BuildGoal buildGoal)
+            if (goal is IBuildGoal buildGoal)
             {
                 var materials = buildGoal.Blueprint.Materials
                     .GroupBy(m => m.Block, StringComparer.OrdinalIgnoreCase)
@@ -682,8 +682,8 @@ public sealed class AgentBackgroundService(
                     logger.LogInformation("[place] CONFIRMED: {Block} placed @ ({X},{Y},{Z})",
                         bpe.Block, bpe.X, bpe.Y, bpe.Z);
                     _blocksPlacedThisCycle++;
-                    AdvanceBuildCheckpoint("PlaceBlock");
-                    CompleteCorrelatedActionByTool("PlaceBlock");
+                    AdvanceBuildCheckpoint("place");
+                    CompleteCorrelatedActionByTool("place");
                     break;
 
                 // Sprint 43 (P0-4): terrain collision — complete correlation so tool loop
@@ -709,9 +709,9 @@ public sealed class AgentBackgroundService(
                     // position indefinitely causes the stall loop. Bot-position skips
                     // and non-terrain collisions both mean the block can't be placed
                     // right now; let the replan revisit later if needed.
-                    AdvanceBuildCheckpoint("PlaceBlock");
+                    AdvanceBuildCheckpoint("place");
                     logger.LogDebug("[build] checkpoint advanced past skip at ({X},{Y},{Z}) reason={Reason}", bps.X, bps.Y, bps.Z, skipReason);
-                    CompleteCorrelatedActionByTool("PlaceBlock");
+                    CompleteCorrelatedActionByTool("place");
                     break;
 
                 case WanderCompleteEvent:
@@ -1484,7 +1484,7 @@ public sealed class AgentBackgroundService(
 
                     // Sprint 42 (TSK-0075): store PlaceBlock build context for checkpoint advancement
                     // on confirmed BlockPlacedEvent, not on fire-and-forget dispatch success.
-                    if (action.Tool.Equals("PlaceBlock", StringComparison.OrdinalIgnoreCase)
+                    if (action.Tool == "place"
                         && action.Context.TryGetValue(
                             BuildFactKeys.PlaceBlockProgressBlueprintId, out var bpId)
                         && action.Context.TryGetValue(
@@ -1544,7 +1544,7 @@ public sealed class AgentBackgroundService(
                         // Sprint 19: elevated to Info with timing for runtime visibility
                         // Sprint 40 P0-B: include bot position for debugging
                         // Sprint 51: for PlaceBlock, include material + target coords
-                        if (action.Tool == "PlaceBlock" || action.Tool == "place")
+                        if (action.Tool == "place")
                         {
                             var mat = action.Arguments.TryGetValue("material", out var m) && m is string ms ? ms : "?";
                             var tx = action.Arguments.TryGetValue("x", out var ax) ? ax : null;
@@ -1826,7 +1826,7 @@ public sealed class AgentBackgroundService(
     /// </summary>
     private int MaxConcurrentForTool(string toolName) => toolName switch
     {
-        "PlaceBlock" => _maxConcurrentPlaceBlock,
+        "place" => _maxConcurrentPlaceBlock,
         _ => 1,
     };
 
@@ -1913,7 +1913,7 @@ public sealed class AgentBackgroundService(
                         (_timeProvider.UtcNow - kv.Value.DispatchedAt).TotalSeconds);
 
                     // Sprint 44 (P1-2): timed-out PlaceBlock → clean up context
-                    if (kv.Value.ToolName.Equals("PlaceBlock", StringComparison.OrdinalIgnoreCase))
+                    if (kv.Value.ToolName == "place")
                         staleContextIds.Add(kv.Key);
                 }
                 // If TryUpdate returns false, another thread already transitioned the action
@@ -1976,7 +1976,7 @@ public sealed class AgentBackgroundService(
     private static bool IsFireAndForgetTool(string toolName) =>
         toolName.Equals("MoveTo", StringComparison.OrdinalIgnoreCase)
         || toolName.Equals("MineBlock", StringComparison.OrdinalIgnoreCase)
-        || toolName.Equals("PlaceBlock", StringComparison.OrdinalIgnoreCase)
+        || toolName == "place"
         || toolName.Equals("GetStatus", StringComparison.OrdinalIgnoreCase)
         || toolName.Equals("Status", StringComparison.OrdinalIgnoreCase)
         || toolName.Equals("Wander", StringComparison.OrdinalIgnoreCase)
@@ -2051,7 +2051,7 @@ public sealed class AgentBackgroundService(
     /// </summary>
     private string SummarizeTaskRelevantInventory(IGoal goal)
     {
-        if (goal is BuildGoal bg)
+        if (goal is IBuildGoal bg)
         {
             var parts = new List<string>();
             foreach (var mat in bg.Blueprint.Materials.OrderByDescending(m => m.Quantity))
@@ -2277,7 +2277,7 @@ public sealed class AgentBackgroundService(
 
     private static bool IsProgressSignalTool(string toolName) =>
         toolName.Equals("MineBlock", StringComparison.OrdinalIgnoreCase)
-        || toolName.Equals("PlaceBlock", StringComparison.OrdinalIgnoreCase)
+        || toolName == "place"
         || toolName.Equals("CraftItem", StringComparison.OrdinalIgnoreCase)
         || toolName.Equals("SmeltItem", StringComparison.OrdinalIgnoreCase);
 

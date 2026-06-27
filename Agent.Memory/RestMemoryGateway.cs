@@ -34,15 +34,41 @@ public sealed class RestMemoryGateway(HttpClient http, RestMemoryGatewayOptions 
     public async Task<IReadOnlyList<SearchResult>> SearchAsync(
         string query, CancellationToken cancellationToken = default)
     {
-        var url = $"api/search?query={Uri.EscapeDataString(query)}&limit=20";
-        var hits = await http.GetFromJsonAsync<SearchHit[]>(url, JsonOpts, cancellationToken)
-                   ?? [];
-        // Preserve MemorySmith's server-side ordering (score desc, then date desc).
-        // Kind="page" → PageId is a slug usable in GetPageAsync.
-        // Kind="memory" → PageId is a UUID, NOT a valid page slug.
-        return hits
-            .Select(h => new SearchResult(h.Id, h.Score ?? 0.0, h.Snippet, h.Kind))
-            .ToArray();
+        // Sprint 53 (TSK-0193): transient HTTP failures return empty results rather
+        // than crashing the tool loop. OperationCanceledException is intentionally
+        // propagated for cooperative cancellation.
+        try
+        {
+            var url = $"api/search?query={Uri.EscapeDataString(query)}&limit=20";
+            var hits = await http.GetFromJsonAsync<SearchHit[]>(url, JsonOpts, cancellationToken)
+                       ?? [];
+            // Preserve MemorySmith's server-side ordering (score desc, then date desc).
+            // Kind="page" → PageId is a slug usable in GetPageAsync.
+            // Kind="memory" → PageId is a UUID, NOT a valid page slug.
+            return hits
+                .Select(h => new SearchResult(h.Id, h.Score ?? 0.0, h.Snippet, h.Kind))
+                .ToArray();
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw; // cooperative cancellation — propagate
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogWarning(ex, "[search] HTTP error for query '{Query}': {Message}", query, ex.Message);
+            return [];
+        }
+        catch (TaskCanceledException ex)
+        {
+            // Timeout (token not cancelled, but HTTP call timed out)
+            _logger.LogWarning(ex, "[search] timeout for query '{Query}'", query);
+            return [];
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogWarning(ex, "[search] JSON deserialization error for query '{Query}': {Message}", query, ex.Message);
+            return [];
+        }
     }
 
     // ── Pages ─────────────────────────────────────────────────────────────────
