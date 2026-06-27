@@ -605,17 +605,17 @@ public sealed class AgentBackgroundService(
                         // expanding radius to find far-away locations when the bot can just
                         // build where it's standing.
                         var pos = _worldState.Position;
-                        SetBuildOrigin(BuildFactKeys.AutoBlueprintId, pos.X, pos.Y - 1, pos.Z);
+                        SetBuildOrigin(BuildFactKeys.AutoBlueprintId, pos.X, pos.Y, pos.Z);
                         logger.LogWarning(
                             "[findFlatArea] 2 consecutive zero-area scans — falling back to bot position " +
                             "({X},{Y},{Z}) area=0 (fallback)",
-                            pos.X, pos.Y - 1, pos.Z);
+                            pos.X, pos.Y, pos.Z);
                         _journal?.Log(new JournalEntry(
                             _timeProvider.UtcNow, JournalEntryType.Observation, "FlatAreaFoundFallback",
                             new Dictionary<string, object?>
                             {
                                 ["x"] = pos.X,
-                                ["y"] = pos.Y - 1,
+                                ["y"] = pos.Y,
                                 ["z"] = pos.Z,
                                 ["area"] = 0,
                             }));
