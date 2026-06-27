@@ -12,6 +12,7 @@
     "sprint-52"
   ],
   "estimatedHours": 3.0,
+  "linkedPages": ["Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z"],
   "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md",
   "key": "TSK-0150",
   "epicId": "tsk-0146-entity-observation-scene"

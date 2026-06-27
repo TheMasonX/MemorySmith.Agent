@@ -10,7 +10,13 @@
   "assigneeDirectoryId": null,
   "assigneeCustomText": "Agent",
   "reporter": "anonymous",
-  "labels": "[\\n\\n    \"sprint-51\",\\n\\n    \"council\",\\n\\n    \"planner\",\\n\\n    \"replan\",\\n\\n    \"bug\"\\n\\n  ]",
+  "labels": [
+    "sprint-51",
+    "council",
+    "planner",
+    "replan",
+    "bug"
+  ],
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],

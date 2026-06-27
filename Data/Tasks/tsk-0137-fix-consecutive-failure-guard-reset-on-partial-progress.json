@@ -10,11 +10,23 @@
   "assigneeDirectoryId": null,
   "assigneeCustomText": "Agent",
   "reporter": "anonymous",
-  "labels": "[\\n\\n    \"sprint-51\",\\n\\n    \"council\",\\n\\n    \"agent-loop\",\\n\\n    \"resilience\"\\n\\n  ]",
+  "labels": [
+    "sprint-51",
+    "council",
+    "agent-loop",
+    "resilience"
+  ],
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": "[\\n\\n    {\\n\\n      \"id\": \"c-s52-sb1\",\\n\\n      \"author\": \"SteveBot\",\\n\\n      \"body\": \"Completed in Sprint 51 Wave B (commit 72ff65f) + Sprint 52 uncommitted changes. IsProgressSignalTool narrowed to only MineBlock/PlaceBlock/CraftItem/SmeltItem (removed MoveTo/FindFlatArea/Wander). Additional creative mode recovery guards added: skip inventory-error recovery in creative mode (adapter handles creative inventory). The failure guard is working as designed — counter resets on partial progress, not just full goal completion. Audit correction applied.\",\\n\\n      \"createdAtUtc\": \"2026-06-27T04:30:00Z\"\\n\\n    }\\n\\n  ]",
+  "comments": [
+    {
+      "id": "c-s52-sb1",
+      "author": "SteveBot",
+      "body": "Completed in Sprint 51 Wave B (commit 72ff65f) + Sprint 52 uncommitted changes. IsProgressSignalTool narrowed to only MineBlock/PlaceBlock/CraftItem/SmeltItem (removed MoveTo/FindFlatArea/Wander). Additional creative mode recovery guards added: skip inventory-error recovery in creative mode (adapter handles creative inventory). The failure guard is working as designed — counter resets on partial progress, not just full goal completion. Audit correction applied.",
+      "createdAtUtc": "2026-06-27T04:30:00Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,

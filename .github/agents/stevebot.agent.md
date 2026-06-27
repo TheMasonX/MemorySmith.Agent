@@ -21,17 +21,9 @@ skills:
 - Cross-repo: Do not edit the base `MemorySmith` repo. Prepare a request
   document for placement under `Data/Pages/MS-Requests/` in that repo instead.
 
-## Request Template (for base repo changes)
-
-When preparing a request for the base `MemorySmith` repo, include:
-
-1. **Title**: One-line summary.
-2. **Motivation**: Why the change is needed and the impact.
-3. **Proposed change**: File-level diffs or clear description.
-4. **Tests**: How to verify; include failing reproduction and passing tests.
-5. **Risk/rollback**: Compatibility and how to revert.
-
-Place the document in the base repo's `Data/Pages/MS-Requests/` for human review.
+## MCP Usage
+Use the `mcp-tools` skill to query and edit the repo-scoped KB (`Data/Memories`) and tasks (`Data/Tasks`) for MemorySmith.Agent. It supports searching, reading, editing, and creating new memory/task files.
+**ALL** task edits must be made via the MCP interface, not direct file edits - this leads to malformed JSON and broken task files. Use the `mcp-tools` skill to create or edit tasks and memories.
 
 ## Debugging
 

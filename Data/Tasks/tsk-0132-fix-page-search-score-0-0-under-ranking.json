@@ -10,10 +10,16 @@
   "assigneeDirectoryId": null,
   "assigneeCustomText": "Agent",
   "reporter": "anonymous",
-  "labels": "[\\n    \"sprint-51\",\\n    \"council\",\\n    \"memory-gateway\",\\n    \"search\",\\n    \"ranking\"\\n  ]",
+  "labels": [
+    "sprint-51",
+    "council",
+    "memory-gateway",
+    "search",
+    "ranking"
+  ],
   "attachments": [],
   "externalLinks": [],
-  "linkedPages": [],
+  "linkedPages": ["architecture", "Features/memory-wiki-integration"],
   "comments": [],
   "epicId": null,
   "parentId": null,
