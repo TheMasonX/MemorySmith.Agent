@@ -833,15 +833,19 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         break;
       }
 
-      // Sprint 52 (TSK-0123): When the bot is standing at the target position,
-      // step aside instead of permanently skipping. The bot navigates to an
-      // adjacent position, then the normal GoalNear+placement flow takes over.
-      // This prevents the "trail of empty spots" where blocks at the bot's
-      // origin are never placed.
+      // Sprint 52 (TSK-0123): When the bot is effectively standing at the target
+      // position, step aside instead of permanently skipping. Use distance check
+      // (< 0.6 blocks) rather than exact coordinate match — floating-point bot
+      // position rarely equals the integer target exactly.
       const botPos2 = botPos();
-      if (x === botPos2.x && y === botPos2.y && z === botPos2.z) {
+      const dx = Math.abs(x - botPos2.x);
+      const dy = Math.abs(y - botPos2.y);
+      const dz = Math.abs(z - botPos2.z);
+      if (dx < 0.6 && dy < 0.6 && dz < 0.6) {
         logStructured('info', 'place', 'stepping aside from target to place', {
-          x, y, z, material: shortMat, reason: 'bot standing on target — moving to adjacent position',
+          x, y, z, botX: botPos2.x, botY: botPos2.y, botZ: botPos2.z,
+          dx, dy, dz, material: shortMat,
+          reason: 'bot too close to target — moving to adjacent position',
         });
         // Move to an adjacent X position so we can approach from the side.
         // GoalNear(x,y,z,2) won't move if already at the target (distance=0),
@@ -932,6 +936,59 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
             refBlock: ref.name,
             face: { fx, fy, fz },
             error: e.message,
+          });
+        }
+      }
+
+      if (!placed) {
+        // Sprint 52 (TSK-0123): scaffold fallback — when no adjacent reference
+        // block exists (e.g. corner position, all 6 faces empty), place a
+        // scaffold block below the target, then use it as reference.
+        logStructured('warn', 'place', 'no reference block — attempting scaffold', {
+          x, y, z, material: shortMat, lastRefError,
+        });
+
+        // Find solid ground below the target
+        let groundY = y - 1;
+        let groundBlock = bot.blockAt(toVec3(x, groundY, z));
+        while (groundY > -64 && (!groundBlock || groundBlock.type === 0 || groundBlock.name === shortMat)) {
+          groundY--;
+          groundBlock = bot.blockAt(toVec3(x, groundY, z));
+        }
+
+        if (groundBlock && groundBlock.type !== 0) {
+          const scaffoldY = groundY + 1;
+          // Navigate near the scaffold position so we can reach it
+          await bot.pathfinder.goto(new pfGoals.GoalNear(x, scaffoldY, z, 2));
+          // Ensure we have the material equipped for the scaffold
+          if (item) await bot.equip(item, 'hand');
+          try {
+            // Place scaffold on top of ground, clicking the ground's top face
+            await bot.placeBlock(groundBlock, toVec3(0, 1, 0));
+            logStructured('info', 'place', 'scaffold placed', {
+              material: shortMat, scaffoldX: x, scaffoldY, scaffoldZ: z,
+              groundY, groundBlock: groundBlock.name,
+            });
+
+            // Now place the target block against the scaffold's top face
+            const scaffoldBlock = bot.blockAt(toVec3(x, scaffoldY, z));
+            if (scaffoldBlock && scaffoldBlock.type !== 0) {
+              await bot.equip(item, 'hand');
+              await bot.placeBlock(scaffoldBlock, toVec3(0, 1, 0));
+              placed = true;
+              logStructured('info', 'place', 'success via scaffold', {
+                material: shortMat, x, y, z, scaffoldY,
+              });
+            }
+          } catch (e) {
+            lastRefError = e.message;
+            logStructured('error', 'place', 'scaffold failed', {
+              x, y, z, material: shortMat, error: e.message,
+            });
+          }
+        } else {
+          logStructured('error', 'place', 'scaffold impossible — no ground below', {
+            x, y, z, material: shortMat,
           });
         }
       }
