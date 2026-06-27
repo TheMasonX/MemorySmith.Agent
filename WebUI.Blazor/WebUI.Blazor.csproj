@@ -32,6 +32,19 @@
          Use Serilog.Sinks.File for persistent log storage instead. -->
   </ItemGroup>
 
+  <!-- Sprint 52: embed build timestamp + git hash for runtime identity verification.
+       Logged at startup to definitively prove which build is running. -->
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>BuildTimestamp</_Parameter1>
+      <_Parameter2>$([System.DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"))</_Parameter2>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>GitHash</_Parameter1>
+      <_Parameter2>$(SourceRevisionId)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
   <!-- Sprint 4a/4b: SignalR push for StatusUpdated, ChatMessage, GoalUpdate events -->
 
 </Project>

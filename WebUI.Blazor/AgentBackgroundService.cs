@@ -458,6 +458,7 @@ public sealed class AgentBackgroundService(
                 await worldAdapter.ConnectAsync(connectionCts.Token);
                 _connectionStatus = "connected";
                 logger.LogInformation("World adapter connected.");
+                LogBuildIdentity();
                 _journal?.Log(new JournalEntry(
                     _timeProvider.UtcNow, JournalEntryType.AgentStarted, "Agent connected"));
 
@@ -2095,6 +2096,37 @@ public sealed class AgentBackgroundService(
     /// navigate away from without an emergency stop. Goals like gather, build, and craft
     /// have work in progress that would be lost if the queue is cleared without stop.
     /// </summary>
+
+    // ── Build identity (Sprint 52) ────────────────────────────────────────────
+
+    /// <summary>
+    /// Logs the build timestamp and git hash baked into the assembly at compile time.
+    /// Provides definitive proof of which binary is running — critical for diagnosing
+    /// stale-DLL issues where an old cached build persists despite clean/rebuild.
+    /// </summary>
+    private static void LogBuildIdentity()
+    {
+        try
+        {
+            var asm = System.Reflection.Assembly.GetExecutingAssembly();
+            var attrs = asm.GetCustomAttributes(typeof(System.Reflection.AssemblyMetadataAttribute), inherit: false);
+            string? ts = null, hash = null;
+            foreach (var a in attrs)
+            {
+                if (a is System.Reflection.AssemblyMetadataAttribute ma)
+                {
+                    if (ma.Key == "BuildTimestamp") ts = ma.Value;
+                    if (ma.Key == "GitHash") hash = ma.Value;
+                }
+            }
+            Console.Error.WriteLine($"[build] BuildTimestamp={ts ?? "unknown"} GitHash={hash ?? "unknown"}");
+        }
+        catch
+        {
+            Console.Error.WriteLine("[build] BuildTimestamp=unknown (reflection failed)");
+        }
+    }
+
     private static bool IsIdleOrWanderGoal(IGoal? goal)
     {
         if (goal is null) return true;

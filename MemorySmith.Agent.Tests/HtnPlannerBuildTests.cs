@@ -47,7 +47,10 @@ public sealed class HtnPlannerBuildTests
     [Test]
     public async Task PlanAsync_BuildGoal_ProducesSixPlaceBlockActions()
     {
-        var plan = await MakePlan(SmallFloor, new WorldState());
+        // Place bot away from origin so TSK-0123 bot-position skip doesn't fire.
+        // Block 0 is at (0,0,0); bot at (10,64,10) means all 6 blocks should be placed.
+        var state = new WorldState { Position = new Position(10, 64, 10) };
+        var plan = await MakePlan(SmallFloor, state);
         Assert.That(CountTool(plan, "PlaceBlock"), Is.EqualTo(6));
     }
 

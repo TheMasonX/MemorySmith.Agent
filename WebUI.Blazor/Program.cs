@@ -1,5 +1,5 @@
 // MemorySmith.Agent — Web UI & Agent Host
-// v0.51.0  Sprint 51 — Wave A: Canonicalize & Classify + Harden Robustness
+// v0.52.0  Sprint 52 — Codebase Health + TSK-0121 MoveTo Fix + Build Identity
 
 using Agent.Construction;
 using Agent.Core;

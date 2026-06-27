@@ -458,7 +458,7 @@ public sealed class HtnTaskLibrary
         {
             // Creative mode grants the agent the requested materials up front, so skip
             // mining, smelting, and crafting pre-gather actions entirely.
-            actions.Add(ActionFactory.Create("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)));
+            // TSK-0121: NO MoveTo(origin) in creative mode — adapter navigates per-block via pathfinder.goto()
 
             var creativeProgressKey     = BuildFactKeys.BuildProgressIndex(blueprint.Name);
             var creativeCheckpointIndex = 0;
@@ -471,6 +471,19 @@ public sealed class HtnTaskLibrary
             for (int i = creativeCheckpointIndex; i < creativeBlockActions.Count; i++)
             {
                 var placeAction = creativeBlockActions[i];
+                // TSK-0123: skip PlaceBlock when bot is standing at target position
+                if (placeAction.Arguments.TryGetValue("x", out var px) && px is int ppx &&
+                    placeAction.Arguments.TryGetValue("y", out var py) && py is int ppy &&
+                    placeAction.Arguments.TryGetValue("z", out var pz) && pz is int ppz)
+                {
+                    var botPos = state.Position;
+                    if (ppx == botPos.X && ppy == botPos.Y && ppz == botPos.Z)
+                    {
+                        System.Console.Error.WriteLine(
+                            $"[HtnTaskLibrary] skipping creative block {i} at ({ppx},{ppy},{ppz}) — bot is standing there (TSK-0123)");
+                        continue;
+                    }
+                }
                 placeAction.Context[BuildFactKeys.PlaceBlockProgressBlueprintId] = blueprint.Name;
                 placeAction.Context[BuildFactKeys.PlaceBlockProgressBlockIndex]  = i;
                 actions.Add(placeAction);
@@ -525,7 +538,7 @@ public sealed class HtnTaskLibrary
                 hasTorch: torchEntry is not null, torchNeeded: torchEntry ?? 0));
         }
 
-        actions.Add(ActionFactory.Create("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)));
+        // TSK-0121: NO MoveTo(origin) — adapter navigates to each target via pathfinder.goto() before placing
 
         var progressKey     = BuildFactKeys.BuildProgressIndex(blueprint.Name);
         var checkpointIndex = 0;
@@ -538,6 +551,19 @@ public sealed class HtnTaskLibrary
         for (int i = checkpointIndex; i < blockActions.Count; i++)
         {
             var placeAction = blockActions[i];
+            // TSK-0123: skip PlaceBlock when bot is standing at target position
+            if (placeAction.Arguments.TryGetValue("x", out var px) && px is int ppx &&
+                placeAction.Arguments.TryGetValue("y", out var py) && py is int ppy &&
+                placeAction.Arguments.TryGetValue("z", out var pz) && pz is int ppz)
+            {
+                var botPos = state.Position;
+                if (ppx == botPos.X && ppy == botPos.Y && ppz == botPos.Z)
+                {
+                    System.Console.Error.WriteLine(
+                        $"[HtnTaskLibrary] skipping block {i} at ({ppx},{ppy},{ppz}) — bot is standing there (TSK-0123)");
+                    continue;
+                }
+            }
             placeAction.Context[BuildFactKeys.PlaceBlockProgressBlueprintId] = blueprint.Name;
             placeAction.Context[BuildFactKeys.PlaceBlockProgressBlockIndex]  = i;
             actions.Add(placeAction);
