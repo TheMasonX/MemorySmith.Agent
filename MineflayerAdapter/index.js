@@ -846,6 +846,18 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         break;
       }
 
+      // Sprint 51: skip PlaceBlock at bot's own position. Placing a block where
+      // the bot is standing has no adjacent reference block to click against.
+      // The adapter skips it and lets the next replan handle it after the bot moves.
+      const botPos2 = botPos();
+      if (x === botPos2.x && y === botPos2.y && z === botPos2.z) {
+        logStructured('warn', 'place', 'SKIPPING PlaceBlock at bot position', {
+          x, y, z, material: shortMat, reason: 'no reference block — bot standing here',
+        });
+        sendEvent('blockPlaceSkipped', { x, y, z, block: shortMat, correlationId, reason: 'botPosition' });
+        break;
+      }
+
       const movements = new Movements(bot);
       bot.pathfinder.setMovements(movements);
       // Sprint 42 (TSK-0076): Reduce tolerance from 3 to 2 so the bot gets closer
@@ -853,7 +865,29 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       // outside the ~4.5 block interact range after pathfinding.
       await bot.pathfinder.goto(new pfGoals.GoalNear(x, y, z, 2));
 
-      const item = bot.inventory.items().find(i => i.name === shortMat || i.name === material);
+      let item = bot.inventory.items().find(i => i.name === shortMat || i.name === material);
+      // Sprint 51: creative mode fallback — when the bot is in creative mode but the
+      // item is not in inventory (e.g. /give didn't work or wasn't used), use the
+      // creative inventory to select the item. Without this, creative builds fail
+      // with "not in inventory" on every block placement.
+      if (!item && bot.game?.gameMode === 1) {
+        const itemByName = bot.registry.itemsByName[shortMat] || bot.registry.itemsByName[material];
+        if (itemByName) {
+          try {
+            await bot.creative.setInventorySlot(36, itemByName); // hotbar slot 1 (0-indexed)
+            item = bot.inventory.items().find(i => i.name === shortMat || i.name === material);
+            if (item) {
+              logStructured('info', 'place', 'creative inventory fallback', {
+                material: shortMat, slot: 36,
+              });
+            }
+          } catch (e) {
+            logStructured('warn', 'place', 'creative setInventorySlot failed', {
+              material: shortMat, error: e.message,
+            });
+          }
+        }
+      }
       if (!item) throw new Error(`${material} not in inventory`);
       await bot.equip(item, 'hand');
 

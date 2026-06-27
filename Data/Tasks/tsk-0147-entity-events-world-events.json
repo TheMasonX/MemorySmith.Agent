@@ -1,0 +1,11 @@
+{
+  "id": "TSK-0147",
+  "title": "Add EntityObservedEvent and EntityDepartedEvent to WorldEvents.cs",
+  "status": "Backlog",
+  "priority": "High",
+  "type": "Task",
+  "description": "Create typed world event records for entity observations so the C# pipeline can process them.\n\nImplementation:\n1. Add `EntityObservedEvent` record to `Agent.Core/Events/WorldEvents.cs`:\n   - `string EntityType` — e.g. \"cow\", \"zombie\", \"skeleton\", \"player\"\n   - `string? DisplayName` — custom name if named (e.g. \"Dinnerbone\")\n   - `string? MobCategory` — \"hostile\", \"passive\", \"neutral\", \"player\"\n   - `Position Position` — floored block position of the entity\n   - `double Distance` — Euclidean distance from bot\n   - `double? Health` — current HP if available\n   - `DateTimeOffset Timestamp`\n2. Add `EntityDepartedEvent` record:\n   - `string EntityType` — the type that left\n   - `Position LastPosition` — last known position\n   - `DateTimeOffset Timestamp`\n3. Add `EntityDamagedEvent` or extend existing `DamageTakenEvent` if the bot is damaged by a nearby entity (future: track which entity caused damage). For now, this can be deferred.\n\nAcceptance:\n- Records compile and are usable in pattern matching.\n- `EntityObservedEvent` carries enough data to summarize for the LLM.\n- No breaking changes to existing event types.\n\nRefs: `memorysmith_situational_awareness_design_doc_20260625T020914Z.md` Phase 1",
+  "labels": ["entity-awareness", "world-events", "situational-awareness", "sprint-52"],
+  "estimatedHours": 1.0,
+  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md"
+}

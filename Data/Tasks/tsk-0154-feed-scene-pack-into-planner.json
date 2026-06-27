@@ -1,0 +1,11 @@
+{
+  "id": "TSK-0154",
+  "title": "Feed ScenePack into planner context without changing planner API",
+  "status": "Backlog",
+  "priority": "High",
+  "type": "Task",
+  "description": "Integrate the ScenePack into the planning layer so decomposers and goals have access to rich situational context without changing the planner's interface contract.\n\nImplementation:\n1. Add `ScenePack?` to the planning context object passed to `IPlanner.PlanAsync` (or attach to `WorldState` via an extension/companion).\n2. Update `PlannerRouter` to extract relevant ScenePack fields before delegating to decomposers.\n3. Update `BuildGoalDecomposer` to use ScenePack for:\n   - Nearby flat area candidates (already in WorldState facts)\n   - Entity presence near the build site (avoid building in zombie crowds)\n4. Update `GatherGoalDecomposer` to use ScenePack for:\n   - Nearby entity threats (pause gathering if hostile mobs are close)\n   - Memory references for known resource locations\n5. Update `HtnPlanner` fallback to pass ScenePack through to task library methods.\n6. Do NOT change the `IPlanner` interface signature — attach the pack to the planning context object or a companion property on WorldState.\n\nAcceptance:\n- Planner has access to entity and scene data without API breakage.\n- Decomposers can query nearby entities.\n- No regression in existing planner tests.\n\nRefs: `memorysmith_situational_awareness_design_doc_20260625T020914Z.md` Phase 3",
+  "labels": ["planner", "scene-pack", "situational-awareness", "sprint-53"],
+  "estimatedHours": 2.5,
+  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md"
+}

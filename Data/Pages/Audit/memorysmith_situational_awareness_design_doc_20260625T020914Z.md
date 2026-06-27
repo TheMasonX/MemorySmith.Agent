@@ -233,3 +233,61 @@ The smallest high-value PR is:
 4. planner integration that consumes the pack without changing the planner API
 
 That gets the repo closer to real situational awareness while preserving the codebase’s existing strengths: deterministic planning, a canonical world state, and a two-gateway memory architecture. fileciteturn33file0turn47file0turn39file0
+---
+
+## Tasks Created (2026-06-26)
+
+Concrete task records were created from this design doc. See `Data/Pages/Handoffs/sprint-52-situational-awareness-planning.md` for the sprint plan.
+
+### Sprint 52 — Entity Awareness + Scene Pack (Phase 1)
+
+| Task | Title | Priority |
+|:-----|:------|:--------:|
+| TSK-0146 | Add entity observation to MineflayerAdapter | High |
+| TSK-0147 | Add EntityObservedEvent + EntityDepartedEvent to WorldEvents.cs | High |
+| TSK-0148 | Project entity events in WorldStateProjector into WorldState | High |
+| TSK-0149 | Include entity summary in LLM system prompt | High |
+| TSK-0150 | Implement ScenePackBuilder projection class | High |
+| TSK-0151 | Wire ScenePackBuilder into chat pipeline | High |
+
+### Sprint 53 — Durable Memory + Planner Integration (Phases 2-3)
+
+| Task | Title | Priority |
+|:-----|:------|:--------:|
+| TSK-0152 | Implement policy-based MemorySmith writer service | Medium |
+| TSK-0153 | Write snapshot/landmark/goal/failure pages to World KB | Medium |
+| TSK-0154 | Feed ScenePack into planner context | High |
+| TSK-0155 | Add observation-driven replan comparison loop | High |
+
+### Sprint 53 — Mineflayer Adapter: Reachability + Motion + Environment
+
+| Task | Title | Priority | Audit Source |
+|:-----|:------|:--------:|:-------------|
+| TSK-0158 | Wire pathfinder events (path_update, goal_reached, path_stop) | Critical | DEF-PAPER-1, DEF-PAPER-3 |
+| TSK-0159 | Promise.race() timeout on all goto() calls | Critical | DEF-PAPER-3 |
+| TSK-0160 | Throttle move events + add yaw/pitch orientation | High | DEF-PAPER-7 |
+| TSK-0161 | Motion/equipment/environment telemetry | High | Audit Finding 2 |
+
+### Sprint 54 — Inventory + Chat + Action Lifecycle
+
+| Task | Title | Priority | Audit Source |
+|:-----|:------|:--------:|:-------------|
+| TSK-0162 | Local world shape: block underfoot, light level, hazards | High | Audit Finding 2 |
+| TSK-0163 | Inventory updateSlot real-time slot-level ground truth | High | DEF-PAPER-4 |
+| TSK-0164 | Chat structured message classification (messageKind) | Medium | Audit Finding 3 |
+| TSK-0165 | Action progress telemetry (started/progress/failed) | Medium | Audit Finding 6 |
+
+### Sprint 55 — Modularization + Cleanup
+
+| Task | Title | Priority | Audit Source |
+|:-----|:------|:--------:|:-------------|
+| TSK-0166 | Modularize MineflayerAdapter (15+ modules) | Medium | Audit Finding 5 |
+| TSK-0167 | Fix documentation version/sprint drift | Low | Audit Finding 1 |
+| TSK-0168 | Remove HtnPlanner legacy typed branches | Low | Audit Finding 4 |
+
+### Sprint 54+ — Semantic Enhancement (Phase 4, Future)
+
+| Task | Title | Priority | Blocker |
+|:-----|:------|:--------:|:--------|
+| TSK-0156 | Add embeddings for durable world pages | Low | MemorySmith backend |
+| TSK-0157 | Add graph links between landmarks/goals/pages | Low | MemorySmith backend |

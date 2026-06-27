@@ -1,0 +1,11 @@
+{
+  "id": "TSK-0152",
+  "title": "Implement policy-based MemorySmith writer service for durable world observations",
+  "status": "Backlog",
+  "priority": "Medium",
+  "type": "Task",
+  "description": "Create a policy-driven service that persists only meaningful world observations to MemorySmith (World KB), avoiding the noise of every-tick writes.\n\nImplementation:\n1. Create `Agent.Memory/WorldObservationWriter.cs` (or similar):\n   - Takes `IMemoryGateway` (keyed \"world\") for writing to World KB.\n   - Writing policy: only persist on meaningful boundaries, not every cycle.\n2. Define write triggers (configurable):\n   - New landmark discovered (unique location, significant biome change)\n   - Goal started / completed / failed\n   - Action failed with a new error pattern\n   - Explicit user checkpoint request\n   - Recurring failure pattern (same action fails 3+ times)\n   - Scan result worth reusing (unique block distribution, structure found)\n3. Define page types and slugs:\n   - `snapshot/{yyyy-MM-dd-HHmmss}` — significant scene snapshots\n   - `landmark/{name}` — stable location records (deduplicate by position proximity)\n   - `goal/{goalId}` — persistent goal context\n   - `failure/{action}` — recurring failure patterns (update existing page, don't create new)\n4. Each page includes: timestamp, position, relevant goal, key facts, scene summary.\n5. Deduplication: check if a similar page exists (same landmark within 10 blocks, same failure pattern) before creating a new one.\n\nAcceptance:\n- Writes are event-driven, not timer-driven.\n- No writes during normal idle loops.\n- Landmark pages are deduplicated.\n- Failure pages accumulate patterns without creating N copies.\n\nRefs: `memorysmith_situational_awareness_design_doc_20260625T020914Z.md` Phase 2",
+  "labels": ["memory", "durable-writing", "situational-awareness", "sprint-53"],
+  "estimatedHours": 3.0,
+  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md"
+}

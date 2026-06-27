@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0169-chat-context-dashboard",
+  "key": "TSK-0169",
+  "title": "Chat Context Dashboard",
+  "description": "Need a dashboard page specifically for the chat context, with expanders for each request/response and then subexpanders for the raw text (show a snippet)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T02:41:55.6695063Z",
+  "updatedAtUtc": "2026-06-27T02:41:55.6695063Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

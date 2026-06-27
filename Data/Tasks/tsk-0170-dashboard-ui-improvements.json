@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0170-dashboard-ui-improvements",
+  "key": "TSK-0170",
+  "title": "Dashboard UI Improvements",
+  "description": "The main dashboard is missing some key features. It doesn\u0027t handle auto-scaling well, and there are missing options like the goal setting doesn\u0027t work. The live log scrolls the wrong way (new logs come in at the top and the autoscroll pins to the bottom).",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T02:44:55.0128671Z",
+  "updatedAtUtc": "2026-06-27T02:44:55.0128671Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

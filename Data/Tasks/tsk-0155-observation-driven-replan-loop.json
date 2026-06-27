@@ -1,0 +1,11 @@
+{
+  "id": "TSK-0155",
+  "title": "Add observation-driven replan comparison loop",
+  "status": "Backlog",
+  "priority": "High",
+  "type": "Task",
+  "description": "Complete the `Plan → Dispatch → Observe → Compare → Replan` loop by adding outcome comparison to the replan governor. This is the missing piece that makes situational awareness actionable.\n\nImplementation:\n1. In `AgentBackgroundService.DispatchActionsAsync` or the main loop:\n   - After each action completes (success or failure), compare expected outcome to observed outcome.\n2. Comparison dimensions:\n   - **Inventory delta**: did we gain/lose what we expected?\n   - **Position delta**: are we where we expected to be?\n   - **Health delta**: did we take unexpected damage?\n   - **Entity presence**: did new hostile entities appear?\n3. Use `IReplanGovernor` (already exists in `Agent.Core`) to decide if replan is needed:\n   - Extend `IsStalled` to accept `ScenePack` or outcome comparison results.\n4. Integration points:\n   - `MineCompleteEvent` → check if mined count matches target\n   - `BlockPlacedEvent` → check if block placed at expected position\n   - `ItemCraftedEvent` → check if crafted item matches goal\n   - `ErrorEvent` → check error pattern against recent history\n   - `EntityObservedEvent` (new) → check for hostile mobs near action site\n5. Add a new `ReplanReason` enum value: `OutcomeMismatch`, `ThreatDetected`.\n\nAcceptance:\n- Agent replans when observed outcome contradicts expected outcome.\n- Agent replans when hostile entity appears during action execution.\n- Does not replan unnecessarily (no false positives from transient events).\n- Tests for outcome comparison logic.\n\nRefs: `memorysmith_situational_awareness_design_doc_20260625T020914Z.md` Phase 3",
+  "labels": ["replan", "observation", "situational-awareness", "sprint-53"],
+  "estimatedHours": 3.0,
+  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md"
+}

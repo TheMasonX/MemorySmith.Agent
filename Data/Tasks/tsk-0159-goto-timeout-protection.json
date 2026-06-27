@@ -1,0 +1,11 @@
+{
+  "id": "TSK-0159",
+  "title": "Add Promise.race() timeout protection on all bot.pathfinder.goto() calls",
+  "status": "Backlog",
+  "priority": "Critical",
+  "type": "Task",
+  "description": "Add hard timeout protection on every `await bot.pathfinder.goto(...)` call to prevent silent hangs. The known mineflayer-pathfinder issue (#222, #273) causes goto() to never resolve when the bot is obstructed by unbreakable blocks or certain edge cases.\n\nCurrently 7 goto() calls exist with NO timeout (confirmed by grep). Each needs a Promise.race() wrapper.\n\nImplementation:\n1. Create a `gotoWithTimeout(goal, timeoutMs)` helper function:\n   ```js\n   async function gotoWithTimeout(goal, timeoutMs) {\n     const gotoPromise = bot.pathfinder.goto(goal);\n     const timeoutPromise = new Promise((_, reject) =>\n       setTimeout(() => reject(new Error(`Pathfinder timeout after ${timeoutMs}ms`)), timeoutMs)\n     );\n     return Promise.race([gotoPromise, timeoutPromise]);\n   }\n   ```\n2. When the timeout wins:\n   - Call `bot.pathfinder.setGoal(null)` to cancel the active path.\n   - Log warning with context (action, target coords, correlationId).\n   - Emit `pathUpdate` event with status `timeout` and correlationId.\n   - Return failure to the action dispatcher so the C# side gets a clean failure.\n3. Tunable constants per action type:\n   - `MOVE_TIMEOUT_MS = 15_000` (move case)\n   - `MINE_GOTO_TIMEOUT_MS = 10_000` (goto to ore block)\n   - `PLACE_GOTO_TIMEOUT_MS = 10_000` (goto to placement site)\n   - `CRAFT_GOTO_TIMEOUT_MS = 10_000` (goto to crafting table)\n   - `WANDER_GOTO_TIMEOUT_MS = 15_000` (wander)\n   - `SMELT_GOTO_TIMEOUT_MS = 10_000` (goto to furnace)\n4. Replace ALL 7 bare `await bot.pathfinder.goto(...)` calls with `await gotoWithTimeout(...)`.\n\nAcceptance:\n- No goto() call runs longer than its timeout.\n- Timeout emits a clean failure event back to C# (not a silent hang).\n- Active pathfinder is cancelled on timeout.\n- All 7 call sites updated.\n\nRefs: `mineflayer-adapter-research.md` DEF-PAPER-3; `msa_planning_mineflayer_audit_20260621_1437.md` Finding 6",
+  "labels": ["mineflayer", "pathfinder", "resilience", "reachability", "sprint-53"],
+  "estimatedHours": 2.0,
+  "designRef": "Data/Pages/Audit/mineflayer-adapter-research.md"
+}

@@ -49,7 +49,10 @@ public sealed class AgentBackgroundService(
     // Sprint 39 P1-C: IntentManager maps IntentDraft → GoalRequest for HandleChatEventAsync.
     IntentManager? intentManager = null,
     // Sprint 39 P1: LLM evaluator for observation-driven replanning.
-    ILlmEvaluator? llmEvaluator = null) : BackgroundService
+    ILlmEvaluator? llmEvaluator = null,
+    // Sprint 52: ChatHistory for recording bot responses so conversational context
+    // flows into the LLM system prompt on subsequent turns.
+    ChatHistory? chatHistory = null) : BackgroundService
 {
     // Sprint 1b: default exponential backoff delays
     private static readonly TimeSpan[] DefaultReconnectDelays =
@@ -128,6 +131,7 @@ public sealed class AgentBackgroundService(
     private readonly WorldStateProjector _projector = new();
     private readonly IAgentJournal? _journal = journal;
     private readonly Logging.IChatLogger? _chatLogger = chatLogger;
+    private readonly ChatHistory? _chatHistory = chatHistory;
     private readonly ITimeProvider _timeProvider = timeProvider ?? SystemTimeProvider.Instance;
     // Sprint 39 P1-C: maps IntentDraft → GoalRequest in HandleChatEventAsync.
     private readonly IntentManager? _intentManager = intentManager;
@@ -259,16 +263,13 @@ public sealed class AgentBackgroundService(
         _cycleOutcomes.Clear();
         // Sprint 37: reset zero-area scan counter for new goal.
         _consecutiveZeroAreaScans = 0;
-        // Sprint 40 P0-B / Sprint 45 (TSK-0091): creative mode provisioning.
-        // When the world is in creative mode, provision items via /give commands.
-        // Minecraft servers kick bots that send 10+ commands in <100ms — the
-        // async method uses Task.Delay(200) between /give commands to prevent
-        // anti-spam kicks. Fire-and-forget because SetGoal is void; the
-        // ActionQueue is thread-safe so enqueues from the async method are safe.
-        // Sprint 41: extended to also handle BuildGoal — provisions ALL blueprint
-        // materials via /give so the creative PlaceBlock path has inventory to work with.
+        // Sprint 51: creative provisioning is now handled by the MineflayerAdapter.
+        // When in creative mode, the adapter's PlaceBlock handler uses
+        // bot.creative.setInventorySlot() to pull blocks from creative inventory.
+        // The old /give command approach required OP permissions and was unreliable.
+        // See MineflayerAdapter/index.js place handler for creative fallback.
         if (_worldState.IsCreativeMode)
-            _ = ProvisionGoalIfCreativeAsync(goal, _connectionCts?.Token ?? CancellationToken.None);
+            logger.LogDebug("[creative] adapter handles inventory — skipping /give provisioning");
 
         // TSK-0021: report task-relevant inventory instead of generic top-5 summary.
         var taskInv = SummarizeTaskRelevantInventory(goal);
@@ -928,6 +929,11 @@ public sealed class AgentBackgroundService(
             ? intent.Response : null;
 
         chatInterpreter.RecordBotSpoke();
+
+        // Sprint 52: record the bot's response in chat history so the LLM
+        // maintains conversational context across turns.
+        if (pendingResponse is not null)
+            _chatHistory?.Record(botName, pendingResponse);
 
         switch (intent.Intent.ToLowerInvariant())
         {
@@ -2168,12 +2174,9 @@ public sealed class AgentBackgroundService(
 
     private static bool IsProgressSignalTool(string toolName) =>
         toolName.Equals("MineBlock", StringComparison.OrdinalIgnoreCase)
-        || toolName.Equals("MoveTo", StringComparison.OrdinalIgnoreCase)
         || toolName.Equals("PlaceBlock", StringComparison.OrdinalIgnoreCase)
         || toolName.Equals("CraftItem", StringComparison.OrdinalIgnoreCase)
-        || toolName.Equals("SmeltItem", StringComparison.OrdinalIgnoreCase)
-        || toolName.Equals("FindFlatArea", StringComparison.OrdinalIgnoreCase)
-        || toolName.Equals("Wander", StringComparison.OrdinalIgnoreCase);
+        || toolName.Equals("SmeltItem", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Asks the LLM interpreter to suggest an alternative goal when the agent has hit
@@ -2198,11 +2201,32 @@ public sealed class AgentBackgroundService(
 
         try
         {
+            // Sprint 51: fast-path recovery for "not in inventory" errors.
+            // When PlaceBlock fails because a material is missing, create a gather
+            // goal for that material directly instead of waiting for the LLM.
+            // Pattern: "place:<material> not in inventory"
+            if (TryExtractMissingMaterial(errMsg, out var missingBlock))
+            {
+                var gatherGoalName = $"Gather:{missingBlock}";
+                // Guard: don't re-attempt the same abandoned or current goal
+                if (!GoalNamesMatch(gatherGoalName, _lastAbandonedGoalName) &&
+                    !GoalNamesMatch(gatherGoalName, _currentGoal?.Name))
+                {
+                    logger.LogInformation(
+                        "[recovery] direct gather for missing material: {Material} → {Goal}",
+                        missingBlock, gatherGoalName);
+                    var gatherRequest = new GatherGoalRequest(missingBlock, Count: 1);
+                    await TryCreateGoalFromChatAsync(gatherRequest, ct);
+                    return;
+                }
+            }
+
             // Sprint 19: refactored to use shared SummarizeInventory helper
-            var invSummary = SummarizeTaskRelevantInventory(_currentGoal);
+            // _currentGoal is guaranteed non-null by the guard at the top of this method.
+            var invSummary = SummarizeTaskRelevantInventory(_currentGoal!);
 
             var prompt =
-                $"recover from runtime error while executing goal {_currentGoal.Name}: {errMsg}. " +
+                $"recover from runtime error while executing goal {_currentGoal!.Name}: {errMsg}. " +
                 $"Bot inventory: {invSummary}. " +
                 "Available actions: gather, navigate, status, craft, smelt. " +
                 "If gather target is unavailable, choose an alternative gather goal or navigate action. " +
@@ -2259,6 +2283,38 @@ public sealed class AgentBackgroundService(
         var itemA = a.Contains(':') ? a[(a.IndexOf(':') + 1)..] : a;
         var itemB = b.Contains(':') ? b[(b.IndexOf(':') + 1)..] : b;
         return string.Equals(itemA, itemB, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Sprint 51: Extracts a missing material name from a "not in inventory" error.
+    /// Pattern: "place:cobblestone not in inventory block=cobblestone at (...)"
+    /// Returns true and sets <paramref name="block"/> if extraction succeeds.
+    /// </summary>
+    private static bool TryExtractMissingMaterial(string errMsg, out string block)
+    {
+        block = string.Empty;
+        if (string.IsNullOrEmpty(errMsg)) return false;
+        if (!errMsg.Contains("not in inventory", StringComparison.OrdinalIgnoreCase)) return false;
+
+        // Try "block=<name>" pattern first
+        var blockMatch = System.Text.RegularExpressions.Regex.Match(
+            errMsg, @"block=(\S+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (blockMatch.Success)
+        {
+            block = blockMatch.Groups[1].Value.Trim();
+            return !string.IsNullOrEmpty(block);
+        }
+
+        // Fallback: try "<action>:<material>" pattern (e.g., "place:cobblestone")
+        var actionMatch = System.Text.RegularExpressions.Regex.Match(
+            errMsg, @"^(?:place|mine):(\S+)\s", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (actionMatch.Success)
+        {
+            block = actionMatch.Groups[1].Value.Trim();
+            return !string.IsNullOrEmpty(block);
+        }
+
+        return false;
     }
 
     // Sprint 25 P0-D: log abandoned PendingActions on shutdown.

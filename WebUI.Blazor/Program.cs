@@ -190,6 +190,8 @@ if (agentEnabled)
     // Enforces PRINCIPLE-1: parsers (LlmChatInterpreter) never create goals.
     builder.Services.AddSingleton<IntentManager>();
     builder.Services.AddSingleton<ChatInterpreter>();
+    // Sprint 51: dedicated LLM context dump logger for full raw request/response audit.
+    builder.Services.AddSingleton<LlmContextLogger>();
     builder.Services.AddSingleton<IChatInterpreter>(sp =>
     {
         // Sprint 36 P1-C: pass registered tool names to the LLM system prompt so the
@@ -210,7 +212,8 @@ if (agentEnabled)
             sp.GetRequiredService<ChatHistory>(),
             sp.GetRequiredService<ILogger<LlmChatInterpreter>>(),
             registeredToolNames: toolNames,
-            intentManager: sp.GetRequiredService<IntentManager>());
+            intentManager: sp.GetRequiredService<IntentManager>(),
+            contextLogger: sp.GetRequiredService<LlmContextLogger>());
     });
 
     // ── Tools ──────────────────────────────────────────────────────────────────────────────────
@@ -339,7 +342,10 @@ if (agentEnabled)
             // Sprint 39 P1-C: inject IntentManager for chat → goal routing in HandleChatEventAsync.
             intentManager:   sp.GetRequiredService<IntentManager>(),
             // Sprint 39 P1: LLM evaluator for observation-driven replanning.
-            llmEvaluator:    sp.GetRequiredService<ILlmEvaluator>());
+            llmEvaluator:    sp.GetRequiredService<ILlmEvaluator>(),
+            // Sprint 52: ChatHistory for recording bot responses so LLM has
+            // conversational context across turns.
+            chatHistory:     sp.GetRequiredService<ChatHistory>());
     });
     builder.Services.AddHostedService(sp => sp.GetRequiredService<AgentBackgroundService>());
 }
@@ -351,7 +357,23 @@ if (!agentEnabled)
 }
 
 var app = builder.Build();
-app.UseSerilogRequestLogging();
+// Sprint 51: Suppress HTTP request logging for dashboard polling endpoints.
+// The dashboard polls /api/dashboard/*, /api/agent/queue, and /api/agent/status
+// every 1-3 seconds — logging every poll doubles the log volume with noise.
+app.UseSerilogRequestLogging(opts =>
+{
+    opts.GetLevel = (ctx, elapsed, ex) =>
+    {
+        if (ex is not null) return LogEventLevel.Error;
+        var path = ctx.Request.Path.Value ?? "";
+        // Suppress dashboard polling noise
+        if (path.StartsWith("/api/dashboard/", StringComparison.OrdinalIgnoreCase) ||
+            path.Equals("/api/agent/queue", StringComparison.OrdinalIgnoreCase) ||
+            path.Equals("/api/agent/status", StringComparison.OrdinalIgnoreCase))
+            return LogEventLevel.Debug;
+        return LogEventLevel.Information;
+    };
+});
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
@@ -364,6 +386,7 @@ app.UseWhen(
 
 if (agentEnabled)
 {
+    app.Logger.LogInformation("MemorySmith.Agent v0.51.1 starting (Sprint 51 Wave B)");
     var opts = app.Services.GetRequiredService<ChatOptions>();
     app.Logger.LogInformation(
         "Chat LLM config: enabled={Enabled}, provider={Provider}, model={Model}, baseUrl={BaseUrl}",

@@ -7,7 +7,10 @@
     <RootNamespace>WebUI.Blazor</RootNamespace>
     <AssemblyName>WebUI.Blazor</AssemblyName>
     <!-- Sprint 51: SQLitePCLRaw removed (deprecated, unpatched CVE-2025-6965).
-         Serilog.Sinks.SQLite dropped. File sink used for persistent log storage. -->
+         Serilog.Sinks.SQLite dropped. File sink used for persistent log storage.
+         ⚠️  POLICY P-2: Adding/removing a PackageReference requires updating
+         wwwroot/about.html in the same commit. Run Scripts/Verify-AboutDeps.ps1
+         to confirm. See Data/Pages/policies/package-vetting.md for all rules. -->
   </PropertyGroup>
 
   <ItemGroup>

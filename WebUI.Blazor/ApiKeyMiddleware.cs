@@ -13,6 +13,11 @@ using System.Text;
 /// When no key is configured the middleware blocks all requests UNLESS
 /// <c>Agent:AllowUnauthenticatedApi</c> is explicitly set to <c>true</c>
 /// (dev/localhost convenience).
+///
+/// Sprint 51: Localhost bypass — the dashboard HTML is served by this same process
+/// and calls /api/dashboard/* endpoints. When no API key is configured, requests
+/// from the loopback address are allowed through so the local dashboard works
+/// out of the box. Remote requests are still blocked.
 /// See Data/Pages/guides/getting-started.md for setup instructions.
 /// </summary>
 public sealed class ApiKeyMiddleware(
@@ -26,11 +31,20 @@ public sealed class ApiKeyMiddleware(
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // If no key is configured, enforce unless explicitly opted out.
+        // Sprint 51: when no API key is configured, allow localhost requests through
+        // so the local dashboard (served by this same process) can access its own API.
+        // Remote requests are still blocked unless AllowUnauthenticatedApi=true.
         if (string.IsNullOrWhiteSpace(_apiKey))
         {
             if (!_allowUnauthenticated)
             {
+                // Allow loopback (localhost/127.0.0.1/::1) — the dashboard is local
+                if (IsLocalConnection(context))
+                {
+                    await next(context);
+                    return;
+                }
+
                 logger.LogWarning(
                     "API key enforcement: Agent:ApiKey is not configured and " +
                     "Agent:AllowUnauthenticatedApi is false. Blocking {Method} {Path}.",
@@ -61,6 +75,17 @@ public sealed class ApiKeyMiddleware(
         }
 
         await next(context);
+    }
+
+    /// <summary>
+    /// Returns true if the request originates from the loopback address.
+    /// Uses Connection.LocalIpAddress which is reliable on all platforms.
+    /// </summary>
+    private static bool IsLocalConnection(HttpContext context)
+    {
+        var remoteIp = context.Connection.RemoteIpAddress;
+        if (remoteIp is null) return false;
+        return System.Net.IPAddress.IsLoopback(remoteIp);
     }
 
     private static bool FixedTimeEquals(string expected, string actual)

@@ -53,7 +53,9 @@ public sealed class LlmChatInterpreter(
     IReadOnlyList<string>? registeredToolNames = null,
     // Sprint 37 P1-B: intent→goal mapping delegate. Null falls back to local switch in
     // ParseDecision for backward compatibility (tests that don't inject IntentManager).
-    IntentManager? intentManager = null) : IChatInterpreter
+    IntentManager? intentManager = null,
+    // Sprint 51: optional raw LLM context dump logger for full audit trail.
+    LlmContextLogger? contextLogger = null) : IChatInterpreter
 {
     private readonly IntentManager? _intentManager = intentManager;
 
@@ -114,14 +116,23 @@ public sealed class LlmChatInterpreter(
 
         // 5. LLM call — Sprint 35 P1-C: enrich system prompt with inventory, HP, tools
         //               Sprint 36 P1-C: pass registeredToolNames so LLM knows available tools
+        //               Sprint 52: inject chat history so LLM remembers recent conversation
         var currentGoal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s ? s : null;
+        var chatHistory = history?.FormatForPrompt();
+        var systemPrompt = BuildSystemPrompt(botName, botPosition, state, currentGoal,
+            onlinePlayers, registeredToolNames, chatHistory);
+        var userMessage = $"{username} says: \"{effective}\"";
         logger?.LogInformation("[llm] calling {Provider} ({Model}) for <{Username}> '{Message}'",
             provider.ProviderName, options.LlmModel, username,
             effective.Length > 60 ? effective[..60] : effective);
-        var raw = await provider.CompleteAsync(
-            BuildSystemPrompt(botName, botPosition, state, currentGoal, onlinePlayers, registeredToolNames),
-            $"{username} says: \"{effective}\"",
-            ct);
+
+        // Sprint 51: dump full raw LLM context to dedicated audit log
+        var llmStart = System.Diagnostics.Stopwatch.StartNew();
+        var raw = await provider.CompleteAsync(systemPrompt, userMessage, ct);
+        llmStart.Stop();
+        contextLogger?.LogRequest(provider.ProviderName, options.LlmModel, username,
+            systemPrompt, userMessage);
+        contextLogger?.LogResponse(provider.ProviderName, options.LlmModel, raw, llmStart.Elapsed);
 
         // Sprint 41: log raw LLM response at Debug level for safety monitoring and debugging.
         if (raw is not null)
@@ -173,11 +184,15 @@ public sealed class LlmChatInterpreter(
     /// Sprint 36 P1-C: <paramref name="toolNames"/> parameter injects comma-separated
     /// registered tool names from ToolDispatcher.All so the LLM knows what tools are
     /// available when deciding intent.
+    ///
+    /// Sprint 52: <paramref name="chatHistory"/> parameter injects formatted recent
+    /// conversation turns so the LLM maintains context across chat messages.
     /// </summary>
     private static string BuildSystemPrompt(
         string botName, Position botPos, WorldState state,
         string? goal, int onlinePlayers,
-        IReadOnlyList<string>? toolNames = null)
+        IReadOnlyList<string>? toolNames = null,
+        string? chatHistory = null)
     {
         // Sprint 35 P1-C: build inventory summary (non-zero items, desc order, max 8)
         var invSummary = state.Inventory.Count == 0
@@ -192,11 +207,15 @@ public sealed class LlmChatInterpreter(
         var health = state.Health;
         var food = state.Food;
 
+        // Sprint 52: inject recent conversation history so the LLM remembers prior turns
+        var historyBlock = chatHistory is not null
+            ? $"\nRecent conversation:\n{chatHistory}\n"
+            : "";
+
         var basePrompt = $$"""
         You are {{botName}}, an autonomous Minecraft bot at ({{botPos.X}},{{botPos.Y}},{{botPos.Z}}).
         Status: {{goalStatus}}. HP: {{health}}/20. Food: {{food}}/20. Players online: {{onlinePlayers}}.
-        Inventory: {{invSummary}}.
-
+        Inventory: {{invSummary}}.{{historyBlock}}
         Decide if the next message is for you and what to do.
         Reply ONLY with valid JSON — no markdown, no prose:
 

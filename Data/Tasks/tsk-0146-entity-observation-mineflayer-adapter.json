@@ -1,0 +1,11 @@
+{
+  "id": "TSK-0146",
+  "title": "Add entity observation events to MineflayerAdapter",
+  "status": "Backlog",
+  "priority": "High",
+  "type": "Task",
+  "description": "Add periodic entity scanning to MineflayerAdapter so the agent knows what mobs/animals/players are nearby. This is the first step in closing the mob/entity awareness gap documented in `Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md`.\n\nImplementation:\n1. Add a periodic scan (every 2-3 seconds) using `bot.entities` to collect nearby living entities within a configurable radius (default 32 blocks).\n2. Filter to living entities: mobs (hostile/passive), animals, other players. Exclude item drops, paintings, minecarts, etc.\n3. Emit `entityObserved` events with: entity type, display name or mob type, position (x/y/z floored), distance from bot, and health if available.\n4. Track which entities were seen last scan; emit `entityDeparted` when an entity leaves the radius.\n5. Use tunable constants at the top of index.js:\n   - `ENTITY_SCAN_RADIUS = 32` (blocks)\n   - `ENTITY_SCAN_INTERVAL_MS = 2000` (ms between scans)\n6. Do NOT scan every tick — use `setInterval` or tick-count throttling.\n\nAcceptance:\n- Running agent logs `entityObserved` events for nearby cows, zombies, etc.\n- Entities that leave the radius emit `entityDeparted`.\n- No entities reported when none are nearby.\n- Item drops are NOT included (those are handled by playerCollect).\n\nRefs: `memorysmith_situational_awareness_design_doc_20260625T020914Z.md` Phase 1",
+  "labels": ["entity-awareness", "mineflayer", "situational-awareness", "sprint-52"],
+  "estimatedHours": 3.0,
+  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md"
+}
