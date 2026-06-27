@@ -1,0 +1,11 @@
+{
+  "id": "tsk-0197",
+  "title": "Normalize ActionData.Tool to canonical form; remove dual-checks",
+  "status": "Backlog",
+  "priority": "High",
+  "type": "Task",
+  "labels": ["data-model", "sprint-54", "p2", "core"],
+  "description": "## Problem\n`ActionData.Tool` has a wire-name inconsistency:\n- `BlueprintExecutor` sets `Tool = \"PlaceBlock\"` (C# class name)\n- `PlaceBlockTool.ExecuteAsync` sets `Tool = ActionProtocol.Place` = `\"place\"` (wire protocol name)\n- `AgentBackgroundService` has dual-checks at line 1547: `action.Tool == \"PlaceBlock\" || action.Tool == \"place\"`\n\nThis latent schism means any new code that writes `ActionData` directly could use the wrong form.\n\n## Desired Outcome\n`ActionData.Tool` normalized to canonical wire protocol name at construction. Dual-checks removed.\n\n## Scope\n- Add normalization in `ActionData` constructor or factory method\n- Update `BlueprintExecutor` to use `ActionProtocol.Place`\n- Remove dual-checks in `AgentBackgroundService`\n- Update any other call sites\n\n## Acceptance Criteria\n- [ ] `ActionData.Tool` always contains wire protocol name (lowercase)\n- [ ] `BlueprintExecutor` uses canonical constant\n- [ ] No `\"PlaceBlock\"` string literal remains in `AgentBackgroundService`\n- [ ] All existing tests pass (including build goal tests)\n- [ ] No new build warnings",
+  "assigneeMode": "Custom",
+  "assigneeCustomText": "Agent"
+}

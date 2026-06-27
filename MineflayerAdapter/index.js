@@ -766,37 +766,75 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           sendEvent('blockPlaced', { x, y, z, block: shortMat, correlationId });
           break;
         }
-        // Sprint 52: wrong block in the way — mine it, then place the correct one.
-        // Thread carefully to avoid destroying blocks that shouldn't be touched:
-        // - Skip unbreakable blocks (bedrock, barrier, command blocks, etc.)
-        // - Log clearly so incorrect mines are traceable
-        const UNBREAKABLE = new Set([
-          'bedrock', 'barrier', 'command_block', 'chain_command_block',
-          'repeating_command_block', 'structure_block', 'structure_void',
-          'end_portal_frame', 'end_portal', 'nether_portal',
+
+        // Sprint 52 (TSK-0124): wrong block in the way — mine it ONLY if it's
+        // natural terrain (grass, dirt, stone, sand, etc.). NEVER mine blocks
+        // that could be part of the blueprint or placed by the bot.
+        //
+        // The C# planner re-emits PlaceBlock for positions that already have
+        // correctly placed blueprint blocks (doors, chests, torches, etc.)
+        // because the checkpoint doesn't advance past failed placements.
+        // Destructive mining would undo valid progress — TSK-0124 regression.
+        //
+        // Only these common world-gen blocks are safe to mine during building:
+        const NATURAL_TERRAIN = new Set([
+          // Dirt variants
+          'grass_block', 'dirt', 'coarse_dirt', 'podzol', 'mycelium',
+          'rooted_dirt', 'mud', 'muddy_mangrove_roots',
+          // Stone variants (natural generation only — not cobblestone placed by bot)
+          'stone', 'andesite', 'diorite', 'granite', 'deepslate',
+          'tuff', 'calcite', 'dripstone_block', 'pointed_dripstone',
+          // Sand variants
+          'sand', 'red_sand', 'sandstone', 'red_sandstone',
+          // Gravel & clay
+          'gravel', 'clay',
+          // Overworld surface
+          'moss_block', 'moss_carpet',
+          // Vegetation (also handled by C#-side TSK-0122 vegetation clearing)
+          'short_grass', 'grass', 'tall_grass', 'fern', 'large_fern',
+          'dandelion', 'poppy', 'blue_orchid', 'allium', 'azure_bluet',
+          'red_tulip', 'orange_tulip', 'white_tulip', 'pink_tulip',
+          'oxeye_daisy', 'cornflower', 'lily_of_the_valley', 'wither_rose',
+          'sunflower', 'lilac', 'rose_bush', 'peony',
+          'brown_mushroom', 'red_mushroom',
+          'dead_bush', 'vine', 'glow_lichen',
+          'snow', 'powder_snow',
+          // Waterlogged / underwater
+          'seagrass', 'tall_seagrass', 'kelp', 'kelp_plant',
+          // Nether surface
+          'netherrack', 'crimson_nylium', 'warped_nylium',
+          'blackstone', 'basalt', 'soul_sand', 'soul_soil',
+          'crimson_roots', 'warped_roots', 'nether_sprouts',
+          'crimson_fungus', 'warped_fungus',
         ]);
-        if (UNBREAKABLE.has(targetBlockName)) {
-          logStructured('warn', 'place', 'terrain collision — unbreakable block, skipping', {
+
+        if (!NATURAL_TERRAIN.has(targetBlockName)) {
+          // Block is not natural terrain — could be a blueprint block placed by
+          // the bot (door, chest, torch, etc.) or a player-placed structure.
+          // DO NOT mine it. Skip and let the planner adjust.
+          logStructured('warn', 'place', 'terrain collision — non-natural block, skipping', {
             material: shortMat, x, y, z, existingBlock: targetBlockName,
+            reason: 'nonTerrainBlock',
           });
           sendEvent('blockPlaceSkipped', { x, y, z, block: shortMat, existingBlock: targetBlockName, correlationId, reason: 'terrainOccupied' });
           break;
         }
-        logStructured('info', 'place', 'mining wrong block to replace', {
+
+        // Mine the natural terrain block, then place the correct one
+        logStructured('info', 'place', 'mining natural terrain to replace', {
           existingBlock: targetBlockName, desiredBlock: shortMat, x, y, z,
         });
         try {
           await bot.pathfinder.goto(new pfGoals.GoalNear(x, y, z, 2));
-          // Equip best tool for the block (creative mode doesn't care, survival does)
           const bestTool = bot.pathfinder.bestHarvestTool(targetBlock);
           if (bestTool) await bot.equip(bestTool, 'hand');
           await bot.dig(targetBlock);
-          logStructured('info', 'place', 'mined wrong block, continuing to place correct one', {
+          logStructured('info', 'place', 'mined natural terrain, continuing to place', {
             existingBlock: targetBlockName, desiredBlock: shortMat,
           });
           // Target is now clear — fall through to normal placement flow below.
         } catch (e) {
-          logStructured('error', 'place', 'failed to mine wrong block', {
+          logStructured('error', 'place', 'failed to mine natural terrain', {
             existingBlock: targetBlockName, desiredBlock: shortMat, error: e.message,
           });
           sendEvent('blockPlaceSkipped', { x, y, z, block: shortMat, existingBlock: targetBlockName, correlationId, reason: 'terrainOccupied' });
@@ -996,9 +1034,11 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       }
 
       if (!placed) {
-        throw new Error(
-          `Cannot place ${material} at (${x},${y},${z}) — no solid reference block` +
-          (lastRefError ? ` (last face error: ${lastRefError})` : ''));
+        logStructured('warn', 'place', 'cannot place — no reference block', {
+          x, y, z, material: shortMat, lastRefError,
+        });
+        sendEvent('blockPlaceSkipped', { x, y, z, block: shortMat, correlationId, reason: 'noReference' });
+        break;
       }
       sendEvent('blockPlaced', { x, y, z, block: shortMat, correlationId });
       break;

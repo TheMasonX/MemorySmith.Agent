@@ -1,0 +1,11 @@
+{
+  "id": "tsk-0180",
+  "title": "Move Gemini API key from URL query string to HTTP header",
+  "status": "Backlog",
+  "priority": "Critical",
+  "type": "Task",
+  "labels": ["security", "sprint-53", "p0", "llm"],
+  "description": "## Problem\n`GeminiProvider.cs:44` places the `LlmApiKey` in the URL query string:\n```csharp\nvar endpoint = $\"/v1beta/models/{options.LlmApiKey}:generateContent?key={options.LlmApiKey}\";\n```\nThis leaks the API key to:\n- Serilog HTTP request logging\n- .NET HttpClient diagnostic handlers\n- Proxy servers, CDNs, networking infrastructure\n\n## Desired Outcome\nAPI key passed via `x-goog-api-key` HTTP header instead of URL query string.\n\n## Scope\n- `Agent.Planning/Llm/GeminiProvider.cs` — change endpoint and add header\n- Add unit test asserting the URL contains no `?key=`\n\n## Non-Goals\n- Changing any other provider (Ollama, OpenAI, Anthropic already use headers correctly)\n- Adding general API key masking (covered by TSK-0184)\n\n## Acceptance Criteria\n- [ ] Gemini API endpoint no longer includes `?key={apiKey}` in URL\n- [ ] API key set via `request.Headers.Add(\"x-goog-api-key\", ...)`\n- [ ] Unit test asserts: URL does not contain API key; header does\n- [ ] All existing tests pass",
+  "assigneeMode": "Custom",
+  "assigneeCustomText": "Agent"
+}

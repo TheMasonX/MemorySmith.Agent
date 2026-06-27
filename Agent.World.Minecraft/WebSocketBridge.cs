@@ -165,80 +165,89 @@ public sealed class WebSocketBridge(string uri,
         const int maxRetries = 3;
         const int retryDelayMs = 5000;
 
-        for (var attempt = 0; attempt <= maxRetries; attempt++)
+        try
         {
-            if (ct.IsCancellationRequested) return;
+            for (var attempt = 0; attempt <= maxRetries; attempt++)
+            {
+                if (ct.IsCancellationRequested) return;
 
-            try
-            {
-                await ReceiveLoopAsync(ct);
-                return; // Normal completion (connection closed cleanly)
-            }
-            catch (OperationCanceledException)
-            {
-                _logger.LogInformation("WebSocketBridge: Receive loop cancelled (normal shutdown)");
-                return;
-            }
-            catch (WebSocketException ex) when (attempt < maxRetries)
-            {
-                _logger.LogWarning(ex,
-                    "WebSocketBridge: Receive loop crashed (attempt {Attempt}/{MaxRetries}). Reconnecting in {DelayMs}ms...",
-                    attempt + 1, maxRetries, retryDelayMs);
-            }
-            catch (Exception ex) when (attempt < maxRetries)
-            {
-                _logger.LogWarning(ex,
-                    "WebSocketBridge: Receive loop crashed with unexpected error (attempt {Attempt}/{MaxRetries}). Reconnecting in {DelayMs}ms...",
-                    attempt + 1, maxRetries, retryDelayMs);
-            }
-
-            // Attempt reconnection
-            try
-            {
-                await Task.Delay(retryDelayMs, ct);
-
-                // Dispose old socket and reconnect
-                if (_ws is not null)
+                try
                 {
-                    try { _ws.Dispose(); } catch { /* best-effort cleanup */ }
+                    await ReceiveLoopAsync(ct);
+                    return; // Normal completion (connection closed cleanly)
+                }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogInformation("WebSocketBridge: Receive loop cancelled (normal shutdown)");
+                    return;
+                }
+                catch (WebSocketException ex) when (attempt < maxRetries)
+                {
+                    _logger.LogWarning(ex,
+                        "WebSocketBridge: Receive loop crashed (attempt {Attempt}/{MaxRetries}). Reconnecting in {DelayMs}ms...",
+                        attempt + 1, maxRetries, retryDelayMs);
+                }
+                catch (Exception ex) when (attempt < maxRetries)
+                {
+                    _logger.LogWarning(ex,
+                        "WebSocketBridge: Receive loop crashed with unexpected error (attempt {Attempt}/{MaxRetries}). Reconnecting in {DelayMs}ms...",
+                        attempt + 1, maxRetries, retryDelayMs);
                 }
 
-                _ws = new ClientWebSocket();
-                await _ws.ConnectAsync(_uri, ct);
-
-                // Re-send handshake if previously configured
-                if (!string.IsNullOrWhiteSpace(_adapterSecret))
+                // Attempt reconnection
+                try
                 {
-                    using var ms = new System.IO.MemoryStream();
-                    using var writer = new Utf8JsonWriter(ms);
-                    writer.WriteStartObject();
-                    writer.WriteString("type", "handshake");
-                    writer.WriteString("secret", _adapterSecret);
-                    writer.WriteEndObject();
-                    await writer.FlushAsync(ct);
-                    await _ws.SendAsync(ms.ToArray(), WebSocketMessageType.Text,
-                        endOfMessage: true, ct);
-                }
+                    await Task.Delay(retryDelayMs, ct);
 
-                _logger.LogInformation("WebSocketBridge: Reconnect succeeded (attempt {Attempt})", attempt + 1);
+                    // Dispose old socket and reconnect
+                    if (_ws is not null)
+                    {
+                        try { _ws.Dispose(); } catch { /* best-effort cleanup */ }
+                    }
+
+                    _ws = new ClientWebSocket();
+                    await _ws.ConnectAsync(_uri, ct);
+
+                    // Re-send handshake if previously configured
+                    if (!string.IsNullOrWhiteSpace(_adapterSecret))
+                    {
+                        using var ms = new System.IO.MemoryStream();
+                        using var writer = new Utf8JsonWriter(ms);
+                        writer.WriteStartObject();
+                        writer.WriteString("type", "handshake");
+                        writer.WriteString("secret", _adapterSecret);
+                        writer.WriteEndObject();
+                        await writer.FlushAsync(ct);
+                        await _ws.SendAsync(ms.ToArray(), WebSocketMessageType.Text,
+                            endOfMessage: true, ct);
+                    }
+
+                    _logger.LogInformation("WebSocketBridge: Reconnect succeeded (attempt {Attempt})", attempt + 1);
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex,
+                        "WebSocketBridge: Reconnect failed (attempt {Attempt}/{MaxRetries})",
+                        attempt + 1, maxRetries);
+                }
             }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex,
-                    "WebSocketBridge: Reconnect failed (attempt {Attempt}/{MaxRetries})",
-                    attempt + 1, maxRetries);
-            }
+
+            // All retries exhausted — permanent failure
+            _logger.LogError(
+                "WebSocketBridge: All {MaxRetries} reconnect attempts failed. Agent is permanently deaf.",
+                maxRetries);
         }
-
-        // All retries exhausted — permanent failure
-        _logger.LogError(
-            "WebSocketBridge: All {MaxRetries} reconnect attempts failed. Agent is permanently deaf.",
-            maxRetries);
-        _inbound.Writer.TryComplete();
+        finally
+        {
+            // TSK-0112: complete the inbound channel on ALL terminal paths
+            // (normal close, cancellation, error, retry exhaustion) so readers
+            // are never left suspended on a clean shutdown.
+            _inbound.Writer.TryComplete();
+        }
     }
 
     private async Task ReceiveLoopAsync(CancellationToken ct)

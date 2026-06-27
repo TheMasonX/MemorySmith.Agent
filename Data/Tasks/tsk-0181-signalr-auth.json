@@ -1,0 +1,11 @@
+{
+  "id": "tsk-0181",
+  "title": "Add API key authentication to SignalR /agent-hub",
+  "status": "Backlog",
+  "priority": "Critical",
+  "type": "Task",
+  "labels": ["security", "sprint-53", "p0", "signalr"],
+  "description": "## Problem\n`WebUI.Blazor/AgentHub.cs` is mapped at `/agent-hub` with no authentication:\n```csharp\napp.MapHub<AgentHub>(\"/agent-hub\");  // No auth gate!\n```\nAny client on the LAN can connect and receive real-time `StatusUpdated`, `ChatMessage`, and `GoalUpdate` events including bot position, health, inventory, and chat messages.\n\n## Desired Outcome\nSignalR hub requires the same API key as REST endpoints.\n\n## Scope\n- Add authentication check to `AgentHub.OnConnectedAsync` or middleware\n- Reuse `ApiKeyMiddleware` pattern (validate `X-Api-Key` header on WebSocket upgrade)\n- Return 401 for unauthenticated connections\n\n## Non-Goals\n- Adding OAuth/OIDC flow (overkill for local dashboard)\n- Changing REST API authentication (already handled by ApiKeyMiddleware)\n\n## Acceptance Criteria\n- [ ] Unauthenticated WebSocket connection to `/agent-hub` returns 401\n- [ ] Authenticated connection (valid `X-Api-Key` header) succeeds\n- [ ] Unit/integration test verifies auth gate\n- [ ] Dashboard continues to work with API key",
+  "assigneeMode": "Custom",
+  "assigneeCustomText": "Agent"
+}

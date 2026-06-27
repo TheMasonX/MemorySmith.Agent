@@ -700,16 +700,17 @@ public sealed class AgentBackgroundService(
                     var skipReason = bps.X == _worldState.Position.X
                         && bps.Y == _worldState.Position.Y
                         && bps.Z == _worldState.Position.Z
-                        ? "botPosition" : "terrainOccupied";
+                        ? "botPosition"
+                        : string.IsNullOrEmpty(bps.ExistingBlock) ? "noReference" : $"occupiedBy_{bps.ExistingBlock}";
                     logger.LogWarning(
-                        "[place] SKIPPED at ({X},{Y},{Z}) — {Reason} (trying to place {Block})",
-                        bps.X, bps.Y, bps.Z, skipReason, bps.Block);
-                    if (skipReason == "botPosition")
-                    {
-                        // Bot is in the way — advance checkpoint so we don't loop forever
-                        AdvanceBuildCheckpoint("PlaceBlock");
-                        logger.LogDebug("[build] checkpoint advanced past bot-position skip at ({X},{Y},{Z})", bps.X, bps.Y, bps.Z);
-                    }
+                        "[place] SKIPPED at ({X},{Y},{Z}) — {Reason} (trying to place {Block}, existing={ExistingBlock})",
+                        bps.X, bps.Y, bps.Z, skipReason, bps.Block, bps.ExistingBlock);
+                    // TSK-0124: Always advance checkpoint on skip — retrying the same
+                    // position indefinitely causes the stall loop. Bot-position skips
+                    // and non-terrain collisions both mean the block can't be placed
+                    // right now; let the replan revisit later if needed.
+                    AdvanceBuildCheckpoint("PlaceBlock");
+                    logger.LogDebug("[build] checkpoint advanced past skip at ({X},{Y},{Z}) reason={Reason}", bps.X, bps.Y, bps.Z, skipReason);
                     CompleteCorrelatedActionByTool("PlaceBlock");
                     break;
 

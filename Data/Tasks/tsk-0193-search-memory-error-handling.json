@@ -1,0 +1,11 @@
+{
+  "id": "tsk-0193",
+  "title": "Add error handling to SearchAsync and SearchMemoryTool",
+  "status": "Backlog",
+  "priority": "High",
+  "type": "Task",
+  "labels": ["reliability", "sprint-53", "p1", "memory"],
+  "description": "## Problem\n`RestMemoryGateway.SearchAsync` (line 36-48) has zero error handling:\n```csharp\nvar hits = await http.GetFromJsonAsync<SearchHit[]>(url, JsonOpts, cancellationToken) ?? [];\n```\nNo try/catch for HttpRequestException, TaskCanceledException, or JsonException. `SearchMemoryTool.ExecuteAsync` (line 54) also has no try/catch. A transient network blip crashes the tool execution loop.\n\n## Desired Outcome\nSearch failures return empty results (logged as warnings) rather than throwing.\n\n## Scope\n- `RestMemoryGateway.SearchAsync` — add try/catch, log warning, return empty on recoverable errors\n- `SearchMemoryTool.ExecuteAsync` — wrap in try/catch, return `ToolResult(false, ...)` on failure\n- Exception: propagate `OperationCanceledException` (cancellation is intentional)\n\n## Acceptance Criteria\n- [ ] HTTP 500 from MemorySmith returns empty results, not throw\n- [ ] Network timeout returns empty results, not throw\n- [ ] SearchMemoryTool returns `ToolResult(false, \"Search failed: {message}\")` on error\n- [ ] Unit test verifies graceful degradation\n- [ ] All existing tests pass",
+  "assigneeMode": "Custom",
+  "assigneeCustomText": "Agent"
+}

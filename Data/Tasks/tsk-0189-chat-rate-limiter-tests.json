@@ -1,0 +1,11 @@
+{
+  "id": "tsk-0189",
+  "title": "Add ChatRateLimiter.TryAcquire unit tests",
+  "status": "Backlog",
+  "priority": "Critical",
+  "type": "Task",
+  "labels": ["testing", "sprint-53", "p0", "llm"],
+  "description": "## Problem\n`ChatRateLimiter.TryAcquire` has zero dedicated tests. The file `ChatRateLimiter.cs` appears nowhere in the test project except as a constructor dependency of `LlmChatInterpreterTests`. Critical paths untested:\n1. Per-player cooldown enforcement\n2. Global per-minute max (fill sliding window → blocked)\n3. Concurrent access thread-safety (`lock(_lock)` block)\n4. `Prune()` method (evicts stale entries)\n5. `waitTime` calculation accuracy\n6. Player name case-insensitivity\n\n## Desired Outcome\nDedicated `ChatRateLimiterTests.cs` with full coverage.\n\n## Scope\n- Create `MemorySmith.Agent.Tests/ChatRateLimiterTests.cs`\n- Test: first-acquire succeeds, same-player-within-cooldown blocked, different-players independent, global-window full blocked, window slides after expiry, prune removes old entries, case-insensitive names\n\n## Acceptance Criteria\n- [ ] Minimum 6 test methods covering boundary conditions\n- [ ] Concurrent access test (multiple threads calling TryAcquire)\n- [ ] All tests pass\n- [ ] No new build warnings",
+  "assigneeMode": "Custom",
+  "assigneeCustomText": "Agent"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "tsk-0186",
+  "title": "Synchronize AgentBackgroundService shared mutable fields",
+  "status": "Backlog",
+  "priority": "High",
+  "type": "Task",
+  "labels": ["thread-safety", "sprint-53", "p1", "core"],
+  "description": "## Problem\n`AgentBackgroundService.cs` has shared mutable fields accessed from multiple threads without synchronization:\n- `_currentGoal` (line 171): Written in `SetGoal()`, `ProcessEventsAsync`, read via `CurrentGoal` property from REST API\n- `_consecutiveFailures` (line 173): Written in `DispatchActionsAsync`, read via `ConsecutiveFailures` property\n- `_connectionStatus` (line 182): Written in `ExecuteAsync`, read externally\n\nUnder concurrent access (event loop + REST API endpoint), readers may see stale or inconsistent state.\n\n## Desired Outcome\nAll shared mutable fields are thread-safe.\n\n## Scope\n- Add `lock` or `Interlocked` to `_currentGoal`, `_consecutiveFailures`, `_connectionStatus`\n- Convert `_connectionStatus` to an enum if still a string\n- Add concurrent-access stress test\n\n## Non-Goals\n- Changing the overall architecture (single event loop is correct for event ordering)\n- Synchronizing `_worldState` (covered by TSK-0187)\n\n## Acceptance Criteria\n- [ ] `_currentGoal` updates are atomic (lock or `Interlocked.Exchange`)\n- [ ] `_consecutiveFailures` uses `Volatile.Read/Write` or `Interlocked`\n- [ ] `_connectionStatus` is thread-safe\n- [ ] Concurrent-access stress test passes (read from REST endpoint while event loop writes)\n- [ ] All existing tests pass",
+  "assigneeMode": "Custom",
+  "assigneeCustomText": "Agent"
+}
