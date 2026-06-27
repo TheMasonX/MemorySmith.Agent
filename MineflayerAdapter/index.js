@@ -755,8 +755,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
 
       // Sprint 42 (TSK-0074): Check if target position already has the correct block.
       // If so, skip placement entirely — the block is already in the desired state.
-      // If occupied by a different block, log it as a terrain collision and skip
-      // (the physical position is filled; a future terrain-clearance pass can fix it).
+      // If occupied by a different block, MINE IT first, then place the correct one.
       const targetPos = toVec3(x, y, z);
       const targetBlock = bot.blockAt(targetPos);
       const shortMat = material.replace('minecraft:', '');
@@ -767,14 +766,42 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           sendEvent('blockPlaced', { x, y, z, block: shortMat, correlationId });
           break;
         }
-        logStructured('warn', 'place', 'terrain collision — skipping occupied position', {
-          material: shortMat, x, y, z, existingBlock: targetBlockName,
+        // Sprint 52: wrong block in the way — mine it, then place the correct one.
+        // Thread carefully to avoid destroying blocks that shouldn't be touched:
+        // - Skip unbreakable blocks (bedrock, barrier, command blocks, etc.)
+        // - Log clearly so incorrect mines are traceable
+        const UNBREAKABLE = new Set([
+          'bedrock', 'barrier', 'command_block', 'chain_command_block',
+          'repeating_command_block', 'structure_block', 'structure_void',
+          'end_portal_frame', 'end_portal', 'nether_portal',
+        ]);
+        if (UNBREAKABLE.has(targetBlockName)) {
+          logStructured('warn', 'place', 'terrain collision — unbreakable block, skipping', {
+            material: shortMat, x, y, z, existingBlock: targetBlockName,
+          });
+          sendEvent('blockPlaceSkipped', { x, y, z, block: shortMat, existingBlock: targetBlockName, correlationId, reason: 'terrainOccupied' });
+          break;
+        }
+        logStructured('info', 'place', 'mining wrong block to replace', {
+          existingBlock: targetBlockName, desiredBlock: shortMat, x, y, z,
         });
-        // Sprint 43 (P0-4): emit blockPlaceSkipped instead of blockPlaced for terrain
-        // collisions. The C# side completes the correlation (so the tool loop continues)
-        // but does NOT advance the build checkpoint — preventing permanent holes.
-        sendEvent('blockPlaceSkipped', { x, y, z, block: shortMat, existingBlock: targetBlockName, correlationId });
-        break;
+        try {
+          await bot.pathfinder.goto(new pfGoals.GoalNear(x, y, z, 2));
+          // Equip best tool for the block (creative mode doesn't care, survival does)
+          const bestTool = bot.pathfinder.bestHarvestTool(targetBlock);
+          if (bestTool) await bot.equip(bestTool, 'hand');
+          await bot.dig(targetBlock);
+          logStructured('info', 'place', 'mined wrong block, continuing to place correct one', {
+            existingBlock: targetBlockName, desiredBlock: shortMat,
+          });
+          // Target is now clear — fall through to normal placement flow below.
+        } catch (e) {
+          logStructured('error', 'place', 'failed to mine wrong block', {
+            existingBlock: targetBlockName, desiredBlock: shortMat, error: e.message,
+          });
+          sendEvent('blockPlaceSkipped', { x, y, z, block: shortMat, existingBlock: targetBlockName, correlationId, reason: 'terrainOccupied' });
+          break;
+        }
       }
 
       // Sprint 52 (TSK-0123): When the bot is effectively standing at the target
