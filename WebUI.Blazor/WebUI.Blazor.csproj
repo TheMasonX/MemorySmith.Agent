@@ -6,12 +6,8 @@
     <Nullable>enable</Nullable>
     <RootNamespace>WebUI.Blazor</RootNamespace>
     <AssemblyName>WebUI.Blazor</AssemblyName>
-    <!-- NU1903 suppression REMOVED per audit finding (too broad for greenfield codebase).
-         SQLitePCLRaw.lib.e_sqlite3 2.1.11 still flagged by GHSA-2m69-gcr7-jv3q
-         (SQLite native library CVE, not in our log-write logic). We keep this as a
-         visible warning (not suppressed) and use WarningsNotAsErrors so the build
-         succeeds while the advisory remains visible for human triage.
-         Revisit when Microsoft.Data.Sqlite / Serilog.Sinks.SQLite update. -->
+    <!-- Sprint 51: SQLitePCLRaw removed (deprecated, unpatched CVE-2025-6965).
+         Serilog.Sinks.SQLite dropped. File sink used for persistent log storage. -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,11 +23,10 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.EventLog" Version="4.0.0" />
-    <PackageReference Include="Serilog.Sinks.SQLite" Version="7.0.0" />
-    <!-- Pinned to 2.1.11 to fix NU1903 (GHSA-2m69-gcr7-jv3q) in transitive
-         SQLitePCLRaw.lib.e_sqlite3 2.1.6. Upgrade when Serilog.Sinks.SQLite
-         updates its dependency range. -->
-    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.11" />
+    <!-- Serilog.Sinks.SQLite and SQLitePCLRaw.lib.e_sqlite3 REMOVED Sprint 51.
+         The SQLitePCLRaw package is deprecated (no patched version for
+         GHSA-2m69-gcr7-jv3q / CVE-2025-6965, CVSS 7.2 High).
+         Use Serilog.Sinks.File for persistent log storage instead. -->
   </ItemGroup>
 
   <!-- Sprint 4a/4b: SignalR push for StatusUpdated, ChatMessage, GoalUpdate events -->

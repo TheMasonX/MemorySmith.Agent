@@ -1,5 +1,5 @@
 // MemorySmith.Agent — Web UI & Agent Host
-// v0.50.2  Sprint 50 — Dashboard Wave D: Context Wiring, Chat Cleanup, SQLite Telemetry
+// v0.51.0  Sprint 51 — Wave A: Canonicalize & Classify + Harden Robustness
 
 using Agent.Construction;
 using Agent.Core;
@@ -56,22 +56,10 @@ builder.Host.UseSerilog((context, services, loggerConfig) =>
     var buffer = services.GetRequiredService<LiveLogBuffer>();
     loggerConfig.WriteTo.Sink(new DashboardLogSink(buffer));
 
-    // TSK-0014: Serilog SQLite sink for runtime telemetry persistence.
-    // Writes all logs (Warning+) to a local SQLite database for offline analysis.
-    // Configure via Agent:Logging:Sqlite section in appsettings.json.
-    var sqliteEnabled = loggingConfig.GetValue<bool>("Sqlite:Enabled");
-    if (sqliteEnabled)
-    {
-        var sqlitePath = loggingConfig.GetValue<string>("Sqlite:Path") ?? "logs/agent-telemetry.db";
-        var sqliteLevelName = loggingConfig.GetValue<string>("Sqlite:Level") ?? "Warning";
-        if (Enum.TryParse<LogEventLevel>(sqliteLevelName, true, out var sqliteLevel))
-        {
-            loggerConfig.WriteTo.SQLite(
-                sqlitePath,
-                restrictedToMinimumLevel: sqliteLevel,
-                batchSize: 50);
-        }
-    }
+    // SQLite sink REMOVED Sprint 51: Serilog.Sinks.SQLite 7.0.0 transitively depends on
+    // SQLitePCLRaw.lib.e_sqlite3 2.1.11 which is DEPRECATED with an UNPATCHED high-severity
+    // CVE (GHSA-2m69-gcr7-jv3q / CVE-2025-6965, CVSS 7.2). The File sink provides
+    // persistent log storage without the dependency chain. See BREAKING_CHANGES.md.
 });
 
 
@@ -427,7 +415,7 @@ app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
 {
     Name    = "MemorySmith.Agent",
     Version = "0.50.2",
-    Phase   = "Sprint 50 — Dashboard Wave D: Context Wiring, Chat Cleanup, SQLite Telemetry",
+    Phase   = "Sprint 51 — Wave A: Canonicalize & Classify + Harden Robustness",
     License = "MIT",
     Repository  = "https://github.com/TheMasonX/MemorySmith.Agent",
     Dashboard   = "/index.html",

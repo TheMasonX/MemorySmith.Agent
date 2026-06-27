@@ -15,6 +15,21 @@ for the full deprecation policy, version rules, and migration templates.
 
 ---
 
+## Package Vetting Policy
+
+All NuGet/npm dependencies must comply with [`Data/Pages/policies/package-vetting.md`](Data/Pages/policies/package-vetting.md):
+
+- **P-1:** Documented justification required for every new package.
+- **P-2:** Every dependency must be listed in `WebUI.Blazor/wwwroot/about.html`.
+- **P-3:** Vulnerable packages are a P0 blocker — `dotnet list package --vulnerable` must return zero results.
+- **P-4:** Deprecated packages are prohibited.
+- **P-5:** Direct pinning of transitive deps requires justification and a removal plan.
+
+**Sprint 51 Incident:** `SQLitePCLRaw.lib.e_sqlite3` (deprecated, CVE-2025-6965 CVSS 7.2) was
+removed after being added without vetting in Sprint 50. The policy above prevents recurrence.
+
+---
+
 ---
 
 ## No Magic Numbers

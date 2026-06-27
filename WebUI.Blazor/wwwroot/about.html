@@ -116,7 +116,7 @@
     <h1>MemorySmith.Agent</h1>
     <p style="margin-top:0.5rem">
       <span class="badge badge-green">v0.51.0</span>
-      <span class="badge badge-green">Sprint 50 — Dashboard Wave D</span>
+      <span class="badge badge-green">Sprint 51 — Wave A Complete</span>
       <span class="badge badge-muted">MIT License</span>
       <span class="badge badge-muted">.NET 10</span>
     </p>
@@ -135,38 +135,54 @@
     backed by a searchable knowledge base of facts, blueprints, and observations.
   </p>
 
-  <h2>Sprint 50 — Dashboard Waves C &amp; D</h2>
+  <h2>Sprint 51 — Wave A: Canonicalize &amp; Harden</h2>
   <p>
-    <strong>Wave C</strong> — Production-quality dashboard experience:
+    <strong>Track 1</strong> — Canonicalize &amp; Classify (15 tasks, ~5 hrs):
   </p>
   <ul style="color:var(--muted);font-size:0.9rem;margin-bottom:0.5rem;line-height:1.8">
-    <li>✅ <strong>Landing page</strong> — Root <code>/</code> redirects to the dashboard</li>
-    <li>✅ <strong>Navigation</strong> — Header nav with Dashboard/About links, tabbed views (Overview/Logs/Timeline)</li>
-    <li>✅ <strong>Status panel</strong> — Real-time SignalR status, uptime counter, uncertainty display, enhanced metrics</li>
-    <li>✅ <strong>Live log</strong> — Persistent mini-log on Overview with level filtering, Auto-scroll toggle, error/warning badges</li>
-    <li>✅ <strong>Version info</strong> — Version badge in header, updated about page</li>
+    <li>✅ <strong>Bridge classification</strong> — All compatibility bridges classified as Permanent/Temporary/Obsolete in architecture.md</li>
+    <li>✅ <strong>Canonical pipeline</strong> — Mermaid diagram in architecture.md, README links canonical source</li>
+    <li>✅ <strong>Dead code removal</strong> — <code>_agentRuntime</code> field removed, lying comment fixed</li>
+    <li>✅ <strong>Regex hardening</strong> — SearchMemoryTool regex fragility fixed, coordinate scanning added</li>
+    <li>✅ <strong>Kind guards</strong> — SearchResult.Kind disambiguation (page vs memory) verified at all consumer sites</li>
+    <li>✅ <strong>Deprecation policy</strong> — BREAKING_CHANGES.md adopted with semantic versioning and migration guides</li>
+    <li>✅ <strong>MakeAction freeze</strong> — Arguments dictionary frozen at build time, preventing mutation bugs</li>
+    <li>✅ <strong>UpdatePageAsync title</strong> — Title parameter added, MockMemoryGateway updated</li>
   </ul>
   <p>
-    <strong>Wave D</strong> — Agent runtime hardening &amp; telemetry:
+    <strong>Track 2</strong> — Harden Robustness (5 tasks, ~1.5 hrs):
   </p>
-  <ul style="color:var(--muted);font-size:0.9rem;margin-bottom:1rem;line-height:1.8">
-    <li>✅ <strong>Context wiring</strong> — Tool Context merged into Arguments before dispatch (TSK-0004)</li>
-    <li>✅ <strong>Chat cleanup</strong> — Removed dead GatherRegex/BuildRegex/CraftRegex fields (TSK-0118)</li>
-    <li>✅ <strong>SQLite telemetry</strong> — Serilog SQLite sink for runtime log persistence (TSK-0014)</li>
+  <ul style="color:var(--muted);font-size:0.9rem;margin-bottom:0.5rem;line-height:1.8">
+    <li>✅ <strong>Task.WhenAll unwrap</strong> — AggregateException properly unwrapped (no silent exception masking)</li>
+    <li>✅ <strong>DeathEvent handler</strong> — Cancel goal, clear queue, mark inventory stale on death</li>
+    <li>✅ <strong>Fault logging</strong> — MonitorAndCancelOnFaultAsync logs all errors (no bare catch)</li>
+    <li>✅ <strong>Logging levels</strong> — SQLite loglevel raised to Information, Agent.Planning overrides removed</li>
+    <li>✅ <strong>Terminal recovery</strong> — Logs warning after MaxConsecutiveFailures instead of silent idle</li>
   </ul>
+  <p>
+    <strong>Track 3</strong> — S50 Partials (3 tasks, ~1.5 hrs):
+  </p>
+  <ul style="color:var(--muted);font-size:0.9rem;margin-bottom:0.5rem;line-height:1.8">
+    <li>✅ <strong>TSK-0081 closed</strong> — Per council: low marginal value, deferred to S53+</li>
+    <li>✅ <strong>TSK-0004 noted</strong> — MoveTo context injection partially delivered in S50</li>
+    <li>✅ <strong>TSK-0014 replaced</strong> — SQLite telemetry removed; CVE-2025-6965 (CVSS 7.2) unpatched in transitive dep</li>
+  </ul>
+  <p>
+    <strong>🔒 Security:</strong> Removed <code>Serilog.Sinks.SQLite</code> / <code>SQLitePCLRaw.lib.e_sqlite3</code> — deprecated package with unpatched high-severity CVE (GHSA-2m69-gcr7-jv3q). File sink provides equivalent persistent log storage without the vulnerability chain.
+  </p>
 
   <h2>Phase Status</h2>
   <div class="phases">
     <div class="phase-card">
-      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 0 — Skeleton</div>
-      <div class="phase-desc">Interfaces, wiki, CI baseline</div>
+      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 5 — Observability</div>
+      <div class="phase-desc">SignalR push, live log, status panels, About page (Sprints 49-51)</div>
     </div>
     <div class="phase-card">
-      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 1 — Core MVP</div>
-      <div class="phase-desc">WebSocket bridge, MoveToTool, agent loop</div>
+      <div class="phase-title"><span class="badge badge-yellow">⟳</span> Phase 6 — Vision</div>
+      <div class="phase-desc">Spatial analysis, aesthetic critique</div>
     </div>
     <div class="phase-card">
-      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 2 — Memory</div>
+      <div class="phase-title"><span class="badge badge-muted">○</span> Phase 7 — Memory</div>
       <div class="phase-desc">RestMemoryGateway, memory tools, DI wiring</div>
     </div>
     <div class="phase-card">
@@ -226,14 +242,28 @@ dotnet run --project WebUI.Blazor</pre>
   -d '{"goalName":"GatherWood","parameters":{"count":10}}'</pre>
 
   <h2>API Endpoints</h2>
-  <table>
-    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
-    <tr><td>GET</td><td>/</td><td>Health check</td></tr>
-    <tr><td>GET</td><td>/api/agent/status</td><td>Current agent state + goal + health</td></tr>
-    <tr><td>POST</td><td>/api/agent/plan</td><td>Set a goal and enqueue its plan</td></tr>
-    <tr><td>POST</td><td>/api/agent/command</td><td>Enqueue a single raw tool call</td></tr>
-    <tr><td>GET</td><td>/api/goals</td><td>List registered goal names</td></tr>
-    <tr><td>GET</td><td>/api/blueprints</td><td>Blueprint catalog (Phase 3+)</td></tr>
+  <table> (REST API)</td></tr>
+    <tr><td>Mineflayer (Node.js)</td><td>MIT</td><td>Minecraft bot automation</td></tr>
+    <tr><td>ws (Node.js)</td><td>MIT</td><td>WebSocket server in the Mineflayer adapter</td></tr>
+    <tr><td>Serilog.AspNetCore</td><td>MIT</td><td>Structured logging pipeline</td></tr>
+    <tr><td>Serilog.Sinks.Console</td><td>MIT</td><td>Console log output</td></tr>
+    <tr><td>Serilog.Sinks.File</td><td>MIT</td><td>Persistent file-based log storage</td></tr>
+    <tr><td>Serilog.Sinks.EventLog</td><td>MIT</td><td>Windows Event Log sink</td></tr>
+    <tr><td>Microsoft.Extensions.*</td><td>MIT</td><td>DI, logging, configuration, hosted services</td></tr>
+    <tr><td>Microsoft.AspNetCore.*</td><td>MIT</td><td>Web host, SignalR, REST endpoints</td></tr>
+    <tr><td>Microsoft.NET.Test.Sdk</td><td>MIT</td><td>Test runner infrastructure</td></tr>
+    <tr><td>NUnit</td><td>MIT</td><td>Test framework</td></tr>
+    <tr><td>NUnit.Analyzers</td><td>MIT</td><td>NUnit best-practice analyzers</td></tr>
+    <tr><td>NUnit3TestAdapter</td><td>MIT</td><td>Visual Studio test adapter</td></tr>
+    <tr><td>coverlet.collector</td><td>MIT</td><td>Code coverage collection</td></tr>
+    <tr><td>GitHubActionsTestLogger</td><td>MIT</td><td>CI test annotations</td></tr>
+    <tr><td>Microsoft.AspNetCore.Mvc.Testing</td><td>MIT</td><td>Integration test host</td></tr>
+  </table>
+  <p style="font-size:0.8rem;margin-top:0.5rem">
+    <strong>Removed in v0.51.0:</strong> <code>Serilog.Sinks.SQLite</code> (MIT) and <code>SQLitePCLRaw.lib.e_sqlite3</code> (Apache-2.0) —
+    the latter is deprecated with an unpatched high-severity CVE (GHSA-2m69-gcr7-jv3q / CVE-2025-6965, CVSS 7.2).
+    See <a href="https://github.com/TheMasonX/MemorySmith.Agent/blob/main/BREAKING_CHANGES.md" target="_blank" rel="noopener">BREAKING_CHANGES.md</a>.
+  </ptd>GET</td><td>/api/blueprints</td><td>Blueprint catalog (Phase 3+)</td></tr>
     <tr><td>GET</td><td>/api/about</td><td>Project metadata (JSON)</td></tr>
     <tr><td>GET</td><td>/about</td><td>This page</td></tr>
   </table>

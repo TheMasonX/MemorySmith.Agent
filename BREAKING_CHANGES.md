@@ -38,6 +38,7 @@ Internal implementation changes (refactoring, extraction) are NOT breaking unles
 | **`_agentRuntime` field removed** from `AgentBackgroundService` | PATCH | No consumer impact — field was unused. DI registration of `AgentRuntime` still exists for Sprint 52 extraction. | S51 |
 | **`SearchMemoryTool` scans all results** for coordinates (not just top hit) | PATCH | Behavior change: coordinate-carry now considers all search results. Previously only the #1 result was checked. `bestPageId` still returns the top-ranked result's PageId. | S51 |
 | **`CoordLabelsPattern` regex updated** — group names changed from single `"x"` to distinct `"axis"`/`"val"` | PATCH | Internal regex change; no consumer impact unless matching against regex group names directly. | S51 |
+| **`Serilog.Sinks.SQLite` / `SQLitePCLRaw.lib.e_sqlite3` removed** | PATCH | Removed due to unpatched CVE-2025-6965 (CVSS 7.2 High) in deprecated transitive dependency. The `Agent:Logging:Sqlite` config section is now ignored. Use `Serilog.Sinks.File` (already configured) for persistent log storage. Logs previously written to `logs/agent-telemetry.db` are no longer produced. | S51 |
 
 ---
 
