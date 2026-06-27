@@ -343,18 +343,55 @@ public sealed class AgentBackgroundService(
     /// <summary>
     /// Sprint 52: Creative mode inventory provisioning is handled entirely by the
     /// MineflayerAdapter via creativeProvider.js. The adapter uses
-    /// bot.creative.setInventorySlot() (version-agnostic, no OP required) with
-    /// /give fallback for servers that don't support the creative API.
+    /// bot.creative.setInventorySlot() (version-agnostic, no OP required).
     ///
-    /// This method is retained as a no-op anchor — the adapter provisions items
-    /// on-demand during PlaceBlock execution, not up-front.
+    /// Sprint 52: Re-enabled /give as a secondary provisioning path. The adapter
+    /// handles per-block creative inventory, but some items (torch, glass_pane,
+    /// crafting_table, chest) may not appear via setInventorySlot on 1.16.5.
+    /// /give ensures these materials are available before building starts.
     /// </summary>
-    private Task ProvisionGoalIfCreativeAsync(IGoal goal, CancellationToken ct)
+    private async Task ProvisionGoalIfCreativeAsync(IGoal goal, CancellationToken ct)
     {
-        logger.LogDebug(
-            "[creative] adapter handles inventory provisioning — skipping C# /give for goal '{Goal}'",
-            goal.Name);
-        return Task.CompletedTask;
+        try
+        {
+            if (goal is BuildGoal buildGoal)
+            {
+                var materials = buildGoal.Blueprint.Materials
+                    .GroupBy(m => m.Block, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(g => g.Key, g => g.Sum(m => m.Quantity), StringComparer.OrdinalIgnoreCase);
+
+                var anyProvisioned = false;
+                foreach (var (block, quantity) in materials)
+                {
+                    var have = _worldState.Inventory.GetValueOrDefault(block);
+                    var need = Math.Max(0, quantity - have);
+                    if (need <= 0) continue;
+
+                    // 200ms spacing to avoid anti-spam
+                    if (anyProvisioned)
+                        await Task.Delay(200, ct);
+
+                    var giveCmd = $"/give @p {block} {need}";
+                    _queue.Enqueue(new ActionData
+                    {
+                        Tool = "Chat",
+                        Arguments = { ["message"] = giveCmd }
+                    });
+                    logger.LogInformation(
+                        "[creative] /give {Need}x {Item} for '{Blueprint}'",
+                        need, block, buildGoal.Blueprint.Name);
+                    anyProvisioned = true;
+                }
+
+                if (anyProvisioned)
+                    _queue.Enqueue(new ActionData { Tool = "GetStatus" });
+            }
+        }
+        catch (OperationCanceledException) { /* shutdown */ }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "[creative] /give provisioning failed: {Message}", ex.Message);
+        }
     }
 
     // ── BackgroundService ─────────────────────────────────────────────────────

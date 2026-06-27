@@ -31,10 +31,9 @@ public sealed class ReplanGovernor : IReplanGovernor
 
     /// <summary>
     /// Graduated stall recovery delays in seconds.
-    /// Sprint 40 P0-C (Fix): replaced single 60s timeout with graduated retry.
-    /// First stall retries after 10s, then 20s, then 30s, then caps at 60s.
+    /// Sprint 52: reduced from [10, 20, 30, 60] to [5, 10, 20, 30] for faster recovery.
     /// </summary>
-    private static readonly int[] DefaultStallGraduatedDelaysSec = [10, 20, 30, 60];
+    private static readonly int[] DefaultStallGraduatedDelaysSec = [5, 10, 20, 30];
 
     private readonly int _threshold;
     private readonly int[] _graduatedDelaysSec;

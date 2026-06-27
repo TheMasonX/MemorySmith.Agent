@@ -12,11 +12,14 @@ const { logStructured } = require('./logger');
 
 // ── Constants ───────────────────────────────────────────────────────────────
 
-/** Hotbar slot for creative item selection (0-indexed slot 36 = hotbar 1). */
-const CREATIVE_HOTBAR_SLOT = 36;
+/** All hotbar slots to cycle through (0-indexed 36-44 = hotbar 1-9). */
+const HOTBAR_SLOTS = [36, 37, 38, 39, 40, 41, 42, 43, 44];
 
 /** Delay after /give to let the server process the command. */
 const GIVE_DELAY_MS = 100;
+
+/** Current hotbar slot index for round-robin provisioning. */
+let _nextSlotIndex = 0;
 
 // ── Public API ──────────────────────────────────────────────────────────────
 
@@ -46,30 +49,32 @@ async function ensureCreativeItem(bot, itemName, count = 1) {
     return true;
   }
 
-  // Strategy 1: creative inventory API
+  // Strategy 1: creative inventory API — try multiple hotbar slots
   const itemDef = bot.registry.itemsByName[cleanName] || bot.registry.itemsByName[itemName];
   if (itemDef) {
-    try {
-      await bot.creative.setInventorySlot(CREATIVE_HOTBAR_SLOT, itemDef);
-      // Small delay to let the server sync inventory
-      await new Promise(r => setTimeout(r, 50));
-      const verify = bot.inventory.items().find(
-        i => i.name === cleanName || i.name === itemName
-      );
-      if (verify) {
-        logStructured('info', 'creative', 'provisioned via creative API', {
-          item: cleanName, slot: CREATIVE_HOTBAR_SLOT,
-        });
-        return true;
+    // Try all hotbar slots, starting from the current round-robin position
+    for (let attempt = 0; attempt < HOTBAR_SLOTS.length; attempt++) {
+      const slot = HOTBAR_SLOTS[(_nextSlotIndex + attempt) % HOTBAR_SLOTS.length];
+      try {
+        await bot.creative.setInventorySlot(slot, itemDef);
+        await new Promise(r => setTimeout(r, 50));
+        const verify = bot.inventory.items().find(
+          i => i.name === cleanName || i.name === itemName
+        );
+        if (verify) {
+          _nextSlotIndex = (_nextSlotIndex + 1) % HOTBAR_SLOTS.length;
+          logStructured('info', 'creative', 'provisioned via creative API', {
+            item: cleanName, slot,
+          });
+          return true;
+        }
+      } catch (e) {
+        // This slot failed — try next one
       }
-      logStructured('warn', 'creative', 'creative API succeeded but item not in inventory — trying /give', {
-        item: cleanName,
-      });
-    } catch (e) {
-      logStructured('warn', 'creative', 'creative API failed — trying /give', {
-        item: cleanName, error: e.message,
-      });
     }
+    logStructured('warn', 'creative', 'all creative API slots failed — trying /give', {
+      item: cleanName,
+    });
   } else {
     logStructured('warn', 'creative', 'item not in registry — trying /give anyway', {
       item: cleanName,
