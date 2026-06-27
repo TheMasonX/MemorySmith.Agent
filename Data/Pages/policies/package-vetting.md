@@ -10,10 +10,28 @@
 Every new dependency must have a written answer to:
 1. **What problem does it solve?** — Specific feature or capability it enables.
 2. **Why not use what we already have?** — Check existing deps for overlap.
-3. **What is the license?** — Must be MIT, Apache-2.0, BSD-2/3-Clause, or similar permissive license. No GPL/AGPL.
+3. **What is the license?** — Must be one of the **pre-approved** permissive licenses: **MIT**, **Apache-2.0**, or **BSD-2-Clause / BSD-3-Clause**. No other license is accepted without explicit human review. Specifically prohibited: GPL (any version), AGPL, LGPL, SSPL, BUSL, CC-NC, WTFPL, Unlicense, or any proprietary / source-available-with-restrictions license.
 4. **What is the maintenance status?** — Is the package actively maintained? Last release date? Open issue count?
 5. **What is its dependency chain?** — Run `dotnet list package --include-transitive` and inspect for known vulnerabilities.
 6. **What is the attack surface?** — Does it run native code? Open network connections? Write to disk? Access system APIs?
+
+### P-1a: Licensing whitelist
+
+Only the following licenses are pre-approved. Anything else requires explicit human review
+documented in the justification.
+
+| License | SPDX | Notes |
+|:--------|:-----|:------|
+| **MIT** | `MIT` | Fully permissive. No copyleft. Preferred. |
+| **Apache 2.0** | `Apache-2.0` | Permissive with explicit patent grant. Acceptable. |
+| **BSD 2-Clause** | `BSD-2-Clause` | Minimal permissive. Acceptable. |
+| **BSD 3-Clause** | `BSD-3-Clause` | Permissive with no-endorsement clause. Acceptable. |
+
+**Prohibited without exception:** GPL (v2, v3), AGPL, LGPL, SSPL, BUSL, CC-NC, WTFPL,
+Unlicense, or any "source-available" license with use restrictions.
+
+If a dependency changes its license to anything outside the whitelist, it must be
+removed in the next sprint.
 
 ### P-2: Every dependency must be listed in the About page
 

@@ -20,6 +20,7 @@ for the full deprecation policy, version rules, and migration templates.
 All NuGet/npm dependencies must comply with [`Data/Pages/policies/package-vetting.md`](Data/Pages/policies/package-vetting.md):
 
 - **P-1:** Documented justification required for every new package.
+- **P-1a:** License whitelist — MIT, Apache-2.0, BSD-2/3-Clause only. No GPL/AGPL/copyleft.
 - **P-2:** Every dependency must be listed in `WebUI.Blazor/wwwroot/about.html`.
 - **P-3:** Vulnerable packages are a P0 blocker — `dotnet list package --vulnerable` must return zero results.
 - **P-4:** Deprecated packages are prohibited.

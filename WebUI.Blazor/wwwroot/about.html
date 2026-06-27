@@ -136,53 +136,31 @@
   </p>
 
   <h2>Sprint 51 — Wave A: Canonicalize &amp; Harden</h2>
-  <p>
-    <strong>Track 1</strong> — Canonicalize &amp; Classify (15 tasks, ~5 hrs):
-  </p>
+  <p><strong>Track 1</strong> — Canonicalize &amp; Classify (12 completed):</p>
   <ul style="color:var(--muted);font-size:0.9rem;margin-bottom:0.5rem;line-height:1.8">
-    <li>✅ <strong>Bridge classification</strong> — All compatibility bridges classified as Permanent/Temporary/Obsolete in architecture.md</li>
-    <li>✅ <strong>Canonical pipeline</strong> — Mermaid diagram in architecture.md, README links canonical source</li>
-    <li>✅ <strong>Dead code removal</strong> — <code>_agentRuntime</code> field removed, lying comment fixed</li>
-    <li>✅ <strong>Regex hardening</strong> — SearchMemoryTool regex fragility fixed, coordinate scanning added</li>
-    <li>✅ <strong>Kind guards</strong> — SearchResult.Kind disambiguation (page vs memory) verified at all consumer sites</li>
-    <li>✅ <strong>Deprecation policy</strong> — BREAKING_CHANGES.md adopted with semantic versioning and migration guides</li>
-    <li>✅ <strong>MakeAction freeze</strong> — Arguments dictionary frozen at build time, preventing mutation bugs</li>
-    <li>✅ <strong>UpdatePageAsync title</strong> — Title parameter added, MockMemoryGateway updated</li>
+    <li>✅ Bridge classification, canonical pipeline, dead code removal</li>
+    <li>✅ Regex hardening, Kind guards, deprecation policy, MakeAction freeze</li>
   </ul>
-  <p>
-    <strong>Track 2</strong> — Harden Robustness (5 tasks, ~1.5 hrs):
-  </p>
+  <p><strong>Track 2</strong> — Harden Robustness (5 completed):</p>
   <ul style="color:var(--muted);font-size:0.9rem;margin-bottom:0.5rem;line-height:1.8">
-    <li>✅ <strong>Task.WhenAll unwrap</strong> — AggregateException properly unwrapped (no silent exception masking)</li>
-    <li>✅ <strong>DeathEvent handler</strong> — Cancel goal, clear queue, mark inventory stale on death</li>
-    <li>✅ <strong>Fault logging</strong> — MonitorAndCancelOnFaultAsync logs all errors (no bare catch)</li>
-    <li>✅ <strong>Logging levels</strong> — SQLite loglevel raised to Information, Agent.Planning overrides removed</li>
-    <li>✅ <strong>Terminal recovery</strong> — Logs warning after MaxConsecutiveFailures instead of silent idle</li>
+    <li>✅ Task.WhenAll unwrap, DeathEvent handler, fault logging, terminal recovery</li>
   </ul>
-  <p>
-    <strong>Track 3</strong> — S50 Partials (3 tasks, ~1.5 hrs):
-  </p>
-  <ul style="color:var(--muted);font-size:0.9rem;margin-bottom:0.5rem;line-height:1.8">
-    <li>✅ <strong>TSK-0081 closed</strong> — Per council: low marginal value, deferred to S53+</li>
-    <li>✅ <strong>TSK-0004 noted</strong> — MoveTo context injection partially delivered in S50</li>
-    <li>✅ <strong>TSK-0014 replaced</strong> — SQLite telemetry removed; CVE-2025-6965 (CVSS 7.2) unpatched in transitive dep</li>
-  </ul>
-  <p>
-    <strong>🔒 Security:</strong> Removed <code>Serilog.Sinks.SQLite</code> / <code>SQLitePCLRaw.lib.e_sqlite3</code> — deprecated package with unpatched high-severity CVE (GHSA-2m69-gcr7-jv3q). File sink provides equivalent persistent log storage without the vulnerability chain.
+  <p style="margin-bottom:1rem">
+    <strong>🔒 Security:</strong> Removed <code>Serilog.Sinks.SQLite</code> / <code>SQLitePCLRaw.lib.e_sqlite3</code> — deprecated package with unpatched high-severity CVE (GHSA-2m69-gcr7-jv3q / CVE-2025-6965, CVSS 7.2).
   </p>
 
   <h2>Phase Status</h2>
   <div class="phases">
     <div class="phase-card">
-      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 5 — Observability</div>
-      <div class="phase-desc">SignalR push, live log, status panels, About page (Sprints 49-51)</div>
+      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 0 — Skeleton</div>
+      <div class="phase-desc">Interfaces, wiki, CI baseline</div>
     </div>
     <div class="phase-card">
-      <div class="phase-title"><span class="badge badge-yellow">⟳</span> Phase 6 — Vision</div>
-      <div class="phase-desc">Spatial analysis, aesthetic critique</div>
+      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 1 — Core MVP</div>
+      <div class="phase-desc">WebSocket bridge, MoveToTool, agent loop</div>
     </div>
     <div class="phase-card">
-      <div class="phase-title"><span class="badge badge-muted">○</span> Phase 7 — Memory</div>
+      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 2 — Memory</div>
       <div class="phase-desc">RestMemoryGateway, memory tools, DI wiring</div>
     </div>
     <div class="phase-card">
@@ -190,61 +168,52 @@
       <div class="phase-desc">HTN/GOAP, GatherWoodGoal, GoalFactory</div>
     </div>
     <div class="phase-card">
-      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 4 — Dashboard & Observability</div>
-      <div class="phase-desc">SignalR push, live log, status panels (Sprints 49-50)</div>
+      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 4 — Dashboard</div>
+      <div class="phase-desc">WebUI.Blazor host, Blazor pages, SignalR push</div>
     </div>
     <div class="phase-card">
-      <div class="phase-title"><span class="badge badge-yellow">⟳</span> Phase 5 — Vision</div>
+      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 5 — Observability</div>
+      <div class="phase-desc">Live log, status panels, About page (Sprints 49–51)</div>
+    </div>
+    <div class="phase-card">
+      <div class="phase-title"><span class="badge badge-yellow">⟳</span> Phase 6 — Vision</div>
       <div class="phase-desc">Spatial analysis, aesthetic critique</div>
     </div>
     <div class="phase-card">
-      <div class="phase-title"><span class="badge badge-muted">○</span> Phase 6 — Advanced</div>
+      <div class="phase-title"><span class="badge badge-muted">○</span> Phase 7 — Advanced</div>
       <div class="phase-desc">Multi-agent, embeddings, CI/CD pipelines</div>
     </div>
   </div>
-
-  <h2>Architecture</h2>
-  <pre>┬────────────────────────────────────────────────────────┬
-│                   WebUI.Blazor (Host)                  │
-│  REST API + AgentBackgroundService + SignalR (Phase 4) │
-└────┬───────────────┬───────────────────────────────────└
-     │               │
-     ▼               ▼
-┬──────────┬  ┬──────────────────────────────────────────┬
-│ IPlanner │  │           IToolCaller (ToolEngine)       │
-│ HtnPlan- │  │  MoveToTool  StatusTool  SearchMemory    │
-│ ner      │  │  GetPage     CreatePage  (+ future tools) │
-└────┬─────└  └──────┬─────────────────┬────────────────-└
-     │               │                 │
-     ▼               ▼                 ▼
-┬─────────────┬ ┬──────────────┬ ┬────────────────────┬
-│  IGoalFact- │ │ IWorldAdapter│ │  IMemoryGateway    │
-│  ory + Goals│ │ MinecraftAda-│ │  RestMemoryGateway │
-│  GatherWood │ │ pter + Node.j│ │  → MemorySmith API │
-│  SurviveNi- │ │ s (Mineflayer│ └────────────────────└
-│  ght + more │ └──────────────└
-└─────────────└       │
-                       │ WebSocket
-                       ▼
-              ┬─────────────────┬
-              │  Minecraft Bot  │
-              │  (Mineflayer)   │
-              └─────────────────└</pre>
 
   <h2>Quick Start</h2>
   <pre>git clone https://github.com/TheMasonX/MemorySmith.Agent
 cd MemorySmith.Agent
 dotnet restore MemorySmith.Agent.slnx
 dotnet run --project WebUI.Blazor</pre>
-  <p>Then visit <a href="http://localhost:5000/api/agent/status" target="_blank"><code>/api/agent/status</code></a> or send a goal:</p>
+  <p>Then visit <code>/api/agent/status</code> or send a goal:</p>
   <pre>curl -X POST http://localhost:5000/api/agent/plan \
   -H "Content-Type: application/json" \
   -d '{"goalName":"GatherWood","parameters":{"count":10}}'</pre>
 
   <h2>API Endpoints</h2>
-  <table> (REST API)</td></tr>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>GET</td><td>/</td><td>Health check</td></tr>
+    <tr><td>GET</td><td>/api/agent/status</td><td>Current agent state + goal + health</td></tr>
+    <tr><td>POST</td><td>/api/agent/plan</td><td>Set a goal and enqueue its plan</td></tr>
+    <tr><td>POST</td><td>/api/agent/command</td><td>Enqueue a single raw tool call</td></tr>
+    <tr><td>GET</td><td>/api/goals</td><td>List registered goal names</td></tr>
+    <tr><td>GET</td><td>/api/blueprints</td><td>Blueprint catalog</td></tr>
+    <tr><td>GET</td><td>/api/about</td><td>Project metadata (JSON)</td></tr>
+    <tr><td>GET</td><td>/about</td><td>This page</td></tr>
+  </table>
+
+  <h2>Third-party Acknowledgments</h2>
+  <table>
+    <tr><th>Dependency</th><th>License</th><th>Use</th></tr>
+    <tr><td>MemorySmith</td><td>MIT</td><td>Long-term memory and wiki backend (REST API)</td></tr>
     <tr><td>Mineflayer (Node.js)</td><td>MIT</td><td>Minecraft bot automation</td></tr>
-    <tr><td>ws (Node.js)</td><td>MIT</td><td>WebSocket server in the Mineflayer adapter</td></tr>
+    <tr><td>ws (Node.js)</td><td>MIT</td><td>WebSocket server in the adapter</td></tr>
     <tr><td>Serilog.AspNetCore</td><td>MIT</td><td>Structured logging pipeline</td></tr>
     <tr><td>Serilog.Sinks.Console</td><td>MIT</td><td>Console log output</td></tr>
     <tr><td>Serilog.Sinks.File</td><td>MIT</td><td>Persistent file-based log storage</td></tr>
@@ -263,23 +232,13 @@ dotnet run --project WebUI.Blazor</pre>
     <strong>Removed in v0.51.0:</strong> <code>Serilog.Sinks.SQLite</code> (MIT) and <code>SQLitePCLRaw.lib.e_sqlite3</code> (Apache-2.0) —
     the latter is deprecated with an unpatched high-severity CVE (GHSA-2m69-gcr7-jv3q / CVE-2025-6965, CVSS 7.2).
     See <a href="https://github.com/TheMasonX/MemorySmith.Agent/blob/main/BREAKING_CHANGES.md" target="_blank" rel="noopener">BREAKING_CHANGES.md</a>.
-  </ptd>GET</td><td>/api/blueprints</td><td>Blueprint catalog (Phase 3+)</td></tr>
-    <tr><td>GET</td><td>/api/about</td><td>Project metadata (JSON)</td></tr>
-    <tr><td>GET</td><td>/about</td><td>This page</td></tr>
-  </table>
-  <p>See the <a href="/api/about">API about endpoint</a> or the <a href="https://github.com/TheMasonX/MemorySmith.Agent/blob/main/Data/Pages/guides/api-reference.md" target="_blank" rel="noopener">full API reference</a> in the wiki.</p>
-
-  <h2>Third-party Acknowledgments</h2>
-  <table>
-    <tr><th>Dependency</th><th>License</th><th>Use</th></tr>
-    <tr><td>MemorySmith</td><td>MIT</td><td>Long-term memory and wiki backend</td></tr>
-    <tr><td>Mineflayer (Node.js)</td><td>MIT</td><td>Minecraft bot automation</td></tr>
-    <tr><td>ws (Node.js)</td><td>MIT</td><td>WebSocket server in the adapter</td></tr>
-    <tr><td>Microsoft.Extensions.*</td><td>MIT</td><td>DI, logging, hosted services</td></tr>
-    <tr><td>NUnit</td><td>MIT</td><td>Test framework</td></tr>
-    <tr><td>coverlet</td><td>MIT</td><td>Code coverage collection</td></tr>
-    <tr><td>GitHubActionsTestLogger</td><td>MIT</td><td>CI test annotations</td></tr>
-  </table>
+  </p>
+  <p style="font-size:0.8rem;margin-top:0.25rem">
+    <strong>Licensing policy:</strong> All dependencies use <strong>MIT</strong> (fully permissive, no copyleft).
+    Only MIT, Apache-2.0, and BSD-2/3-Clause are pre-approved.
+    GPL, AGPL, LGPL, SSPL, BUSL, and proprietary licenses are prohibited without explicit human review.
+    See <a href="https://github.com/TheMasonX/MemorySmith.Agent/blob/main/Data/Pages/policies/package-vetting.md" target="_blank" rel="noopener">package vetting policy</a>.
+  </p>
 
   <h2>License</h2>
   <div class="license-box">MIT License
@@ -296,7 +255,7 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", "WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
@@ -311,7 +270,7 @@ SOFTWARE.</div>
       <a href="https://github.com/TheMasonX/MemorySmith" target="_blank" rel="noopener">MemorySmith</a>
       <a href="/api/about">API About</a>
       <a href="/api/agent/status">Agent Status</a>
-      <a href="https://github.com/TheMasonX/MemorySmith.Agent/blob/main/Data/Pages/home.md" target="_blank" rel="noopener">Wiki Home</a>
+      <a href="Data/Pages/home.md">Wiki Home</a>
     </div>
   </footer>
 
