@@ -49,9 +49,7 @@ public sealed class AgentBackgroundService(
     // Sprint 39 P1-C: IntentManager maps IntentDraft → GoalRequest for HandleChatEventAsync.
     IntentManager? intentManager = null,
     // Sprint 39 P1: LLM evaluator for observation-driven replanning.
-    ILlmEvaluator? llmEvaluator = null,
-    // Sprint 39 P2: AgentRuntime encapsulates the six decomposed manager components.
-    AgentRuntime? agentRuntime = null) : BackgroundService
+    ILlmEvaluator? llmEvaluator = null) : BackgroundService
 {
     // Sprint 1b: default exponential backoff delays
     private static readonly TimeSpan[] DefaultReconnectDelays =
@@ -133,9 +131,8 @@ public sealed class AgentBackgroundService(
     private readonly ITimeProvider _timeProvider = timeProvider ?? SystemTimeProvider.Instance;
     // Sprint 39 P1-C: maps IntentDraft → GoalRequest in HandleChatEventAsync.
     private readonly IntentManager? _intentManager = intentManager;
-    // Sprint 39 P1+P2: LLM evaluator and AgentRuntime fields.
+    // Sprint 39 P1+P2: LLM evaluator for observation-driven replanning.
     private readonly ILlmEvaluator? _llmEvaluator = llmEvaluator;
-    private readonly AgentRuntime?  _agentRuntime  = agentRuntime;
 
     private readonly Channel<string> _gameErrors =
         Channel.CreateUnbounded<string>(new UnboundedChannelOptions { SingleWriter = true });
@@ -479,6 +476,13 @@ public sealed class AgentBackgroundService(
             {
                 return; // external stop — don't retry
             }
+            // Sprint 51 (TSK-0139): Unwrap AggregateException from Task.WhenAll
+            // so individual inner exceptions are visible in logs instead of masked.
+            catch (AggregateException aex)
+            {
+                foreach (var inner in aex.InnerExceptions)
+                    logger.LogError(inner, "Connection attempt {N} failed (inner).", attempt + 1);
+            }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Connection attempt {N} failed.", attempt + 1);
@@ -500,11 +504,12 @@ public sealed class AgentBackgroundService(
             MaxConnectionAttempts);
     }
 
-    private static async Task MonitorAndCancelOnFaultAsync(Task task, CancellationTokenSource cts)
+    private async Task MonitorAndCancelOnFaultAsync(Task task, CancellationTokenSource cts)
     {
         try { await task; }
         catch (OperationCanceledException) { throw; }
-        catch { cts.Cancel(); throw; }
+        // Sprint 51 (TSK-0141): log before rethrow — never silently cancel.
+        catch (Exception ex) { logger.LogError(ex, "MonitorAndCancelOnFaultAsync: monitored task faulted"); cts.Cancel(); throw; }
         cts.Cancel();
     }
 
@@ -745,6 +750,25 @@ public sealed class AgentBackgroundService(
                 // Sprint 40 P0-B: reachable block query result.
                 case ReachableBlockFoundEvent:
                     CompleteCorrelatedActionByTool("FindReachableBlock");
+                    break;
+
+                // Sprint 51 (TSK-0140): DeathEvent handler — cancel the current goal,
+                // clear the action queue, clear all correlated actions, mark inventory
+                // stale (items are dropped on death), and set goal to null so the agent
+                // does not continue a now-impossible goal.
+                case DeathEvent de:
+                    logger.LogWarning("[death] bot died at ({X},{Y},{Z}) — " +
+                        "cancelling goal '{Goal}', clearing queue and stale inventory",
+                        de.Pos.X, de.Pos.Y, de.Pos.Z,
+                        _currentGoal?.Name ?? "(none)");
+                    _worldState = _worldState with { IsInventoryStale = true };
+                    lock (_pendingLock) _pendingActions.Clear();
+                    _correlatedActions.Clear();
+                    _currentGoal = null;
+                    _consecutiveFailures = 0;
+                    _journal?.Log(new JournalEntry(
+                        _timeProvider.UtcNow, JournalEntryType.GoalCancel,
+                        $"death at ({de.Pos.X},{de.Pos.Y},{de.Pos.Z})"));
                     break;
 
                 // Sprint 41 (E-3): log unhandled events so missing handlers are visible.
@@ -1649,7 +1673,22 @@ public sealed class AgentBackgroundService(
                     SweepTimedOutActions();
                 }
                 else
+                {
+                    // Sprint 51 (TSK-0143): terminal recovery — when the agent is idling
+                    // without a goal, log a warning so operators know the bot isn't stuck
+                    // or crashed. Do NOT auto-restart the failed goal (would create a loop).
+                    // The _lastAbandonedGoalName guard prevents repeating the same warning
+                    // every 50ms — only logs on goal→idle transition.
+                    if (_currentGoal is null && _lastAbandonedGoalName is not null)
+                    {
+                        logger.LogWarning(
+                            "[terminal] agent idling — last abandoned goal was '{Goal}'. " +
+                            "Waiting for chat command or REST API goal assignment.",
+                            _lastAbandonedGoalName);
+                        _lastAbandonedGoalName = null; // reset to avoid log spam on every 50ms cycle
+                    }
                     await Task.Delay(50, ct);
+                }
             }
         }
     }

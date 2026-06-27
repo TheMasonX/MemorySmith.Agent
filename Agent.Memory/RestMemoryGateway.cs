@@ -71,9 +71,21 @@ public sealed class RestMemoryGateway(HttpClient http, RestMemoryGatewayOptions 
     }
 
     public async Task UpdatePageAsync(
-        string pageId, string content, CancellationToken cancellationToken = default)
+        string pageId, string content, string? title = null, CancellationToken cancellationToken = default)
     {
         var url = $"api/pages/{Uri.EscapeDataString(pageId)}";
+
+        // Sprint 51 (TSK-0138): when an explicit title is provided, skip the fetch
+        // and use it directly. This eliminates the race condition where a page is
+        // updated between the GET and PUT calls, and avoids the slug-derived fallback
+        // which guessed wrong for non-English or special-character page IDs.
+        if (title is not null)
+        {
+            var req = new PageSaveRequest(pageId, title, content, options.DefaultPageRole);
+            var resp = await http.PutAsJsonAsync(url, req, JsonOpts, cancellationToken);
+            resp.EnsureSuccessStatusCode();
+            return;
+        }
 
         // Fetch existing page to preserve its title on update.
         // If the page doesn't exist we fall back to pageId as a reasonable title
@@ -90,10 +102,10 @@ public sealed class RestMemoryGateway(HttpClient http, RestMemoryGatewayOptions 
             _logger?.LogInformation("RestMemoryGateway.UpdatePageAsync: page '{PageId}' not found — will upsert.", pageId);
         }
 
-        var title = existing?.Title ?? pageId.Replace("-", " ");
-        var req = new PageSaveRequest(pageId, title, content, options.DefaultPageRole);
-        var resp = await http.PutAsJsonAsync(url, req, JsonOpts, cancellationToken);
-        resp.EnsureSuccessStatusCode();
+        var resolvedTitle = existing?.Title ?? pageId.Replace("-", " ");
+        var req2 = new PageSaveRequest(pageId, resolvedTitle, content, options.DefaultPageRole);
+        var resp2 = await http.PutAsJsonAsync(url, req2, JsonOpts, cancellationToken);
+        resp2.EnsureSuccessStatusCode();
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

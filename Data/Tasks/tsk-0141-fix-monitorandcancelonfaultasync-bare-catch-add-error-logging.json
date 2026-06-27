@@ -4,7 +4,7 @@
   "title": "Fix MonitorAndCancelOnFaultAsync Bare Catch \u2014 Add Error Logging",
   "description": "CRITICAL finding from Error Handling Auditor. MonitorAndCancelOnFaultAsync at AgentBackgroundService.cs:507 has a bare \u0060catch { cts.Cancel(); throw; }\u0060 with no exception logging. The original exception context (type, message, stack) is invisible until the outer handler \u2014 which may itself lose context (see TSK-0139).\n\nFix: Add \u0060logger.LogError(ex, \u0022Unhandled exception in monitored task \u2014 cancelling CTS.\u0022)\u0060 before the rethrow.\n\nSource: Sprint 51 Council, Error Handling Auditor, Finding F-BARECATCH",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "Critical",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -25,11 +25,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-27T00:42:53.4158408Z",
-  "updatedAtUtc": "2026-06-27T00:42:53.4158408Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-06-27T01:17:29.8353319Z",
+  "completedAtUtc": "2026-06-27T01:17:29.8353319Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0141-fix-monitorandcancelonfaultasync-bare-catch-add-error-logging.json"
 }

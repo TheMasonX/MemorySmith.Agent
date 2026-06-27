@@ -4,7 +4,7 @@
   "title": "Fix Task.WhenAll Exception Masking \u2014 Unwrap AggregateException",
   "description": "CRITICAL finding from Error Handling Auditor. \u0060Task.WhenAll\u0060 at AgentBackgroundService.cs:471 wraps multiple exceptions into AggregateException. If both DispatchActionsAsync and ChatConsumerAsync fault before MonitorAndCancelOnFaultAsync cancels the CTS, only the first exception is logged. The other task\u0027s exception context is permanently lost.\n\nFix: Unwrap AggregateException.InnerExceptions in the catch block at line 482 and log each one individually.\n\nSource: Sprint 51 Council, Error Handling Auditor, Finding F-WHENALL",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "Critical",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -25,11 +25,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-27T00:42:53.3556267Z",
-  "updatedAtUtc": "2026-06-27T00:42:53.3556267Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-06-27T01:17:29.7610573Z",
+  "completedAtUtc": "2026-06-27T01:17:29.7610573Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0139-fix-task-whenall-exception-masking-unwrap-aggregateexception.json"
 }

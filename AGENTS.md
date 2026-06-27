@@ -3,6 +3,18 @@
 This project (`MemorySmith.Agent`) is maintained by AI agents (Claude, etc.) and
 human developers alike. These conventions keep the codebase consistent.
 
+## Semantic Versioning & Breaking Changes
+
+MemorySmith.Agent follows **Semantic Versioning** for its public API surface (tool schemas,
+event contracts, REST API, protocol wire format). See [`BREAKING_CHANGES.md`](BREAKING_CHANGES.md)
+for the full deprecation policy, version rules, and migration templates.
+
+- **Announce breaking changes 1 sprint before implementation.**
+- **Mark deprecated APIs with `[Obsolete("message")]`** pointing to the replacement.
+- **Record every breaking change in `BREAKING_CHANGES.md`** with before/after and migration guidance.
+
+---
+
 ---
 
 ## No Magic Numbers
@@ -178,6 +190,10 @@ catch (Exception ex) when (!ct.IsCancellationRequested)
 
 These rules encode architectural decisions locked in Sprint 35. Violations require
 a council review and an explicit ADR to reverse.
+
+**Canonical pipeline diagram:** [`Data/Pages/architecture.md`](Data/Pages/architecture.md#runtime-flow-canonical--sprint-50) —
+this is the single authoritative description of the agent runtime flow.
+When `architecture.md`, `AGENTS.md`, or any other doc disagree, `architecture.md` wins.
 
 ---
 

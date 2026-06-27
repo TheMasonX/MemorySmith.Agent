@@ -4,7 +4,7 @@
   "title": "Fix HtnTaskLibrary.MakeAction Arguments Dictionary Mutability",
   "description": "Research Report R2-004 (Confidence 93%, Medium). HtnTaskLibrary.MakeAction mutates the Arguments dictionary after init-only construction. The dictionary reference is init-only but contents are mutable \u2014 a subtle gotcha that could cause bugs if the dictionary is replaced or shared across threads.\n\nFix: Either freeze the dictionary after construction (ImmutableDictionary), clone before mutation, or document the pattern explicitly with a warning comment.\n\nSource: research-MemorySmith.Agent Codebase Audit Sprint-35, Council Addendum 2026-06-26",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "Medium",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -25,11 +25,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-27T00:33:27.4423351Z",
-  "updatedAtUtc": "2026-06-27T00:33:27.4423351Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-06-27T01:14:34.1311381Z",
+  "completedAtUtc": "2026-06-27T01:14:34.1311381Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0135-fix-htntasklibrary-makeaction-arguments-dictionary-mutability.json"
 }

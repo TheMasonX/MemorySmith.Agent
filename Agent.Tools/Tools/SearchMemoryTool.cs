@@ -16,8 +16,12 @@ public sealed class SearchMemoryTool : ITool
         @"(?:at|coordinates?|pos(?:ition)?)\s*[=:≈~]?\s*\(?\s*(?<x>-?\d+)\s*[,;]\s*(?<y>-?\d+)\s*[,;]\s*(?<z>-?\d+)\s*\)?",
         RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+    // Sprint 51: fixed to use distinct named groups (x/y/z) instead of single group "x".
+    // The axis label is captured as literal text in the axis group; the numeric value
+    // is in the val group. This makes the regex self-documenting and safe against
+    // accidental group-name reuse.
     private static readonly Regex CoordLabelsPattern = new(
-        @"\b[xyz]\s*[:=]\s*(?<x>-?\d+)\b",
+        @"\b(?<axis>[xyz])\s*[:=]\s*(?<val>-?\d+)\b",
         RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     private readonly IMemoryGateway _memory;
@@ -49,32 +53,44 @@ public sealed class SearchMemoryTool : ITool
 
         var results = await _memory.SearchAsync(query!, ct).ConfigureAwait(false);
         var limitedResults = results.Take(limit).ToList();
+        // bestPageId always points to the top-ranked result for backward compatibility
+        // (consumers that don't need coordinates still want the best page reference).
         var bestPageId = limitedResults.FirstOrDefault()?.PageId;
-        var bestSnippet = limitedResults.FirstOrDefault()?.Snippet;
 
-        // Attempt to extract coordinates from the best result's snippet.
+        // Sprint 51: scan ALL results for the first hit with valid coordinates,
+        // not just the top-ranked result. This ensures the bot finds known resource
+        // locations even when they don't appear in the #1 search result.
         // Priority: parenthesized "at (x, y, z)" pattern first, then labeled "x: n" pattern.
         int? coordX = null, coordY = null, coordZ = null;
-        if (bestSnippet is not null)
+        foreach (var result in limitedResults)
         {
-            var coordMatch = CoordPattern.Match(bestSnippet);
-            if (coordMatch.Success)
+            if (result.Snippet is not { } snippet) continue;
+
+            var coordMatch = CoordPattern.Match(snippet);
+            if (coordMatch.Success
+                && int.TryParse(coordMatch.Groups["x"].Value, out var cx)
+                && int.TryParse(coordMatch.Groups["y"].Value, out var cy)
+                && int.TryParse(coordMatch.Groups["z"].Value, out var cz))
             {
-                coordX = int.Parse(coordMatch.Groups["x"].Value);
-                coordY = int.Parse(coordMatch.Groups["y"].Value);
-                coordZ = int.Parse(coordMatch.Groups["z"].Value);
+                coordX = cx; coordY = cy; coordZ = cz;
+                break;
             }
-            else
+
+            // Fallback: look for labeled x:/y:/z: patterns in the snippet
+            var labelMatches = CoordLabelsPattern.Matches(snippet);
+            int? lx = null, ly = null, lz = null;
+            foreach (Match m in labelMatches)
             {
-                // Fallback: look for labeled x:/y:/z: patterns in the snippet
-                var labelMatches = CoordLabelsPattern.Matches(bestSnippet);
-                foreach (Match m in labelMatches)
-                {
-                    var val = int.Parse(m.Groups["x"].Value);
-                    _ = m.Value[0] is 'x' or 'X' ? coordX = val
-                        : m.Value[0] is 'y' or 'Y' ? coordY = val
-                        : coordZ = val;
-                }
+                if (!int.TryParse(m.Groups["val"].Value, out var val)) continue;
+                var axis = m.Groups["axis"].Value;
+                if (axis is "x" or "X") lx = val;
+                else if (axis is "y" or "Y") ly = val;
+                else if (axis is "z" or "Z") lz = val;
+            }
+            if (lx.HasValue && ly.HasValue && lz.HasValue)
+            {
+                coordX = lx; coordY = ly; coordZ = lz;
+                break;
             }
         }
 

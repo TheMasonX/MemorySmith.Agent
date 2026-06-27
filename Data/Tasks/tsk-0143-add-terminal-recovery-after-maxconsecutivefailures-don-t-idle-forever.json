@@ -4,7 +4,7 @@
   "title": "Add Terminal Recovery After maxConsecutiveFailures \u2014 Don\u0027t Idle Forever",
   "description": "CRITICAL finding from Plan Recovery Specialist. When maxConsecutiveFailures=3 is reached, the agent sets _currentGoal=null and idles forever. There is NO automatic fallback goal (wander, explore, return-to-spawn, self-diagnose). The agent just sits still until a user sends a chat message.\n\nFix: After goal abandonment, enqueue a fallback behavior: either \u0022Wander\u0022 or \u0022Explore\u0022 or \u0022ReturnToSpawn\u0022 or \u0022SelfDiagnose\u0022. At minimum, log at Warning that agent has no goal and is idling.\n\nSource: Sprint 51 Council, Plan Recovery Specialist, Finding F-TERMINAL",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "Critical",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -26,11 +26,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-27T00:42:53.4671282Z",
-  "updatedAtUtc": "2026-06-27T00:42:53.4671282Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-06-27T01:17:29.8651077Z",
+  "completedAtUtc": "2026-06-27T01:17:29.8651077Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0143-add-terminal-recovery-after-maxconsecutivefailures-don-t-idle-forever.json"
 }

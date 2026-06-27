@@ -351,9 +351,7 @@ if (agentEnabled)
             // Sprint 39 P1-C: inject IntentManager for chat → goal routing in HandleChatEventAsync.
             intentManager:   sp.GetRequiredService<IntentManager>(),
             // Sprint 39 P1: LLM evaluator for observation-driven replanning.
-            llmEvaluator:    sp.GetRequiredService<ILlmEvaluator>(),
-            // Sprint 39 P2: AgentRuntime encapsulates the six manager components.
-            agentRuntime:    sp.GetRequiredService<AgentRuntime>());
+            llmEvaluator:    sp.GetRequiredService<ILlmEvaluator>());
     });
     builder.Services.AddHostedService(sp => sp.GetRequiredService<AgentBackgroundService>());
 }

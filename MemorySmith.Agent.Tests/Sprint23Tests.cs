@@ -193,7 +193,7 @@ public sealed class Sprint23WorldKbRoutingTests
             return Task.FromResult("page-test-001");
         }
 
-        public Task UpdatePageAsync(string pageId, string content, CancellationToken ct = default)
+        public Task UpdatePageAsync(string pageId, string content, string? title = null, CancellationToken ct = default)
             => Task.CompletedTask;
     }
 

@@ -304,6 +304,6 @@ file sealed class CountingGateway(MockMemoryGateway inner) : IMemoryGateway
     public Task<string> CreatePageAsync(string title, string content, string type, CancellationToken cancellationToken = default)
         => inner.CreatePageAsync(title, content, type, cancellationToken);
 
-    public Task UpdatePageAsync(string pageId, string content, CancellationToken cancellationToken = default)
-        => inner.UpdatePageAsync(pageId, content, cancellationToken);
+    public Task UpdatePageAsync(string pageId, string content, string? title = null, CancellationToken cancellationToken = default)
+        => inner.UpdatePageAsync(pageId, content, title, cancellationToken);
 }

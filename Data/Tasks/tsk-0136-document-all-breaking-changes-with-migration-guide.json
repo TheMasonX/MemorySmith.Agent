@@ -4,7 +4,7 @@
   "title": "Document All Breaking Changes with Migration Guide",
   "description": "Research Reports R3-091 through R3-093 (Confidence 90%, High). Multiple breaking changes across API signatures, tool contracts, and planner logic. Migration guidance is partial in README and wiki. Tool signature migration guidance is incomplete.\n\nTasks:\n1. Catalog ALL breaking changes with before/after code examples\n2. Create per-tool migration paths\n3. Expand migration section in README and wiki\n4. Link to new deprecation policy (TSK-0130)\n\nSource: research-MemorySmith.Agent Delta Audit Sprint-35, Council Addendum 2026-06-26",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -25,11 +25,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-27T00:33:27.4740464Z",
-  "updatedAtUtc": "2026-06-27T00:33:27.4740464Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-06-27T01:12:18.6026662Z",
+  "completedAtUtc": "2026-06-27T01:12:18.6026662Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0136-document-all-breaking-changes-with-migration-guide.json"
 }
