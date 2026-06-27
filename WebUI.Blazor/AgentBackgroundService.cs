@@ -917,6 +917,18 @@ public sealed class AgentBackgroundService(
         if (chatInterpreter is null) return;
         if (worldEvent is not ChatEvent chat) return;
 
+        // Sprint 54: filter Minecraft server commands (/give, /summon, /tp, etc.)
+        // from intent parsing. These are recorded in chat history for LLM context
+        // but should never be interpreted as player commands to the agent.
+        if (chat.Message.StartsWith('/'))
+        {
+            logger.LogDebug("[chat] <{Username}> server command (skipped): {Message}",
+                chat.Username, chat.Message);
+            _chatLogger?.LogInbound(chat.Username, chat.Message);
+            _chatHistory?.Record(chat.Username, chat.Message);
+            return;
+        }
+
         logger.LogInformation("[chat] <{Username}> {Message}", chat.Username, chat.Message);
         _ = PushChatToDashboardAsync("player", chat.Username, chat.Message);
         _chatLogger?.LogInbound(chat.Username, chat.Message);
