@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0210-add-contextual-inventory-summary-and-intelligent-status-reports",
+  "key": "TSK-0210",
+  "title": "Add contextual inventory summary and intelligent status reports",
+  "description": "## Problem\nThe current \u0060status\u0060 and \u0060inventory\u0060 commands dump raw item counts: \u002270x oak_planks, 63x cobblestone, 63x oak_slab, ...\u0022. This is hard to parse and doesn\u0027t provide actionable context. The agent should be able to summarize its state intelligently.\n\n## Agent Request\nFrom session log: the LLM already tries to add context to status responses (\u0022The chat harness allows me to take commands, move, build, craft...\u0022), but the deterministic path still uses raw dumps. An intelligent status report would combine inventory, goal, position, nearby entities, and suggestions.\n\n## Examples\n- Current: \u0022Inventory: 70x oak_planks, 63x cobblestone, 63x oak_slab, ...\u0022\n- Desired: \u0022I\u0027m at the base with plenty of building materials (70 planks, 63 cobble). I have a crafting table and a bed. Resources are low on wood logs (6) and food. Would you like me to gather more?\u0022\n- Player: \u0022How are we doing?\u0022 \u2192 \u0022We\u0027re in good shape! The house is 70% built. I have enough materials to finish the walls but need 20 more oak_slab for the roof. There\u0027s a creeper nearby I\u0027m watching.\u0022\n\n## Scope\n- Replace the deterministic status/inventory response with an LLM-generated summary\n- Pass inventory, goal, position, nearby entities, recent errors, and build progress to the LLM for summarization\n- The summary should be concise (respecting ChatMaxResponseLength) but contextual\n- Deterministic fast-path preserved for when LLM is unavailable (current raw dump)\n\n## Implementation sketch\n1. Add \u0060BuildContextSummaryPrompt\u0060 that collects: inventory (non-empty items), current goal, position, build progress %, recent errors, nearby entities count\n2. On \u0022status\u0022 or \u0022inventory\u0022 intent, route to LLM for summarization (instead of raw dump) when LLM is available\n3. When LLM is not available, fall back to current deterministic format\n4. Add \u0022how are we doing\u0022 / \u0022what\u0027s happening\u0022 as additional status triggers\n\n## Complexity\nLow. Mostly prompt engineering and data plumbing.\n\n## Priority\nLow \u2014 UX polish.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:chat",
+    "domain:llm",
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T15:27:24.9536856Z",
+  "updatedAtUtc": "2026-06-27T15:27:24.9536856Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

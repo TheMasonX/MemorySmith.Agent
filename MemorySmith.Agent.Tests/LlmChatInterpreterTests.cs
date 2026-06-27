@@ -4,6 +4,11 @@ using Agent.Planning.Llm;
 
 namespace MemorySmith.Agent.Tests;
 
+/// <summary>
+/// Sprint 39 P1-C: assertions updated from ChatInterpretation to IntentDraft.
+///   null result = not addressed (was IntentType.NotAddressed)
+///   result.Intent = semantic string (was IntentType enum)
+/// </summary>
 [TestFixture]
 [Description("LlmChatInterpreter: distance gate, rate limiting, LLM + pattern fallback pipeline")]
 public sealed class LlmChatInterpreterTests
@@ -38,7 +43,7 @@ public sealed class LlmChatInterpreterTests
         var result = await interp.InterpretAsync(
             "Player1", "hello everyone", BotName, 3,
             BotAtOrigin, PlayerFar, EmptyState);
-        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.NotAddressed));
+        Assert.That(result, Is.Null, "Far multi-player message not mentioning bot should be ignored (null).");
     }
 
     [Test]
@@ -48,14 +53,17 @@ public sealed class LlmChatInterpreterTests
         var result = await interp.InterpretAsync(
             "Player1", "get me wood", BotName, 1,
             BotAtOrigin, PlayerFar, EmptyState);
-        Assert.That(result.IntentType, Is.Not.EqualTo(ChatIntentType.NotAddressed));
+        Assert.That(result, Is.Not.Null, "Solo player is always addressed regardless of distance.");
     }
 
     // ── Pattern fast-path ───────────────────────────────────────────────────────────────────────
 
     [Test]
-    public async Task ClearGather_SkipsLlm_UsesPatternResult()
+    public async Task ClearGather_ReachesLlm_NotFastPathed()
     {
+        // Sprint 35 P1-D: gather is no longer a fast-path in ChatInterpreter.
+        // ChatInterpreter returns "clarify" for gather commands so LlmChatInterpreter
+        // calls the LLM (CountingLlmProvider.IsAvailable=true). Verify LLM IS called.
         var counting = new CountingLlmProvider();
         var interp   = new LlmChatInterpreter(counting, new ChatInterpreter(DefaultOpts),
             new ChatRateLimiter(DefaultOpts), DefaultOpts);
@@ -63,12 +71,12 @@ public sealed class LlmChatInterpreterTests
         await interp.InterpretAsync("P1", "gather 32 cobblestone", BotName, 1,
             BotAtOrigin, PlayerNear, EmptyState);
 
-        Assert.That(counting.CallCount, Is.Zero,
-            "Clear gather command should be handled by pattern matcher; LLM not called");
+        Assert.That(counting.CallCount, Is.EqualTo(1),
+            "Gather command is not fast-pathed — LLM should be called (returns null from CountingLlmProvider).");
     }
 
     [Test]
-    public async Task StopCommand_SkipsLlm_ReturnsCancelGoal()
+    public async Task StopCommand_SkipsLlm_ReturnsCancel()
     {
         var counting = new CountingLlmProvider();
         var interp   = new LlmChatInterpreter(counting, new ChatInterpreter(DefaultOpts),
@@ -77,8 +85,9 @@ public sealed class LlmChatInterpreterTests
         var result = await interp.InterpretAsync("P1", "stop", BotName, 1,
             BotAtOrigin, PlayerNear, EmptyState);
 
-        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CancelGoal));
-        Assert.That(counting.CallCount, Is.Zero);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Intent, Is.EqualTo("cancel"));
+        Assert.That(counting.CallCount, Is.Zero, "Cancel is fast-pathed — LLM should not be called.");
     }
 
     // ── LLM integration ────────────────────────────────────────────────────────────────────────
@@ -97,8 +106,11 @@ public sealed class LlmChatInterpreterTests
             "P1", "let's go mining for shiny stuff", BotName, 1,
             BotAtOrigin, PlayerNear, EmptyState);
 
-        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CreateGoal));
-        Assert.That(result.GoalName,   Is.EqualTo("GatherItem:diamond"));
+        Assert.That(result, Is.Not.Null);
+        // Sprint 39 P1-C: no GoalName in IntentDraft — caller builds goal via IntentManager.
+        Assert.That(result!.Intent, Is.EqualTo("gather"));
+        Assert.That(result.Item,    Is.EqualTo("diamond"));
+        Assert.That(result.Count,   Is.EqualTo(5));
     }
 
     [Test]
@@ -108,11 +120,14 @@ public sealed class LlmChatInterpreterTests
         var interp = new LlmChatInterpreter(new NullLlmProvider(), new ChatInterpreter(opts),
             new ChatRateLimiter(opts), opts);
 
+        // "gather 10 wood" — LLM returns null → pattern fallback → "clarify"
+        // (Sprint 35 P1-D removed gather from ChatInterpreter)
         var result = await interp.InterpretAsync("P1", "gather 10 wood", BotName, 1,
             BotAtOrigin, PlayerNear, EmptyState);
 
-        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CreateGoal));
-        Assert.That(result.GoalName,   Is.EqualTo("GatherItem:oak_log"));
+        Assert.That(result, Is.Not.Null, "Pattern fallback should still produce a non-null IntentDraft.");
+        Assert.That(result!.Intent, Is.EqualTo("clarify"),
+            "Gather is not fast-pathed; LLM null → pattern fallback → 'clarify'.");
     }
 
     // ── Rate limiting ─────────────────────────────────────────────────────────────────────────
@@ -127,11 +142,12 @@ public sealed class LlmChatInterpreterTests
         var llm    = new FixedLlmProvider("{\"addressed\":\"yes\",\"intent\":\"help\",\"response\":\"LLM help\"}");
         var interp = new LlmChatInterpreter(llm, new ChatInterpreter(opts), limiter, opts);
 
-        // "stop" is handled by pattern matcher regardless
+        // "stop" is fast-pathed — rate limit doesn't matter
         var result = await interp.InterpretAsync("P1", "stop", BotName, 1,
             BotAtOrigin, PlayerNear, EmptyState);
 
-        Assert.That(result.IntentType, Is.EqualTo(ChatIntentType.CancelGoal));
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Intent, Is.EqualTo("cancel"));
     }
 
     // ── Max message length ────────────────────────────────────────────────────────────────────
@@ -144,7 +160,7 @@ public sealed class LlmChatInterpreterTests
         // 100-char message truncated to 10 before interpretation
         var result = await interp.InterpretAsync("P1", new string('g', 100), BotName, 1,
             BotAtOrigin, PlayerNear, EmptyState with { });
-        // Should not throw; result can be any interpretation
+        // Should not throw; result can be any interpretation (clarify from pattern)
         Assert.That(result, Is.Not.Null);
     }
 

@@ -1,0 +1,18 @@
+{
+  "id": "tsk-0161-motion-equipment-environment-telemetry",
+  "title": "Expose motion, equipment, and environment state from Mineflayer to WorldState",
+  "status": "Backlog",
+  "priority": "High",
+  "type": "Task",
+  "description": "Add rich motion, equipment, and environment telemetry so the agent understands its physical state and surroundings beyond just position/health/food.\n\n**Motion state** (from `bot.entity`):\n- `onGround` — is the bot standing on a solid block?\n- `isInWater` — swimming state (affects movement speed)\n- `isInLava` — critical safety info (taking fire damage)\n- `isCollidedHorizontally` — stuck against a wall?\n- `velocity` — current motion vector (for detecting knockback/push)\n\n**Equipment** (from `bot.inventory.slots`):\n- `heldItem` — name and count of the item in the selected hotbar slot (slot 36 + hotbar index)\n- `selectedSlot` — 0-8 hotbar index\n- `armor` — helmet/chestplate/leggings/boots names\n- `offhand` — offhand item name\n\n**Environment** (from `bot.time`, `bot.game`):\n- `timeOfDay` — Minecraft time (0-24000 ticks, dawn=0, noon=6000, dusk=12000, midnight=18000)\n- `isRaining` — boolean (affects undead burn, fishing)\n- `isThundering` — boolean\n- `gameMode` — already emitted, but emit on every status update\n- `dimension` — overworld/nether/end\n\n**Emit strategy:**\n1. Add a periodic `sendRichStatus()` function called every 2 seconds (separate from the 4/s move throttle).\n2. Or emit on significant changes only: health change, dimension change, weather change, selected slot change.\n3. Create new `RichStatusEvent` in `WorldEvents.cs` or extend `StatusEvent` with optional fields.\n\nTunable constants:\n- `RICH_STATUS_INTERVAL_MS = 2000`\n\nAcceptance:\n- WorldState includes motion flags, held item, armor, time-of-day, weather.\n- Agent can query \"is it raining?\" and \"what am I holding?\" from WorldState.\n- No regression in existing status event handling.\n\nRefs: `msa_planning_mineflayer_audit_20260621_1437.md` Finding 2 (motion, equipment, environment)",
+  "labels": [
+    "mineflayer",
+    "telemetry",
+    "world-state",
+    "environment",
+    "sprint-53"
+  ],
+  "estimatedHours": 3.0,
+  "designRef": "Data/Pages/Audit/msa_planning_mineflayer_audit_20260621_1437.md",
+  "key": "TSK-0161"
+}

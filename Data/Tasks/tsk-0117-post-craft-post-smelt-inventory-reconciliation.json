@@ -1,0 +1,24 @@
+{
+  "id": "tsk-0117-post-craft-post-smelt-inventory-reconciliation",
+  "key": "TSK-0117",
+  "title": "Add Post-Craft/Post-Smelt Inventory Reconciliation",
+  "description": "After craft/smelt completion, sendBotStatus() is not reliably invoked to reconcile inventory. The world state projector applies inferred changes (ApplyCraftComplete/ApplySmeltComplete), but the actual inventory can diverge from projected state.\n\nSource: msa_sprint35-llm-first_audit_2026-06-24.md (P0 Finding 1, 98% confidence)\n\nRequirements:\n1. Ensure sendBotStatus() (or equivalent reconciliation event) is sent after every craft and smelt completion in the adapter\n2. In C#, when CraftCompleteEvent or SmeltCompleteEvent is received, force an inventory status refresh before marking the action complete\n3. Add tests verifying inventory reconciliation after craft/smelt events\n\nFiles: WorldStateProjector.cs, MineflayerAdapter/index.js\n\nRelated: TSK-0113 (drop-resolution table), TSK-0084 (ApplySmeltComplete)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeCustomText": "Agent",
+  "labels": ["domain:inventory", "type:bug", "sprint-47"],
+  "comments": [
+    {
+      "id": "c-0117-migration",
+      "author": "SteveBot",
+      "body": "Converted from orphan .md file (TSK-0117.md) to canonical .json format as part of task store cleanup council 2026-06-27.",
+      "createdAtUtc": "2026-06-27T12:00:00Z"
+    }
+  ],
+  "createdAtUtc": "2026-06-24T00:00:00Z",
+  "updatedAtUtc": "2026-06-27T12:00:00Z",
+  "revision": 1,
+  "isArchived": false
+}

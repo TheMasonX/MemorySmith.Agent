@@ -1,0 +1,18 @@
+{
+  "id": "tsk-0144-enforce-package-vetting-policy-in-ci",
+  "title": "Enforce package vetting policy in CI and audit existing dependencies",
+  "status": "Ready",
+  "priority": "Critical",
+  "type": "Task",
+  "description": "Implement automated enforcement of the package vetting policy (Data/Pages/policies/package-vetting.md):\n\n1. Add a CI step that runs `dotnet list package --vulnerable` and fails the build if any vulnerabilities are found (treat warnings as errors for NU1903+).\n2. Add a CI step that checks for deprecated packages (`dotnet list package --deprecated`).\n3. Add a pre-commit or build-time check that verifies the About page (WebUI.Blazor/wwwroot/about.html) lists every top-level package from the solution.\n4. Document the CI enforcement in the policy page.\n\nAcceptance: CI goes red if a vulnerable/deprecated package is added or if the About page is out of sync.",
+  "linkedPages": ["policies/package-vetting"],
+  "labels": [
+    "security",
+    "ci",
+    "policy",
+    "sprint-51"
+  ],
+  "estimatedHours": 2.0,
+  "councilFinding": "Sprint 51 post-mortem: SQLitePCLRaw CVE was preventable with automated checks.",
+  "key": "TSK-0144"
+}

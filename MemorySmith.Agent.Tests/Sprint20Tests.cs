@@ -19,7 +19,7 @@ public sealed class Sprint20GovernorProgressTests
 
     private static ReplanGovernor MakeGovernor(int threshold = 3, int timeoutSeconds = 60)
         => new(identicalPlanThreshold: threshold,
-               stalledRecoveryTimeout: TimeSpan.FromSeconds(timeoutSeconds));
+               stallGraduatedDelaysSec: [timeoutSeconds]);
 
     private const string Fp = "Gather:sand:SearchMemory,MineBlock,GetStatus";
 
@@ -192,8 +192,11 @@ public sealed class Sprint20LlmTruncationTests
         var result = TruncatedJsonHelper.Parse(
             @"{ ""addressed"": ""yes"", ""intent"": ""status"", ""response"": ""I have 12 dirt...");
 
-        Assert.That(result, Is.Not.Null, "Truncated JSON should produce a non-null interpretation.");
-        Assert.That(result!.IntentType, Is.EqualTo(ChatIntentType.QueryStatus));
+        // Sprint 39 P1-C: IntentDraft.Intent is a string, not a ChatIntentType enum.
+        Assert.That(result, Is.Not.Null, "Truncated JSON should produce a non-null IntentDraft.");
+        Assert.That(result!.Intent, Is.EqualTo("status"),
+            "Intent field should be 'status' from the truncated JSON.");
+        Assert.That(result.Addressed, Is.EqualTo("yes"));
     }
 
     [Test]
@@ -203,7 +206,8 @@ public sealed class Sprint20LlmTruncationTests
             @"{ ""addressed"": ""yes"", ""intent"": ""cancel"", ""response"": ""OK, stopping."" }");
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result!.IntentType, Is.EqualTo(ChatIntentType.CancelGoal));
+        Assert.That(result!.Intent, Is.EqualTo("cancel"));
+        Assert.That(result.Response, Is.EqualTo("OK, stopping."));
     }
 
     [Test]
@@ -215,12 +219,13 @@ public sealed class Sprint20LlmTruncationTests
     }
 
     [Test]
-    public void ParseDecision_WithAddressedNo_ReturnsNotAddressed()
+    public void ParseDecision_WithAddressedNo_ReturnsNull()
     {
+        // Sprint 39 P1-C: addressed="no" returns null IntentDraft? (was NotAddressed ChatInterpretation)
         var result = TruncatedJsonHelper.Parse(
             @"{ ""addressed"": ""no"", ""intent"": ""ignore""");
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.IntentType, Is.EqualTo(ChatIntentType.NotAddressed));
+        Assert.That(result, Is.Null,
+            "addressed='no' should return null IntentDraft (message not directed at bot).");
     }
 
     /// <summary>
@@ -238,7 +243,8 @@ public sealed class Sprint20LlmTruncationTests
                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
         }
 
-        public static ChatInterpretation? Parse(string json)
+        // Sprint 39 P1-C: TryParseTruncatedJson now returns IntentDraft? (was ChatInterpretation?)
+        public static IntentDraft? Parse(string json)
         {
             if (_method is null)
             {
@@ -246,7 +252,8 @@ public sealed class Sprint20LlmTruncationTests
                 Assert.Ignore("TryParseTruncatedJson method not found via reflection — skipping.");
                 return null;
             }
-            return (ChatInterpretation?)_method.Invoke(null, [json]);
+            // Sprint 46 P0 (TSK-0101): Added optional ILogger parameter — pass null for test.
+            return (IntentDraft?)_method.Invoke(null, [json, null]);
         }
     }
 }

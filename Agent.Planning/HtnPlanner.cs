@@ -22,7 +22,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 ///   2. Phase-by-phase decomposition.
 ///   3. Throw if no actions result (caller falls back to LLM).
 ///
-/// In production the agent loop uses <see cref="IPlanner"/> → <see cref="PlannerRouter"/>
+/// In production the agent loop uses <see cref="IPlanner"/> â†’ <see cref="PlannerRouter"/>
 /// which routes typed goals to their decomposers before reaching <see cref="HtnPlanner"/>.
 /// <see cref="HtnPlanner"/> therefore only receives goals with no registered decomposer.
 /// </summary>
@@ -31,7 +31,7 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
     private readonly ILogger<HtnPlanner> _logger = logger ??
         Microsoft.Extensions.Logging.Abstractions.NullLogger<HtnPlanner>.Instance;
 
-    // ── PlanAsync ─────────────────────────────────────────────────────────────
+    // â”€â”€ PlanAsync â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public Task<IPlan> PlanAsync(
         IGoal goal, WorldState state, CancellationToken cancellationToken = default)
     {
@@ -39,24 +39,21 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
 
         if (goal is BuildGoal buildGoal)
         {
-            var originX = ReadOriginFact(state, buildGoal.Blueprint.Id, "x");
-            var originY = ReadOriginFact(state, buildGoal.Blueprint.Id, "y");
-            var originZ = ReadOriginFact(state, buildGoal.Blueprint.Id, "z");
+            // TSK-0107: construct BuildOrigin from facts for the decomposer.
+            // TSK-0116: removed IsCreativeMode branch — HtnTaskLibrary.DecomposeBuild
+            // already handles creative mode internally. The PlannerRouter prefers
+            // BuildGoalDecomposer first, making this HtnPlanner path a fallback.
+            var origin = new BuildOrigin(
+                ReadOriginFact(state, buildGoal.Blueprint.Id, "x"),
+                ReadOriginFact(state, buildGoal.Blueprint.Id, "y"),
+                ReadOriginFact(state, buildGoal.Blueprint.Id, "z"),
+                BuildOriginSource.AutoScanned);
 
-            if (state.IsCreativeMode)
-            {
-                actions.AddRange(CreateCreativeBuildActions(buildGoal, state, originX, originY, originZ));
-            }
-            else
-            {
-                actions.AddRange(library.DecomposeBuild(
-                    buildGoal.Blueprint,
-                    buildGoal.Blocks,
-                    originX,
-                    originY,
-                    originZ,
-                    state));
-            }
+            actions.AddRange(library.DecomposeBuild(
+                buildGoal.Blueprint,
+                buildGoal.Blocks,
+                origin,
+                state));
         }
         else if (goal is CraftItemGoal craftGoal)
         {
@@ -92,16 +89,18 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
         return Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases.ToArray(), actions));
     }
 
+    // Sprint 44 (TSK-0080): SearchMemory: removed â€” results were never consumed.
+    // PreservedContextPrefixes keeps CraftItem:, FindFlatArea:, Build:, MoveTo: results.
     private static readonly string[] PreservedContextPrefixes =
-        ["SearchMemory:", "CraftItem:", "FindFlatArea:", "Build:", "MoveTo:"];
+        ["CraftItem:", "FindFlatArea:", "Build:", "MoveTo:"];
 
     private static IReadOnlyList<ActionData> CreateCreativeBuildActions(
         BuildGoal buildGoal, WorldState state, int originX, int originY, int originZ)
     {
         var actions = new List<ActionData>
         {
-            MakeAction("SearchMemory", ("query", $"flat area build location {buildGoal.Blueprint.Name}")),
-            MakeAction("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)),
+            // Sprint 44 (TSK-0080): SearchMemory removed â€” results were never consumed downstream.
+            ActionFactory.Create("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)),
         };
 
         var progressKey = BuildFactKeys.BuildProgressIndex(buildGoal.Blueprint.Name);
@@ -120,7 +119,7 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
             actions.Add(placeAction);
         }
 
-        actions.Add(MakeAction("GetStatus"));
+        actions.Add(ActionFactory.Create("GetStatus"));
         return actions;
     }
 
@@ -139,14 +138,6 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
         };
     }
 
-    private static ActionData MakeAction(
-        string tool, params (string key, object? value)[] args)
-    {
-        var action = new ActionData { Tool = tool };
-        foreach (var (key, value) in args)
-            action.Arguments[key] = value;
-        return action;
-    }
 
     private static bool TryGetIntFactFromState(WorldState state, string key, out int result)
     {
@@ -163,46 +154,47 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
         };
     }
 
-    // ── ReplanAsync ───────────────────────────────────────────────────────────
-    public async Task<IPlan?> ReplanAsync(
-        IPlan currentPlan, WorldState state, string failureReason,
-        CancellationToken cancellationToken = default, IGoal? originalGoal = null)
+    // â”€â”€ ReplanAsync (TSK-0104: ReplanResult + ReplanGoalContext) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    public async Task<ReplanResult> ReplanAsync(
+        ReplanGoalContext context, CancellationToken cancellationToken = default)
     {
         // Sprint 32 P2-2: thread failureReason to log so it is visible in telemetry.
         // Two independent audits (Sprint 25 deep-code-audit + Sprint 32 refinement-audit)
         // both flagged this parameter as accepted but unused. Adaptive replanning that
         // acts on the reason (e.g. choose alternative decomposer) is future scope.
-        if (!string.IsNullOrWhiteSpace(failureReason))
+        if (!string.IsNullOrWhiteSpace(context.FailureReason))
             _logger.LogInformation(
                 "ReplanAsync triggered for goal '{GoalName}' with reason: {FailureReason}",
-                currentPlan.GoalName, failureReason);
+                context.CurrentPlan.GoalName, context.FailureReason);
 
         var preservedContext = new Dictionary<string, object?>();
-        foreach (var action in currentPlan.Actions)
+        foreach (var action in context.CurrentPlan.Actions)
             foreach (var (key, value) in action.Context)
                 if (Array.Exists(PreservedContextPrefixes,
                         prefix => key.StartsWith(prefix, StringComparison.Ordinal)))
                     preservedContext.TryAdd(key, value);
 
         var goal = new SimpleGoal(
-            currentPlan.GoalName, "",
-            [.. currentPlan.Phases],
+            context.CurrentPlan.GoalName, "",
+            [.. context.CurrentPlan.Phases],
             _ => false);
 
         try
         {
-            var newPlan = await PlanAsync(goal, state, cancellationToken);
+            var newPlan = await PlanAsync(goal, context.State, cancellationToken);
 
             if (preservedContext.Count > 0)
                 foreach (var newAction in (newPlan as ActionPlan)?.Actions ?? newPlan.Actions)
                     foreach (var (key, value) in preservedContext)
                         newAction.Context.TryAdd(key, value);
 
-            return newPlan;
+            return ReplanResult.Success(newPlan);
         }
-        catch
+        catch (Exception ex)
         {
-            return null;
+            _logger.LogWarning(ex, "HtnPlanner.ReplanAsync: Planner error for goal '{Goal}'",
+                context.CurrentPlan.GoalName);
+            return ReplanResult.Failure($"Planner error: {ex.Message}");
         }
     }
 }

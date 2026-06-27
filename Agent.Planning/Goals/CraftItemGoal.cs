@@ -25,6 +25,9 @@ public sealed class CraftItemGoal(string itemId, int count = 1) : IGoal
     public string   Description => $"Craft {count}x {itemId.Replace('_', ' ')}.";
     public string[] Phases      => ["Craft"];
 
+    /// <summary>Sprint 39: stable per-instance ID so ActionOutcome.GoalId is unique across goals.</summary>
+    public Guid Id { get; } = Guid.NewGuid();
+
     /// <inheritdoc/>
     public string? FailureReason { get; set; }
 

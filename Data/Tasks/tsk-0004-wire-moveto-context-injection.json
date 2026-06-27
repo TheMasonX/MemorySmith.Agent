@@ -1,32 +1,35 @@
-{
-  "Id": "tsk-0004-wire-moveto-context-injection",
-  "Key": "TSK-0004",
-  "Title": "Wire MoveToTool to read coordinates from ActionData.Context (Phase 4 adaptive)",
-  "Description": "Currently MoveToTool requires explicit x/y/z in ActionData.Arguments. The Phase 4 plan is for SearchMemoryTool to write location data to ToolResult.Data (which AgentBackgroundService carries into planContext), and MoveToTool to read from ActionData.Context when Arguments don't contain coords.\n\nImplementation:\n1. Update SearchMemoryTool to extract coordinates from the best page snippet/content when it contains 'x:', 'y:', 'z:' patterns or a structured location record.\n2. Update MoveToTool.ExecuteAsync: if Arguments has x/y/z, use those; else check Context['nearestX'], Context['nearestY'], Context['nearestZ'].\n3. Update HtnTaskLibrary.GatherWoodDecompose: add a MoveToTool action after SearchMemory (with no explicit coords, relying on context).\n4. Add ContextCarryTests to verify the full flow.\n\nThis makes GatherWood actually navigate to where wood was found in memory.",
-  "Type": "Feature",
-  "Status": "Backlog",
-  "Priority": "High",
-  "AssigneeMode": "Custom",
-  "AssigneeDirectoryId": null,
-  "AssigneeCustomText": "AI Agent",
-  "Reporter": "agent-session-20260615",
-  "Labels": [
+﻿{
+  "id": "tsk-0004-wire-moveto-context-injection",
+  "key": "TSK-0004",
+  "title": "Wire MoveToTool to read coordinates from ActionData.Context (Phase 4 adaptive)",
+  "description": "Currently MoveToTool requires explicit x/y/z in ActionData.Arguments. The Phase 4 plan is for SearchMemoryTool to write location data to ToolResult.Data (which AgentBackgroundService carries into planContext), and MoveToTool to read from ActionData.Context when Arguments don\u0027t contain coords.\n\nDelivered in Sprint 50 Wave D:\n- AgentBackgroundService dispatch loop now merges non-internal Context entries into Arguments before tool validation (TSK-0004 partial)\n- planContext dictionary carries plan-level state into each action\u0027s Context bag\n\nRemaining items (Sprint 51\u002B):\n- Fix context merge: current approach copies ALL non-internal context keys into Arguments, but ToolDispatcher.ValidateAgainstSchema rejects undeclared properties. Replace with per-tool allowlist or IContextAwareTool contract.\n- Update SearchMemoryTool to emit structured coordinate hints (nearestX, nearestY, nearestZ) from best result\n- Update MoveToTool.ExecuteAsync: if Arguments has x/y/z, use those; else check Context[\u0027nearestX\u0027], Context[\u0027nearestY\u0027], Context[\u0027nearestZ\u0027]\n- Add ContextCarryTests with both happy path (coordinates found) and failure path (unrelated context keys rejected)\n- Update HtnTaskLibrary.GatherWoodDecompose: add SearchMemory \u2192 MoveTo flow (currently mines directly)",
+  "type": "Feature",
+  "status": "InProgress",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "AI Agent",
+  "reporter": "agent-session-20260615",
+  "labels": [
     "phase-4",
     "adaptive-execution",
     "context-carry"
   ],
-  "Attachments": [],
-  "ExternalLinks": [],
-  "LinkedPages": [
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
     "Tasks/phase4-tasks"
   ],
-  "Comments": [],
-  "EpicId": null,
-  "ParentId": null,
-  "DueDateUtc": null,
-  "CreatedAtUtc": "2026-06-15T23:30:00Z",
-  "UpdatedAtUtc": "2026-06-15T23:30:00Z",
-  "CompletedAtUtc": null,
-  "Revision": 1,
-  "IsArchived": false
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-15T23:30:00Z",
+  "updatedAtUtc": "2026-06-27T01:17:45.988253Z",
+  "completedAtUtc": null,
+  "revision": 4,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0004-wire-moveto-context-injection.json"
 }

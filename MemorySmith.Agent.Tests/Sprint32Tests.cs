@@ -31,7 +31,7 @@ public class Sprint32Tests
     // minimal ASP.NET Core pipeline: ApiKeyMiddleware on /api/* routes, a plain
     // response handler for the endpoint, and config from an in-memory dictionary.
 
-    private static WebApplication BuildTestApp(string? configuredApiKey)
+    private static WebApplication BuildTestApp(string? configuredApiKey, bool allowUnauthenticated = false)
     {
         var builder = WebApplication.CreateBuilder();
         builder.WebHost.UseTestServer();
@@ -40,6 +40,7 @@ public class Sprint32Tests
         var cfg = new Dictionary<string, string?>();
         if (configuredApiKey is not null)
             cfg["Agent:ApiKey"] = configuredApiKey;
+        cfg["Agent:AllowUnauthenticatedApi"] = allowUnauthenticated ? "true" : "false";
         builder.Configuration.AddInMemoryCollection(cfg);
 
         builder.Services.AddLogging(lb => lb.SetMinimumLevel(LogLevel.None));
@@ -58,18 +59,33 @@ public class Sprint32Tests
     }
 
     [Test]
-    public async Task ApiKeyMiddleware_NoKeyConfigured_AllowsRequest()
+    public async Task ApiKeyMiddleware_NoKeyConfigured_BlocksByDefault()
     {
-        // When no API key is configured, middleware must pass all requests through
-        // (dev/localhost convenience mode).
+        // When no API key is configured AND no explicit AllowUnauthenticatedApi=true,
+        // middleware must block all requests with 401.
         await using var app = BuildTestApp(configuredApiKey: null);
         await app.StartAsync();
 
         var client = app.GetTestClient();
         var response = await client.GetAsync("/api/about");
 
+        Assert.That((int)response.StatusCode, Is.EqualTo(401),
+            "No ApiKey and no AllowUnauthenticatedApi=true → must block with 401.");
+    }
+
+    [Test]
+    public async Task ApiKeyMiddleware_NoKeyConfigured_WithExplicitOptIn_AllowsRequest()
+    {
+        // When no API key is configured but AllowUnauthenticatedApi=true,
+        // middleware must pass all requests through (dev/localhost convenience mode).
+        await using var app = BuildTestApp(configuredApiKey: null, allowUnauthenticated: true);
+        await app.StartAsync();
+
+        var client = app.GetTestClient();
+        var response = await client.GetAsync("/api/about");
+
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK),
-            "No ApiKey configured → middleware must pass all requests (dev mode).");
+            "No ApiKey with AllowUnauthenticatedApi=true → must pass all requests.");
     }
 
     [Test]

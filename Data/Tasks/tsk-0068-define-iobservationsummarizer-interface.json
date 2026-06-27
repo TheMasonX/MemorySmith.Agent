@@ -1,0 +1,38 @@
+{
+  "id": "tsk-0068-define-iobservationsummarizer-interface",
+  "key": "TSK-0068",
+  "title": "Define IObservationSummarizer integration point for LLM observation feed",
+  "description": "## Problem\nThe research paper's Phase 3 proposes building compact observation summaries for the LLM evaluator. However, there is no `IObservationSummarizer` interface, no `LlmEvaluator` step between the projector and the planner, and no documented hook in `AgentBackgroundService` for injecting this. `IWorldModel` defines `Predict()`, `Reconcile()`, and `Uncertainty` — a natural home for observation-aware state management — but the paper never references it.\n\n## Source\nCouncil review DEF-PAPER-5 (Confidence: 90%). Phase 3 observation summaries have no integration point in the existing C# architecture.\n\n## Requirements\n1. Design `IObservationSummarizer` interface in `Agent.Core/Interfaces/` with:\n   - `Task<ObservationSummary> SummarizeAsync(IReadOnlyList<ActionOutcome> outcomes, WorldState state, CancellationToken ct)`\n2. Design `ObservationSummary` record containing:\n   - What changed (block mined, item crafted, entity moved, etc.)\n   - Whether the bot is moving, mining, building, or idle\n   - Whether inventory changed\n   - Whether pathfinding encountered issues\n   - Whether the target was reached, broken, placed, or collected\n   - Whether environmental context changed\n3. Define where this feeds into: `ILlmEvaluator` (Sprint 39) or a new pipeline step\n4. Document the integration point in architecture docs — do NOT implement yet\n5. Update `Data/Pages/architecture.md` with the planned seam\n\n## References\n- `Agent.Core/Interfaces/IWorldModel.cs` — `Predict()`, `Reconcile()`, `Uncertainty`\n- `Agent.Core/Models/ActionOutcome.cs` — `IObservationSummary` stub exists (Sprint 36)\n- `Data/Pages/architecture.md`\n- Council review: DEF-PAPER-5, OQ-3, OQ-4",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Low",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint40",
+    "architecture",
+    "planning",
+    "council-response",
+    "llm"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audit/mineflayer-adapter-research.md",
+    "Data/Pages/architecture.md"
+  ],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-22T00:00:00Z",
+  "updatedAtUtc": "2026-06-22T00:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

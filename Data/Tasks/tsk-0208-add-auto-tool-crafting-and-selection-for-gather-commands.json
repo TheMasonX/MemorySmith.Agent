@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0208-add-auto-tool-crafting-and-selection-for-gather-commands",
+  "key": "TSK-0208",
+  "title": "Add auto-tool crafting and selection for gather commands",
+  "description": "## Problem\nWhen asked to gather stone, the agent tries to mine with its bare hands if no pickaxe is in inventory. It doesn\u0027t automatically craft or equip the appropriate tool for the job. The player must explicitly say \u0022craft a pickaxe\u0022 before \u0022mine stone\u0022.\n\n## Agent Request\nFrom session log: \u0022automatic restocking of tools\u0022 and the gather\u2192tool dependency gap observed in gameplay.\n\n## Examples\n- Player: \u0022Mine 10 stone\u0022 \u2192 agent checks inventory \u2192 no pickaxe \u2192 auto-crafts wooden pickaxe \u2192 equips it \u2192 mines stone\n- Player: \u0022Get wood\u0022 \u2192 agent checks if axe exists \u2192 if not, auto-crafts wooden axe \u2192 gathers wood faster\n- Player: \u0022Mine iron ore\u0022 \u2192 agent checks: needs stone pickaxe\u002B \u2192 crafts if needed \u2192 mines\n\n## Scope\n- Add tool requirement mapping: each minable block type \u2192 required tool tier\n- In \u0060GatherGoalDecomposer\u0060, add a pre-gather phase that checks/crafts/equips the correct tool\n- LLM prompt updated so the agent understands tool prerequisites\n- Inventory-aware: don\u0027t craft if suitable tool already exists\n- Configurable via \u0060ChatOptions\u0060: \u0060AutoCraftTools\u0060 (default true)\n\n## Implementation sketch\n1. Define \u0060ToolRequirement\u0060 map: {stone\u2192pickaxe, wood\u2192axe, dirt\u2192shovel, ...}\n2. In decomposition phase, check inventory for required tool before gathering\n3. If missing, insert a \u0060CraftItem\u0060 action for the tool before the \u0060MineBlock\u0060 actions\n4. Add \u0060EquipItem\u0060 action if the tool needs to be in the bot\u0027s hand\n5. Mineflayer adapter already handles auto-equip for mining; focus on the crafting gap\n\n## Complexity\nLow-Medium. Mostly orchestration logic in the decomposer layer.\n\n## Priority\nMedium \u2014 significant quality-of-life improvement for survival mode.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:gathering",
+    "domain:crafting",
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T15:27:04.6413109Z",
+  "updatedAtUtc": "2026-06-27T15:27:04.6413109Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

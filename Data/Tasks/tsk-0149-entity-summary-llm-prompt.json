@@ -1,0 +1,19 @@
+{
+  "id": "tsk-0149-entity-summary-llm-prompt",
+  "title": "Include entity summary in LLM system prompt (BuildSystemPrompt)",
+  "status": "Backlog",
+  "priority": "High",
+  "type": "Task",
+  "description": "Add nearby entity information to the LLM system prompt so the agent is aware of mobs and other entities when making decisions.\n\nImplementation:\n1. Modify `LlmChatInterpreter.BuildSystemPrompt()` in `Agent.Planning/LlmChatInterpreter.cs` to accept an `IReadOnlyList<ObservedEntity>?` parameter (or a pre-formatted summary string).\n2. Add a new line to the status section:\n   - `\"Nearby: 2 cows, 1 zombie (5 blocks), 1 skeleton (12 blocks)\"`\n   - Use `NearbyEntitySummary` from WorldState.\n   - Cap at 8 entities max in the prompt.\n   - Sort by distance (closest first).\n3. Update all callers of `BuildSystemPrompt()` to pass the entity data:\n   - `HandleChatEventAsync` in `AgentBackgroundService`\n   - Any test call sites\n4. Add rule hints in the prompt about entities:\n   - E.g., \"If hostile mobs are nearby (< 10 blocks), prioritize self-preservation\"\n\nAcceptance:\n- LLM prompt includes nearby entity count when entities are present.\n- Empty entity list shows nothing (no \"Nearby: none\" clutter).\n- Test fixtures updated.\n\nRefs: `memorysmith_situational_awareness_design_doc_20260625T020914Z.md` Phase 1",
+  "labels": [
+    "entity-awareness",
+    "llm-prompt",
+    "situational-awareness",
+    "sprint-52"
+  ],
+  "estimatedHours": 1.5,
+  "linkedPages": ["Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z"],
+  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md",
+  "key": "TSK-0149",
+  "epicId": "tsk-0146-entity-observation-scene"
+}

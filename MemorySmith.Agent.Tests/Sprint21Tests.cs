@@ -316,11 +316,14 @@ public sealed class Sprint21BlockNotFoundFactTests
 }
 
 // ── P1-C: TryParseTruncatedJson gather/build support ────────────────────────
+// Sprint 39 P1-C: TryParseTruncatedJson now returns IntentDraft? (was ChatInterpretation?).
+// Assertions updated to IntentDraft fields: .Intent, .Item, .Blueprint, .Count.
+// Goal-name strings no longer live in the parser — caller uses IntentManager.BuildGoalRequest.
 
 [TestFixture]
 public sealed class Sprint21TruncatedJsonGatherTests
 {
-    private static ChatInterpretation? Parse(string json)
+    private static IntentDraft? Parse(string json)
     {
         var method = typeof(LlmChatInterpreter)
             .GetMethod("TryParseTruncatedJson",
@@ -330,33 +333,39 @@ public sealed class Sprint21TruncatedJsonGatherTests
             Assert.Ignore("TryParseTruncatedJson not found via reflection — skipping.");
             return null;
         }
-        return (ChatInterpretation?)method.Invoke(null, [json]);
+        // Sprint 39 P1-C: TryParseTruncatedJson takes json string + optional ILogger.
+        // Sprint 46 P0 (TSK-0101): Added optional ILogger parameter — pass null for test.
+        return (IntentDraft?)method.Invoke(null, new object?[] { json, null });
     }
 
     [Test]
-    public void TruncatedGatherJson_ExtractsGoalName()
+    public void TruncatedGatherJson_ExtractsIntent()
     {
         // Truncated JSON from llama3.2:3b hitting num_predict limit on "gather sand"
         var json = @"{ ""addressed"": ""yes"", ""intent"": ""gather"", ""item"": ""sand"", ""count"": 10, ""response"": ""Sure, I'll gather";
         var result = Parse(json);
 
         Assert.That(result, Is.Not.Null, "Should parse truncated gather JSON.");
-        Assert.That(result!.IntentType, Is.EqualTo(ChatIntentType.CreateGoal),
-            "gather intent should map to CreateGoal.");
-        Assert.That(result.GoalName, Is.EqualTo("GatherItem:sand"),
-            "Goal name should be GatherItem:sand from item field.");
+        Assert.That(result!.Intent, Is.EqualTo("gather"),
+            "Intent field should be 'gather'.");
+        Assert.That(result.Item, Is.EqualTo("sand"),
+            "Item field should be extracted from truncated JSON.");
+        Assert.That(result.Count, Is.EqualTo(10),
+            "Count field should be extracted.");
     }
 
     [Test]
-    public void TruncatedGatherJson_DefaultsCountToTen_WhenCountMissing()
+    public void TruncatedGatherJson_DefaultsCountToNull_WhenCountMissing()
     {
         var json = @"{ ""addressed"": ""yes"", ""intent"": ""gather"", ""item"": ""dirt"", ""response"": ""Let me";
         var result = Parse(json);
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result!.GoalName, Is.EqualTo("GatherItem:dirt"));
-        Assert.That(result.GoalParameters?.TryGetValue("count", out var c) == true && c is int count && count == 10,
-            Is.True, "Default count should be 10 when count field is absent.");
+        Assert.That(result!.Intent, Is.EqualTo("gather"));
+        Assert.That(result.Item, Is.EqualTo("dirt"),
+            "Item should be extracted even when count is missing.");
+        Assert.That(result.Count, Is.Null,
+            "Count is null when absent from truncated JSON — caller provides default.");
     }
 
     [Test]
@@ -366,21 +375,24 @@ public sealed class Sprint21TruncatedJsonGatherTests
         var result = Parse(json);
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result!.IntentType, Is.EqualTo(ChatIntentType.CreateGoal));
-        Assert.That(result.GoalName, Is.EqualTo("Build:small-house"));
+        Assert.That(result!.Intent, Is.EqualTo("build"));
+        Assert.That(result.Blueprint, Is.EqualTo("small-house"),
+            "Blueprint field should be extracted from truncated JSON.");
     }
 
     [Test]
-    public void TruncatedGatherJson_WithNoItem_ReturnsUnknown()
+    public void TruncatedGatherJson_WithNoItem_StillProducesIntentDraft()
     {
-        // intent=gather but item field is cut off entirely
+        // intent=gather but item field is cut off entirely — IntentDraft still produced,
+        // Item will be null; IntentManager.BuildGoalRequest returns null for gather with no item.
         var json = @"{ ""addressed"": ""yes"", ""intent"": ""gather"", ""response"": ""Sure";
         var result = Parse(json);
 
-        // Should parse but without a goal (no item to gather)
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.IntentType, Is.EqualTo(ChatIntentType.Unknown),
-            "gather without item should be Unknown (cannot create goal without item).");
+        Assert.That(result, Is.Not.Null,
+            "IntentDraft is always produced when addressed+intent are present.");
+        Assert.That(result!.Intent, Is.EqualTo("gather"));
+        Assert.That(result.Item, Is.Null,
+            "Item is null when cut off — caller (IntentManager) handles the no-item case.");
     }
 
     [Test]
@@ -391,7 +403,7 @@ public sealed class Sprint21TruncatedJsonGatherTests
         var result = Parse(json);
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result!.IntentType, Is.EqualTo(ChatIntentType.QueryStatus));
+        Assert.That(result!.Intent, Is.EqualTo("status"));
     }
 }
 
@@ -404,9 +416,11 @@ public sealed class Sprint21TruncatedJsonGatherTests
 file sealed class AlwaysStalledGovernor : IReplanGovernor
 {
     public bool IsStalled => true;
+    public TimeSpan CurrentStallDelay => TimeSpan.FromSeconds(60);
     public ReplanVerdict Evaluate(string _) => ReplanVerdict.Stalled;
     public void RecordProgress() { }
     public void Reset() { }
+    public bool TryAutoRecover() => false;
 }
 
 /// <summary>Sprint 21: local no-op tool (avoids name conflict with AgentBackgroundServiceTests).</summary>

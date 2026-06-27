@@ -2,6 +2,8 @@
 
 A cross-sprint catalogue of agent features, their configuration knobs, and the architectural notes worth remembering when tuning or extending them. Sprints are listed newest-first.
 
+> **New: Feature wiki pages** in [`Data/Pages/Features/`](../Features/) provide comprehensive overviews of each major subsystem. This reference focuses on detailed per-sprint configuration notes. Start with the [Feature Deep-Dives](../home.md#feature-deep-dives) table on the home page.
+
 ## Sprint 23 — Damage interrupt + World KB routing
 
 ### `DamageTakenEvent` and damage interrupt system

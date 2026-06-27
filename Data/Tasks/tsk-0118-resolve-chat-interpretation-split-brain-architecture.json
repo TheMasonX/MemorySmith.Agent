@@ -1,0 +1,24 @@
+{
+  "id": "tsk-0118-resolve-chat-interpretation-split-brain-architecture",
+  "key": "TSK-0118",
+  "title": "Resolve Chat Interpretation Split-Brain Architecture",
+  "description": "The codebase has two parallel chat interpretation paths with different semantics: LlmChatInterpreter early-returns on deterministic fast paths, while ChatInterpreter still creates CreateGoal interpretations directly for build/gather/craft/navigate routes. This conflicts with the Sprint 35 architecture contract: parsers never create goals.\n\nSource: msa_sprint35-llm-first_audit_2026-06-24.md (P0 Finding 2, 99% confidence)\n\nRequirements:\n1. Keep only stop/status/inventory/help as deterministic shortcuts\n2. Route everything else through semantic intent (IntentDraft)\n3. Move goal creation exclusively into the planner/intent manager layer\n4. Remove or retire the old ChatInterpreter direct-goal-creation path\n\nFiles: Agent.Planning/LlmChatInterpreter.cs, Agent.Planning/ChatInterpreter.cs\n\nRelated: TSK-0107 (runtime decomposition — both involve architectural migration)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeCustomText": "Agent",
+  "labels": ["domain:chat", "type:refactor", "sprint-47"],
+  "comments": [
+    {
+      "id": "c-0118-migration",
+      "author": "SteveBot",
+      "body": "Converted from orphan .md file (TSK-0118.md) to canonical .json format as part of task store cleanup council 2026-06-27.",
+      "createdAtUtc": "2026-06-27T12:00:00Z"
+    }
+  ],
+  "createdAtUtc": "2026-06-24T00:00:00Z",
+  "updatedAtUtc": "2026-06-27T12:00:00Z",
+  "revision": 1,
+  "isArchived": false
+}

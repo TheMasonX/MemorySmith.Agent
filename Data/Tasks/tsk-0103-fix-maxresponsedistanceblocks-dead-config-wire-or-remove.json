@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0103-fix-maxresponsedistanceblocks-dead-config-wire-or-remove",
+  "key": "TSK-0103",
+  "title": "Fix MaxResponseDistanceBlocks dead config \u2014 wire or remove",
+  "description": "From audit: ChatOptions.MaxResponseDistanceBlocks is documented but not actually used by ChatInterpreter. Operators tune it believing it works. Either wire it back into IsDirectedAtBot or remove it from public config until behavior returns.\n\nSource: msa_audit_ad2215e-6-24-26.md (Finding 2, 96% confidence), memorysmith_agent_extended_audit (Finding 6, 96% confidence)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "audit",
+    "chat",
+    "config-drift"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-25T04:20:54.7944185Z",
+  "updatedAtUtc": "2026-06-25T04:20:54.7944185Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

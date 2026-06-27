@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0202-add-waypoint-and-navigation-marker-system",
+  "key": "TSK-0202",
+  "title": "Add waypoint and navigation marker system",
+  "description": "## Problem\nThe agent has no way to remember locations between sessions or mark points of interest. Commands like \u0022remember this spot\u0022, \u0022set a waypoint\u0022, or \u0022go to my base\u0022 are not supported.\n\n## Agent Request\nFrom session log: \u0022ability to set waypoints\u0022 was suggested by the agent.\n\n## Scope\n- Add a \u0060SetWaypoint\u0060 / \u0060GoToWaypoint\u0060 / \u0060ListWaypoints\u0060 chat command\n- Store waypoints in the MemorySmith KB (via \u0060IMemoryGateway\u0060) as structured memory records\n- Wire into the LLM chat interpreter so the agent understands \u0022remember this place\u0022, \u0022mark the base\u0022, \u0022go to the mine\u0022, etc.\n- Add a deterministic fast-path for short waypoint recall commands\n\n## Implementation sketch\n1. Define \u0060WaypointRecord\u0060 model (name, position, dimension, timestamp)\n2. Add \u0060SetWaypointTool\u0060 and \u0060GoToWaypointTool\u0060 in \u0060Agent.Tools\u0060\n3. Store/retrieve via \u0060RestMemoryGateway\u0060\n4. Add \u0022remember\u0022 / \u0022save\u0022 / \u0022waypoint\u0022 keywords to the LLM system prompt\n\n## Complexity\nLow-Medium. Mostly integrates existing components (MoveTo, MemoryGateway).\n\n## Priority\nLow \u2014 nice quality-of-life feature.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Low",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:navigation",
+    "domain:memory",
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T15:23:55.4978726Z",
+  "updatedAtUtc": "2026-06-27T15:23:55.4978726Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

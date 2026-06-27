@@ -1,6 +1,7 @@
 using Agent.Construction;
 using Agent.Core;
 using Agent.Planning;
+using Agent.Planning.Goals;
 
 namespace MemorySmith.Agent.Tests;
 
@@ -46,52 +47,55 @@ public sealed class HtnTaskLibraryExtraTests
         Materials = materials ?? [new MaterialEntry("cobblestone", 3)],
     };
 
-    // ── TryGetIntFact coercion — via B2 checkpoint ────────────────────────────
+    // ── Per-block status filtering (TSK-0125) ──────────────────────────────────
     //
-    // DecomposeBuild reads the checkpoint fact as:
-    //   checkpointIndex = lastPlaced + 1
-    // so setting it to 1 causes the first two blocks (0,1) to be skipped and
-    // the plan to contain exactly ThreeBlocks.Count - 2 = 1 PlaceBlock action.
+    // TSK-0125 replaced linear checkpoint (BuildProgressIndex) with per-block
+    // status facts (BlockStatus). Setting block 0 and 1 to "placed" causes
+    // DecomposeBuild to skip them, leaving only block 2 as a PlaceBlock action.
 
     [Test]
-    [Description("TryGetIntFact reads a boxed int fact correctly via B2 checkpoint path")]
+    [Description("Per-block status: blocks 0 and 1 marked placed → only block 2 emitted")]
     public void DecomposeBuild_Checkpoint_IntFact_SkipsCorrectBlocks()
     {
-        var progressKey = BuildFactKeys.BuildProgressIndex("test");
-        var state = new WorldState().With(b => b.SetFact(progressKey, 1.ToString(), FactSource.Observed)); // int
-        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, 0, 64, 0, state);
-        Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1),
-            "Checkpoint=1 means blocks 0 and 1 were placed; only block 2 remains.");
+        var state = new WorldState()
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 0), BuildFactKeys.BlockStatusPlaced, FactSource.Observed))
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 1), BuildFactKeys.BlockStatusPlaced, FactSource.Observed));
+        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
+        Assert.That(CountTool(actions, "place"), Is.EqualTo(1),
+            "Blocks 0 and 1 marked placed; only block 2 remains.");
     }
 
     [Test]
-    [Description("TryGetIntFact reads a boxed long fact correctly via B2 checkpoint path")]
+    [Description("Per-block status works regardless of fact value type")]
     public void DecomposeBuild_Checkpoint_LongFact_SkipsCorrectBlocks()
     {
-        var progressKey = BuildFactKeys.BuildProgressIndex("test");
-        var state = new WorldState().With(b => b.SetFact(progressKey, 1L.ToString(), FactSource.Observed)); // long
-        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, 0, 64, 0, state);
-        Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1));
+        var state = new WorldState()
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 0), BuildFactKeys.BlockStatusPlaced, FactSource.Observed))
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 1), BuildFactKeys.BlockStatusPlaced, FactSource.Observed));
+        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
+        Assert.That(CountTool(actions, "place"), Is.EqualTo(1));
     }
 
     [Test]
-    [Description("TryGetIntFact reads a boxed double fact correctly via B2 checkpoint path")]
+    [Description("Per-block status skips blocks with placed status")]
     public void DecomposeBuild_Checkpoint_DoubleFact_SkipsCorrectBlocks()
     {
-        var progressKey = BuildFactKeys.BuildProgressIndex("test");
-        var state = new WorldState().With(b => b.SetFact(progressKey, 1.0.ToString(), FactSource.Observed)); // double
-        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, 0, 64, 0, state);
-        Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1));
+        var state = new WorldState()
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 0), BuildFactKeys.BlockStatusPlaced, FactSource.Observed))
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 1), BuildFactKeys.BlockStatusPlaced, FactSource.Observed));
+        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
+        Assert.That(CountTool(actions, "place"), Is.EqualTo(1));
     }
 
     [Test]
-    [Description("TryGetIntFact reads a string fact (from JSON deserialization) correctly via B2 checkpoint path")]
+    [Description("Per-block status: string-typed facts from deserialization still work")]
     public void DecomposeBuild_Checkpoint_StringFact_SkipsCorrectBlocks()
     {
-        var progressKey = BuildFactKeys.BuildProgressIndex("test");
-        var state = new WorldState().With(b => b.SetFact(progressKey, "1", FactSource.Observed)); // string
-        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, 0, 64, 0, state);
-        Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(1));
+        var state = new WorldState()
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 0), BuildFactKeys.BlockStatusPlaced, FactSource.Observed))
+            .With(b => b.SetFact(BuildFactKeys.BlockStatus("test", 1), BuildFactKeys.BlockStatusPlaced, FactSource.Observed));
+        var actions = _library.DecomposeBuild(MakeBlueprint(), ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), state);
+        Assert.That(CountTool(actions, "place"), Is.EqualTo(1));
     }
 
     // ── GroupBy.Sum with duplicate materials — D3 fix ─────────────────────────
@@ -108,7 +112,7 @@ public sealed class HtnTaskLibraryExtraTests
         ]);
 
         Assert.DoesNotThrow(() =>
-            _library.DecomposeBuild(blueprint, ThreeBlocks, 0, 64, 0, new WorldState()),
+            _library.DecomposeBuild(blueprint, ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), new WorldState()),
             "Duplicate blueprint materials should be merged via GroupBy.Sum, not throw.");
     }
 
@@ -122,7 +126,7 @@ public sealed class HtnTaskLibraryExtraTests
             new MaterialEntry("cobblestone", 2),
             new MaterialEntry("cobblestone", 1),
         ]);
-        var actions = _library.DecomposeBuild(blueprint, ThreeBlocks, 0, 64, 0, new WorldState());
+        var actions = _library.DecomposeBuild(blueprint, ThreeBlocks, new BuildOrigin(0, 64, 0, BuildOriginSource.AutoScanned), new WorldState());
         var mineAction = actions.FirstOrDefault(a =>
             a.Tool == "MineBlock" &&
             a.Arguments.TryGetValue("block", out var b) &&
@@ -142,8 +146,8 @@ public sealed class HtnTaskLibraryExtraTests
     {
         var actions = _library.DecomposeBuild(
             MakeBlueprint(), ThreeBlocks,
-            originX: 0, originY: 0, originZ: 0,
-            state: new WorldState(),
+            new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned),
+            new WorldState(),
             requireOrigin: true);
 
         Assert.That(actions, Has.Count.EqualTo(1),
@@ -165,11 +169,11 @@ public sealed class HtnTaskLibraryExtraTests
 
         var actions = _library.DecomposeBuild(
             MakeBlueprint(), ThreeBlocks,
-            originX: 0, originY: 0, originZ: 0,
-            state: state,
+            new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned),
+            state,
             requireOrigin: true);
 
-        Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(3),
+        Assert.That(CountTool(actions, "place"), Is.EqualTo(3),
             "When auto-origin is available, requireOrigin=true proceeds to the full 3-block build.");
     }
 
@@ -180,10 +184,10 @@ public sealed class HtnTaskLibraryExtraTests
         // requireOrigin defaults to false — existing callers (HtnPlanner) are not affected.
         var actions = _library.DecomposeBuild(
             MakeBlueprint(), ThreeBlocks,
-            originX: 0, originY: 0, originZ: 0,
-            state: new WorldState());
+            new BuildOrigin(0, 0, 0, BuildOriginSource.AutoScanned),
+            new WorldState());
 
-        Assert.That(CountTool(actions, "PlaceBlock"), Is.EqualTo(3),
+        Assert.That(CountTool(actions, "place"), Is.EqualTo(3),
             "With requireOrigin=false (default), the plan proceeds even without a stored origin.");
     }
 

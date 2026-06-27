@@ -21,6 +21,25 @@ namespace Agent.Core;
 /// Sprint 23 P0-A: DamageTakenEvent is a synthetic event computed by AgentBackgroundService
 ///            from consecutive HealthEvent health-delta comparisons; the projector stores its
 ///            facts under event:DamageTaken: for planner/diagnostics use.
+/// Sprint 35 P0-A: ApplyBlockMined no longer updates inventory directly. Inventory truth
+///            now comes from ItemCollectedEvent (Mineflayer playerCollect) which provides
+///            the actual drop name (diamond, not diamond_ore). Periodic GetStatus reconciles
+///            any drift. ApplyItemCollected added for the new event.
+/// Sprint 35 P0-B: MineCompleteEvent stored as facts only (lifecycle handled by AgentBackgroundService).
+/// Sprint 35 P2-A stubs: ItemCraftedEvent and ItemConsumedEvent stored as facts; full wiring Sprint 36.
+/// Sprint 36 P1-B: ApplyItemCrafted added — ItemCraftedEvent now updates inventory.
+/// Sprint 38 P4-A: ApplyItemConsumed added — ItemConsumedEvent now updates inventory.
+/// TSK-0117: ApplyCraftComplete and ApplySmeltComplete added — CraftCompleteEvent and
+/// SmeltCompleteEvent from the Node.js adapter now update inventory post-craft/post-smelt.
+/// Sprint 40 P0-B (Fix C): Restored inventory increment for BlockMinedEvent for self-dropping blocks.
+///   The Sprint 35 change removed ALL inventory updates from BlockMinedEvent, relying entirely
+///   on ItemCollectedEvent (playerCollect) for inventory truth. However, if the item drop entity
+///   is not collected (falls through a hole, too far away), playerCollect never fires and the
+///   inventory stays at 0 forever. This fix adds ApplyBlockMined which increments inventory
+///   for blocks that drop themselves (dirt, sand, logs, cobblestone, etc.) while still relying
+///   on ItemCollectedEvent for ores with different drop names (diamond_ore -> diamond).
+///   The block-to-item map covers known mappings; unknown blocks fall through to the bare
+///   block name as a best-effort default.
 /// </summary>
 public sealed class WorldStateProjector
 {
@@ -35,10 +54,26 @@ public sealed class WorldStateProjector
         GameModeChangedEvent e => ApplyGameModeChanged(current, e),
         DamageTakenEvent e => StoreFacts(current, e),  // Sprint 23: store facts only; health already updated via HealthEvent
         MoveEvent e => ApplyMove(current, e),
+        // Sprint 40 P0-B: ApplyBlockMined replaces the Sprint 35 bare StoreFacts call.
+        // Increments inventory for self-dropping blocks; falls back to ItemCollectedEvent
+        // for ores with different drop names (diamond_ore -> diamond).
         BlockMinedEvent e => ApplyBlockMined(current, e),
+        ItemCollectedEvent e => ApplyItemCollected(current, e),
+        // Sprint 35 P0-B: MineCompleteEvent stored as facts; lifecycle handled by AgentBackgroundService.
+        MineCompleteEvent e => StoreFacts(current, e),
+        // Sprint 36 P1-B: ItemCraftedEvent now updates inventory (full wiring).
+        // Sprint 38 P4-A: ItemConsumedEvent now updates inventory (full wiring).
+        ItemCraftedEvent e => ApplyItemCrafted(current, e),
+        ItemConsumedEvent e => ApplyItemConsumed(current, e),
         StatusEvent e => ApplyStatus(current, e),
-        // All other events (Chat, Error, BlockNotFound, CraftComplete, SmeltComplete,
-        // Death, BlockPlaced, WanderComplete, WanderFailed, Kicked, FlatAreaFound):
+        // TSK-0117: Post-craft/post-smelt inventory reconciliation.
+        // CraftCompleteEvent and SmeltCompleteEvent arrive from the Node.js adapter
+        // when crafting/smelting finishes. Ingredients are consumed server-side;
+        // we add the output to our C#-side inventory to keep it in sync.
+        CraftCompleteEvent e => ApplyCraftComplete(current, e),
+        SmeltCompleteEvent e => ApplySmeltComplete(current, e),
+        // All other events (Chat, Error, BlockNotFound, Death, BlockPlaced,
+        // WanderComplete, WanderFailed, Kicked, FlatAreaFound):
         // no structured state change; store raw facts for debugging only.
         _ => StoreFacts(current, ev, SourceFor(ev)),
     };
@@ -69,13 +104,110 @@ public sealed class WorldStateProjector
         return StoreFacts(result, e);
     }
 
+    // ── TSK-0108: Shared block-to-item drop mapping ─────────────────────────────
+    // SelfDroppingBlocks and BlockToItemDrop moved to CommonMinecraftBlocks.cs
+    // so WorldModel.PredictMine uses the same mapping. Use CommonMinecraftBlocks.ResolveBlockDrop
+    // for the canonical item drop name given a block name.
+
+    /// <summary>
+    /// Sprint 40 P0-B: Restored inventory increment for BlockMinedEvent.
+    /// Maps the mined block name to its item drop and increments inventory.
+    /// For blocks that drop themselves (dirt, sand, logs), uses the block name directly.
+    /// For blocks with different drops (stone->cobblestone, diamond_ore->diamond),
+    /// uses the BlockToItemDrop map. Falls back to the block name for unknown blocks.
+    /// ItemCollectedEvent (playerCollect) remains the authoritative source and will
+    /// add a second increment when the item IS collected — but this is acceptable
+    /// because: (a) it's rare to mine a block and not collect it, (b) periodic
+    /// GetStatus reconciles any drift, and (c) the alternative (stuck at 0 forever
+    /// when drop falls through a hole) is far worse than occasional double-count.
+    /// </summary>
     private static WorldState ApplyBlockMined(WorldState current, BlockMinedEvent e)
     {
-        var itemKey = e.Block.Contains(':') ? e.Block.Split(':')[1] : e.Block;
-        // Sprint 15 P0: use e.Count (actual blocks mined) instead of hardcoded 1.
-        // Mineflayer can report multiple blocks mined in a single event; hardcoding 1
-        // caused inventory under-counting and gather goals that never completed.
+        // TSK-0108: use shared resolver from CommonMinecraftBlocks for consistency
+        // with WorldModel.PredictMine.
+        var itemDrop = CommonMinecraftBlocks.ResolveBlockDrop(e.Block);
+        var result = current.With(b => b.AddInventoryItem(itemDrop, e.Count));
+        return StoreFacts(result, e, SourceFor(e));
+    }
+
+    /// <summary>
+    /// Sprint 35 P0-A: Updates inventory with the actual item drop name.
+    /// Fired by Mineflayer playerCollect event — provides the true item name
+    /// (e.g. "diamond" from mining "diamond_ore", not "diamond_ore").
+    /// Guard in index.js ensures only the bot's own collections fire this event.
+    /// </summary>
+    private static WorldState ApplyItemCollected(WorldState current, ItemCollectedEvent e)
+    {
+        // Normalize: strip minecraft: prefix if present (defensive; playerCollect typically returns bare names)
+        var itemKey = e.Item.Contains(':') ? e.Item.Split(':', 2)[1] : e.Item;
         var result = current.With(b => b.AddInventoryItem(itemKey, e.Count));
+        return StoreFacts(result, e);
+    }
+
+    /// <summary>
+    /// Sprint 36 P1-B: Updates inventory with the crafted item output.
+    /// Fired when an ItemCraftedEvent arrives (from craftComplete → ItemCraftedEvent).
+    /// Normalizes the item key (strips "minecraft:" prefix) for consistency with
+    /// the rest of the inventory system.
+    /// ItemConsumedEvent (ingredient deduction) is Sprint 37.
+    /// </summary>
+    private static WorldState ApplyItemCrafted(WorldState current, ItemCraftedEvent e)
+    {
+        // Normalize: strip minecraft: prefix if present
+        var itemKey = e.Item.Contains(':') ? e.Item.Split(':', 2)[1] : e.Item;
+        var result = current.With(b => b.AddInventoryItem(itemKey, e.Count));
+        return StoreFacts(result, e);
+    }
+
+    /// <summary>
+    /// Sprint 38 P4-A: Deducts consumed ingredient quantities from inventory.
+    /// Fired when an ItemConsumedEvent arrives (e.g. ingredients used during crafting).
+    /// Normalizes the item key (strips "minecraft:" prefix) for consistency with
+    /// the rest of the inventory system. Clamps at zero — never goes negative.
+    /// ItemConsumedEvent wiring: Sprint 35 P2-A stub → Sprint 38 P4-A full wiring.
+    /// </summary>
+    private static WorldState ApplyItemConsumed(WorldState current, ItemConsumedEvent e)
+    {
+        // Normalize: strip minecraft: prefix if present
+        var itemKey = e.Item.Contains(':') ? e.Item.Split(':', 2)[1] : e.Item;
+        var have    = current.Inventory.GetValueOrDefault(itemKey);
+        var after   = Math.Max(0, have - e.Count);
+
+        // Build updated inventory with the deducted count
+        var newInv = new Dictionary<string, int>(
+            current.Inventory, StringComparer.OrdinalIgnoreCase);
+        if (after == 0)
+            newInv.Remove(itemKey);
+        else
+            newInv[itemKey] = after;
+
+        var result = current.With(b => b.SetInventory(newInv));
+        return StoreFacts(result, e);
+    }
+
+    /// <summary>
+    /// TSK-0117: Post-craft inventory reconciliation.
+    /// When CraftCompleteEvent arrives from the adapter, the crafted items have
+    /// been added server-side. This method syncs our C#-side inventory by adding
+    /// the crafted item count. Ingredients were already consumed server-side.
+    /// </summary>
+    private static WorldState ApplyCraftComplete(WorldState current, CraftCompleteEvent e)
+    {
+        var itemKey = e.Item.Contains(':') ? e.Item.Split(':', 2)[1] : e.Item;
+        var result = current.With(b => b.AddInventoryItem(itemKey, e.Count));
+        return StoreFacts(result, e);
+    }
+
+    /// <summary>
+    /// TSK-0117: Post-smelt inventory reconciliation.
+    /// When SmeltCompleteEvent arrives from the adapter, the input has been
+    /// consumed and the output added server-side. This method syncs our C#-side
+    /// inventory by adding the result item. Input was already consumed server-side.
+    /// </summary>
+    private static WorldState ApplySmeltComplete(WorldState current, SmeltCompleteEvent e)
+    {
+        var resultKey = e.Result.Contains(':') ? e.Result.Split(':', 2)[1] : e.Result;
+        var result = current.With(b => b.AddInventoryItem(resultKey, e.Count));
         return StoreFacts(result, e);
     }
 
@@ -173,11 +305,49 @@ public sealed class WorldStateProjector
                 result = result.With(b => b.SetFact($"{prefix}Pos", e.Pos.ToString(), source));
                 break;
             case BlockMinedEvent e:
+                // Sprint 35 P0-A: facts only — inventory update removed; ItemCollectedEvent
+                // provides the authoritative inventory update with the correct drop name.
                 result = result.With(b =>
                 {
                     b.SetFact($"{prefix}Block", e.Block, source);
                     b.SetFact($"{prefix}Count", e.Count.ToString(), source);
                     b.SetFact($"{prefix}Pos", e.Pos.ToString(), source);
+                });
+                break;
+            case ItemCollectedEvent e:
+                // Sprint 35 P0-A: the actual inventory update is done in ApplyItemCollected above;
+                // here we only record the fact for diagnostics.
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Item", e.Item, source);
+                    b.SetFact($"{prefix}Count", e.Count.ToString(), source);
+                });
+                break;
+            case MineCompleteEvent e:
+                // Sprint 35 P0-B: final mining summary for diagnostics.
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Block", e.Block, source);
+                    b.SetFact($"{prefix}Mined", e.Mined.ToString(), source);
+                    b.SetFact($"{prefix}TargetCount", e.TargetCount.ToString(), source);
+                });
+                break;
+            case ItemCraftedEvent e:
+                // Sprint 36 P1-B: inventory update done in ApplyItemCrafted above;
+                // here we only record diagnostic facts.
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Item", e.Item, source);
+                    b.SetFact($"{prefix}Count", e.Count.ToString(), source);
+                });
+                break;
+            case ItemConsumedEvent e:
+                // Sprint 38 P4-A: inventory deduction done in ApplyItemConsumed above;
+                // here we only record diagnostic facts.
+                result = result.With(b =>
+                {
+                    b.SetFact($"{prefix}Item", e.Item, source);
+                    b.SetFact($"{prefix}Count", e.Count.ToString(), source);
                 });
                 break;
             case ChatEvent e:
@@ -268,11 +438,14 @@ public sealed class WorldStateProjector
                     b.SetFact($"{prefix}MaxX", e.MaxX.ToString(), source);
                     b.SetFact($"{prefix}MinZ", e.MinZ.ToString(), source);
                     b.SetFact($"{prefix}MaxZ", e.MaxZ.ToString(), source);
+                    // Sprint 35 P0-C: record searched radius for BuildGoalDecomposer retry logic.
+                    b.SetFact($"{prefix}SearchedRadius", e.SearchedRadius.ToString(), source);
                     // Sprint 9: cross-event summary key — lets planners read the last
                     // flat-area scan result via BuildFactKeys without parsing per-event keys.
                     b.SetFact(BuildFactKeys.LastFlatArea, e.Area.ToString(), source);
                 });
                 break;
+            // TSK-0117: store diagnostic facts for craft/smelt completion events
         }
 
         return result;

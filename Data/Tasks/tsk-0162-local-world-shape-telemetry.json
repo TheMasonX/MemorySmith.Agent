@@ -1,0 +1,18 @@
+{
+  "id": "tsk-0162-local-world-shape-telemetry",
+  "title": "Expose local world shape: block underfoot, block in front, nearby hazards",
+  "status": "Backlog",
+  "priority": "High",
+  "type": "Task",
+  "description": "Add local world shape telemetry so the agent knows what it's standing on, what's directly ahead, and what hazards are nearby. This directly supports planning for movement, placement, and combat avoidance.\n\nImplementation:\n1. Add a periodic `sendLocalShape()` function (runs on same 2s interval as rich status):\n   - `blockUnderfoot` — `bot.blockAt(bot.entity.position.offset(0, -1, 0))` — what the bot is standing ON\n   - `blockAtFeet` — `bot.blockAt(bot.entity.position)` — block at the bot's position (e.g., tall grass, water)\n   - `blockAtHead` — `bot.blockAt(bot.entity.position.offset(0, 1, 0))` — block at head level\n   - `blockInFront` — `bot.blockAt(bot.entity.position.offset(forward vector * 1))` using yaw to compute forward\n   - `supportBlockInFront` — the solid block the bot would place against if placing at eye level\n   - `isInLiquid` — block at feet is water or lava\n   - `isOnGround` — block underfoot is solid (not air, not liquid)\n   - `skyLight` — `bot.blockAt(bot.entity.position.offset(0, 1, 0)).skyLight` (0-15, darkness = dangerous)\n   - `blockLight` — light level at head (for spawning safety)\n2. Compute forward vector from yaw:\n   ```js\n   const rad = yaw * Math.PI / 180;\n   const fx = -Math.sin(rad); // Mineflayer yaw: 0 = south, PI = north\n   const fz = -Math.cos(rad);\n   ```\n3. Create `LocalShapeEvent` in `WorldEvents.cs` with all fields.\n4. Handle in `WebSocketBridge.ParseEvent()` and project in `WorldStateProjector`.\n5. Include relevant fields in `ScenePackBuilder`:\n   - \"Standing on grass_block. Light: 15 sky, 0 block. Safe.\"\n   - \"Standing in water! Light: 7 sky. Hostile spawn possible.\"\n\nTunable constants:\n- `LOCAL_SHAPE_INTERVAL_MS = 2000` (same as rich status)\n\nAcceptance:\n- Agent knows what block it's standing on.\n- Agent knows light level (dark = danger).\n- Agent can check if it's in water before attempting non-aquatic movement.\n\nRefs: `msa_planning_mineflayer_audit_20260621_1437.md` Finding 2 (local world shape)",
+  "labels": [
+    "mineflayer",
+    "telemetry",
+    "world-state",
+    "local-shape",
+    "sprint-54"
+  ],
+  "estimatedHours": 2.5,
+  "designRef": "Data/Pages/Audit/msa_planning_mineflayer_audit_20260621_1437.md",
+  "key": "TSK-0162"
+}

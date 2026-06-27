@@ -24,8 +24,12 @@ public sealed record ChatTurn(string Speaker, string Message, DateTimeOffset Tim
 /// </summary>
 public sealed class ChatHistory
 {
-    /// <summary>Default context window size (from Sprint 4b spec).</summary>
-    public const int MaxTurnsDefault = 5;
+    /// <summary>
+    /// Default context window size (Sprint 52: increased from 5 to 30 — 5 turns
+    /// only covers ~30s of rapid chat, making the agent appear forgetful).
+    /// Future: replace turn-count eviction with character-length-based eviction (TSK-0169).
+    /// </summary>
+    public const int MaxTurnsDefault = 30;
 
     private readonly int _maxTurns;
 

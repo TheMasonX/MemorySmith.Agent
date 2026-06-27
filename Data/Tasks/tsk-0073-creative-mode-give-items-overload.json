@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0073-creative-mode-give-items-overload",
+  "key": "TSK-0073",
+  "title": "Creative Mode Give Items Overload",
+  "description": "When the agent starts building in creative and gives themselves items, they often give themselves the full set, even if they already have some of the required materials",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-23T04:43:10.5717173Z",
+  "updatedAtUtc": "2026-06-23T04:43:10.5717173Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

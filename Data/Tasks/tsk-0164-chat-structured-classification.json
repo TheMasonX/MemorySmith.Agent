@@ -1,0 +1,18 @@
+{
+  "id": "tsk-0164-chat-structured-classification",
+  "title": "Replace regex-only chat filter with structured message classification",
+  "status": "Backlog",
+  "priority": "Medium",
+  "type": "Task",
+  "description": "Upgrade the chat/system-message filter from a regex firewall to structured classification with `messageKind` field. Per the Mineflayer audit, the current `SYSTEM_MESSAGE_PATTERNS` array is brittle — any server phrasing change can leak noise into the LLM pipeline.\n\nImplementation:\n1. Add a `messageKind` classification emitted with every chat event:\n   - `player_chat` — message from another player\n   - `server_info` — server announcement (join/leave, time set, gamemode change)\n   - `server_command_echo` — server echo of a command (teleport, give, clear)\n   - `server_error` — permission denied, unknown command, etc.\n   - `death_message` — player/mob death announcement\n   - `advancement` — advancement earned announcement\n2. Classification strategy:\n   - First: check `username` — empty/null → server message (reliable)\n   - Second: check JSON message structure if available (Mineflayer 4.x exposes `json` property)\n   - Third: regex patterns as fallback only\n3. Add `messageKind` to `ChatEvent` in `WorldEvents.cs`:\n   - `ChatEvent(string Username, string Message, string? MessageKind, int OnlinePlayers, Position? PlayerPos, DateTimeOffset Timestamp)`\n4. Forward `messageKind` to C# so `AgentBackgroundService` can filter at the C# level:\n   - Only `player_chat` and `server_command_echo` reach the LLM\n   - `server_info` and `death_message` logged but not forwarded\n5. Keep existing regex patterns as the fallback tier, not the primary classifier.\n\nAcceptance:\n- New server message types are less likely to leak through.\n- C# side can distinguish chat sources without re-parsing text.\n- No regression: existing filtered messages stay filtered.\n\nRefs: `msa_planning_mineflayer_audit_20260621_1437.md` Finding 3; `mineflayer-adapter-research.md` related section",
+  "labels": [
+    "mineflayer",
+    "chat",
+    "classification",
+    "reliability",
+    "sprint-54"
+  ],
+  "estimatedHours": 2.0,
+  "designRef": "Data/Pages/Audit/msa_planning_mineflayer_audit_20260621_1437.md",
+  "key": "TSK-0164"
+}

@@ -1,0 +1,40 @@
+﻿{
+  "id": "tsk-0083-add-tests-for-advancebuildcheckpoint-blockplacedevent-blockplaceskippedevent-placeblockcontexts",
+  "key": "TSK-0083",
+  "title": "Add tests for AdvanceBuildCheckpoint, BlockPlacedEvent, BlockPlaceSkippedEvent, _placeBlockContexts",
+  "description": "Sprint44Tests.cs class doc comment promises tests for these checkpoint-related components, but the test methods don\u0027t exist. Need to add:\n- AdvanceBuildCheckpoint: happy path, missing context, duplicate event\n- BlockPlacedEvent handler: normal placement advances checkpoint\n- BlockPlaceSkippedEvent handler: checkpoint NOT advanced, correlation completed\n- _placeBlockContexts: entry creation, cleanup on goal completion/cancel/timeout\n\nThese are the remaining ~50% of TSK-0081 that was documented but not implemented.",
+  "type": "Task",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "tests",
+    "sprint-45",
+    "council"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-85e4e952c16f4706bffad25d8566103b",
+      "author": "anonymous",
+      "body": "Audit verification (2026-06-23): This task overlaps with the Sprint44Tests which already cover AdvanceBuildCheckpoint, BlockPlacedEvent, and BlockPlaceSkippedEvent. The audit confirms more tests would be valuable, especially for: (1) the BlockPlaceSkipped \u2192 no checkpoint advance path, (2) duplicate BlockPlacedEvent, (3) missing _placeBlockContexts entry.",
+      "createdAtUtc": "2026-06-24T04:21:21.9879198Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-23T14:31:12.6036778Z",
+  "updatedAtUtc": "2026-06-25T13:39:03.7061762Z",
+  "completedAtUtc": "2026-06-25T13:39:03.7061762Z",
+  "revision": 3,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0083-add-tests-for-advancebuildcheckpoint-blockplacedevent-blockplaceskippedevent-placeblockcontexts.json"
+}

@@ -1,0 +1,29 @@
+{
+  "id": "tsk-0116-move-creative-build-handling-into-decomposer-layer",
+  "key": "TSK-0116",
+  "title": "Move creative-mode build handling into decomposer layer",
+  "description": "HtnPlanner.CreateCreativeBuildActions was dead code - PlannerRouter prefers BuildGoalDecomposer, and HtnTaskLibrary.DecomposeBuild already handles creative mode internally. Removed the creative branch from HtnPlanner.PlanAsync and the CreateCreativeBuildActions helper method.",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Medium",
+  "assigneeCustomText": "Agent",
+  "reporter": "SteveBot",
+  "labels": [
+    "audit",
+    "architecture",
+    "creative-mode",
+    "build"
+  ],
+  "comments": [
+    {
+      "id": "c-s50wb-0116",
+      "author": "SteveBot",
+      "body": "Completed in Sprint 50 Wave B. Removed dead CreateCreativeBuildActions from HtnPlanner. DecomposeBuild already handles creative mode. The HtnPlanner branch was dead code since PlannerRouter prefers BuildGoalDecomposer first.",
+      "createdAtUtc": "2026-06-25T23:45:00Z"
+    }
+  ],
+  "createdAtUtc": "2026-06-25T19:24:12.5892284Z",
+  "updatedAtUtc": "2026-06-25T23:45:00Z",
+  "completedAtUtc": "2026-06-25T23:45:00Z",
+  "revision": 1
+}

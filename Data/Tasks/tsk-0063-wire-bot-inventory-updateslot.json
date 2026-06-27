@@ -1,0 +1,37 @@
+{
+  "id": "tsk-0063-wire-bot-inventory-updateslot",
+  "key": "TSK-0063",
+  "title": "Wire bot.inventory.on('updateSlot') for real-time inventory",
+  "description": "## Problem\nThe current inventory tracking infers item counts from `BlockMinedEvent` events (`ApplyBlockMined → AddInventoryItem`), which is an inference, not ground truth. The actual Mineflayer hook `bot.inventory.on('updateSlot', (slot, oldItem, newItem) => {...})` provides real-time slot-level inventory updates.\n\n## Source\nCouncil review DEF-PAPER-4 (Confidence: 90%). The research paper says to \"prefer pickup events\" but never names the actual Mineflayer hook: `bot.inventory.on('updateSlot')` which is the real-time slot-level event confirmed in the Mineflayer API docs.\n\n## Requirements\n1. Add `bot.inventory.on('updateSlot')` listener in `MineflayerAdapter/index.js`\n2. Emit a new `inventorySlotUpdate` event from the adapter with: slot index, old item (name+count), new item (name+count)\n3. Define C# `WorldEvent` subtype: `InventorySlotUpdateEvent`\n4. Add parsing in `WebSocketBridge.cs`\n5. Add handler in `WorldStateProjector.cs` — `ApplyInventorySlotUpdate` should update the specific slot in `WorldState.Inventory`\n6. Keep existing `BlockMinedEvent` → inventory path as a fallback/projection, but prefer `InventorySlotUpdateEvent` as the authoritative source\n7. Verify this does not conflict with creative-mode `/give` inventory path\n\n## References\n- Mineflayer API: `bot.inventory.on('updateSlot')`\n- `Agent.Core/WorldStateProjector.cs` — `ApplyBlockMined` inventory path\n- `Agent.Core/Models/WorldState.cs` — `Inventory` dictionary\n- Council review: DEF-PAPER-4",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint40",
+    "mineflayer-adapter",
+    "inventory",
+    "events",
+    "council-response"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audit/mineflayer-adapter-research.md"
+  ],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-22T00:00:00Z",
+  "updatedAtUtc": "2026-06-22T00:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

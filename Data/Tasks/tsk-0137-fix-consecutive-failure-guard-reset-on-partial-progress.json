@@ -1,0 +1,41 @@
+{
+  "id": "tsk-0137-fix-consecutive-failure-guard-reset-on-partial-progress",
+  "key": "TSK-0137",
+  "title": "Fix Consecutive Failure Guard \\u2014 Reset on Partial Progress",
+  "description": "Research Report R2-007 (Confidence 87%, Medium). **Audit correction (SteveBot 2026-06-26):** The original audit claim (counter resets only on full success, not partial progress) is incorrect. The code DOES reset `_consecutiveFailures` on partial progress — any success from MineBlock, PlaceBlock, CraftItem, or SmeltItem resets it via `IsProgressSignalTool` (line 1601).\\\\n\\\\nREVISED finding: The real gap is that **non-progress actions (MoveTo, Wander, FindFlatArea, GetStatus) do NOT reset the counter on success** AND do NOT increment it on failure. This means 3 consecutive PlaceBlock failures cause goal abandonment even if MoveTo succeeded in between — which is actually correct behavior because the progress-signal tool (PlaceBlock) is failing.\\\\n\\\\nHowever, there IS a subtle issue: if the agent is in a state where it ONLY takes non-progress actions (e.g., stuck in a MoveTo→Wander→GetStatus loop), failures in those actions DO increment the counter (since they're not Chat) and successes DON'T reset it (since they're not progress tools). This could cause premature goal abandonment if the agent can't reach the progress phase.\\\\n\\\\nRevised fix:\\\\n1. **Narrow the scope**: Only apply if there's evidence of premature abandonment from non-progress loops.\\\\n2. **Alternative fix**: Add Wander to `IsProgressSignalTool` (it changes position = progress).\\\\n3. **Or**: Don't count failures from non-progress tools toward the counter (only count MineBlock/PlaceBlock/CraftItem/SmeltItem failures).\\\\n4. **Keep current behavior**: The guard is working as designed for the common case.\\\\n\\\\nCurrent counter behavior (confirmed in code):\\\\n- Reset on success: MineBlock, PlaceBlock, CraftItem, SmeltItem\\\\n- Incremented on failure: ALL tools except Chat\\\\n- Reset on lifecycle: SetGoal, CancelGoal, goal completion, goal abandonment, DeathEvent, continue intent\\\\n- Game errors: counted separately, escalate at 2+ failures via TryRecoverFromGameErrorAsync\\\\n- Max: 3 consecutive failures (constructor param)\\\\n\\\\nFiles:\\\\n- AgentBackgroundService.cs:43 (maxConsecutiveFailures)\\\\n- AgentBackgroundService.cs:170 (_consecutiveFailures field)\\\\n- AgentBackgroundService.cs:2224 (IsProgressSignalTool)\\\\n- AgentBackgroundService.cs:1601 (counter reset on success)\\\\n- AgentBackgroundService.cs:1624-1699 (counter increment on failures)\\\\n- AgentBackgroundService.cs:1281-1292 (goal abandonment trigger)\\\\n\\\\nSource: research-MemorySmith.Agent Codebase Audit Sprint-35, Council Addendum 2026-06-26. Code audit correction: SteveBot 2026-06-26.,\\\\n\\\\n  \\\"type\\\": \\\"Task\\\",\\\\n\\\\n  \\\"status\\\": \\\"Done\\\",\\\\n\\\\n  \\\"priority\\\": \\\"Medium\\\",\\\\n\\\\n  \\\"assigneeMode\\\": \\\"Custom\\\",\\\\n\\\\n  \\\"assigneeDirectoryId\\\": null,\\\\n\\\\n  \\\"assigneeCustomText\\\": \\\"Agent\\\",\\\\n\\\\n  \\\"reporter\\\": \\\"anonymous\\\",\\\\n\\\\n  \\\"labels\\\": [\\\\n\\\\n    \\\"sprint-51\\\",\\\\n\\\\n    \\\"council\\\",\\\\n\\\\n    \\\"agent-loop\\\",\\\\n\\\\n    \\\"resilience\\\"\\\\n\\\\n  ],\\\\n\\\\n  \\\"attachments\\\": [],\\\\n\\\\n  \\\"externalLinks\\\": [],\\\\n\\\\n  \\\"linkedPages\\\": [],\\\\n\\\\n  \\\"comments\\\": [\\\\n\\\\n    {\\\\n\\\\n      \\\"id\\\": \\\"c-s52-sb1\\\",\\\\n\\\\n      \\\"author\\\": \\\"SteveBot\\\",\\\\n\\\\n      \\\"body\\\": \\\"Completed in Sprint 51 Wave B (commit 72ff65f) + Sprint 52 uncommitted changes. IsProgressSignalTool narrowed to only MineBlock/PlaceBlock/CraftItem/SmeltItem (removed MoveTo/FindFlatArea/Wander). Additional creative mode recovery guards added: skip inventory-error recovery in creative mode (adapter handles creative inventory). The failure guard is working as designed — counter resets on partial progress, not just full goal completion. Audit correction applied.\\\",\\\\n\\\\n      \\\"createdAtUtc\\\": \\\"2026-06-27T04:30:00Z\\\"\\\\n\\\\n    }\\\\n\\\\n  ],\\\\n\\\\n  \\\"epicId\\\": null,\\\\n\\\\n  \\\"parentId\\\": null,\\\\n\\\\n  \\\"dueDateUtc\\\": null,\\\\n\\\\n  \\\"createdAtUtc\\\": \\\"2026-06-27T00:33:27.5038789Z\\\",\\\\n\\\\n  \\\"updatedAtUtc\\\": \\\"2026-06-27T00:33:27.5038789Z\\\",\\\\n\\\\n  \\\"completedAtUtc\\\": null,\\\\n\\\\n  \\\"revision\\\": 1,\\\\n\\\\n  \\\"isArchived\\\": false,\\\\n\\\\n  \\\"hasLoadError\\\": false,\\\\n\\\\n  \\\"loadError\\\": null,\\\\n\\\\n  \\\"sourceFilePath\\\": null\\\\n\\\\n}\\\\n\\\\n",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-51",
+    "council",
+    "agent-loop",
+    "resilience"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-s52-sb1",
+      "author": "SteveBot",
+      "body": "Completed in Sprint 51 Wave B (commit 72ff65f) + Sprint 52 uncommitted changes. IsProgressSignalTool narrowed to only MineBlock/PlaceBlock/CraftItem/SmeltItem (removed MoveTo/FindFlatArea/Wander). Additional creative mode recovery guards added: skip inventory-error recovery in creative mode (adapter handles creative inventory). The failure guard is working as designed — counter resets on partial progress, not just full goal completion. Audit correction applied.",
+      "createdAtUtc": "2026-06-27T04:30:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T00:33:27.5038789Z",
+  "updatedAtUtc": "2026-06-27T00:33:27.5038789Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

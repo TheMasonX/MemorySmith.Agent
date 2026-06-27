@@ -94,9 +94,10 @@ public class Sprint30Tests
     // ── P1-D: ChatInterpreter plural-map regression ──────────────────────────
 
     private static MethodInfo? GetResolveItemId()
+        // Sprint 39: method is named ResolveItem (not ResolveItemId) — public static.
         => typeof(ChatInterpreter).GetMethod(
-            "ResolveItemId",
-            BindingFlags.NonPublic | BindingFlags.Static);
+            "ResolveItem",
+            BindingFlags.Public | BindingFlags.Static);
 
     [Test]
     public void ChatInterpreter_ResolveItemId_Grass_DoesNotReturnGra()
@@ -156,7 +157,7 @@ public class Sprint30Tests
         Assert.That(method, Is.Not.Null, "ParseIntent must exist as a private static method.");
 
         var state = new WorldState();
-        var result = method!.Invoke(null, new object[] { "doing", state });
+        var result = method!.Invoke(null, new object?[] { "doing", state, null });
         Assert.That(result, Is.Not.Null);
 
         // Use reflection to read the IntentType property generically.

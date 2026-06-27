@@ -1,0 +1,19 @@
+{
+  "id": "tsk-0157-future-graph-links-landmarks-goals",
+  "title": "[FUTURE] Add graph links between landmarks, goals, and pages in MemorySmith",
+  "status": "Backlog",
+  "priority": "Low",
+  "type": "Task",
+  "description": "Once MemorySmith supports graph relations, link world pages together to form a spatial-semantic knowledge graph of the agent's world experience.\n\nThis is explicitly a FUTURE phase (Phase 4) per the design doc. Do not start until:\n- MemorySmith supports graph relation endpoints.\n- Embedding phase (TSK-0156) is complete or at least the backend is ready.\n\nImplementation sketch:\n1. Link landmark pages to nearby landmarks (spatial proximity edges).\n2. Link goal pages to landmarks where they were executed.\n3. Link failure pages to the goals/actions they relate to.\n4. Enable graph traversal queries: \"landmarks near position X\", \"goals executed at landmark Y\", \"common failures at landmark Z\".\n5. Use `MemorySmith.CodeSearch` MCP tool or equivalent for graph queries.\n\nAcceptance: Deferred until MemorySmith backend supports graph relations.\n\nRefs: `memorysmith_situational_awareness_design_doc_20260625T020914Z.md` Phase 4",
+  "labels": [
+    "future",
+    "graph",
+    "knowledge-graph",
+    "situational-awareness"
+  ],
+  "estimatedHours": 0,
+  "linkedPages": ["Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z"],
+  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md",
+  "blockedReason": "MemorySmith backend does not yet expose graph relation endpoints.",
+  "key": "TSK-0157"
+}

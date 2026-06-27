@@ -36,7 +36,7 @@ public sealed class MockMemoryGateway : IMemoryGateway
         return Task.FromResult(id);
     }
 
-    public Task UpdatePageAsync(string pageId, string content, CancellationToken cancellationToken = default)
+    public Task UpdatePageAsync(string pageId, string content, string? title = null, CancellationToken cancellationToken = default)
     {
         _pages[pageId] = content;
         return Task.CompletedTask;

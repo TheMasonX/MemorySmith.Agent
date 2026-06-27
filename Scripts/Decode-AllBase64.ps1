@@ -1,6 +1,8 @@
 ﻿# Define the target directory and file extension filter
 $TargetFolder = "D:\@Repos\MemorySmith.Agent"
-$ExtensionFilter = "*.md" # Change to "*.txt" or "*.cs" if needed
+$ExtensionFilter = "*.cs" # Change to "*.txt", "*.cs", "*.md", etc. as needed
+
+$PrintSkipped = $false # Set to $true to print skipped files
 
 # Regex to validate if the string is valid Base64 format
 $Base64Regex = '^[A-Za-z0-9+/]*={0,2}$'
@@ -43,7 +45,7 @@ foreach ($File in $Files) {
             }
             
             Write-Host "Successfully decoded: $NewPath" -ForegroundColor Green
-        } else {
+        } elseif ($PrintSkipped) {
             Write-Host "Skipped (Not valid Base64): $($File.FullName)" -ForegroundColor Yellow
         }
     }

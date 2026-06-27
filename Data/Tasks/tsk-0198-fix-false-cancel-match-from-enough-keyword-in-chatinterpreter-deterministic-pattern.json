@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0198-fix-false-cancel-match-from-enough-keyword-in-chatinterpreter-deterministic-pattern",
+  "key": "TSK-0198",
+  "title": "Fix false cancel match from \u0022enough\u0022 keyword in ChatInterpreter deterministic pattern",
+  "description": "## Problem\nThe deterministic pattern matcher \u0060ChatInterpreter.ParseIntent\u0060 has a cancel regex that includes the word \u0022enough\u0022:\n\u0060\u0060\u0060csharp\nRegex.IsMatch(message, @\u0022\\b(stop|cancel|enough|quit|abort|nevermind|never mind)\\b\u0022, RegexOptions.IgnoreCase)\n\u0060\u0060\u0060\n\nThis causes a false positive whenever a player naturally says \u0022enough\u0022 in a non-cancellation context, e.g. \u0022Is this enough to play Minecraft?\u0022 \u2192 matched as \u0022cancel\u0022 \u2192 emergency stop fired.\n\n## Evidence\nFrom session log 2026-06-27:\n\u0060\u0060\u0060\n[10:02:37] [chat] \u003CTheMasonX23\u003E What do you have access to? Is this enough to play minecraft?\n[10:02:37] [chat] \u003CTheMasonX23\u003E -\u003E cancel\n[10:02:37] [stop] emergency stop dispatched to adapter via StopNow\n\u0060\u0060\u0060\nThis repeated 3 times (10:02:37, 10:02:50, 10:03:07) before the LLM path finally handled it as \u0022status\u0022 at 10:03:07.\n\n## Recommended Fix\nRemove \u0022enough\u0022 from the cancel regex. The word \u0022enough\u0022 is too common in everyday language (e.g. \u0022is this enough\u0022, \u0022that\u0027s enough food\u0022, \u0022enough wood\u0022) to be a reliable cancel signal. Consider replacing with a more specific pattern like \u0060\u0022that.s enough\u0022\u0060 or \u0060\u0022(that\u0027s|thats) enough\u0022\u0060 if needed, or just remove it entirely since \u0022stop\u0022, \u0022cancel\u0022, \u0022abort\u0022, \u0022quit\u0022, \u0022nevermind\u0022 already cover the real cancel intents.\n\n## Files\n- \u0060Agent.Planning/ChatInterpreter.cs\u0060 line ~280: cancel regex pattern\n\n## Priority\nHigh \u2014 this causes repeated false emergency stops that disrupt the agent and confuse users.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "type:bug",
+    "domain:chat",
+    "sprint-54"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T15:13:16.9538052Z",
+  "updatedAtUtc": "2026-06-27T15:13:16.9538052Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

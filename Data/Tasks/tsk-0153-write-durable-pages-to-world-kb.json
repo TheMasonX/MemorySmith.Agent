@@ -1,0 +1,19 @@
+{
+  "id": "tsk-0153-write-durable-pages-to-world-kb",
+  "title": "Write snapshot, landmark, goal, and failure pages to MemorySmith World KB",
+  "status": "Backlog",
+  "priority": "Medium",
+  "type": "Task",
+  "description": "Wire the `WorldObservationWriter` into the agent lifecycle so durable records are created at the right boundaries.\n\nImplementation:\n1. Wire into `AgentBackgroundService`:\n   - On goal start → write `goal/{goalId}` page with initial context.\n   - On goal complete → update `goal/{goalId}` with outcome summary, update snapshot.\n   - On goal fail/abandon → write `failure/{action}` page with error pattern.\n2. Wire into `MineflayerAdapter` or event processing:\n   - On significant position change (e.g., biome boundary crossed) → write `landmark/{name}`.\n   - On structure found (village, temple, etc.) → write `landmark/{name}` with structure type.\n3. Add a `!remember` or `!checkpoint` chat command that triggers an explicit snapshot write.\n4. Add a `!landmark <name>` chat command for manual landmark creation.\n5. Ensure writes go to World KB gateway, NOT Agent KB.\n6. Respect `WorldKbUrl` null fallback — if World KB is not configured, log a warning and skip writes.\n\nAcceptance:\n- MemorySmith shows goal pages appearing/disappearing as goals cycle.\n- Landmark pages for interesting locations.\n- Failure pages for recurring problems.\n- Manual `!remember` command works.\n- No writes when World KB URL is null.\n\nRefs: `memorysmith_situational_awareness_design_doc_20260625T020914Z.md` Phase 2",
+  "labels": [
+    "memory",
+    "durable-writing",
+    "situational-awareness",
+    "sprint-53"
+  ],
+  "estimatedHours": 3.0,
+  "linkedPages": ["Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z"],
+  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md",
+  "key": "TSK-0153",
+  "epicId": "tsk-0146-entity-observation-scene"
+}

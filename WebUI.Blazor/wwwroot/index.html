@@ -92,6 +92,75 @@ select:focus, input:focus { border-color: var(--accent); }
 .queue-item .args { color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .queue-empty { color: var(--dim); font-size: 11px; text-align: center; padding: 16px; }
 
+/* ── Tabs ── */
+.tab-bar { display: flex; gap: 2px; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 14px; }
+.tab { padding: 8px 16px; font-size: 12px; font-weight: 500; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; user-select: none; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.view { display: none; }
+.view.active { display: contents; }
+
+/* ── Log viewer ── */
+.log-controls { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
+.log-controls select, .log-controls input { width: auto; min-width: 100px; }
+.log-list { max-height: 500px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+.log-row { font-size: 11px; padding: 4px 8px; border-radius: 3px; background: var(--bg); border-left: 3px solid var(--border); font-family: 'SF Mono', 'Fira Code', monospace; line-height: 1.5; }
+.log-row.Warning { border-left-color: var(--yellow); }
+.log-row.Error, .log-row.Fatal { border-left-color: var(--red); }
+.log-row.Information { border-left-color: var(--accent); }
+.log-row .log-time { color: var(--dim); margin-right: 8px; }
+.log-row .log-level { font-weight: 600; margin-right: 8px; width: 24px; display: inline-block; }
+.log-row .log-level.Warning { color: var(--yellow); }
+.log-row .log-level.Error { color: var(--red); }
+.log-row .log-source { color: var(--purple); margin-right: 8px; }
+.log-row .log-msg { color: var(--text); }
+
+/* ── Timeline ── */
+.timeline { max-height: 600px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+.tl-entry { font-size: 11px; padding: 6px 10px; border-radius: 3px; background: var(--bg); border-left: 3px solid var(--border); display: flex; gap: 10px; align-items: flex-start; }
+.tl-entry.tl-journal { border-left-color: var(--accent); }
+.tl-entry.tl-log.Warning { border-left-color: var(--yellow); }
+.tl-entry.tl-log.Error { border-left-color: var(--red); }
+.tl-entry .tl-time { color: var(--dim); white-space: nowrap; min-width: 140px; }
+.tl-entry .tl-type { font-weight: 600; min-width: 60px; font-size: 10px; text-transform: uppercase; }
+.tl-entry .tl-type.tl-journal { color: var(--accent); }
+.tl-entry .tl-type.tl-log.Warning { color: var(--yellow); }
+.tl-entry .tl-type.tl-log.Error { color: var(--red); }
+.tl-entry .tl-source { color: var(--purple); min-width: 100px; }
+.tl-entry .tl-summary { color: var(--text); flex: 1; }
+.tl-empty { color: var(--dim); font-size: 11px; text-align: center; padding: 24px; }
+
+/* ── Live Log Strip (Overview) ── */
+.live-log { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 1px; font-size: 10px; font-family: 'SF Mono', 'Fira Code', monospace; }
+.live-log .log-row { padding: 2px 6px; border-left-width: 2px; font-size: 10px; line-height: 1.4; }
+.live-log .log-row .log-time { color: var(--dim); margin-right: 4px; min-width: 70px; display: inline-block; }
+.live-log .log-row .log-level { width: 18px; font-size: 9px; }
+.live-log .log-row .log-source { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: middle; }
+.live-log .log-row .log-msg { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.live-log-controls { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; flex-wrap: wrap; }
+.live-log-controls .filter-btn { padding: 2px 8px; font-size: 10px; border-radius: 3px; border: 1px solid var(--border); background: var(--surface2); color: var(--dim); cursor: pointer; }
+.live-log-controls .filter-btn.active { background: var(--accent); color: #0d1117; border-color: var(--accent); }
+.live-log-controls .filter-btn.err.active { background: var(--red); color: #fff; border-color: var(--red); }
+.live-log-controls .filter-btn.warn.active { background: var(--yellow); color: #0d1117; border-color: var(--yellow); }
+
+/* ── Position History ── */
+.pos-history { display: flex; gap: 4px; flex-wrap: wrap; max-height: 48px; overflow-y: auto; margin-top: 6px; }
+.pos-history .pos-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: 0.3; flex-shrink: 0; }
+.pos-history .pos-dot.current { opacity: 1; background: var(--green); }
+.pos-history .pos-dot.old { opacity: 0.15; }
+
+/* ── Current Action Detail ── */
+.current-action { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; margin-bottom: 6px; font-size: 11px; }
+.current-action .ca-tool { color: var(--green); font-weight: 600; }
+.current-action .ca-args { color: var(--dim); font-size: 10px; margin-top: 2px; word-break: break-all; }
+.current-action .ca-elapsed { color: var(--yellow); font-size: 10px; }
+
+/* ── Error Badge ── */
+.err-badge { font-size: 10px; background: rgba(248,81,73,.15); border: 1px solid var(--red); color: var(--red); padding: 1px 6px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+.err-badge.zero { border-color: var(--border); color: var(--dim); background: transparent; }
+.warn-badge { font-size: 10px; background: rgba(210,153,34,.15); border: 1px solid var(--yellow); color: var(--yellow); padding: 1px 6px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+.warn-badge.zero { border-color: var(--border); color: var(--dim); background: transparent; }
+
 /* ── Chat ── */
 .chat-log { height: 200px; overflow-y: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 8px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; }
 .chat-msg { font-size: 12px; line-height: 1.4; }
@@ -116,17 +185,33 @@ a:hover { text-decoration: underline; }
 <body>
 
 <header>
-  <h1>MemorySmith.<span>Agent</span></h1>
+  <div style="display:flex;align-items:center;gap:12px">
+    <h1>MemorySmith.<span>Agent</span></h1>
+    <span style="font-size:10px;color:var(--dim);background:var(--surface2);padding:2px 8px;border-radius:10px;border:1px solid var(--border)">v0.50.2</span>
+  </div>
   <div style="display:flex;align-items:center;gap:16px">
+    <nav style="display:flex;gap:4px;font-size:12px">
+      <a href="/index.html" class="btn btn-secondary btn-sm" style="text-decoration:none">📊 Dashboard</a>
+      <a href="/about.html" class="btn btn-secondary btn-sm" style="text-decoration:none">ℹ️ About</a>
+    </nav>
     <span class="status-badge">
       <span class="dot" id="statusDot"></span>
       <span id="statusLabel">Connecting…</span>
     </span>
-    <a href="/about.html" class="btn btn-secondary btn-sm">About</a>
+    <span class="warn-badge zero" id="warnBadge" title="Warnings" onclick="switchView('logs');document.getElementById('logLevelFilter').value='Warning';fetchLogs()">⚠ 0</span>
+    <span class="err-badge zero" id="errBadge" title="Errors" onclick="switchView('logs');document.getElementById('logLevelFilter').value='Error';fetchLogs()">✗ 0</span>
   </div>
 </header>
 
+<div class="tab-bar">
+  <span class="tab active" data-view="overview" onclick="switchView('overview')">📊 Overview</span>
+  <span class="tab" data-view="logs" onclick="switchView('logs')">📋 Logs</span>
+  <span class="tab" data-view="timeline" onclick="switchView('timeline')">⏱ Timeline</span>
+</div>
+
 <main>
+  <!-- ═══ Overview View ═══ -->
+  <div id="view-overview" class="view active">
   <!-- ── Left column ── -->
   <div style="display:flex;flex-direction:column;gap:12px">
 
@@ -185,7 +270,14 @@ a:hover { text-decoration: underline; }
 
     <!-- Status Panel -->
     <div class="panel">
-      <h2>📊 Status</h2>
+      <h2>📊 Agent Status</h2>
+
+      <!-- System Connection Status -->
+      <div style="display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-size:11px;color:var(--dim)">🟢 SignalR: <b id="signalRStatus" style="color:var(--green)">Connected</b></span>
+        <span style="font-size:11px;color:var(--dim)">🔄 Polling: <b id="pollingStatus" style="color:var(--dim)">Fallback</b></span>
+        <span style="font-size:11px;color:var(--dim)">⏱ Uptime: <b id="uptimeDisplay">—</b></span>
+      </div>
 
       <!-- Current goal -->
       <div id="currentGoalBox" class="current-goal" style="display:none">
@@ -207,23 +299,36 @@ a:hover { text-decoration: underline; }
       </div>
 
       <!-- Position -->
-      <div class="pos-row" id="posDisplay" style="margin-top:10px">
+      <div class="pos-row" id="posDisplay">
         <span>📍</span>
         <span class="pos-coord">X <span id="posX">—</span></span>
         <span class="pos-coord">Y <span id="posY">—</span></span>
         <span class="pos-coord">Z <span id="posZ">—</span></span>
       </div>
 
-      <div style="display:flex;gap:8px;margin-top:8px;font-size:11px;color:var(--dim)">
-        <span>Queue: <b id="queueCount">0</b> actions</span>
-        <span>•</span>
-        <span>Failures: <b id="failCount">0</b></span>
+      <!-- Current action detail -->
+      <div id="currentActionBox" class="current-action" style="display:none">
+        <span class="ca-tool" id="currentActionTool">—</span>
+        <span class="ca-elapsed" id="currentActionElapsed"></span>
+        <div class="ca-args" id="currentActionArgs"></div>
       </div>
+
+      <!-- Metrics row -->
+      <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;font-size:11px;color:var(--dim)">
+        <span title="Actions in dispatch queue">📋 Queue: <b id="queueCount">0</b></span>
+        <span title="Consecutive action failures">❌ Failures: <b id="failCount">0</b></span>
+        <span title="Total log errors in current view">✗ Errors: <b id="liveErrCount">0</b></span>
+        <span title="Total log warnings">⚠ Warnings: <b id="liveWarnCount">0</b></span>
+        <span title="World model uncertainty score">🔮 Uncertainty: <b id="uncertaintyDisplay">—</b></span>
+      </div>
+
+      <!-- Position history trail -->
+      <div class="pos-history" id="posHistory"></div>
     </div>
 
     <!-- Inventory Panel -->
     <div class="panel" style="flex:1">
-      <h2>🎒 Inventory</h2>
+      <h2>🎒 Inventory <span class="badge blue" id="invCountBadge">0 items</span></h2>
       <div class="inv-grid" id="invGrid">
         <div class="queue-empty">No inventory data yet.</div>
       </div>
@@ -242,6 +347,24 @@ a:hover { text-decoration: underline; }
       </div>
     </div>
 
+    <!-- Live Log Strip (persistent mini-log) -->
+    <div class="panel" style="flex:2">
+      <h2>📋 Live Log
+        <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--dim);margin-left:8px" id="liveLogCount">0 entries</span>
+      </h2>
+      <div class="live-log-controls">
+        <button class="filter-btn active" data-filter="all" onclick="setLiveLogFilter('all')">All</button>
+        <button class="filter-btn warn" data-filter="Warning" onclick="setLiveLogFilter('Warning')">⚠ Warnings</button>
+        <button class="filter-btn err" data-filter="Error" onclick="setLiveLogFilter('Error')">✗ Errors</button>
+        <label style="margin-left:auto;font-size:10px;color:var(--dim);display:flex;align-items:center;gap:4px;cursor:pointer">
+          <input type="checkbox" id="autoScrollLog" checked> Auto-scroll
+        </label>
+      </div>
+      <div class="live-log" id="liveLogList">
+        <div class="tl-empty">Waiting for log entries…</div>
+      </div>
+    </div>
+
     <!-- Chat Panel -->
     <div class="panel">
       <h2>💬 Chat</h2>
@@ -255,6 +378,52 @@ a:hover { text-decoration: underline; }
     </div>
 
   </div>
+</div><!-- /view-overview -->
+
+<!-- ═══ Logs View ═══ -->
+<div id="view-logs" class="view">
+  <div style="grid-column:1/-1;display:flex;flex-direction:column;gap:12px;">
+
+    <div class="panel">
+      <h2>📋 Log Viewer</h2>
+      <div class="log-controls">
+        <select id="logLevelFilter" onchange="fetchLogs()">
+          <option value="">All Levels</option>
+          <option value="Information">Information</option>
+          <option value="Warning">Warning</option>
+          <option value="Error">Error</option>
+          <option value="Fatal">Fatal</option>
+        </select>
+        <input id="logSourceFilter" type="text" placeholder="Filter by source…" oninput="fetchLogs()">
+        <button class="btn btn-secondary btn-sm" onclick="fetchLogs()">⟳ Refresh</button>
+        <span style="font-size:11px;color:var(--dim);margin-left:auto" id="logCount">0 entries</span>
+      </div>
+      <div class="log-list" id="logList">
+        <div class="tl-empty">No log entries yet. Logs appear here as the agent runs.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ Timeline View ═══ -->
+<div id="view-timeline" class="view">
+  <div style="grid-column:1/-1;display:flex;flex-direction:column;gap:12px;">
+
+    <div class="panel">
+      <h2>⏱ Activity Timeline</h2>
+      <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+        <button class="btn btn-secondary btn-sm" onclick="fetchTimeline()">⟳ Refresh</button>
+        <span style="font-size:11px;color:var(--dim)" id="tlCount">0 entries</span>
+      </div>
+      <div class="timeline" id="timelineList">
+        <div class="tl-empty">No activity yet. Timeline entries appear as the agent runs.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 </main>
 
 <script>
@@ -262,9 +431,19 @@ a:hover { text-decoration: underline; }
 
 let lastStatus = null;
 let registeredGoals = [];
+let logPollInterval = null;
+let timelinePollInterval = null;
+let liveLogInterval = null;
 let chatMessages = [];
 let signalRConnected = false;
 let signalRConn = null;
+let liveLogFilter = 'all';
+let liveLogEntries = [];
+let errCount = 0;
+let warnCount = 0;
+let posHistory = [];
+let startTime = Date.now();
+let uptimeInterval = null;
 
 // ── Init ───────────────────────────────────────────────────────────────────────
 
@@ -275,6 +454,24 @@ async function init() {
   connectSignalR();
   setInterval(refreshStatus, 2000);   // fallback if WebSocket disconnects
   setInterval(refreshQueue,  3000);
+  startLiveLogPolling();              // Sprint 50: persistent mini-log on Overview
+  startUptimeCounter();               // Sprint 50 Wave C: uptime display
+}
+
+// ── Uptime Counter ──────────────────────────────────────────────────────────
+
+function startUptimeCounter() {
+  updateUptime();
+  uptimeInterval = setInterval(updateUptime, 1000);
+}
+
+function updateUptime() {
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const h = Math.floor(elapsed / 3600);
+  const m = Math.floor((elapsed % 3600) / 60);
+  const s = elapsed % 60;
+  const el = document.getElementById('uptimeDisplay');
+  if (el) el.textContent = h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`;
 }
 
 // ── SignalR real-time push — Sprint 4a/4b ─────────────────────────────────
@@ -320,18 +517,35 @@ async function connectSignalR() {
       signalRConnected = false;
       document.getElementById('statusDot').className = 'dot';
       document.getElementById('statusLabel').textContent = 'Reconnecting…';
+      updateConnectionStatus(false);
     });
 
     signalRConn.onclose(() => {
       signalRConnected = false;
+      updateConnectionStatus(false);
     });
 
     await signalRConn.start();
     signalRConnected = true;
+    updateConnectionStatus(true);
     console.log('SignalR connected to /agent-hub');
   } catch (e) {
     console.warn('SignalR unavailable, falling back to polling:', e.message);
     signalRConnected = false;
+    updateConnectionStatus(false);
+  }
+}
+
+function updateConnectionStatus(connected) {
+  const el = document.getElementById('signalRStatus');
+  if (el) {
+    el.textContent = connected ? 'Connected' : 'Disconnected';
+    el.style.color = connected ? 'var(--green)' : 'var(--red)';
+  }
+  const polling = document.getElementById('pollingStatus');
+  if (polling) {
+    polling.textContent = connected ? 'Standby' : 'Active (polling)';
+    polling.style.color = connected ? 'var(--dim)' : 'var(--yellow)';
   }
 }
 
@@ -520,10 +734,15 @@ async function setOrigin() {
 }
 
 function useCurrentPos() {
-  if (!lastStatus?.position) return;
-  document.getElementById('originX').value = lastStatus.position.x ?? 0;
-  document.getElementById('originY').value = lastStatus.position.y ?? 64;
-  document.getElementById('originZ').value = lastStatus.position.z ?? 0;
+  if (!lastStatus) return;
+  // Handle both flat (SignalR push) and nested (HTTP poll) position formats
+  const pos = lastStatus.position || lastStatus;
+  const x = pos.x ?? lastStatus.x ?? 0;
+  const y = pos.y ?? lastStatus.y ?? 64;
+  const z = pos.z ?? lastStatus.z ?? 0;
+  document.getElementById('originX').value = x;
+  document.getElementById('originY').value = y;
+  document.getElementById('originZ').value = z;
 }
 
 // ── Status refresh ─────────────────────────────────────────────────────────────
@@ -567,6 +786,22 @@ function applyStatus(s) {
   document.getElementById('queueCount').textContent = s.queuedActions ?? 0;
   document.getElementById('failCount').textContent  = s.consecutiveFailures ?? 0;
   document.getElementById('queueBadge').textContent = s.queuedActions ?? 0;
+  document.getElementById('liveErrCount').textContent = errCount;
+  document.getElementById('liveWarnCount').textContent = warnCount;
+
+  // Uncertainty
+  const uncEl = document.getElementById('uncertaintyDisplay');
+  if (uncEl) uncEl.textContent = s.uncertainty != null ? (s.uncertainty * 100).toFixed(0) + '%' : '—';
+
+  // Current action tracking
+  updateCurrentAction(s);
+
+  // Position history (keep last 30)
+  if (s.position) {
+    posHistory.push({ x: s.position.x, y: s.position.y, z: s.position.z });
+    if (posHistory.length > 30) posHistory.shift();
+    renderPosHistory();
+  }
 
   // Current goal
   const goalBox   = document.getElementById('currentGoalBox');
@@ -585,9 +820,13 @@ function applyStatus(s) {
   const inv = s.inventory ?? {};
   const grid = document.getElementById('invGrid');
   const keys = Object.keys(inv).sort();
+  const invBadge = document.getElementById('invCountBadge');
   if (keys.length === 0) {
     grid.innerHTML = '<div class="queue-empty">Inventory empty.</div>';
+    if (invBadge) invBadge.textContent = '0 items';
   } else {
+    const totalItems = Object.values(inv).reduce((sum, c) => sum + c, 0);
+    if (invBadge) invBadge.textContent = keys.length + ' types, ' + totalItems + ' total';
     grid.innerHTML = keys.map(k =>
       `<div class="inv-item"><span class="name" title="${k}">${k}</span><span class="count">${inv[k]}</span></div>`
     ).join('');
@@ -655,6 +894,212 @@ function addChatMsg(type, who, text) {
 
 function escapeHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── View switching ───────────────────────────────────────────────────────────
+
+function switchView(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === name));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+
+  if (name === 'logs') { fetchLogs(); startLogPolling(); }
+  else { stopLogPolling(); }
+
+  if (name === 'timeline') { fetchTimeline(); startTimelinePolling(); }
+  else { stopTimelinePolling(); }
+
+  // Live-log is always on — no action needed on view switch
+}
+
+function startLogPolling() {
+  stopLogPolling();
+  logPollInterval = setInterval(fetchLogs, 3000);
+}
+
+function stopLogPolling() {
+  if (logPollInterval) { clearInterval(logPollInterval); logPollInterval = null; }
+}
+
+function startTimelinePolling() {
+  stopTimelinePolling();
+  timelinePollInterval = setInterval(fetchTimeline, 4000);
+}
+
+function stopTimelinePolling() {
+  if (timelinePollInterval) { clearInterval(timelinePollInterval); timelinePollInterval = null; }
+}
+
+// ── Logs ─────────────────────────────────────────────────────────────────────
+
+async function fetchLogs() {
+  try {
+    const level = document.getElementById('logLevelFilter').value;
+    const source = document.getElementById('logSourceFilter').value.trim();
+    let url = '/api/dashboard/logs?limit=200';
+    if (level) url += '&level=' + encodeURIComponent(level);
+    if (source) url += '&source=' + encodeURIComponent(source);
+
+    const res = await fetch(url);
+    if (!res.ok) return;
+    const data = await res.json();
+    renderLogs(data.entries || []);
+    document.getElementById('logCount').textContent = data.count + ' entries (' + data.returned + ' shown)';
+  } catch(e) { /* silent */ }
+}
+
+function renderLogs(entries) {
+  const list = document.getElementById('logList');
+  if (!entries || entries.length === 0) {
+    list.innerHTML = '<div class="tl-empty">No matching log entries.</div>';
+    return;
+  }
+  list.innerHTML = entries.map(e => {
+    const ts = new Date(e.timestampUtc).toLocaleTimeString();
+    const level = e.level || 'Information';
+    return `<div class="log-row ${level}">
+      <span class="log-time">${ts}</span>
+      <span class="log-level ${level}">${level.substring(0,4)}</span>
+      <span class="log-source">${escapeHtml(e.source || '')}</span>
+      <span class="log-msg">${escapeHtml(e.message || '')}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── Timeline ─────────────────────────────────────────────────────────────────
+
+async function fetchTimeline() {
+  try {
+    const res = await fetch('/api/dashboard/timeline?limit=100');
+    if (!res.ok) return;
+    const data = await res.json();
+    renderTimeline(data.entries || []);
+    document.getElementById('tlCount').textContent = data.count + ' entries';
+  } catch(e) { /* silent */ }
+}
+
+function renderTimeline(entries) {
+  const list = document.getElementById('timelineList');
+  if (!entries || entries.length === 0) {
+    list.innerHTML = '<div class="tl-empty">No timeline entries yet.</div>';
+    return;
+  }
+  list.innerHTML = entries.map(e => {
+    const ts = new Date(e.timestamp).toLocaleTimeString();
+    const type = e.type || 'journal';
+    const source = e.source || '';
+    const level = type === 'log' ? (e.level || 'Information') : '';
+    return `<div class="tl-entry tl-${type} ${level}">
+      <span class="tl-time">${ts}</span>
+      <span class="tl-type tl-${type} ${level}">${type}</span>
+      <span class="tl-source">${escapeHtml(source)}</span>
+      <span class="tl-summary">${escapeHtml(e.summary || '')}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── Live Log (persistent mini-log on Overview) ─────────────────────────────
+
+function startLiveLogPolling() {
+  stopLiveLogPolling();
+  fetchLiveLog(); // immediate first fetch
+  liveLogInterval = setInterval(fetchLiveLog, 2000);
+}
+
+function stopLiveLogPolling() {
+  if (liveLogInterval) { clearInterval(liveLogInterval); liveLogInterval = null; }
+}
+
+function setLiveLogFilter(filter) {
+  liveLogFilter = filter;
+  document.querySelectorAll('.live-log-controls .filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === filter);
+  });
+  renderLiveLog();
+}
+
+async function fetchLiveLog() {
+  try {
+    let url = '/api/dashboard/logs?limit=100';
+    if (liveLogFilter !== 'all') url += '&level=' + encodeURIComponent(liveLogFilter);
+    const res = await fetch(url);
+    if (!res.ok) return;
+    const data = await res.json();
+    liveLogEntries = data.entries || [];
+    renderLiveLog();
+
+    // Update error/warning counts
+    errCount = (data.entries || []).filter(e => (e.level === 'Error' || e.level === 'Fatal')).length;
+    warnCount = (data.entries || []).filter(e => e.level === 'Warning').length;
+    updateErrorBadges();
+
+    document.getElementById('liveLogCount').textContent = data.count + ' entries';
+  } catch(e) { /* silent */ }
+}
+
+function renderLiveLog() {
+  const list = document.getElementById('liveLogList');
+  const autoScroll = document.getElementById('autoScrollLog').checked;
+  if (!liveLogEntries || liveLogEntries.length === 0) {
+    list.innerHTML = '<div class="tl-empty">Waiting for log entries…</div>';
+    return;
+  }
+  list.innerHTML = liveLogEntries.slice(-50).map(e => {
+    const ts = new Date(e.timestampUtc).toLocaleTimeString();
+    const level = e.level || 'Information';
+    const src = (e.source || '').split('.').pop() || '';
+    return `<div class="log-row ${level}">
+      <span class="log-time">${ts}</span>
+      <span class="log-level ${level}">${level.substring(0,4)}</span>
+      <span class="log-source">${escapeHtml(src)}</span>
+      <span class="log-msg">${escapeHtml(e.message || '')}</span>
+    </div>`;
+  }).join('');
+  if (autoScroll) list.scrollTop = list.scrollHeight;
+}
+
+function updateErrorBadges() {
+  const errBadge = document.getElementById('errBadge');
+  const warnBadge = document.getElementById('warnBadge');
+  errBadge.textContent = '✗ ' + errCount;
+  errBadge.className = 'err-badge' + (errCount === 0 ? ' zero' : '');
+  warnBadge.textContent = '⚠ ' + warnCount;
+  warnBadge.className = 'warn-badge' + (warnCount === 0 ? ' zero' : '');
+}
+
+// ── Current Action Display ──────────────────────────────────────────────────
+
+function updateCurrentAction(s) {
+  const box = document.getElementById('currentActionBox');
+  if (!s.currentAction && !s.goal) {
+    box.style.display = 'none';
+    return;
+  }
+  box.style.display = '';
+  const action = s.currentAction || { tool: s.goal || '—', args: {} };
+  document.getElementById('currentActionTool').textContent = action.tool || '—';
+  const args = action.args || {};
+  const argStr = Object.entries(args).map(([k,v]) => `${k}=${v}`).join(', ');
+  document.getElementById('currentActionArgs').textContent = argStr || '(no args)';
+  if (s.actionElapsedMs) {
+    document.getElementById('currentActionElapsed').textContent = ` (${s.actionElapsedMs}ms)`;
+  } else {
+    document.getElementById('currentActionElapsed').textContent = '';
+  }
+}
+
+// ── Position History ────────────────────────────────────────────────────────
+
+function renderPosHistory() {
+  const container = document.getElementById('posHistory');
+  if (posHistory.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  container.innerHTML = posHistory.map((p, i) => {
+    const cls = i === posHistory.length - 1 ? 'current' : (i < posHistory.length - 5 ? 'old' : '');
+    return `<span class="pos-dot ${cls}" title="(${p.x},${p.y},${p.z})"></span>`;
+  }).join('') + 
+    `<span style="font-size:9px;color:var(--dim);margin-left:4px">(${posHistory[posHistory.length-1].x}, ${posHistory[posHistory.length-1].y}, ${posHistory[posHistory.length-1].z})</span>`;
 }
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────

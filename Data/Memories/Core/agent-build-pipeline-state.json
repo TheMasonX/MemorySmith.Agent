@@ -1,0 +1,18 @@
+{
+  "Id": "agent-build-pipeline-state",
+  "Title": "MemorySmith.Agent — Build Pipeline Architecture & Debugging",
+  "Content": "## Build Pipeline Flow\n\nChat \"build a house\" -> LlmChatInterpreter -> IntentDraft(blueprint=\"house\") -> IntentManager.BuildGoalRequest -> resolves via BlueprintAliases[\"house\"]=\"small-house\" -> BuildGoalRequest(\"small-house\") -> GoalFactory.CreateAsync(\"Build:small-house\") -> MemorySmithBlueprintRepository.GetAsync(\"small-house\") -> finds blueprints/small-house.md -> BuildGoal -> HtnPlanner -> BuildGoalDecomposer -> HtnTaskLibrary.DecomposeBuild -> PlaceBlock, CraftItem, etc.\n\n## Known Issues (Sprint 41 - FIXED)\n\n### Blueprint alias resolution missing from LLM path\n\nThe BlueprintAliases dictionary (\"house\" -> \"small-house\", etc.) existed only in ChatInterpreter.cs (the fast-path non-LLM interpreter). The LlmChatInterpreter (LLM path) didn't resolve aliases. When the LLM returned \"blueprint\": \"house\", IntentManager.BuildGoalRequest passed \"house\" directly to GoalFactory, which looked for \"blueprints/house\" (doesn't exist) instead of \"blueprints/small-house\" (exists at Data/Pages/blueprints/small-house.md).\n\nFix: Added BlueprintAliases dictionary to IntentManager.cs with ResolveBlueprint() applied before creating BuildGoalRequest.\n\n### Insufficient logging in build pipeline\n\nFailures were silent at multiple stages:\n- IntentManager.BuildGoalRequest returning null was not logged\n- GoalFactory blueprint lookup failure had no log line\n- MemorySmithBlueprintRepository.GetAsync didn't log which fallbacks succeeded/failed\n\nFix: Added logging at each stage:\n- HandleChatEventAsync logs intent draft fields + goal request creation result\n- GoalFactory logs warning when blueprint not found, including slug path hint\n- MemorySmithBlueprintRepository logs each fallback (gateway, local, search) with success/failure\n\n### Files Changed\n\n- Agent.Planning/IntentManager.cs - BlueprintAliases + ResolveBlueprint()\n- Agent.Memory/MemorySmithBlueprintRepository.cs - ILogger + logging at each lookup stage\n- Agent.Memory/Agent.Memory.csproj - added Microsoft.Extensions.Logging.Abstractions\n- Agent.Planning/GoalFactory.cs - logging when blueprint not found\n- WebUI.Blazor/AgentBackgroundService.cs - logging in HandleChatEventAsync\n- WebUI.Blazor/Program.cs - pass logger to MemorySmithBlueprintRepository\n- Agent.Planning/LlmChatInterpreter.cs - build intent guidance in system prompt",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": ["agent", "build", "pipeline", "blueprint", "alias", "logging", "kind:reference", "audience:agent", "scope:tech"],
+  "References": ["agent-mineflayer-adapter-state", "agent-planner-task-library"],
+  "Conflicts": [],
+  "SourceLinks": [
+    { "Label": "Blueprint pages", "Uri": "%RepoRoot%Data/Pages/blueprints/" },
+    { "Label": "IntentManager source", "Uri": "%RepoRoot%Agent.Planning/IntentManager.cs" },
+    { "Label": "GoalFactory source", "Uri": "%RepoRoot%Agent.Planning/GoalFactory.cs" },
+    { "Label": "Blueprint repo source", "Uri": "%RepoRoot%Agent.Memory/MemorySmithBlueprintRepository.cs" }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-06-23T00:00:00Z"
+}

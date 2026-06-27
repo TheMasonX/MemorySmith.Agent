@@ -1,0 +1,33 @@
+{
+  "id": "tsk-0114-update-readme-and-sprint-state-docs-to-reflect-current-code-state",
+  "key": "TSK-0114",
+  "title": "Update README and sprint state docs to reflect current code state",
+  "description": "From deep_code_audit finding 5 (95% confidence): README still says v0.35.0 / Sprint 35 complete and 501+ tests. Current state is Sprint 49, 722 tests. Stale operator docs make it harder to trust the repo and easier to duplicate planning work.\n\nFix: Update README version string, sprint state, and test counts to match current code. Keep handoff docs and roadmap in sync whenever a sprint closes.\n\nSource: deep_code_audit (Finding 5)",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "audit",
+    "documentation",
+    "readme"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-25T19:24:22.1110455Z",
+  "updatedAtUtc": "2026-06-25T19:31:58.1463074Z",
+  "completedAtUtc": "2026-06-25T19:31:58.1463074Z",
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0114-update-readme-and-sprint-state-docs-to-reflect-current-code-state.json"
+}

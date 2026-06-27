@@ -22,7 +22,18 @@ public record ActionData
 }
 
 /// <summary>Result returned by a tool after execution.</summary>
-public record ToolResult(bool Success, string? Message = null, Dictionary<string, object?>? Data = null);
+/// <param name="Success">Whether the tool call succeeded at the transport level.</param>
+/// <param name="Message">Human-readable result description.</param>
+/// <param name="Data">Optional structured data returned by the tool.</param>
+/// <param name="Outcome">
+/// Rich outcome type providing semantic detail about WHY an action succeeded or failed.
+/// Defaults to <see cref="OutcomeType.Completed"/> for backward compatibility;
+/// tools that need to report Blocked, Unreachable, TimedOut, or NoProgress should set this explicitly.
+/// <c>CallWithOutcomeAsync</c> maps this value to the corresponding <see cref="ActionOutcome"/> factory method.
+/// </param>
+public record ToolResult(bool Success, string? Message = null,
+    Dictionary<string, object?>? Data = null,
+    OutcomeType Outcome = OutcomeType.Completed);
 
 /// <summary>
 /// A search hit from MemorySmith.
@@ -34,3 +45,27 @@ public record SearchResult(string PageId, double Score, string? Snippet = null, 
 
 /// <summary>High-level goal metadata returned by the LLM planner.</summary>
 public record GoalMeta(string Name, string Description, string[] Phases);
+
+// ── ActionData factory ─────────────────────────────────────────────────────
+
+/// <summary>Factory helpers for <see cref="ActionData"/>.</summary>
+public static class ActionFactory
+{
+    /// <summary>
+    /// Creates an <see cref="ActionData"/> with a tool name and key-value arguments.
+    /// Each call constructs a fresh <see cref="Dictionary{TKey,TValue}"/> to prevent
+    /// accidental shared-mutation between decomposers (TSK-0135).
+    /// </summary>
+    public static ActionData Create(
+        string tool, params (string key, object? value)[] args)
+    {
+        var dict = new Dictionary<string, object?>(args.Length);
+        foreach (var (key, value) in args)
+            dict[key] = value;
+        return new ActionData
+        {
+            Tool = tool,
+            Arguments = dict,
+        };
+    }
+}

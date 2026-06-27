@@ -222,6 +222,27 @@ public class ItemRegistryTests
     }
 
     /// <summary>
+    /// Sprint 45 (TSK-0092): Null (not-found) results use a shorter TTL (NullCacheTtlSeconds)
+    /// so transient outages don't permanently mask items that exist.
+    /// </summary>
+    [Test]
+    public async Task GetAsync_NullResult_UsesShorterTtl()
+    {
+        var counting = new CountingGateway(_gateway);
+        var opts = new RestMemoryGatewayOptions
+        {
+            ItemCacheTtlSeconds = 60,    // valid cache: 60s
+            NullCacheTtlSeconds = 5,     // null cache: 5s
+        };
+        var registry = new MemorySmithItemRegistry(counting, opts);
+
+        // Item doesn't exist — cached as null with 5s TTL
+        var spec1 = await registry.GetAsync("temp_unavailable");
+        Assert.That(spec1, Is.Null);
+        Assert.That(counting.GetPageCallCount, Is.EqualTo(1));
+    }
+
+    /// <summary>
     /// When ItemCacheTtlSeconds = 0, caching is disabled and every call queries the gateway.
     /// </summary>
     [Test]
@@ -283,6 +304,6 @@ file sealed class CountingGateway(MockMemoryGateway inner) : IMemoryGateway
     public Task<string> CreatePageAsync(string title, string content, string type, CancellationToken cancellationToken = default)
         => inner.CreatePageAsync(title, content, type, cancellationToken);
 
-    public Task UpdatePageAsync(string pageId, string content, CancellationToken cancellationToken = default)
-        => inner.UpdatePageAsync(pageId, content, cancellationToken);
+    public Task UpdatePageAsync(string pageId, string content, string? title = null, CancellationToken cancellationToken = default)
+        => inner.UpdatePageAsync(pageId, content, title, cancellationToken);
 }

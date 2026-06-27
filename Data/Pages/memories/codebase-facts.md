@@ -36,20 +36,35 @@ Persistent facts about the codebase for agents working in this repo.
 - Phase 1: Complete — WebSocket bridge, MoveTo/Status tools, agent loop
 - Phase 2: Complete — RestMemoryGateway, memory tools, DI wiring
 - Phase 3: Complete — HTN planner, GatherWoodGoal, SurviveNightGoal, GoalFactory
-- Phase 4: In progress — adaptive execution, vision, GOAP
+- Phase 4: Complete — ActionData.Context bag, findBestBlock, BLOCK_MINING_ALIASES, graduated stall, emergency stop, kick→reconnect
+- Phase 5: Complete (Sprint 45) — intent reliability, LLM model upgrade, goto safety, dashboard decoupling, smelt goal, checkpoint verification
+- Phase 6: In progress (Sprint 46) — Observability First: silent-failure hardening, structured logging across all catch→null paths, WebSocketBridge resilience, BuildOrigin consolidation, ReplanResult, documentation drift repair
+
+## Core memory count: 28 files (all critical areas covered)
+
+See `Data/Memories/Core/` for the full catalog. New agents should read the [home.md](../home.md) Features table first, then consult specific core memories for implementation details.
 
 ## Key interfaces
 
 - `IAgent` — top-level agent lifecycle
-- `IGoal` — goal evaluation (IsComplete, HasFailed)
+- `IGoal` — goal evaluation (IsComplete, HasFailed, DamageInterruptThresholdHp)
+- `IItemSpecGoal` — extends IGoal with ItemSpec + TargetCount
 - `IPlan` — ordered action sequence
-- `IMemoryGateway` — MemorySmith search/read/write
+- `IMemoryGateway` — MemorySmith search/read/write (dual gateway: Agent KB + World KB)
 - `ITool` — MCP tool (Name, InputSchema, ExecuteAsync)
 - `IWorldAdapter` — world comms (Connect, SendAction, ReceiveEvents)
 - `IPlanner` — HTN/GOAP plan generation
+- `IGoalDecomposer` — pluggable goal decomposition (CanHandle + Decompose)
+- `IReplanGovernor` — stall detection (ACTIVE/STALLED states, inventory-delta)
+- `IAgentJournal` — append-only bounded event ring (1000 entries, 11 types)
+- `IWorldModel` — observe/predict/reconcile/uncertainty
+- `IChatInterpreter` — Minecraft chat → agent intent (pattern-first, LLM fallback)
+- `ILlmEvaluator` — evaluate ActionOutcome[] → should replan? (Sprint 39 stub)
 - `IGoalFactory` — creates IGoal from string name + params
-- `ISpatialAnalyzer` — terrain metrics (Phase 4)
-- `IVisionModel` — aesthetic critique via multimodal LLM (Phase 4)
+- `IBlueprintRepository` — blueprint CRUD (3-stage lookup)
+- `IBlueprintExecutor` — emits PlaceBlock actions from Blueprint record
+- `ISpatialAnalyzer` — terrain metrics (Phase 6)
+- `IVisionModel` — aesthetic critique via multimodal LLM (Phase 6)
 
 ## CI known issues / lessons
 

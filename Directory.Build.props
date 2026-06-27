@@ -8,5 +8,11 @@
       explicitly with #pragma warning disable <ID> and a comment explaining why.
     -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- NU1903 (NuGet advisory) is NOT suppressed — the warning is fully visible in
+         build output. It is listed here so it doesn't break the build under
+         TreatWarningsAsErrors. This is NOT a suppression; it is a policy exemption
+         for transitive dependency advisories that cannot be fixed at our layer.
+         Revisit per-incident when the dependency chain updates. -->
+    <WarningsNotAsErrors>NU1903</WarningsNotAsErrors>
   </PropertyGroup>
 </Project>

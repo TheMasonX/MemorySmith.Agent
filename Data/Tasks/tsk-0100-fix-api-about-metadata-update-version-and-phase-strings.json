@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0100-fix-api-about-metadata-update-version-and-phase-strings",
+  "key": "TSK-0100",
+  "title": "Fix /api/about metadata \u2014 update version and phase strings",
+  "description": "Update \u0060WebUI.Blazor/Program.cs\u0060 \u0060/api/about\u0060 endpoint: set \u0060Version = \u00220.46.0\u0022\u0060 and \u0060Phase = \u0022Sprint 46 \u2014 Observability \u002B Safety\u0022\u0060. Currently reports \u00220.37.0\u0022 and \u0022Sprint 36\u0022. Add a test that asserts the values match the roadmap. Stretch goal: centralize version in Directory.Build.props or a shared constants file.\n\nEvidence: deep-dive audit Finding #4 \u2014 runtime metadata is stale and undermines operator trust.\n\n**Note:** Auto-generated key TSK-0100 conflicts with existing Sprint 46 Wave A task. Correct key is **TSK-0109**.",
+  "type": "Task",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-46",
+    "wave-c",
+    "observability"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-25T01:45:19.5935654Z",
+  "updatedAtUtc": "2026-06-25T13:37:30.2431866Z",
+  "completedAtUtc": "2026-06-25T13:37:30.2431866Z",
+  "revision": 3,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0100-fix-api-about-metadata-update-version-and-phase-strings.json"
+}

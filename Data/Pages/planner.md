@@ -31,7 +31,7 @@ The agent uses a **hierarchical task network (HTN)** planner with a **decomposer
 
 7. **Repeat** — loops until goal complete or user interrupts.
 
-## Decomposer Registry (Sprint 6)
+## Decomposer Registry (Sprint 6+)
 
 `DecomposerRegistry` holds pluggable `IGoalDecomposer` implementations:
 
@@ -39,19 +39,24 @@ The agent uses a **hierarchical task network (HTN)** planner with a **decomposer
 public interface IGoalDecomposer
 {
     bool CanHandle(IGoal goal);
-    IPlan Decompose(IGoal goal, WorldState state);
+    ActionPlan Decompose(IGoal goal, WorldState state);
 }
 ```
 
-Registered decomposers (all in DI):
+Registered decomposers (all in DI, registered via `DecomposerRegistry.Register`):
 
 | Decomposer | Handles | Default Plan |
 |---|---|---|
-| `BuildGoalDecomposer` | `Build:*` goals | FindFlatArea → [gather materials] → [place blocks] |
-| `GatherGoalDecomposer` | `Gather:*`, `GatherItem:*` goals | SearchMemory → MineBlock → GetStatus |
+| `BuildGoalDecomposer` | `BuildGoal` | Origin resolution (explicit→facts→FindFlatArea) → gather materials → place blocks |
+| `GatherGoalDecomposer` | `GatherWoodGoal`, `IItemSpecGoal` | SearchMemory → MineBlock → GetStatus (passes TargetCount, not default 10 — Sprint 26) |
+| `CraftItemGoalDecomposer` | `CraftItemGoal` | Gather prerequisites → place crafting table → craft item (handles 2x2+ grid recipes) |
 | `SurviveNightGoalDecomposer` | `SurviveNight` goals | FindFlatArea → build shelter → Chat |
 
-`PlannerRouter` tries decomposers first, then falls back to `HtnPlanner`.
+`PlannerRouter` tries decomposers first via `registry.Find(goal)`, then falls back to `HtnPlanner`.
+
+### CraftItemGoalDecomposer (Sprint 22+)
+
+Handles the full craft pipeline: checks if the recipe requires a crafting table (2x2+ grid), searches for or places one, gathers prerequisite materials, crafts N items, and cleans up. Registered in `DecomposerRegistry` and routed by `PlannerRouter` when `goal is CraftItemGoal`.
 
 ## Goal Decomposition Details
 
@@ -102,15 +107,20 @@ Recovery: 60s auto-recovery to ACTIVE state.
 
 ## GoalFactory & Item Classification
 
-`GoalFactory` creates `IGoal` instances from goal names and parameters. Item classification via `LocalKnowledgeResolver`:
+`GoalFactory` creates `IGoal` instances from goal names and parameters via a `Dictionary<string, Func<...>>` registry. Returns `null` if goalName is not registered (logs warning with available names).
 
-1. Check `CraftingRecipes` — item has a recipe → `Craftable`
-2. Check `DirectMineBlocks` — item is directly mineable (includes ore drops: diamond, coal, emerald, redstone, lapis_lazuli) → `DirectMineable`
-3. Check `SourceBlocks` — item drops from a source block → `DirectMineable`
-4. Check `WorldState.StructuredFacts` — world-fact-based confidence (Sprint 17)
-5. Fallback → `Unknown`
+Item classification via `LocalKnowledgeResolver.ResolveAsync` (Phase 7-B pipeline):
 
-Stone aliases: `stone` resolves `SourceBlocks` to include `cobblestone` for correct `IsComplete` behavior.
+1. **Normalize query** — lowercase, trim, strip pluralization
+2. **IItemRegistry.GetAsync** — exact match against item registry pages (confidence 0.95)
+3. **IMemoryGateway.SearchAsync** — wiki search results (confidence 0.60 × search score)
+4. **WorldState.StructuredFacts scan** — recent world facts (0.70 if < 60s, 0.50 if older)
+5. **Type filter + confidence cap + TopN sort** — filter by `CandidateType` match
+6. **Ambiguity detection** — if top-2 candidates within 0.05 confidence → mark as ambiguous
+
+See [memory.md](memory.md) for the full resolver pipeline details.
+
+**Stone aliases:** `stone` resolves through `SourceBlocks` to include `cobblestone` for correct `IsComplete` behavior.
 
 ## Implementation Status
 
@@ -127,4 +137,4 @@ Stone aliases: `stone` resolves `SourceBlocks` to include `cobblestone` for corr
 | Progress-hash governor | ✅ Sprint 20 |
 | Governor pre-plan check | ✅ Sprint 21 |
 | `IItemSpecGoal` count fix | ✅ Sprint 22 |
-| LLM integration (`IChatClient`) | ⬜ Phase 4 |
+| LLM integration (`IChatClient`/`ILlmProvider`) | ✅ Sprint 11 |

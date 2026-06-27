@@ -1,0 +1,45 @@
+{
+  "Id": "agent-mineflayer-adapter-state",
+  "Title": "MemorySmith.Agent — Mineflayer Adapter Architecture & Lessons Learned",
+  "Content": "## Architecture\n\nThe Mineflayer adapter (MineflayerAdapter/index.js) is a Node.js ESM module that:\n1. Creates a Mineflayer bot connected to a Minecraft server (configurable via env vars)\n2. Runs a WebSocket server (default port 3000) that the C# host connects to\n3. Receives actions from C# as JSON messages: {\"action\":\"...\", \"arguments\":{...}, \"correlationId\":\"...\"}\n4. Sends events back to C# as JSON: {\"event\":\"...\", ...payload}\n\n### Key Architecture Points\n\n- **Sequential command queue**: Actions are enqueued and dispatched one at a time via drainQueue()\n- **Emergency stop**: The 'stop'/'StopNow'/'EmergencyStop' action bypasses the queue and executes immediately via handleStop() — clears queue, sets _stopRequested, stops pathfinder\n- **Action correlation**: Each action carries a correlationId echoed back in all result events, enabling C#-side lifecycle tracking via _correlatedActions in AgentBackgroundService\n- **Structured logging**: Writes JSON lines to daily rolling log files (logs/adapter-YYYY-MM-DD.log) alongside console output\n\n### Block Selection (findBestBlock)\n\nSprint 40 added sophisticated block targeting with Y-level preference and alias support:\n- Three-pass search: same-Y-level → nearby-Y scoring → fallback\n- ALIASES: BLOCK_MINING_ALIASES map lets \"dirt\" mining also target \"grass_block\"\n- Array matching: [...acceptableIds] passed to findBlocks/findBlock — confirmed compatible with Mineflayer 4.x. Function matching was removed due to compatibility concerns.\n\n### Critical Lessons Learned\n\n1. **bot.registry.blocksById does NOT exist** in Mineflayer 4.x. For reverse block-ID-to-name lookup, use bot.registry.blocksByName with a known name list, or Object.values(bot.registry.blocks).find(b => b.id === block.type).name.\n\n2. **toVec3() position objects MUST include full Vec3 API** (minus, plus, distanceTo, equals, toString, clone). Mineflayer's bot.dig(block) internally calls block.position.minus(otherVec) to compute the dig direction vector. Without .minus(), every dig crashes with \"point.minus is not a function\" -> all blocks skipped -> zero inventory change -> governor stall loop. Fixed Sprint 41 by extracting toVec3() to a standalone module (MineflayerAdapter/vec3.js) implementing the COMPLETE prismarine-vector Vec3 API - all 46 methods verified: isZero, at, xz, xy, yz, xzy, set, update, rounded, round, floored, floor, offset, translate, add, subtract, multiply, divide, plus, minus, scaled, abs, volume, modulus, distanceTo, distanceSquared, equals, toString, clone, min, max, norm, dot, cross, unit, normalize, scale, xyDistanceTo, xzDistanceTo, yzDistanceTo, innerProduct, manhattanDistanceTo, toArray.\n\n3. **bot.dig() can throw unrecoverable errors** (e.g., \"point.minus is not a function\"). The dig loop now has a MAX_DIG_FAILURES (3) per-block-position limit to prevent infinite retry loops.\r\n4. **findBestBlock() infinite loop when all nearby blocks exhausted**: After MAX_DIG_FAILURES (3) consecutive dig failures at a position, the skip logic logs \"skipping block\" and continues. But findBestBlock() kept returning the same exhausted position because it didn't track prior failures. Fixed Sprint 41 by:\r\n   - Moving digFailures Map declaration BEFORE findBestBlock() so the closure can reference it\r\n   - Adding isDigExhausted() helper: (digFailures.get(key) ?? 0) >= MAX_DIG_FAILURES\r\n   - Adding excludeExhausted() filter applied to all three passes (same-Y, nearby-Y, fallback)\r\n   - Returning null when ALL positions are exhausted -> triggers blockNotFound -> mine loop exits cleanly\n\n5. **WebSocket stays alive after kick** but the Mineflayer bot is dead. The C# KickedEvent handler cancels _connectionCts to force a full reconnect cycle through the exponential backoff loop.\n\n6. **findBlocks with function matching** may not work reliably across Mineflayer 4.x versions. Always prefer array matching: matching: [...acceptableIds].\n\n### Non-Vec3 Interop Risks (placeBlock face vector)\n\nThe \"placeBlock\" handler at index.js line 831 passes a plain {x,y,z} object literal as the faceVector parameter to bot.placeBlock(ref, faceVector). Confirmed from Mineflayer source (generic_place.js) that the face vector is only read for .x/.y/.z (no method calls). Currently LOW RISK, but if a future Mineflayer version calls .floored() or .clone() on the face vector, it will crash with the same pattern as the toVec3/.minus() bug. Fixed Sprint 41 by wrapping with toVec3(fx, fy, fz).\n\n### Event Wire Protocol (C# → Node → C#)\n\n| Direction | Format | Examples |\n|-----------|--------|---------|\n| C# → Node | {\"action\":\"...\", \"arguments\":{...}, \"correlationId\":\"...\"} | move, mine, place, wander, findFlatArea, craft, smelt, Chat, GetStatus, StopNow |\n| Node → C# | {\"event\":\"...\", ...payload} | spawn, health, move, moveComplete, blockMined, mineComplete, mineAborted, stopComplete, itemCollected, chat, kicked, error, status, blockNotFound, blockPlaced, wanderComplete, craftComplete, smeltComplete, death, gameMode, flatAreaFound, reachableBlockFound |\n\n### Tunable Constants (top of index.js)\n\nAll timing, distance, and count parameters are named constants grouped by category with inline comments. Environment variables can override:\n- WS_PORT, MC_HOST, MC_PORT, MC_USERNAME, MC_VERSION, WS_TOKEN, LOG_DIR\n\n### Mineflayer Version\n- mineflayer ^4.23.0\n- mineflayer-pathfinder ^2.4.5\n- ws ^8.18.0\n- Node.js >= 22, ESM modules (type: module)",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": [
+    "agent",
+    "mineflayer",
+    "adapter",
+    "architecture",
+    "lessons-learned",
+    "kind:reference",
+    "audience:agent",
+    "scope:tech"
+  ],
+  "References": [
+    "agent-sprint40-p0-implementation-status",
+    "agent-technology-stack",
+    "agent-architecture-bounded-contexts"
+  ],
+  "Conflicts": [],
+  "SourceLinks": [
+    {
+      "Label": "Adapter source",
+      "Uri": "%RepoRoot%MineflayerAdapter/index.js",
+      "StartLine": null,
+      "EndLine": null
+    },
+    {
+      "Label": "Research paper",
+      "Uri": "%RepoRoot%Data/Pages/Tasks/mineflayer_adapter_research_paper.md",
+      "StartLine": null,
+      "EndLine": null
+    },
+    {
+      "Label": "AGENTS.md",
+      "Uri": "%RepoRoot%AGENTS.md",
+      "StartLine": null,
+      "EndLine": null
+    }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-06-23T00:00:00Z"
+}

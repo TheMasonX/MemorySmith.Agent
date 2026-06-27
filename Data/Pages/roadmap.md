@@ -2,7 +2,7 @@
 
 MemorySmith.Agent uses a sprint-based delivery model. Each sprint is council-reviewed by a 6-seat panel before merge.
 
-**Current version: v0.35.0** | **Latest: Sprint 35 (2026-06-20)**
+**Current version: v0.51.1** | **Latest: Sprint 51 — Audit Synthesis + Runtime Bug Fixes**
 
 ---
 
@@ -24,9 +24,39 @@ AgentHost, WebSocket bridge, basic movement tools, goal/action loop, Blazor stat
 
 `HtnPlanner`, goal decomposition, task library, `GoalFactory`, `IPlanner.ReplanAsync`.
 
+### Phase 4 — Advanced Adapter & Runtime ✅ COMPLETE (Sprint 40)
+
+ActionData.Context bag, WebSocketBridge background receive loop, findBestBlock three-pass scorer, BLOCK_MINING_ALIASES, graduated stall retry [10,20,30,60]s, kick→reconnect verified E2E, emergency stop, stopComplete/MineAborted events, ReachableBlockFoundEvent parsing.
+
+### Phase 5 — Intent Reliability & Adaptive Execution ✅ COMPLETE (Sprint 45)
+
+Intent parsing reliability (ollama 3B insufficient), goto() timeout safety, path_update wiring, stale-inventory guard at goal-creation, blueprint alias resolution in LLM path, MemorySmithBlueprintRepository logging.
+
+### Phase 6 — Observability First ✅ COMPLETE (Sprint 49)
+
+Silent-failure hardening: structured logging across all catch→null paths, WebSocketBridge receive loop resilience with auto-reconnect, BuildOrigin consolidation, ReplanResult typed outcomes, documentation drift repair. Theme: "make every failure observable."
+
+### Phase 7 — Dashboard & Audit Hardening ✅ COMPLETE (Sprint 49)
+
+Dashboard infrastructure (log sink, publisher, REST endpoints, static HTML UI), ActionQueue lock protection, WebSocket clean shutdown, structured tool outcomes (TSK-0110), emergency stop delivery resilience (TSK-0119).
+
+### Phase 8 — Dashboard Usability ✅ COMPLETE (Sprint 50)
+
+Dashboard Wave A (build placement fixes + overview UI), Wave B (BuildOrigin migration + creative cleanup + council review), Wave C (landing page, navigation, status panel enhancement, version bump to v0.50.1), Wave D (context wiring, chat cleanup, SQLite telemetry, version bump to v0.50.2).
+
+### Phase 9 — Audit Synthesis + Runtime Hardening ✅ COMPLETE (Sprint 51)
+
+**Wave A** (v0.51.0): Canonicalize & classify (12 tasks: bridge classification, doc alignment, SearchMemoryTool regex, SearchResult.Kind, deprecation policy, IHttpClientFactory, MakeAction freeze, breaking changes doc, UpdatePageAsync fix, NU1903 policy reform, LlmChatInterpreter doc fix, task sync). Harden robustness (5 tasks: Task.WhenAll unwrap, DeathEvent handler, fault logging, logging levels, terminal recovery).
+
+**Wave B** (v0.51.1): Creative build infinite-replan fix (creative inventory fallback in adapter, non-progress tools removed from failure reset, direct gather recovery for missing materials). Verify-AboutDeps.ps1 script created.
+
+**Wave B+**: PlaceBlock observability logging. Creative mode recovery guards: don't gather materials when adapter handles creative inventory. Build checkpoint advances past bot-position skips to fix origin infinite-loop. MoveTo early-exit when already at target. `IsProgressSignalTool` narrowed (removed MoveTo/Wander/FindFlatArea). ChatHistory MaxTurns increased 5→30, configurable.
+
+**Incident:** SQLitePCLRaw CVE — package removed, File sink replaces SQLite sink. Package vetting policy (P-1 through P-5) created and enforced.
+
 ---
 
-## Sprint History (Sprints 5–23)
+## Sprint History (Sprints 5–51)
 
 | Sprint | Date | Theme | Key Deliverables |
 |--------|------|-------|-----------------|
@@ -51,6 +81,21 @@ AgentHost, WebSocket bridge, basic movement tools, goal/action loop, Blazor stat
 | **33** | 2026-06-20 | DI Logger Wiring + Base64 Sweep + Rule E-2 | BLK-S33-01 Program.cs restored, GoalFactory + HtnPlanner ILogger wired, /api/about phase updated, TestHost added, SetFact migration (6 sites), README.md decoded |
 | **34** | 2026-06-20 | Build Verification + Final Base64 Sweep | Build gate verification, comprehensive .cs base64 sweep, WebApplicationFactory entrypoint check — handoff only, no council review |
 | **35** | 2026-06-20 | Build Origin + API Auth + Connect Announcement | API auth fix (MEMORYSMITH_API_KEY env var, WorldKbUrl→null fallback), chat announcement on connect, build origin coordinate system (three-tier resolution: explicit→facts→auto-detect FindFlatArea), LLM build intent coords passthrough |
+| **36** | 2026-06-21 | Configurable Responses + Inventory Event Sourcing | Configurable agent responses via wiki pages, ActionOutcome record, ItemCollectedEvent (Sprint 35 P0-A), mineComplete event contract, playerCollect guard, IItemSpecGoal/SurviveNightGoal wiring, inventory report chat tool |
+| **37** | 2026-06-21 | Service Lifetime + LLM Planning + Agent Greeting | Service lifetime fixes, LLM planning path, agent greeting on connect, plan display RLE, build task resource counts, task chat updates |
+| **38** | 2026-06-22 | LLM-First Architecture, ActionOutcome, Correlation | Chat→IntentDraft→Planner→Goal pipeline locked (AGENTS.md Rule A-1), ParseDecision goal-name switch removed, IntentManager maps intents to GoalRequests, ActionOutcome universal result type, _cycleOutcomes, ILlmEvaluator interface stub, IItemSpecGoal/SurviveNightGoal cleanup, ItemConsumedEvent (P4-A) |
+| **39** | 2026-06-22 | Build Pipeline Fixes + Blueprint Alias Resolution | BlueprintAliases added to IntentManager (Sprint 41 P1 fix), MemorySmithBlueprintRepository ILogger + per-stage logging, GoalFactory blueprint-not-found warnings, HandleChatEventAsync intent logging |
+| **40** | 2026-06-23 | P0/P1 Fix Package — Adapter Stability | findBestBlock() three-pass scorer (same-Y→nearby→fallback), BLOCK_MINING_ALIASES (dirt←grass_block), MAX_DIG_FAILURES=3, graduated stall retry [10,20,30,60]s, kick→reconnect E2E verified, stopComplete/MineAborted/ReachableBlockFoundEvent wiring, configurable constants in index.js |
+| **41** | 2026-06-23 | Placement Hygiene | Block placement quality fixes (blockUpdate timeout, scaffolding prep, terrain clearance, hill detection). Sprint 41 P1-4 deferred. |
+| **42** | 2026-06-23 | Checkpoint Verification | Build checkpoint only advances on confirmed BlockPlacedEvent, terrain occupancy skip, BlockPlaceSkipped event, Sprint 42 checkpoint/occupancy tests |
+| **43** | 2026-06-23 | Smelt Goal + SearchMemory Removal | SmeltGoal, SmeltGoalDecomposer, SmeltGoalRequest, GoalFactory routing, LLM prompt, ABS handler — full end-to-end smelt route. 15 dead SearchMemory calls stripped from decompositions. |
+| **44** | 2026-06-23 | Correctness Sprint | ChatInterpretation.GoalName removed (7-sprint-old zombie), _placeBlockContexts cleanup, 31 new tests (638 total), 5 new tasks (TSK-0082 through TSK-0086) |
+| **45** | 2026-06-24 | Audit-Fix Sprint | TSK-0087 (origin typo), TSK-0090 (GetPageTool guard), TSK-0091 (Thread.Sleep→await), TSK-0088 (gateway try/catch), TSK-0094 (blueprint validation), TSK-0092 (null cache TTL), TSK-0089 (nav contract). 644 tests. |
+| **46** | 2026-06-24 | Observability First 🔄 | TSK-0100 (WebSocketBridge resilience), TSK-0101 (7 catch→null fixes with logging), TSK-0102 (cross-repo request), TSK-0103 (BuildOrigin), TSK-0104 (ReplanResult), TSK-0105 (doc drift), TSK-0106 (error-path tests) |
+| **41** | 2026-06-23 | Intent Reliability + Goto Safety | Intent parsing reliability (ollama 3B insufficient), goto() timeout safety, path_update wiring, stale-inventory guard at goal-creation, 28 core memories, 10 feature wiki pages |
+| **49** | 2026-06-25 | Dashboard Wave 1 + Audit Hardening | Dashboard log sink, publisher, REST endpoints, static HTML UI; ActionQueue lock protection; WebSocket clean shutdown; structured tool outcomes (TSK-0110); emergency stop decoupling (TSK-0119); logger wiring (TSK-0120); version drift repair; TSK-0114/0115 test verification (731+ tests) |
+| **50** | 2026-06-26 | Dashboard Usability — Waves A/B/C/D | **Wave A:** Rehome-to-origin removed, terrain clearance, self-position block skip, overview UI (live log strip, error/warning badges, position trail, current action, auto-scroll) — commit `153fbd6`<br>**Wave B:** BuildOrigin sentinel elimination (TSK-0107), creative dead code removal (TSK-0116), 7-seat council review — commit `3da01c1`<br>**Wave C:** Landing page redirect, header nav, version badge, SignalR status indicator, uptime counter, uncertainty display, enhanced metrics, about page update, docs update — v0.50.1<br>**Wave D:** MoveToTool context wiring (TSK-0004), dead regex field removal (TSK-0118), Serilog SQLite telemetry sink (TSK-0014), doc updates — v0.50.2 |
+| **51** | 2026-06-26 | Audit Synthesis + Runtime Bug Fixes — Waves A/B/B+ | **Wave A (v0.51.0):** 12 canonicalize+classify tasks (bridge registry, doc alignment, regex hardening, deprecation policy, IHttpClientFactory), 5 robustness fixes (Task.WhenAll unwrap, DeathEvent, fault logging, log levels, terminal recovery). NU1903 visible-warning policy. **Wave B (v0.51.1):** Creative build infinite-replan fix, creative inventory fallback in adapter, direct gather recovery for missing materials, Verify-AboutDeps.ps1. **Wave B+:** PlaceBlock observability logging. **Incident:** SQLite CVE — package removed, File sink replaces SQLite, package vetting policy created. |
 
 ---
 
@@ -58,6 +103,13 @@ AgentHost, WebSocket bridge, basic movement tools, goal/action loop, Blazor stat
 
 | Version | Sprint | Tests | Status |
 |---------|--------|-------|--------|
+| v0.51.1 | 51 | 742 | ✅ green |
+| v0.51.0 | 51 | 742 | ✅ green |
+| v0.50.2 | 50 | 731+ | ✅ green |
+| v0.50.1 | 50 | 731+ | ✅ green |
+| v0.50.0 | 49 | 731+ | ✅ green |
+| v0.49.0 | 49 | 722 | ✅ green |
+| v0.40.0 | 40 | 63+ | ✅ green |
 | v0.35.0 | 35 | 501 (498 passed, 3 pre-existing fails) | ✅ green |
 | v0.28.0 | 33 | 276+ | ✅ green |
 | v0.27.0 | 27 | 244+ | ✅ green |
@@ -71,33 +123,140 @@ AgentHost, WebSocket bridge, basic movement tools, goal/action loop, Blazor stat
 
 ---
 
-## Upcoming Priorities
+## Sprint Roadmap (Planned)
 
-| Priority | Item |
-|----------|------|
-| P0 | `IBuildGoal` marker interface — replace `goal is BuildGoal` type-check in HtnPlanner |
-| P1 | Semantic build locations — LLM resolves "build a house in the nearest village" from memory |
-| P1 | World KB setup guide and dedicated instance deployment verification |
-| P2 | Configurable agent responses — wiki-page-driven response templates (see Sprint 36 feature) |
+### Sprint 52 — Situational Awareness: Entity Pipeline + ScenePack
+**Status:** 🟡 Planned (all tasks Backlog) | **Design:** `Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md`
+
+| Task | Priority | Summary |
+|:-----|:--------:|:--------|
+| TSK-0146 | High | Entity observation in MineflayerAdapter (periodic scan, 32-block radius) |
+| TSK-0147 | High | EntityObservedEvent + EntityDepartedEvent WorldEvents records |
+| TSK-0148 | High | Project entity events into WorldState (NearbyEntities, bounded max 50) |
+| TSK-0149 | High | Entity summary in LLM system prompt (BuildSystemPrompt) |
+| TSK-0150 | High | ScenePackBuilder projection class (compact scene context) |
+| TSK-0151 | High | Wire ScenePack into chat pipeline |
+
+**Does not include:** Durable MemorySmith writing (Phase 2 → S53), Planner integration with ScenePack (Phase 3 → S53), Embeddings/graph links (Phase 4 → S54+)
 
 ---
 
-## Future Phases
+### Sprint 53 — Reachability, Motion & Environment Exposure
+**Status:** 🟡 Planned (all tasks Backlog) | **Design Refs:** SA design doc Phases 2-3, Mineflayer adapter audit
 
-### Sprint 36 — Configurable Agent Responses (priority: upcoming)
+#### Wave A — Pathfinder Telemetry + Timeout Protection (Critical)
 
-All hardcoded bot chat responses (thinking indicators, navigation replies, stop acknowledgements, task announcements, error messages) should be configurable via a wiki page with named options per response type. See `Data/Pages/Tasks/configurable-agent-responses.md`.
+| Task | Priority | Summary |
+|:-----|:--------:|:--------|
+| TSK-0158 | **Critical** | Wire pathfinder events (path_update, goal_reached, path_stop) |
+| TSK-0159 | **Critical** | Promise.race() timeout on all 7 goto() calls (15s default) |
+| TSK-0160 | High | Throttle move events (250ms), add yaw/pitch orientation |
+| TSK-0161 | High | Motion/equipment/environment telemetry (onGround, heldItem, timeOfDay, etc.) |
 
-| Priority | Item |
-|----------|------|
-| P0 | Define response type schema and wiki page format |
-| P1 | Wire chat interpreter to read response config |
-| P2 | REST API endpoint to query/update response config |
+#### Wave B — Durable Memory + Planner Integration (SA Phase 2-3)
 
-### Phase 4 — Vision & Aesthetics (confidence 0.60)
+| Task | Priority | Summary |
+|:-----|:--------:|:--------|
+| TSK-0152 | Medium | Policy-based MemorySmith writer (goal boundaries, landmarks, failures) |
+| TSK-0153 | Medium | Write durable pages to World KB (snapshot, landmark, goal, failure) |
+| TSK-0154 | High | Feed ScenePack into planner context |
+| TSK-0155 | High | Observation-driven replan comparison loop |
 
-ISpatialAnalyzer, IVisionModel, `TakeScreenshot` tool, aesthetic critique via Ollama/Gemma.
+---
 
-### Phase 5 — Advanced Features (confidence 0.50)
+### Sprint 54 — Inventory, Chat & Action Lifecycle
+**Status:** 🟡 Planned (all tasks Backlog)
 
-Multi-agent support, persona plugin, vector embeddings in Memory, multiple LLM providers, CI/CD pipelines.
+| Task | Priority | Summary |
+|:-----|:--------:|:--------|
+| TSK-0162 | High | Local world shape: block underfoot, block in front, light level, hazards |
+| TSK-0163 | High | Inventory updateSlot real-time slot-level ground truth |
+| TSK-0164 | Medium | Chat structured message classification (messageKind field) |
+| TSK-0165 | Medium | Action progress telemetry (started/progress/failed with reason codes) |
+
+---
+
+### Sprint 55 — Modularization + Cleanup
+**Status:** 🟡 Planned (all tasks Backlog)
+
+| Task | Priority | Summary |
+|:-----|:--------:|:--------|
+| TSK-0166 | Medium | Modularize MineflayerAdapter (~1500 lines → 15+ focused modules) |
+| TSK-0167 | Low | Fix documentation version/sprint drift across README, roadmap, handoffs |
+| TSK-0168 | Low | Remove HtnPlanner legacy typed decomposition branches |
+
+---
+
+### Future Phases (No Sprint Assigned)
+
+| Phase | Summary | Blockers | Confidence |
+|:------|:--------|:---------|:----------:|
+| **Vision & Aesthetics** (Phase 6) | ISpatialAnalyzer, IVisionModel, TakeScreenshot tool, aesthetic critique via Ollama. TSK-0005 (SpatialAnalyzer) exists in Backlog. | Needs stable entity pipeline first | 0.60 |
+| **Advanced Features** (Phase 7) | Multi-agent support, persona plugin, vector embeddings (TSK-0156), graph links (TSK-0157), multiple LLM providers, CI/CD pipelines | Blocked on MemorySmith backend (TSK-0156/0157) | 0.50 |
+
+---
+
+### Deferred from Sprint 51 — Still Pending (Ready, Not Started)
+
+These are high-value, well-scoped tasks deferred from S51 that should be picked up before or alongside new sprint work.
+
+| Task | Priority | Summary | Est. |
+|:-----|:--------:|:--------|:----:|
+| **TSK-0144** | **Critical** | Enforce package vetting policy in CI (`dotnet list package --vulnerable` fails build) | 2 hrs |
+| **TSK-0145** | High | Run Verify-AboutDeps.ps1 in CI | 1.5 hrs |
+| **TSK-0134** | High | DI startup failure logging + health check endpoints | 30 min |
+| **TSK-0133** | High | Fix parameter preservation on replan (remaining count lost) | 45 min |
+| **TSK-0132** | High | Fix page search Score=0.0 under-ranking | 30 min |
+| **TSK-0137** | Medium | Fix consecutive failure guard reset on partial progress | 20 min |
+| **TSK-0004** | High *(InProgress)* | Context carry: per-tool allowlist for context→Arguments merge | 15+ min |
+| **TSK-0121** | **Critical** *(Backlog, reopened)* | Rehome-to-origin after every block — walks back to origin between placements | — |
+
+---
+
+### Stale Backlog Items (No Current Sprint)
+
+| Task | Priority | Summary | First Mentioned |
+|:-----|:--------:|:--------|:--------------:|
+| TSK-0082 | High | Extract shared SmeltableMapping class | Sprint 44 |
+| TSK-0093 | Medium | Structured ParseItemSpec result (NotFound vs Malformed) | Sprint 44 |
+| TSK-0118 | Medium | Chat split-brain cleanup — dead `ChatInterpreter` regex fields | Sprint 47+ |
+| TSK-0005 | Medium | Implement SpatialAnalyzer.cs in Agent.Vision | Sprint 0 |
+| TSK-0013 | Medium | Add ListBlocks/ListItems tool for in-game block discovery | Sprint 0 |
+| TSK-0169 | Medium | Chat context dashboard (expandable request/response viewer) | Sprint 51 B+ |
+| TSK-0170 | Medium | Dashboard UI improvements (auto-scaling, goal setting, live log scroll) | Sprint 51 B+ |
+
+---
+
+## Gap Analysis: Items Planned in Documents But Missing from Tasks
+
+The following items are mentioned across handoffs, sprint plans, and roadmap docs but have NO corresponding task record. They are at risk of being dropped.
+
+| Item | Source Document | Proposed Priority | Notes |
+|:-----|:----------------|:-----------------:|:------|
+| Upgrade LLM model from 3B to 7B+ | Roadmap Upcoming Priorities (P0), Sprint 41 | **P0** | No task exists. Intent parsing reliability is the #1 runtime issue with ollama 3B. |
+| IBuildGoal marker interface | Roadmap Upcoming Priorities (P1) | P1 | Replace `goal is BuildGoal` type-check in HtnPlanner with marker interface |
+| Semantic build locations (LLM resolves from memory) | Roadmap Upcoming Priorities (P2) | P2 | "Build a house in the nearest village" pattern |
+| World KB setup guide + dedicated instance deployment | Roadmap Upcoming Priorities (P2) | P2 | Deploy and verify a dedicated MemorySmith wiki instance for item/blueprint lookup |
+| Configurable agent responses (wiki-page-driven templates) | Roadmap Upcoming Priorities (P2) | P2 | Response templates stored in wiki pages |
+| Dashboard event bus | Roadmap Upcoming Priorities (P1), Sprint 42 Future Phases | P1 | Decouple publishing from agent loop (old TSK-0042-0046 numbering in MemorySmith repo) |
+| Remove MoveTo-to-origin from replans (TSK-0121 fix) | Sprint 51 B+ handoff (Critical) | **Critical** | TSK-0121 exists but was marked Done then reopened. The original fix was claimed in S50 Wave A but the user confirms it's still happening. |
+| GOAP planner evaluation | Sprint 51 Wave A (explicitly out of scope for S51-52), Sprint 54+ | Medium | HTN is sufficient currently; GOAP evaluation slated for Sprint 54+ |
+| E2E game test (GatherWood) | Sprint 50 handoff (TSK-0003, High) | High | Requires Minecraft server + Mineflayer. No task in Agent repo's task store. |
+| **Unified build decomposition (Creative+Survival)** | Multiple audits, council S52 plan, user request | **High** | Today `HtnTaskLibrary.DecomposeBuild` has a ~300-line `if/else` branch separating creative and survival. Most logic (origin, placement loop, checkpoint, vegetation clearing) is shared. Should extract `BuildActionPipeline` with injectable material provider. See `Data/Pages/Audit/survival-creative-build-decomposition-analysis.md`. |
+| **HtnTaskLibrary split** | Council S52 plan | High | Council planned 5 focused decomposers (Gather, Craft, Smelt, Build, Explore). No task exists. Current S52 tasks (TSK-0146-0151) are entity awareness only. |
+| **Typed PlanContext** | Council S52 plan | Medium | Replace `Dictionary<string, object?>` context with typed properties. |
+| **IBuildGoal marker interface** | Roadmap Upcoming Priorities (P1) | P1 | Replace `goal is BuildGoal` type-check in HtnPlanner with marker interface |
+
+---
+
+## Knowledge Base Status
+
+| Artifact | Count | Status |
+|----------|-------|--------|
+| Core memories (JSON) | 28 | 15 new + 13 existing = 28 covering all critical areas |
+| Feature wiki pages | 10 | Agent Runtime, Chat Interpretation, Planning, Blueprints, World Events, Adapter, Safety, Memory/Wiki, Dashboard, Emergency Stop |
+| Task records | 70+ | tsk-0001 through tsk-0170 (Agent: 55 active; MemorySmith: legacy numbering) |
+| Guides | 18+ | Getting started, adding goals/tools, API, troubleshooting, etc. |
+| Council reviews | 20+ | Sprint 0 through Sprint 38 |
+| Blueprint files | 4 | small-house, farm, castle, wizards-tower |
+| Item registry entries | 80+ | All craftable Minecraft items

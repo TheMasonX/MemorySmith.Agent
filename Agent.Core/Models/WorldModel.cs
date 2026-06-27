@@ -39,7 +39,7 @@ public sealed class WorldModel : IWorldModel
 
     public WorldModel()
     {
-        // SprÉnt 25 P1-A: separate dictionary instances for each state.
+        // Sprï¿½nt 25 P1-A: separate dictionary instances for each state.
         // Previously a single empty dict was shared between _observed and _belief,
         // meaning mutations to one would silently corrupt the other.
         _observed = new ObservationState(20, 20, new Position(0, 0, 0),
@@ -158,7 +158,9 @@ public sealed class WorldModel : IWorldModel
         var block = GetStrArg(args, "block");
         var count = GetIntArg(args, "count", 1);
         var newInv = new Dictionary<string, int>(b.Inventory);
-        var itemKey = block.Contains(':') ? block.Split(':')[1] : block;
+        // TSK-0108: use shared BlockToItemDrop mapping so prediction agrees with
+        // WorldStateProjector projection (e.g. diamond_ore â†’ diamond, not diamond_ore).
+        var itemKey = CommonMinecraftBlocks.ResolveBlockDrop(block);
         newInv[itemKey] = newInv.GetValueOrDefault(itemKey) + count;
         return new PredictionState("mine", args,
             b.Position, b.Health, b.Food - 1,

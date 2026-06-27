@@ -68,11 +68,11 @@ internal sealed class RecordingHtnPlanner : IPlanner
         CancellationToken ct = default)
         => Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases, []));
 
-    public Task<IPlan?> ReplanAsync(IPlan currentPlan, WorldState state,
-        string failureReason, CancellationToken ct = default, IGoal? originalGoal = null)
+    public Task<ReplanResult> ReplanAsync(ReplanGoalContext context,
+        CancellationToken ct = default)
     {
         ReplanCalled = true;
-        return Task.FromResult<IPlan?>(null);
+        return Task.FromResult(ReplanResult.Failure("Recording: null"));
     }
 }
 
@@ -183,16 +183,16 @@ public class PlannerRouterReplanTests
 
         // Act
         var result = await router.ReplanAsync(
-            currentPlan, state, "test-failure",
-            CancellationToken.None, gatherGoal);
+            new ReplanGoalContext(currentPlan, state, "test-failure", gatherGoal),
+            CancellationToken.None);
 
         // Assert
         Assert.That(spy.WasCalled, Is.True,
             "The spy decomposer should have been invoked when originalGoal is a GenericGatherGoal.");
         Assert.That(spy.LastGoal, Is.SameAs(gatherGoal),
             "The decomposer should receive the original concrete goal, not a reconstructed SimpleGoal.");
-        Assert.That(result, Is.Not.Null,
-            "ReplanAsync should return a non-null plan when a decomposer handles the goal.");
+        Assert.That(result.IsSuccess, Is.True,
+            "ReplanAsync should return a successful result when a decomposer handles the goal.");
         Assert.That(htnRecorder.ReplanCalled, Is.False,
             "HTN fallback should NOT be called when a decomposer matches.");
     }
@@ -216,7 +216,7 @@ public class PlannerRouterReplanTests
 
         // Act — note: no originalGoal passed (defaults to null)
         var result = await router.ReplanAsync(
-            currentPlan, state, "test-failure",
+            new ReplanGoalContext(currentPlan, state, "test-failure"),
             CancellationToken.None);
 
         // Assert
@@ -224,6 +224,8 @@ public class PlannerRouterReplanTests
             "Spy decomposer should NOT be called when originalGoal is null and a SimpleGoal is reconstructed.");
         Assert.That(htnRecorder.ReplanCalled, Is.True,
             "HTN fallback should be invoked when no decomposer can handle the reconstructed SimpleGoal.");
+        // HtnPlanner's ReplanAsync catches exceptions and returns Failure; when it succeeds it
+        // returns Success. The RecordingHtnPlanner always returns Failure, so IsSuccess is false.
     }
 
     [Test]
@@ -242,8 +244,9 @@ public class PlannerRouterReplanTests
         var state       = new WorldState();
 
         // Act
-        await router.ReplanAsync(currentPlan, state, "failure",
-            CancellationToken.None, gatherGoal);
+        await router.ReplanAsync(
+            new ReplanGoalContext(currentPlan, state, "failure", gatherGoal),
+            CancellationToken.None);
 
         // Assert
         Assert.That(spy.LastGoal, Is.InstanceOf<GenericGatherGoal>(),
@@ -260,13 +263,13 @@ public class PlannerRouterReplanTests
         // Both call patterns must compile:
         //   1. Without originalGoal (backward-compatible)
         var t1 = planner.ReplanAsync(
-            MakePlan("G", []), new WorldState(), "reason");
+            new ReplanGoalContext(MakePlan("G", []), new WorldState(), "reason"));
 
         //   2. With originalGoal
         var item = MakeDirtSpec();
         var t2 = planner.ReplanAsync(
-            MakePlan("G", []), new WorldState(), "reason",
-            CancellationToken.None, new GenericGatherGoal(item, 1));
+            new ReplanGoalContext(MakePlan("G", []), new WorldState(), "reason",
+                new GenericGatherGoal(item, 1)));
 
         Assert.That(t1, Is.Not.Null);
         Assert.That(t2, Is.Not.Null);
@@ -289,10 +292,9 @@ public class IPlannerInterfaceTests
             CancellationToken cancellationToken = default)
             => Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases, []));
 
-        public Task<IPlan?> ReplanAsync(IPlan currentPlan, WorldState state,
-            string failureReason, CancellationToken cancellationToken = default,
-            IGoal? originalGoal = null)
-            => Task.FromResult<IPlan?>(null);
+        public Task<ReplanResult> ReplanAsync(ReplanGoalContext context,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(ReplanResult.Failure("Mock: null"));
     }
 
     [Test]
@@ -304,8 +306,11 @@ public class IPlannerInterfaceTests
         var state         = new WorldState();
 
         // Must compile without originalGoal — backward-compat check.
-        var task = planner.ReplanAsync(plan, state, "reason");
+        var task = planner.ReplanAsync(
+            new ReplanGoalContext(plan, state, "reason"));
         Assert.That(task, Is.Not.Null, "ReplanAsync must return a non-null Task.");
+        Assert.That(task.Result.IsSuccess, Is.False,
+            "ConcreteMinimalPlanner should return a failed result.");
     }
 
     [Test]
@@ -317,12 +322,14 @@ public class IPlannerInterfaceTests
         // Here we test the contract via ConcreteMinimalPlanner which mirrors the same signature.
         IPlanner planner = new ConcreteMinimalPlanner();
         var task = planner.ReplanAsync(
-            new ActionPlan("G", [], []),
-            new WorldState(), "reason",
-            CancellationToken.None,
-            null);
+            new ReplanGoalContext(
+                new ActionPlan("G", [], []),
+                new WorldState(), "reason",
+                null));
 
-        Assert.That(task.Result, Is.Null,
-            "MinimalNullPlanner variant should always return null from ReplanAsync.");
+        Assert.That(task.Result.IsSuccess, Is.False,
+            "MinimalNullPlanner variant should always return failure from ReplanAsync.");
+        Assert.That(task.Result.Plan, Is.Null,
+            "Plan should be null for a failed replan result.");
     }
 }

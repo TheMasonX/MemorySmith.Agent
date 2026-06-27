@@ -5,6 +5,8 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 /// <summary>
 /// IMemoryGateway implementation that calls MemorySmith's REST API.
@@ -17,7 +19,7 @@ using System.Text.Json.Serialization;
 ///
 /// Auth: optional X-Api-Key header when MemorySmith is configured with ApiKey.
 /// </summary>
-public sealed class RestMemoryGateway(HttpClient http, RestMemoryGatewayOptions options) : IMemoryGateway
+public sealed class RestMemoryGateway(HttpClient http, RestMemoryGatewayOptions options, ILogger<RestMemoryGateway>? logger = null) : IMemoryGateway
 {
     private static readonly JsonSerializerOptions JsonOpts = new()
     {
@@ -25,20 +27,48 @@ public sealed class RestMemoryGateway(HttpClient http, RestMemoryGatewayOptions 
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
     };
 
+    private readonly ILogger<RestMemoryGateway> _logger = logger ?? NullLogger<RestMemoryGateway>.Instance;
+
     // ── Search ────────────────────────────────────────────────────────────────
 
     public async Task<IReadOnlyList<SearchResult>> SearchAsync(
         string query, CancellationToken cancellationToken = default)
     {
-        var url = $"api/search?query={Uri.EscapeDataString(query)}&limit=20";
-        var hits = await http.GetFromJsonAsync<SearchHit[]>(url, JsonOpts, cancellationToken)
-                   ?? [];
-        // Preserve MemorySmith's server-side ordering (score desc, then date desc).
-        // Kind="page" → PageId is a slug usable in GetPageAsync.
-        // Kind="memory" → PageId is a UUID, NOT a valid page slug.
-        return hits
-            .Select(h => new SearchResult(h.Id, h.Score ?? 0.0, h.Snippet, h.Kind))
-            .ToArray();
+        // Sprint 53 (TSK-0193): transient HTTP failures return empty results rather
+        // than crashing the tool loop. OperationCanceledException is intentionally
+        // propagated for cooperative cancellation.
+        try
+        {
+            var url = $"api/search?query={Uri.EscapeDataString(query)}&limit=20";
+            var hits = await http.GetFromJsonAsync<SearchHit[]>(url, JsonOpts, cancellationToken)
+                       ?? [];
+            // Preserve MemorySmith's server-side ordering (score desc, then date desc).
+            // Kind="page" → PageId is a slug usable in GetPageAsync.
+            // Kind="memory" → PageId is a UUID, NOT a valid page slug.
+            return hits
+                .Select(h => new SearchResult(h.Id, h.Score ?? 0.0, h.Snippet, h.Kind))
+                .ToArray();
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw; // cooperative cancellation — propagate
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogWarning(ex, "[search] HTTP error for query '{Query}': {Message}", query, ex.Message);
+            return [];
+        }
+        catch (TaskCanceledException ex)
+        {
+            // Timeout (token not cancelled, but HTTP call timed out)
+            _logger.LogWarning(ex, "[search] timeout for query '{Query}'", query);
+            return [];
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogWarning(ex, "[search] JSON deserialization error for query '{Query}': {Message}", query, ex.Message);
+            return [];
+        }
     }
 
     // ── Pages ─────────────────────────────────────────────────────────────────
@@ -67,24 +97,41 @@ public sealed class RestMemoryGateway(HttpClient http, RestMemoryGatewayOptions 
     }
 
     public async Task UpdatePageAsync(
-        string pageId, string content, CancellationToken cancellationToken = default)
+        string pageId, string content, string? title = null, CancellationToken cancellationToken = default)
     {
         var url = $"api/pages/{Uri.EscapeDataString(pageId)}";
+
+        // Sprint 51 (TSK-0138): when an explicit title is provided, skip the fetch
+        // and use it directly. This eliminates the race condition where a page is
+        // updated between the GET and PUT calls, and avoids the slug-derived fallback
+        // which guessed wrong for non-English or special-character page IDs.
+        if (title is not null)
+        {
+            var req = new PageSaveRequest(pageId, title, content, options.DefaultPageRole);
+            var resp = await http.PutAsJsonAsync(url, req, JsonOpts, cancellationToken);
+            resp.EnsureSuccessStatusCode();
+            return;
+        }
 
         // Fetch existing page to preserve its title on update.
         // If the page doesn't exist we fall back to pageId as a reasonable title
         // (the PUT will create it as an upsert on MemorySmith's side).
+        // TSK-0111: only HttpRequestException with 404 triggers the upsert fallback.
+        // Auth failures, timeouts, and 500s propagate to avoid silent data loss.
         PageResponse? existing = null;
         try
         {
             existing = await http.GetFromJsonAsync<PageResponse>(url, JsonOpts, cancellationToken);
         }
-        catch { /* 404 or parse error — proceed with fallback title */ }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            _logger?.LogInformation("RestMemoryGateway.UpdatePageAsync: page '{PageId}' not found — will upsert.", pageId);
+        }
 
-        var title = existing?.Title ?? pageId.Replace("-", " ");
-        var req = new PageSaveRequest(pageId, title, content, options.DefaultPageRole);
-        var resp = await http.PutAsJsonAsync(url, req, JsonOpts, cancellationToken);
-        resp.EnsureSuccessStatusCode();
+        var resolvedTitle = existing?.Title ?? pageId.Replace("-", " ");
+        var req2 = new PageSaveRequest(pageId, resolvedTitle, content, options.DefaultPageRole);
+        var resp2 = await http.PutAsJsonAsync(url, req2, JsonOpts, cancellationToken);
+        resp2.EnsureSuccessStatusCode();
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

@@ -1,0 +1,19 @@
+{
+  "Id": "agent-wiki-integration",
+  "Title": "MemorySmith.Agent — MemorySmith Wiki Integration (REST Gateway & Local Fallback)",
+  "Content": "The agent uses the MemorySmith wiki as its long-term memory through a dual-gateway IMemoryGateway setup. Each gateway (Agent KB and World KB) connects to a separate MemorySmith instance.\n\n## IMemoryGateway Interface (Agent.Core)\n\n- SearchAsync(query, limit=20, ct) → IReadOnlyList<SearchResult>\n- GetPageAsync(slug, ct) → Page?\n- CreatePageAsync(slug, title, body, minimumRole, ct) → Page\n- UpdatePageAsync(slug, title, body, minimumRole, ct) → Page\n\n## RestMemoryGateway (Agent.Memory/RestMemoryGateway.cs)\n\nImplements IMemoryGateway via MemorySmith REST endpoints:\n- GET /api/search?query={q}&limit=20 → unified search (pages + memories)\n- GET /api/pages/{slug} → page content (body field)\n- POST /api/pages → create page {slug, title, body, minimumRole}\n- PUT /api/pages/{slug} → update page\n\nSearchResult.Kind field distinguishes 'page' (slug usable in GetPageAsync) from 'memory' (UUID, NOT a valid page slug).\n\n## Dual Gateway Setup (Sprint 22)\n\n| Gateway | Key | Purpose | Default URL |\n|---------|-----|---------|-------------|\n| Agent KB | (default) | Codebase, guides, architecture | http://localhost:5001 |\n| World KB | 'world' | World facts, exploration log | WorldKbUrl (null = disabled) |\n\nTool routing (Sprint 23):\n- SearchMemoryTool, CreatePageTool → World KB (world facts and events)\n- GetPageTool → Agent KB (codebase knowledge and guides)\n\n## Configuration (appsettings.json)\n\nAgent:Memory section:\n- BaseUrl (string): MemorySmith base URL\n- ApiKey (string?): X-Api-Key header if configured\n- TimeoutSeconds (int, default 30)\n- DefaultPageRole (string, default 'User')\n- WorldKbUrl (string?): separate URL for World KB gateway (null = disabled)\n\n## LocalKnowledgeResolver (Agent.Memory/LocalKnowledgeResolver.cs)\n\nProvides local file fallback when MemorySmith instance is unavailable:\n- Maps slugs to local files under Data/Pages/ and Data/Memories/\n- Used as fallback chain in MemorySmithBlueprintRepository\n- Also supports reading item registry pages from Data/Pages/item-registry/\n\n## Known Fixes\n\n- Phase 2: UpdatePageAsync preserves existing title via GET-then-PUT; falls back gracefully if page doesn't exist\n- IHttpClientFactory used for connection pooling (not new HttpClient())\n- Auth: X-Api-Key header if ApiKey is configured in MemorySmith\n\n## Testing\n\nMockMemoryGateway (in MemorySmith.Agent.Tests) provides in-memory IMemoryGateway implementation. No real MemorySmith instance needed for unit tests. Tests should copy Data/Memories to temp storage before mutation (copilot-instructions.md).",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": ["agent", "wiki", "memorysmith", "rest-api", "gateway", "integration", "kind:reference", "audience:agent", "scope:memory"],
+  "References": ["agent-memorygateway-integration", "agent-architecture-bounded-contexts", "agent-blueprint-system"],
+  "Conflicts": [],
+  "SourceLinks": [
+    { "Label": "RestMemoryGateway.cs", "Uri": "%RepoRoot%Agent.Memory/RestMemoryGateway.cs" },
+    { "Label": "RestMemoryGatewayOptions.cs", "Uri": "%RepoRoot%Agent.Memory/RestMemoryGatewayOptions.cs" },
+    { "Label": "LocalKnowledgeResolver.cs", "Uri": "%RepoRoot%Agent.Memory/LocalKnowledgeResolver.cs" },
+    { "Label": "Memory wiki page", "Uri": "%RepoRoot%Data/Pages/memory.md" },
+    { "Label": "World KB guide", "Uri": "%RepoRoot%Data/Pages/guides/world-kb.md" }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-06-23T00:00:00Z"
+}

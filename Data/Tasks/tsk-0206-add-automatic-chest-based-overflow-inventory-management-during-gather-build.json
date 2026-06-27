@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0206-add-automatic-chest-based-overflow-inventory-management-during-gather-build",
+  "key": "TSK-0206",
+  "title": "Add automatic chest-based overflow inventory management during gather/build",
+  "description": "## Problem\nWhen gathering resources in survival mode, the bot\u0027s inventory fills up quickly. Currently it either stops gathering or the player must manually manage inventory. The agent has no concept of using chests as overflow storage.\n\n## Agent Request\nFrom session log: \u0022automatic inventory management\u0022 and \u0022direct integration for placing blocks from inventory\u0022.\n\n## Scope\n- When inventory is full (or nearly full) during a gather operation, the agent should:\n  1. Navigate to the nearest known chest (or place one if none exists)\n  2. Deposit overflow items\n  3. Resume the gather goal\n- Track known chest locations in the agent\u0027s knowledge base\n- \u0022Deposit all\u0022 / \u0022Withdraw for build\u0022 chat commands\n- LLM prompt updated so the agent can explain its inventory state\n\n## Implementation sketch\n1. Add \u0060FindNearestChest\u0060 / \u0060PlaceChest\u0060 action handlers in the Mineflayer adapter\n2. Add \u0060DepositOverflowTool\u0060 that checks inventory capacity and deposits to nearest chest\n3. Store chest locations as world facts via \u0060IWorldModel\u0060\n4. In \u0060GatherGoalDecomposer\u0060 (or the dispatch loop), check inventory capacity before each gather cycle\n5. Add chat commands: \u0022deposit all [item]\u0022, \u0022withdraw [item] [n]\u0022, \u0022where is my chest?\u0022\n\n## Dependencies\nTSK-0201 (chest interaction) provides the basic open/deposit/withdraw capability. This task adds automated overflow management on top.\n\n## Complexity\nMedium-High. Builds on TSK-0201 with additional automation logic.\n\n## Priority\nLow \u2014 survival-mode optimization.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Low",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:inventory",
+    "domain:gathering",
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T15:26:45.3061478Z",
+  "updatedAtUtc": "2026-06-27T15:26:45.3061478Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

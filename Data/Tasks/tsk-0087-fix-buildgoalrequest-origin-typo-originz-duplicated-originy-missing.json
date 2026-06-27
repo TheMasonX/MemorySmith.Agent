@@ -1,0 +1,33 @@
+{
+  "id": "tsk-0087-fix-buildgoalrequest-origin-typo-originz-duplicated-originy-missing",
+  "key": "TSK-0087",
+  "title": "Fix BuildGoalRequest origin typo + require all three axes for explicit origin + add tests",
+  "description": "## Council-merged task (absorbs TSK-0095 + TSK-0097)\n\n## Evidence\n`Agent.Planning/IntentManager.cs` line 187: `if (OriginX is null || OriginZ is null || OriginZ is null)` — OriginZ checked twice, OriginY never checked. Same bug in `BuildGoalRequest.Parameters` property.\n\nAdditionally, `BuildGoal.HasExplicitOrigin` (BuildGoal.cs:56) returns true if ANY axis is present, causing missing axes to silently become 0 via `?? 0` in BuildGoalDecomposer.\n\n## Impact\nMalformed build requests with missing Y coordinate leak through as valid. Partial origin collapses to (x, 0, z) silently.\n\n## Fix\n1. Change second `OriginZ` to `OriginY` in the null check on line 187\n2. Change `HasExplicitOrigin` to require all three axes: `OriginX.HasValue && OriginY.HasValue && OriginZ.HasValue`\n3. Verify `GoalFactory.CreateAsync` handles null Parameters correctly\n4. Add NUnit tests:\n   - All three origins present → Parameters is non-null with correct values\n   - OriginX null → Parameters is null\n   - OriginY null → Parameters is null (regression guard for the typo)\n   - OriginZ null → Parameters is null\n   - All three null → Parameters is null\n\n## Verification\nVerified against codebase 2026-06-23. Council: `Data/Pages/council/audit-task-prioritization-council-2026-06-24.md`",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "bug",
+    "audit-verified",
+    "origin-validation"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-24T04:20:51.5548418Z",
+  "updatedAtUtc": "2026-06-24T04:33:29.5119772Z",
+  "completedAtUtc": "2026-06-24T04:33:29.5119772Z",
+  "revision": 3,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0087-fix-buildgoalrequest-origin-typo-originz-duplicated-originy-missing.json"
+}

@@ -2,38 +2,10 @@
   "id": "tsk-0017-agent-greeting-upon-connection",
   "key": "TSK-0017",
   "title": "Agent Greeting Upon Connection",
-  "description": "Optional greeting messages (either from a preconfigured set as default, or ask the llm to greet). Adds to the world-building and immersion.",
+  "description": "The agent should greet the player when they connect to Minecraft. Adds world-building and immersion.\n\n## Implementation Plan (MVP)\n\n1. Add `GreetingMessage` property to `ChatOptions`:\n   - `public string? GreetingMessage { get; init; }` — null = no greeting\n   - Configure in appsettings.json: `\"Agent\": { \"Chat\": { \"GreetingMessage\": \"Hi! I'm ready to help.\" } }`\n2. In `AgentBackgroundService`, track `_greeted` flag (reset on disconnect)\n3. On first `StatusEvent` after WebSocket connects AND bot spawn event received:\n   - If `_greeted` is false AND GreetingMessage is non-null AND no active goal → dispatch Chat tool with greeting\n   - Set `_greeted = true`\n4. Guard: don't greet if a goal is already active (agent is busy)\n\n## Future Extension: AgentProfile Integration\n\nAgentProfile.cs (Agent.Personality) has `Name`, `Backstory`, `VoiceStyle` fields but is dead code — never injected into the LLM pipeline. In a future sprint, AgentProfile should be:\n- Registered in DI\n- Injected into `LlmChatInterpreter.BuildSystemPrompt` (personality section in prompt)\n- Used as the source for the greeting message (derive from Name + Backstory)\nThis is deferred because the current personality model isn't dynamic enough to warrant the injection yet.\n\n## Files\n- Agent.Planning/Llm/ChatOptions.cs — add GreetingMessage property\n- WebUI.Blazor/AgentBackgroundService.cs — greeting dispatch on connect/spawn\n- WebUI.Blazor/appsettings.json — configure greeting\n- Future: Agent.Personality/AgentProfile.cs — extend and wire into LLM pipeline",
   "type": "Task",
   "status": "Backlog",
   "priority": "Medium",
-  "assigneeMode": "Directory",
-  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
-  "assigneeCustomText": null,
-  "reporter": "TheMasonX",
-  "labels": [
-    "future"
-  ],
-  "attachments": [
-    {
-      "id": "a-d55d00b2cdf3455faf51e0aba4c97b47",
-      "name": "TSK-0018 - Configurable Responses",
-      "kind": "task",
-      "uri": "task:tsk-0018-configurable-responses",
-      "addedAtUtc": "2026-06-21T06:49:50.9458633Z"
-    }
-  ],
-  "externalLinks": [],
-  "linkedPages": [],
-  "comments": [],
-  "epicId": null,
-  "parentId": null,
-  "dueDateUtc": null,
-  "createdAtUtc": "2026-06-21T06:45:24.7598958Z",
-  "updatedAtUtc": "2026-06-21T06:49:50.9458633Z",
-  "completedAtUtc": null,
-  "revision": 2,
-  "isArchived": false,
-  "hasLoadError": false,
-  "loadError": null,
-  "sourceFilePath": "tsk-0017-agent-greeting-upon-connection.json"
+  "labels": ["greeting", "chat", "immersion", "sprint-53"],
+  "estimatedHours": 1.0
 }

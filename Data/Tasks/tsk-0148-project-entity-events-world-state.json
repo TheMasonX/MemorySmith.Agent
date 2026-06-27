@@ -1,0 +1,20 @@
+{
+  "id": "tsk-0148-project-entity-events-world-state",
+  "title": "Project entity events in WorldStateProjector into WorldState",
+  "status": "Backlog",
+  "priority": "High",
+  "type": "Task",
+  "description": "Handle `EntityObservedEvent` and `EntityDepartedEvent` in `WorldStateProjector` so entity state is tracked in `WorldState`.\n\nImplementation:\n1. Extend `WorldState` with a bounded `NearbyEntities` collection (e.g., `IReadOnlyList<ObservedEntity>`, max 50 entries).\n2. Add `ObservedEntity` record:\n   - Type, DisplayName, MobCategory, Position, Distance, Health, LastSeenAt\n3. Add handler in `WorldStateProjector.Apply` for `EntityObservedEvent`:\n   - Upsert into the entities list (replace entry for same Type+Position combo).\n   - Trim list to max count, dropping farthest/oldest first.\n4. Add handler for `EntityDepartedEvent`:\n   - Remove matching entity from list by Type+Position.\n5. Store entity data as structured facts with `entity:` prefix so `WorldVision.GetNearbyEntities()` can also read them.\n6. Add a `NearbyEntitySummary` computed property or method that returns a compact string like \"2 cows (5 blocks), 1 zombie (12 blocks)\".\n\nAcceptance:\n- `WorldState.NearbyEntities` updates on every entity event.\n- Departed entities are removed.\n- List never exceeds 50 entries.\n- `WorldVision.GetNearbyEntities()` no longer dead code.\n\nRefs: `memorysmith_situational_awareness_design_doc_20260625T020914Z.md` Phase 1",
+  "labels": [
+    "entity-awareness",
+    "world-state",
+    "projector",
+    "situational-awareness",
+    "sprint-52"
+  ],
+  "estimatedHours": 2.0,
+  "linkedPages": ["Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z"],
+  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md",
+  "key": "TSK-0148",
+  "epicId": "tsk-0146-entity-observation-scene"
+}

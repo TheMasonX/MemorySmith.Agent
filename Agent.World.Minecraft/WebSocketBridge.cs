@@ -6,6 +6,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 /// <summary>
 /// WebSocket bridge between the C# agent host and the Node.js/Mineflayer process.
@@ -28,16 +30,21 @@ using System.Threading.Channels;
 ///   {"event":"moveComplete", "x":110,"y":64,"z":110}
 ///   {"event":"status",       "x":100,"y":64,"z":100,"hp":20}
 ///   {"event":"error",        "message":"path blocked"}
+///   {"event":"itemCollected","item":"diamond","count":1}   Sprint 35 P0-A
+///   {"event":"mineComplete", "block":"oak_log","mined":5,"targetCount":5}  Sprint 35 P0-B
 ///
 /// Wire-name responsibility: each tool sets <see cref="ActionData.Tool"/> to the
 /// correct Node.js action name via <see cref="ActionProtocol"/> constants.
 /// This bridge forwards the value as-is (no lowercasing). See ADR-010.
 /// </summary>
-public sealed class WebSocketBridge(string uri) : IDisposable
+public sealed class WebSocketBridge(string uri,
+    ILogger<WebSocketBridge>? logger = null) : IDisposable
 {
+    private readonly ILogger<WebSocketBridge> _logger = logger ?? NullLogger<WebSocketBridge>.Instance;
     private ClientWebSocket? _ws;
     private readonly Uri _uri = new(uri);
     private CancellationTokenSource? _receiveCts;
+    private string? _adapterSecret;
 
     // Inbound events buffered from the background receive loop
     private readonly Channel<WorldEvent> _inbound =
@@ -55,6 +62,7 @@ public sealed class WebSocketBridge(string uri) : IDisposable
     public async Task ConnectAsync(CancellationToken cancellationToken = default,
         string? adapterSecret = null)
     {
+        _adapterSecret = adapterSecret;
         _ws = new ClientWebSocket();
         await _ws.ConnectAsync(_uri, cancellationToken);
 
@@ -76,7 +84,7 @@ public sealed class WebSocketBridge(string uri) : IDisposable
 
         // Start background receive loop
         _receiveCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        _ = ReceiveLoopAsync(_receiveCts.Token);
+        _ = RunReceiveLoopWithRetryAsync(_receiveCts.Token);
     }
 
     public async Task CloseAsync(CancellationToken cancellationToken = default)
@@ -85,7 +93,7 @@ public sealed class WebSocketBridge(string uri) : IDisposable
         if (_ws?.State == WebSocketState.Open)
         {
             try { await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Disconnect", cancellationToken); }
-            catch { /* best effort */ }
+            catch (Exception ex) { _logger.LogWarning(ex, "WebSocketBridge.CloseAsync: {Message}", ex.Message); }
         }
     }
 
@@ -152,37 +160,118 @@ public sealed class WebSocketBridge(string uri) : IDisposable
 
     // ── Background receive loop ───────────────────────────────────────────────
 
+    private async Task RunReceiveLoopWithRetryAsync(CancellationToken ct)
+    {
+        const int maxRetries = 3;
+        const int retryDelayMs = 5000;
+
+        try
+        {
+            for (var attempt = 0; attempt <= maxRetries; attempt++)
+            {
+                if (ct.IsCancellationRequested) return;
+
+                try
+                {
+                    await ReceiveLoopAsync(ct);
+                    return; // Normal completion (connection closed cleanly)
+                }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogInformation("WebSocketBridge: Receive loop cancelled (normal shutdown)");
+                    return;
+                }
+                catch (WebSocketException ex) when (attempt < maxRetries)
+                {
+                    _logger.LogWarning(ex,
+                        "WebSocketBridge: Receive loop crashed (attempt {Attempt}/{MaxRetries}). Reconnecting in {DelayMs}ms...",
+                        attempt + 1, maxRetries, retryDelayMs);
+                }
+                catch (Exception ex) when (attempt < maxRetries)
+                {
+                    _logger.LogWarning(ex,
+                        "WebSocketBridge: Receive loop crashed with unexpected error (attempt {Attempt}/{MaxRetries}). Reconnecting in {DelayMs}ms...",
+                        attempt + 1, maxRetries, retryDelayMs);
+                }
+
+                // Attempt reconnection
+                try
+                {
+                    await Task.Delay(retryDelayMs, ct);
+
+                    // Dispose old socket and reconnect
+                    if (_ws is not null)
+                    {
+                        try { _ws.Dispose(); } catch { /* best-effort cleanup */ }
+                    }
+
+                    _ws = new ClientWebSocket();
+                    await _ws.ConnectAsync(_uri, ct);
+
+                    // Re-send handshake if previously configured
+                    if (!string.IsNullOrWhiteSpace(_adapterSecret))
+                    {
+                        using var ms = new System.IO.MemoryStream();
+                        using var writer = new Utf8JsonWriter(ms);
+                        writer.WriteStartObject();
+                        writer.WriteString("type", "handshake");
+                        writer.WriteString("secret", _adapterSecret);
+                        writer.WriteEndObject();
+                        await writer.FlushAsync(ct);
+                        await _ws.SendAsync(ms.ToArray(), WebSocketMessageType.Text,
+                            endOfMessage: true, ct);
+                    }
+
+                    _logger.LogInformation("WebSocketBridge: Reconnect succeeded (attempt {Attempt})", attempt + 1);
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex,
+                        "WebSocketBridge: Reconnect failed (attempt {Attempt}/{MaxRetries})",
+                        attempt + 1, maxRetries);
+                }
+            }
+
+            // All retries exhausted — permanent failure
+            _logger.LogError(
+                "WebSocketBridge: All {MaxRetries} reconnect attempts failed. Agent is permanently deaf.",
+                maxRetries);
+        }
+        finally
+        {
+            // TSK-0112: complete the inbound channel on ALL terminal paths
+            // (normal close, cancellation, error, retry exhaustion) so readers
+            // are never left suspended on a clean shutdown.
+            _inbound.Writer.TryComplete();
+        }
+    }
+
     private async Task ReceiveLoopAsync(CancellationToken ct)
     {
         var buffer = new byte[32_768];
         var sb = new StringBuilder(4096);
 
-        try
+        while (_ws is { State: WebSocketState.Open } && !ct.IsCancellationRequested)
         {
-            while (_ws is { State: WebSocketState.Open } && !ct.IsCancellationRequested)
+            sb.Clear();
+            WebSocketReceiveResult result;
+
+            // Reassemble multi-frame messages
+            do
             {
-                sb.Clear();
-                WebSocketReceiveResult result;
-
-                // Reassemble multi-frame messages
-                do
-                {
-                    result = await _ws.ReceiveAsync(buffer, ct);
-                    if (result.MessageType == WebSocketMessageType.Close) return;
-                    sb.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
-                }
-                while (!result.EndOfMessage);
-
-                var ev = ParseEvent(sb.ToString());
-                if (ev is not null)
-                    _inbound.Writer.TryWrite(ev);
+                result = await _ws.ReceiveAsync(buffer, ct);
+                if (result.MessageType == WebSocketMessageType.Close) return;
+                sb.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
             }
-        }
-        catch (OperationCanceledException) { /* normal shutdown */ }
-        catch (WebSocketException) { /* connection dropped */ }
-        finally
-        {
-            _inbound.Writer.TryComplete();
+            while (!result.EndOfMessage);
+
+            var ev = ParseEvent(sb.ToString(), _logger);
+            if (ev is not null)
+                _inbound.Writer.TryWrite(ev);
         }
     }
 
@@ -191,8 +280,11 @@ public sealed class WebSocketBridge(string uri) : IDisposable
     /// <summary>
     /// Sprint 3a: Parse JSON into typed event subtypes instead of
     /// <c>WorldEvent(string, Dictionary, DateTimeOffset)</c>.
+    /// Sprint 35 P0-A: Added itemCollected → ItemCollectedEvent.
+    /// Sprint 35 P0-B: Added mineComplete → MineCompleteEvent.
+    /// Sprint 35 P0-C: FlatAreaFoundEvent now includes SearchedRadius.
     /// </summary>
-    private static WorldEvent? ParseEvent(string json)
+    private static WorldEvent? ParseEvent(string json, ILogger<WebSocketBridge> instanceLogger)
     {
         try
         {
@@ -230,7 +322,33 @@ public sealed class WebSocketBridge(string uri) : IDisposable
                     Block: GetString(root, "block") ?? "unknown",
                     Count: GetInt(root, "count", 1),
                     Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
+                    BlockPosition: new Position(
+                        GetInt(root, "blockX", GetInt(root, "x")),
+                        GetInt(root, "blockY", GetInt(root, "y")),
+                        GetInt(root, "blockZ", GetInt(root, "z"))),
                     Timestamp: now),
+
+                // Sprint 35 P0-A: actual item collected by the bot (playerCollect event in Mineflayer).
+                // Provides the true drop name (e.g. "diamond" from diamond_ore, "cobblestone" from stone).
+                // Guard in index.js ensures only the bot's own collections reach here.
+                "itemCollected" => new ItemCollectedEvent(
+                    Item: GetString(root, "item") ?? "unknown",
+                    Count: GetInt(root, "count", 1),
+                    Timestamp: now),
+
+                // Sprint 35 P0-B: mining loop completed — definitive end-of-mine signal.
+                // Sprint 40 P0-B: includes block position from the LAST mined block.
+                "mineComplete" => new MineCompleteEvent(
+                    Block: GetString(root, "block") ?? "unknown",
+                    Mined: GetInt(root, "mined"),
+                    TargetCount: GetInt(root, "targetCount"),
+                    Timestamp: now,
+                    BlockPosition: root.TryGetProperty("blockX", out _)
+                        ? new Position(
+                            GetInt(root, "blockX"),
+                            GetInt(root, "blockY"),
+                            GetInt(root, "blockZ"))
+                        : new Position(0, 0, 0)),
 
                 "chat" => new ChatEvent(
                     Username: GetString(root, "username") ?? "?",
@@ -244,7 +362,13 @@ public sealed class WebSocketBridge(string uri) : IDisposable
                 "error" => new ErrorEvent(
                     Action: GetString(root, "action") ?? "?",
                     Message: GetString(root, "message") ?? "unknown",
-                    Timestamp: now),
+                    Timestamp: now,
+                    X: GetIntOrNull(root, "x"),
+                    Y: GetIntOrNull(root, "y"),
+                    Z: GetIntOrNull(root, "z"),
+                    Block: GetString(root, "block"),
+                    Material: GetString(root, "material"),
+                    Item: GetString(root, "item")),
 
                 "blockNotFound" => new BlockNotFoundEvent(
                     Block: GetString(root, "block") ?? "?",
@@ -266,11 +390,19 @@ public sealed class WebSocketBridge(string uri) : IDisposable
                     Pos: new Position(GetInt(root, "x"), GetInt(root, "y"), GetInt(root, "z")),
                     Timestamp: now),
 
-                "status" => ParseStatus(root, now),
+                "status" => ParseStatus(root, now, instanceLogger),
 
                 "blockPlaced" => new BlockPlacedEvent(
                     X: GetInt(root, "x"), Y: GetInt(root, "y"), Z: GetInt(root, "z"),
                     Block: GetString(root, "block") ?? "?",
+                    Timestamp: now,
+                    CorrelationId: TryGetGuid(root, "correlationId")),
+
+                // Sprint 43 (P0-4): terrain collision skip — completes correlation but does not advance checkpoint.
+                "blockPlaceSkipped" => new BlockPlaceSkippedEvent(
+                    X: GetInt(root, "x"), Y: GetInt(root, "y"), Z: GetInt(root, "z"),
+                    Block: GetString(root, "block") ?? "?",
+                    ExistingBlock: GetString(root, "existingBlock") ?? "?",
                     Timestamp: now),
 
                 "wanderComplete" => new WanderCompleteEvent(
@@ -288,6 +420,8 @@ public sealed class WebSocketBridge(string uri) : IDisposable
                     Reason: GetString(root, "reason") ?? "?",
                     Timestamp: now),
 
+                // Sprint 35 P0-C: now parses SearchedRadius so BuildGoalDecomposer
+                // can distinguish "searched small radius" from "searched maximum radius".
                 "flatAreaFound" => new FlatAreaFoundEvent(
                     X: GetInt(root, "x"),
                     Y: GetInt(root, "y"),
@@ -297,18 +431,46 @@ public sealed class WebSocketBridge(string uri) : IDisposable
                     MaxX: GetInt(root, "maxX"),
                     MinZ: GetInt(root, "minZ"),
                     MaxZ: GetInt(root, "maxZ"),
+                    SearchedRadius: GetInt(root, "searchedRadius", 32),
+                    Timestamp: now),
+
+                // Sprint 40 P0-C: mine action aborted by stop signal.
+                "mineAborted" => new MineAbortedEvent(
+                    Block: GetString(root, "block") ?? "unknown",
+                    Mined: GetInt(root, "mined"),
+                    TargetCount: GetInt(root, "targetCount", 0),
+                    BlockPosition: root.TryGetProperty("blockX", out _)
+                        ? new Position(
+                            GetInt(root, "blockX"),
+                            GetInt(root, "blockY"),
+                            GetInt(root, "blockZ"))
+                        : null,
+                    Timestamp: now),
+
+                // Sprint 40 P0-C: emergency stop acknowledged by the adapter.
+                "stopComplete" => new StopCompleteEvent(Timestamp: now),
+
+                // Sprint 40 P0-B: reachable block query result.
+                "reachableBlockFound" => new ReachableBlockFoundEvent(
+                    Block: GetString(root, "block") ?? "unknown",
+                    X: GetInt(root, "x"),
+                    Y: GetInt(root, "y"),
+                    Z: GetInt(root, "z"),
+                    EuclideanDistance: GetDouble(root, "euclideanDistance", 0),
+                    PathDistance: GetInt(root, "pathDistance", 0),
                     Timestamp: now),
 
                 _ => null, // unknown event type — ignored
             };
         }
-        catch
+        catch (Exception ex)
         {
+            instanceLogger.LogWarning(ex, "WebSocketBridge.ParseEvent: {Message}", ex.Message);
             return null;
         }
     }
 
-    private static StatusEvent ParseStatus(JsonElement root, DateTimeOffset now)
+    private static StatusEvent ParseStatus(JsonElement root, DateTimeOffset now, ILogger<WebSocketBridge> instanceLogger)
     {
         var inv = new Dictionary<string, int>();
         if (root.TryGetProperty("inventory", out var invEl))
@@ -323,7 +485,7 @@ public sealed class WebSocketBridge(string uri) : IDisposable
                         if (prop.Value.TryGetInt32(out var qty) && qty > 0)
                             inv[prop.Name] = qty;
                 }
-                catch { /* malformed inventory — leave empty */ }
+                catch (Exception ex) { instanceLogger.LogWarning(ex, "WebSocketBridge.ParseEvent malformed inventory: {Message}", ex.Message); }
             }
             else if (invEl.ValueKind == JsonValueKind.Object)
             {
@@ -355,6 +517,37 @@ public sealed class WebSocketBridge(string uri) : IDisposable
     {
         if (!root.TryGetProperty(key, out var el)) return defaultValue;
         return el.ValueKind == JsonValueKind.String ? el.GetString() : defaultValue;
+    }
+
+    /// <summary>
+    /// Sprint 41: returns null when the key is missing or not a number (unlike
+    /// <see cref="GetInt"/> which returns a default). Used for optional fields
+    /// like error event position coordinates.
+    /// </summary>
+    private static int? GetIntOrNull(JsonElement root, string key)
+    {
+        if (!root.TryGetProperty(key, out var el)) return null;
+        return el.ValueKind == JsonValueKind.Number && el.TryGetInt32(out var i)
+            ? i : null;
+    }
+
+    private static double GetDouble(JsonElement root, string key, double defaultValue = 0)
+    {
+        if (!root.TryGetProperty(key, out var el)) return defaultValue;
+        return el.ValueKind == JsonValueKind.Number && el.TryGetDouble(out var d)
+            ? d : defaultValue;
+    }
+
+    /// <summary>
+    /// TSK-0128: Extracts an optional Guid from a JSON string property.
+    /// Returns null when the key is missing, not a string, or not a valid Guid.
+    /// </summary>
+    private static Guid? TryGetGuid(JsonElement root, string key)
+    {
+        if (!root.TryGetProperty(key, out var el)) return null;
+        if (el.ValueKind != JsonValueKind.String) return null;
+        var s = el.GetString();
+        return Guid.TryParse(s, out var g) ? g : null;
     }
 
     // ── Dispose ──────────────────────────────────────────────────────────────

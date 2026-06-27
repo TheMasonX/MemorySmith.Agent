@@ -32,14 +32,51 @@ public static class BuildFactKeys
     // Written by AgentBackgroundService after each successful PlaceBlock action.
     // Read by HtnTaskLibrary.DecomposeBuild to resume from the last checkpoint
     // instead of re-placing already-placed blocks.
+    //
+    // TSK-0125: replaced single-index checkpoint with per-block status facts.
+    // The legacy key is kept for backward compatibility during migration.
 
     /// <summary>
-    /// Returns the fact key for the last successfully placed block index within
-    /// a specific blueprint build plan. Index is 0-based; the next unplaced
-    /// block is at <c>index + 1</c>.
+    /// [LEGACY — TSK-0125] Returns the fact key for the last successfully placed
+    /// block index within a specific blueprint. Replaced by per-block status facts
+    /// for checkpointing; still used by ReplanGovernor for stall detection.
     /// </summary>
     public static string BuildProgressIndex(string blueprintId) =>
         $"build:{blueprintId}:progress:index";
+
+    // ── Per-block status keys (TSK-0125) ──────────────────────────────────
+    // Each block in a blueprint has an independent status fact.
+    // Status transitions: pending → in-progress → placed | skipped
+    // - pending: not yet dispatched (default if fact is absent)
+    // - in-progress: dispatched to adapter, awaiting BlockPlacedEvent
+    // - placed: confirmed by BlockPlacedEvent
+    // - skipped: cannot place (bot position, terrain occupied, no reference)
+
+    /// <summary>Status value for blocks not yet attempted.</summary>
+    public const string BlockStatusPending = "pending";
+
+    /// <summary>Status value for blocks dispatched but unconfirmed.</summary>
+    public const string BlockStatusInProgress = "in-progress";
+
+    /// <summary>Status value for blocks confirmed placed.</summary>
+    public const string BlockStatusPlaced = "placed";
+
+    /// <summary>Status value for blocks that could not be placed.</summary>
+    public const string BlockStatusSkipped = "skipped";
+
+    /// <summary>
+    /// Returns the fact key for per-block status in a blueprint.
+    /// Format: build:{blueprintId}:block:{index}:status
+    /// </summary>
+    public static string BlockStatus(string blueprintId, int blockIndex) =>
+        $"build:{blueprintId}:block:{blockIndex}:status";
+
+    /// <summary>
+    /// Returns the fact key prefix for all blocks in a blueprint.
+    /// Used by ClearFactsByPrefix to remove all build facts for a blueprint.
+    /// </summary>
+    public static string BlockStatusPrefix(string blueprintId) =>
+        $"build:{blueprintId}:block:";
 
     /// <summary>
     /// Context key added to each PlaceBlock <see cref="ActionData"/> so that

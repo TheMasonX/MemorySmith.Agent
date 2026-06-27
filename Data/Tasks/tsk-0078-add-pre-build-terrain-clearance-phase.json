@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0078-add-pre-build-terrain-clearance-phase",
+  "key": "TSK-0078",
+  "title": "Add pre-build terrain clearance phase",
+  "description": "## Problem\nThe bot places wall blocks into existing terrain (hills, slopes) because the flat-area scanner finds \u0022flat\u0022 ground but doesn\u0027t verify that the 3D build volume is clear of terrain. Terrain overlap causes blocks to be placed inside dirt/stone instead of replacing it with the correct material.\n\n## Required Work\n1. Add pre-build terrain survey: scan all target positions in the blueprint\u0027s bounding box\n2. Count positions that already contain non-air blocks\n3. Emit \u0060MineBlock\u0060 actions for terrain blocks at blueprint positions before the placing phase\n4. Log: count of terrain-overlapping positions found during build decomposition\n5. After terrain clearance, proceed with normal placement\n\n## Priority: P1\n## Labels: placement, sprint-42, terrain-clearance",
+  "type": "Task",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "anonymous",
+  "labels": [
+    "placement",
+    "sprint-42",
+    "terrain-clearance"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-23T06:11:55.0822606Z",
+  "updatedAtUtc": "2026-06-27T00:43:00.8284915Z",
+  "completedAtUtc": "2026-06-27T00:43:00.8284915Z",
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0078-add-pre-build-terrain-clearance-phase.json"
+}

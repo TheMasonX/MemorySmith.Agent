@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0207-add-block-area-inspection-and-resource-scanning-chat-commands",
+  "key": "TSK-0207",
+  "title": "Add block/area inspection and resource scanning chat commands",
+  "description": "## Problem\nThe player has no way to ask the agent about the local terrain or specific blocks without manually going there themselves. Commands like \u0022what\u0027s at that spot?\u0022 or \u0022scan this area for resources\u0022 would let the agent use its block-scanning capability and report back.\n\n## Examples\n- Player: \u0022What\u0027s in this area?\u0022 \u2192 agent scans nearby chunks and summarizes: \u0022Oak forest to the north, mountain with exposed coal at y=45 to the east, river to the south\u0022\n- Player: \u0022Is there iron nearby?\u0022 \u2192 agent scans for iron_ore blocks within radar range\n- Player: \u0022Where\u0027s a good place to build?\u0022 \u2192 agent uses findFlatArea and reports the best location\n- Player: \u0022What block is at (-230, 65, 179)?\u0022 \u2192 agent inspects the specific coordinate\n\n## Scope\n- Add \u0060ScanArea\u0060 / \u0060InspectBlock\u0060 / \u0060FindResources\u0060 chat commands\n- Uses existing Mineflayer block scanning (\u0060bot.findBlock\u0060, chunk data) \n- Results summarized via LLM for natural language response\n- Leverages existing \u0060findFlatArea\u0060 and world-scanning infrastructure\n\n## Implementation sketch\n1. Add \u0060ScanBlocksTool\u0060 that queries nearby chunks for specific block types\n2. Add \u0060DescribeAreaTool\u0060 that scans the surrounding area and returns a terrain summary\n3. Wire into chat interpreter as LLM-routed intents (not deterministic regex)\n4. Add resource-whitelist so the agent only reports valuable blocks (ores, caves, water, etc.)\n\n## Complexity\nMedium. Uses existing Mineflayer scanning APIs with new LLM summarization.\n\n## Priority\nLow \u2014 exploration and building aid.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Low",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:world-scanning",
+    "domain:chat",
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T15:26:55.7161258Z",
+  "updatedAtUtc": "2026-06-27T15:26:55.7161258Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

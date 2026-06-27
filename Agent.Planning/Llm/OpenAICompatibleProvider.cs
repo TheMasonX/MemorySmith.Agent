@@ -2,6 +2,8 @@ namespace Agent.Planning.Llm;
 
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 /// <summary>
 /// <see cref="ILlmProvider"/> for OpenAI chat completions API and compatible services.
@@ -21,8 +23,11 @@ using System.Text.Json.Serialization;
 ///   LlmProvider: "openrouter", LlmModel: "mistralai/mistral-7b-instruct", LlmApiKey: "sk-or-..."
 ///   LlmProvider: "deepseek",  LlmModel: "deepseek-chat",             LlmApiKey: "..."
 /// </summary>
-public sealed class OpenAICompatibleProvider(HttpClient http, ChatOptions options) : ILlmProvider
+public sealed class OpenAICompatibleProvider(HttpClient http, ChatOptions options,
+    ILogger<OpenAICompatibleProvider>? logger = null) : ILlmProvider
 {
+    private readonly ILogger<OpenAICompatibleProvider> _logger = logger ?? NullLogger<OpenAICompatibleProvider>.Instance;
+
     private static readonly HashSet<string> SupportedProviders =
         new(StringComparer.OrdinalIgnoreCase)
         { "openai", "openrouter", "deepseek", "github-copilot" };
@@ -70,9 +75,9 @@ public sealed class OpenAICompatibleProvider(HttpClient http, ChatOptions option
 
             return result?.Choices?.FirstOrDefault()?.Message?.Content;
         }
-        catch (OperationCanceledException) { return null; }
-        catch (HttpRequestException)        { return null; }
-        catch                               { return null; }
+        catch (OperationCanceledException ex) { _logger.LogWarning(ex, "OpenAICompatibleProvider.CompleteAsync: Operation cancelled"); return null; }
+        catch (HttpRequestException ex)        { _logger.LogWarning(ex, "OpenAICompatibleProvider.CompleteAsync: HTTP error"); return null; }
+        catch (Exception ex)                   { _logger.LogWarning(ex, "OpenAICompatibleProvider.CompleteAsync: Unexpected error"); return null; }
     }
 
     // ── Wire types ────────────────────────────────────────────────────────────

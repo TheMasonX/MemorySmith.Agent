@@ -20,17 +20,22 @@ using Agent.Core;
 /// HasFailed: world-state fact "goal:Build:{blueprintId}:failed" = true.
 ///
 /// Origin resolution priority (Sprint 35):
-///   1. Explicit origin passed via constructor (<see cref="OriginX"/>, <see cref="OriginY"/>,
-///      <see cref="OriginZ"/>) — e.g. from chat "build a house at 100 64 200".
+///   1. Explicit origin passed via constructor (<see cref="BuildOrigin"/>) —
+///      e.g. from chat "build a house at 100 64 200".
 ///   2. World-state facts: "build:{blueprintId}:origin:{axis}" — e.g. from REST API or prior run.
 ///   3. Auto-detect: FindFlatArea action emitted to locate the nearest suitable flat spot.
+///
+/// TSK-0103: Origin coordinates consolidated into <see cref="BuildOrigin"/> value object.
+/// Partial coordinates are rejected (all three or none). <see cref="BuildOrigin.Source"/>
+/// tracks how the origin was determined.
 ///
 /// Blueprints are "stamps" — they never store absolute positions. All coordinates
 /// are relative offsets applied on top of the resolved origin.
 ///
-/// Introduced in TSK-0011 Phase 4b. Sprint 35: explicit origin support + auto-find fallback.
+/// Introduced in TSK-0011 Phase 4b. Sprint 35: explicit origin support + OriginSource enum.
+/// TSK-0103: BuildOrigin value object consolidation.
 /// </summary>
-public sealed class BuildGoal : IGoal
+public sealed class BuildGoal : IBuildGoal
 {
     /// <summary>Blueprint metadata (id, name, materials, dimensions).</summary>
     public Blueprint Blueprint { get; }
@@ -38,15 +43,15 @@ public sealed class BuildGoal : IGoal
     /// <summary>Flat ordered list of blocks to place, relative to the build origin.</summary>
     public IReadOnlyList<PlacementBlock> Blocks { get; }
 
-    /// <summary>Explicit world-coordinate origin from chat (e.g. "build a house at 100 64 200").</summary>
-    public int? OriginX { get; }
-    /// <summary>Explicit world-coordinate origin from chat.</summary>
-    public int? OriginY { get; }
-    /// <summary>Explicit world-coordinate origin from chat.</summary>
-    public int? OriginZ { get; }
+    /// <summary>
+    /// Resolved build origin, or <c>null</c> when no explicit origin is set.
+    /// When null, the planner resolves the origin via auto-scan or player position.
+    /// TSK-0103: Consolidates previous OriginX/OriginY/OriginZ + OriginSource fields.
+    /// </summary>
+    public BuildOrigin? Origin { get; }
 
-    /// <summary>True when the builder explicitly supplied a build origin.</summary>
-    public bool HasExplicitOrigin => OriginX.HasValue || OriginY.HasValue || OriginZ.HasValue;
+    /// <summary>True when a build origin was supplied (all three coordinates present).</summary>
+    public bool HasExplicitOrigin => Origin is not null;
 
     /// <inheritdoc/>
     public string Name { get; }
@@ -57,25 +62,22 @@ public sealed class BuildGoal : IGoal
     public BuildGoal(
         Blueprint blueprint,
         IReadOnlyList<PlacementBlock> blocks,
-        int? originX = null,
-        int? originY = null,
-        int? originZ = null)
+        BuildOrigin? origin = null)
     {
         Blueprint = blueprint;
         Blocks = blocks;
+        Origin = origin;
         Name = $"Build:{blueprint.Id}";
-        OriginX = originX;
-        OriginY = originY;
-        OriginZ = originZ;
         // TSK-0020: include material resource counts in the description.
         var materialSummary = blueprint.Materials.Length > 0
             ? " | " + string.Join(", ", blueprint.Materials
                 .OrderByDescending(m => m.Quantity)
                 .Select(m => $"{m.Block} x {m.Quantity}"))
             : "";
-        Description = originX.HasValue
-            ? $"Build {blueprint.Name} ({blocks.Count} blocks) at ({originX},{originY},{originZ}).{materialSummary}"
-            : $"Build {blueprint.Name} ({blocks.Count} blocks, {blueprint.Dimensions.X}x{blueprint.Dimensions.Y}x{blueprint.Dimensions.Z}).{materialSummary}";
+        var originDesc = origin is not null
+            ? $" at ({origin.X},{origin.Y},{origin.Z}) [{origin.Source}]"
+            : " [AutoScanned]";
+        Description = $"Build {blueprint.Name} ({blocks.Count} blocks, {blueprint.Dimensions.X}x{blueprint.Dimensions.Y}x{blueprint.Dimensions.Z}){originDesc}.{materialSummary}";
     }
 
     /// <inheritdoc/>
@@ -98,4 +100,20 @@ public sealed class BuildGoal : IGoal
         string s when bool.TryParse(s, out var parsed) => parsed,
         _ => false,
     };
+}
+
+/// <summary>
+/// Sprint 35 P0-C: How the build origin was resolved.
+/// Preview of Sprint 36's full Fact.Source enum (PlayerInstruction | Observation | Memory | Inference | Scan | Recovery).
+/// </summary>
+public enum BuildOriginSource
+{
+    /// <summary>Origin explicitly provided by the player via chat or REST API.</summary>
+    Explicit,
+
+    /// <summary>Origin taken from the bot's current position as a positional fallback.</summary>
+    PlayerPosition,
+
+    /// <summary>Origin determined automatically by FindFlatArea scan. Log a warning before building.</summary>
+    AutoScanned,
 }

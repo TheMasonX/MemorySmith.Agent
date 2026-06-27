@@ -1,36 +1,38 @@
 {
-  "Id": "tsk-0011-document-verified-mcp-baseline",
-  "Key": "TSK-0011",
-  "Title": "Document verified MCP baseline and route caveats",
-  "Description": "Track the verified MCP route inventory, live tool names, and documented caveats from the non-destructive probe pass. This task covers the docs, usage guides, and memory updates needed so SteveBot and MCP guidance stay aligned with the live server behavior.",
-  "Type": "Task",
-  "Status": "Open",
-  "Priority": "Medium",
-  "AssigneeMode": "Custom",
-  "AssigneeDirectoryId": null,
-  "AssigneeCustomText": "AI Agent",
-  "Reporter": "agent-session-20260617",
-  "Labels": [
+  "id": "tsk-0011-document-verified-mcp-baseline",
+  "key": "TSK-0011",
+  "title": "Document verified MCP baseline and route caveats",
+  "description": "Track the verified MCP route inventory, live tool names, and documented caveats from the non-destructive probe pass. This task covers the docs, usage guides, and memory updates needed so SteveBot and MCP guidance stay aligned with the live server behavior.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "AI Agent",
+  "reporter": "agent-session-20260617",
+  "labels": [
     "mcp",
     "stevebot",
     "documentation",
     "verification"
   ],
-  "Attachments": [],
-  "ExternalLinks": [],
-  "LinkedPages": [
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
     "guides/mcp-tools-usage",
     "guides/memorysmith-setup"
   ],
-  "Comments": [
-    "Verified findings: /mcp exposes 10 live tools; /api/diagnostics returns 401 Unauthorized; /mcp/status is not a valid route; semantic-search fallback remains limited by the missing ONNX model."
+  "comments": [
+    {
+      "body": "Verified findings: /mcp exposes 10 live tools; /api/diagnostics returns 401 Unauthorized; /mcp/status is not a valid route; semantic-search fallback remains limited by the missing ONNX model."
+    }
   ],
-  "EpicId": null,
-  "ParentId": null,
-  "DueDateUtc": null,
-  "CreatedAtUtc": "2026-06-17T00:00:00Z",
-  "UpdatedAtUtc": "2026-06-17T00:00:00Z",
-  "CompletedAtUtc": null,
-  "Revision": 1,
-  "IsArchived": false
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-17T00:00:00Z",
+  "updatedAtUtc": "2026-06-17T00:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false
 }

@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0072-place-blueprint-command",
+  "key": "TSK-0072",
+  "title": "Place blueprint command",
+  "description": "Uses commands to place a blueprint, instead of manually building. Very similar paths to start as far as finding the right location. No longer needs to give the player all items in creative either, as placement just changes from a bunch of block placements to a set of commands. Note that rapid fire commands seem to break the server, so adding a slight delay might help",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-23T04:42:18.5997955Z",
+  "updatedAtUtc": "2026-06-23T04:42:18.5997955Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

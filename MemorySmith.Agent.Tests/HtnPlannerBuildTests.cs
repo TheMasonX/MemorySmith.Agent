@@ -47,15 +47,17 @@ public sealed class HtnPlannerBuildTests
     [Test]
     public async Task PlanAsync_BuildGoal_ProducesSixPlaceBlockActions()
     {
+        // Block (0,0,0) overlaps with default bot position (0,0,0) in an empty
+        // WorldState — the TSK-0123 self-skip filters it. Expected: 5.
         var plan = await MakePlan(SmallFloor, new WorldState());
-        Assert.That(CountTool(plan, "PlaceBlock"), Is.EqualTo(6));
+        Assert.That(CountTool(plan, "place"), Is.EqualTo(5));
     }
 
     [Test]
     public async Task PlanAsync_BuildGoal_PlaceBlocks_HaveCorrectMaterial()
     {
         var plan  = await MakePlan(SmallFloor, new WorldState());
-        var place = plan.Actions.Where(a => a.Tool == "PlaceBlock").ToList();
+        var place = plan.Actions.Where(a => a.Tool == "place").ToList();
         Assert.That(place, Has.All.Matches<ActionData>(a =>
             a.Arguments.TryGetValue("material", out var m) &&
             m?.ToString() == "cobblestone"));
@@ -65,7 +67,7 @@ public sealed class HtnPlannerBuildTests
     public async Task PlanAsync_BuildGoal_PlaceBlocks_HaveXYZArguments()
     {
         var plan  = await MakePlan(SmallFloor, new WorldState());
-        var place = plan.Actions.Where(a => a.Tool == "PlaceBlock").ToList();
+        var place = plan.Actions.Where(a => a.Tool == "place").ToList();
         Assert.That(place, Has.All.Matches<ActionData>(a =>
             a.Arguments.ContainsKey("x") &&
             a.Arguments.ContainsKey("y") &&

@@ -1,0 +1,186 @@
+Archived|Critical|Add unit tests for Sprint 42/43 checkpoint changes
+Backlog|Critical|Add API key authentication to SignalR /agent-hub
+Backlog|Critical|Add ChatRateLimiter.TryAcquire unit tests
+Backlog|Critical|Add Promise.race() timeout protection on all bot.pathfinder.goto() calls
+Backlog|Critical|Add tests for all 4 LLM providers (Ollama, OpenAI, Anthropic, Gemini)
+Backlog|Critical|Move Gemini API key from URL query string to HTTP header
+Backlog|Critical|Wire pathfinder events (path_update, goal_reached, path_stop) in MineflayerAdapter
+Backlog|High|Add entity observation events to MineflayerAdapter
+Backlog|High|Add EntityObservedEvent and EntityDepartedEvent to WorldEvents.cs
+Backlog|High|Add error handling to SearchAsync and SearchMemoryTool
+Backlog|High|Add goto() timeout with Promise.race() backstop
+Backlog|High|Add HTTP retry/resilience for MemorySmith API clients
+Backlog|High|Add observation-driven replan comparison loop
+Backlog|High|Add scaffolding phase for roof/upper wall placement
+Backlog|High|Add stale-inventory guard at goal-creation time in HandleChatEventAsync
+Backlog|High|Chat I/O Disk Logging
+Backlog|High|Correct path_reset references to path_update with noPath status
+Backlog|High|Diagnose & fix torch recipe failure in Mineflayer craft handler
+Backlog|High|Expose local world shape: block underfoot, block in front, nearby hazards
+Backlog|High|Expose motion, equipment, and environment state from Mineflayer to WorldState
+Backlog|High|Extract shared SmeltableMapping class to eliminate OutputItem drift
+Backlog|High|Feed ScenePack into planner context without changing planner API
+Backlog|High|Implement ScenePackBuilder projection class
+Backlog|High|Include entity summary in LLM system prompt (BuildSystemPrompt)
+Backlog|High|Normalize ActionData.Tool to canonical form; remove dual-checks
+Backlog|High|Ollama lifetime management — auto-launch Ollama with the requested model
+Backlog|High|Project entity events in WorldStateProjector into WorldState
+Backlog|High|Replace turn-count chat history eviction with character-length-based eviction
+Backlog|High|Respawn handler — bot.once('spawn') doesn't re-fire on death/respawn
+Backlog|High|Synchronize AgentBackgroundService shared mutable fields
+Backlog|High|Throttle move event emission and add orientation telemetry
+Backlog|High|Wire bot.inventory updateSlot for real-time inventory ground truth
+Backlog|High|Wire ScenePackBuilder into AgentBackgroundService chat pipeline
+Backlog|Low|[FUTURE] Add embeddings for durable world pages in MemorySmith
+Backlog|Low|[FUTURE] Add graph links between landmarks, goals, and pages in MemorySmith
+Backlog|Low|Add Minecraft version config and parameterize block IDs in HtnTaskLibrary
+Backlog|Low|Add mineflayer-collectblock and mineflayer-tool dependencies to package.json
+Backlog|Low|Define IObservationSummarizer integration point for LLM observation feed
+Backlog|Low|Design observation layer gap analysis
+Backlog|Low|Fix documentation drift: canonicalize version/sprint status across README, roadmap, and handoffs
+Backlog|Low|Future Spatial UI - ViewportSnapshot Reserve
+Backlog|Low|Implement GOAP fallback in HtnPlanner.ReplanAsync
+Backlog|Low|Refactor Mineflayer adapter monolith into bounded modules
+Backlog|Low|Remove legacy HtnPlanner typed decomposition branches (defer to PlannerRouter)
+Backlog|Medium|Add action progress telemetry (started/progress/completed/failed/timed-out)
+Backlog|Medium|Add action progress telemetry to Mineflayer adapter events
+Backlog|Medium|Add Blazor status panel with SignalR real-time push
+Backlog|Medium|Add Microsoft.Extensions.AI + Ollama LLM fallback to HtnPlanner
+Backlog|Medium|Add recipe/prerequisite diagnostics to craft error handling
+Backlog|Medium|Add throttle/debounce for move events in Mineflayer adapter
+Backlog|Medium|Agent Can Build A House
+Backlog|Medium|Agent Greeting Upon Connection
+Backlog|Medium|Agent Threat Response
+Backlog|Medium|Agent Vision
+Backlog|Medium|Aliases In Pages Or Config
+Backlog|Medium|Build Task Resource Counts
+Backlog|Medium|Chat Context Dashboard
+Backlog|Medium|Command Keyword Fallbacks
+Backlog|Medium|Configurable Responses
+Backlog|Medium|Console Command Tool
+Backlog|Medium|Creative Item Give Shulker Box
+Backlog|Medium|Creative Mode Gather
+Backlog|Medium|Creative Mode Give Items Overload
+Backlog|Medium|Dashboard Broadcast Service
+Backlog|Medium|Dashboard Contracts - Snapshot models
+Backlog|Medium|Dashboard Event Bus
+Backlog|Medium|Dashboard Snapshot Store
+Backlog|Medium|Dashboard UI Improvements
+Backlog|Medium|Deepen Mineflayer adapter world observation payload
+Backlog|Medium|Design and implement GenericGatherGoal — arbitrary item gathering including mods
+Backlog|Medium|Fix MaxResponseDistanceBlocks dead config — wire or remove
+Backlog|Medium|Follow Command
+Backlog|Medium|Fuzzy Search
+Backlog|Medium|Go To Command
+Backlog|Medium|Implement policy-based MemorySmith writer service for durable world observations
+Backlog|Medium|Implement SpatialAnalyzer.cs in Agent.Vision
+Backlog|Medium|Inventory Report Chat
+Backlog|Medium|Live Log Buffer & Log Sink
+Backlog|Medium|LLM Plan Status Review
+Backlog|Medium|LLM Planning
+Backlog|Medium|Look at Player
+Backlog|Medium|Place blueprint command
+Backlog|Medium|Plan Completion and Progress Updates
+Backlog|Medium|Plan Display RLE
+Backlog|Medium|Plan Resuming
+Backlog|Medium|Planned Block Ordering
+Backlog|Medium|Program.cs DI Wiring & Endpoints
+Backlog|Medium|Refactor AgentBackgroundService to Event Bus
+Backlog|Medium|Replace chat regex filter with structured message classification
+Backlog|Medium|Replace regex-only chat filter with structured message classification
+Backlog|Medium|Replan and Continue After Death
+Backlog|Medium|Return structured parse result from ParseItemSpec (distinguish NotFound vs Malformed)
+Backlog|Medium|Runtime Configuration Model
+Backlog|Medium|Service Lifetime Management
+Backlog|Medium|SignalR Event Normalization
+Backlog|Medium|Smart step-aside: Y-axis ±1 and perpendicular-to-build-direction offset selection
+Backlog|Medium|Stale Inventory
+Backlog|Medium|Track scaffolding blocks placed during builds and clean them up
+Backlog|Medium|Wire bot.inventory.on('updateSlot') for real-time inventory
+Backlog|Medium|Write snapshot, landmark, goal, and failure pages to MemorySmith World KB
+Blocked|Medium|TSK-0153: Extract IBuildMaterialProvider from HtnTaskLibrary (Strategy Pattern)
+Closed - Merged into TSK-0103|Medium|Consolidate duplicate ReadOriginFact implementations
+Closed - Merged into TSK-0105|Medium|Fix stale doc comments across multiple files
+Completed|Medium|Task Chat Updates
+Done|Critical|Add DeathEvent Handler — Cancel Goal, Clear Queue, Mark Inventory Stale
+Done|Critical|Add SearchResult.Kind Field to Disambiguate Page vs Memory Results
+Done|Critical|Add Terminal Recovery After maxConsecutiveFailures — Don't Idle Forever
+Done|Critical|Add try/catch around gateway calls in repository fallback chains
+Done|Critical|Adopt Deprecation Policy and Semantic Versioning
+Done|Critical|Agent Won't Break Blocks To Build
+Done|Critical|Align Architecture Docs to Single Canonical Pipeline
+Done|Critical|Build checkpoint only advances on confirmed BlockPlacedEvent
+Done|Critical|Classify All Compatibility Bridges (Permanent/Temporary/Obsolete)
+Done|Critical|Creative Mode Gather Bypass Guard
+Done|Critical|DONE: MineflayerAdapter/index.js fully implemented with pathfinder
+Done|Critical|DONE: WebSocketBridge fully implemented with background receive loop
+Done|Critical|Fix BuildGoalRequest origin typo + require all three axes for explicit origin + add tests
+Done|Critical|Fix Logging Levels — SQLite to Information, Remove Agent.Planning* Overrides
+Done|Critical|Fix MonitorAndCancelOnFaultAsync Bare Catch — Add Error Logging
+Done|Critical|Fix smelt→CraftItem routing (7 sprints old)
+Done|Critical|Fix Task.WhenAll Exception Masking — Unwrap AggregateException
+Done|Critical|Investigate and fix block position off-by-one in gather-dirt
+Done|Critical|Investigate MoveTo Re-added on Replan Root Cause
+Done|Critical|PlaceBlock terrain occupancy check — skip occupied positions
+Done|Critical|Rehome To Origin After Every Block
+Done|Critical|Skip PlaceBlock at bot's current position (no reference block)
+Done|Critical|Sprint 37 Issue A: Remove GetStatus from GatherItemDecompose
+Done|Critical|Sprint 37 Issue A+B: BlockMinedEvent handler changes
+Done|Critical|Sprint 37: Build and test validation
+Done|Critical|Verify kick→reconnect loop end-to-end with exponential backoff
+Done|Critical|Wire mineAborted/stopComplete events to C# side
+Done|Critical|Wire SearchMemory results or strip dead calls
+Done|High|Add error handling to SearchAsync and SearchMemoryTool
+Done|High|Add HTTP retry/resilience for MemorySmith API clients
+Done|High|Add pre-build terrain clearance phase
+Done|High|Add tests for AdvanceBuildCheckpoint, BlockPlacedEvent, BlockPlaceSkippedEvent, _placeBlockContexts
+Done|High|Add tests for BuildGoalRequest origin validation (including typo regression guard)
+Done|High|Add WorldStateProjector.ApplySmeltComplete for real-time inventory updates
+Done|High|Adopt IHttpClientFactory in RestMemoryGateway with Resilience Policies
+Done|High|ApiKeyMiddleware safety hardening with explicit AllowUnauthenticatedApi flag
+Done|High|Complete Chat Split-Brain Cleanup: Remove ChatInterpretation.GoalName
+Done|High|Creative mode recovery guards — don't gather materials in creative mode
+Done|High|Document All Breaking Changes with Migration Guide
+Done|High|Fix /api/about metadata — update version and phase strings
+Done|High|Fix BlockNotFound retry count — string/int type mismatch in TryRouteAsError
+Done|High|Fix Lying Comment in GatherItemDecompose + Resolve _agentRuntime Dead Code
+Done|High|Fix memory gateway write path — narrow exception handling in UpdatePageAsync
+Done|High|Fix mining inventory prediction — use BlockToItemDrop mapping in WorldModel.PredictMine
+Done|High|Fix SearchMemoryTool Regex Fragility and Top-Hit Limitation
+Done|High|Fix UpdatePageAsync Title Bug and Harden Slug Generation
+Done|High|MoveEvent Log Suppression
+Done|High|Normalize ActionData.Tool to canonical form; remove dual-checks
+Done|High|Reduce MoveTo tolerance before PlaceBlock from 3 to 2 blocks
+Done|High|Reject empty/whitespace pageId in GetPageTool before gateway call
+Done|High|Replace Thread.Sleep with await Task.Delay in creative provisioning
+Done|High|Resolve navigation coordinate contract mismatch between prompt and mapper
+Done|High|Run first end-to-end game test (GatherWood in Minecraft)
+Done|High|Sprint 37 Issue C: FindFlatArea ground check + logging
+Done|High|TSK-0152: MoveTo source investigation — find where MoveTo enters build plan pipeline
+Done|Low|Fix ActionQueue race-prone surface area — add lock protection to all operations
+Done|Low|Wire ILogger into ToolDispatcher construction
+Done|Medium|Add deduplication for mining inventory double-counting
+Done|Medium|Decouple emergency stop delivery from queue mutation in ClearAndEnqueueAsync
+Done|Medium|Extract shared alias dictionaries to eliminate drift risk
+Done|Medium|Fix blueprint repository cancellation swallowing
+Done|Medium|Fix bot name detection — use whole-word matching
+Done|Medium|Fix HtnTaskLibrary.MakeAction Arguments Dictionary Mutability
+Done|Medium|Fix SmeltGoal.HasFailed dead code — never returns true
+Done|Medium|Fix structured tool outcomes — stop collapsing ActionOutcome to binary success/failure
+Done|Medium|Fix WebSocket clean shutdown — complete inbound channel on all terminal paths
+Done|Medium|Move creative-mode build handling into decomposer layer
+Done|Medium|Reject malformed blueprints with missing id/name before goal creation
+Done|Medium|Require all three axes for explicit build origin
+Done|Medium|Sprint 37 Issue D: Chat try/catch defensive guard
+Done|Medium|Sweep remaining 3 bare-catch sites with structured logging
+Done|Medium|TSK-0154: Introduce IBuildGoal marker interface (replace fragile type-check)
+Done|Medium|Update README and sprint state docs to reflect current code state
+Done|Medium|Use shorter TTL for null item-registry cache entries
+InProgress|High|Wire MoveToTool to read coordinates from ActionData.Context (Phase 4 adaptive)
+InProgress|Medium|Modularize MineflayerAdapter: split index.js into focused modules
+Open|High|Deploy a Minecraft-specific MemorySmith wiki
+Open|Medium|Add a ListBlocks / ListItems tool for in-game block discovery
+Open|Medium|Document verified MCP baseline and route caveats
+Ready|Critical|Enforce package vetting policy in CI and audit existing dependencies
+Ready|High|Keep About page as living dependency inventory with automated sync check
+Rejected|Medium|Add Serilog SQLite sink for agent runtime telemetry

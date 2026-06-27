@@ -1,0 +1,18 @@
+{
+  "id": "tsk-0165-action-progress-telemetry",
+  "title": "Add action progress telemetry (started/progress/completed/failed/timed-out)",
+  "status": "Backlog",
+  "priority": "Medium",
+  "type": "Task",
+  "description": "Add granular action lifecycle events so the C# side can track progress of long-running actions (mining, pathfinding, smelting) without having to infer from final outcomes alone. Per the audit, the action-correlation layer exists but reports progress too coarsely.\n\nImplementation:\n1. Add `actionStarted` event emitted at the beginning of each `dispatch()` case, before any work:\n   - `{ action, args, correlationId, timestamp }`\n2. Add `actionProgress` event for long-running actions:\n   - **Mining**: emit after every block mined with `{mined, targetCount, percentComplete}`\n   - **Pathfinding**: emit on `path_update` with `{remainingNodes, estimatedTime}` (already covered by TSK-0158)\n   - **Smelting**: emit periodically with `{smelted, toSmelt, elapsedMs}`\n   - **Wandering**: emit on each waypoint reached\n3. Add `actionFailed` event with structured reason:\n   - `{ action, reason, detail, correlationId }`\n   - Reason codes: `path_timeout`, `path_no_path`, `path_blocked`, `dig_failed`, `no_block_found`, `missing_item`, `not_spawned`, `furnace_not_found`\n4. Add `actionCompleted` event (already partly done via `mineComplete`, `craftComplete`, etc. — standardize).\n5. Create corresponding `WorldEvent` subtypes:\n   - `ActionStartedEvent(string Action, string CorrelationId, DateTimeOffset Timestamp)`\n   - `ActionProgressEvent(string Action, double PercentComplete, string CorrelationId, DateTimeOffset Timestamp)`\n   - `ActionFailedEvent(string Action, string ReasonCode, string Detail, string CorrelationId, DateTimeOffset Timestamp)`\n   - `ActionCompletedEvent` already exists as specific types — add a generic fallback.\n6. Handle in `AgentBackgroundService.ProcessEventsAsync()`:\n   - `ActionStarted` → log and track in journal\n   - `ActionProgress` → update dashboard progress bar\n   - `ActionFailed` → feed into recovery path (TSK-0155 replan loop)\n\nAcceptance:\n- Every action emits a started event on dispatch.\n- Long-running actions (mining, smelting) emit progress events.\n- Failed actions include a machine-readable reason code.\n- Dashboard shows current action progress.\n\nRefs: `msa_planning_mineflayer_audit_20260621_1437.md` Finding 6 (action progress coarse); `mineflayer-adapter-research.md` related section",
+  "labels": [
+    "mineflayer",
+    "telemetry",
+    "action-lifecycle",
+    "progress",
+    "sprint-54"
+  ],
+  "estimatedHours": 3.0,
+  "designRef": "Data/Pages/Audit/msa_planning_mineflayer_audit_20260621_1437.md",
+  "key": "TSK-0165"
+}

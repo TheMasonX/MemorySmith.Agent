@@ -1,0 +1,33 @@
+{
+  "id": "tsk-0090-reject-empty-whitespace-pageid-in-getpagetool-before-gateway-call",
+  "key": "TSK-0090",
+  "title": "Reject empty/whitespace pageId in GetPageTool before gateway call",
+  "description": "## Evidence\n`Agent.Tools/Tools/GetPageTool.ExecuteAsync()` does `var pageId = idEl.GetString() ?? \"\";` then passes directly to `memory.GetPageAsync(pageId, ...)` with no empty/whitespace check.\n\n## Impact\nA malformed tool call returns \"Page '' not found\" instead of a validation error, making LLM/tool debugging noisier.\n\n## Fix\n1. Add `if (string.IsNullOrWhiteSpace(pageId)) return new ToolResult(false, \"pageId must be a non-empty string.\");`\n2. Add tests for `pageId: \"\"` and `pageId: \"   \"`\n\n## Verification\nVerified against codebase 2026-06-23. See `Data/Pages/audits/msa-audit-verification-6-23.md` section F3.",
+  "type": "Task",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "bug",
+    "audit-verified",
+    "input-validation"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-24T04:20:51.612031Z",
+  "updatedAtUtc": "2026-06-24T04:33:29.5403414Z",
+  "completedAtUtc": "2026-06-24T04:33:29.5403414Z",
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0090-reject-empty-whitespace-pageid-in-getpagetool-before-gateway-call.json"
+}

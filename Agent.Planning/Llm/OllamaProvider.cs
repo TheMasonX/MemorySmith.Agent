@@ -1,5 +1,6 @@
 namespace Agent.Planning.Llm;
 
+using System.Diagnostics;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
@@ -34,6 +35,8 @@ public sealed class OllamaProvider(HttpClient http, ChatOptions options,
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         cts.CancelAfter(TimeSpan.FromSeconds(options.LlmTimeoutSeconds));
 
+        var sw = Stopwatch.StartNew();
+
         try
         {
             var request = new OllamaChatRequest
@@ -51,6 +54,13 @@ public sealed class OllamaProvider(HttpClient http, ChatOptions options,
                     : null,
             };
 
+            // Sprint 41: log full request at Debug level for safety monitoring and debugging.
+            // Production Info-level stays summary-only to avoid log flooding.
+            logger?.LogDebug("[ollama] request to {Model}: system={SysLen} chars, user={UserLen} chars\n{sysPrompt}",
+                options.LlmModel, systemPrompt.Length, userMessage.Length, systemPrompt);
+            logger?.LogDebug("[ollama] user message for {Model}: {UserMsg}",
+                options.LlmModel, userMessage);
+
             var response = await http.PostAsJsonAsync("/api/chat", request, cts.Token);
             if (!response.IsSuccessStatusCode)
             {
@@ -64,7 +74,24 @@ public sealed class OllamaProvider(HttpClient http, ChatOptions options,
             var result = await response.Content
                 .ReadFromJsonAsync<OllamaChatResponse>(cancellationToken: cts.Token);
 
-            return result?.Message?.Content;
+            var responseContent = result?.Message?.Content;
+
+            // Sprint 41: log full response at Debug level for safety monitoring and debugging.
+            if (responseContent is not null)
+            {
+                logger?.LogDebug("[ollama] response from {Model} ({Elapsed}s): {Response}",
+                    options.LlmModel, sw.Elapsed.TotalSeconds.ToString("F1"), responseContent);
+                logger?.LogInformation("[ollama] {Model} responded ({RespLen} chars) in {Elapsed}s",
+                    options.LlmModel, responseContent.Length,
+                    sw.Elapsed.TotalSeconds.ToString("F1"));
+            }
+            else
+            {
+                logger?.LogWarning("[ollama] {Model} returned empty response after {Elapsed}s",
+                    options.LlmModel, sw.Elapsed.TotalSeconds.ToString("F1"));
+            }
+
+            return responseContent;
         }
         catch (OperationCanceledException)
         {

@@ -17,7 +17,10 @@ namespace Agent.Planning.Llm;
 ///     "GlobalPerMinuteMax": 5,
 ///     "MaxMessageLength": 1024,
 ///     "MaxResponseDistanceBlocks": 64.0,
-///     "ConversationWindowSeconds": 60
+///     "ChatMaxResponseLength": 500,
+///     "ChatHistoryMaxTurns": 30,
+///     "ConversationWindowSeconds": 60,
+///     "LlmConfidenceThreshold": 0.6
 ///   }
 /// }
 /// </code>
@@ -67,6 +70,15 @@ public sealed record ChatOptions
     /// </summary>
     public int LlmMaxResponseTokens { get; init; } = 300;
 
+    /// <summary>
+    /// Minimum confidence threshold (0.0–1.0) for the LLM to proceed with an intent.
+    /// When the LLM returns Confidence &lt; LlmConfidenceThreshold AND ClarificationQuestion
+    /// is non-null, the interpreter returns Unknown and the bot asks the clarifying question.
+    /// Sprint 35 P1-A: added for IntentDraft confidence handling.
+    /// Default: 0.6 (60% confidence required before acting on LLM intent).
+    /// </summary>
+    public double LlmConfidenceThreshold { get; init; } = 0.6;
+
     // ── Rate limiting ─────────────────────────────────────────────────────────
 
     /// <summary>Minimum seconds between LLM calls for the same player. Default: 3.</summary>
@@ -85,16 +97,40 @@ public sealed record ChatOptions
     public int MaxMessageLength { get; init; } = 1024;
 
     /// <summary>
+    /// Maximum character length for bot chat responses sent to Minecraft.
+    /// Responses longer than this are split into multiple in-game chat messages
+    /// at sentence boundaries. A value &lt;= 0 disables splitting.
+    /// Default: 500.
+    /// </summary>
+    public int ChatMaxResponseLength { get; init; } = 500;
+
+    /// <summary>
     /// Distance (blocks) beyond which the bot ignores messages not directed at it by name.
     /// Implements the "closest agent responds" heuristic for multi-bot deployments. Default: 64.
     /// </summary>
     public double MaxResponseDistanceBlocks { get; init; } = 64.0;
 
     /// <summary>
+    /// Sprint 54: whether the agent is allowed to execute Minecraft server commands
+    /// (e.g. /give, /tp, /setblock) via chat. When false, the LLM is told it cannot
+    /// use commands and the "command" intent is rejected. Default: false (safe).
+    /// </summary>
+    public bool CommandExecutionEnabled { get; init; } = true;
+
+    /// <summary>
     /// Seconds after the bot last spoke during which any message is treated as a continuation
     /// of the conversation (directed at the bot). Default: 60.
     /// </summary>
     public int ConversationWindowSeconds { get; init; } = 60;
+
+    /// <summary>
+    /// Maximum number of chat turns (player + bot messages) retained in the
+    /// conversation history buffer injected into the LLM system prompt.
+    /// Sprint 52: increased from 5 to 30. Future: replace with character-length-based
+    /// eviction (TSK-0169) so short messages don't prematurely evict context.
+    /// Default: 30.
+    /// </summary>
+    public int ChatHistoryMaxTurns { get; init; } = 30;
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 

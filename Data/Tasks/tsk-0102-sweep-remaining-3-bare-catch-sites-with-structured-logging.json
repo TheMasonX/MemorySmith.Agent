@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0102-sweep-remaining-3-bare-catch-sites-with-structured-logging",
+  "key": "TSK-0102",
+  "title": "Sweep remaining 3 bare-catch sites with structured logging",
+  "description": "Add \u0060LogWarning\u0060 before silent fallback at 3 remaining catch\u2192silent sites not covered by TSK-0101:\n1. \u0060Agent.Memory/RestMemoryGateway.cs\u0060 ~line 82 \u2014 HTTP 404/parse error silently swallowed\n2. \u0060Agent.World.Minecraft/WebSocketBridge.cs\u0060 ~line 96 \u2014 CloseAsync best-effort catch\n3. \u0060Agent.World.Minecraft/WebSocketBridge.cs\u0060 ~line 480 \u2014 malformed inventory parse silently swallowed\n\nEach should log warning with exception type and context before falling through. Add NUnit tests for the error paths where feasible.\n\nEvidence: Sprint 46 audit-validation council report identified these as remaining gaps.\n\n**Note:** Auto-generated key TSK-0102 conflicts with existing Sprint 46 Wave A task (ChatServices cross-repo request). Correct key is **TSK-0111**.",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-46",
+    "wave-c",
+    "observability"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-25T01:45:19.6963131Z",
+  "updatedAtUtc": "2026-06-25T13:37:57.5014994Z",
+  "completedAtUtc": "2026-06-25T13:37:57.5014994Z",
+  "revision": 3,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0102-sweep-remaining-3-bare-catch-sites-with-structured-logging.json"
+}

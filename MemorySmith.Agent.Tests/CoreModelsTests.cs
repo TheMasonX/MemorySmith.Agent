@@ -82,6 +82,147 @@ public class CoreModelsTests
     }
 }
 
+// ─── TSK-0115: ActionQueue concurrency and atomicity tests ──────────────────────
+
+[TestFixture]
+public class ActionQueueConcurrencyTests
+{
+    [Test]
+    public async Task ClearAndEnqueue_IsAtomic_RelativeToConcurrentEnqueue()
+    {
+        // Verify that ClearAndEnqueue's lock prevents interleaving with Enqueue.
+        var queue = new ActionQueue();
+        queue.Enqueue(new ActionData { Tool = "MoveTo" });
+        queue.Enqueue(new ActionData { Tool = "MineBlock" });
+
+        var t1 = Task.Run(() =>
+        {
+            // Concurrent enqueue while ClearAndEnqueue holds the lock
+            for (int i = 0; i < 10; i++)
+                queue.Enqueue(new ActionData { Tool = $"Concurrent_{i}" });
+        });
+
+        var t2 = Task.Run(() =>
+        {
+            queue.ClearAndEnqueue(new ActionData { Tool = "GetStatus" });
+        });
+
+        await Task.WhenAll(t1, t2);
+
+        // After ClearAndEnqueue, the queue should have GetStatus + any
+        // concurrent enqueues that happened after the lock was released.
+        // The key invariant: GetStatus is always first (it was the priority action).
+        var first = queue.Dequeue();
+        Assert.That(first?.Tool, Is.EqualTo("GetStatus"),
+            "ClearAndEnqueue's priority action must be dequeued first");
+    }
+
+    [Test]
+    public async Task ClearAndEnqueueAsync_StopCallbackFailure_StillClearsQueue()
+    {
+        // TSK-0119: stop callback failure should not prevent queue clear.
+        var queue = new ActionQueue();
+        queue.Enqueue(new ActionData { Tool = "MoveTo" });
+        queue.Enqueue(new ActionData { Tool = "MineBlock" });
+
+        await queue.ClearAndEnqueueAsync(
+            new ActionData { Tool = "GetStatus" },
+            stopCallback: () => throw new InvalidOperationException("Simulated send failure"));
+
+        // Queue should be cleared and priority action enqueued despite the throw.
+        Assert.That(queue.Count, Is.EqualTo(1));
+        var first = queue.Dequeue();
+        Assert.That(first?.Tool, Is.EqualTo("GetStatus"));
+        Assert.That(queue.IsEmpty, Is.True);
+    }
+
+    [Test]
+    public async Task ClearAndEnqueueAsync_StopCallbackSuccess_WorksNormally()
+    {
+        var queue = new ActionQueue();
+        queue.Enqueue(new ActionData { Tool = "MoveTo" });
+        var stopCalled = false;
+
+        await queue.ClearAndEnqueueAsync(
+            new ActionData { Tool = "GetStatus" },
+            stopCallback: () => { stopCalled = true; return Task.CompletedTask; });
+
+        Assert.That(stopCalled, Is.True, "Stop callback must be invoked");
+        Assert.That(queue.Count, Is.EqualTo(1));
+        Assert.That(queue.Dequeue()?.Tool, Is.EqualTo("GetStatus"));
+    }
+
+    [Test]
+    public void ConcurrentEnqueueDequeue_DoesNotCorruptState()
+    {
+        // Stress test: multiple threads enqueue and dequeue concurrently.
+        var queue = new ActionQueue();
+        var errors = 0;
+
+        var producers = Enumerable.Range(0, 4).Select(i => Task.Run(() =>
+        {
+            for (int j = 0; j < 25; j++)
+                queue.Enqueue(new ActionData { Tool = $"P{i}_A{j}" });
+        }));
+
+        var consumers = Enumerable.Range(0, 2).Select(i => Task.Run(() =>
+        {
+            for (int j = 0; j < 50; j++)
+            {
+                var item = queue.Dequeue();
+                if (item is not null && string.IsNullOrEmpty(item.Tool))
+                    Interlocked.Increment(ref errors);
+            }
+        }));
+
+        Task.WaitAll([.. producers, .. consumers]);
+
+        // No corrupted items should have been observed
+        Assert.That(errors, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void AllOperations_UseSameLock_ConsistentCount()
+    {
+        // Verify that Count, IsEmpty, and mutations all observe consistent state.
+        var queue = new ActionQueue();
+        Assert.That(queue.IsEmpty, Is.True);
+
+        queue.Enqueue(new ActionData { Tool = "A" });
+        queue.Enqueue(new ActionData { Tool = "B" });
+        queue.Enqueue(new ActionData { Tool = "C" });
+        Assert.That(queue.Count, Is.EqualTo(3));
+        Assert.That(queue.IsEmpty, Is.False);
+
+        Assert.That(queue.Peek()?.Tool, Is.EqualTo("A"));
+        Assert.That(queue.Count, Is.EqualTo(3)); // Peek doesn't remove
+
+        Assert.That(queue.Dequeue()?.Tool, Is.EqualTo("A"));
+        Assert.That(queue.Count, Is.EqualTo(2));
+
+        queue.Clear();
+        Assert.That(queue.IsEmpty, Is.True);
+        Assert.That(queue.Count, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void EnqueueAll_AddsAllActionsInOrder()
+    {
+        var queue = new ActionQueue();
+        queue.EnqueueAll([
+            new ActionData { Tool = "First" },
+            new ActionData { Tool = "Second" },
+            new ActionData { Tool = "Third" },
+        ]);
+
+        Assert.That(queue.Count, Is.EqualTo(3));
+        Assert.That(queue.Dequeue()?.Tool, Is.EqualTo("First"));
+        Assert.That(queue.Dequeue()?.Tool, Is.EqualTo("Second"));
+        Assert.That(queue.Dequeue()?.Tool, Is.EqualTo("Third"));
+        Assert.That(queue.IsEmpty, Is.True);
+    }
+}
+
 /// <summary>Minimal ITool stub for registry tests.</summary>
 file sealed class StubTool(string name) : ITool
 {

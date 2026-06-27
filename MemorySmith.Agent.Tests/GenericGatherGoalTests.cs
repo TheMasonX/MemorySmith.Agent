@@ -169,13 +169,22 @@ public class GenericGatherGoalTests
     }
 
     [Test]
-    public void IsComplete_CreativeMode_ReturnsTrueImmediately()
+    public void IsComplete_CreativeMode_DoesNotAutoComplete()
     {
+        // Sprint 40 P0-B: Creative mode no longer auto-completes gather goals.
+        // The goal must still have the required items in inventory. Creative mode
+        // provisioning is handled by AgentBackgroundService.SetGoal which enqueues
+        // a /give command. See GenericGatherGoal.IsComplete for details.
         var goal  = new GenericGatherGoal(OakLogSpec(), 10);
         var state = new WorldState().With(b => b.SetFact("world:gamemode", "creative", FactSource.Observed));
 
-        Assert.That(goal.IsComplete(state), Is.True,
-            "Creative mode should satisfy gather goals immediately without mining.");
+        Assert.That(goal.IsComplete(state), Is.False,
+            "Creative mode should NOT auto-complete — items must be provisioned via /give");
+
+        // With items in inventory, creative mode should complete normally
+        var withItems = state.With(b => b.AddInventoryItem("oak_log", 10));
+        Assert.That(goal.IsComplete(withItems), Is.True,
+            "Creative mode with sufficient items should complete");
     }
 
     // ── IsComplete — smelting ─────────────────────────────────────────────────

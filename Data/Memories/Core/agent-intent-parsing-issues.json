@@ -1,0 +1,53 @@
+{
+    "Id":  "agent-intent-parsing-issues",
+    "Title":  "MemorySmith.Agent — Intent Parsing Failures with Ollama (llama3.2:3b)",
+    "Content":  "## Problem Summary\n\nDuring Sprint 40 runtime testing with Ollama (llama3.2:3b), the agent repeatedly failed to correctly parse player chat intent. Three distinct failure modes were observed:\n\n### Failure 1: \"no, that\u0027s wrong\" → classified as \"ignore\"\n\nLog:\n```\n[chat] \u003cTheMasonX23\u003e no, that\u0027s wrong\n[llm] failed to parse JSON from ollama response: \u0027{\n  \"addressed\": \"no\",\n  \"intent\": \"ignore\",\n  \"response\": \"\"\n}\u0027\n[chat] \u003cTheMasonX23\u003e -\u003e clarify\n```\n\n**Problem:** The LLM correctly set `addressed: \"yes\"` and `intent: \"ignore\"` — but this is WRONG. The user is clearly addressing the bot (disagreeing with its previous inventory claim). \"ignore\" should only be used for messages NOT directed at the bot. This is an LLM model quality issue — llama3.2:3b is too small to reliably distinguish between \"not addressed\" and \"addressed but disagreeing\".\n\n**Impact:** The user\u0027s correction is silently dropped. The bot appears to ignore the user.\n\n### Failure 2: \"Removed 58 item(s)\" → leaked through system message filter\n\nLog:\n```\n[chat] \u003cTheMasonX23\u003e Removed 58 item(s) from player TheMasonX23]\n[llm] failed to parse JSON from ollama response: \u0027{...}\u0027\n```\n\n**Problem:** The SYSTEM_MESSAGE_PATTERNS filter in index.js blocked most server messages, but `/clear` responses have slight formatting variations (trailing bracket, different phrasing) that leak through. The Mineflayer chat handler forwards whatever chat events arrive from the server, and the pattern filter is regex-based — fragile against formatting differences.\n\n**Impact:** Server messages reach the LLM pipeline, wasting a 15-second Ollama call that returns garbage.\n\n### Failure 3: Clarify uses hardcoded \"clarify\" response instead of LLM-generated question\n\nLog:\n```\n[chat] \u003cTheMasonX23\u003e -\u003e clarify\n```\n\n**Problem:** When ParseDecision in LlmChatInterpreter triggers the clarify path (confidence \u003c threshold), the response text is supposed to be the LLM-generated clarificationQuestion. But when the LLM fails to parse (returns null from ParseDecision), the pattern fallback\u0027s clarify response is a generic hardcoded string. Even when the LLM response DOES parse with low confidence, the clarificationQuestion is often empty or unhelpful because llama3.2:3b doesn\u0027t reliably produce good clarifying questions.\n\n**Impact:** The bot says \"-\u003e clarify\" in logs but the user doesn\u0027t see a meaningful question in chat. The bot appears confused.\n\n### Failure 4: \"inventory\" / \"inv\" fast-path bypasses LLM entirely\n\nLog:\n```\n[chat] \u003cTheMasonX23\u003e leo, your inventory is stale, refresh it\n[chat] \u003cTheMasonX23\u003e -\u003e status\n[chat] bot: Inventory: 3x dirt\n```\n\n**Problem:** The pattern-based ChatInterpreter has fast-path keywords like \"inv\" and \"inventory\" that classify as status intent BEFORE the LLM is consulted. The user\u0027s message \"your inventory is stale, refresh it\" triggers the \"inventory\" keyword match and returns status — completely bypassing the LLM and ignoring the user\u0027s actual request (to refresh/re-sync inventory, not just report it).\n\n**Impact:** The bot repeatedly reports stale inventory instead of refreshing it. The user\u0027s intent is lost.\n\n## Root Causes\n\n1. **Model quality:** llama3.2:3b (3B parameters) is too small for reliable intent classification. Needs a larger model (7B+) or a different approach entirely for the LLM-based path.\n2. **Pattern fast-paths are too broad:** Keywords like \"inv\" and \"inventory\" match in contexts where the user\u0027s intent is NOT a simple status check. The pattern fallback should require more precise matching or be deprioritized.\n3. **No recovery from clarification:** When the LLM fails or produces low-confidence, the system falls back to hardcoded patterns that don\u0027t explain what\u0027s happening. The user sees no useful output.\n\n## Recommendations\n\n1. **Upgrade or switch LLM model:** llama3.2:3b is insufficient for reliable intent parsing. Consider:\n   - llama3.1:8b or similar (better intent classification)\n   - A smaller dedicated intent-classification model fine-tuned for Minecraft commands\n   - OpenAI/GitHub Models API fallback when Ollama confidence is low\n\n2. **Make \"clarify\" use the LLM:** When the pattern fallback produces \"clarify\", the system should re-prompt the LLM with a refined request: \"The player\u0027s intent was unclear. Ask a specific clarifying question about what they want.\" This would generate better clarification questions.\n\n3. **Audit and narrow pattern fast-paths:** Review all keywords in ChatInterpreter. Remove \"inv\" and \"inventory\" as hard fast-paths. Instead, route ALL non-trivial messages through the LLM and only use deterministic fast-paths for \"cancel\", \"status\" (when explicitly matching simple patterns like \"status\" or \"stop\"), and \"help\".\n\n4. **Add system message classification robustness:** Use the structured chat system (TSK-0038) instead of fragile regex patterns in index.js.\n\n5. **Consider graduated LLM strategy:** Try Ollama first with short timeout (5s), fall back to a cloud API (GitHub Models) with longer timeout if Ollama fails or returns low confidence.",
+    "Status":  2,
+    "Confidence":  0.92,
+    "Tags":  [
+                 "agent",
+                 "intent-parsing",
+                 "ollama",
+                 "llm",
+                 "chat",
+                 "bug",
+                 "kind:bug",
+                 "audience:agent",
+                 "scope:personality"
+             ],
+    "References":  [
+                       "agent-phase-status-current",
+                       "agent-sprint40-p0-implementation-status"
+                   ],
+    "Conflicts":  [
+
+                  ],
+    "SourceLinks":  [
+                        {
+                            "Label":  "ChatInterpreter source",
+                            "Uri":  "%RepoRoot%Agent.Planning/LlmChatInterpreter.cs",
+                            "StartLine":  42,
+                            "EndLine":  320
+                        },
+                        {
+                            "Label":  "ChatInterpreter tests",
+                            "Uri":  "%RepoRoot%MemorySmith.Agent.Tests/ChatInterpreterTests.cs",
+                            "StartLine":  1,
+                            "EndLine":  200
+                        },
+                        {
+                            "Label":  "Chat system docs",
+                            "Uri":  "%RepoRoot%Data/Pages/chat-system.md",
+                            "StartLine":  null,
+                            "EndLine":  null
+                        },
+                        {
+                            "Label":  "HandleChatEventAsync",
+                            "Uri":  "%RepoRoot%WebUI.Blazor/AgentBackgroundService.cs",
+                            "StartLine":  724,
+                            "EndLine":  830
+                        }
+                    ],
+    "UsageCount":  0,
+    "LastUpdated":  "2026-06-23T00:00:00Z"
+}

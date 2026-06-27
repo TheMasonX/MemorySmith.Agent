@@ -1,0 +1,41 @@
+﻿{
+  "id": "tsk-0127-complete-chat-split-brain-cleanup-remove-chatinterpretation-goalname",
+  "key": "TSK-0127",
+  "title": "Complete Chat Split-Brain Cleanup: Remove ChatInterpretation.GoalName",
+  "description": "Council Review Sprint 51 High Priority Task.\n\nRemove ChatInterpretation.GoalName backward-compat field (deferred since Sprint 38 per AGENTS.md PRINCIPLE-1).\n\nRequires:\n- Update ChatInterpreterTests\n- Update Sprint21Tests\n- Remove field and all references\n- Verify CRITICAL Rule A-1 (Parsers Never Create Goals) is not violated\n\nGate: all chat tests pass, build 0w/0e.\n\nSource: Council Review 2026-06-26, Sprint 50 handoff TSK-0118 follow-up",
+  "type": "Task",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-51",
+    "council",
+    "chat",
+    "cleanup"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-4384613724984bf6b01e23cbfec80fcb",
+      "author": "anonymous",
+      "body": "Council report: Data/Pages/council/audit-findings-consolidation-council-2026-06-26.md\n\nThis was deferred since Sprint 38 (AGENTS.md PRINCIPLE-1). Sprint 51 is the right time to close it \u2014 after chat cleanup (TSK-0118) removed dead regex fields, GoalName is the last Sprint 21 backward-compat artifact.",
+      "createdAtUtc": "2026-06-27T00:26:41.3246649Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T00:26:33.0298155Z",
+  "updatedAtUtc": "2026-06-27T01:08:06.5485311Z",
+  "completedAtUtc": "2026-06-27T01:08:06.5485311Z",
+  "revision": 3,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0127-complete-chat-split-brain-cleanup-remove-chatinterpretation-goalname.json"
+}

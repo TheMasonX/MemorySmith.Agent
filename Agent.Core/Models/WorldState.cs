@@ -101,6 +101,25 @@ public record WorldState
         }
 
         /// <summary>
+        /// TSK-0125: Removes all facts (both legacy Facts dict and StructuredFacts)
+        /// whose keys start with the given prefix. Used to clean up per-block
+        /// status facts on build completion, cancellation, or goal replacement.
+        /// </summary>
+        public Builder ClearFactsByPrefix(string prefix)
+        {
+            var facts = new Dictionary<string, object?>(_state.Facts);
+            var removed = facts.Keys.Where(k => k.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList();
+            foreach (var key in removed) facts.Remove(key);
+
+            var structured = _state.StructuredFacts
+                .Where(f => !f.Key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            _state = _state with { Facts = facts, StructuredFacts = structured, UpdatedAt = DateTimeOffset.UtcNow };
+            return this;
+        }
+
+        /// <summary>
         /// Replaces the entire inventory with the supplied snapshot.
         /// Used when a full status event arrives from the world adapter.
         /// </summary>

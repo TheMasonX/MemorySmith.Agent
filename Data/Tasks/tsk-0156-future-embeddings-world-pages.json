@@ -1,0 +1,19 @@
+{
+  "id": "tsk-0156-future-embeddings-world-pages",
+  "title": "[FUTURE] Add embeddings for durable world pages in MemorySmith",
+  "status": "Backlog",
+  "priority": "Low",
+  "type": "Task",
+  "description": "Once MemorySmith backend exposes embedding/vector search, add semantic embeddings to durable world pages so the agent can find similar past situations.\n\nThis is explicitly a FUTURE phase (Phase 4) per the design doc. Do not start until:\n- MemorySmith server supports vector search endpoints.\n- `RestMemoryGateway` has been updated with embedding-aware methods.\n\nImplementation sketch:\n1. Generate embeddings for snapshot, landmark, and goal pages.\n2. Use vector similarity to find: \"similar past build sites\", \"similar failure patterns\", \"nearby landmarks\".\n3. Include semantic hits in `ScenePack.MemoryReferences`.\n4. Add `SearchMemory` tool support for semantic queries.\n\nAcceptance: Deferred until MemorySmith backend supports it.\n\nRefs: `memorysmith_situational_awareness_design_doc_20260625T020914Z.md` Phase 4",
+  "labels": [
+    "future",
+    "embeddings",
+    "semantic-search",
+    "situational-awareness"
+  ],
+  "estimatedHours": 0,
+  "linkedPages": ["Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z"],
+  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md",
+  "blockedReason": "MemorySmith backend does not yet expose embedding/vector search endpoints.",
+  "key": "TSK-0156"
+}

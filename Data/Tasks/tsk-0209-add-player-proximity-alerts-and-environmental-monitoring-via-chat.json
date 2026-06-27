@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0209-add-player-proximity-alerts-and-environmental-monitoring-via-chat",
+  "key": "TSK-0209",
+  "title": "Add player proximity alerts and environmental monitoring via chat",
+  "description": "## Problem\nThe agent is aware of nearby entities (mobs, players) via Mineflayer events but has no way to proactively alert the player about important environmental changes. The player has to ask \u0022what\u0027s near you?\u0022 rather than being told about threats or events.\n\n## Examples\n- Automatic: \u0022Creeper detected 15 blocks to the east!\u0022 (proximity alert)\n- Player: \u0022Is there anything dangerous near me?\u0022 \u2192 agent scans entities: \u0022Zombie 20 blocks north, skeleton 30 blocks west\u0022\n- Player: \u0022Watch for creepers while I build\u0022 \u2192 agent enters sentry mode, warns on hostile spawn\n- Player: \u0022Let me know when you find diamonds\u0022 \u2192 agent sets a find-and-notify watch\n- Player: \u0022Report every 5 minutes\u0022 \u2192 periodic status updates\n\n## Scope\n- Add entity monitoring via existing Mineflayer \u0060bot.on(\u0027entitySpawn\u0027)\u0060 / \u0060bot.on(\u0027entityMoved\u0027)\u0060\n- Sentry/watch mode as a concurrent background loop (doesn\u0027t interrupt current goal)\n- Chat-based watch commands: \u0022watch for [entity]\u0022, \u0022alert me when [condition]\u0022, \u0022stop watching\u0022\n- Proximity thresholds configurable per entity type\n\n## Implementation sketch\n1. Add \u0060EntityWatcher\u0060 service that monitors entity spawns/moves within configurable radius\n2. Define \u0060WatchCondition\u0060 model (entity type, radius, action on trigger)\n3. Add \u0060WatchTool\u0060 / \u0060UnwatchTool\u0060 / \u0060ListWatchesTool\u0060 in Agent.Tools\n4. Watches run as a background task alongside the main goal loop\n5. On trigger: enqueue a Chat action with the alert message (non-blocking)\n\n## Complexity\nMedium. Entity events already exist; new monitoring layer on top.\n\n## Priority\nLow \u2014 immersion and safety feature.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Low",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:entities",
+    "domain:safety",
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T15:27:15.1657867Z",
+  "updatedAtUtc": "2026-06-27T15:27:15.1657867Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

@@ -1,0 +1,37 @@
+{
+  "id": "tsk-0066-verify-kick-reconnect-loop",
+  "key": "TSK-0066",
+  "title": "Verify kick→reconnect loop end-to-end with exponential backoff",
+  "description": "## Problem\nThe Minecraft server kicked the bot with `multiplayer.disconnect.chat_validation_failed` after the `/give @p dirt 10` command was processed. The `KickedEvent` handler (PR #2) adds `_connectionCts.Cancel()` and `LogCritical` but this has never been tested end-to-end. Additionally:\n1. Whether the Node.js adapter process needs to be restarted after a kick (WebSocket stays alive but Mineflayer bot is dead) is unknown.\n2. No exponential backoff exists to prevent rapid reconnect loops.\n\n## Source\nHandoff Sprint 40 P0 Fixes — Issue B: \"Chat Validation Kick (Server-Side)\"\n\n## Requirements\n1. Verify `KickedEvent` in `ProcessEventsAsync` triggers `_connectionCts.Cancel()` correctly\n2. Check whether the Node.js Mineflayer process needs a restart after a kick — the WebSocket may stay alive but `bot` entity is dead\n3. Add exponential backoff to reconnection logic to prevent rapid reconnect loops\n4. Add a named constant for max reconnect attempts (e.g., `MaxReconnectAttempts = 5`) with exponential backoff base delay (e.g., `ReconnectBaseDelayMs = 1000`)\n5. Log reconnect attempt count and current delay\n6. After max attempts, transition to a terminal disconnected state (not infinite retry)\n7. Test by triggering a server-side kick and observing clean reconnection\n\n## References\n- `WebUI.Blazor/AgentBackgroundService.cs` — `_connectionCts`, `KickedEvent` handler (PR #2 changes)\n- `MineflayerAdapter/index.js` — connection/reconnection logic\n- Handoff document: Issue B\n- `Agent.Core/Events/WorldEvents.cs` — `KickedEvent`",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint40",
+    "mineflayer-adapter",
+    "fix",
+    "connection",
+    "reconnect"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Tasks/handoff-sprint40-p0-fixes.md"
+  ],
+  "comments": [{"author":"Agent","text":"Completed Sprint 40 P0. Verified: reconnect loop already implemented with exponential backoff (DefaultReconnectDelays = [2s, 4s, 8s, 16s, 32s]), KickedEvent handler cancels _connectionCts to force full reconnect, test Reconnect_AfterTwoFailures_ResumesCurrentGoal validates the behavior. Also added graduated stall recovery [10, 20, 30, 60] and chat notification on stall."}],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-22T00:00:00Z",
+  "updatedAtUtc": "2026-06-22T00:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

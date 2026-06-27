@@ -83,3 +83,47 @@ Key decisions recorded here so agents and developers understand the "why" behind
 **Reviewed**: phase3-refactor-candidates-council-20260616.md
 
 **Confidence**: High (0.95).
+
+## D-011: Parsers Never Create Goals (CRITICAL)
+
+**Decision**: `IChatInterpreter.InterpretAsync` returns `ChatInterpretation`/`IntentDraft`. It expresses semantic intent (what, item, blueprint, count, coords, confidence). It does **not** call `GoalFactory` and does **not** return a `GoalName` string. The mapping `intent → GoalName` is done exclusively in `AgentBackgroundService.IntentDraftToGoal`/`IntentManager`.
+
+**Rationale**: Fast-path goal creation bypasses the LLM and skips confidence scoring, clarification questions, and context enrichment. Sprint 35 P1-B explicitly removed these fast-paths after they caused BUG-4 (two-minute stall on "craft an iron pickaxe" when Ollama timed out). All non-trivial intents (gather, build, craft, navigate) must route through the LLM for confidence scoring.
+
+**Enforcement**: `ChatInterpreter` returns null/Unknown for any non-fast-path intent. `LlmChatInterpreter.ParseDecision` has no goal-name switch. No regex in `ChatInterpreter` may produce `ChatIntentType.CreateGoal` for gather/build/craft intents.
+
+**Reviewed**: AGENTS.md Rule A-1, Sprint 35 council
+
+**Confidence**: High (0.98).
+
+## D-012: ActionOutcome Is the Universal Tool Result
+
+**Decision**: Every `ToolDispatcher.CallAsync` produces an `ActionOutcome` record. This is the single result type flowing into recovery, replanning, journaling, and world-state updates.
+
+```csharp
+public sealed record ActionOutcome(
+    Guid GoalId, string ToolName, bool Success,
+    string ObservationSummary,
+    IReadOnlyList<StructuredEffect> Effects,
+    DateTimeOffset Timestamp);
+```
+
+Factory helpers: `ActionOutcome.Collected(goalId, tool, item, count)`, `ActionOutcome.Succeeded(goalId, tool, summary)`, `ActionOutcome.Failed(goalId, tool, reason)`.
+
+**Rationale**: Previously, each tool had its own result format, making recovery/replanning logic fragile. A single result type allows the `ILlmEvaluator` (Sprint 39 stub) to evaluate all outcomes uniformly.
+
+**Reviewed**: Sprint 35 P1-E, AGENTS.md
+
+**Confidence**: High (0.95).
+
+## D-013: Inventory Is Event-Sourced via ItemCollectedEvent
+
+**Decision**: Inventory is tracked via authoritative events (`ItemCollectedEvent` from `playerCollect`, `ItemCraftedEvent` from `craftComplete`), not by querying Mineflayer's inventory on every action.
+
+**Rationale**: The `playerCollect` event is the authoritative source for item pickups. Querying inventory via `bot.inventory` is slow and can race with game ticks. Event sourcing gives accurate per-item deltas without polling.
+
+**Guard** (Sprint 35 P0-A): The `bot.on('playerCollect', ...)` listener must guard against items collected by other players: `if (collector.username !== bot.username) return;`.
+
+**Reviewed**: AGENTS.md Sprint 35 P0-A, Sprint 35 council
+
+**Confidence**: High (0.95).

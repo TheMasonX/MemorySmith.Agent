@@ -7,6 +7,10 @@ namespace MemorySmith.Agent.Tests;
 /// Verifies the pure-function contract: applying a WorldEvent returns the
 /// correct new WorldState without mutating the input.
 /// Sprint 14 P1b: added inventory key normalization tests for StatusEvent.
+/// Sprint 35 P0-A: updated BlockMined tests — ApplyBlockMined no longer updates inventory.
+///   Inventory truth now comes exclusively from ItemCollectedEvent (playerCollect).
+///   Periodic GetStatus reconciles drift.
+/// Sprint 35 P0-C: added SearchedRadius to FlatAreaFoundEvent constructors.
 /// </summary>
 [TestFixture]
 public class WorldStateProjectorTests
@@ -193,55 +197,71 @@ public class WorldStateProjectorTests
         });
     }
 
-    // ── blockMined ────────────────────────────────────────────────────────────
+    // ── blockMined (Sprint 35 P0-A: no longer updates inventory) ─────────────
+    // Sprint 35: ApplyBlockMined stores facts only. Inventory updates come exclusively
+    // from ItemCollectedEvent (Mineflayer playerCollect). GetStatus reconciles drift.
 
     [Test]
-    public void Apply_BlockMined_MultiCount_AccumulatesCorrectly()
+    public void Apply_BlockMined_UpdatesInventoryForSelfDroppingBlocks()
     {
-        // Sprint 15 P0: use e.Count not hardcoded 1
-        var ev = new BlockMinedEvent("oak_log", 5, new Position(0, 64, 0), Now);
+        // Sprint 40 P0-B: BlockMinedEvent now updates inventory for self-dropping blocks.
+        // The Sprint 35 change (no inventory updates) caused items to be lost when
+        // ItemCollectedEvent (playerCollect) never fired (e.g. drop fell through a hole).
+        // Self-dropping blocks like oak_log, dirt, cobblestone now increment inventory.
+        var ev = new BlockMinedEvent("oak_log", 5, new Position(0, 64, 0), new Position(0, 64, 0), Now);
         var result = _projector.Apply(EmptyState, ev);
 
         Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(5),
-            "BlockMinedEvent with Count=5 must add 5 to inventory (was hardcoded to 1 before Sprint 15).");
+            "Sprint 40: Self-dropping block (oak_log) should update inventory");
     }
 
     [Test]
-    public void Apply_BlockMined_MultiCount_NamespacedId_AccumulatesCorrectly()
+    public void Apply_BlockMined_StoresBlockNameFact()
     {
-        // Namespaced + multi-count
-        var ev = new BlockMinedEvent("minecraft:cobblestone", 64, new Position(0, 64, 0), Now);
+        // Even though inventory is no longer updated, block name + count facts still stored.
+        var ev = new BlockMinedEvent("oak_log", 5, new Position(100, 64, 200), new Position(100, 64, 200), Now);
         var result = _projector.Apply(EmptyState, ev);
 
-        Assert.That(result.Inventory.GetValueOrDefault("cobblestone"), Is.EqualTo(64));
+        Assert.That(result.Facts.TryGetValue("event:BlockMined:Block", out var block), Is.True,
+            "BlockMined block name fact should be stored for diagnostics");
+        Assert.That(block?.ToString(), Is.EqualTo("oak_log"));
+        Assert.That(result.Facts.TryGetValue("event:BlockMined:Count", out var count), Is.True);
+        Assert.That(count?.ToString(), Is.EqualTo("5"));
     }
 
     [Test]
-    public void Apply_BlockMined_NamespacedId_IncrementsInventory()
+    public void Apply_BlockMined_NamespacedId_UpdatesInventory()
     {
-        var ev = new BlockMinedEvent("minecraft:oak_log", 1, new Position(0, 64, 0), Now);
+        // Sprint 40 P0-B: Namespaced BlockMinedEvent now updates inventory.
+        // The namespace is stripped and the block drop lookup is applied.
+        var ev = new BlockMinedEvent("minecraft:cobblestone", 64, new Position(0, 64, 0), new Position(0, 64, 0), Now);
         var result = _projector.Apply(EmptyState, ev);
 
-        Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(1));
+        Assert.That(result.Inventory.GetValueOrDefault("cobblestone"), Is.EqualTo(64),
+            "Sprint 40: Namespaced BlockMinedEvent should update inventory");
     }
 
     [Test]
-    public void Apply_BlockMined_ShortId_IncrementsInventory()
+    public void Apply_ItemCollectedEvent_UpdatesInventory()
     {
-        var ev = new BlockMinedEvent("oak_log", 1, new Position(0, 64, 0), Now);
+        // Sprint 35 P0-A: ItemCollectedEvent is now the canonical inventory source
+        var ev = new ItemCollectedEvent("oak_log", 5, Now);
         var result = _projector.Apply(EmptyState, ev);
 
-        Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(1));
+        Assert.That(result.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(5),
+            "ItemCollectedEvent must update inventory with correct item count");
     }
 
     [Test]
-    public void Apply_BlockMined_Twice_AccumulatesCount()
+    public void Apply_ItemCollectedEvent_NamespacedItem_Normalized()
     {
-        var ev     = new BlockMinedEvent("minecraft:oak_log", 1, new Position(0, 64, 0), Now);
-        var after1 = _projector.Apply(EmptyState, ev);
-        var after2 = _projector.Apply(after1, ev);
+        // Guard: playerCollect should return bare names, but normalize defensively
+        var ev = new ItemCollectedEvent("minecraft:diamond", 1, Now);
+        var result = _projector.Apply(EmptyState, ev);
 
-        Assert.That(after2.Inventory.GetValueOrDefault("oak_log"), Is.EqualTo(2));
+        Assert.That(result.Inventory.GetValueOrDefault("diamond"), Is.EqualTo(1),
+            "ItemCollectedEvent with namespaced item should normalize to bare name");
+        Assert.That(result.Inventory.ContainsKey("minecraft:diamond"), Is.False);
     }
 
     // ── Error / blockNotFound — no structured state change ────────────────────
@@ -370,16 +390,18 @@ public class WorldStateProjectorTests
         Assert.That(result, Is.Not.SameAs(original));
     }
 
-    // ── FlatAreaFound (Sprint 9 A4) ──────────────────────────────────────────
+    // ── FlatAreaFound (Sprint 9 A4, Sprint 35 P0-C SearchedRadius) ──────────
 
     [Test]
     public void Apply_FlatAreaFoundEvent_StoresAllFieldsAsFacts_AndLeavesStructuredStateUnchanged()
     {
         var withHealth = StateWithHealth(20);
+        // Sprint 35 P0-C: SearchedRadius is now a required positional arg
         var ev = new FlatAreaFoundEvent(
             X: 10, Y: 64, Z: -5,
             Area: 36,
             MinX: 7, MaxX: 13, MinZ: -8, MaxZ: -2,
+            SearchedRadius: 32,
             Timestamp: Now);
 
         var result = _projector.Apply(withHealth, ev);
@@ -401,6 +423,11 @@ public class WorldStateProjectorTests
             Assert.That(result.Facts["event:FlatAreaFound:MinX"]?.ToString(), Is.EqualTo("7"));
             Assert.That(result.Facts["event:FlatAreaFound:MaxZ"]?.ToString(), Is.EqualTo("-2"));
 
+            // Sprint 35 P0-C: SearchedRadius fact stored
+            Assert.That(result.Facts.ContainsKey("event:FlatAreaFound:SearchedRadius"), Is.True,
+                "SearchedRadius fact must be stored for BuildGoalDecomposer retry logic.");
+            Assert.That(result.Facts["event:FlatAreaFound:SearchedRadius"]?.ToString(), Is.EqualTo("32"));
+
             // Sprint 9: cross-event summary key readable by planners
             Assert.That(result.Facts.ContainsKey(BuildFactKeys.LastFlatArea), Is.True,
                 "LastFlatArea summary fact should be written for planner access.");
@@ -412,10 +439,12 @@ public class WorldStateProjectorTests
     public void Apply_FlatAreaFoundEvent_ZeroArea_StillStoresFacts()
     {
         // Area=0 means no suitable flat region was found by the scanner
+        // Sprint 35 P0-C: SearchedRadius=48 means we searched the max radius — no retry needed
         var ev = new FlatAreaFoundEvent(
             X: 0, Y: 64, Z: 0,
             Area: 0,
             MinX: 0, MaxX: 0, MinZ: 0, MaxZ: 0,
+            SearchedRadius: 48,
             Timestamp: Now);
 
         var result = _projector.Apply(EmptyState, ev);
@@ -427,6 +456,8 @@ public class WorldStateProjectorTests
                 "Area=0 (no flat area found) should still be stored as a fact.");
             Assert.That(result.Facts.ContainsKey(BuildFactKeys.LastFlatArea), Is.True,
                 "LastFlatArea should be stored even for area=0 result (no flat area found).");
+            Assert.That(result.Facts["event:FlatAreaFound:SearchedRadius"]?.ToString(), Is.EqualTo("48"),
+                "SearchedRadius=48 should be stored so BuildGoalDecomposer knows not to retry.");
         });
     }
 }

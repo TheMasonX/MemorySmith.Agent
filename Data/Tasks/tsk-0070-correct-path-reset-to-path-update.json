@@ -1,0 +1,37 @@
+{
+  "id": "tsk-0070-correct-path-reset-to-path-update",
+  "key": "TSK-0070",
+  "title": "Correct path_reset references to path_update with noPath status",
+  "description": "## Problem\nThe research paper references `path_reset` as a mineflayer-pathfinder event, but this event does not exist. GitHub issue #222 shows a user explicitly requesting that the pathfinder emit a `path_reset` event — it was not accepted. The actual signal for path failure is `path_update` with `status: 'noPath'`. Using `path_reset` in a listener would silently do nothing.\n\nThe correct event list is: `goal_reached`, `path_update` (statuses: `success`, `noPath`, `timeout`, `partial`), `goal_updated`, `path_stop`.\n\n## Source\nCouncil review DEF-PAPER-1 (Confidence: 85%).\n\n## Requirements\n1. Audit `MineflayerAdapter/index.js` for any `path_reset` reference (listener or emission)\n2. If found, replace with `path_update` listener checking `status === 'noPath'`\n3. Audit `Data/Pages/Audit/mineflayer-adapter-research.md` for `path_reset` references — update the research paper to use correct event name\n4. Audit any other docs or plans referencing `path_reset`\n5. Add a comment in the adapter code documenting the correct event list for future reference\n6. Wire `path_update` with `status: 'noPath'` to emit a `PathUpdateEvent` to C# (coordinates with TSK-0062)\n\n## References\n- `MineflayerAdapter/index.js` — event listeners section\n- PrismarineJS/mineflayer-pathfinder — README and issues\n- Council review: DEF-PAPER-1\n- GitHub issue #222 (mineflayer-pathfinder)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint40",
+    "mineflayer-adapter",
+    "fix",
+    "pathfinding",
+    "council-response"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audit/mineflayer-adapter-research.md"
+  ],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-22T00:00:00Z",
+  "updatedAtUtc": "2026-06-22T00:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

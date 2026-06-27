@@ -107,16 +107,22 @@
 
   <header>
     <div class="logo">
-  __  __                          ___ _   _   _ _   _
- |  \/  | ___ _ __ ___   ___  __|  _| |_|_|_| | |_| |_
- | |\/| |/ _ \ '_ ` _ \ / _ \| '__| | | | | | | | | '_ \
- | |  | |  __/ | | | | | (_) | |  | |_| | | | | |_| | | |
- |_|  |_|\___|_| |_| |_|\___/|_|   \__| |_|_|_|\__|_| |_|
+$$\      $$\                                                        $$$$$$\                $$\   $$\     $$\       
+$$$\    $$$ |                                                      $$  __$$\               \__|  $$ |    $$ |      
+$$$$\  $$$$ | $$$$$$\  $$$$$$\$$$$\   $$$$$$\   $$$$$$\  $$\   $$\ $$ /  \__|$$$$$$\$$$$\  $$\ $$$$$$\   $$$$$$$\  
+$$\$$\$$ $$ |$$  __$$\ $$  _$$  _$$\ $$  __$$\ $$  __$$\ $$ |  $$ |\$$$$$$\  $$  _$$  _$$\ $$ |\_$$  _|  $$  __$$\ 
+$$ \$$$  $$ |$$$$$$$$ |$$ / $$ / $$ |$$ /  $$ |$$ |  \__|$$ |  $$ | \____$$\ $$ / $$ / $$ |$$ |  $$ |    $$ |  $$ |
+$$ |\$  /$$ |$$   ____|$$ | $$ | $$ |$$ |  $$ |$$ |      $$ |  $$ |$$\   $$ |$$ | $$ | $$ |$$ |  $$ |$$\ $$ |  $$ |
+$$ | \_/ $$ |\$$$$$$$\ $$ | $$ | $$ |\$$$$$$  |$$ |      \$$$$$$$ |\$$$$$$  |$$ | $$ | $$ |$$ |  \$$$$  |$$ |  $$ |
+\__|     \__| \_______|\__| \__| \__| \______/ \__|       \____$$ | \______/ \__| \__| \__|\__|   \____/ \__|  \__|
+                                                         $$\   $$ |                                                
+                                                         \$$$$$$  |                                                
+                                                          \______/                                                 
     </div>
     <h1>MemorySmith.Agent</h1>
     <p style="margin-top:0.5rem">
-      <span class="badge badge-green">v0.3.0</span>
-      <span class="badge badge-green">Phase 3 Complete</span>
+      <span class="badge badge-green">v0.51.0</span>
+      <span class="badge badge-green">Sprint 51 — Wave A Complete</span>
       <span class="badge badge-muted">MIT License</span>
       <span class="badge badge-muted">.NET 10</span>
     </p>
@@ -133,6 +139,20 @@
   <p>
     Agents build, explore, and survive in Minecraft using an <strong>HTN/GOAP hybrid planner</strong>
     backed by a searchable knowledge base of facts, blueprints, and observations.
+  </p>
+
+  <h2>Sprint 51 — Wave A: Canonicalize &amp; Harden</h2>
+  <p><strong>Track 1</strong> — Canonicalize &amp; Classify (12 completed):</p>
+  <ul style="color:var(--muted);font-size:0.9rem;margin-bottom:0.5rem;line-height:1.8">
+    <li>✅ Bridge classification, canonical pipeline, dead code removal</li>
+    <li>✅ Regex hardening, Kind guards, deprecation policy, MakeAction freeze</li>
+  </ul>
+  <p><strong>Track 2</strong> — Harden Robustness (5 completed):</p>
+  <ul style="color:var(--muted);font-size:0.9rem;margin-bottom:0.5rem;line-height:1.8">
+    <li>✅ Task.WhenAll unwrap, DeathEvent handler, fault logging, terminal recovery</li>
+  </ul>
+  <p style="margin-bottom:1rem">
+    <strong>🔒 Security:</strong> Removed <code>Serilog.Sinks.SQLite</code> / <code>SQLitePCLRaw.lib.e_sqlite3</code> — deprecated package with unpatched high-severity CVE (GHSA-2m69-gcr7-jv3q / CVE-2025-6965, CVSS 7.2).
   </p>
 
   <h2>Phase Status</h2>
@@ -154,49 +174,29 @@
       <div class="phase-desc">HTN/GOAP, GatherWoodGoal, GoalFactory</div>
     </div>
     <div class="phase-card">
-      <div class="phase-title"><span class="badge badge-yellow">⟳</span> Phase 4 — Vision</div>
-      <div class="phase-desc">Spatial analysis, adaptive execution, GOAP</div>
+      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 4 — Dashboard</div>
+      <div class="phase-desc">WebUI.Blazor host, Blazor pages, SignalR push</div>
     </div>
     <div class="phase-card">
-      <div class="phase-title"><span class="badge badge-muted">○</span> Phase 5 — Advanced</div>
+      <div class="phase-title"><span class="badge badge-green">✓</span> Phase 5 — Observability</div>
+      <div class="phase-desc">Live log, status panels, About page (Sprints 49–51)</div>
+    </div>
+    <div class="phase-card">
+      <div class="phase-title"><span class="badge badge-yellow">⟳</span> Phase 6 — Vision</div>
+      <div class="phase-desc">Spatial analysis, aesthetic critique</div>
+    </div>
+    <div class="phase-card">
+      <div class="phase-title"><span class="badge badge-muted">○</span> Phase 7 — Advanced</div>
       <div class="phase-desc">Multi-agent, embeddings, CI/CD pipelines</div>
     </div>
   </div>
-
-  <h2>Architecture</h2>
-  <pre>┬────────────────────────────────────────────────────────┬
-│                   WebUI.Blazor (Host)                  │
-│  REST API + AgentBackgroundService + SignalR (Phase 4) │
-└────┬───────────────┬───────────────────────────────────└
-     │               │
-     ▼               ▼
-┬──────────┬  ┬──────────────────────────────────────────┬
-│ IPlanner │  │           IToolCaller (ToolEngine)       │
-│ HtnPlan- │  │  MoveToTool  StatusTool  SearchMemory    │
-│ ner      │  │  GetPage     CreatePage  (+ future tools) │
-└────┬─────└  └──────┬─────────────────┬────────────────-└
-     │               │                 │
-     ▼               ▼                 ▼
-┬─────────────┬ ┬──────────────┬ ┬────────────────────┬
-│  IGoalFact- │ │ IWorldAdapter│ │  IMemoryGateway    │
-│  ory + Goals│ │ MinecraftAda-│ │  RestMemoryGateway │
-│  GatherWood │ │ pter + Node.j│ │  → MemorySmith API │
-│  SurviveNi- │ │ s (Mineflayer│ └────────────────────└
-│  ght + more │ └──────────────└
-└─────────────└       │
-                       │ WebSocket
-                       ▼
-              ┬─────────────────┬
-              │  Minecraft Bot  │
-              │  (Mineflayer)   │
-              └─────────────────└</pre>
 
   <h2>Quick Start</h2>
   <pre>git clone https://github.com/TheMasonX/MemorySmith.Agent
 cd MemorySmith.Agent
 dotnet restore MemorySmith.Agent.slnx
 dotnet run --project WebUI.Blazor</pre>
-  <p>Then visit <a href="http://localhost:5000/api/agent/status" target="_blank"><code>/api/agent/status</code></a> or send a goal:</p>
+  <p>Then visit <code>/api/agent/status</code> or send a goal:</p>
   <pre>curl -X POST http://localhost:5000/api/agent/plan \
   -H "Content-Type: application/json" \
   -d '{"goalName":"GatherWood","parameters":{"count":10}}'</pre>
@@ -209,23 +209,42 @@ dotnet run --project WebUI.Blazor</pre>
     <tr><td>POST</td><td>/api/agent/plan</td><td>Set a goal and enqueue its plan</td></tr>
     <tr><td>POST</td><td>/api/agent/command</td><td>Enqueue a single raw tool call</td></tr>
     <tr><td>GET</td><td>/api/goals</td><td>List registered goal names</td></tr>
-    <tr><td>GET</td><td>/api/blueprints</td><td>Blueprint catalog (Phase 3+)</td></tr>
+    <tr><td>GET</td><td>/api/blueprints</td><td>Blueprint catalog</td></tr>
     <tr><td>GET</td><td>/api/about</td><td>Project metadata (JSON)</td></tr>
     <tr><td>GET</td><td>/about</td><td>This page</td></tr>
   </table>
-  <p>See the <a href="/api/about">API about endpoint</a> or the <a href="https://github.com/TheMasonX/MemorySmith.Agent/blob/main/Data/Pages/guides/api-reference.md" target="_blank" rel="noopener">full API reference</a> in the wiki.</p>
 
   <h2>Third-party Acknowledgments</h2>
   <table>
     <tr><th>Dependency</th><th>License</th><th>Use</th></tr>
-    <tr><td>MemorySmith</td><td>MIT</td><td>Long-term memory and wiki backend</td></tr>
+    <tr><td>MemorySmith</td><td>MIT</td><td>Long-term memory and wiki backend (REST API)</td></tr>
     <tr><td>Mineflayer (Node.js)</td><td>MIT</td><td>Minecraft bot automation</td></tr>
     <tr><td>ws (Node.js)</td><td>MIT</td><td>WebSocket server in the adapter</td></tr>
-    <tr><td>Microsoft.Extensions.*</td><td>MIT</td><td>DI, logging, hosted services</td></tr>
+    <tr><td>Serilog.AspNetCore</td><td>MIT</td><td>Structured logging pipeline</td></tr>
+    <tr><td>Serilog.Sinks.Console</td><td>MIT</td><td>Console log output</td></tr>
+    <tr><td>Serilog.Sinks.File</td><td>MIT</td><td>Persistent file-based log storage</td></tr>
+    <tr><td>Serilog.Sinks.EventLog</td><td>MIT</td><td>Windows Event Log sink</td></tr>
+    <tr><td>Microsoft.Extensions.*</td><td>MIT</td><td>DI, logging, configuration, hosted services</td></tr>
+    <tr><td>Microsoft.AspNetCore.*</td><td>MIT</td><td>Web host, SignalR, REST endpoints</td></tr>
+    <tr><td>Microsoft.NET.Test.Sdk</td><td>MIT</td><td>Test runner infrastructure</td></tr>
     <tr><td>NUnit</td><td>MIT</td><td>Test framework</td></tr>
-    <tr><td>coverlet</td><td>MIT</td><td>Code coverage collection</td></tr>
+    <tr><td>NUnit.Analyzers</td><td>MIT</td><td>NUnit best-practice analyzers</td></tr>
+    <tr><td>NUnit3TestAdapter</td><td>MIT</td><td>Visual Studio test adapter</td></tr>
+    <tr><td>coverlet.collector</td><td>MIT</td><td>Code coverage collection</td></tr>
     <tr><td>GitHubActionsTestLogger</td><td>MIT</td><td>CI test annotations</td></tr>
+    <tr><td>Microsoft.AspNetCore.Mvc.Testing</td><td>MIT</td><td>Integration test host</td></tr>
   </table>
+  <p style="font-size:0.8rem;margin-top:0.5rem">
+    <strong>Removed in v0.51.0:</strong> <code>Serilog.Sinks.SQLite</code> (MIT) and <code>SQLitePCLRaw.lib.e_sqlite3</code> (Apache-2.0) —
+    the latter is deprecated with an unpatched high-severity CVE (GHSA-2m69-gcr7-jv3q / CVE-2025-6965, CVSS 7.2).
+    See <a href="https://github.com/TheMasonX/MemorySmith.Agent/blob/main/BREAKING_CHANGES.md" target="_blank" rel="noopener">BREAKING_CHANGES.md</a>.
+  </p>
+  <p style="font-size:0.8rem;margin-top:0.25rem">
+    <strong>Licensing policy:</strong> All dependencies use <strong>MIT</strong> (fully permissive, no copyleft).
+    Only MIT, Apache-2.0, and BSD-2/3-Clause are pre-approved.
+    GPL, AGPL, LGPL, SSPL, BUSL, and proprietary licenses are prohibited without explicit human review.
+    See <a href="https://github.com/TheMasonX/MemorySmith.Agent/blob/main/Data/Pages/policies/package-vetting.md" target="_blank" rel="noopener">package vetting policy</a>.
+  </p>
 
   <h2>License</h2>
   <div class="license-box">MIT License
@@ -242,7 +261,7 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", "WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
@@ -257,7 +276,7 @@ SOFTWARE.</div>
       <a href="https://github.com/TheMasonX/MemorySmith" target="_blank" rel="noopener">MemorySmith</a>
       <a href="/api/about">API About</a>
       <a href="/api/agent/status">Agent Status</a>
-      <a href="https://github.com/TheMasonX/MemorySmith.Agent/blob/main/Data/Pages/home.md" target="_blank" rel="noopener">Wiki Home</a>
+      <a href="Data/Pages/home.md">Wiki Home</a>
     </div>
   </footer>
 

@@ -1,0 +1,47 @@
+{
+  "id": "tsk-0107-fix-build-origin-sentinel-eliminate-0-0-0-as-missing-origin-signal",
+  "key": "TSK-0107",
+  "title": "Fix build origin sentinel — eliminate (0,0,0) as \\\"missing origin\\\" signal",
+  "description": "From all three audits (93-97% confidence): HtnTaskLibrary.DecomposeBuild still checks `originX == 0 && originY == 0 && originZ == 0` as the signal for auto-detect, even though BuildOrigin value object was introduced to eliminate sentinel overloading. This makes building at world origin (0,0,0) impossible — it's silently reinterpreted as \"no origin supplied\".\n\nFix: Change DecomposeBuild to accept `BuildOrigin?` instead of raw `int originX/originY/originZ`. Remove the (0,0,0) sentinel check. Use `BuildOriginSource` enum to distinguish Explicit vs AutoScanned vs Fact origins.\n\nFiles: Agent.Planning/HtnTaskLibrary.cs (DecomposeBuild), Agent.Planning/Decomposition/BuildGoalDecomposer.cs, Agent.Planning/Goals/BuildOrigin.cs\n\nThis is a larger refactor touching the build planning pipeline. Coordinate with BuildGoalDecomposer and any callers.\n\nSource: memorysmith_agent_supplemental_audit_findings_2026-06-25.md (Finding 2), deep_code_audit (Finding 1), sprint35_audit (Findings 1-2)",
+  "type": "Task",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "SteveBot",
+  "labels": [
+    "audit",
+    "bug",
+    "build",
+    "origin"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-s50wb-0107",
+      "author": "SteveBot",
+      "body": "Completed in Sprint 50 Wave B. DecomposeBuild now accepts BuildOrigin? instead of raw int originX/Y/Z. BuildGoalDecomposer and HtnPlanner construct BuildOrigin before calling. The (0,0,0) sentinel is eliminated. 7-seat adversarial council review completed.",
+      "createdAtUtc": "2026-06-25T23:45:00Z"
+    },
+    {
+      "id": "c-372e16096bdf44f1a84333c80099a360",
+      "author": "anonymous",
+      "body": "Deferred from Sprint 49 Wave B — requires deeper refactor threading BuildOrigin? through HtnTaskLibrary.DecomposeBuild pipeline. See handoff at Data/Pages/Handoffs/sprint-49-waveb-handoff-2026-06-25.md.",
+      "createdAtUtc": "2026-06-25T23:00:35.0186732Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-25T19:24:12.5892284Z",
+  "updatedAtUtc": "2026-06-25T23:45:00Z",
+  "completedAtUtc": "2026-06-25T23:45:00Z",
+  "revision": 3,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0107-fix-build-origin-sentinel-eliminate-0-0-0-as-missing-origin-signal.json"
+}

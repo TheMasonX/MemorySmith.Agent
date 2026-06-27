@@ -30,6 +30,7 @@ public sealed class GoalFactory : IGoalFactory
     private const string GatherItemPrefix = "GatherItem:";
     private const string BuildPrefix      = "Build:";
     private const string CraftItemPrefix  = "CraftItem:";
+    private const string PlaceBlockPrefix = "PlaceBlock:";
 
     private static readonly Dictionary<string, Func<IReadOnlyDictionary<string, object?>?, IGoal>>
         Creators = new(StringComparer.OrdinalIgnoreCase)
@@ -53,7 +54,7 @@ public sealed class GoalFactory : IGoalFactory
     }
 
     public IReadOnlyList<string> RegisteredGoals =>
-        [.. Creators.Keys, "GatherItem:{itemId}", "Build:{blueprintId}", "CraftItem:{itemId}"];
+        [.. Creators.Keys, "GatherItem:{itemId}", "Build:{blueprintId}", "CraftItem:{itemId}", "SmeltItem:{inputItem}"];
 
     public IGoal? Create(
         string goalName,
@@ -111,17 +112,27 @@ public sealed class GoalFactory : IGoalFactory
             }
 
             var blueprint = await _blueprintRepository.GetAsync(blueprintId, ct);
-            if (blueprint is null) return null;
+            if (blueprint is null)
+            {
+                _logger.LogWarning(
+                    "Blueprint '{BlueprintId}' not found in repository — " +
+                    "checked gateway and local fallback (Data/Pages/blueprints/{Slug}.md). " +
+                    "Available blueprints can be listed via SearchMemory('blueprints/').",
+                    blueprintId, blueprintId);
+                return null;
+            }
 
             var (_, blocks) = BlueprintParser.Parse(blueprint.RawMarkdown);
 
-            // Sprint 35: extract optional origin coordinates from chat parameters
-            // e.g. "build a house at 100 64 200" → originX=100, originY=64, originZ=200
+            // TSK-0103: extract optional origin coordinates from chat parameters
+            // e.g. "build a house at 100 64 200" → BuildOrigin(100, 64, 200, Explicit)
+            // When any coordinate is missing, Origin is null (auto-detect).
             var ox = GetInt(parameters, "originX", null);
             var oy = GetInt(parameters, "originY", null);
             var oz = GetInt(parameters, "originZ", null);
+            var origin = BuildOrigin.FromNullable(ox, oy, oz, BuildOriginSource.Explicit);
 
-            return new BuildGoal(blueprint, blocks, ox, oy, oz);
+            return new BuildGoal(blueprint, blocks, origin);
         }
 
         // ── CraftItem:{itemId} ────────────────────────────────────────────────
@@ -131,6 +142,28 @@ public sealed class GoalFactory : IGoalFactory
             if (string.IsNullOrWhiteSpace(itemId)) return null;
             var count = GetInt(parameters, "count", 1);
             return new CraftItemGoal(itemId, count);
+        }
+
+        // ── SmeltItem:{inputItem} (Sprint 44 TSK-0079) ────────────────────────
+        const string SmeltItemPrefix = "SmeltItem:";
+        if (goalName.StartsWith(SmeltItemPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            var inputItem = goalName[SmeltItemPrefix.Length..];
+            if (string.IsNullOrWhiteSpace(inputItem)) return null;
+            var count = GetInt(parameters, "count", 1);
+            return new Goals.SmeltGoal(inputItem, count);
+        }
+
+        // ── PlaceBlock:{item} (Sprint 54) ────────────────────────────────────
+        if (goalName.StartsWith(PlaceBlockPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            var item = goalName[PlaceBlockPrefix.Length..];
+            if (string.IsNullOrWhiteSpace(item)) return null;
+            var count = GetInt(parameters, "count", 1);
+            var x = GetInt(parameters, "x", (int?)null);
+            var y = GetInt(parameters, "y", (int?)null);
+            var z = GetInt(parameters, "z", (int?)null);
+            return new Goals.PlaceBlockGoal(item, count, x, y, z);
         }
 
         return Create(goalName, parameters);

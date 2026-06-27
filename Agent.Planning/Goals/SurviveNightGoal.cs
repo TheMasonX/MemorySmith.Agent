@@ -19,6 +19,9 @@ public sealed class SurviveNightGoal : IGoal
     public string Description => "Find shelter and survive until sunrise.";
     public string[] Phases => ["FindShelter", "LightArea", "WaitForSunrise"];
 
+    /// <summary>Sprint 39: stable per-instance ID so ActionOutcome.GoalId is unique across goals.</summary>
+    public Guid Id { get; } = Guid.NewGuid();
+
     /// <inheritdoc/>
     public string? FailureReason { get; set; }
 

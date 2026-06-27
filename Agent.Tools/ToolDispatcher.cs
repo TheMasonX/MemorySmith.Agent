@@ -1,6 +1,7 @@
 namespace Agent.Tools;
 
 using Agent.Core;
+using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Text.Json;
 
@@ -19,16 +20,29 @@ using System.Text.Json;
 /// Sprint 25 P0-C: ExecuteAsync is now wrapped in try/catch — tool exceptions produce
 /// ToolResult(false, ...) instead of propagating. Integer validation uses TryGetInt32
 /// to correctly reject scientific notation (e.g. "1e5").
+///
+/// Sprint 36 P0-B: CallWithOutcomeAsync wraps CallAsync and produces an ActionOutcome.
+/// Sprint 37 P0-B: CallAsync no longer emits its own success/failure journal entry;
+/// callers using CallWithOutcomeAsync call _journal?.LogOutcome(outcome) explicitly.
+///
+/// Sprint 36 P1-C: RegisteredNames exposes all registration keys (including aliases) in
+/// sorted order for deterministic LLM prompt injection.
+///
+/// Sprint 39 P3: ValidateAgainstSchema extended with deeper constraints:
+///   minimum/maximum for numeric properties, enum for allowed-value sets,
+///   minLength/maxLength for string properties.
 /// </summary>
 public sealed class ToolDispatcher : IToolCaller
 {
     private readonly ConcurrentDictionary<string, ITool> _tools =
         new(StringComparer.OrdinalIgnoreCase);
     private readonly IAgentJournal? _journal;
+    private readonly ILogger<ToolDispatcher>? _logger;
 
-    public ToolDispatcher(IAgentJournal? journal = null)
+    public ToolDispatcher(IAgentJournal? journal = null, ILogger<ToolDispatcher>? logger = null)
     {
         _journal = journal;
+        _logger  = logger;
     }
 
     // ── Registration ──────────────────────────────────────────────────────────
@@ -44,15 +58,36 @@ public sealed class ToolDispatcher : IToolCaller
     /// existing entry is silently overwritten (<c>_tools[name] = tool</c>). This is
     /// intentional for alias registration. Callers that need to detect collisions
     /// should check <see cref="Get"/> before calling this overload.
+    ///
+    /// Sprint 38 P4-C: LogWarning when overwriting an existing registration to aid
+    /// diagnostics in production (double-registration is almost always a bug).
     /// </summary>
-    public void Register(string name, ITool tool) => _tools[name] = tool;
+    public void Register(string name, ITool tool)
+    {
+        if (_tools.ContainsKey(name))
+            _logger?.LogWarning("ToolDispatcher] Register: overwriting existing tool '{Name}' " +
+                "with {NewTool}. Check for duplicate registrations.", name, tool.Name);
+        _tools[name] = tool;
+    }
 
     public ITool? Get(string name) =>
         _tools.TryGetValue(name, out var t) ? t : null;
 
     public IReadOnlyList<ITool> All => [.. _tools.Values];
 
-    // ── Dispatch ──────────────────────────────────────────────────────────────
+    /// <summary>
+    /// Sprint 36 P1-C: Returns all registered names (including aliases) in
+    /// case-insensitive alphabetical order. Use this instead of
+    /// <see cref="All"/> when building an LLM prompt — <see cref="All"/>
+    /// iterates dict values in nondeterministic order and does not surface
+    /// alias keys (e.g. "Status" is registered as an alias for GetStatusTool
+    /// but does not appear in <see cref="All"/> because the dict stores only
+    /// one tool instance per value, not per registration key).
+    /// </summary>
+    public IReadOnlyList<string> RegisteredNames =>
+        [.. _tools.Keys.OrderBy(k => k, StringComparer.OrdinalIgnoreCase)];
+
+    // ── Dispatch ─────────────────────────────────────────────────────────────
 
     /// <summary>
     /// Resolves the named tool, validates arguments against its InputSchema,
@@ -105,31 +140,111 @@ public sealed class ToolDispatcher : IToolCaller
         }
         catch (Exception ex)
         {
+            // TSK-0114: preserve structured exception metadata (type, stack, inner)
+            _logger?.LogWarning(ex, "Tool '{ToolName}' threw {ExceptionType}: {Message}",
+                toolName, ex.GetType().Name, ex.Message);
+            var details = new Dictionary<string, object?>
+            {
+                ["exceptionType"] = ex.GetType().Name,
+                ["message"] = ex.Message,
+                ["stackTrace"] = ex.StackTrace,
+                ["innerException"] = ex.InnerException?.Message,
+            };
             var exEntry = new JournalEntry(
                 DateTimeOffset.UtcNow,
                 JournalEntryType.ActionFailed,
-                $"Tool '{toolName}' threw: {ex.Message}");
+                $"Tool '{toolName}' threw {ex.GetType().Name}: {ex.Message}",
+                details);
             _journal?.Log(exEntry);
-            return new ToolResult(false, $"Tool '{toolName}' threw: {ex.Message}");
+            return new ToolResult(false,
+                $"Tool '{toolName}' failed ({ex.GetType().Name}): {ex.Message}");
         }
 
-        var entry = new JournalEntry(
-            DateTimeOffset.UtcNow,
-            result.Success ? JournalEntryType.ActionCompleted : JournalEntryType.ActionFailed,
-            result.Success
-                ? $"Tool '{toolName}' succeeded"
-                : $"Tool '{toolName}' failed: {result.Message}");
-        _journal?.Log(entry);
-
+        // Sprint 37 P0-B: success/failure journal entry removed here. Callers using
+        // CallWithOutcomeAsync (e.g. DispatchActionsAsync) call _journal?.LogOutcome(outcome)
+        // explicitly in the outer dispatch loop. This eliminates the double-journal issue
+        // identified in Sprint 36 audit finding #4 while keeping validation-failure and
+        // exception entries (which are separate semantics and must remain).
         return result;
+    }
+
+    /// <summary>
+    /// Sprint 36 P0-B: Executes the named tool and wraps the result in an
+    /// <see cref="ActionOutcome"/> that is also recorded in the journal via
+    /// <see cref="IAgentJournal.LogOutcome"/>.
+    ///
+    /// Use this overload when recovery, replanning, or LLM evaluation needs
+    /// structured outcome data (effects, observation summary). Callers that only
+    /// need the raw <see cref="ToolResult"/> can continue using <see cref="CallAsync"/>.
+    ///
+    /// <para>
+    /// The returned ActionOutcome uses factory helpers:
+    /// <c>ActionOutcome.Succeeded</c> for success; <c>ActionOutcome.Failed</c> for failure.
+    /// Callers that need richer outcomes (e.g. <c>ActionOutcome.Collected</c>) should
+    /// build the outcome from the ToolResult and the world event that follows.
+    /// </para>
+    ///
+    /// <para>
+    /// Sprint 37 P0-B: CallAsync no longer emits its own ActionCompleted / ActionFailed
+    /// entry (that entry was removed to prevent double-logging). The caller
+    /// (<c>DispatchActionsAsync</c>) calls <c>_journal?.LogOutcome(outcome)</c> explicitly
+    /// after this method returns. This method itself does NOT call LogOutcome.
+    /// </para>
+    /// </summary>
+    public async Task<(ToolResult Result, ActionOutcome Outcome)> CallWithOutcomeAsync(
+        Guid goalId,
+        string toolName,
+        JsonElement arguments,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await CallAsync(toolName, arguments, cancellationToken);
+
+        // TSK-0110: Preserve ActionOutcome semantics by mapping the ToolResult's OutcomeType
+        // to the corresponding ActionOutcome factory method. This ensures that Blocked,
+        // Unreachable, TimedOut, and NoProgress outcomes are preserved for the LLM evaluator
+        // and replan governor, rather than collapsing everything to Succeeded/Failed.
+        var outcome = MapResultToOutcome(result, goalId, toolName);
+
+        // Sprint 37 P0-B: CallAsync no longer emits its own ActionCompleted / ActionFailed
+        // journal entry (removed to prevent double-logging with DispatchActionsAsync's
+        // explicit _journal?.LogOutcome(outcome) call). Do NOT add LogOutcome here.
+        // The outer dispatch loop logs the structured outcome explicitly.
+        return (result, outcome);
+    }
+
+    /// <summary>
+    /// TSK-0110: Maps a <see cref="ToolResult"/> to the corresponding <see cref="ActionOutcome"/>
+    /// factory method, preserving rich outcome semantics.
+    /// <para>
+    /// When the tool sets <see cref="ToolResult.Outcome"/> explicitly, that value is used directly.
+    /// When it's the default <see cref="OutcomeType.Completed"/>, we infer from
+    /// <see cref="ToolResult.Success"/>: success → Succeeded, failure → Failed.
+    /// </para>
+    /// </summary>
+    private static ActionOutcome MapResultToOutcome(ToolResult result, Guid goalId, string toolName)
+    {
+        var outcome = result.Outcome;
+
+        // If the tool didn't explicitly set an outcome, infer from Success flag
+        if (outcome == OutcomeType.Completed && !result.Success)
+            outcome = OutcomeType.Failed;
+
+        return outcome switch
+        {
+            OutcomeType.Completed => ActionOutcome.Succeeded(goalId, toolName, result.Message ?? "Success"),
+            OutcomeType.NoProgress => ActionOutcome.NoProgress(goalId, toolName, result.Message ?? "No progress"),
+            OutcomeType.Blocked => ActionOutcome.Blocked(goalId, toolName, result.Message ?? "Blocked"),
+            OutcomeType.Unreachable => ActionOutcome.Unreachable(goalId, toolName, result.Message ?? "Unreachable"),
+            OutcomeType.TimedOut => ActionOutcome.TimedOut(goalId, toolName, result.Message ?? "Timed out"),
+            _ => ActionOutcome.Failed(goalId, toolName, result.Message ?? "Failed"),
+        };
     }
 
     // ── Schema validation ─────────────────────────────────────────────────────
     //
-    // Lightweight JSON Schema validator covering the subset used by tool schemas:
-    // type (object), properties (name → { type, description }), required array.
-    // This is intentionally minimal — it validates the guard-rail subset, not full
-    // JSON Schema Draft support. All 12 registered tools use this subset.
+    // Lightweight JSON Schema validator covering the subset used by tool schemas.
+    // Sprint 5 baseline: type (object), properties (name → { type, description }), required.
+    // Sprint 39 P3 additions: minimum/maximum (numbers), enum (any type), minLength/maxLength (strings).
 
     /// <summary>
     /// Validates <paramref name="args"/> against a JSON Schema object.
@@ -160,11 +275,18 @@ public sealed class ToolDispatcher : IToolCaller
             if (!knownProps.Contains(argProp.Name))
                 return $"Unexpected property '{argProp.Name}' is not declared in the tool schema.";
 
-            if (schemaProps.TryGetProperty(argProp.Name, out var propSchema) &&
-                propSchema.TryGetProperty("type", out var expectedType))
+            if (schemaProps.TryGetProperty(argProp.Name, out var propSchema))
             {
-                var error = CheckType(argProp.Name, argProp.Value, expectedType.GetString()!);
-                if (error is not null) return error;
+                // Type check (Sprint 5 baseline)
+                if (propSchema.TryGetProperty("type", out var expectedType))
+                {
+                    var typeError = CheckType(argProp.Name, argProp.Value, expectedType.GetString()!);
+                    if (typeError is not null) return typeError;
+                }
+
+                // Sprint 39 P3: deeper constraint checks (minimum, maximum, enum, minLength, maxLength)
+                var constraintError = CheckConstraints(argProp.Name, argProp.Value, propSchema);
+                if (constraintError is not null) return constraintError;
             }
         }
 
@@ -199,5 +321,52 @@ public sealed class ToolDispatcher : IToolCaller
             "array" when value.ValueKind != JsonValueKind.Array => $"Property '{name}' must be an array, got '{value.GetRawText()}'.",
             _ => null, // unknown type — accept (forward-compatible)
         };
+    }
+
+    /// <summary>
+    /// Sprint 39 P3: Validates deeper JSON Schema constraints beyond basic type checking.
+    /// Supports: minimum/maximum (numeric), enum (any type), minLength/maxLength (string).
+    /// Returns null on success, or an error message on failure.
+    /// </summary>
+    private static string? CheckConstraints(string name, JsonElement value, JsonElement propSchema)
+    {
+        // minimum / maximum — is only applicable to numeric values
+        if (value.ValueKind == JsonValueKind.Number && value.TryGetDouble(out var numVal))
+        {
+            if (propSchema.TryGetProperty("minimum", out var minProp) &&
+                numVal < minProp.GetDouble())
+                return $"Property '{name}' must be >= {minProp.GetDouble()}, got {value.GetRawText()}.";
+
+            if (propSchema.TryGetProperty("maximum", out var maxProp) &&
+                numVal > maxProp.GetDouble())
+                return $"Property '{name}' must be <= {maxProp.GetDouble()}, got {value.GetRawText()}.";
+        }
+
+        // enum — compares raw JSON text; handles strings, numbers, and booleans uniformly
+        if (propSchema.TryGetProperty("enum", out var enumProp))
+        {
+            var argRaw = value.GetRawText();
+            var matched = enumProp.EnumerateArray().Any(e => e.GetRawText() == argRaw);
+            if (!matched)
+            {
+                var allowed = string.Join(", ", enumProp.EnumerateArray().Select(e => e.GetRawText()));
+                return $"Property '{name}' must be one of [{allowed}], got {argRaw}.";
+            }
+        }
+
+        // minLength / maxLength — only applicable to string values
+        if (value.ValueKind == JsonValueKind.String)
+        {
+            var strVal = value.GetString()!;
+            if (propSchema.TryGetProperty("minLength", out var minLenProp) &&
+                strVal.Length < minLenProp.GetInt32())
+                return $"Property '{name}' minLength is {minLenProp.GetInt32()}, got length {strVal.Length}.";
+
+            if (propSchema.TryGetProperty("maxLength", out var maxLenProp) &&
+                strVal.Length > maxLenProp.GetInt32())
+                return $"Property '{name}' maxLength is {maxLenProp.GetInt32()}, got length {strVal.Length}.";
+        }
+
+        return null;
     }
 }

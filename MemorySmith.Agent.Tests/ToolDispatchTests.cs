@@ -201,15 +201,18 @@ public class ToolDispatchTests
     }
 
     [Test]
-    public async Task Dispatcher_MissingRequired_ReturnsFailureWithMessage()
+    public async Task Dispatcher_MissingRequired_ReturnsFailure()
     {
         var dispatcher = new ToolDispatcher();
         dispatcher.Register(new MoveToTool(_adapter));
 
+        // MoveToTool now accepts nearestX/Y/Z from context carry, so x/y/z are not
+        // required in the schema. But when NEITHER explicit nor context-carried coords
+        // are provided, the tool itself returns failure.
         var result = await dispatcher.CallAsync("MoveTo", Args("{\"x\":10}"));
         Assert.That(result.Success, Is.False);
-        Assert.That(result.Message, Does.Contain("Schema validation failed"));
-        Assert.That(result.Message, Does.Contain("'y'"));
+        // The failure message now comes from the tool's own validation
+        Assert.That(result.Message, Does.Contain("nearestX"));
     }
 
     [Test]

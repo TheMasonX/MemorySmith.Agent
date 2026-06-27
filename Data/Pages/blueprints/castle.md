@@ -27,17 +27,17 @@ foundations. The keep has two main floors plus tower lookout levels.
 ### Y=0 (Foundation — cobblestone)
 CCCCCCCCCCCCCCCCC
 CCCCCCCCCCCCCCCCC
-CCCCC     CCCCCCC
-CCCCC     CCCCCCC
-CCCCC     CCCCCCC
-CCCCC     CCCCCCC
-CCCCC     CCCCCCC
-CCCCC     CCCCCCC
-CCCCC     CCCCCCC
-CCCCC     CCCCCCC
-CCCCC     CCCCCCC
-CCCCC     CCCCCCC
-CCCCC     CCCCCCC
+CCCCC.....CCCCCCC
+CCCCC.....CCCCCCC
+CCCCC.....CCCCCCC
+CCCCC.....CCCCCCC
+CCCCC.....CCCCCCC
+CCCCC.....CCCCCCC
+CCCCC.....CCCCCCC
+CCCCC.....CCCCCCC
+CCCCC.....CCCCCCC
+CCCCC.....CCCCCCC
+CCCCC.....CCCCCCC
 CCCCCCCCCCCCCCCCC
 CCCCCCCCCCCCCCCCC
 
@@ -46,15 +46,15 @@ SSSSSSSSSSSSSSSSS
 SGGGGSGGGGGSGGGGS
 SGGGGSGGGGGSGGGGS
 SGGGGSGGGGGSGGGGS
-SGGGGS     SGGGGS
-SGGGGS     SGGGGS
-SGGGGS     SGGGGS
-SGGGGS     SGGGGS
-SGGGGS     SGGGGS
-SGGGGS     SGGGGS
-SGGGGS     SGGGGS
-SGGGGS     SGGGGS
-SGGGGS     SGGGGS
+SGGGGS.....SGGGGS
+SGGGGS.....SGGGGS
+SGGGGS.....SGGGGS
+SGGGGS.....SGGGGS
+SGGGGS.....SGGGGS
+SGGGGS.....SGGGGS
+SGGGGS.....SGGGGS
+SGGGGS.....SGGGGS
+SGGGGS.....SGGGGS
 SSSSSSSSSSSSSDSSS
 SSSSSSSSSSSSSSSSS
 
@@ -93,36 +93,36 @@ SSSSSSSSSSSSSSSSS
 SSSSSSSSSSSSSSSSS
 
 ### Y=4 (Tower lower + wall top + tower interior floor)
-SSSSS SSSSS SSSSS
-S...S S...S S...S
-S...S S...S S...S
-S...S S...S S...S
-SSSSS       SSSSS
-S...S       S...S
-S...S       S...S
-S...S       S...S
-SSSSS       SSSSS
-S...S       S...S
-S...S       S...S
-S...S       S...S
-SSSSS       SSSSS
-SSSSS SSSSS SSSSS
-SSSSS SSSSS SSSSS
+SSSSS.SSSSS.SSSSS
+S...S.S...S.S...S
+S...S.S...S.S...S
+S...S.S...S.S...S
+SSSSS.......SSSSS
+S...S.......S...S
+S...S.......S...S
+S...S.......S...S
+SSSSS.......SSSSS
+S...S.......S...S
+S...S.......S...S
+S...S.......S...S
+SSSSS.......SSSSS
+SSSSS.SSSSS.SSSSS
+SSSSS.SSSSS.SSSSS
 
 ### Y=5 (Tower mid + battlements base + walkway)
 SBSBSBSBSBSBSBSBS
 B.....B.....B...B
 S.....S.....S...S
 B.....B.....B...B
-SBSBS       SBSBS
-B...B       B...B
-S...S       S...S
-B...B       B...B
-SBSBS       SBSBS
-B...B       B...B
-S...S       S...S
-B...B       B...B
-SBSBS       SBSBS
+SBSBS.......SBSBS
+B...B.......B...B
+S...S.......S...S
+B...B.......B...B
+SBSBS.......SBSBS
+B...B.......B...B
+S...S.......S...S
+B...B.......B...B
+SBSBS.......SBSBS
 SBSBSBSBSBSBSBSBS
 SBSBSBSBSBSBSBSBS
 
@@ -131,15 +131,15 @@ SPSPSPSPSPSPSPSPS
 P.....P.....P...P
 S.....T.....T...S
 P.....P.....P...P
-SPSPS       SPSPS
-P...P       P...P
-S...T       T...S
-P...P       P...P
-SPSPS       SPSPS
-P...P       P...P
-S...T       T...S
-P...P       P...P
-SPSPS       SPSPS
+SPSPS.......SPSPS
+P...P.......P...P
+S...T.......T...S
+P...P.......P...P
+SPSPS.......SPSPS
+P...P.......P...P
+S...T.......T...S
+P...P.......P...P
+SPSPS.......SPSPS
 SPSPSPSPSPSPSPSPS
 SPSPSPSPSPSPSPSPS
 
@@ -148,15 +148,15 @@ SPSPSPSPSPSPSPSPS
 P..TP..P..TP..P.T
 SPSPSPSPSPSPSPSPS
 P..TP..P..TP..P.T
-SPSPS       SPSPS
-P..TP       P..TP
-SPSPS       SPSPS
-P..TP       P..TP
-SPSPS       SPSPS
-P..TP       P..TP
-SPSPS       SPSPS
-P..TP       P..TP
-SPSPS       SPSPS
+SPSPS.......SPSPS
+P..TP.......P..TP
+SPSPS.......SPSPS
+P..TP.......P..TP
+SPSPS.......SPSPS
+P..TP.......P..TP
+SPSPS.......SPSPS
+P..TP.......P..TP
+SPSPS.......SPSPS
 SPSPSPSPSPSPSPSPS
 SPSPSPSPSPSPSPSPS
 
@@ -177,7 +177,7 @@ SPSPSPSPSPSPSPSPS
 - `L` = oak_slab (roof accent)
 - `H` = oak_log
 
-**Blank spaces** in Y=0–Y=4 are air (courtyard interior open to sky at Y=3+ in center).
+**Dots (`.`)** in grid rows represent air — courtyard interior open to sky in Y=4+ center.
 
 ---
 

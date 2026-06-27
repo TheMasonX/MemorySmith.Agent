@@ -1,0 +1,40 @@
+﻿{
+  "id": "tsk-0084-add-worldstateprojector-applysmeltcomplete-for-real-time-inventory-updates",
+  "key": "TSK-0084",
+  "title": "Add WorldStateProjector.ApplySmeltComplete for real-time inventory updates",
+  "description": "SmeltCompleteEvent only completes the correlated action and logs; it does NOT update _worldState.Inventory with the smelted output items. The inventory is only refreshed on the next GetStatus/StatusEvent cycle, causing delayed goal completion (up to 2s). Add ApplySmeltComplete to WorldStateProjector that adds e.Result items to inventory, mirroring how BlockMinedEvent handles inventory updates.\n\nCouncil confidence: 100%. Severity: Medium (P1).",
+  "type": "Task",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "improvement",
+    "sprint-45",
+    "council"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-2ae0f7b27a0141dd8d5ee3356575dd32",
+      "author": "anonymous",
+      "body": "Audit verification (2026-06-23): This task is referenced by audit finding F15 (smelt completion optimism). The audit confirms the need for ApplySmeltComplete but notes that \u0060SmeltGoal.IsComplete\u0060 already checks inventory \u2014 it\u0027s not \u0022first output observed\u0022 as one audit claimed. The gap is real-time inventory delta updates vs relying on status refresh. See \u0060Data/Pages/audits/msa-audit-verification-6-23.md\u0060 section F15.",
+      "createdAtUtc": "2026-06-24T04:21:21.9071649Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-23T14:31:12.6328944Z",
+  "updatedAtUtc": "2026-06-25T13:37:30.158886Z",
+  "completedAtUtc": "2026-06-25T13:37:30.158886Z",
+  "revision": 3,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0084-add-worldstateprojector-applysmeltcomplete-for-real-time-inventory-updates.json"
+}

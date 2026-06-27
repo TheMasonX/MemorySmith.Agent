@@ -3,7 +3,7 @@ id: wizards-tower
 name: Wizard's Tower
 tags: tower, magical, build, enchanting, medieval
 dimensions: 9x10x9
-materials: stone_bricks x 201, spruce_planks x 63, oak_stairs x 7, bookshelf x 22, enchanting_table x 1, oak_door x 1, torch x 6, glass_pane x 8, oak_slab x 8, ladder x 7, spruce_log x 8
+materials: stone_bricks x 201, spruce_planks x 63, oak_stairs x 7, bookshelf x 22, enchanting_table x 1, oak_door x 1, torch x 6, glass_pane x 8, ladder x 7, spruce_log x 8
 description: A 9x9 tall wizard's tower with 8 habitable levels, spiral staircase, enchanting chamber, library, and spire roof.
 ---
 

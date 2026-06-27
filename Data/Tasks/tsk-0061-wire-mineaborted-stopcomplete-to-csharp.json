@@ -1,0 +1,37 @@
+{
+  "id": "tsk-0061-wire-mineaborted-stopcomplete-to-csharp",
+  "key": "TSK-0061",
+  "title": "Wire mineAborted/stopComplete events to C# side",
+  "description": "## Problem\nThe Mineflayer adapter (`index.js`) already emits `mineAborted` (Sprint 18 stop path) and `stopComplete` (from `handleStop()`) events, but `WebSocketBridge.ParseEvent()` returns `null` for both. No C# `WorldEvent` subtype exists for either event. The C# agent therefore cannot confirm that a stop command completed or that mining was aborted.\n\n## Source\nCouncil review DEF-PAPER-2 (Confidence: 100%). This is a current production defect.\n\n## Requirements\n1. Define C# `WorldEvent` subtypes: `MineAbortedEvent` and `StopCompleteEvent` in `Agent.Core/Events/WorldEvents.cs`\n2. Add parsing in `Agent.World.Minecraft/WebSocketBridge.cs` to deserialize these events from adapter JSON\n3. Add handling in `WebUI.Blazor/AgentBackgroundService.cs` `ProcessEventsAsync` switch statement\n4. Ensure `mineAborted` triggers correlation completion for `MineBlock` (similar to how `mineComplete` works)\n5. Verify both events survive the serialization/deserialization round trip\n\n## References\n- `MineflayerAdapter/index.js` — `mineAborted` and `stopComplete` emission points\n- `Agent.World.Minecraft/WebSocketBridge.cs` — `ParseEvent()` returns null for both\n- `Agent.Core/Events/WorldEvents.cs` — where new event types should be added\n- Council review: DEF-PAPER-2 — \"mineAborted and stopComplete already exist and are already broken\"",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint40",
+    "mineflayer-adapter",
+    "fix",
+    "events",
+    "council-response"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audit/mineflayer-adapter-research.md"
+  ],
+  "comments": [{"author":"Agent","text":"Completed Sprint 40 P0. Events were already wired in index.js (3 paths: stop check, goto catch, dig catch) and C# side (WebSocketBridge.ParseEvent, AgentBackgroundService.ProcessEventsAsync). Verified: no code change needed — events were already fully functional. The task description was based on an outdated assumption that these events weren't wired."}],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-22T00:00:00Z",
+  "updatedAtUtc": "2026-06-22T00:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

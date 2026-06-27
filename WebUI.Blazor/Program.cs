@@ -1,8 +1,10 @@
 // MemorySmith.Agent — Web UI & Agent Host
-// v0.28.0  Sprint 33 — Build verify, DI logger wiring, base64 sweep, Rule E-2
+// v0.52.0  Sprint 52 — Codebase Health + TSK-0121 MoveTo Fix + Build Identity
 
 using Agent.Construction;
 using Agent.Core;
+using Agent.Core.Runtime;
+using WebUI.Blazor.Managers;
 using Agent.Memory;
 using Agent.Planning;
 using Agent.Planning.Llm;
@@ -13,6 +15,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
 using WebUI.Blazor;
+using WebUI.Blazor.Dashboard.Logging;
 using WebUI.Blazor.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,6 +49,17 @@ builder.Host.UseSerilog((context, services, loggerConfig) =>
             shared: true,
             restrictedToMinimumLevel: LogEventLevel.Debug,
             outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {SourceContext}: {Message:lj} {Properties:j}{NewLine}{Exception}");
+
+    // Wire the live dashboard log buffer sink.
+    // Registered as a singleton below so the same buffer is shared between
+    // the Serilog sink, REST endpoints, and SignalR push.
+    var buffer = services.GetRequiredService<LiveLogBuffer>();
+    loggerConfig.WriteTo.Sink(new DashboardLogSink(buffer));
+
+    // SQLite sink REMOVED Sprint 51: Serilog.Sinks.SQLite 7.0.0 transitively depends on
+    // SQLitePCLRaw.lib.e_sqlite3 2.1.11 which is DEPRECATED with an UNPATCHED high-severity
+    // CVE (GHSA-2m69-gcr7-jv3q / CVE-2025-6965, CVSS 7.2). The File sink provides
+    // persistent log storage without the dependency chain. See BREAKING_CHANGES.md.
 });
 
 
@@ -59,10 +73,23 @@ if (!string.IsNullOrEmpty(memorysmithApiKey))
     builder.Configuration["Agent:Memory:ApiKey"] = memorysmithApiKey;
 }
 
+// Map MSA_LLM_API_KEY env var → Agent:Chat:LlmApiKey so cloud LLM providers
+// (DeepSeek, OpenAI, Anthropic, etc.) can use credentials without hardcoding
+// them in appsettings.json.
+var llmApiKey = Environment.GetEnvironmentVariable("MSA_LLM_API_KEY");
+if (!string.IsNullOrEmpty(llmApiKey))
+{
+    builder.Configuration["Agent:Chat:LlmApiKey"] = llmApiKey;
+}
+
 builder.Services.Configure<RestMemoryGatewayOptions>(
     builder.Configuration.GetSection("Agent:Memory"));
 builder.Services.Configure<MinecraftAdapterConfig>(
     builder.Configuration.GetSection("Agent:Minecraft"));
+
+// Live log buffer for the dashboard — must be registered before the Serilog
+// config lambda above so the DashboardLogSink can resolve it.
+builder.Services.AddSingleton<LiveLogBuffer>();
 
 var agentEnabled = builder.Configuration.GetValue<bool>("Agent:Enabled");
 
@@ -78,7 +105,8 @@ if (agentEnabled)
         http.Timeout     = TimeSpan.FromSeconds(opts.TimeoutSeconds);
         if (!string.IsNullOrEmpty(opts.ApiKey))
             http.DefaultRequestHeaders.Add("X-Api-Key", opts.ApiKey);
-    });
+    })
+    .AddStandardResilienceHandler(); // Sprint 53 (TSK-0194): retry with backoff + circuit breaker
     builder.Services.AddSingleton<IMemoryGateway>(sp =>
     {
         var factory = sp.GetRequiredService<IHttpClientFactory>();
@@ -95,7 +123,8 @@ if (agentEnabled)
         var apiKey   = opts.WorldApiKey ?? opts.ApiKey;
         if (!string.IsNullOrEmpty(apiKey))
             http.DefaultRequestHeaders.Add("X-Api-Key", apiKey);
-    });
+    })
+    .AddStandardResilienceHandler(); // Sprint 53 (TSK-0194): retry with backoff + circuit breaker
     builder.Services.AddKeyedSingleton<IMemoryGateway>("world", (sp, _) =>
     {
         var factory  = sp.GetRequiredService<IHttpClientFactory>();
@@ -113,9 +142,12 @@ if (agentEnabled)
     builder.Services.AddSingleton<IItemRegistry>(sp =>
         new MemorySmithItemRegistry(
             sp.GetRequiredService<IMemoryGateway>(),
-            sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value));
+            sp.GetRequiredService<IOptions<RestMemoryGatewayOptions>>().Value,
+            logger: sp.GetService<ILogger<MemorySmithItemRegistry>>()));
     builder.Services.AddSingleton<IBlueprintRepository>(sp =>
-        new MemorySmithBlueprintRepository(sp.GetRequiredService<IMemoryGateway>()));
+        new MemorySmithBlueprintRepository(
+            sp.GetRequiredService<IMemoryGateway>(),
+            logger: sp.GetService<ILogger<MemorySmithBlueprintRepository>>()));
 
     builder.Services.AddSingleton<IKnowledgeResolver>(sp =>
         new LocalKnowledgeResolver(
@@ -129,11 +161,14 @@ if (agentEnabled)
         sp.GetRequiredService<ILogger<GoalFactory>>())); // Sprint 33 DEF-S32-A
     builder.Services.AddSingleton<IGoalFactory>(sp => sp.GetRequiredService<GoalFactory>());
 
-    builder.Services.AddSingleton<ChatHistory>();
-
     var chatOpts = new ChatOptions();
     var chatSection = builder.Configuration.GetSection("Agent:Chat");
     chatSection.Bind(chatOpts);
+
+    // Sprint 52: ChatHistory uses configurable max turns (default 30).
+    // Future TSK-0169 will add character-length-based eviction.
+    builder.Services.AddSingleton<ChatHistory>(
+        _ => new ChatHistory(chatOpts.ChatHistoryMaxTurns));
     var legacyModel = chatSection["Model"];
     if (!string.IsNullOrWhiteSpace(legacyModel) && string.IsNullOrWhiteSpace(chatSection["LlmModel"]))
         chatOpts = chatOpts with { LlmModel = legacyModel };
@@ -165,15 +200,35 @@ if (agentEnabled)
     });
 
     builder.Services.AddSingleton<ChatRateLimiter>();
+    // Sprint 37 P1-A: IntentManager maps IntentDraft → GoalRequest for GoalFactory.
+    // Enforces PRINCIPLE-1: parsers (LlmChatInterpreter) never create goals.
+    builder.Services.AddSingleton<IntentManager>();
     builder.Services.AddSingleton<ChatInterpreter>();
+    // Sprint 51: dedicated LLM context dump logger for full raw request/response audit.
+    builder.Services.AddSingleton<LlmContextLogger>();
     builder.Services.AddSingleton<IChatInterpreter>(sp =>
-        new LlmChatInterpreter(
+    {
+        // Sprint 36 P1-C: pass registered tool names to the LLM system prompt so the
+        // model knows what tools are available when deciding intent.
+        // Use ToolDispatcher.RegisteredNames (sorted keys, including aliases like "Status")
+        // rather than .All.Select(t=>t.Name) which is nondeterministic and drops aliases.
+        // Resolving IToolCaller first is safe — there are no circular dependencies here.
+        var toolNames = (sp.GetRequiredService<IToolCaller>() as ToolDispatcher)
+                            ?.RegisteredNames
+                        ?? (IReadOnlyList<string>)[];
+        // Sprint 37 P1-B: inject IntentManager so ParseDecision delegates
+        // intent→goal mapping to it (PRINCIPLE-1: parsers never create goals).
+        return new LlmChatInterpreter(
             sp.GetRequiredService<ILlmProvider>(),
             sp.GetRequiredService<ChatInterpreter>(),
             sp.GetRequiredService<ChatRateLimiter>(),
             chatOpts,
             sp.GetRequiredService<ChatHistory>(),
-            sp.GetRequiredService<ILogger<LlmChatInterpreter>>()));
+            sp.GetRequiredService<ILogger<LlmChatInterpreter>>(),
+            registeredToolNames: toolNames,
+            intentManager: sp.GetRequiredService<IntentManager>(),
+            contextLogger: sp.GetRequiredService<LlmContextLogger>());
+    });
 
     // ── Tools ──────────────────────────────────────────────────────────────────────────────────
     builder.Services.AddSingleton<IToolCaller>(sp =>
@@ -183,7 +238,8 @@ if (agentEnabled)
         // Sprint 23 P0-B: SearchMemory + CreatePage route to world KB; GetPage uses agent KB.
         var worldMemory = sp.GetKeyedService<IMemoryGateway>("world") ?? memory;
         var journal = sp.GetRequiredService<IAgentJournal>();
-        var d = new ToolDispatcher(journal);
+        // TSK-0120: pass ILogger<ToolDispatcher> so duplicate-registration warnings emit correctly.
+        var d = new ToolDispatcher(journal, sp.GetRequiredService<ILogger<ToolDispatcher>>());
         d.Register(new MoveToTool(world));
         // Sprint 25 P0-B: StatusTool deleted (duplicate of GetStatusTool).
         // GetStatusTool is registered under its canonical name "GetStatus" and aliased as "Status"
@@ -193,6 +249,7 @@ if (agentEnabled)
         d.Register(new MineBlockTool(world));
         d.Register(new WanderTool(world));
         d.Register(new PlaceBlockTool(world));
+        d.Register("place", new PlaceBlockTool(world)); // wire protocol alias (BlueprintExecutor uses "place")
         d.Register(new SearchMemoryTool(worldMemory)); // world KB
         d.Register(new GetPageTool(memory));           // agent KB
         d.Register(new CreatePageTool(worldMemory));   // world KB
@@ -217,9 +274,15 @@ if (agentEnabled)
         var lf  = sp.GetRequiredService<ILoggerFactory>(); // Sprint 32 BLK-01: BuildGoalDecomposer requires ILogger
         var reg = new DecomposerRegistry();
         reg.Register(new BuildGoalDecomposer(lib, lf.CreateLogger<BuildGoalDecomposer>()));
+        // Sprint 54: PlaceBlockGoalDecomposer MUST be registered before
+        // GatherGoalDecomposer. GatherGoalDecomposer.CanHandle matches IItemSpecGoal
+        // which would also match PlaceBlockGoal if it implemented that interface.
+        // Registration order ensures PlaceBlockGoal reaches the right decomposer.
+        reg.Register(new PlaceBlockGoalDecomposer()); // Sprint 54
         reg.Register(new GatherGoalDecomposer(lib));
         reg.Register(new SurviveNightGoalDecomposer(lib));
         reg.Register(new CraftItemGoalDecomposer(lib)); // Sprint 27 P0-D
+        reg.Register(new SmeltGoalDecomposer(lib)); // Sprint 44 (TSK-0079)
         return reg;
     });
     builder.Services.AddSingleton<PlannerRouter>(sp =>
@@ -231,12 +294,54 @@ if (agentEnabled)
 
     builder.Services.AddSingleton<IAgentJournal>(new AgentJournal());
 
-    builder.Services.AddSingleton<IReplanGovernor, ReplanGovernor>();
+    // Sprint 41: increased threshold from 3 to 5 to prevent false stalls under
+    // the 2-second replan interval — a 6-second stall window was too short when
+    // block placement + pathfinding can take 4-10 seconds per action.
+    builder.Services.AddSingleton<IReplanGovernor>(
+        _ => new ReplanGovernor(identicalPlanThreshold: 5));
 
     // Sprint 27 P0-C: injectable time provider for deterministic testing.
     builder.Services.AddSingleton<ITimeProvider>(SystemTimeProvider.Instance);
 
     builder.Services.AddSignalR();
+
+    // Sprint 39 P1: LLM evaluator for observation-driven replanning.
+    builder.Services.AddSingleton<ILlmEvaluator>(sp => new LlmEvaluatorImpl(
+        sp.GetRequiredService<ILlmProvider>(),
+        sp.GetRequiredService<ILogger<LlmEvaluatorImpl>>()));
+
+    // Sprint 39 P2: AgentRuntime component implementations.
+    builder.Services.AddSingleton<IIntentManager>(sp =>
+    {
+        var cfg2 = sp.GetRequiredService<IOptions<MinecraftAdapterConfig>>().Value;
+        return new IntentManagerImpl(
+            sp.GetRequiredService<IChatInterpreter>(),
+            sp.GetRequiredService<IntentManager>(),
+            cfg2.BotUsername,
+            sp.GetRequiredService<ILogger<IntentManagerImpl>>());
+    });
+    builder.Services.AddSingleton<IPlanningManager>(sp => new PlanningManagerImpl(
+        sp.GetRequiredService<IPlanner>(),
+        sp.GetService<IReplanGovernor>(),
+        sp.GetRequiredService<ILogger<PlanningManagerImpl>>()));
+    builder.Services.AddSingleton<IExecutionManager>(sp => new ExecutionManagerImpl(
+        sp.GetRequiredService<IToolCaller>(),
+        sp.GetRequiredService<ILogger<ExecutionManagerImpl>>()));
+    builder.Services.AddSingleton<IRecoveryManager>(sp => new RecoveryManagerImpl(
+        sp.GetRequiredService<ILogger<RecoveryManagerImpl>>()));
+    builder.Services.AddSingleton<IStateManager>(sp => new StateManagerImpl(
+        sp.GetRequiredService<ILogger<StateManagerImpl>>()));
+    builder.Services.AddSingleton<IDashboardPublisher>(sp => new DashboardPublisherImpl(
+        sp.GetService<IHubContext<AgentHub>>(),
+        sp.GetRequiredService<IStateManager>(),
+        sp.GetRequiredService<ILogger<DashboardPublisherImpl>>()));
+    builder.Services.AddSingleton<AgentRuntime>(sp => new AgentRuntime(
+        sp.GetRequiredService<IIntentManager>(),
+        sp.GetRequiredService<IPlanningManager>(),
+        sp.GetRequiredService<IExecutionManager>(),
+        sp.GetRequiredService<IRecoveryManager>(),
+        sp.GetRequiredService<IStateManager>(),
+        sp.GetRequiredService<IDashboardPublisher>()));
 
     builder.Services.AddSingleton<AgentBackgroundService>(sp =>
     {
@@ -253,7 +358,20 @@ if (agentEnabled)
             botName:         cfg.BotUsername,
             journal:         sp.GetRequiredService<IAgentJournal>(),
             replanGovernor:  sp.GetRequiredService<IReplanGovernor>(),
-            timeProvider:    sp.GetRequiredService<ITimeProvider>());  // Sprint 27 P0-C
+            timeProvider:    sp.GetRequiredService<ITimeProvider>(),
+            // Sprint 39 P1-C: inject IntentManager for chat → goal routing in HandleChatEventAsync.
+            intentManager:   sp.GetRequiredService<IntentManager>(),
+            // Sprint 39 P1: LLM evaluator for observation-driven replanning.
+            llmEvaluator:    sp.GetRequiredService<ILlmEvaluator>(),
+            // Sprint 52: ChatHistory for recording bot responses so LLM has
+            // conversational context across turns.
+            chatHistory:              sp.GetRequiredService<ChatHistory>(),
+            // Sprint 54 (TSK-0203): IMemoryGateway for cross-session fact persistence.
+            memoryGateway:            sp.GetService<IMemoryGateway>(),
+            // Sprint 52: configurable max concurrent PlaceBlock dispatches.
+            maxConcurrentPlaceBlock:  builder.Configuration.GetValue<int>("Agent:Build:MaxConcurrentPlaceBlock", 8),
+            // Sprint 54 (TSK-0199): max chat response length before splitting.
+            chatMaxResponseLength:    chatOpts.ChatMaxResponseLength);
     });
     builder.Services.AddHostedService(sp => sp.GetRequiredService<AgentBackgroundService>());
 }
@@ -265,7 +383,23 @@ if (!agentEnabled)
 }
 
 var app = builder.Build();
-app.UseSerilogRequestLogging();
+// Sprint 51: Suppress HTTP request logging for dashboard polling endpoints.
+// The dashboard polls /api/dashboard/*, /api/agent/queue, and /api/agent/status
+// every 1-3 seconds — logging every poll doubles the log volume with noise.
+app.UseSerilogRequestLogging(opts =>
+{
+    opts.GetLevel = (ctx, elapsed, ex) =>
+    {
+        if (ex is not null) return LogEventLevel.Error;
+        var path = ctx.Request.Path.Value ?? "";
+        // Suppress dashboard polling noise
+        if (path.StartsWith("/api/dashboard/", StringComparison.OrdinalIgnoreCase) ||
+            path.Equals("/api/agent/queue", StringComparison.OrdinalIgnoreCase) ||
+            path.Equals("/api/agent/status", StringComparison.OrdinalIgnoreCase))
+            return LogEventLevel.Debug;
+        return LogEventLevel.Information;
+    };
+});
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
@@ -278,6 +412,7 @@ app.UseWhen(
 
 if (agentEnabled)
 {
+    app.Logger.LogInformation("MemorySmith.Agent v0.51.1 starting (Sprint 51 Wave B)");
     var opts = app.Services.GetRequiredService<ChatOptions>();
     app.Logger.LogInformation(
         "Chat LLM config: enabled={Enabled}, provider={Provider}, model={Model}, baseUrl={BaseUrl}",
@@ -316,21 +451,30 @@ if (agentEnabled)
 if (agentEnabled)
     app.MapHub<AgentHub>("/agent-hub");
 
-app.MapGet("/", () => "MemorySmith.Agent is running.");
+// Sprint 50 Wave C: root / now redirects to dashboard HTML.
+// UseDefaultFiles + UseStaticFiles serve index.html from wwwroot/.
+// This MapGet is a fallback in case static file middleware doesn't match.
+app.MapGet("/", (HttpContext ctx) =>
+{
+    ctx.Response.Redirect("/index.html");
+    return Task.CompletedTask;
+});
 
 app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
 {
     Name    = "MemorySmith.Agent",
-    Version = "0.28.0",
-    Phase   = "Sprint 33 — Build verify, DI logger wiring, base64 sweep, Rule E-2",
+    Version = "0.50.2",
+    Phase   = "Sprint 51 — Wave A: Canonicalize & Classify + Harden Robustness",
     License = "MIT",
     Repository  = "https://github.com/TheMasonX/MemorySmith.Agent",
-    Dashboard   = "/",
+    Dashboard   = "/index.html",
     RegisteredGoals = factory?.RegisteredGoals ?? [],
 }));
 
 app.MapGet("/api/agent/status", (AgentBackgroundService? agent, IWorldModel? worldModel) =>
-    Results.Ok(new
+{
+    var currentAction = agent?.GetCurrentAction();
+    return Results.Ok(new
     {
         Status              = agentEnabled ? (agent?.CurrentGoal != null ? "active" : "idle") : "disabled",
         Goal                = agent?.CurrentGoal?.Name,
@@ -339,11 +483,15 @@ app.MapGet("/api/agent/status", (AgentBackgroundService? agent, IWorldModel? wor
         Health              = agent?.WorldState.Health  ?? 0,
         Food                = agent?.WorldState.Food    ?? 0,
         Position            = agent?.WorldState.Position,
+        CurrentAction       = currentAction is not null
+            ? new { tool = currentAction.Tool, args = currentAction.Arguments }
+            : null,
         Inventory           = agent?.WorldState.Inventory,
         QueuedActions       = agent?.GetPendingActions().Count ?? 0,
         ConsecutiveFailures = agent?.ConsecutiveFailures ?? 0,
         Uncertainty         = worldModel?.Uncertainty ?? 0.0,
-    }));
+    });
+});
 
 app.MapGet("/api/goals", (IGoalFactory? factory) =>
     Results.Ok(factory?.RegisteredGoals ?? []));
@@ -413,7 +561,7 @@ app.MapPost("/api/agent/command", (CommandRequest req, AgentBackgroundService? a
     if (tools is not ToolDispatcher dispatcher)
         return Results.Problem("Tool dispatcher not available.");
     if (dispatcher.Get(req.Command) is null)
-        return Results.BadRequest(new { Error = $"Unknown tool '{req.Command}'.", Registered = dispatcher.All.Select(t => t.Name) });
+        return Results.BadRequest(new { Error = $"Unknown tool '{req.Command}'.", Registered = dispatcher.RegisteredNames });
     agent.Enqueue(new ActionData { Tool = req.Command });
     return Results.Ok(new { Received = req.Command, Status = "queued" });
 });
@@ -440,6 +588,85 @@ app.MapGet("/api/agent/journal", (
     )).ToList();
 
     return Results.Ok(new { count = journal.Count, returned = dtos.Count, entries = dtos });
+});
+
+app.MapGet("/api/dashboard/logs", (
+    LiveLogBuffer? buffer,
+    int limit = 100,
+    string? level = null,
+    string? source = null) =>
+{
+    if (buffer is null)
+        return Results.Ok(new { count = 0, returned = 0, entries = Array.Empty<object>() });
+
+    var entries = buffer.GetLatest(limit);
+
+    if (!string.IsNullOrWhiteSpace(level))
+        entries = entries.Where(e =>
+            e.Level.Equals(level, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    if (!string.IsNullOrWhiteSpace(source))
+        entries = entries.Where(e =>
+            e.Source.Contains(source, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    return Results.Ok(new { count = buffer.Count, returned = entries.Count, entries });
+});
+
+app.MapGet("/api/dashboard/timeline", (
+    IAgentJournal? journal,
+    LiveLogBuffer? buffer,
+    int limit = 50) =>
+{
+    // Merge recent journal entries and log events into a unified timeline,
+    // newest first.
+    var timeline = new List<object>();
+
+    if (journal is not NullAgentJournal && journal is not null)
+    {
+        var journalEntries = journal.Query(null).Take(limit).ToList();
+        foreach (var je in journalEntries)
+        {
+            timeline.Add(new
+            {
+                timestamp = je.Timestamp.ToString("O"),
+                type = "journal",
+                source = je.Type.ToString(),
+                summary = je.Summary,
+                details = (je.Details ?? new Dictionary<string, object?>())
+                    .ToDictionary(kv => kv.Key, kv => kv.Value?.ToString())
+            });
+        }
+    }
+
+    if (buffer is not null)
+    {
+        var logEntries = buffer.GetLatest(limit);
+        foreach (var le in logEntries)
+        {
+            timeline.Add(new
+            {
+                timestamp = le.TimestampUtc.ToString("O"),
+                type = "log",
+                source = le.Source,
+                summary = le.Message,
+                details = le.Exception is not null
+                    ? new Dictionary<string, string?> { ["exception"] = le.Exception }
+                    : null
+            });
+        }
+    }
+
+    // Sort by timestamp descending, take limit
+    var merged = timeline
+        .OrderByDescending(e =>
+        {
+            var ts = e.GetType().GetProperty("timestamp")?.GetValue(e) as string;
+            return ts is not null && DateTimeOffset.TryParse(ts, out var dt) ? dt : DateTimeOffset.MinValue;
+        })
+        .Take(limit)
+        .ToList();
+
+    return Results.Ok(new { count = merged.Count, entries = merged });
 });
 
 app.MapGet("/api/agent/worldmodel", (IWorldModel? model, bool detail = true) =>

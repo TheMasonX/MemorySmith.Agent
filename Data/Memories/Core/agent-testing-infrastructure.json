@@ -1,0 +1,18 @@
+{
+  "Id": "agent-testing-infrastructure",
+  "Title": "MemorySmith.Agent — Testing Infrastructure & Conventions",
+  "Content": "The test project (MemorySmith.Agent.Tests) uses NUnit 4.6.1 with standard mocking patterns. ~63+ tests as of Sprint 40.\n\n## Test Stack\n\n- NUnit 4.6.1, NUnit3TestAdapter 6.2.0, Microsoft.NET.Test.Sdk 18.6.0\n- coverlet.collector 10.0.1 for code coverage\n- GitHubActionsTestLogger 2.4.1 for CI annotations\n- Moq or manual mock implementations (MockMemoryGateway, etc.)\n\n## Test Categories\n\nBased on test file organization:\n- Domain model tests (~7): WorldState, Position, ItemSpec, Fact\n- Memory gateway tests (~7): RestMemoryGateway, MockMemoryGateway, SearchResult disambiguation\n- Tool engine tests (~4): ToolDispatcher, InputSchema validation, tool call routing\n- World adapter tests (~6): MinecraftAdapter, WebSocketBridge, message serialization\n- Planner + goal tests (~15+): HtnPlanner, each goal type IsComplete/HasFailed, PlannerRouter routing, decomposer registration\n- Integration tests (~6): Full pipeline tests (Connect → Plan → Dispatch → Event → Complete), ReconnectAfterFailures, etc.\n- Chat interpreter tests: ChatInterpreter pattern matching, LlmChatInterpreter JSON parsing, confidence threshold behavior\n\n## Mock Strategy\n\n- MockMemoryGateway: in-memory implementation of IMemoryGateway for unit tests (no real MemorySmith instance needed)\n- MockWorldAdapter: simulates WebSocket events for pipeline testing\n- Test-injectable delays: optional constructor params with 'null = use defaults' pattern so tests can inject zero-delay values\n- file-scoped test helper classes: use 'file' modifier to avoid name collisions\n\n## CI Configuration\n\n- GitHub Actions with single build-and-test job on ubuntu-latest\n- ci.runsettings activates GitHubActionsTestLogger\n- dotnet build --no-restore first (restore cached in CI)\n- dotnet test with coverage via coverlet.collector\n\n## Known Issues\n\n- coverlet.collector 6.0.4 doesn't exist on NuGet — use 10.0.1\n- XPlat Code Coverage locally shows 'Unable to find datacollector' but tests still pass (exit 0)\n- Sandbox NuGet restore may fail with proxy 407 — workaround: start authproxy.py on port 9081, override HTTPS_PROXY/https_proxy\n- Some test data fixtures use real Data/Memories files — tests should copy to temp storage before mutation (per copilot-instructions.md)\n\n## Test Patterns\n\n- Arrange/Act/Assert with descriptive test names (TestName_Scenario_ExpectedBehavior)\n- Test categories via [Category('name')] attribute\n- Async test methods with Task return type\n- Parallel test execution within assembly (NUnit default)\n\n## Scripts\n\n- Scripts/Validate-Repo.ps1: default local validation entrypoint. Flags: -IncludeCoverage, -IncludeE2E, -IncludeDocs\n- Scripts/ directories also contain utility scripts for sandbox setup and data management",
+  "Status": 2,
+  "Confidence": 0.92,
+  "Tags": ["agent", "testing", "nunit", "ci", "mocks", "kind:reference", "audience:agent", "scope:testing"],
+  "References": ["agent-ci-baseline-status", "agent-phase-status-current"],
+  "Conflicts": [],
+  "SourceLinks": [
+    { "Label": "Test project", "Uri": "%RepoRoot%MemorySmith.Agent.Tests/" },
+    { "Label": "Test csproj", "Uri": "%RepoRoot%MemorySmith.Agent.Tests/MemorySmith.Agent.Tests.csproj" },
+    { "Label": "CI workflow", "Uri": "%RepoRoot%.github/workflows/ci.yml" },
+    { "Label": "Validate-Repo.ps1", "Uri": "%RepoRoot%Scripts/Validate-Repo.ps1" }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-06-23T00:00:00Z"
+}
