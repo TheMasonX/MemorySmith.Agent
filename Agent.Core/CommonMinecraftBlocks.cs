@@ -140,4 +140,96 @@ public static class CommonMinecraftBlocks
             return normalized;
         return normalized; // best-effort fallback
     }
+
+    // ── Crafting data tables (extracted from HtnTaskLibrary, Sprint 52) ──────
+
+    /// <summary>Vanilla: 1 log → 4 planks.</summary>
+    public const int PlanksPerLog = 4;
+
+    /// <summary>Vanilla: 1 stick + 1 coal → 4 torches.</summary>
+    public const int TorchesPerCraft = 4;
+
+    /// <summary>
+    /// Maps plank item IDs to their source log item IDs for raw-material prerequisite
+    /// gathering before crafting.
+    /// </summary>
+    public static readonly IReadOnlyDictionary<string, string> PlankToLogMap =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["oak_planks"]       = "oak_log",
+        ["birch_planks"]     = "birch_log",
+        ["spruce_planks"]    = "spruce_log",
+        ["dark_oak_planks"]  = "dark_oak_log",
+        ["jungle_planks"]    = "jungle_log",
+        ["acacia_planks"]    = "acacia_log",
+        ["mangrove_planks"]  = "mangrove_log",
+        ["cherry_planks"]    = "cherry_log",
+    };
+
+    /// <summary>Items that require a crafting table (3×3 grid).</summary>
+    public static readonly HashSet<string> RequiresCraftingTable = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "oak_slab", "oak_stairs", "oak_door", "oak_fence", "oak_fence_gate",
+        "chest", "wooden_pickaxe", "wooden_axe", "wooden_shovel",
+        "stone_pickaxe", "stone_axe", "stone_shovel", "stone_sword",
+        "iron_pickaxe", "iron_axe", "iron_shovel", "iron_sword", "iron_hoe",
+        "iron_helmet", "iron_chestplate", "iron_leggings", "iron_boots",
+    };
+
+    /// <summary>Iron ingots required to craft each iron tool or armour piece.</summary>
+    public static readonly IReadOnlyDictionary<string, int> IronIngotRequirements =
+        new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["iron_pickaxe"]    = 3,
+        ["iron_axe"]        = 3,
+        ["iron_shovel"]     = 1,
+        ["iron_sword"]      = 2,
+        ["iron_hoe"]        = 2,
+        ["iron_helmet"]     = 5,
+        ["iron_chestplate"] = 8,
+        ["iron_leggings"]   = 7,
+        ["iron_boots"]      = 4,
+    };
+
+    /// <summary>Cobblestone required to craft each stone tool.</summary>
+    public static readonly IReadOnlyDictionary<string, int> CobblestoneRequirements =
+        new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["stone_pickaxe"] = 3,
+        ["stone_axe"]     = 3,
+        ["stone_shovel"]  = 1,
+        ["stone_sword"]   = 2,
+        ["stone_hoe"]     = 2,
+    };
+
+    /// <summary>Blocks that require a pickaxe to mine efficiently.</summary>
+    public static readonly HashSet<string> RequiresPickaxeBlocks = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "cobblestone", "stone", "andesite", "diorite", "granite",
+        "iron_ore", "deepslate_iron_ore", "coal_ore", "deepslate_coal_ore",
+        "gold_ore", "deepslate_gold_ore",
+        "diamond_ore", "deepslate_diamond_ore",
+        "copper_ore", "deepslate_copper_ore",
+    };
+
+    /// <summary>Blocks that require an axe to mine efficiently.</summary>
+    public static readonly HashSet<string> RequiresAxeBlocks = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "oak_log", "birch_log", "spruce_log", "dark_oak_log",
+        "jungle_log", "acacia_log", "cherry_log", "mangrove_log",
+    };
+
+    /// <summary>All pickaxe item IDs (any tier).</summary>
+    public static readonly string[] PickaxeItems =
+        ["wooden_pickaxe", "stone_pickaxe", "iron_pickaxe", "diamond_pickaxe", "golden_pickaxe"];
+
+    /// <summary>All axe item IDs (any tier).</summary>
+    public static readonly string[] AxeItems =
+        ["wooden_axe", "stone_axe", "iron_axe", "diamond_axe", "golden_axe"];
+
+    /// <summary>First-tier pickaxe to craft when none is available.</summary>
+    public const string DefaultPickaxeToCraft = "wooden_pickaxe";
+
+    /// <summary>First-tier axe to craft when none is available.</summary>
+    public const string DefaultAxeToCraft = "wooden_axe";
 }

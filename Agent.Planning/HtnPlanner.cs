@@ -100,7 +100,7 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
         var actions = new List<ActionData>
         {
             // Sprint 44 (TSK-0080): SearchMemory removed â€” results were never consumed downstream.
-            MakeAction("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)),
+            ActionFactory.Create("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)),
         };
 
         var progressKey = BuildFactKeys.BuildProgressIndex(buildGoal.Blueprint.Name);
@@ -119,7 +119,7 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
             actions.Add(placeAction);
         }
 
-        actions.Add(MakeAction("GetStatus"));
+        actions.Add(ActionFactory.Create("GetStatus"));
         return actions;
     }
 
@@ -138,14 +138,6 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
         };
     }
 
-    private static ActionData MakeAction(
-        string tool, params (string key, object? value)[] args)
-    {
-        var action = new ActionData { Tool = tool };
-        foreach (var (key, value) in args)
-            action.Arguments[key] = value;
-        return action;
-    }
 
     private static bool TryGetIntFactFromState(WorldState state, string key, out int result)
     {

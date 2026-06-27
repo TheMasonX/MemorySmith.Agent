@@ -45,3 +45,27 @@ public record SearchResult(string PageId, double Score, string? Snippet = null, 
 
 /// <summary>High-level goal metadata returned by the LLM planner.</summary>
 public record GoalMeta(string Name, string Description, string[] Phases);
+
+// ── ActionData factory ─────────────────────────────────────────────────────
+
+/// <summary>Factory helpers for <see cref="ActionData"/>.</summary>
+public static class ActionFactory
+{
+    /// <summary>
+    /// Creates an <see cref="ActionData"/> with a tool name and key-value arguments.
+    /// Each call constructs a fresh <see cref="Dictionary{TKey,TValue}"/> to prevent
+    /// accidental shared-mutation between decomposers (TSK-0135).
+    /// </summary>
+    public static ActionData Create(
+        string tool, params (string key, object? value)[] args)
+    {
+        var dict = new Dictionary<string, object?>(args.Length);
+        foreach (var (key, value) in args)
+            dict[key] = value;
+        return new ActionData
+        {
+            Tool = tool,
+            Arguments = dict,
+        };
+    }
+}

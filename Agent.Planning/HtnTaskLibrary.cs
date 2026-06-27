@@ -212,9 +212,9 @@ public sealed class HtnTaskLibrary
                 var needOre  = Math.Max(0, needIngots - haveOre);
                 if (needOre > 0)
                 {
-                    actions.Add(MakeAction("Wander",
+                    actions.Add(ActionFactory.Create("Wander",
                         ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)150)));
-                    actions.Add(MakeAction("MineBlock",
+                    actions.Add(ActionFactory.Create("MineBlock",
                         ("block", "iron_ore"), ("count", (object?)needOre)));
                 }
 
@@ -225,11 +225,11 @@ public sealed class HtnTaskLibrary
                 if (haveCoal < coalNeeded)
                 {
                     var coalToMine = coalNeeded - haveCoal;
-                    actions.Add(MakeAction("MineBlock",
+                    actions.Add(ActionFactory.Create("MineBlock",
                         ("block", "coal_ore"), ("count", (object?)coalToMine)));
                 }
 
-                actions.Add(MakeAction("SmeltItem",
+                actions.Add(ActionFactory.Create("SmeltItem",
                     ("item", "iron_ore"), ("count", (object?)needIngots), ("fuel", "coal")));
             }
         }
@@ -241,7 +241,7 @@ public sealed class HtnTaskLibrary
             var needCobble = (cobbleCount * count) - haveCobble; // TSK-0112: scale by count
             if (needCobble > 0)
             {
-                actions.Add(MakeAction("MineBlock",
+                actions.Add(ActionFactory.Create("MineBlock",
                     ("block", "stone"), ("count", (object?)needCobble)));
             }
         }
@@ -256,7 +256,7 @@ public sealed class HtnTaskLibrary
             var logsToMine = logsNeeded - haveLogs;
             if (logsToMine > 0)
             {
-                actions.Add(MakeAction("MineBlock",
+                actions.Add(ActionFactory.Create("MineBlock",
                     ("block", logType), ("count", (object?)logsToMine)));
             }
         }
@@ -268,8 +268,8 @@ public sealed class HtnTaskLibrary
 
         // ── The craft ─────────────────────────────────────────────────────────
         // Materials should now be in inventory; CraftItemTool returns failure if not.
-        actions.Add(MakeAction("CraftItem", ("item", itemId), ("count", (object?)count)));
-        actions.Add(MakeAction("GetStatus"));
+        actions.Add(ActionFactory.Create("CraftItem", ("item", itemId), ("count", (object?)count)));
+        actions.Add(ActionFactory.Create("GetStatus"));
         return actions;
     }
 
@@ -295,7 +295,7 @@ public sealed class HtnTaskLibrary
         if (haveCoal < coalNeeded)
         {
             var coalToMine = coalNeeded - haveCoal;
-            actions.Add(MakeAction("MineBlock",
+            actions.Add(ActionFactory.Create("MineBlock",
                 ("block", "coal_ore"), ("count", (object?)coalToMine)));
         }
 
@@ -307,14 +307,14 @@ public sealed class HtnTaskLibrary
         var needInput = count - haveInput;
         if (needInput > 0 && IsMineableBlock(inputBlock))
         {
-            actions.Add(MakeAction("MineBlock",
+            actions.Add(ActionFactory.Create("MineBlock",
                 ("block", inputBlock), ("count", (object?)needInput)));
         }
 
         // Sprint 44: the actual smelt action.
-        actions.Add(MakeAction("SmeltItem",
+        actions.Add(ActionFactory.Create("SmeltItem",
             ("item", inputBlock), ("count", (object?)count), ("fuel", "coal")));
-        actions.Add(MakeAction("GetStatus"));
+        actions.Add(ActionFactory.Create("GetStatus"));
         return actions;
     }
 
@@ -357,10 +357,10 @@ public sealed class HtnTaskLibrary
         if (state.Inventory.GetValueOrDefault("oak_planks") < 4)
         {
             if (state.Inventory.GetValueOrDefault("oak_log") < 1)
-                actions.Add(MakeAction("MineBlock", ("block", "oak_log"), ("count", (object?)1)));
-            actions.Add(MakeAction("CraftItem", ("item", "oak_planks"), ("count", (object?)4)));
+                actions.Add(ActionFactory.Create("MineBlock", ("block", "oak_log"), ("count", (object?)1)));
+            actions.Add(ActionFactory.Create("CraftItem", ("item", "oak_planks"), ("count", (object?)4)));
         }
-        actions.Add(MakeAction("CraftItem", ("item", "crafting_table"), ("count", (object?)1)));
+        actions.Add(ActionFactory.Create("CraftItem", ("item", "crafting_table"), ("count", (object?)1)));
     }
 
     /// <summary>
@@ -447,7 +447,7 @@ public sealed class HtnTaskLibrary
             // Sprint 36 P0-C: only reached when SearchedRadius < FlatAreaRetryRadius.
             var searchRadius = lastArea == 0 ? FlatAreaRetryRadius : PreflightFlatAreaRadius;
 
-            return [MakeAction("FindFlatArea",
+            return [ActionFactory.Create("FindFlatArea",
                 ("radius", (object?)searchRadius),
                 ("minFlatArea", (object?)PreflightFlatAreaMin))];
         }
@@ -458,7 +458,7 @@ public sealed class HtnTaskLibrary
         {
             // Creative mode grants the agent the requested materials up front, so skip
             // mining, smelting, and crafting pre-gather actions entirely.
-            actions.Add(MakeAction("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)));
+            actions.Add(ActionFactory.Create("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)));
 
             var creativeProgressKey     = BuildFactKeys.BuildProgressIndex(blueprint.Name);
             var creativeCheckpointIndex = 0;
@@ -476,7 +476,7 @@ public sealed class HtnTaskLibrary
                 actions.Add(placeAction);
             }
 
-            actions.Add(MakeAction("GetStatus"));
+            actions.Add(ActionFactory.Create("GetStatus"));
             return actions;
         }
         else
@@ -491,8 +491,8 @@ public sealed class HtnTaskLibrary
                 var have   = state.Inventory.GetValueOrDefault(block);
                 var needed = quantity - have;
                 if (needed <= 0) continue;
-                actions.Add(MakeAction("Wander", ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)150)));
-                actions.Add(MakeAction("MineBlock", ("block", block), ("count", (object?)needed)));
+                actions.Add(ActionFactory.Create("Wander", ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)150)));
+                actions.Add(ActionFactory.Create("MineBlock", ("block", block), ("count", (object?)needed)));
             }
 
             var torchEntry = materials.TryGetValue("torch", out var tq) ? (int?)tq : null;
@@ -505,7 +505,7 @@ public sealed class HtnTaskLibrary
                     var haveCoal   = state.Inventory.GetValueOrDefault("coal");
                     if (haveCoal < coalNeeded)
                     {
-                        actions.Add(MakeAction("MineBlock", ("block", "coal_ore"), ("count", (object?)(coalNeeded - haveCoal))));
+                        actions.Add(ActionFactory.Create("MineBlock", ("block", "coal_ore"), ("count", (object?)(coalNeeded - haveCoal))));
                     }
                 }
             }
@@ -516,8 +516,8 @@ public sealed class HtnTaskLibrary
                 var toSmelt  = ironNeeded - haveIron;
                 if (toSmelt > 0)
                 {
-                    actions.Add(MakeAction("MineBlock", ("block", "iron_ore"), ("count", (object?)toSmelt)));
-                    actions.Add(MakeAction("SmeltItem", ("item", "iron_ore"), ("count", (object?)toSmelt), ("fuel", "coal")));
+                    actions.Add(ActionFactory.Create("MineBlock", ("block", "iron_ore"), ("count", (object?)toSmelt)));
+                    actions.Add(ActionFactory.Create("SmeltItem", ("item", "iron_ore"), ("count", (object?)toSmelt), ("fuel", "coal")));
                 }
             }
 
@@ -525,7 +525,7 @@ public sealed class HtnTaskLibrary
                 hasTorch: torchEntry is not null, torchNeeded: torchEntry ?? 0));
         }
 
-        actions.Add(MakeAction("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)));
+        actions.Add(ActionFactory.Create("MoveTo", ("x", (object?)originX), ("y", (object?)originY), ("z", (object?)originZ)));
 
         var progressKey     = BuildFactKeys.BuildProgressIndex(blueprint.Name);
         var checkpointIndex = 0;
@@ -543,7 +543,7 @@ public sealed class HtnTaskLibrary
             actions.Add(placeAction);
         }
 
-        actions.Add(MakeAction("GetStatus"));
+        actions.Add(ActionFactory.Create("GetStatus"));
         return actions;
     }
 
@@ -596,7 +596,7 @@ public sealed class HtnTaskLibrary
             && !materials.ContainsKey("crafting_table")
             && state.Inventory.GetValueOrDefault("crafting_table") == 0)
         {
-            actions.Add(MakeAction("CraftItem", ("item", "crafting_table"), ("count", (object?)1)));
+            actions.Add(ActionFactory.Create("CraftItem", ("item", "crafting_table"), ("count", (object?)1)));
         }
 
         foreach (var item in CraftingChainOrder)
@@ -610,8 +610,8 @@ public sealed class HtnTaskLibrary
                 var sticksNeeded = Math.Max(1, (needed + TorchesPerCraft - 1) / TorchesPerCraft);
                 var haveSticks   = state.Inventory.GetValueOrDefault("stick");
                 if (haveSticks < sticksNeeded)
-                    actions.Add(MakeAction("CraftItem", ("item", "stick"), ("count", (object?)(sticksNeeded - haveSticks))));
-                actions.Add(MakeAction("CraftItem", ("item", "torch"), ("count", (object?)needed)));
+                    actions.Add(ActionFactory.Create("CraftItem", ("item", "stick"), ("count", (object?)(sticksNeeded - haveSticks))));
+                actions.Add(ActionFactory.Create("CraftItem", ("item", "torch"), ("count", (object?)needed)));
             }
         }
 
@@ -632,7 +632,7 @@ public sealed class HtnTaskLibrary
         // BuildGoal decomposition should stay on the crafting path for crafted
         // prerequisites. It should not emit mining actions for those items;
         // explicit craft goals remain responsible for any raw-material pre-gather.
-        actions.Add(MakeAction("CraftItem", ("item", item), ("count", (object?)toCraft)));
+        actions.Add(ActionFactory.Create("CraftItem", ("item", item), ("count", (object?)toCraft)));
     }
 
     // ── Decomposers ───────────────────────────────────────────────────────────
@@ -700,11 +700,11 @@ public sealed class HtnTaskLibrary
             // Progressive wander radius: 40 → 80 → 120 based on consecutive failures.
             var wanderRadius = Math.Min(40 + (failCount - 1) * 40, 120);
             var maxDist = Math.Min(100 + (failCount - 1) * 50, 300);
-            actions.Add(MakeAction("Wander", ("radius", (object?)wanderRadius), ("maxDistanceFromSpawn", (object?)maxDist)));
+            actions.Add(ActionFactory.Create("Wander", ("radius", (object?)wanderRadius), ("maxDistanceFromSpawn", (object?)maxDist)));
         }
 
         foreach (var block in spec.SourceBlocks)
-            actions.Add(MakeAction("MineBlock", ("block", block), ("count", (object?)count)));
+            actions.Add(ActionFactory.Create("MineBlock", ("block", block), ("count", (object?)count)));
         // Sprint 38 P0-A: GetStatus removed — inventory truth now comes from
         // ItemCollectedEvent (playerCollect) which fires after each pickup.
         // ApplyStatus replaces the entire inventory snapshot, wiping additive
@@ -717,7 +717,7 @@ public sealed class HtnTaskLibrary
 
     private static IReadOnlyList<ActionData> FindTreeDecompose(string[] _, WorldState state) =>
     [
-        MakeAction("GetStatus"),
+        ActionFactory.Create("GetStatus"),
     ];
 
     private static IReadOnlyList<ActionData> MineWoodDecompose(
@@ -726,31 +726,31 @@ public sealed class HtnTaskLibrary
         var count = parameters.Length > 0 && int.TryParse(parameters[0], out var c) ? c : 10;
         return
         [
-            MakeAction("MineBlock", ("block", "minecraft:oak_log"),   ("count", (object?)count)),
-            MakeAction("MineBlock", ("block", "minecraft:birch_log"), ("count", (object?)count)),
+            ActionFactory.Create("MineBlock", ("block", "minecraft:oak_log"),   ("count", (object?)count)),
+            ActionFactory.Create("MineBlock", ("block", "minecraft:birch_log"), ("count", (object?)count)),
         ];
     }
 
     private static IReadOnlyList<ActionData> CollectDecompose(
-        string[] _, WorldState __) => [MakeAction("GetStatus")];
+        string[] _, WorldState __) => [ActionFactory.Create("GetStatus")];
 
     private static IReadOnlyList<ActionData> SurviveNightDecompose(
         string[] _, WorldState state) =>
     [
-        MakeAction("GetStatus"),
+        ActionFactory.Create("GetStatus"),
     ];
 
     private static IReadOnlyList<ActionData> FindShelterDecompose(
         string[] _, WorldState state) =>
     [
-        MakeAction("GetStatus"),
+        ActionFactory.Create("GetStatus"),
     ];
 
     private static IReadOnlyList<ActionData> LightAreaDecompose(
-        string[] _, WorldState __) => [MakeAction("GetStatus")];
+        string[] _, WorldState __) => [ActionFactory.Create("GetStatus")];
 
     private static IReadOnlyList<ActionData> WaitDecompose(
-        string[] _, WorldState __) => [MakeAction("GetStatus")];
+        string[] _, WorldState __) => [ActionFactory.Create("GetStatus")];
 
     private static IReadOnlyList<ActionData> WanderDecompose(
         string[] parameters, WorldState state)
@@ -759,8 +759,8 @@ public sealed class HtnTaskLibrary
         var maxDist = parameters.Length > 1 && int.TryParse(parameters[1], out var m) ? m : 100;
         return
         [
-            MakeAction("Wander",    ("radius", (object?)radius), ("maxDistanceFromSpawn", (object?)maxDist)),
-            MakeAction("GetStatus"),
+            ActionFactory.Create("Wander",    ("radius", (object?)radius), ("maxDistanceFromSpawn", (object?)maxDist)),
+            ActionFactory.Create("GetStatus"),
         ];
     }
 
@@ -770,10 +770,10 @@ public sealed class HtnTaskLibrary
         var maxDist = parameters.Length > 0 && int.TryParse(parameters[0], out var m) ? m : 100;
         return
         [
-            MakeAction("Wander",       ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)maxDist)),
-            MakeAction("GetStatus"),
-            MakeAction("Wander",       ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)maxDist)),
-            MakeAction("GetStatus"),
+            ActionFactory.Create("Wander",       ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)maxDist)),
+            ActionFactory.Create("GetStatus"),
+            ActionFactory.Create("Wander",       ("radius", (object?)30), ("maxDistanceFromSpawn", (object?)maxDist)),
+            ActionFactory.Create("GetStatus"),
         ];
     }
 
@@ -784,19 +784,8 @@ public sealed class HtnTaskLibrary
         var minFlatArea = parameters.Length > 1 && int.TryParse(parameters[1], out var a) ? a : 25;
         return
         [
-            MakeAction("FindFlatArea", ("radius", (object?)radius), ("minFlatArea", (object?)minFlatArea)),
-            MakeAction("GetStatus"),
+            ActionFactory.Create("FindFlatArea", ("radius", (object?)radius), ("minFlatArea", (object?)minFlatArea)),
+            ActionFactory.Create("GetStatus"),
         ];
-    }
-
-    // ── Factory helper ────────────────────────────────────────────────────────
-
-    private static ActionData MakeAction(
-        string tool, params (string key, object? value)[] args)
-    {
-        var action = new ActionData { Tool = tool };
-        foreach (var (key, value) in args)
-            action.Arguments[key] = value;
-        return action;
     }
 }
