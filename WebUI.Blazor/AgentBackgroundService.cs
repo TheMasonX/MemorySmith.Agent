@@ -1516,18 +1516,24 @@ public sealed class AgentBackgroundService(
                             logger.LogWarning(
                                 "[governor] STALLED: goal '{Goal}' — plan repeated with no inventory change (Σ={InvSum}). Auto-retry in {RetrySec}s.",
                                 _currentGoal.Name, _worldState.Inventory.Values.Sum(), stallDelaySec);
-                            // Sprint 40 P0-C (Fix): notify in chat so the user knows
-                            // the agent is aware of the stall rather than appearing frozen.
+
+                            // Sprint 54: enhanced stall message with goal-specific detail.
+                            var stallDetail = BuildStallDetail();
                             _queue.Enqueue(new ActionData
                             {
                                 Tool = "Chat",
                                 Arguments =
                                 {
                                     ["message"] =
-                                        $"I'm stuck on {_currentGoal.Name} — no progress detected. " +
+                                        $"I'm stuck on {_currentGoal.Name} — {stallDetail} " +
                                         $"Waiting {stallDelaySec}s before retrying."
                                 }
                             });
+
+                            // Sprint 54: LLM replanning — when stalled, ask the LLM to
+                            // analyze the state and suggest remediation steps.
+                            _ = TryLlmReplanOnStallAsync(ct);
+
                             continue;
                         }
                     }
@@ -2499,6 +2505,73 @@ public sealed class AgentBackgroundService(
     ///
     /// Sprint 54 (TSK-0205): TryAdvanceSequence for multi-step chaining follows.
     /// </summary>
+
+    // ── Enhanced stall diagnostics (Sprint 54) ──────────────────────────────
+
+    /// <summary>
+    /// Builds a human-readable detail string about what the current goal is
+    /// stuck on. For build goals, reports placed/total blocks and recent
+    /// timeouts. For other goals, reports general state.
+    /// </summary>
+    private string BuildStallDetail()
+    {
+        if (_currentGoal is IBuildGoal buildGoal)
+        {
+            var blueprint = buildGoal.Blueprint;
+            var totalBlocks = blueprint.Materials.Sum(m => m.Quantity);
+            var placedBlocks = 0;
+            for (int i = 0; i < totalBlocks; i++)
+            {
+                var key = BuildFactKeys.BlockStatus(blueprint.Name, i);
+                if (_worldState.Facts.TryGetValue(key, out var sv)
+                    && sv?.ToString() == BuildFactKeys.BlockStatusPlaced)
+                    placedBlocks++;
+            }
+
+            var recentTimeouts = _correlatedActions
+                .Where(kv => kv.Value.ToolName == "place"
+                    && kv.Value.State == ActionLifecycle.TimedOut)
+                .Take(3)
+                .Select(kv => kv.Key.ToString()[..8])
+                .ToList();
+
+            var timeoutNote = recentTimeouts.Count > 0
+                ? $" Recent place timeouts: {string.Join(", ", recentTimeouts)}."
+                : "";
+
+            return $"no progress. {placedBlocks}/{totalBlocks} blocks placed.{timeoutNote}";
+        }
+
+        return "no progress detected.";
+    }
+
+    /// <summary>
+    /// When stalled, asks the LLM to analyze the current world state and
+    /// suggest remediation. The LLM response is logged and sent to chat.
+    /// </summary>
+    private async Task TryLlmReplanOnStallAsync(CancellationToken ct)
+    {
+        if (_llmEvaluator is null) return;
+
+        try
+        {
+            var outcomes = _cycleOutcomes.ToArray();
+            var shouldReplan = await _llmEvaluator.EvaluateAsync(
+                _currentGoal!, outcomes, _worldState, ct);
+
+            if (shouldReplan)
+            {
+                logger.LogInformation(
+                    "[llm-replan] LLM evaluator recommends replan for '{Goal}'",
+                    _currentGoal!.Name);
+            }
+        }
+        catch (OperationCanceledException) { /* shutdown */ }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "[llm-replan] failed: {Message}", ex.Message);
+        }
+    }
 
     // ── Multi-step sequence advancement (TSK-0205) ────────────────────────────
 

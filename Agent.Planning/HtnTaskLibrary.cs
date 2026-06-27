@@ -482,7 +482,7 @@ public sealed class HtnTaskLibrary
                 if (state.Facts.TryGetValue(sk, out var sv) && sv?.ToString() == BuildFactKeys.BlockStatusPlaced)
                     placedCount++;
             }
-            _logger?.LogWarning(
+            _logger?.LogDebug(
                 "[HtnTaskLibrary] TSK-0125 creative diag: blueprint.Name='{Name}', " +
                 "totalBlocks={Total}, placedInFacts={Placed}, sampleBuildKeys=[{Keys}]",
                 blueprint.Name, creativeBlockActions.Count, placedCount,
