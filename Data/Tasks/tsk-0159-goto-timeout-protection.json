@@ -13,6 +13,7 @@
     "sprint-53"
   ],
   "estimatedHours": 2.0,
+  "linkedPages": ["Audit/mineflayer-adapter-research", "Features/mineflayer-adapter"],
   "designRef": "Data/Pages/Audit/mineflayer-adapter-research.md",
   "comments": [
     {

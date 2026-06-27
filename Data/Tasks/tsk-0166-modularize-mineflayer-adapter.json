@@ -13,6 +13,7 @@
     "sprint-55"
   ],
   "estimatedHours": 5.0,
+  "linkedPages": ["Audit/msa_planning_mineflayer_audit_20260621_1437", "Features/mineflayer-adapter"],
   "designRef": "Data/Pages/Audit/msa_planning_mineflayer_audit_20260621_1437.md",
   "comments": [
     {

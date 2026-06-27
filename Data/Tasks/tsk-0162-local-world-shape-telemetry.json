@@ -13,6 +13,7 @@
     "sprint-54"
   ],
   "estimatedHours": 2.5,
+  "linkedPages": ["Audit/msa_planning_mineflayer_audit_20260621_1437", "Features/mineflayer-adapter"],
   "designRef": "Data/Pages/Audit/msa_planning_mineflayer_audit_20260621_1437.md",
   "key": "TSK-0162"
 }
