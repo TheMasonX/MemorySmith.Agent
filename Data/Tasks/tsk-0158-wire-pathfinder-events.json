@@ -1,11 +1,18 @@
 {
-  "id": "TSK-0158",
+  "id": "tsk-0158-wire-pathfinder-events",
   "title": "Wire pathfinder events (path_update, goal_reached, path_stop) in MineflayerAdapter",
   "status": "Backlog",
   "priority": "Critical",
   "type": "Task",
   "description": "Wire mineflayer-pathfinder event listeners so the agent knows WHY navigation succeeded or failed. This is the single biggest telemetry gap identified in the Mineflayer audit.\n\nCurrently all 7 `await bot.pathfinder.goto(...)` calls are fire-and-wait — the C# side gets no pathfinding telemetry beyond the final success/failure. If goto() hangs (known issue: mineflayer-pathfinder #222, #273), the agent stalls silently.\n\nImplementation:\n1. Register pathfinder event listeners (use `bot.pathfinder.on(...)`, not `bot.on(...)` per mineflayer-pathfinder docs):\n   - `goal_reached` → log and emit `goalReached` event with target coords + correlationId\n   - `path_update` → emit only on non-success statuses: `noPath`, `timeout`, `partial`. Do NOT forward `success` status (fires on every recalc during goto).\n   - `path_stop` → emit `pathStopped` event when pathfinder is externally stopped\n2. Add `PathUpdateEvent` and `GoalReachedEvent` to `Agent.Core/Events/WorldEvents.cs`:\n   - `PathUpdateEvent(string Status, int? RemainingNodes, Position Target, DateTimeOffset Timestamp)`\n   - `GoalReachedEvent(Position Target, DateTimeOffset Timestamp)`\n   - `PathStoppedEvent(string? Reason, DateTimeOffset Timestamp)`\n3. Handle in `WebSocketBridge.ParseEvent()` and `AgentBackgroundService.ProcessEventsAsync()`.\n4. Project in `WorldStateProjector` to update `WorldState` with last pathfinder status.\n5. Include pathfinder state in `ScenePackBuilder` (TSK-0150) or `BuildSystemPrompt`.\n\nTunable constants at top of index.js:\n- `PATH_UPDATE_MAX_NODES = 500` — max nodes to include in path_update event (avoid huge payloads)\n\nAcceptance:\n- Agent receives `goalReached` when pathfinding succeeds.\n- Agent receives `pathUpdate` with `noPath`/`timeout` status when pathfinding fails.\n- No events forwarded on `pathUpdate` with `success` status (noise reduction).\n- C# tests validate new event types.\n\nRefs: `mineflayer-adapter-research.md` DEF-PAPER-1, DEF-PAPER-3, OQ-2; `msa_planning_mineflayer_audit_20260621_1437.md` Finding 2, Finding 6",
-  "labels": ["mineflayer", "pathfinder", "telemetry", "reachability", "sprint-53"],
+  "labels": [
+    "mineflayer",
+    "pathfinder",
+    "telemetry",
+    "reachability",
+    "sprint-53"
+  ],
   "estimatedHours": 3.0,
-  "designRef": "Data/Pages/Audit/mineflayer-adapter-research.md"
+  "designRef": "Data/Pages/Audit/mineflayer-adapter-research.md",
+  "key": "TSK-0158"
 }

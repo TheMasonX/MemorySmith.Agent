@@ -1,8 +1,8 @@
-﻿{
+{
   "id": "tsk-0111-fix-memory-gateway-write-path-narrow-exception-handling-in-updatepageasync",
   "key": "TSK-0111",
-  "title": "Fix memory gateway write path \u2014 narrow exception handling in UpdatePageAsync",
-  "description": "From supplemental audit finding 3 (84% confidence) and deep_code_audit finding 3 (87%): RestMemoryGateway.UpdatePageAsync catches ALL exceptions when fetching the existing page, logs \u0022404 or parse error\u0022, and then unconditionally issues a PUT upsert. Auth failures, timeouts, 500s all get flattened into the same recovery path.\n\nFix: Only catch HttpRequestException with 404 status code for the \u0022page not found\u0022 fallback. Let other exceptions (auth, timeout, 500) propagate. This prevents silent conversion of infrastructure failures into unintended writes.\n\nAlso: CreatePageAsync accepts a \u0060type\u0060 parameter that is never used. Either wire it into the request payload or remove the parameter.\n\nSource: memorysmith_agent_supplemental_audit_findings_2026-06-25.md (Finding 3), deep_code_audit (Finding 3)",
+  "title": "Fix memory gateway write path — narrow exception handling in UpdatePageAsync",
+  "description": "From supplemental audit finding 3 (84% confidence) and deep_code_audit finding 3 (87%): RestMemoryGateway.UpdatePageAsync catches ALL exceptions when fetching the existing page, logs \"404 or parse error\", and then unconditionally issues a PUT upsert. Auth failures, timeouts, 500s all get flattened into the same recovery path.\n\nFix: Only catch HttpRequestException with 404 status code for the \"page not found\" fallback. Let other exceptions (auth, timeout, 500) propagate. This prevents silent conversion of infrastructure failures into unintended writes.\n\nAlso: CreatePageAsync accepts a `type` parameter that is never used. Either wire it into the request payload or remove the parameter.\n\nSource: memorysmith_agent_supplemental_audit_findings_2026-06-25.md (Finding 3), deep_code_audit (Finding 3)",
   "type": "Task",
   "status": "Done",
   "priority": "High",
@@ -13,7 +13,6 @@
   "labels": [
     "audit",
     "bug",
-    "P1",
     "memory",
     "gateway"
   ],

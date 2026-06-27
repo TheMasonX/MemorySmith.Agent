@@ -1,8 +1,8 @@
-﻿{
+{
   "id": "tsk-0108-fix-mining-inventory-prediction-use-blocktoitemdrop-mapping-in-worldmodel-predictmine",
   "key": "TSK-0108",
-  "title": "Fix mining inventory prediction \u2014 use BlockToItemDrop mapping in WorldModel.PredictMine",
-  "description": "From deep_code_audit finding 2 (88% confidence) and sprint35_audit finding 3 (98%): WorldModel.PredictMine adds the raw block name to predicted inventory (e.g. \u0022diamond_ore\u0022 \u2192 \u002B1 diamond_ore), while WorldStateProjector.ApplyBlockMined correctly uses BlockToItemDrop mapping (e.g. \u0022diamond_ore\u0022 \u2192 \u002B1 diamond). This means prediction and projection disagree on what drops, degrading replanning quality.\n\nFix: Have PredictMine reference the same BlockToItemDrop mapping that WorldStateProjector uses. Extract BlockToItemDrop to a shared location (e.g., CommonMinecraftBlocks.cs or a new DropMapping class) so both prediction and projection use the same source of truth.\n\nSource: deep_code_audit (Finding 2), sprint35_audit (Finding 3)",
+  "title": "Fix mining inventory prediction — use BlockToItemDrop mapping in WorldModel.PredictMine",
+  "description": "From deep_code_audit finding 2 (88% confidence) and sprint35_audit finding 3 (98%): WorldModel.PredictMine adds the raw block name to predicted inventory (e.g. \"diamond_ore\" → +1 diamond_ore), while WorldStateProjector.ApplyBlockMined correctly uses BlockToItemDrop mapping (e.g. \"diamond_ore\" → +1 diamond). This means prediction and projection disagree on what drops, degrading replanning quality.\n\nFix: Have PredictMine reference the same BlockToItemDrop mapping that WorldStateProjector uses. Extract BlockToItemDrop to a shared location (e.g., CommonMinecraftBlocks.cs or a new DropMapping class) so both prediction and projection use the same source of truth.\n\nSource: deep_code_audit (Finding 2), sprint35_audit (Finding 3)",
   "type": "Task",
   "status": "Done",
   "priority": "High",
@@ -13,7 +13,6 @@
   "labels": [
     "audit",
     "bug",
-    "P1",
     "inventory",
     "mining",
     "prediction"

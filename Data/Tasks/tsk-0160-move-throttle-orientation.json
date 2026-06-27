@@ -1,11 +1,18 @@
 {
-  "id": "TSK-0160",
+  "id": "tsk-0160-move-throttle-orientation",
   "title": "Throttle move event emission and add orientation telemetry",
   "status": "Backlog",
   "priority": "High",
   "type": "Task",
   "description": "Fix the move event flood and add camera orientation telemetry. Currently `bot.on('move', () => sendEvent('move', botPos()))` fires on every physics tick (up to 20/s during pathfinding), creating excessive WebSocket traffic and redundant WorldState updates. Additionally, the bot's facing direction is never reported.\n\nImplementation:\n1. Add a throttle to move events:\n   - Minimum 250ms between position updates (4 updates/sec max).\n   - Emit immediately if position changed by > 1 block (significance filter).\n   - Use a simple `lastMoveEmittedAt` timestamp guard.\n2. Add yaw/pitch to position events:\n   - `bot.entity.yaw` and `bot.entity.pitch` are always available.\n   - Emit orientation alongside position: `{ x, y, z, yaw, pitch }`.\n3. Update `MoveEvent` in `WorldEvents.cs` to include optional `Yaw` and `Pitch`:\n   ```csharp\n   public sealed record MoveEvent(Position Pos, double? Yaw, double? Pitch, DateTimeOffset Timestamp)\n   ```\n   (Add new ctor overload for backward compat; existing Position-only calls still work.)\n4. Update `WorldStateProjector.ApplyMove` to store orientation in WorldState.\n5. Add orientation to `ScenePackBuilder` or `BuildSystemPrompt` as a compact compass direction:\n   - Convert yaw to cardinal (N/NE/E/SE/S/SW/W/NW).\n   - E.g., `\"Facing: SE (yaw: -135)\"`.\n\nTunable constants:\n- `MOVE_THROTTLE_MS = 250`\n- `MOVE_SIGNIFICANT_DISTANCE = 1` (blocks — emit immediately if moved this far)\n\nAcceptance:\n- Move event count drops significantly during pathfinding (from ~20/s to ~4/s).\n- Position is still accurate — significant moves (> 1 block) emit immediately.\n- Yaw/pitch available in WorldState.\n- Backward compatible: existing MoveEvent consumers still work.\n\nRefs: `mineflayer-adapter-research.md` DEF-PAPER-7; `msa_planning_mineflayer_audit_20260621_1437.md` Finding 2 (orientation)",
-  "labels": ["mineflayer", "telemetry", "performance", "orientation", "sprint-53"],
+  "labels": [
+    "mineflayer",
+    "telemetry",
+    "performance",
+    "orientation",
+    "sprint-53"
+  ],
   "estimatedHours": 2.0,
-  "designRef": "Data/Pages/Audit/mineflayer-adapter-research.md"
+  "designRef": "Data/Pages/Audit/mineflayer-adapter-research.md",
+  "key": "TSK-0160"
 }

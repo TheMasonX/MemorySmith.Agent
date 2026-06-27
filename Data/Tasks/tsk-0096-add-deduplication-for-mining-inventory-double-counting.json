@@ -1,8 +1,8 @@
-﻿{
+{
   "id": "tsk-0096-add-deduplication-for-mining-inventory-double-counting",
   "key": "TSK-0096",
   "title": "Add deduplication for mining inventory double-counting",
-  "description": "## Evidence\n\u0060WorldStateProjector\u0060 has two inventory increment paths for the same mined block:\n1. \u0060ApplyBlockMined\u0060 \u2014 increments for self-dropping blocks  \n2. \u0060ApplyItemCollected\u0060 \u2014 increments when playerCollect fires\n\nCode comments (WorldStateProjector.cs:106-117) explicitly acknowledge this double-counting tradeoff.\n\n## Impact\nInventory can drift high. Crafting and gather goals appear complete earlier than they should. The overcount case is likely the common path.\n\n## Fix\nOptions: (a) Make one source authoritative, (b) add deduplication keyed by correlationId \u002B block position \u002B item type, or (c) only increment in ApplyBlockMined for blocks where the drop might not be collectible, and rely on ItemCollectedEvent for everything else.\n\nAdd a regression test that mines a self-dropping block once and asserts inventory increases by exactly one.\n\n## Verification\nVerified against codebase 2026-06-23. See \u0060Data/Pages/audits/msa-audit-verification-6-23.md\u0060 section F10.",
+  "description": "## Evidence\n`WorldStateProjector` has two inventory increment paths for the same mined block:\n1. `ApplyBlockMined` — increments for self-dropping blocks  \n2. `ApplyItemCollected` — increments when playerCollect fires\n\nCode comments (WorldStateProjector.cs:106-117) explicitly acknowledge this double-counting tradeoff.\n\n## Impact\nInventory can drift high. Crafting and gather goals appear complete earlier than they should. The overcount case is likely the common path.\n\n## Fix\nOptions: (a) Make one source authoritative, (b) add deduplication keyed by correlationId + block position + item type, or (c) only increment in ApplyBlockMined for blocks where the drop might not be collectible, and rely on ItemCollectedEvent for everything else.\n\nAdd a regression test that mines a self-dropping block once and asserts inventory increases by exactly one.\n\n## Verification\nVerified against codebase 2026-06-23. See `Data/Pages/audits/msa-audit-verification-6-23.md` section F10.",
   "type": "Task",
   "status": "Done",
   "priority": "Medium",
@@ -12,7 +12,6 @@
   "reporter": "anonymous",
   "labels": [
     "bug",
-    "P1",
     "audit-verified",
     "inventory",
     "mining"

@@ -264,6 +264,10 @@ public sealed class AgentBackgroundService(
         // Sprint 25 P0-D: clear correlation tracking for new goal.
         _correlatedActions.Clear();
         _placeBlockContexts.Clear();
+        // TSK-0125: clear per-block status facts for the new build target.
+        // Old build facts (from a previous goal) are also cleaned up here
+        // by their blueprint ID prefix when CancelGoal was called.
+        ClearBuildFacts(goal);
         // Sprint 39 D-S38-01: clear cycle outcomes so the ILlmEvaluator only sees outcomes
         // from the active goal, not carry-over from a previous one.
         _cycleOutcomes.Clear();
@@ -308,6 +312,9 @@ public sealed class AgentBackgroundService(
         // Sprint 25 P0-D: clear correlation tracking on cancel.
         _correlatedActions.Clear();
         _placeBlockContexts.Clear();
+        // TSK-0125: clear per-block status facts for cancelled build.
+        if (previousGoalName?.StartsWith("Build:") == true)
+            ClearBuildFacts(previousGoalName["Build:".Length..]);
         // Sprint 4b: push goal clear to dashboard
         _ = PushGoalToDashboardAsync();
     }
@@ -682,8 +689,11 @@ public sealed class AgentBackgroundService(
                     logger.LogInformation("[place] CONFIRMED: {Block} placed @ ({X},{Y},{Z})",
                         bpe.Block, bpe.X, bpe.Y, bpe.Z);
                     _blocksPlacedThisCycle++;
-                    AdvanceBuildCheckpoint("place");
+                    // TSK-0128: use event's CorrelationId for direct context lookup.
+                    // TSK-0125: SetBlockStatus writes per-block status instead of linear checkpoint.
+                    AdvanceBuildCheckpoint("place", bpe.CorrelationId);
                     CompleteCorrelatedActionByTool("place");
+                    LogBuildProgress();
                     break;
 
                 // Sprint 43 (P0-4): terrain collision — complete correlation so tool loop
@@ -705,12 +715,8 @@ public sealed class AgentBackgroundService(
                     logger.LogWarning(
                         "[place] SKIPPED at ({X},{Y},{Z}) — {Reason} (trying to place {Block}, existing={ExistingBlock})",
                         bps.X, bps.Y, bps.Z, skipReason, bps.Block, bps.ExistingBlock);
-                    // TSK-0124: Always advance checkpoint on skip — retrying the same
-                    // position indefinitely causes the stall loop. Bot-position skips
-                    // and non-terrain collisions both mean the block can't be placed
-                    // right now; let the replan revisit later if needed.
-                    AdvanceBuildCheckpoint("place");
-                    logger.LogDebug("[build] checkpoint advanced past skip at ({X},{Y},{Z}) reason={Reason}", bps.X, bps.Y, bps.Z, skipReason);
+                    // TSK-0125: write per-block "skipped" status via the first matching context
+                    MarkSkippedBlock();
                     CompleteCorrelatedActionByTool("place");
                     break;
 
@@ -1771,30 +1777,119 @@ public sealed class AgentBackgroundService(
     /// <summary>
     /// Sprint 42 (TSK-0075): Advances the build checkpoint when a BlockPlacedEvent confirms
     /// that a block was actually placed. Looks up the stored PlaceBlock build context by
-    /// correlationId to find the blueprint ID and block index, then writes the checkpoint fact.
+    /// correlationId or by scanning Dispatched actions.
     /// Previously checkpoint was advanced at dispatch time (fire-and-forget "success"),
     /// which caused failed placements to be skipped permanently.
+    ///
+    /// TSK-0128: Accepts optional correlationId from the event. When provided, looks up
+    /// _placeBlockContexts directly by that key — this handles late events where the
+    /// correlated action was already swept to TimedOut but the context entry remains.
+    /// When not provided (legacy), falls back to scanning for first Dispatched action.
     /// </summary>
-    private void AdvanceBuildCheckpoint(string toolName)
+    private void AdvanceBuildCheckpoint(string toolName, Guid? correlationId = null)
     {
+        // TSK-0125: delegate to SetBlockStatus for per-block tracking
+        if (correlationId.HasValue && _placeBlockContexts.TryGetValue(correlationId.Value, out var directCtx))
+        {
+            SetBlockStatus(directCtx.BlueprintId, directCtx.BlockIndex, BuildFactKeys.BlockStatusPlaced);
+            return;
+        }
+
+        // Legacy: scan for first Dispatched action
         foreach (var kv in _correlatedActions)
         {
             if (kv.Value.State == ActionLifecycle.Dispatched &&
                 kv.Value.ToolName.Equals(toolName, StringComparison.OrdinalIgnoreCase))
             {
-                if (_placeBlockContexts.TryRemove(kv.Key, out var ctx))
+                if (_placeBlockContexts.TryGetValue(kv.Key, out var ctx))
                 {
-                    var progressFactKey = BuildFactKeys.BuildProgressIndex(ctx.BlueprintId);
-                    _worldState = _worldState.With(b => b.SetFact(
-                        progressFactKey,
-                        ctx.BlockIndex.ToString(),
-                        FactSource.Observed));
-                    logger.LogDebug(
-                        "[build] checkpoint advanced: {Blueprint} block {Index} (confirmed by BlockPlacedEvent)",
-                        ctx.BlueprintId, ctx.BlockIndex);
+                    SetBlockStatus(ctx.BlueprintId, ctx.BlockIndex, BuildFactKeys.BlockStatusPlaced);
                 }
-                return; // only advance for the first matching action
+                return;
             }
+        }
+    }
+
+    /// <summary>
+    /// TSK-0125: Writes a per-block status fact for build progress tracking.
+    /// Replaces the linear checkpoint (build:{blueprint}:progress:index) with
+    /// individual block status facts (build:{blueprint}:block:{N}:status).
+    /// Each block is independently tracked — a timeout on block 51 no longer
+    /// prevents blocks 52-215 from being confirmed.
+    /// </summary>
+    private void SetBlockStatus(string blueprintId, int blockIndex, string status)
+    {
+        var key = BuildFactKeys.BlockStatus(blueprintId, blockIndex);
+        _worldState = _worldState.With(b => b.SetFact(key, status, FactSource.Observed));
+        logger.LogDebug(
+            "[build] block {Blueprint} #{Index} → {Status}",
+            blueprintId, blockIndex, status);
+    }
+
+    /// <summary>
+    /// TSK-0125: Removes all per-block status facts for a blueprint.
+    /// Called on SetGoal (new build replaces old) and CancelGoal.
+    /// </summary>
+    private void ClearBuildFacts(string blueprintId)
+    {
+        var prefix = BuildFactKeys.BlockStatusPrefix(blueprintId);
+        _worldState = _worldState.With(b => b.ClearFactsByPrefix(prefix));
+        // Also clear the legacy progress index and total fact
+        _worldState = _worldState.With(b => b.ClearFactsByPrefix($"build:{blueprintId}:progress:"));
+        _worldState = _worldState.With(b => b.ClearFactsByPrefix($"build:{blueprintId}:total"));
+        logger.LogDebug("[build] cleared facts for blueprint '{Blueprint}'", blueprintId);
+    }
+
+    /// <summary>
+    /// TSK-0125: Extracts the blueprint ID from a BuildGoal and clears its facts.
+    /// </summary>
+    private void ClearBuildFacts(IGoal goal)
+    {
+        if (goal.Name.StartsWith("Build:"))
+            ClearBuildFacts(goal.Name["Build:".Length..]);
+    }
+
+    /// <summary>
+    /// TSK-0125: Marks the first matching PlaceBlock context as "skipped" for
+    /// per-block tracking. Called from the BlockPlaceSkippedEvent handler.
+    /// </summary>
+    private void MarkSkippedBlock()
+    {
+        foreach (var kv in _correlatedActions)
+        {
+            if (kv.Value.State == ActionLifecycle.Dispatched &&
+                kv.Value.ToolName.Equals("place", StringComparison.OrdinalIgnoreCase))
+            {
+                if (_placeBlockContexts.TryGetValue(kv.Key, out var ctx))
+                {
+                    SetBlockStatus(ctx.BlueprintId, ctx.BlockIndex, BuildFactKeys.BlockStatusSkipped);
+                }
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// TSK-0125: Logs a structured build progress summary when blocks are placed.
+    /// Rate-limited: only logs when _blocksPlacedThisCycle > 0 and a build goal is active.
+    /// </summary>
+    private void LogBuildProgress()
+    {
+        if (_currentGoal?.Name is null || !_currentGoal.Name.StartsWith("Build:")) return;
+        var bpId = _currentGoal.Name["Build:".Length..];
+        // Get total blocks from the plan — approximate from last DecomposeBuild call
+        // We use a single fact to track total: build:{blueprint}:total
+        var totalKey = $"build:{bpId}:total";
+        int total = 215; // fallback for small-house
+        if (_worldState.Facts.TryGetValue(totalKey, out var tv) && tv?.ToString() is string ts)
+            int.TryParse(ts, out total);
+
+        var report = BuildProgressReport.FromFacts(_worldState, bpId, total);
+        if (report.PlacedCount > 0 || report.SkippedCount > 0)
+        {
+            logger.LogInformation(
+                "[build] {Report}",
+                report.ToString());
         }
     }
 
@@ -1912,8 +2007,12 @@ public sealed class AgentBackgroundService(
                         kv.Value.ToolName, kv.Key.ToString()[..8],
                         (_timeProvider.UtcNow - kv.Value.DispatchedAt).TotalSeconds);
 
-                    // Sprint 44 (P1-2): timed-out PlaceBlock → clean up context
-                    if (kv.Value.ToolName == "place")
+                    // TSK-0128: do NOT remove _placeBlockContexts for timed-out PlaceBlock.
+                    // Late BlockPlacedEvents arrive 5-15s after dispatch and need the
+                    // context entry for (blueprintId, blockIndex) correlation.
+                    // The context entry will be cleaned up by the orphan sweep below
+                    // after the correlated action is fully removed from _correlatedActions.
+                    if (kv.Value.ToolName != "place")
                         staleContextIds.Add(kv.Key);
                 }
                 // If TryUpdate returns false, another thread already transitioned the action

@@ -9,7 +9,11 @@
   "assigneeMode": "Custom",
   "assigneeCustomText": "Agent",
   "reporter": "TheMasonX",
-  "labels": ["bug", "P0", "build", "placement"],
+  "labels": [
+    "bug",
+    "build",
+    "placement"
+  ],
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],

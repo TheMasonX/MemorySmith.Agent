@@ -1,9 +1,18 @@
 {
   "Id": "tsk-0013-game-inventory-query-tool",
   "Title": "Add a ListBlocks / ListItems tool for in-game block discovery",
-  "Status": "Open",
+  "Status": "Backlog",
   "Priority": "Medium",
-  "Tags": ["tool", "mineflayer", "block-discovery", "mod-support"],
+  "Tags": [
+    "tool",
+    "mineflayer",
+    "block-discovery",
+    "mod-support"
+  ],
   "Description": "The agent cannot currently discover what blocks or items exist in the loaded game world/mods. This causes gather loops to spin on hardcoded block names that don't exist in the biome or on modded servers.\n\nProposed solution: add a 'ListBlocks' tool that queries Mineflayer's block registry and returns all registered block names (optionally filtered by a prefix or tag).\n\nImplementation:\n1. Add a 'listBlocks' case to MineflayerAdapter/index.js:\n   - args: { filter?: string } — optional name prefix/substring to narrow results\n   - Response: sendEvent('blockList', { blocks: [...] }) with all matching names from bot.registry.blocksByName\n2. Add a corresponding WebSocketBridge parse case for 'blockList' event.\n3. Add ListBlocksTool.cs in Agent.Tools/Tools/:\n   - Name: 'ListBlocks'\n   - ExecuteAsync sends the 'listBlocks' action and returns the block list in ToolResult.Data\n4. Register in Program.cs ToolDispatcher.\n5. Wire into chat: user can ask 'what wood is in this biome?' and the LLM (or planner) calls ListBlocks.\n\nStretch: add a 'scanNearby' action that does a local block census within N blocks of the bot and returns a frequency-ranked list. This is more useful for immediate planning (e.g. 'I see 12 spruce_log, 0 oak_log nearby — switch to spruce_log goal').\n\nThis is the primary mechanism for mod support: modded blocks show up in bot.registry.blocksByName and in a local scan, so the agent can learn new block IDs without any hardcoded lists.",
-  "References": ["tsk-0010-generic-gather-goal-arbitrary-items.json", "tsk-0012-deploy-minecraft-memorysmith-wiki.json"]
+  "References": [
+    "tsk-0010-generic-gather-goal-arbitrary-items.json",
+    "tsk-0012-deploy-minecraft-memorysmith-wiki.json"
+  ],
+  "key": "TSK-0013"
 }

@@ -1,8 +1,8 @@
-﻿{
+{
   "id": "tsk-0091-replace-thread-sleep-with-await-task-delay-in-creative-provisioning",
   "key": "TSK-0091",
   "title": "Replace Thread.Sleep with await Task.Delay in creative provisioning",
-  "description": "## Council note: Pre-flight verification required\n\n## Evidence\n\u0060WebUI.Blazor/AgentBackgroundService.cs\u0060 line 319: \u0060if (anyProvisioned) Thread.Sleep(200);\u0060 inside what should be an async workflow. This blocks the thread and reduces responsiveness during creative-mode \u0060/give\u0060 commands.\n\n## Pre-flight check\n**Verify the enclosing method is declared \u0060async Task\u0060** before making the change. If it\u0027s \u0060void\u0060 or synchronous, the fix requires a method signature change plus updating all callers.\n\n## Impact\nBlocks the thread pool thread, delays event processing, wastes resources.\n\n## Fix\n1. Pre-flight: verify method signature is \u0060async Task\u0060\n2. Replace \u0060Thread.Sleep(200)\u0060 with \u0060await Task.Delay(200, stoppingToken)\u0060\n3. Add test: creative provisioning with multiple items emits Chat actions with correct delay\n\n## Verification\nVerified against codebase 2026-06-23. Council: \u0060Data/Pages/council/audit-task-prioritization-council-2026-06-24.md\u0060",
+  "description": "## Council note: Pre-flight verification required\n\n## Evidence\n`WebUI.Blazor/AgentBackgroundService.cs` line 319: `if (anyProvisioned) Thread.Sleep(200);` inside what should be an async workflow. This blocks the thread and reduces responsiveness during creative-mode `/give` commands.\n\n## Pre-flight check\n**Verify the enclosing method is declared `async Task`** before making the change. If it's `void` or synchronous, the fix requires a method signature change plus updating all callers.\n\n## Impact\nBlocks the thread pool thread, delays event processing, wastes resources.\n\n## Fix\n1. Pre-flight: verify method signature is `async Task`\n2. Replace `Thread.Sleep(200)` with `await Task.Delay(200, stoppingToken)`\n3. Add test: creative provisioning with multiple items emits Chat actions with correct delay\n\n## Verification\nVerified against codebase 2026-06-23. Council: `Data/Pages/council/audit-task-prioritization-council-2026-06-24.md`",
   "type": "Task",
   "status": "Done",
   "priority": "High",
@@ -12,7 +12,6 @@
   "reporter": "anonymous",
   "labels": [
     "bug",
-    "P0",
     "audit-verified",
     "async"
   ],

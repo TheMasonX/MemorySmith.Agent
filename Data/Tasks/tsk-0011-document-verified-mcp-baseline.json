@@ -4,7 +4,7 @@
   "Title": "Document verified MCP baseline and route caveats",
   "Description": "Track the verified MCP route inventory, live tool names, and documented caveats from the non-destructive probe pass. This task covers the docs, usage guides, and memory updates needed so SteveBot and MCP guidance stay aligned with the live server behavior.",
   "Type": "Task",
-  "Status": "Open",
+  "Status": "Backlog",
   "Priority": "Medium",
   "AssigneeMode": "Custom",
   "AssigneeDirectoryId": null,

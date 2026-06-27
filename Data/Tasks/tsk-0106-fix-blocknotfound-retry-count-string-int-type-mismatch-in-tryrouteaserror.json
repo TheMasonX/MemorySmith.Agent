@@ -1,8 +1,8 @@
-﻿{
+{
   "id": "tsk-0106-fix-blocknotfound-retry-count-string-int-type-mismatch-in-tryrouteaserror",
   "key": "TSK-0106",
-  "title": "Fix BlockNotFound retry count \u2014 string/int type mismatch in TryRouteAsError",
-  "description": "From supplemental audit finding 1 (96% confidence): TryRouteAsError reads the retry counter with \u0060pc is int pci\u0060 but stores it via \u0060.ToString()\u0060 (string). The type mismatch means the counter never increments past 1, undermining the progressive wander radius design (40\u219280\u2192120). Fix the read to parse as string.\n\nEvidence: WebUI.Blazor/AgentBackgroundService.cs: reads with \u0060pc is int pci ? pci : 0\u0060, writes with \u0060SetFact(countKey, (prevCount \u002B 1).ToString())\u0060.\n\nSource: memorysmith_agent_supplemental_audit_findings_2026-06-25.md (Finding 1)",
+  "title": "Fix BlockNotFound retry count — string/int type mismatch in TryRouteAsError",
+  "description": "From supplemental audit finding 1 (96% confidence): TryRouteAsError reads the retry counter with `pc is int pci` but stores it via `.ToString()` (string). The type mismatch means the counter never increments past 1, undermining the progressive wander radius design (40→80→120). Fix the read to parse as string.\n\nEvidence: WebUI.Blazor/AgentBackgroundService.cs: reads with `pc is int pci ? pci : 0`, writes with `SetFact(countKey, (prevCount + 1).ToString())`.\n\nSource: memorysmith_agent_supplemental_audit_findings_2026-06-25.md (Finding 1)",
   "type": "Task",
   "status": "Done",
   "priority": "High",
@@ -13,7 +13,6 @@
   "labels": [
     "audit",
     "bug",
-    "P0",
     "retry"
   ],
   "attachments": [],

@@ -1,11 +1,18 @@
 {
-  "id": "TSK-0163",
+  "id": "tsk-0163-inventory-update-slot-telemetry",
   "title": "Wire bot.inventory updateSlot for real-time inventory ground truth",
   "status": "Backlog",
   "priority": "High",
   "type": "Task",
   "description": "Replace inference-based inventory tracking with real-time slot-level events from Mineflayer's `bot.inventory.on('updateSlot')`. This is the correct hook per the Mineflayer API, not pickup events or snapshot polling.\n\nCurrently `sendBotStatus()` snapshots the entire inventory via `bot.inventory.items()`, which aggregates counts but provides no slot-level detail, no timing, and no delta information. The `ItemCollectedEvent` handles pickups but not crafting consumption, tool damage, or chest interactions.\n\nImplementation:\n1. Register `bot.inventory.on('updateSlot', (slot, oldItem, newItem) => { ... })`:\n   - `slot` — inventory slot index (0-44 for player inventory, 45+ for armor/offhand/crafting)\n   - `oldItem` — `{ name, count, metadata }` or null if slot was empty\n   - `newItem` — `{ name, count, metadata }` or null if slot is now empty\n2. Map slot indices to categories (Mineflayer convention):\n   - 0-8: hotbar\n   - 9-35: main inventory\n   - 36-39: armor (boots, leggings, chestplate, helmet)\n   - 40: offhand\n   - 41-44: crafting input\n   - 45: crafting output (if using crafting table, may differ)\n3. Compute delta from oldItem → newItem:\n   - `InventorySlotChangedEvent(slot, category, oldName, oldCount, newName, newCount, timestamp)`\n   - If old=null and new!=null → item added\n   - If old!=null and new=null → item removed\n   - If both non-null with different name → item replaced\n   - If both non-null with same name but different count → count changed\n4. Emit only meaningful deltas (skip `crafting input` slots 41-44 unless the agent is crafting).\n5. Create `InventorySlotChangedEvent` in `WorldEvents.cs`.\n6. Project in `WorldStateProjector` to update `WorldState.Inventory` — this becomes the authoritative source, replacing the inference-only path.\n7. Keep `sendBotStatus()` for full reconciliation (periodic snapshot as ground truth reset).\n\nTunable constants:\n- `SKIP_CRAFTING_SLOTS = true` — don't emit for slots 41-44 (noise)\n\nAcceptance:\n- Inventory changes are real-time and slot-level.\n- Crafting consumption is tracked (planks removed when crafting table used).\n- Tool durability changes are tracked if visible (future enhancement).\n- `sendBotStatus()` still runs for periodic reconciliation.\n\nRefs: `mineflayer-adapter-research.md` DEF-PAPER-4; `msa_planning_mineflayer_audit_20260621_1437.md` Finding 2 (inventory slot-level)",
-  "labels": ["mineflayer", "inventory", "telemetry", "slot-level", "sprint-54"],
+  "labels": [
+    "mineflayer",
+    "inventory",
+    "telemetry",
+    "slot-level",
+    "sprint-54"
+  ],
   "estimatedHours": 3.0,
-  "designRef": "Data/Pages/Audit/mineflayer-adapter-research.md"
+  "designRef": "Data/Pages/Audit/mineflayer-adapter-research.md",
+  "key": "TSK-0163"
 }

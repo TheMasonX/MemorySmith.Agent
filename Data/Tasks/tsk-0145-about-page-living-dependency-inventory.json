@@ -1,11 +1,17 @@
 {
-  "id": "TSK-0145",
+  "id": "tsk-0145-about-page-living-dependency-inventory",
   "title": "Keep About page as living dependency inventory with automated sync check",
   "status": "Ready",
   "priority": "High",
   "type": "Task",
   "description": "The About page (WebUI.Blazor/wwwroot/about.html) is the canonical inventory of third-party dependencies. Ensure it stays accurate:\n\n1. Add a script (Scripts/Verify-AboutDeps.ps1) that extracts top-level packages from all .csproj files and compares against the about.html table.\n2. Run this script in CI (part of TSK-0144).\n3. Update about.html to include all current deps with correct license info (done Sprint 51).\n4. Add a reminder comment in WebUI.Blazor.csproj that adding a PackageReference requires updating about.html.\n\nAcceptance: Script detects drift between csproj and about.html; CI fails on drift.",
-  "labels": ["documentation", "ci", "policy", "sprint-51"],
+  "labels": [
+    "documentation",
+    "ci",
+    "policy",
+    "sprint-51"
+  ],
   "estimatedHours": 1.5,
-  "councilFinding": "About page was missing 10 of 17 dependencies before Sprint 51 fix."
+  "councilFinding": "About page was missing 10 of 17 dependencies before Sprint 51 fix.",
+  "key": "TSK-0145"
 }

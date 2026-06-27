@@ -1,9 +1,15 @@
 {
-  "id": "tsk-0177",
+  "id": "tsk-0177-smart-step-aside-y-axis-and-perpendicular-offset",
   "title": "Smart step-aside: Y-axis ±1 and perpendicular-to-build-direction offset selection",
   "status": "Backlog",
   "priority": "Medium",
   "type": "Task",
   "description": "The adapter's step-aside currently hardcodes x+2. When the bot stands on the target block, it should: (1) prefer offsets perpendicular to the direction of the next block (typically Z-axis when building along X), (2) try y±1 levels for better placement access, (3) check walkable ground below each candidate position, (4) try 4 cardinal directions in priority order {z+2, z-2, x-2, x+2}, falling back to x+2 as last resort.",
-  "labels": ["adapter", "place", "tsk-0123", "ai-assisted"]
+  "labels": [
+    "adapter",
+    "place",
+    "tsk-0123",
+    "ai-assisted"
+  ],
+  "key": "TSK-0177"
 }

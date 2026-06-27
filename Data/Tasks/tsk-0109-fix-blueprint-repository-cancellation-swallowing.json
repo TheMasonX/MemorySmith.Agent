@@ -1,8 +1,8 @@
-﻿{
+{
   "id": "tsk-0109-fix-blueprint-repository-cancellation-swallowing",
   "key": "TSK-0109",
   "title": "Fix blueprint repository cancellation swallowing",
-  "description": "From supplemental audit finding 4 (80% confidence): MemorySmithBlueprintRepository.GetAsync and SearchAsync catch TaskCanceledException and continue into fallback logic. A caller that cancels does not actually get cancellation behavior \u2014 the repository continues doing file I/O and additional network calls.\n\nFix: Check ct.IsCancellationRequested and rethrow (or return immediately) when cancellation was requested by the caller. Only use fallback paths for genuine transient failures, not an explicit abort.\n\nSource: memorysmith_agent_supplemental_audit_findings_2026-06-25.md (Finding 4)",
+  "description": "From supplemental audit finding 4 (80% confidence): MemorySmithBlueprintRepository.GetAsync and SearchAsync catch TaskCanceledException and continue into fallback logic. A caller that cancels does not actually get cancellation behavior — the repository continues doing file I/O and additional network calls.\n\nFix: Check ct.IsCancellationRequested and rethrow (or return immediately) when cancellation was requested by the caller. Only use fallback paths for genuine transient failures, not an explicit abort.\n\nSource: memorysmith_agent_supplemental_audit_findings_2026-06-25.md (Finding 4)",
   "type": "Task",
   "status": "Done",
   "priority": "Medium",
@@ -13,7 +13,6 @@
   "labels": [
     "audit",
     "bug",
-    "P1",
     "blueprint",
     "cancellation"
   ],

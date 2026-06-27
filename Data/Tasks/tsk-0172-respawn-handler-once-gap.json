@@ -1,8 +1,0 @@
-{
-  "id": "TSK-0172",
-  "title": "Respawn handler — bot.once('spawn') doesn't re-fire on death/respawn",
-  "status": "Backlog",
-  "priority": "High",
-  "type": "Bug",
-  "description": "Found during code audit 2026-06-27. The adapter registers `bot.once('spawn')` which only fires on the FIRST spawn. If the bot dies and respawns, no event re-triggers. The C# side receives the `death` event but gets no fresh `spawn` event with updated position/health after respawn.\n\nImpact:\n- `spawnPos` is only set once (first spawn) — wander distance-from-spawn constraint uses stale origin after respawn\n- C# WorldState doesn't get fresh position on respawn until next GetStatus\n- If the bot is teleported away after respawn, WorldState position is stale\n\nFix:\n1. Change `bot.once('spawn')` to `bot.on('spawn')` (or keep both for first-spawn vs respawn distinction)\n2. On respawn, reset `spawnPos` to the new position\n3. Emit `spawn` event with current position/health/food on each respawn\n4. If keeping first-spawn distinction, emit `respawn` event on subsequent spawns\n\nFiles:\n- MineflayerAdapter/index.js line ~247 (bot.once('spawn'))\n\nRef: Code audit SteveBot 2026-06-27. See /memories/repo/adapter-event-contracts.md."
-}

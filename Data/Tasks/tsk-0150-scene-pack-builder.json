@@ -1,11 +1,18 @@
 {
-  "id": "TSK-0150",
+  "id": "tsk-0150-scene-pack-builder",
   "title": "Implement ScenePackBuilder projection class",
   "status": "Backlog",
   "priority": "High",
   "type": "Task",
   "description": "Create a pure projection layer that builds a compact, structured scene summary from live state — the core deliverable of Phase 1 of the situational awareness design.\n\nImplementation:\n1. Create `Agent.Core/ScenePack/ScenePackBuilder.cs` (or similar location) as a pure static or injectable class.\n2. Define `ScenePack` immutable record:\n   - `string Headline` — one-line summary (e.g., \"At (-232,65,151), HP 15, idle, 3 entities nearby\")\n   - `Position Position` — current bot position\n   - `int Health`, `int Food` — current vitals\n   - `string? GameMode` — survival/creative/etc.\n   - `string? CurrentGoal` — goal summary or null if idle\n   - `IReadOnlyList<SceneDelta> RecentDeltas` — inventory/position/health changes since last tick\n   - `IReadOnlyList<string> NearbyEntities` — compact entity summaries sorted by distance\n   - `IReadOnlyList<string> TaskHighlights` — goal-relevant facts (e.g., \"oak_log: 5/10 gathered\")\n   - `IReadOnlyList<string> MemoryReferences` — relevant MemorySmith page slugs for the current goal\n   - `DateTimeOffset BuiltAt`\n3. Define `SceneDelta` record:\n   - `string Field` — what changed (\"inventory\", \"position\", \"health\")\n   - `string OldValue`, `string NewValue` — before/after\n4. `ScenePackBuilder.Build(WorldState state, IReadOnlyList<WorldEvent> recentEvents, GoalMetadata? goal)`:\n   - Compute deltas by comparing current state to recent events.\n   - Filter entities to top 8 by distance.\n   - Generate task highlights from inventory vs goal requirements.\n   - Include relevant MemorySmith page slugs from goal context.\n5. Unit test: verify pack size stays compact (no unbounded growth), deltas are correct, empty state produces valid pack.\n\nAcceptance:\n- `ScenePack` is deterministic given the same inputs.\n- Pack size is bounded (no more than 8 entities, 10 deltas, 8 highlights).\n- Works with empty/null inputs.\n- Tests pass.\n\nRefs: `memorysmith_situational_awareness_design_doc_20260625T020914Z.md` Phase 1",
-  "labels": ["scene-pack", "projection", "situational-awareness", "sprint-52"],
+  "labels": [
+    "scene-pack",
+    "projection",
+    "situational-awareness",
+    "sprint-52"
+  ],
   "estimatedHours": 3.0,
-  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md"
+  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md",
+  "key": "TSK-0150",
+  "epicId": "tsk-0146-entity-observation-scene"
 }

@@ -240,6 +240,7 @@ if (agentEnabled)
         d.Register(new MineBlockTool(world));
         d.Register(new WanderTool(world));
         d.Register(new PlaceBlockTool(world));
+        d.Register("place", new PlaceBlockTool(world)); // wire protocol alias (BlueprintExecutor uses "place")
         d.Register(new SearchMemoryTool(worldMemory)); // world KB
         d.Register(new GetPageTool(memory));           // agent KB
         d.Register(new CreatePageTool(worldMemory));   // world KB

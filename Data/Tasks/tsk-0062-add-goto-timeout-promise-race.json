@@ -4,7 +4,7 @@
   "title": "Add goto() timeout with Promise.race() backstop",
   "description": "## Problem\n`await bot.pathfinder.goto(...)` can hang silently when the bot is obstructed by unbreakable blocks or encounters certain edge cases. The promise never resolves and no event fires. The current `index.js` has no timeout on any `goto()` call.\n\n## Source\nCouncil review DEF-PAPER-3 (Confidence: 95%). The paper's recommendation to wire `path_update` for `noPath`/`timeout`/`partial` is correct but insufficient alone — the known hang case produces _no event at all_.\n\n## Requirements\n1. Add a per-`goto()` timeout wrapper using `Promise.race()` in `MineflayerAdapter/index.js`\n2. Declare a named constant for the timeout duration (e.g., `const GOTO_TIMEOUT_MS = 30000;` at the top of the file per AGENTS.md conventions)\n3. When timeout fires, emit a typed event (`gotoTimeout`) with the target coordinates and duration\n4. Wire `path_update` listener for `noPath`/`timeout`/`partial` status events — forward only on non-`success` statuses plus `goal_reached` (per OQ-2 recommendation)\n5. Add C# `WorldEvent` subtypes: `GotoTimeoutEvent` and `PathUpdateEvent`\n6. Add parsing in `WebSocketBridge.cs` for both new events\n7. Add handling in `AgentBackgroundService.cs` `ProcessEventsAsync` — `GotoTimeoutEvent` should set OutcomeType.Unreachable on the correlated action\n\n## Design Notes\n- The `path_update` listener alone is NOT sufficient for the hang case (DEF-PAPER-3 finding)\n- The `Promise.race()` is the hard backstop; `path_update` is the fast path for detectable failures\n- Only forward `path_update` on status transitions (non-`success`), not every recalculation\n\n## References\n- `MineflayerAdapter/index.js` — all `await bot.pathfinder.goto(...)` call sites\n- Council review: DEF-PAPER-3 — \"The known hang case produces no event at all\"\n- Council review: OQ-2 — \"Recommend only forward on non-success statuses plus goal_reached\"\n- GitHub issue #222, #273 on mineflayer-pathfinder",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -33,5 +33,6 @@
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": null,
+  "absorbedBy": "TSK-0159"
 }

@@ -1,11 +1,17 @@
 {
-  "id": "TSK-0168",
+  "id": "tsk-0168-remove-htn-planner-legacy-branches",
   "title": "Remove legacy HtnPlanner typed decomposition branches (defer to PlannerRouter)",
   "status": "Backlog",
   "priority": "Low",
   "type": "Task",
   "description": "Consolidate planning by removing the remaining typed decomposition branches from `HtnPlanner` now that `PlannerRouter` owns the preferred routing seam. Per the audit, `HtnPlanner` still contains direct type branches for `BuildGoal`, `CraftItemGoal`, `IItemSpecGoal`, and task-name fallback — overlapping with decomposer registry routing.\n\nImplementation:\n1. Verify that `PlannerRouter` handles all goal types currently in HtnPlanner:\n   - `BuildGoal` → `BuildGoalDecomposer` (already registered)\n   - `GatherGoal` → `GatherGoalDecomposer` (already registered)\n   - `CraftItemGoal` → needs dedicated decomposer or falls back correctly\n   - `IItemSpecGoal` → check if any impl remains\n2. If `CraftItemGoal` lacks a decomposer, create one before removing the HtnPlanner branch.\n3. Reduce `HtnPlanner` to a pure fallback decomposition engine — no typed branches, only generic task decomposition.\n4. Update tests that depend on HtnPlanner's typed branches to use PlannerRouter instead.\n5. Add deletion test: \"If I remove HtnPlanner, does the system still plan correctly?\" — if yes, HtnPlanner is truly a fallback.\n\nAcceptance:\n- HtnPlanner has zero typed goal branches.\n- All existing goal types route through PlannerRouter → DecomposerRegistry.\n- Tests pass with PlannerRouter as the sole planning entry point.\n\nRefs: `msa_planning_mineflayer_audit_20260621_1437.md` Finding 4 (planner overlap)",
-  "labels": ["planning", "cleanup", "architecture", "sprint-55"],
+  "labels": [
+    "planning",
+    "cleanup",
+    "architecture",
+    "sprint-55"
+  ],
   "estimatedHours": 2.5,
-  "designRef": "Data/Pages/Audit/msa_planning_mineflayer_audit_20260621_1437.md"
+  "designRef": "Data/Pages/Audit/msa_planning_mineflayer_audit_20260621_1437.md",
+  "key": "TSK-0168"
 }

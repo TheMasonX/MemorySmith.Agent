@@ -175,7 +175,7 @@ public sealed record StatusEvent(
     string? GameMode,
     DateTimeOffset Timestamp) : WorldEvent(Timestamp);
 
-public sealed record BlockPlacedEvent(int X, int Y, int Z, string Block, DateTimeOffset Timestamp)
+public sealed record BlockPlacedEvent(int X, int Y, int Z, string Block, DateTimeOffset Timestamp, Guid? CorrelationId = null)
     : WorldEvent(Timestamp);
 
 /// <summary>

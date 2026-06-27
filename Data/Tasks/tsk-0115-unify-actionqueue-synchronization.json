@@ -1,0 +1,24 @@
+{
+  "id": "tsk-0115-unify-actionqueue-synchronization",
+  "key": "TSK-0115",
+  "title": "Unify ActionQueue Synchronization",
+  "description": "ActionQueue uses ConcurrentQueue<ActionData> but mixes lock-protected (EnqueueAll, ClearAndEnqueue) and lock-free (Enqueue, Clear, Dequeue, Peek) operations. The documented atomic interrupt guarantee of ClearAndEnqueue is not actually global because Enqueue and Clear don't take the same lock.\n\nSource: msa_code_audit_report-6-24-26.md (Finding 5), msa_followup_audit-6-24-26.md (Finding 3)\n\nRequirements:\n1. Either enforce one lock for all mutating operations, or narrow the documented guarantee to best-effort local atomicity only\n2. If the queue models strict priority semantics, use a single synchronization strategy consistently\n3. Add a concurrency test that interleaves Enqueue, Clear, and ClearAndEnqueue\n\nFiles: Agent.Core/Models/ActionQueue.cs",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeCustomText": "Agent",
+  "labels": ["domain:agent-loop", "type:refactor", "sprint-49"],
+  "comments": [
+    {
+      "id": "c-0115-migration",
+      "author": "SteveBot",
+      "body": "Converted from orphan .md file (TSK-0115.md) to canonical .json format as part of task store cleanup council 2026-06-27. Original .md indicated status Done, Sprint 49 Wave E.",
+      "createdAtUtc": "2026-06-27T12:00:00Z"
+    }
+  ],
+  "createdAtUtc": "2026-06-24T00:00:00Z",
+  "updatedAtUtc": "2026-06-27T12:00:00Z",
+  "revision": 1,
+  "isArchived": false
+}

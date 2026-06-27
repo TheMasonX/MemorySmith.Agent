@@ -1,8 +1,8 @@
-﻿{
+{
   "id": "tsk-0092-use-shorter-ttl-for-null-item-registry-cache-entries",
   "key": "TSK-0092",
   "title": "Use shorter TTL for null item-registry cache entries",
-  "description": "## Evidence\n\u0060Agent.Memory/MemorySmithItemRegistry.GetAsync()\u0060 caches null results with the same TTL as successful results (\u0060_cache[slug] = (spec, ...)\u0060 stores \u0060spec=null\u0060 with full TTL).\n\n## Impact\nA transient gateway failure or a newly published page can be treated as absent until the TTL expires. A miss becomes sticky.\n\n## Fix\nOptions: (a) use much shorter TTL for null entries (e.g. 5s vs 60s), (b) don\u0027t cache null at all, or (c) cache null only for clearly \u0022not found\u0022 responses, not transport failures.\n\n## Verification\nVerified against codebase 2026-06-23. See \u0060Data/Pages/audits/msa-audit-verification-6-23.md\u0060 section F6.",
+  "description": "## Evidence\n`Agent.Memory/MemorySmithItemRegistry.GetAsync()` caches null results with the same TTL as successful results (`_cache[slug] = (spec, ...)` stores `spec=null` with full TTL).\n\n## Impact\nA transient gateway failure or a newly published page can be treated as absent until the TTL expires. A miss becomes sticky.\n\n## Fix\nOptions: (a) use much shorter TTL for null entries (e.g. 5s vs 60s), (b) don't cache null at all, or (c) cache null only for clearly \"not found\" responses, not transport failures.\n\n## Verification\nVerified against codebase 2026-06-23. See `Data/Pages/audits/msa-audit-verification-6-23.md` section F6.",
   "type": "Task",
   "status": "Done",
   "priority": "Medium",
@@ -12,7 +12,6 @@
   "reporter": "anonymous",
   "labels": [
     "bug",
-    "P1",
     "audit-verified",
     "caching",
     "item-registry"

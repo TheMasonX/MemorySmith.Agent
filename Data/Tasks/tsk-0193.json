@@ -1,8 +1,8 @@
-﻿{
+{
   "id": "tsk-0193",
   "key": "TSK-0193",
   "title": "Add error handling to SearchAsync and SearchMemoryTool",
-  "description": "## Problem\n\u0060RestMemoryGateway.SearchAsync\u0060 (line 36-48) has zero error handling:\n\u0060\u0060\u0060csharp\nvar hits = await http.GetFromJsonAsync\u003CSearchHit[]\u003E(url, JsonOpts, cancellationToken) ?? [];\n\u0060\u0060\u0060\nNo try/catch for HttpRequestException, TaskCanceledException, or JsonException. \u0060SearchMemoryTool.ExecuteAsync\u0060 (line 54) also has no try/catch. A transient network blip crashes the tool execution loop.\n\n## Desired Outcome\nSearch failures return empty results (logged as warnings) rather than throwing.\n\n## Scope\n- \u0060RestMemoryGateway.SearchAsync\u0060 \u2014 add try/catch, log warning, return empty on recoverable errors\n- \u0060SearchMemoryTool.ExecuteAsync\u0060 \u2014 wrap in try/catch, return \u0060ToolResult(false, ...)\u0060 on failure\n- Exception: propagate \u0060OperationCanceledException\u0060 (cancellation is intentional)\n\n## Acceptance Criteria\n- [ ] HTTP 500 from MemorySmith returns empty results, not throw\n- [ ] Network timeout returns empty results, not throw\n- [ ] SearchMemoryTool returns \u0060ToolResult(false, \u0022Search failed: {message}\u0022)\u0060 on error\n- [ ] Unit test verifies graceful degradation\n- [ ] All existing tests pass",
+  "description": "## Problem\n`RestMemoryGateway.SearchAsync` (line 36-48) has zero error handling:\n```csharp\nvar hits = await http.GetFromJsonAsync<SearchHit[]>(url, JsonOpts, cancellationToken) ?? [];\n```\nNo try/catch for HttpRequestException, TaskCanceledException, or JsonException. `SearchMemoryTool.ExecuteAsync` (line 54) also has no try/catch. A transient network blip crashes the tool execution loop.\n\n## Desired Outcome\nSearch failures return empty results (logged as warnings) rather than throwing.\n\n## Scope\n- `RestMemoryGateway.SearchAsync` — add try/catch, log warning, return empty on recoverable errors\n- `SearchMemoryTool.ExecuteAsync` — wrap in try/catch, return `ToolResult(false, ...)` on failure\n- Exception: propagate `OperationCanceledException` (cancellation is intentional)\n\n## Acceptance Criteria\n- [ ] HTTP 500 from MemorySmith returns empty results, not throw\n- [ ] Network timeout returns empty results, not throw\n- [ ] SearchMemoryTool returns `ToolResult(false, \"Search failed: {message}\")` on error\n- [ ] Unit test verifies graceful degradation\n- [ ] All existing tests pass",
   "type": "Task",
   "status": "Done",
   "priority": "High",
@@ -13,7 +13,6 @@
   "labels": [
     "reliability",
     "sprint-53",
-    "p1",
     "memory"
   ],
   "attachments": [],

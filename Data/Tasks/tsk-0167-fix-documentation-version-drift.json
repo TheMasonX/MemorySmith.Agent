@@ -1,11 +1,16 @@
 {
-  "id": "TSK-0167",
+  "id": "tsk-0167-fix-documentation-version-drift",
   "title": "Fix documentation drift: canonicalize version/sprint status across README, roadmap, and handoffs",
   "status": "Backlog",
   "priority": "Low",
   "type": "Task",
   "description": "Reconcile version numbers and sprint status across all documentation files. Per the audit, `README.md` says v0.28.0, `roadmap.md` says v0.23.0, and sprint handoff docs disagree on completion status of older sprints.\n\nImplementation:\n1. Audit all version/sprint references:\n   - `README.md` — version number, sprint, test count\n   - `Data/Pages/roadmap.md` — version, latest sprint\n   - All handoff docs in `Data/Pages/Handoffs/` — completion status consistency\n   - `WebUI.Blazor/wwwroot/about.html` — version badge\n2. Pick ONE canonical version: v0.51.0 (Sprint 51 complete, 742 tests) as of 2026-06-26.\n3. Update all files to match.\n4. Add a `last-verified` field to each sprint handoff:\n   ```md\n   **Last verified against code:** 2026-06-26, commit abc123\n   ```\n5. Add a CI-friendly version file: `version.json` or `VERSION.txt` that all docs reference.\n6. Document the canonical-status policy in AGENTS.md or a new `Data/Pages/policies/doc-drift.md`.\n\nAcceptance:\n- All docs agree on version v0.51.0.\n- Sprint handoffs include last-verified commit.\n- Policy exists for keeping docs in sync with code.\n\nRefs: `msa_planning_mineflayer_audit_20260621_1437.md` Finding 1",
-  "labels": ["documentation", "cleanup", "sprint-55"],
+  "labels": [
+    "documentation",
+    "cleanup",
+    "sprint-55"
+  ],
   "estimatedHours": 1.5,
-  "designRef": "Data/Pages/Audit/msa_planning_mineflayer_audit_20260621_1437.md"
+  "designRef": "Data/Pages/Audit/msa_planning_mineflayer_audit_20260621_1437.md",
+  "key": "TSK-0167"
 }

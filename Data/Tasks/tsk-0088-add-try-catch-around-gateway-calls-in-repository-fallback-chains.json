@@ -1,8 +1,8 @@
-﻿{
+{
   "id": "tsk-0088-add-try-catch-around-gateway-calls-in-repository-fallback-chains",
   "key": "TSK-0088",
   "title": "Add try/catch around gateway calls in repository fallback chains",
-  "description": "## Council-promoted to P0\n\n## Evidence\n\u0060MemorySmithBlueprintRepository.GetAsync()\u0060 and \u0060MemorySmithItemRegistry.FetchAsync()\u0060 call \u0060memory.GetPageAsync()\u0060 without try/catch. A transport exception (HTTP 500, timeout) bypasses the local file fallback and search fallback entirely.\n\n## Impact\nA temporary backend outage makes blueprints and items disappear even when local file copies exist in \u0060Data/Pages/\u0060.\n\n## Design decisions needed\n1. Catch \u0060HttpRequestException\u0060 and \u0060TaskCanceledException\u0060 (timeout) only\n2. \u0060OperationCanceledException\u0060 from CancellationToken should propagate, not be swallowed\n3. Only fall back on transport/network exceptions \u2014 not on \u0022not found\u0022 (empty content)\n\n## Fix\n1. Wrap gateway lookups in narrow try/catch catching HttpRequestException/TaskCanceledException\n2. On transport failure, continue to local file fallback (LoadLocalPage / search)\n3. Log the exception type and page/item ID\n4. Only fall back on transport/network exceptions (not on \u0022not found\u0022)\n5. Add tests: gateway throws \u2192 fallback succeeds; gateway returns empty \u2192 returns null\n\n## Scope\nBoth files: \u0060Agent.Memory/MemorySmithBlueprintRepository.GetAsync()\u0060 and \u0060Agent.Memory/MemorySmithItemRegistry.FetchAsync()\u0060\n\n## Verification\nVerified against codebase 2026-06-23. Council: \u0060Data/Pages/council/audit-task-prioritization-council-2026-06-24.md\u0060",
+  "description": "## Council-promoted to P0\n\n## Evidence\n`MemorySmithBlueprintRepository.GetAsync()` and `MemorySmithItemRegistry.FetchAsync()` call `memory.GetPageAsync()` without try/catch. A transport exception (HTTP 500, timeout) bypasses the local file fallback and search fallback entirely.\n\n## Impact\nA temporary backend outage makes blueprints and items disappear even when local file copies exist in `Data/Pages/`.\n\n## Design decisions needed\n1. Catch `HttpRequestException` and `TaskCanceledException` (timeout) only\n2. `OperationCanceledException` from CancellationToken should propagate, not be swallowed\n3. Only fall back on transport/network exceptions — not on \"not found\" (empty content)\n\n## Fix\n1. Wrap gateway lookups in narrow try/catch catching HttpRequestException/TaskCanceledException\n2. On transport failure, continue to local file fallback (LoadLocalPage / search)\n3. Log the exception type and page/item ID\n4. Only fall back on transport/network exceptions (not on \"not found\")\n5. Add tests: gateway throws → fallback succeeds; gateway returns empty → returns null\n\n## Scope\nBoth files: `Agent.Memory/MemorySmithBlueprintRepository.GetAsync()` and `Agent.Memory/MemorySmithItemRegistry.FetchAsync()`\n\n## Verification\nVerified against codebase 2026-06-23. Council: `Data/Pages/council/audit-task-prioritization-council-2026-06-24.md`",
   "type": "Task",
   "status": "Done",
   "priority": "Critical",
@@ -12,7 +12,6 @@
   "reporter": "anonymous",
   "labels": [
     "bug",
-    "P0",
     "audit-verified",
     "resilience"
   ],

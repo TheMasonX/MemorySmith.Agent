@@ -1,10 +1,10 @@
-﻿{
+{
   "id": "tsk-0098-consolidate-duplicate-readoriginfact-implementations",
   "key": "TSK-0098",
   "title": "Consolidate duplicate ReadOriginFact implementations",
-  "description": "## Evidence\nTwo separate \u0060ReadOriginFact\u0060 implementations exist:\n1. \u0060BuildGoalDecomposer.ReadOriginFact()\u0060 \u2014 logs a warning when the fact is unparseable\n2. \u0060HtnPlanner.ReadOriginFact()\u0060 \u2014 silently returns 0 for unparseable values\n\n## Impact\nInconsistent behavior. The HtnPlanner path silently swallows bad data while the BuildGoalDecomposer path logs it.\n\n## Fix\n1. Extract a shared \u0060BuildFactKeys.ReadOriginFact()\u0060 utility method\n2. Add logging to both call sites\n3. Handle all value types consistently (int, long, string)\n\n## Verification\nOverlooked by all audits. See \u0060Data/Pages/audits/msa-audit-verification-6-23.md\u0060 section O1.",
+  "description": "## Evidence\nTwo separate `ReadOriginFact` implementations exist:\n1. `BuildGoalDecomposer.ReadOriginFact()` — logs a warning when the fact is unparseable\n2. `HtnPlanner.ReadOriginFact()` — silently returns 0 for unparseable values\n\n## Impact\nInconsistent behavior. The HtnPlanner path silently swallows bad data while the BuildGoalDecomposer path logs it.\n\n## Fix\n1. Extract a shared `BuildFactKeys.ReadOriginFact()` utility method\n2. Add logging to both call sites\n3. Handle all value types consistently (int, long, string)\n\n## Verification\nOverlooked by all audits. See `Data/Pages/audits/msa-audit-verification-6-23.md` section O1.",
   "type": "Task",
-  "status": "Closed - Merged into TSK-0103",
+  "status": "Done",
   "priority": "Medium",
   "absorbedBy": "TSK-0103",
   "assigneeMode": "Custom",
@@ -13,7 +13,6 @@
   "reporter": "anonymous",
   "labels": [
     "improvement",
-    "P1",
     "audit-overlooked",
     "build-origin",
     "refactor"

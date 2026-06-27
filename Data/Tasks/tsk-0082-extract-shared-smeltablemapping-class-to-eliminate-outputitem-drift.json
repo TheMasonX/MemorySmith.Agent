@@ -1,10 +1,10 @@
-﻿{
+{
   "id": "tsk-0082-extract-shared-smeltablemapping-class-to-eliminate-outputitem-drift",
   "key": "TSK-0082",
   "title": "Extract shared SmeltableMapping class to eliminate OutputItem drift",
-  "description": "The ore\u2192ingot mapping currently exists in two places: SmeltGoal.OutputItem (for IsComplete) and DecomposeSmeltItem (for inputBlock reverse mapping). Extract a shared SmeltableMapping static class in Agent.Core or Agent.Planning that provides OutputFor(input), InputFor(output), and IsSmeltable(item) in one place. This prevents drift where one mapping gets updated but the other doesn\u0027t.\n\nCouncil confidence: 88%. Severity: Medium (P1). Will cause a P1 bug within 2-3 sprints if not consolidated.",
+  "description": "The ore→ingot mapping currently exists in two places: SmeltGoal.OutputItem (for IsComplete) and DecomposeSmeltItem (for inputBlock reverse mapping). Extract a shared SmeltableMapping static class in Agent.Core or Agent.Planning that provides OutputFor(input), InputFor(output), and IsSmeltable(item) in one place. This prevents drift where one mapping gets updated but the other doesn't.\n\nCouncil confidence: 88%. Severity: Medium (P1). Will cause a P1 bug within 2-3 sprints if not consolidated.",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,

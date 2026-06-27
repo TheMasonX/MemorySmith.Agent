@@ -9,7 +9,12 @@
   "assigneeMode": "Custom",
   "assigneeCustomText": "Agent",
   "reporter": "SteveBot",
-  "labels": ["audit", "observability", "P3", "tool-dispatcher", "logging"],
+  "labels": [
+    "audit",
+    "observability",
+    "tool-dispatcher",
+    "logging"
+  ],
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],

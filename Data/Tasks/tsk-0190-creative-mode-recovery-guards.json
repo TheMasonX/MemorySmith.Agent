@@ -1,0 +1,9 @@
+{
+  "id": "tsk-0190-creative-mode-recovery-guards",
+  "title": "Creative mode recovery guards — don't gather materials in creative mode",
+  "status": "Done",
+  "priority": "High",
+  "type": "Task",
+  "description": "Add creative mode guards in AgentBackgroundService recovery paths so the agent doesn't try to gather raw materials when the adapter handles creative inventory.\n\nProblem: When in creative mode, the bot's `!inventory` is often empty because items are pulled from creative inventory at placement time (Sprint 51 Wave B adapter fallback). The old recovery path would see 'not in inventory' errors and create gather goals, causing the bot to wander hundreds of blocks looking for materials (e.g. sand for glass_pane) that don't exist nearby.\n\nFix (committed 72ff65f + uncommitted):\n1. `TryRecoverFromGameErrorAsync` (line 1713): skip LLM recovery for inventory errors when `_worldState.IsCreativeMode`\n2. `TryExtractMissingMaterial` path (line 2277): skip direct gather recovery when `_worldState.IsCreativeMode`\n3. `SetGoal` (line 263): removed `/give` provisioning — adapter now handles creative inventory via `bot.creative.setInventorySlot()`\n4. Build checkpoint advancement for bot-position skips: when BlockPlaceSkippedEvent reason is botPosition, advance checkpoint to avoid infinite loop at origin\n\nFiles:\n- WebUI.Blazor/AgentBackgroundService.cs:263 (removed /give provisioning)\n- WebUI.Blazor/AgentBackgroundService.cs:1713-1730 (creative guard in game error recovery)\n- WebUI.Blazor/AgentBackgroundService.cs:2283-2295 (creative guard in missing material recovery)\n- WebUI.Blazor/AgentBackgroundService.cs:733-746 (BlockPlaceSkippedEvent checkpoint advancement)\n- MineflayerAdapter/index.js:846-858 (bot-position skip in adapter)\n- MineflayerAdapter/index.js:865-890 (creative inventory fallback)\n\nLabels: creative-mode, build, recovery, survival-decomposition",
+  "key": "TSK-0190"
+}

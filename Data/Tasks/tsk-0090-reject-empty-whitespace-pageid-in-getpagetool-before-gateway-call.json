@@ -1,8 +1,8 @@
-﻿{
+{
   "id": "tsk-0090-reject-empty-whitespace-pageid-in-getpagetool-before-gateway-call",
   "key": "TSK-0090",
   "title": "Reject empty/whitespace pageId in GetPageTool before gateway call",
-  "description": "## Evidence\n\u0060Agent.Tools/Tools/GetPageTool.ExecuteAsync()\u0060 does \u0060var pageId = idEl.GetString() ?? \u0022\u0022;\u0060 then passes directly to \u0060memory.GetPageAsync(pageId, ...)\u0060 with no empty/whitespace check.\n\n## Impact\nA malformed tool call returns \u0022Page \u0027\u0027 not found\u0022 instead of a validation error, making LLM/tool debugging noisier.\n\n## Fix\n1. Add \u0060if (string.IsNullOrWhiteSpace(pageId)) return new ToolResult(false, \u0022pageId must be a non-empty string.\u0022);\u0060\n2. Add tests for \u0060pageId: \u0022\u0022\u0060 and \u0060pageId: \u0022   \u0022\u0060\n\n## Verification\nVerified against codebase 2026-06-23. See \u0060Data/Pages/audits/msa-audit-verification-6-23.md\u0060 section F3.",
+  "description": "## Evidence\n`Agent.Tools/Tools/GetPageTool.ExecuteAsync()` does `var pageId = idEl.GetString() ?? \"\";` then passes directly to `memory.GetPageAsync(pageId, ...)` with no empty/whitespace check.\n\n## Impact\nA malformed tool call returns \"Page '' not found\" instead of a validation error, making LLM/tool debugging noisier.\n\n## Fix\n1. Add `if (string.IsNullOrWhiteSpace(pageId)) return new ToolResult(false, \"pageId must be a non-empty string.\");`\n2. Add tests for `pageId: \"\"` and `pageId: \"   \"`\n\n## Verification\nVerified against codebase 2026-06-23. See `Data/Pages/audits/msa-audit-verification-6-23.md` section F3.",
   "type": "Task",
   "status": "Done",
   "priority": "High",
@@ -12,7 +12,6 @@
   "reporter": "anonymous",
   "labels": [
     "bug",
-    "P0",
     "audit-verified",
     "input-validation"
   ],

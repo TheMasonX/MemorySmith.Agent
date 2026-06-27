@@ -1,11 +1,16 @@
 {
-  "id": "tsk-0191",
+  "id": "tsk-0191-llm-provider-tests",
   "title": "Add tests for all 4 LLM providers (Ollama, OpenAI, Anthropic, Gemini)",
   "status": "Backlog",
   "priority": "Critical",
   "type": "Task",
-  "labels": ["testing", "sprint-53", "p0", "llm"],
+  "labels": [
+    "testing",
+    "sprint-53",
+    "llm"
+  ],
   "description": "## Problem\nAll 4 LLM providers have zero unit tests:\n- `OllamaProvider.CompleteAsync` — no tests\n- `OpenAICompatibleProvider.CompleteAsync` — no tests\n- `AnthropicProvider.CompleteAsync` — no tests\n- `GeminiProvider.CompleteAsync` — no tests\n\nThese are the critical path for all LLM chat interpretation. Every provider has a `return null` on failure contract that is untested.\n\n## Desired Outcome\nEach provider has at minimum: success path test, auth-failure test, timeout test.\n\n## Scope\n- Create test files for each provider using `HttpMessageHandler` mocking\n- Test: `IsAvailable==false` returns null, HTTP timeout returns null, HTTP 4xx/5xx returns null, HTTP 200 returns content, empty response returns null, cancellation propagates\n\n## Dependencies\n- TSK-0180 (Gemini header change) must complete before GeminiProvider tests\n- TSK-0182 (error body logging) should complete before OpenAI/Anthropic tests\n\n## Acceptance Criteria\n- [ ] `OllamaProviderTests.cs` — minimum 5 tests\n- [ ] `OpenAICompatibleProviderTests.cs` — minimum 5 tests\n- [ ] `AnthropicProviderTests.cs` — minimum 5 tests\n- [ ] `GeminiProviderTests.cs` — minimum 5 tests\n- [ ] All tests mock HTTP (no real network calls)\n- [ ] All tests pass",
   "assigneeMode": "Custom",
-  "assigneeCustomText": "Agent"
+  "assigneeCustomText": "Agent",
+  "key": "TSK-0191"
 }

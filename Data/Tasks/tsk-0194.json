@@ -1,8 +1,8 @@
-﻿{
+{
   "id": "tsk-0194",
   "key": "TSK-0194",
   "title": "Add HTTP retry/resilience for MemorySmith API clients",
-  "description": "## Problem\nNo retry policy or circuit breaker on MemorySmith HTTP clients. Every transient failure (connection reset, 503, DNS glitch) causes immediate failure. In a Minecraft bot context running for hours, this is a reliability concern.\n\n## Desired Outcome\nMemorySmith HTTP clients have standard resilience handlers (retry with backoff, circuit breaker).\n\n## Scope\n- Add \u0060Microsoft.Extensions.Http.Resilience\u0060 package reference\n- Call \u0060AddStandardResilienceHandler()\u0060 on \u0060\u0022memorysmith\u0022\u0060 and \u0060\u0022memorysmith-world\u0022\u0060 named HttpClient registrations in \u0060Program.cs\u0060\n- Verify retry behavior in integration test\n\n## Acceptance Criteria\n- [ ] \u0060Microsoft.Extensions.Http.Resilience\u0060 added to \u0060WebUI.Blazor.csproj\u0060\n- [ ] \u0060AddStandardResilienceHandler()\u0060 called on both MemorySmith HttpClient registrations\n- [ ] Integration test: transient 503 \u2192 retry succeeds\n- [ ] No breaking changes to \u0060RestMemoryGateway\u0060 interface\n- [ ] All existing tests pass",
+  "description": "## Problem\nNo retry policy or circuit breaker on MemorySmith HTTP clients. Every transient failure (connection reset, 503, DNS glitch) causes immediate failure. In a Minecraft bot context running for hours, this is a reliability concern.\n\n## Desired Outcome\nMemorySmith HTTP clients have standard resilience handlers (retry with backoff, circuit breaker).\n\n## Scope\n- Add `Microsoft.Extensions.Http.Resilience` package reference\n- Call `AddStandardResilienceHandler()` on `\"memorysmith\"` and `\"memorysmith-world\"` named HttpClient registrations in `Program.cs`\n- Verify retry behavior in integration test\n\n## Acceptance Criteria\n- [ ] `Microsoft.Extensions.Http.Resilience` added to `WebUI.Blazor.csproj`\n- [ ] `AddStandardResilienceHandler()` called on both MemorySmith HttpClient registrations\n- [ ] Integration test: transient 503 → retry succeeds\n- [ ] No breaking changes to `RestMemoryGateway` interface\n- [ ] All existing tests pass",
   "type": "Task",
   "status": "Done",
   "priority": "High",
@@ -13,7 +13,6 @@
   "labels": [
     "reliability",
     "sprint-53",
-    "p1",
     "memory"
   ],
   "attachments": [],

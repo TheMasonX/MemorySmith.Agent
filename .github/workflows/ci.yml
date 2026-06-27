@@ -29,3 +29,7 @@ jobs:
           --no-build --configuration Release --verbosity normal -p:CopilotSkipCliDownload=true
           --collect:"XPlat Code Coverage" --results-directory artifacts/TestResults
           -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+
+      - name: Validate task records
+        run: pwsh ./Scripts/Test-TaskRecords.ps1
+        shell: pwsh

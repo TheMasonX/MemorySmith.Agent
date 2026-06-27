@@ -1,8 +1,8 @@
-﻿{
+{
   "id": "tsk-0095-require-all-three-axes-for-explicit-build-origin",
   "key": "TSK-0095",
   "title": "Require all three axes for explicit build origin",
-  "description": "## Evidence\n\u0060BuildGoal.HasExplicitOrigin\u0060 (Agent.Planning/Goals/BuildGoal.cs:56) returns true if ANY axis is present. \u0060BuildGoalDecomposer\u0060 (line 33-38) fills missing axes with \u0060?? 0\u0060. \u0060ReadOriginFact\u0060 returns 0 for unparseable facts with \u0060found=true\u0060.\n\n## Impact\nA build with only X specified silently becomes (X, 0, 0). A malformed stored origin fact is treated as valid instead of falling back.\n\n## Fix\n1. Treat explicit origin as valid only when all three axes are present\n2. Treat malformed stored origin facts as missing (not as 0)\n3. Log a warning with the blueprint ID and missing axes\n4. Consolidate the two separate ReadOriginFact implementations (BuildGoalDecomposer \u002B HtnPlanner)\n\n## Verification\nVerified against codebase 2026-06-23. See \u0060Data/Pages/audits/msa-audit-verification-6-23.md\u0060 sections F9 and O1.",
+  "description": "## Evidence\n`BuildGoal.HasExplicitOrigin` (Agent.Planning/Goals/BuildGoal.cs:56) returns true if ANY axis is present. `BuildGoalDecomposer` (line 33-38) fills missing axes with `?? 0`. `ReadOriginFact` returns 0 for unparseable facts with `found=true`.\n\n## Impact\nA build with only X specified silently becomes (X, 0, 0). A malformed stored origin fact is treated as valid instead of falling back.\n\n## Fix\n1. Treat explicit origin as valid only when all three axes are present\n2. Treat malformed stored origin facts as missing (not as 0)\n3. Log a warning with the blueprint ID and missing axes\n4. Consolidate the two separate ReadOriginFact implementations (BuildGoalDecomposer + HtnPlanner)\n\n## Verification\nVerified against codebase 2026-06-23. See `Data/Pages/audits/msa-audit-verification-6-23.md` sections F9 and O1.",
   "type": "Task",
   "status": "Done",
   "priority": "Medium",
@@ -12,7 +12,6 @@
   "reporter": "anonymous",
   "labels": [
     "bug",
-    "P1",
     "audit-verified",
     "build-origin",
     "validation"

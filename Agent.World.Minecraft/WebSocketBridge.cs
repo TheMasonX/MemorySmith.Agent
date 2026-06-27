@@ -395,7 +395,8 @@ public sealed class WebSocketBridge(string uri,
                 "blockPlaced" => new BlockPlacedEvent(
                     X: GetInt(root, "x"), Y: GetInt(root, "y"), Z: GetInt(root, "z"),
                     Block: GetString(root, "block") ?? "?",
-                    Timestamp: now),
+                    Timestamp: now,
+                    CorrelationId: TryGetGuid(root, "correlationId")),
 
                 // Sprint 43 (P0-4): terrain collision skip — completes correlation but does not advance checkpoint.
                 "blockPlaceSkipped" => new BlockPlaceSkippedEvent(
@@ -535,6 +536,18 @@ public sealed class WebSocketBridge(string uri,
         if (!root.TryGetProperty(key, out var el)) return defaultValue;
         return el.ValueKind == JsonValueKind.Number && el.TryGetDouble(out var d)
             ? d : defaultValue;
+    }
+
+    /// <summary>
+    /// TSK-0128: Extracts an optional Guid from a JSON string property.
+    /// Returns null when the key is missing, not a string, or not a valid Guid.
+    /// </summary>
+    private static Guid? TryGetGuid(JsonElement root, string key)
+    {
+        if (!root.TryGetProperty(key, out var el)) return null;
+        if (el.ValueKind != JsonValueKind.String) return null;
+        var s = el.GetString();
+        return Guid.TryParse(s, out var g) ? g : null;
     }
 
     // ── Dispose ──────────────────────────────────────────────────────────────

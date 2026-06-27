@@ -1,11 +1,18 @@
 {
-  "id": "TSK-0151",
+  "id": "tsk-0151-wire-scene-pack-into-chat-pipeline",
   "title": "Wire ScenePackBuilder into AgentBackgroundService chat pipeline",
   "status": "Backlog",
   "priority": "High",
   "type": "Task",
   "description": "Integrate `ScenePackBuilder` into the main agent loop so every LLM chat interpretation receives a compact scene context.\n\nImplementation:\n1. Register `ScenePackBuilder` in DI (Program.cs).\n2. In `AgentBackgroundService.HandleChatEventAsync`:\n   - Build a `ScenePack` from current `WorldState` + recent events before calling the chat interpreter.\n   - Pass relevant pack fields to `BuildSystemPrompt` (entity summary, task highlights).\n3. Update `LlmChatInterpreter.BuildSystemPrompt` signature to accept a `ScenePack?` parameter instead of individual fields.\n4. Adjust the prompt text to include scene context in a structured way (not a raw dump):\n   ```\n   Scene: at (-232,65,151) in survival. Nearby: 2 cows, 1 zombie (5 blocks).\n   Goal: Gather 10 oak_log (3/10 collected).\n   Last actions: mined oak_log +1, moved to (-230,65,150).\n   ```\n5. Keep the prompt compact — no more than 3-4 additional lines.\n\nAcceptance:\n- LLM prompt includes scene summary when available.\n- Backward compatible: no scene pack → prompt looks as it did before.\n- Tests pass.\n\nRefs: `memorysmith_situational_awareness_design_doc_20260625T020914Z.md` Phase 1",
-  "labels": ["scene-pack", "chat-pipeline", "situational-awareness", "sprint-52"],
+  "labels": [
+    "scene-pack",
+    "chat-pipeline",
+    "situational-awareness",
+    "sprint-52"
+  ],
   "estimatedHours": 2.0,
-  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md"
+  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md",
+  "key": "TSK-0151",
+  "epicId": "tsk-0146-entity-observation-scene"
 }

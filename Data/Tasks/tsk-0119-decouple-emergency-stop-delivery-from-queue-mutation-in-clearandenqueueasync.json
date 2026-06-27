@@ -9,7 +9,12 @@
   "assigneeMode": "Custom",
   "assigneeCustomText": "Agent",
   "reporter": "SteveBot",
-  "labels": ["audit", "correctness", "P2", "action-queue", "damage-interrupt"],
+  "labels": [
+    "audit",
+    "correctness",
+    "action-queue",
+    "damage-interrupt"
+  ],
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],

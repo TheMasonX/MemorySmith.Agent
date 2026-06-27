@@ -1,8 +1,8 @@
-﻿{
+{
   "id": "tsk-0087-fix-buildgoalrequest-origin-typo-originz-duplicated-originy-missing",
   "key": "TSK-0087",
-  "title": "Fix BuildGoalRequest origin typo \u002B require all three axes for explicit origin \u002B add tests",
-  "description": "## Council-merged task (absorbs TSK-0095 \u002B TSK-0097)\n\n## Evidence\n\u0060Agent.Planning/IntentManager.cs\u0060 line 187: \u0060if (OriginX is null || OriginZ is null || OriginZ is null)\u0060 \u2014 OriginZ checked twice, OriginY never checked. Same bug in \u0060BuildGoalRequest.Parameters\u0060 property.\n\nAdditionally, \u0060BuildGoal.HasExplicitOrigin\u0060 (BuildGoal.cs:56) returns true if ANY axis is present, causing missing axes to silently become 0 via \u0060?? 0\u0060 in BuildGoalDecomposer.\n\n## Impact\nMalformed build requests with missing Y coordinate leak through as valid. Partial origin collapses to (x, 0, z) silently.\n\n## Fix\n1. Change second \u0060OriginZ\u0060 to \u0060OriginY\u0060 in the null check on line 187\n2. Change \u0060HasExplicitOrigin\u0060 to require all three axes: \u0060OriginX.HasValue \u0026\u0026 OriginY.HasValue \u0026\u0026 OriginZ.HasValue\u0060\n3. Verify \u0060GoalFactory.CreateAsync\u0060 handles null Parameters correctly\n4. Add NUnit tests:\n   - All three origins present \u2192 Parameters is non-null with correct values\n   - OriginX null \u2192 Parameters is null\n   - OriginY null \u2192 Parameters is null (regression guard for the typo)\n   - OriginZ null \u2192 Parameters is null\n   - All three null \u2192 Parameters is null\n\n## Verification\nVerified against codebase 2026-06-23. Council: \u0060Data/Pages/council/audit-task-prioritization-council-2026-06-24.md\u0060",
+  "title": "Fix BuildGoalRequest origin typo + require all three axes for explicit origin + add tests",
+  "description": "## Council-merged task (absorbs TSK-0095 + TSK-0097)\n\n## Evidence\n`Agent.Planning/IntentManager.cs` line 187: `if (OriginX is null || OriginZ is null || OriginZ is null)` — OriginZ checked twice, OriginY never checked. Same bug in `BuildGoalRequest.Parameters` property.\n\nAdditionally, `BuildGoal.HasExplicitOrigin` (BuildGoal.cs:56) returns true if ANY axis is present, causing missing axes to silently become 0 via `?? 0` in BuildGoalDecomposer.\n\n## Impact\nMalformed build requests with missing Y coordinate leak through as valid. Partial origin collapses to (x, 0, z) silently.\n\n## Fix\n1. Change second `OriginZ` to `OriginY` in the null check on line 187\n2. Change `HasExplicitOrigin` to require all three axes: `OriginX.HasValue && OriginY.HasValue && OriginZ.HasValue`\n3. Verify `GoalFactory.CreateAsync` handles null Parameters correctly\n4. Add NUnit tests:\n   - All three origins present → Parameters is non-null with correct values\n   - OriginX null → Parameters is null\n   - OriginY null → Parameters is null (regression guard for the typo)\n   - OriginZ null → Parameters is null\n   - All three null → Parameters is null\n\n## Verification\nVerified against codebase 2026-06-23. Council: `Data/Pages/council/audit-task-prioritization-council-2026-06-24.md`",
   "type": "Task",
   "status": "Done",
   "priority": "Critical",
@@ -12,7 +12,6 @@
   "reporter": "anonymous",
   "labels": [
     "bug",
-    "P0",
     "audit-verified",
     "origin-validation"
   ],

@@ -31,6 +31,58 @@ removed after being added without vetting in Sprint 50. The policy above prevent
 
 ---
 
+## Task Governance
+
+All tasks live in `Data/Tasks/*.json`. The following conventions prevent data integrity issues.
+
+### Schema Contract
+Every task JSON file must conform to this schema:
+- **Required fields**: `id`, `key`, `title`, `status`, `type`, `priority`, `description`, `createdAtUtc`, `updatedAtUtc`, `revision`
+- **Field casing**: camelCase (`id`, `key`, `title`, `status`, `description`, etc.)
+- **ID format**: `id` = `"tsk-XXXX-descriptive-slug"` matching the filename. The `key` field is `"TSK-XXXX"`.
+- **New tasks**: `id` must match `^tsk-\d{4}-[a-z0-9-]+$`. `key` must match `^TSK-\d{4}$`.
+
+### Allowed Statuses
+| Status | Meaning |
+|--------|---------|
+| `Backlog` | Not yet started, awaiting prioritization |
+| `Ready` | Prioritized and scoped, ready to begin |
+| `InProgress` | Actively being worked on |
+| `Blocked` | Cannot proceed; reason documented in comments |
+| `Done` | Complete with evidence comment |
+| `Archived` | Superseded or no longer relevant; rationale documented |
+| `Rejected` | Considered and declined; rationale documented |
+
+No other status values are permitted. Non-standard statuses (`Open`, `Completed`, `Closed - Merged into X`, etc.) must be migrated to the canonical set.
+
+### Priority Values
+Only `Critical`, `High`, `Medium`, `Low` are permitted. Priority labels (`p0`, `p1`, `P0`) are not allowed in the `labels` array — the `priority` field is the single source of truth.
+
+### Labels
+Labels use lowercase with hyphen-separated words. Prefix conventions:
+- `sprint-XX` for sprint association (e.g., `sprint-53`)
+- `domain:xxx` for domain area (e.g., `domain:mineflayer`, `domain:chat`)
+- `type:xxx` for classification (e.g., `type:bug`, `type:refactor`, `type:testing`)
+
+Priority codes (`p0`, `p1`, `P0`) are not allowed as labels — use the `priority` field instead. Duplicate casing variants (e.g., `P1` vs `p1`) are not permitted.
+
+### Creation Process
+1. Use `memorysmith_task_create` MCP tool when available, or copy a validated template.
+2. Always run validation after creation or mutation.
+3. Moving to `Done` requires an evidence comment with file paths, test results, or sprint handoff reference.
+4. New task files must have unique `key` values — check for existing keys before creating.
+
+### Validation
+Before committing any change to `Data/Tasks/`, run:
+```powershell
+pwsh ./Scripts/Test-TaskRecords.ps1
+```
+This script checks: valid JSON, allowed statuses, allowed priorities, unique keys, no orphan `.md` files, no embedded control characters in string values.
+
+A CI step in `.github/workflows/ci.yml` runs the same validation on every push that touches `Data/Tasks/`.
+
+---
+
 ---
 
 ## No Magic Numbers

@@ -1,8 +1,8 @@
-﻿{
+{
   "id": "tsk-0121-rehome-to-origin-after-every-block",
   "key": "TSK-0121",
   "title": "Rehome To Origin After Every Block",
-  "description": "The agent walks back to the origin of the building after each block it places. This wastes a lot of time and looks unnatural. It should repathfind from its current position to the target block placement instead of rerouting to the origin and THEN going to the placement block.\n\n## Investigation Findings (SteveBot 2026-06-26)\n\n1. \u0060HtnTaskLibrary.DecomposeBuild\u0060 creative path does NOT add MoveTo \u2014 confirmed. Comment at line 504 says \u0022TSK-0121: Removed MoveTo(origin) from creative build plan.\u0022\n2. \u0060BuildGoalDecomposer.Decompose\u0060 does NOT inject MoveTo \u2014 confirmed.\n3. \u0060PlannerRouter \u2192 DecomposerPlanner\u0060 does NOT modify actions \u2014 confirmed.\n4. The survival path (line ~600) also has a comment \u0022TSK-0121: Remove proximity-gated MoveTo(origin).\u0022 and does NOT emit MoveTo in the action list.\n\n**If MoveTo still appears in the plan summary but NOT in the trace logs, the injection is happening in AgentBackgroundService\u0027s dispatch loop, context preservation code, or \u0060PlanAsync \u2192 ActionPlan\u0060 construction outside the planner pipeline.**\n\nTrace logging added to HtnTaskLibrary.DecomposeBuild and BuildGoalDecomposer.Decompose to confirm action list at generation time.\n\nNext: Run the bot, observe if MoveTo appears in trace. If not in trace but in dispatch, investigate AgentBackgroundService dispatch loop and ActionPlan construction.\n\nFiles:\n- Agent.Planning/HtnTaskLibrary.cs:497-650 (DecomposeBuild creative \u002B survival paths)\n- Agent.Planning/Decomposition/BuildGoalDecomposer.cs:40-70 (Decompose)\n- Agent.Planning/HtnPlanner.cs:36-53 (fallback build path)\n- WebUI.Blazor/AgentBackgroundService.cs (dispatch loop)",
+  "description": "The agent walks back to the origin of the building after each block it places. This wastes a lot of time and looks unnatural. It should repathfind from its current position to the target block placement instead of rerouting to the origin and THEN going to the placement block.\n\n## Investigation Findings (SteveBot 2026-06-26)\n\n1. `HtnTaskLibrary.DecomposeBuild` creative path does NOT add MoveTo — confirmed. Comment at line 504 says \"TSK-0121: Removed MoveTo(origin) from creative build plan.\"\n2. `BuildGoalDecomposer.Decompose` does NOT inject MoveTo — confirmed.\n3. `PlannerRouter → DecomposerPlanner` does NOT modify actions — confirmed.\n4. The survival path (line ~600) also has a comment \"TSK-0121: Remove proximity-gated MoveTo(origin).\" and does NOT emit MoveTo in the action list.\n\n**If MoveTo still appears in the plan summary but NOT in the trace logs, the injection is happening in AgentBackgroundService's dispatch loop, context preservation code, or `PlanAsync → ActionPlan` construction outside the planner pipeline.**\n\nTrace logging added to HtnTaskLibrary.DecomposeBuild and BuildGoalDecomposer.Decompose to confirm action list at generation time.\n\nNext: Run the bot, observe if MoveTo appears in trace. If not in trace but in dispatch, investigate AgentBackgroundService dispatch loop and ActionPlan construction.\n\nFiles:\n- Agent.Planning/HtnTaskLibrary.cs:497-650 (DecomposeBuild creative + survival paths)\n- Agent.Planning/Decomposition/BuildGoalDecomposer.cs:40-70 (Decompose)\n- Agent.Planning/HtnPlanner.cs:36-53 (fallback build path)\n- WebUI.Blazor/AgentBackgroundService.cs (dispatch loop)",
   "type": "Task",
   "status": "Done",
   "priority": "Critical",
@@ -12,7 +12,6 @@
   "reporter": "SteveBot",
   "labels": [
     "bug",
-    "P0",
     "build",
     "placement"
   ],
@@ -23,13 +22,13 @@
     {
       "id": "c-234c3c8728574c899e1424a31cafaf0f",
       "author": "TheMasonX",
-      "body": "Reopening. Still seen as of \u006072ff65f\u0060",
+      "body": "Reopening. Still seen as of `72ff65f`",
       "createdAtUtc": "2026-06-27T02:53:00.634966Z"
     },
     {
       "id": "c-f3cc9b82fedd4db185f4e705590f8ffe",
       "author": "anonymous",
-      "body": "## Sprint 52 Update (SteveBot)\n\nInvestigated the MoveTo source in the build decomposition pipeline. Key findings:\n\n1. **DecomposeBuild creative path** does NOT add MoveTo \u2014 confirmed by code audit\n2. **BuildGoalDecomposer.Decompose** does NOT inject MoveTo \u2014 confirmed\n3. **PlannerRouter \u2192 DecomposerPlanner** does NOT modify actions \u2014 confirmed\n\nTemporary trace logging added:\n- \u0060HtnTaskLibrary.DecomposeBuild\u0060 now logs exact action list to stderr: \u0060[HtnTaskLibrary] DecomposeBuild returning N actions: [PlaceBlock,PlaceBlock,...,GetStatus]\u0060\n- \u0060BuildGoalDecomposer.Decompose\u0060 now logs to ILogger: \u0060[BuildGoalDecomposer] DecomposeBuild returned N actions: [...]\u0060\n\nNext step: Run the bot and check the trace output. If MoveTo still appears in the plan summary but NOT in the trace logs, the injection is happening in AgentBackgroundService\u0027s dispatch loop or context preservation code outside the planner pipeline.\n\nCreated TSK-0174 (TSK-0152) for the investigation follow-up.",
+      "body": "## Sprint 52 Update (SteveBot)\n\nInvestigated the MoveTo source in the build decomposition pipeline. Key findings:\n\n1. **DecomposeBuild creative path** does NOT add MoveTo — confirmed by code audit\n2. **BuildGoalDecomposer.Decompose** does NOT inject MoveTo — confirmed\n3. **PlannerRouter → DecomposerPlanner** does NOT modify actions — confirmed\n\nTemporary trace logging added:\n- `HtnTaskLibrary.DecomposeBuild` now logs exact action list to stderr: `[HtnTaskLibrary] DecomposeBuild returning N actions: [PlaceBlock,PlaceBlock,...,GetStatus]`\n- `BuildGoalDecomposer.Decompose` now logs to ILogger: `[BuildGoalDecomposer] DecomposeBuild returned N actions: [...]`\n\nNext step: Run the bot and check the trace output. If MoveTo still appears in the plan summary but NOT in the trace logs, the injection is happening in AgentBackgroundService's dispatch loop or context preservation code outside the planner pipeline.\n\nCreated TSK-0174 (TSK-0152) for the investigation follow-up.",
       "createdAtUtc": "2026-06-27T04:05:00.8311531Z"
     }
   ],

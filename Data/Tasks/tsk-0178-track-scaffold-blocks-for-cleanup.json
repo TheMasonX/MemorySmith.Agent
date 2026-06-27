@@ -1,9 +1,15 @@
 {
-  "id": "tsk-0178",
+  "id": "tsk-0178-track-scaffold-blocks-for-cleanup",
   "title": "Track scaffolding blocks placed during builds and clean them up",
   "status": "Backlog",
   "priority": "Medium",
   "type": "Task",
   "description": "When the adapter places scaffold blocks (temporary blocks below targets that have no reference face), track them in a list. After the blueprint is complete, mine/remove all scaffold blocks. This prevents leftover blocks from polluting the build area.",
-  "labels": ["adapter", "place", "scaffold", "tsk-0123"]
+  "labels": [
+    "adapter",
+    "place",
+    "scaffold",
+    "tsk-0123"
+  ],
+  "key": "TSK-0178"
 }

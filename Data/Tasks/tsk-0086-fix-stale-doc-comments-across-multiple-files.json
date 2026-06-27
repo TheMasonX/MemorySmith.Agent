@@ -1,10 +1,10 @@
-﻿{
+{
   "id": "tsk-0086-fix-stale-doc-comments-across-multiple-files",
   "key": "TSK-0086",
   "title": "Fix stale doc comments across multiple files",
-  "description": "Several doc comments are stale after Sprint 44 changes and will mislead maintainers:\n1. HtnTaskLibrary.cs line ~770: \u0022Default plan: SearchMemory \u2192 MineBlock\u0022 should say \u0022Default plan: MineBlock\u0022\n2. LlmChatInterpreter.cs line 19: \u0022extract ChatInterpretation from IntentDraft response\u0022 should be \u0022extract IntentDraft from LLM response\u0022\n3. LlmChatInterpreter.cs line 40: \u0022removing ChatInterpretation\u0022 - past tense, mention it\u0027s done\n4. ChatInterpreter.cs: duplicate old doc block about ChatInterpretation that predates Sprint 39 P1-C\n5. Sprint44Tests.cs class doc: claims checkpoint tests exist that don\u0027t\n\nCouncil confidence: 70%. Severity: Low (P2).",
+  "description": "Several doc comments are stale after Sprint 44 changes and will mislead maintainers:\n1. HtnTaskLibrary.cs line ~770: \"Default plan: SearchMemory → MineBlock\" should say \"Default plan: MineBlock\"\n2. LlmChatInterpreter.cs line 19: \"extract ChatInterpretation from IntentDraft response\" should be \"extract IntentDraft from LLM response\"\n3. LlmChatInterpreter.cs line 40: \"removing ChatInterpretation\" - past tense, mention it's done\n4. ChatInterpreter.cs: duplicate old doc block about ChatInterpretation that predates Sprint 39 P1-C\n5. Sprint44Tests.cs class doc: claims checkpoint tests exist that don't\n\nCouncil confidence: 70%. Severity: Low (P2).",
   "type": "Task",
-  "status": "Closed - Merged into TSK-0105",
+  "status": "Done",
   "priority": "Medium",
   "absorbedBy": "TSK-0105",
   "assigneeMode": "Custom",
