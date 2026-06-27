@@ -1,0 +1,41 @@
+﻿{
+  "id": "tsk-0125-align-architecture-docs-to-single-canonical-pipeline",
+  "key": "TSK-0125",
+  "title": "Align Architecture Docs to Single Canonical Pipeline",
+  "description": "Council Review Sprint 51 Critical Task.\n\nProblem: architecture.md describes deterministic HTN pipeline; AGENTS.md describes LLM-first pipeline; chat-system.md describes hybrid. A new developer cannot determine the authoritative pipeline.\n\nFix:\n- Create single Mermaid diagram showing actual runtime flow as of Sprint 50\n- Update architecture.md runtime flow section\n- Ensure AGENTS.md and architecture.md agree\n- Add note about ADR D-003 fast-paths being intentional, not drift\n- Link canonical diagram from README and home.md\n\nSource: Council Review 2026-06-26, DA-001, Human Learning Advocate findings",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-51",
+    "council",
+    "documentation",
+    "architecture"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-7d049abaedcd44c4bebcc0e31cb2cfbc",
+      "author": "anonymous",
+      "body": "Council report: Data/Pages/council/audit-findings-consolidation-council-2026-06-26.md\n\nKey fix: Human Learning Advocate found that architecture.md, AGENTS.md, and chat-system.md describe contradictory pipelines. This task creates ONE authoritative pipeline diagram and aligns all docs.",
+      "createdAtUtc": "2026-06-27T00:26:41.2811744Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T00:26:32.6431931Z",
+  "updatedAtUtc": "2026-06-27T00:26:41.2811744Z",
+  "completedAtUtc": null,
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0125-align-architecture-docs-to-single-canonical-pipeline.json"
+}

@@ -1,0 +1,41 @@
+﻿{
+  "id": "tsk-0128-fix-searchmemorytool-regex-fragility-and-top-hit-limitation",
+  "key": "TSK-0128",
+  "title": "Fix SearchMemoryTool Regex Fragility and Top-Hit Limitation",
+  "description": "Council Review Sprint 51 High Priority Task.\n\nThree fixes to SearchMemoryTool.cs:\n1. Scan ALL results for first valid coordinate-bearing hit (not just FirstOrDefault)\n2. Replace int.Parse with int.TryParse (guarded parsing)\n3. Fix CoordLabelsPattern regex to use distinct named groups (x/y/z) instead of single group name \u0022x\u0022\n\nAlso: align Sprint51Tests.cs regex patterns with production patterns.\n\nSource: Council Review 2026-06-26, DA-005, Retrieval Specialist findings",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-51",
+    "council",
+    "bug",
+    "search-memory"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-7479bb42a3484abaae5d5267a17f7341",
+      "author": "anonymous",
+      "body": "Council report: Data/Pages/council/audit-findings-consolidation-council-2026-06-26.md\n\nRetrieval Specialist flagged 3 issues: (1) top-hit-only limitation is Critical \u2014 bot can miss known resource locations, (2) int.Parse throws on malformed coordinates, (3) CoordLabelsPattern uses single group name \u0022x\u0022 for all axes. All three are small, independent fixes.",
+      "createdAtUtc": "2026-06-27T00:26:41.3560597Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T00:26:33.1083654Z",
+  "updatedAtUtc": "2026-06-27T00:26:41.3560597Z",
+  "completedAtUtc": null,
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0128-fix-searchmemorytool-regex-fragility-and-top-hit-limitation.json"
+}

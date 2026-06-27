@@ -1,0 +1,41 @@
+﻿{
+  "id": "tsk-0124-classify-all-compatibility-bridges-permanent-temporary-obsolete",
+  "key": "TSK-0124",
+  "title": "Classify All Compatibility Bridges (Permanent/Temporary/Obsolete)",
+  "description": "Council Review Sprint 51 Critical Task.\n\nLabel every compatibility bridge in MemorySmith.Agent with: owner, purpose, replacement, removal criteria, target sprint.\n\nBridges to classify:\n- MoveToTool context-carry fallback (nearestX/Y/Z)\n- AgentBackgroundService selective context-key merge\n- ChatInterpreter legacy regex paths\n- HtnTaskLibrary fallback decomposers\n- ChatInterpretation.GoalName backward-compat field\n\nDocument classifications in Data/Pages/architecture.md.\n\nSource: Council Review 2026-06-26 audit-findings-consolidation, DA-007",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-51",
+    "council",
+    "architecture",
+    "audit-fix"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-93f4fe14c2834c66af6b1d2e5a85cbeb",
+      "author": "anonymous",
+      "body": "Council report: Data/Pages/council/audit-findings-consolidation-council-2026-06-26.md\n\nThis task is part of Sprint 51 \u0022Canonicalize \u0026 Classify\u0022 \u2014 the zero-risk prep work phase. All bridges should be documented before any extraction work begins in Sprint 52.",
+      "createdAtUtc": "2026-06-27T00:26:41.2511829Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T00:26:32.6026827Z",
+  "updatedAtUtc": "2026-06-27T00:26:41.2511829Z",
+  "completedAtUtc": null,
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0124-classify-all-compatibility-bridges-permanent-temporary-obsolete.json"
+}
