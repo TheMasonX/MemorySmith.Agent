@@ -1,0 +1,42 @@
+{
+  "id": "tsk-0173-investigate-moveto-replan-root-cause",
+  "key": "TSK-0173",
+  "title": "Investigate MoveTo Re-added on Replan Root Cause",
+  "description": "TSK-0121 (Remove MoveTo-to-origin from replans) was marked done in Sprint 51 Wave B but the fix didn't hold. The DecomposeBuild creative path has no MoveTo action, yet the plan summary shows [MoveTo → PlaceBlockx215 → GetStatus] and MoveTo(72,4,124) is dispatched every cycle. \n\nRoot cause is NOT in DecomposeBuild — the creative path correctly omits MoveTo. Investigation needed: \n1. Check if PlannerRouter falls through to HtnPlanner (losing BuildGoal type) \n2. Check if DecomposerPlanner.ReplanAsync preserves originalGoal \n3. Check if any middleware injects MoveTo before enqueue \n4. Verify plan action count: creative path = 216 (215 PlaceBlock + 1 GetStatus), but log shows 217 — the extra action is MoveTo",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "SteveBot",
+  "labels": [
+    "bug",
+    "P0",
+    "build",
+    "placement",
+    "investigation"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-tsk0173-01",
+      "author": "SteveBot",
+      "body": "Created from Sprint 51 Wave B+ investigation. TSK-0121's fix (comment in DecomposeBuild creative path saying 'Removed MoveTo') was cosmetic only — the MoveTo was never in the creative code path. The real MoveTo injection point is elsewhere. Parent task TSK-0121 reopened.",
+      "createdAtUtc": "2026-06-27T04:00:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": "tsk-0121-rehome-to-origin-after-every-block",
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T04:00:00Z",
+  "updatedAtUtc": "2026-06-27T04:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0173-investigate-moveto-replan-root-cause.json"
+}

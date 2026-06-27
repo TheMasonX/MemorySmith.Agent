@@ -150,11 +150,14 @@ if (agentEnabled)
         sp.GetRequiredService<ILogger<GoalFactory>>())); // Sprint 33 DEF-S32-A
     builder.Services.AddSingleton<IGoalFactory>(sp => sp.GetRequiredService<GoalFactory>());
 
-    builder.Services.AddSingleton<ChatHistory>();
-
     var chatOpts = new ChatOptions();
     var chatSection = builder.Configuration.GetSection("Agent:Chat");
     chatSection.Bind(chatOpts);
+
+    // Sprint 52: ChatHistory uses configurable max turns (default 30).
+    // Future TSK-0169 will add character-length-based eviction.
+    builder.Services.AddSingleton<ChatHistory>(
+        _ => new ChatHistory(chatOpts.ChatHistoryMaxTurns));
     var legacyModel = chatSection["Model"];
     if (!string.IsNullOrWhiteSpace(legacyModel) && string.IsNullOrWhiteSpace(chatSection["LlmModel"]))
         chatOpts = chatOpts with { LlmModel = legacyModel };

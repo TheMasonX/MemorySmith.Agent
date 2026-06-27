@@ -442,6 +442,16 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       const { x, y, z } = args;
       if (x == null || y == null || z == null)
         throw new Error('move requires x, y, z');
+      // Sprint 51: early-exit when already at target. pathfinder.goto() with
+      // GoalNear(1) handles this internally but still incurs goal setup cost.
+      const { x: bx, y: by, z: bz } = botPos();
+      const dist = Math.sqrt((x - bx) ** 2 + (y - by) ** 2 + (z - bz) ** 2);
+      if (dist <= 1.0) {
+        logStructured('debug', 'move', 'already at target', { x, y, z, botX: bx, botY: by, botZ: bz, dist });
+        sendEvent('moveComplete', { ...botPos(), correlationId });
+        break;
+      }
+      logStructured('info', 'move', 'navigating', { x, y, z, botX: bx, botY: by, botZ: bz, dist: dist.toFixed(1) });
       const movements = new Movements(bot);
       bot.pathfinder.setMovements(movements);
       await bot.pathfinder.goto(new pfGoals.GoalNear(x, y, z, 1));

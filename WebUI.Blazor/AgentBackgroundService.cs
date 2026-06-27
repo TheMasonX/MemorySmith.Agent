@@ -172,6 +172,8 @@ public sealed class AgentBackgroundService(
     private bool _actionDispatchedThisCycle;
     // Sprint 20: inventory sum snapshot for progress-based stagnation detection.
     private int _cycleInventorySnapshot = -1;
+    // Sprint 51: count of confirmed block placements in the current cycle.
+    private int _blocksPlacedThisCycle;
     // Sprint 4a: connection status for SignalR push; D2: "reconnecting" broadcast
     private string _connectionStatus = "disconnected";
 
@@ -520,7 +522,13 @@ public sealed class AgentBackgroundService(
     {
         await foreach (var worldEvent in worldAdapter.ReceiveEventsAsync(ct))
         {
-            logger.LogDebug("World event: {Type}", worldEvent.GetType().Name);
+            // Sprint 51 Wave B+: MoveEvent fires ~10x/second and floods logs.
+            // Log at Trace so it's available when needed but invisible by default.
+            // All other events remain at Debug for observability.
+            if (worldEvent is MoveEvent)
+                logger.LogTrace("World event: {Type}", worldEvent.GetType().Name);
+            else
+                logger.LogDebug("World event: {Type}", worldEvent.GetType().Name);
             _worldState = _projector.Apply(_worldState, worldEvent);
 
             // Sprint 23 P0-A: real-time damage interrupt.
@@ -705,8 +713,9 @@ public sealed class AgentBackgroundService(
                 // checkpoint was set when the tool dispatched (which always "succeeds" since
                 // it's fire-and-forget), causing failed placements to be skipped permanently.
                 case BlockPlacedEvent bpe:
-                    logger.LogDebug("[place] block placed: {Block} @ ({X},{Y},{Z})",
+                    logger.LogInformation("[place] CONFIRMED: {Block} placed @ ({X},{Y},{Z})",
                         bpe.Block, bpe.X, bpe.Y, bpe.Z);
+                    _blocksPlacedThisCycle++;
                     AdvanceBuildCheckpoint("PlaceBlock");
                     CompleteCorrelatedActionByTool("PlaceBlock");
                     break;
@@ -714,11 +723,27 @@ public sealed class AgentBackgroundService(
                 // Sprint 43 (P0-4): terrain collision — complete correlation so tool loop
                 // continues, but do NOT advance build checkpoint. The position is still
                 // occupied by terrain; the planner retries it on the next cycle.
+                //
+                // Sprint 51: bot-position skip — when the skip target equals the bot's
+                // current position, the bot is standing exactly where the block goes.
+                // Advance the checkpoint anyway so the next block (at a different position)
+                // can be placed. The skipped block will be retried on the next replan once
+                // the bot has moved. Without this, the first block of a blueprint at the
+                // origin creates an infinite skip loop.
                 case BlockPlaceSkippedEvent bps:
+                    var skipReason = bps.X == _worldState.Position.X
+                        && bps.Y == _worldState.Position.Y
+                        && bps.Z == _worldState.Position.Z
+                        ? "botPosition" : "terrainOccupied";
                     logger.LogWarning(
-                        "[place] SKIPPED at ({X},{Y},{Z}) — occupied by {ExistingBlock} " +
-                        "(trying to place {Block})",
-                        bps.X, bps.Y, bps.Z, bps.ExistingBlock, bps.Block);
+                        "[place] SKIPPED at ({X},{Y},{Z}) — {Reason} (trying to place {Block})",
+                        bps.X, bps.Y, bps.Z, skipReason, bps.Block);
+                    if (skipReason == "botPosition")
+                    {
+                        // Bot is in the way — advance checkpoint so we don't loop forever
+                        AdvanceBuildCheckpoint("PlaceBlock");
+                        logger.LogDebug("[build] checkpoint advanced past bot-position skip at ({X},{Y},{Z})", bps.X, bps.Y, bps.Z);
+                    }
                     CompleteCorrelatedActionByTool("PlaceBlock");
                     break;
 
@@ -1332,6 +1357,16 @@ public sealed class AgentBackgroundService(
                 {
                     var plan = await planner.PlanAsync(_currentGoal, _worldState, ct);
 
+                    // Sprint 52 diagnostic: raw action dump to trace MoveTo source (TSK-0121).
+                    // DecomposeBuild creative path claims no MoveTo, but plan summary shows one.
+                    // This log captures the EXACT actions from the planner before any processing.
+                    var rawActions = string.Join(",", plan.Actions.Take(5).Select(a => a.Tool));
+                    var totalActions = plan.Actions.Count;
+                    logger.LogWarning(
+                        "[plan-raw] {Goal}: {N} total actions, first 5: [{Actions}] | planner={Planner}",
+                        _currentGoal.Name, totalActions, rawActions,
+                        planner.GetType().Name);
+
                     // Sprint 19: governor evaluates plan fingerprint before enqueueing.
                     // Fingerprint = goal key + action type sequence (excludes parameters
                     // since Wander coordinates change each cycle).
@@ -1416,7 +1451,10 @@ public sealed class AgentBackgroundService(
                 // action to report progress via blockMined events.
                 if (IsFireAndForgetTool(action.Tool) && HasPendingActionOfTool(action.Tool))
                 {
-                    logger.LogDebug("[dispatch] {Tool} skipped — already in-flight", action.Tool);
+                    // Sprint 52: reduce "skipped - already in-flight" log spam.
+                    // PlaceBlock is dispatched ~200 times per cycle; only the first
+                    // one actually flies. Log at Trace so it's invisible by default.
+                    logger.LogTrace("[dispatch] {Tool} skipped — already in-flight", action.Tool);
                     continue;
                 }
 
@@ -1538,10 +1576,25 @@ public sealed class AgentBackgroundService(
                     {
                         // Sprint 19: elevated to Info with timing for runtime visibility
                         // Sprint 40 P0-B: include bot position for debugging
-                        logger.LogInformation(
-                            "[action] {Tool} OK ({ElapsedMs}ms) pos=({PosX},{PosY},{PosZ})",
-                            action.Tool, sw.ElapsedMilliseconds,
-                            _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
+                        // Sprint 51: for PlaceBlock, include material + target coords
+                        if (action.Tool == "PlaceBlock" || action.Tool == "place")
+                        {
+                            var mat = action.Arguments.TryGetValue("material", out var m) && m is string ms ? ms : "?";
+                            var tx = action.Arguments.TryGetValue("x", out var ax) ? ax : null;
+                            var ty = action.Arguments.TryGetValue("y", out var ay) ? ay : null;
+                            var tz = action.Arguments.TryGetValue("z", out var az) ? az : null;
+                            logger.LogInformation(
+                                "[action] PlaceBlock {Material} → ({Tx},{Ty},{Tz}) ({ElapsedMs}ms) bot=({PosX},{PosY},{PosZ})",
+                                mat, tx, ty, tz, sw.ElapsedMilliseconds,
+                                _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
+                        }
+                        else
+                        {
+                            logger.LogInformation(
+                                "[action] {Tool} OK ({ElapsedMs}ms) pos=({PosX},{PosY},{PosZ})",
+                                action.Tool, sw.ElapsedMilliseconds,
+                                _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
+                        }
 
                         // Sprint 36: log outbound chat to disk (opt-out).
                         if (action.Tool.Equals("Chat", StringComparison.OrdinalIgnoreCase)
@@ -1626,6 +1679,15 @@ public sealed class AgentBackgroundService(
             {
                 if (_actionDispatchedThisCycle)
                 {
+                    // Sprint 51: log blocks placed this cycle before resetting
+                    if (_blocksPlacedThisCycle > 0)
+                    {
+                        logger.LogInformation("[build] cycle complete: {Count} blocks placed | " +
+                            "remaining: {Remaining} | pos=({PosX},{PosY},{PosZ})",
+                            _blocksPlacedThisCycle, _queue.Count,
+                            _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
+                        _blocksPlacedThisCycle = 0;
+                    }
                     logger.LogDebug("Plan cycle complete — settling for 300 ms");
                     await Task.Delay(300, ct);
                     _actionDispatchedThisCycle = false;
@@ -1654,8 +1716,21 @@ public sealed class AgentBackgroundService(
                             (errMsg.Contains("recipe", StringComparison.OrdinalIgnoreCase) &&
                              errMsg.Contains("missing", StringComparison.OrdinalIgnoreCase));
 
-                        if (_consecutiveFailures >= 2 || isImmediateRecovery)
+                        // Sprint 52: In creative mode, skip recovery for inventory errors.
+                        // The adapter handles creative inventory — gathering is unnecessary
+                        // and causes the bot to wander hundreds of blocks looking for raw
+                        // materials (e.g. sand for glass_pane) that may not exist nearby.
+                        var isInventoryError = errMsg.Contains("not in inventory", StringComparison.OrdinalIgnoreCase);
+                        if (isInventoryError && _worldState.IsCreativeMode)
+                        {
+                            logger.LogInformation(
+                                "[recovery] skipping for '{Error}' — bot is in creative mode, adapter handles inventory",
+                                errMsg);
+                        }
+                        else if (_consecutiveFailures >= 2 || isImmediateRecovery)
+                        {
                             await TryRecoverFromGameErrorAsync(errMsg, ct);
+                        }
                     }
 
                     // Sprint 15 P1: stall detection
@@ -2205,8 +2280,20 @@ public sealed class AgentBackgroundService(
             // When PlaceBlock fails because a material is missing, create a gather
             // goal for that material directly instead of waiting for the LLM.
             // Pattern: "place:<material> not in inventory"
+            // Sprint 51 Wave B+ fix: skip gather recovery in creative mode — the
+            // adapter's creative inventory fallback handles block provisioning.
+            // Without this guard the bot wanders hundreds of blocks looking for
+            // raw materials (e.g. sand for glass_pane) that don't exist nearby.
             if (TryExtractMissingMaterial(errMsg, out var missingBlock))
             {
+                if (_worldState.IsCreativeMode)
+                {
+                    logger.LogDebug(
+                        "[recovery] skipping gather for '{Material}' — bot is in creative mode, " +
+                        "adapter handles inventory",
+                        missingBlock);
+                    return;
+                }
                 var gatherGoalName = $"Gather:{missingBlock}";
                 // Guard: don't re-attempt the same abandoned or current goal
                 if (!GoalNamesMatch(gatherGoalName, _lastAbandonedGoalName) &&

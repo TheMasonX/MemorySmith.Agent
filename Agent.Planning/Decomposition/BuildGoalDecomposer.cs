@@ -64,6 +64,14 @@ public sealed class BuildGoalDecomposer(HtnTaskLibrary taskLibrary, ILogger<Buil
         var actions = taskLibrary.DecomposeBuild(
             bg.Blueprint, bg.Blocks, buildOrigin, state, requireOrigin);
 
+        // Sprint 52 diagnostic: log RLE-compressed action list from BuildGoalDecomposer
+        // to help trace where MoveTo enters the pipeline (TSK-0121).
+        // Inline RLE to avoid coupling to AgentBackgroundService.RleCompressActions.
+        var actionSummary = RleCompress(actions);
+        logger.LogDebug(
+            "[BuildGoalDecomposer] DecomposeBuild returned {Count} actions: [{Sequence}]",
+            actions.Count, actionSummary);
+
         return new ActionPlan(bg.Name, bg.Phases, actions);
     }
 
@@ -94,5 +102,36 @@ public sealed class BuildGoalDecomposer(HtnTaskLibrary taskLibrary, ILogger<Buil
             "Build origin fact unparseable; defaulting to 0 for axis {Axis}. Value={Value}",
             axis, v);
         return 0;
+    }
+
+    /// <summary>RLE-compresses an action list for compact logging.</summary>
+    private static string RleCompress(IReadOnlyList<ActionData> actions)
+    {
+        var sb = new System.Text.StringBuilder();
+        string? current = null;
+        int count = 0;
+        foreach (var a in actions)
+        {
+            var tool = a.Tool;
+            if (tool == current) { count++; }
+            else
+            {
+                if (current is not null)
+                {
+                    if (sb.Length > 0) sb.Append(" → ");
+                    sb.Append(current);
+                    if (count > 1) sb.Append('×').Append(count);
+                }
+                current = tool;
+                count = 1;
+            }
+        }
+        if (current is not null)
+        {
+            if (sb.Length > 0) sb.Append(" → ");
+            sb.Append(current);
+            if (count > 1) sb.Append('×').Append(count);
+        }
+        return sb.ToString();
     }
 }

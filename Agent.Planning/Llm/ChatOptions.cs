@@ -17,6 +17,7 @@ namespace Agent.Planning.Llm;
 ///     "GlobalPerMinuteMax": 5,
 ///     "MaxMessageLength": 1024,
 ///     "MaxResponseDistanceBlocks": 64.0,
+///     "ChatHistoryMaxTurns": 30,
 ///     "ConversationWindowSeconds": 60,
 ///     "LlmConfidenceThreshold": 0.6
 ///   }
@@ -105,6 +106,15 @@ public sealed record ChatOptions
     /// of the conversation (directed at the bot). Default: 60.
     /// </summary>
     public int ConversationWindowSeconds { get; init; } = 60;
+
+    /// <summary>
+    /// Maximum number of chat turns (player + bot messages) retained in the
+    /// conversation history buffer injected into the LLM system prompt.
+    /// Sprint 52: increased from 5 to 30. Future: replace with character-length-based
+    /// eviction (TSK-0169) so short messages don't prematurely evict context.
+    /// Default: 30.
+    /// </summary>
+    public int ChatHistoryMaxTurns { get; init; } = 30;
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
