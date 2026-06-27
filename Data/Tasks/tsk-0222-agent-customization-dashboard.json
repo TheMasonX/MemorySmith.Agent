@@ -1,0 +1,31 @@
+﻿{
+  "id": "tsk-0222-agent-customization-dashboard",
+  "key": "TSK-0222",
+  "title": "Agent Customization Dashboard",
+  "description": "Dashboard page for the name/backstory (500 char limit) and any per agent settings. Also lets you change the skin",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": "f84ef6348fea4a94bc75bb5b66a80af9",
+  "assigneeCustomText": null,
+  "reporter": "TheMasonX",
+  "labels": [
+    "future"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-27T20:56:11.0618905Z",
+  "updatedAtUtc": "2026-06-27T20:56:11.0618905Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

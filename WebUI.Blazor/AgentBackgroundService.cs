@@ -2627,8 +2627,12 @@ public sealed class AgentBackgroundService(
         try
         {
             var outcomes = _cycleOutcomes.ToArray();
+            // Sprint 54 (TSK-0222): forceEvaluate=true bypasses fast-paths.
+            // The governor has already declared a stall — that IS the failure signal.
+            // Fire-and-forget tools like PlaceBlock always report success at dispatch;
+            // their real failures (timeouts, skips) are in _correlatedActions, not outcomes.
             var evalResult = await _llmEvaluator.EvaluateAsync(
-                _currentGoal!, outcomes, _worldState, ct);
+                _currentGoal!, outcomes, _worldState, ct, forceEvaluate: true);
 
             if (evalResult.ShouldReplan)
             {

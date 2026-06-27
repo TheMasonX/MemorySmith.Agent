@@ -27,13 +27,19 @@ public interface ILlmEvaluator
     /// Added in Sprint 39 D-S38-02.
     /// </param>
     /// <param name="ct">Cancellation token.</param>
+    /// <param name="forceEvaluate">
+    /// Sprint 54 (TSK-0222): When true, bypasses fast-path short-circuits (too-few-outcomes,
+    /// all-succeeded) and always calls the LLM. Used by TryLlmReplanOnStallAsync when the
+    /// governor has already declared a stall — the stall itself is evidence of failure,
+    /// even if individual tool outcomes appear successful (e.g., fire-and-forget place actions).
+    /// </param>
     /// <returns>
     /// <see cref="EvaluationResult"/> with <see cref="EvaluationResult.ShouldReplan"/> set to
     /// <see langword="true"/> to trigger replanning and an optional <see cref="EvaluationResult.Suggestion"/>
     /// for specific remediation.
     /// </returns>
     Task<EvaluationResult> EvaluateAsync(IGoal goal, IReadOnlyList<ActionOutcome> outcomes,
-        WorldState worldState, CancellationToken ct = default);
+        WorldState worldState, CancellationToken ct = default, bool forceEvaluate = false);
 }
 
 /// <summary>

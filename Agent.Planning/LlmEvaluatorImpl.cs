@@ -46,15 +46,20 @@ public sealed class LlmEvaluatorImpl : ILlmEvaluator
         IGoal goal,
         IReadOnlyList<ActionOutcome> outcomes,
         WorldState worldState,
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        bool forceEvaluate = false)
     {
         // Fast-path 1: too few data points to make a reliable judgement.
-        if (outcomes.Count < MinOutcomesBeforeEval)
+        // Sprint 54 (TSK-0222): skipped when forceEvaluate=true (governor stall).
+        if (!forceEvaluate && outcomes.Count < MinOutcomesBeforeEval)
             return new EvaluationResult(false, "too few outcomes");
 
         // Fast-path 2: all outcomes succeeded — no reason to replan.
+        // Sprint 54 (TSK-0222): skipped when forceEvaluate=true. Fire-and-forget
+        // tools (place, MineBlock) always report success at dispatch time; their
+        // real failures show up later in correlated action timeouts, not outcomes.
         var failureCount = outcomes.Count(static o => !o.Success);
-        if (failureCount == 0)
+        if (!forceEvaluate && failureCount == 0)
             return new EvaluationResult(false, "all actions succeeded");
 
         // Fast-path 3: provider offline — skip silently.
