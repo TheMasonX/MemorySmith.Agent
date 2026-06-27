@@ -199,8 +199,14 @@ public sealed class ChatInterpreter : IChatInterpreter
 
         // TSK-0015: inventory report command
         // Sprint 54 (TSK-0210): enriched with goal context and suggestions.
-        if (Regex.IsMatch(message, @"\b(inventory|what do you have|what are you carrying|items)\b",
-            RegexOptions.IgnoreCase))
+        // Sprint 54 (fix): length gate prevents "inventory"/"items" false positives
+        // in long sentences (same pattern as TSK-0200 help fix). Multi-word
+        // phrases "what do you have" / "what are you carrying" are unrestricted.
+        var isShortInventory = message.Length <= 40 && Regex.IsMatch(message,
+            @"\b(inventory|items)\b", RegexOptions.IgnoreCase);
+        if (isShortInventory
+            || Regex.IsMatch(message, @"\bwhat do you have\b|\bwhat are you carrying\b",
+                RegexOptions.IgnoreCase))
         {
             var inv = state.Inventory.Count == 0
                 ? "Inventory is empty."
@@ -218,8 +224,13 @@ public sealed class ChatInterpreter : IChatInterpreter
                 1.0, null, $"Inventory{goal}: {inv}.{suggestion}");
         }
 
-        if (Regex.IsMatch(message, @"\b(status|what.?re you doing|what are you doing|report)\b",
-            RegexOptions.IgnoreCase))
+        // Sprint 54 (fix): length gate for "status"/"report" — same false-positive
+        // pattern as inventory/help. Multi-word "what are you doing" is unrestricted.
+        var isShortStatus = message.Length <= 40 && Regex.IsMatch(message,
+            @"\b(status|report)\b", RegexOptions.IgnoreCase);
+        if (isShortStatus
+            || Regex.IsMatch(message, @"\bwhat.?re you doing\b|\bwhat are you doing\b",
+                RegexOptions.IgnoreCase))
         {
             // Sprint 54 (TSK-0210): enriched status with build progress, inventory summary,
             // and contextual suggestions instead of raw dumps.

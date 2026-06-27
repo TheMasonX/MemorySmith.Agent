@@ -30,6 +30,7 @@ public sealed class GoalFactory : IGoalFactory
     private const string GatherItemPrefix = "GatherItem:";
     private const string BuildPrefix      = "Build:";
     private const string CraftItemPrefix  = "CraftItem:";
+    private const string PlaceBlockPrefix = "PlaceBlock:";
 
     private static readonly Dictionary<string, Func<IReadOnlyDictionary<string, object?>?, IGoal>>
         Creators = new(StringComparer.OrdinalIgnoreCase)
@@ -151,6 +152,18 @@ public sealed class GoalFactory : IGoalFactory
             if (string.IsNullOrWhiteSpace(inputItem)) return null;
             var count = GetInt(parameters, "count", 1);
             return new Goals.SmeltGoal(inputItem, count);
+        }
+
+        // ── PlaceBlock:{item} (Sprint 54) ────────────────────────────────────
+        if (goalName.StartsWith(PlaceBlockPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            var item = goalName[PlaceBlockPrefix.Length..];
+            if (string.IsNullOrWhiteSpace(item)) return null;
+            var count = GetInt(parameters, "count", 1);
+            var x = GetInt(parameters, "x", (int?)null);
+            var y = GetInt(parameters, "y", (int?)null);
+            var z = GetInt(parameters, "z", (int?)null);
+            return new Goals.PlaceBlockGoal(item, count, x, y, z);
         }
 
         return Create(goalName, parameters);

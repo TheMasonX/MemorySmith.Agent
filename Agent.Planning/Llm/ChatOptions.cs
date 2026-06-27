@@ -111,6 +111,13 @@ public sealed record ChatOptions
     public double MaxResponseDistanceBlocks { get; init; } = 64.0;
 
     /// <summary>
+    /// Sprint 54: whether the agent is allowed to execute Minecraft server commands
+    /// (e.g. /give, /tp, /setblock) via chat. When false, the LLM is told it cannot
+    /// use commands and the "command" intent is rejected. Default: false (safe).
+    /// </summary>
+    public bool CommandExecutionEnabled { get; init; } = false;
+
+    /// <summary>
     /// Seconds after the bot last spoke during which any message is treated as a continuation
     /// of the conversation (directed at the bot). Default: 60.
     /// </summary>

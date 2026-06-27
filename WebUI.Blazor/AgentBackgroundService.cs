@@ -978,6 +978,27 @@ public sealed class AgentBackgroundService(
                     logger.LogInformation("[chat] bot: {Response}", pendingResponse);
                 break;
 
+            case "command":
+                // Sprint 54: execute a Minecraft server command via chat.
+                if (intent.Item is not null && intent.Item.StartsWith('/'))
+                {
+                    if (pendingResponse is not null)
+                        logger.LogInformation("[chat] bot: {Response}", pendingResponse);
+                    _queue.Enqueue(new ActionData
+                    {
+                        Tool = "Chat",
+                        Arguments = { ["message"] = intent.Item }
+                    });
+                    _ = PushChatToDashboardAsync("bot", botName, intent.Item);
+                    if (pendingResponse is not null)
+                        _chatHistory?.Record(botName, pendingResponse);
+                }
+                else
+                {
+                    logger.LogWarning("[command] missing item or no leading slash: '{Item}'", intent.Item);
+                }
+                break;
+
             case "status" or "help":
                 _worldState = _worldState.With(b =>
                     b.SetFact("currentGoal", _currentGoal?.Name ?? "idle", FactSource.Observed));
@@ -1010,7 +1031,7 @@ public sealed class AgentBackgroundService(
                     logger.LogInformation("[chat] bot: {Response}", pendingResponse);
                 break;
 
-            case "gather" or "build" or "craft" or "smelt":
+            case "gather" or "build" or "craft" or "smelt" or "place":
                 if (pendingResponse is not null)
                     logger.LogInformation("[chat] bot: {Response}", pendingResponse);
                 if (_intentManager is not null)

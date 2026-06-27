@@ -119,8 +119,9 @@ public sealed class LlmChatInterpreter(
         //               Sprint 52: inject chat history so LLM remembers recent conversation
         var currentGoal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s ? s : null;
         var chatHistory = history?.FormatForPrompt();
+        var commandsAvailable = options.CommandExecutionEnabled;
         var systemPrompt = BuildSystemPrompt(botName, botPosition, state, currentGoal,
-            onlinePlayers, registeredToolNames, chatHistory);
+            onlinePlayers, registeredToolNames, chatHistory, commandsAvailable);
         var userMessage = $"{username} says: \"{effective}\"";
         logger?.LogInformation("[llm] calling {Provider} ({Model}) for <{Username}> '{Message}'",
             provider.ProviderName, options.LlmModel, username,
@@ -192,7 +193,8 @@ public sealed class LlmChatInterpreter(
         string botName, Position botPos, WorldState state,
         string? goal, int onlinePlayers,
         IReadOnlyList<string>? toolNames = null,
-        string? chatHistory = null)
+        string? chatHistory = null,
+        bool commandsAvailable = false)
     {
         // Sprint 35 P1-C: build inventory summary (non-zero items, desc order, max 8)
         var invSummary = state.Inventory.Count == 0
@@ -227,7 +229,7 @@ public sealed class LlmChatInterpreter(
 
         {
           "addressed": "yes" | "maybe" | "no",
-          "intent": "gather" | "build" | "craft" | "smelt" | "navigate" | "cancel" | "status"
+          "intent": "gather" | "build" | "craft" | "smelt" | "navigate" | "cancel" | "status" | "place" | "command"
                   | "help" | "conversation" | "clarify" | "ignore",
           "item": "<minecraft_id or null>",
           "blueprint": "<blueprint_id or null>",
@@ -262,8 +264,13 @@ public sealed class LlmChatInterpreter(
         • "navigate" — when the player says "come here", "come to me", "follow me", "go to".
           Set coords to null — the system uses the player's current position.
           NEVER set intent="cancel" for "come here" — that will REJECT the command.
-        WRONG: setting intent="gather" for "build a house" — this will be REJECTED.
-        CORRECT: "build a house" → intent="build", blueprint="house"
+        • "place"   — when the player wants to place individual blocks ("place a torch",
+          "place 3 cobblestone in front of me", "put a block here").
+          Set item to the block ID. Use for SINGLE blocks only — "build" is for structures.
+          CORRECT: "place a torch" → intent="place", item="torch", count=1
+          CORRECT: "put 5 dirt here" → intent="place", item="dirt", count=5
+        • "command" — when the player wants you to execute a Minecraft server command.
+          Set item to the FULL command including slash (e.g. "/give @p dirt 64").
 
         Use Minecraft item IDs without namespace prefix (oak_log, cobblestone, diamond).
         For inventory/what-do-you-have → intent "status", list inventory in response.
@@ -306,7 +313,15 @@ public sealed class LlmChatInterpreter(
         use intent="conversation" to explain what happened to the player.
         """;
 
-        return basePrompt;
+        // Sprint 54: conditionally include command instructions
+        var commandBlock = commandsAvailable
+            ? "\nCOMMANDS: You CAN execute Minecraft server commands (/give, /tp, /setblock, " +
+              "/time, etc.). When asked to run a command, use intent=\"command\" with item=\"/command args\"."
+            : "\nCOMMANDS: Minecraft server commands are NOT currently enabled for you. " +
+              "If a player asks you to use a command like /give or /tp, explain that command " +
+              "execution is disabled and suggest alternatives (gather, craft, build).";
+
+        return basePrompt + commandBlock;
     }
 
     // -- Response parsing ------------------------------------------------------------------
