@@ -919,6 +919,19 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       // The old code computed refPos from botPos + offset + (target - botPos), which was
       // mathematically correct (simplifies to target + offset) but fragile when the bot's
       // entity.position changed between goto() and the blockAt() calls.
+      //
+      // Sprint 54 Wave C: when args.facing is provided, prefer the face vector that
+      // produces the desired orientation FIRST. Fall through to the full 6-face loop
+      // if the preferred face has no solid reference block.
+      const FACING_VECTORS = {
+        north: { rx: 0, ry: 0, rz: -1, fx: 0,  fy: 0,  fz: 1  },  // place against south face → faces north
+        south: { rx: 0, ry: 0, rz: 1,  fx: 0,  fy: 0,  fz: -1 },  // place against north face → faces south
+        east:  { rx: -1, ry: 0, rz: 0, fx: 1,  fy: 0,  fz: 0  },  // place against west face → faces east
+        west:  { rx: 1,  ry: 0, rz: 0, fx: -1, fy: 0,  fz: 0  },  // place against east face → faces west
+        up:    { rx: 0, ry: 1,  rz: 0, fx: 0,  fy: -1, fz: 0  },  // place against bottom face → faces up
+        down:  { rx: 0, ry: -1, rz: 0, fx: 0,  fy: 1,  fz: 0  },  // place against top face → faces down
+      };
+
       const refFaces = [
         { rx: 0, ry: -1, rz: 0,  fx: 0,  fy: 1,  fz: 0  },  // ground below target
         { rx: 0, ry: 1,  rz: 0,  fx: 0,  fy: -1, fz: 0  },  // ceiling above target
@@ -928,9 +941,23 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         { rx: 0,  ry: 0, rz: 1,  fx: 0,  fy: 0,  fz: -1 },  // south
       ];
 
+      // Sprint 54 Wave C: when facing is specified, try that face vector first.
+      const preferredFace = args.facing ? FACING_VECTORS[args.facing] : null;
+      const faceOrder = preferredFace
+        ? [preferredFace, ...refFaces.filter(f =>
+            f.rx !== preferredFace.rx || f.ry !== preferredFace.ry || f.rz !== preferredFace.rz)]
+        : refFaces;
+
+      if (args.facing) {
+        logStructured('debug', 'place', 'facing-aware placement', {
+          x, y, z, material: shortMat, facing: args.facing,
+          preferredRef: { rx: preferredFace.rx, ry: preferredFace.ry, rz: preferredFace.rz },
+        });
+      }
+
       let placed = false;
       let lastRefError = '';
-      for (const { rx, ry, rz, fx, fy, fz } of refFaces) {
+      for (const { rx, ry, rz, fx, fy, fz } of faceOrder) {
         const refPos = toVec3(x + rx, y + ry, z + rz);
         const ref = bot.blockAt(refPos);
         if (!ref || ref.type === 0) {

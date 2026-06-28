@@ -142,51 +142,37 @@ Parse `Facing: north` and `BlockState: half=top` from the markdown blueprint for
 - Architecture: `Data/Pages/architecture.md`
 - AGENTS.md: root of repo
 - Logs: `WebUI.Blazor/logs/memorysmith-agent-20260627.log`
-- Task system: TSK-0217 through TSK-0226 (all Done)
+- Task system: TSK-0217 through TSK-0229 (all Done) ✅
 
 ---
 
-## 🚀 Wave C Plan — Facing-Direction Blocks & Blueprint Extension
+## 🚀 Wave C — COMPLETED — Facing-Direction Blocks & Blueprint Extension
 
-**Status:** Planned (2026-06-28) | **Tasks:** TSK-0227, TSK-0228, TSK-0229
+**Status:** ✅ Complete (2026-06-28) | **Tasks:** TSK-0227, TSK-0228, TSK-0229 — all Done | **Build:** 746 tests, 0 warnings
 
-### Overview
+### What Changed
 
-Wave C addresses the 3 remaining issues from the round 5 audit:
-1. Facing-direction blocks (beds, doors, stairs, slabs) placing in wrong orientation
-2. Roof holes + furniture issues (consequence of #1)
-3. Blueprint format has no way to specify block orientation
+| Task | File(s) | What changed |
+|---|---|---|
+| **TSK-0227** | `BlueprintSchema.cs`, `BlueprintParser.cs`, `BlueprintParserTests.cs` | `PlacementBlock` gains `Facing?` and `BlockState?` (both `null` default). Parser uses internal `LegendEntry` record; legend supports `\| facing: north` and `\| blockState: half=top` annotations. 4 new tests. |
+| **TSK-0228** | `BlueprintExecutor.cs` | Passes `block.Facing` → `args["facing"]` and `block.BlockState` → `args["blockState"]` when non-null (2 lines). |
+| **TSK-0229** | `MineflayerAdapter/index.js` | `FACING_VECTORS` map (6 directions). When `args.facing` provided, prefer that face vector FIRST. Falls through to full 6-face loop if preferred face has no solid reference. Structured debug log for facing-aware placement. |
 
-### Task Breakdown
-
-| Task | Priority | What | Dependencies |
-|---|---|---|---|
-| **TSK-0227** | High | Extend `PlacementBlock` schema with `Facing` + `BlockState`; extend `BlueprintParser` to parse them from markdown | None |
-| **TSK-0228** | High | Wire `Facing`/`BlockState` through `BlueprintExecutor` → ActionData → WebSocketBridge | TSK-0227 |
-| **TSK-0229** | High | Make `MineflayerAdapter` facing-aware: prefer specific face vectors when `facing` arg is provided | TSK-0227, TSK-0228 |
-
-### Implementation Order
+### Blueprint Legend Format (new)
 
 ```
-TSK-0227 (schema + parser)
-    ↓
-TSK-0228 (pipeline wiring)  ←  trivial: 2 lines in BlueprintExecutor
-    ↓
-TSK-0229 (adapter facing-aware placement)
+## Legend
+- `D` = oak_door | facing: north
+- `S` = oak_slab | facing: up | blockState: half=top
+- `C` = cobblestone
 ```
 
-### Design Decisions
+Backward-compatible: existing blueprints without `\|` annotations work unchanged.
 
-- **`Facing` values**: `north`, `south`, `east`, `west`, `up`, `down` — same as Minecraft convention
-- **`BlockState`**: optional string like `"half=top"`, `"shape=inner_left"` — passed through to adapter for future use
-- **Adapter behavior**: When `facing` is provided, try that face vector FIRST. Fall through to the full 6-face loop if the preferred face has no solid reference block. When no `facing` is provided, maintain current behavior.
-- **Backward compatibility**: `Facing` and `BlockState` are optional (default `null`). All existing blueprints and tests continue to work unchanged.
+### Remaining Known Issues (after Wave C)
 
-### Key Files (same as Issues 1-3 above)
-
-| File | Change |
-|---|---|
-| `Agent.Construction/BlueprintSchema.cs` | `PlacementBlock` gains `Facing?` and `BlockState?` |
-| `Agent.Construction/BlueprintParser.cs` | Parse `Facing:` and `BlockState:` from markdown |
-| `Agent.Construction/BlueprintExecutor.cs` | Pass `facing`/`blockState` in ActionData args |
-| `MineflayerAdapter/index.js` | `FACING_VECTORS` map; prefer-faced-vector loop
+| Issue | Status | Notes |
+|---|---|---|
+| Roof holes + furniture | Mitigated | Facing awareness in place; blueprint authors need to annotate legends |
+| Blueprint battle-test | Pending | Need live test with annotated blueprint to verify end-to-end |
+| `orientationSensitiveBlocks` set | Deferred | Adapter currently applies facing preference to all blocks (harmless, just slightly slower for cobblestone). Could add a set later. |

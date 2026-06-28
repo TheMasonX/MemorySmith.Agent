@@ -74,8 +74,6 @@ public static class BlueprintParser
         return (metadata, blocks);
     }
 
-    // ── Frontmatter ───────────────────────────────────────────────────────────
-
     private static Dictionary<string, string> ExtractFrontmatter(
         string[] lines, out int contentStart)
     {
@@ -175,10 +173,21 @@ public static class BlueprintParser
 
     // ── Legend ────────────────────────────────────────────────────────────────
 
-    private static Dictionary<char, string?> ParseLegend(string[] lines, int contentStart)
+    /// <summary>
+    /// Internal parsed legend entry: block ID plus optional facing/blockState
+    /// extracted from per-symbol annotations.
+    /// </summary>
+    private sealed record LegendEntry(
+        string? BlockId,
+        string? Facing = null,
+        string? BlockState = null);
+
+    private static Dictionary<char, LegendEntry> ParseLegend(string[] lines, int contentStart)
     {
         // Start from the defaults; individual entries may be overridden.
-        var legend = new Dictionary<char, string?>(DefaultLegend);
+        var legend = new Dictionary<char, LegendEntry>();
+        foreach (var kv in DefaultLegend)
+            legend[kv.Key] = new LegendEntry(kv.Value);
 
         bool inLegend = false;
         for (int i = contentStart; i < lines.Length; i++)
@@ -203,6 +212,8 @@ public static class BlueprintParser
             //   - `C` = cobblestone
             //   * 'D' = oak_door
             //   C = cobblestone
+            //   - `D` = oak_door | facing: north
+            //   - `S` = oak_slab | facing: up | blockState: half=top
             var stripped = trimmed.TrimStart('-', '*', ' ');
             if (stripped.Length < 3) continue;
 
@@ -225,20 +236,45 @@ public static class BlueprintParser
 
             if (eqIdx < 0) continue;
 
-            var blockId = stripped[(eqIdx + 1)..].Trim();
+            var rawValue = stripped[(eqIdx + 1)..].Trim();
+
+            // Split on '|' to separate block ID from annotations
+            var parts = rawValue.Split('|', StringSplitOptions.TrimEntries);
+            var blockId = parts[0];
 
             // Strip inline comments like "(skip - auto-placed)" or "(head only)"
             var parenIdx = blockId.IndexOf('(');
             if (parenIdx > 0)
                 blockId = blockId[..parenIdx].Trim();
 
+            // Parse annotations: facing: X, blockState: X
+            string? facing = null;
+            string? blockState = null;
+            for (int a = 1; a < parts.Length; a++)
+            {
+                var annotation = parts[a];
+                var colonIdx = annotation.IndexOf(':');
+                if (colonIdx <= 0) continue;
+
+                var key = annotation[..colonIdx].Trim();
+                var val = annotation[(colonIdx + 1)..].Trim();
+
+                if (key.Equals("facing", StringComparison.OrdinalIgnoreCase) && val.Length > 0)
+                    facing = val;
+                else if (key.Equals("blockState", StringComparison.OrdinalIgnoreCase) && val.Length > 0)
+                    blockState = val;
+            }
+
+            string? resolvedBlockId;
             if (blockId.Equals("air",  StringComparison.OrdinalIgnoreCase)
              || blockId.Equals("skip", StringComparison.OrdinalIgnoreCase)
              || blockId.Equals("null", StringComparison.OrdinalIgnoreCase)
              || blockId.Length == 0)
-                legend[sym] = null;
+                resolvedBlockId = null;
             else
-                legend[sym] = blockId;
+                resolvedBlockId = blockId;
+
+            legend[sym] = new LegendEntry(resolvedBlockId, facing, blockState);
         }
 
         return legend;
@@ -247,7 +283,7 @@ public static class BlueprintParser
     // ── Layers ────────────────────────────────────────────────────────────────
 
     private static IReadOnlyList<PlacementBlock> ParseLayers(
-        string[] lines, int contentStart, Dictionary<char, string?> legend)
+        string[] lines, int contentStart, Dictionary<char, LegendEntry> legend)
     {
         var blocks   = new List<PlacementBlock>();
         int currentY = -1;
@@ -297,10 +333,12 @@ public static class BlueprintParser
             for (int x = 0; x < trimmed.Length; x++)
             {
                 var ch = trimmed[x];
-                if (!legend.TryGetValue(ch, out var blockId) || blockId is null)
+                if (!legend.TryGetValue(ch, out var entry) || entry.BlockId is null)
                     continue; // air or auto-placed — skip
 
-                blocks.Add(new PlacementBlock(x, currentY, currentZ, blockId));
+                blocks.Add(new PlacementBlock(
+                    x, currentY, currentZ, entry.BlockId,
+                    entry.Facing, entry.BlockState));
             }
 
             currentZ++;
@@ -323,7 +361,7 @@ public static class BlueprintParser
         return (end > start && int.TryParse(headerLine[start..end], out var y)) ? y : -1;
     }
 
-    private static bool IsValidGridRow(string line, Dictionary<char, string?> legend)
+    private static bool IsValidGridRow(string line, Dictionary<char, LegendEntry> legend)
     {
         // Every character in the line must be a known legend symbol.
         // Prose lines will contain characters like spaces, letters not in the legend,

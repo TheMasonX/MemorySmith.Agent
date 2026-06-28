@@ -46,6 +46,10 @@ public sealed class BlueprintExecutor : IBlueprintExecutor
                     ["z"]        = (object?)(originZ + block.Z),
                 }
             };
+            if (block.Facing != null)
+                action.Arguments["facing"] = block.Facing;
+            if (block.BlockState != null)
+                action.Arguments["blockState"] = block.BlockState;
             actions.Add(action);
         }
 

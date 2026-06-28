@@ -283,4 +283,106 @@ public sealed class BlueprintParserTests
         var cob = meta.Materials.FirstOrDefault(m => m.Block == "cobblestone");
         Assert.That(cob?.Quantity, Is.EqualTo(10));
     }
+
+    // ── Sprint 54 Wave C: Facing & BlockState ─────────────────────────────────
+
+    [Test]
+    public void Parse_FacingAnnotation_ExtractsFacing()
+    {
+        const string markdown = """
+            ---
+            id: facing-test
+            name: Facing Test
+            ---
+
+            ## Layers
+
+            ### Y=0
+            D
+
+            ## Legend
+            - `D` = oak_door | facing: north
+            """;
+
+        var (_, blocks) = BlueprintParser.Parse(markdown);
+        Assert.That(blocks, Has.Count.EqualTo(1));
+        Assert.That(blocks[0].BlockId, Is.EqualTo("oak_door"));
+        Assert.That(blocks[0].Facing, Is.EqualTo("north"));
+        Assert.That(blocks[0].BlockState, Is.Null);
+    }
+
+    [Test]
+    public void Parse_BlockStateAnnotation_ExtractsBlockState()
+    {
+        const string markdown = """
+            ---
+            id: state-test
+            name: State Test
+            ---
+
+            ## Layers
+
+            ### Y=0
+            S
+
+            ## Legend
+            - `S` = oak_slab | blockState: half=top
+            """;
+
+        var (_, blocks) = BlueprintParser.Parse(markdown);
+        Assert.That(blocks, Has.Count.EqualTo(1));
+        Assert.That(blocks[0].BlockId, Is.EqualTo("oak_slab"));
+        Assert.That(blocks[0].BlockState, Is.EqualTo("half=top"));
+        Assert.That(blocks[0].Facing, Is.Null);
+    }
+
+    [Test]
+    public void Parse_FacingAndBlockStateAnnotation_ExtractsBoth()
+    {
+        const string markdown = """
+            ---
+            id: both-test
+            name: Both Test
+            ---
+
+            ## Layers
+
+            ### Y=0
+            S
+
+            ## Legend
+            - `S` = oak_slab | facing: up | blockState: half=top
+            """;
+
+        var (_, blocks) = BlueprintParser.Parse(markdown);
+        Assert.That(blocks, Has.Count.EqualTo(1));
+        Assert.That(blocks[0].BlockId, Is.EqualTo("oak_slab"));
+        Assert.That(blocks[0].Facing, Is.EqualTo("up"));
+        Assert.That(blocks[0].BlockState, Is.EqualTo("half=top"));
+    }
+
+    [Test]
+    public void Parse_NoFacingAnnotation_DefaultsToNull()
+    {
+        // Regular cobblestone has no facing — should default to null
+        const string markdown = """
+            ---
+            id: no-facing
+            name: No Facing
+            ---
+
+            ## Layers
+
+            ### Y=0
+            CCC
+
+            ## Legend
+            - `C` = cobblestone
+            """;
+
+        var (_, blocks) = BlueprintParser.Parse(markdown);
+        Assert.That(blocks, Has.Count.EqualTo(3));
+        Assert.That(blocks, Has.All.Matches<PlacementBlock>(b => b.Facing == null));
+        Assert.That(blocks, Has.All.Matches<PlacementBlock>(b => b.BlockState == null));
+    }
 }

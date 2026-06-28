@@ -41,4 +41,19 @@ public record Dimensions(int X = 0, int Y = 0, int Z = 0);
 /// Produced by <see cref="BlueprintParser"/> and consumed by
 /// <see cref="BlueprintExecutor"/> to emit PlaceBlock <see cref="Agent.Core.ActionData"/>.
 /// </summary>
-public record PlacementBlock(int X, int Y, int Z, string BlockId);
+/// <param name="X">East offset from build origin.</param>
+/// <param name="Y">Up offset from build origin.</param>
+/// <param name="Z">South offset from build origin.</param>
+/// <param name="BlockId">Minecraft block ID (e.g. "oak_door", "oak_slab").</param>
+/// <param name="Facing">
+/// Desired facing direction for orientation-sensitive blocks.
+/// One of: north, south, east, west, up, down. <c>null</c> means no preference
+/// (adapter tries all faces). Only meaningful for blocks like doors, beds,
+/// stairs, slabs, furnaces.
+/// </param>
+/// <param name="BlockState">
+/// Optional block state properties (e.g. "half=top", "shape=inner_left").
+/// Passed through to the adapter for future use. <c>null</c> means default state.
+/// </param>
+public record PlacementBlock(int X, int Y, int Z, string BlockId,
+    string? Facing = null, string? BlockState = null);
