@@ -500,6 +500,38 @@ implement → push → CI green (conclusion: success) →
 
 ---
 
+## Conditional Style Preference
+
+Decompose complex conditionals into named boolean locals. This makes state transitions
+unambiguous and keeps each gate independently reviewable.
+
+```js
+// ✅  preferred — named locals, clear semantics
+const isMissing = !entity.position || entity.height == null || entity.pitch == null || entity.yaw == null
+const isInvalid = !Number.isFinite(entity.height) || !Number.isFinite(entity.pitch) || !Number.isFinite(entity.yaw)
+if (isMissing || isInvalid) {
+  return null
+}
+
+// ❌  avoid — run-on conditional buries the intent
+if (
+  !entity.position ||
+  entity.height == null || entity.pitch == null || entity.yaw == null ||
+  !Number.isFinite(entity.height) || !Number.isFinite(entity.pitch) || !Number.isFinite(entity.yaw)
+) {
+  return null
+}
+```
+
+**Rule:** Use separate boolean locals when a conditional has multiple independent
+gates (e.g. null checks + validity checks). Keep the original gate order so
+short-circuit ordering is preserved when the first gate is cheaper than the second.
+
+Exception: single-gate conditionals (a single logical clause, possibly spanning lines)
+may remain inline — extracting a local for "bot is sleeping" adds no clarity.
+
+---
+
 ## Key ADRs
 
 | ID | Decision |

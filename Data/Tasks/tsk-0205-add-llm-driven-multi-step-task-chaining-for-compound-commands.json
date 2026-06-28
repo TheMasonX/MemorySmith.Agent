@@ -4,7 +4,7 @@
   "title": "Add LLM-driven multi-step task chaining for compound commands",
   "description": "## Problem\nComplex workflows require multiple sequential commands. \u0022Gather wood, then craft planks, then build a house\u0022 currently needs 3 separate chat messages. The agent has no way to chain sub-goals into a single plan.\n\n## Agent Request\nFrom session log: \u0022modular task scripts so I can handle sequences like \u0027go mine iron then smelt it into ingots and craft tools\u0027\u0022 and \u0022persistent task queues with priorities, like gather wood then build\u0022.\n\n## Scope\n- Allow the LLM to decompose a compound command into multiple sequential sub-goals\n- Each sub-goal is created via the existing \u0060TryCreateGoalFromChatAsync\u0060 pipeline\n- A new \u0060TaskSequenceGoal\u0060 or similar wrapper tracks completion of sub-goals in order\n- When one sub-goal completes, the next in the sequence starts automatically\n- Failure in any sub-goal stops the sequence and reports which step failed\n\n## Implementation sketch\n1. Define \u0060TaskSequenceGoal(IGoal[] Steps)\u0060 that completes steps in order\n2. In \u0060LlmChatInterpreter.BuildSystemPrompt\u0060, add instructions for compound commands:\n   - \u0022gather 5 oak_log then craft 20 planks\u0022 \u2192 submit two sequential gather/craft intents\n3. \u0060IntentManager.BuildGoalRequest\u0060 returns a sequence when multiple items are detected\n4. \u0060AgentBackgroundService\u0060 processes sequence goal using existing PlanAsync loop\n5. Track progress: \u0022Completed step 1/3: gathered 5 oak_log. Starting step 2/3: crafting planks...\u0022\n\n## Complexity\nMedium-High. Requires goal sequencing infrastructure \u002B LLM prompt changes \u002B testing.\n\n## Priority\nMedium \u2014 high-impact for practical usability.",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,11 +23,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-27T15:26:37.6909694Z",
-  "updatedAtUtc": "2026-06-27T15:26:37.6909694Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-06-28T22:01:40.1381639Z",
+  "completedAtUtc": "2026-06-28T22:01:40.1381639Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0205-add-llm-driven-multi-step-task-chaining-for-compound-commands.json"
 }

@@ -12,19 +12,32 @@ If they don't fit within the scope of the current task, they need to be added st
 
 ## Report Format
 
-```
+```report-format
 # Report Title
 
 **Task Description:**
+**Author:**
 **Timestamp:**
 **Branch:**
 **Commit:**
 
 ## Executive Summary
 
-## List of Findings
+## Findings
+
+// Severity sorted
+| ID | Name | Description | Severity | Impact | Probability | Confidence |
+| -- | ---- | ----------- | -------- | ------ | ----------- | ---------- |
 
 ### {ITEMID}-001: Finding Name
+
+#### Description
+
+#### Rationale
+
+#### Recommendation
+
+#### Sources
 
 ...
 
@@ -43,6 +56,7 @@ If they don't fit within the scope of the current task, they need to be added st
 Name format: `{task-description}-audit-{dd-mm-yy-hh-mm-ss}.md`
 
 ## Rules
+
 State all assumptions and open questions. Provide realistic, grounded confidence values as %.
 Use evidence based claims and cite sources as appropriate.
 Think critically and do not take claims at face value without evidence.
@@ -51,5 +65,6 @@ Avoid prose or explanation heavy sections unless they are critical. That bloat d
 Make it just a summary followed by the actionable findings and recommendations, with rationale and sources.
 
 ## Sources
-https://github.com/TheMasonX/MemorySmith.Agent/tree/main
-https://github.com/TheMasonX/MemorySmith.Agent/commit/d6dc26e54a58b8c6bd9cf5bf776844675dd8a399
+
+- https://github.com/TheMasonX/MemorySmith.Agent/tree/main
+- https://github.com/TheMasonX/MemorySmith.Agent/commit/d6dc26e54a58b8c6bd9cf5bf776844675dd8a399

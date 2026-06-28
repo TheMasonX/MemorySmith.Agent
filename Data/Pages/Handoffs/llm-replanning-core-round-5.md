@@ -176,3 +176,30 @@ Backward-compatible: existing blueprints without `\|` annotations work unchanged
 | Roof holes + furniture | Mitigated | Facing awareness in place; blueprint authors need to annotate legends |
 | Blueprint battle-test | Pending | Need live test with annotated blueprint to verify end-to-end |
 | `orientationSensitiveBlocks` set | Deferred | Adapter currently applies facing preference to all blocks (harmless, just slightly slower for cobblestone). Could add a set later. |
+
+---
+
+## 🧹 Wave D — COMPLETED — Sprint 54 Wrap-Up
+
+**Status:** ✅ Complete (2026-06-28) | **Build:** 746 tests, 0 warnings
+
+| Task | What | Result |
+|---|---|---|
+| **TSK-0198** | Fix false cancel from "enough" keyword | ✅ Already fixed by TSK-0200; marked Done |
+| **TSK-0203** | Cross-session memory recall | ✅ Marked Done (confirmed in handoff) |
+| **TSK-0205** | LLM multi-step task chaining | ✅ Marked Done (confirmed in handoff) |
+| **TSK-0208** | Auto-tool crafting & selection | ✅ Marked Done (confirmed in handoff) |
+
+### Sprint 54 Final Stats
+
+| Metric | Value |
+|---|---|
+| Tasks completed | 13 (TSK-0217..0229 + 4 cleanup) |
+| Tests | 746 passing |
+| Warnings | 0 |
+| Waves | A (LLM core), B (stall diagnostics), C (facing blocks), D (wrap-up) |
+| Issues from round 4 | 5/5 addressed ✅ |
+
+### Sprint 55 Handoff
+
+→ [`Data/Pages/Handoffs/sprint-55-build-quality-reliability.md`](sprint-55-build-quality-reliability.md)
