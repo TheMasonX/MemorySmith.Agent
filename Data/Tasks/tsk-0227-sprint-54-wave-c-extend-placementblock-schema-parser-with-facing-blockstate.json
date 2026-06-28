@@ -1,0 +1,41 @@
+﻿{
+  "id": "tsk-0227-sprint-54-wave-c-extend-placementblock-schema-parser-with-facing-blockstate",
+  "key": "TSK-0227",
+  "title": "Sprint 54 Wave C: Extend PlacementBlock schema \u0026 parser with Facing \u002B BlockState",
+  "description": "## Problem\nBlocks with orientation (beds, doors, furnaces, stairs, slabs) place in wrong facing or fail entirely. The blueprint format has no way to specify orientation.\n\n## Changes\n1. **BlueprintSchema.cs**: Add \u0060Facing\u0060 (north/south/east/west/up/down) and \u0060BlockState\u0060 (optional string, e.g. \u0022half=top\u0022) fields to \u0060PlacementBlock\u0060\n2. **BlueprintParser.cs**: Parse \u0060Facing: north\u0060 and \u0060BlockState: half=top\u0060 from the markdown blueprint\u0027s per-block annotations (or a per-symbol facing map in the Legend section)\n\n## Design\n\u0060\u0060\u0060csharp\n// Before:\npublic record PlacementBlock(int X, int Y, int Z, string BlockId);\n\n// After:\npublic record PlacementBlock(int X, int Y, int Z, string BlockId, \n    string? Facing = null, string? BlockState = null);\n\u0060\u0060\u0060\n\nWhere \u0060Facing\u0060 is one of: north, south, east, west, up, down.\n\n## Key files\n- \u0060Agent.Construction/BlueprintSchema.cs\u0060 \u2014 PlacementBlock record\n- \u0060Agent.Construction/BlueprintParser.cs\u0060 \u2014 ParseLayers / Legend parsing\n- \u0060Agent.Construction.Tests/\u0060 \u2014 BlueprintParserTests\n\n## References\n- Handoff: \u0060Data/Pages/Handoffs/llm-replanning-core-round-5.md\u0060 Issue 1, 3\n- AGENTS.md",
+  "type": "Feature",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-54",
+    "domain:construction",
+    "domain:blueprint",
+    "wave-c"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-91a8bae9212347b3af867a68ba0adc4e",
+      "author": "anonymous",
+      "body": "**Dependencies**: None (first in Wave C chain)\n**Depends on by**: TSK-0228, TSK-0229\n**Handoff**: \u0060Data/Pages/Handoffs/llm-replanning-core-round-5.md\u0060 Issues 1, 3\n\nThis is the foundational Wave C task. All downstream work (pipeline wiring, adapter changes) depends on \u0060PlacementBlock\u0060 having \u0060Facing\u0060 and \u0060BlockState\u0060 fields.",
+      "createdAtUtc": "2026-06-28T06:56:32.1716409Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-28T06:56:19.2084586Z",
+  "updatedAtUtc": "2026-06-28T06:56:32.1716409Z",
+  "completedAtUtc": null,
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0227-sprint-54-wave-c-extend-placementblock-schema-parser-with-facing-blockstate.json"
+}

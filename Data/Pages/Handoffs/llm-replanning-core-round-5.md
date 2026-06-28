@@ -143,3 +143,50 @@ Parse `Facing: north` and `BlockState: half=top` from the markdown blueprint for
 - AGENTS.md: root of repo
 - Logs: `WebUI.Blazor/logs/memorysmith-agent-20260627.log`
 - Task system: TSK-0217 through TSK-0226 (all Done)
+
+---
+
+## 🚀 Wave C Plan — Facing-Direction Blocks & Blueprint Extension
+
+**Status:** Planned (2026-06-28) | **Tasks:** TSK-0227, TSK-0228, TSK-0229
+
+### Overview
+
+Wave C addresses the 3 remaining issues from the round 5 audit:
+1. Facing-direction blocks (beds, doors, stairs, slabs) placing in wrong orientation
+2. Roof holes + furniture issues (consequence of #1)
+3. Blueprint format has no way to specify block orientation
+
+### Task Breakdown
+
+| Task | Priority | What | Dependencies |
+|---|---|---|---|
+| **TSK-0227** | High | Extend `PlacementBlock` schema with `Facing` + `BlockState`; extend `BlueprintParser` to parse them from markdown | None |
+| **TSK-0228** | High | Wire `Facing`/`BlockState` through `BlueprintExecutor` → ActionData → WebSocketBridge | TSK-0227 |
+| **TSK-0229** | High | Make `MineflayerAdapter` facing-aware: prefer specific face vectors when `facing` arg is provided | TSK-0227, TSK-0228 |
+
+### Implementation Order
+
+```
+TSK-0227 (schema + parser)
+    ↓
+TSK-0228 (pipeline wiring)  ←  trivial: 2 lines in BlueprintExecutor
+    ↓
+TSK-0229 (adapter facing-aware placement)
+```
+
+### Design Decisions
+
+- **`Facing` values**: `north`, `south`, `east`, `west`, `up`, `down` — same as Minecraft convention
+- **`BlockState`**: optional string like `"half=top"`, `"shape=inner_left"` — passed through to adapter for future use
+- **Adapter behavior**: When `facing` is provided, try that face vector FIRST. Fall through to the full 6-face loop if the preferred face has no solid reference block. When no `facing` is provided, maintain current behavior.
+- **Backward compatibility**: `Facing` and `BlockState` are optional (default `null`). All existing blueprints and tests continue to work unchanged.
+
+### Key Files (same as Issues 1-3 above)
+
+| File | Change |
+|---|---|
+| `Agent.Construction/BlueprintSchema.cs` | `PlacementBlock` gains `Facing?` and `BlockState?` |
+| `Agent.Construction/BlueprintParser.cs` | Parse `Facing:` and `BlockState:` from markdown |
+| `Agent.Construction/BlueprintExecutor.cs` | Pass `facing`/`blockState` in ActionData args |
+| `MineflayerAdapter/index.js` | `FACING_VECTORS` map; prefer-faced-vector loop

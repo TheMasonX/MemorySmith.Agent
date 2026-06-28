@@ -1,0 +1,41 @@
+﻿{
+  "id": "tsk-0229-sprint-54-wave-c-make-mineflayeradapter-facing-aware-for-block-placement",
+  "key": "TSK-0229",
+  "title": "Sprint 54 Wave C: Make MineflayerAdapter facing-aware for block placement",
+  "description": "## Problem\nThe adapter\u0027s \u0060refFaces\u0060 loop (index.js line 920-955) tries all 6 faces in fixed order (ground, ceiling, west, east, north, south). No orientation data from the blueprint is used. This causes beds, doors, furnaces, stairs, slabs to place in wrong facing or fail.\n\n## Changes\n1. Add \u0060FACING_VECTORS\u0060 map at the top of \u0060handlePlaceBlock\u0060 (or as file-level constant):\n\u0060\u0060\u0060javascript\nconst FACING_VECTORS = {\n  north: { fx: 0, fy: 0, fz: -1 },  // place against south face \u2192 faces north\n  south: { fx: 0, fy: 0, fz: 1 },   // place against north face \u2192 faces south\n  east:  { fx: 1, fy: 0, fz: 0 },   // place against west face \u2192 faces east\n  west:  { fx: -1, fy: 0, fz: 0 },  // place against east face \u2192 faces west\n  up:    { fx: 0, fy: 1, fz: 0 },   // place against bottom face \u2192 faces up\n  down:  { fx: 0, fy: -1, fz: 0 },  // place against top face \u2192 faces down\n};\n\u0060\u0060\u0060\n\n2. When \u0060args.facing\u0060 is provided, prefer that face vector FIRST (find the reference block on that face, use the facing vector). Fall through to the full 6-face loop if the preferred face has no solid reference.\n\n3. When \u0060args.facing\u0060 is NOT provided, maintain current behavior (try all 6 faces).\n\n## Key files\n- \u0060MineflayerAdapter/index.js\u0060 \u2014 \u0060handlePlaceBlock\u0060 function, lines ~910-980\n\n## References\n- TSK-0227 (schema \u002B parser), TSK-0228 (pipeline wiring)\n- Handoff: \u0060Data/Pages/Handoffs/llm-replanning-core-round-5.md\u0060 Issue 1, Implementation Note 2",
+  "type": "Feature",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-54",
+    "domain:mineflayer",
+    "domain:adapter",
+    "wave-c"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-5373ce4e588344ea864cecd3fae5a2a7",
+      "author": "anonymous",
+      "body": "**Depends on**: TSK-0227 (schema), TSK-0228 (pipeline wiring)\n**Handoff**: \u0060Data/Pages/Handoffs/llm-replanning-core-round-5.md\u0060 Issue 1, Implementation Note 2\n\nKey design decision: When \u0060args.facing\u0060 is provided, prefer that face vector FIRST. Fall through to the full 6-face loop if the preferred face has no solid reference block. This ensures graceful degradation for edge cases (e.g., the face we want to place against is air).\n\nTODO during implementation: consider adding an \u0060orientationSensitiveBlocks\u0060 set so we only do facing-aware placement for blocks that need it (beds, doors, stairs, slabs, furnaces, etc.). Blocks like cobblestone don\u0027t need facing.",
+      "createdAtUtc": "2026-06-28T06:56:32.236478Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-28T06:56:19.2774375Z",
+  "updatedAtUtc": "2026-06-28T06:56:32.236478Z",
+  "completedAtUtc": null,
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0229-sprint-54-wave-c-make-mineflayeradapter-facing-aware-for-block-placement.json"
+}
