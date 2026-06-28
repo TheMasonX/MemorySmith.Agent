@@ -33,11 +33,11 @@ Default: "Release"
 
 .PARAMETER ServiceName
 Windows Service name for the world wiki.
-Default: "MemorySmith - World Wiki (TestWorld)"
+Default: "MemorySmith - TestWorld"
 
 .PARAMETER ServiceDisplayName
 Display name shown in Windows Service Manager.
-Default: "MemorySmith - World Wiki (TestWorld)"
+Default: "MemorySmith - TestWorld"
 
 .PARAMETER NoBuild
 Skip the dotnet publish step. Uses the existing publish output from
@@ -73,8 +73,8 @@ param(
   [int]$PreferredPort = 6869,
   [int]$FallbackPort = 6969,
   [string]$Configuration = "Release",
-  [string]$ServiceName = "MemorySmith - World Wiki (TestWorld)",
-  [string]$ServiceDisplayName = "MemorySmith - World Wiki (TestWorld)",
+  [string]$ServiceName = "MemorySmith -TestWorld",
+  [string]$ServiceDisplayName = "MemorySmith - TestWorld",
   [switch]$NoBuild,
   [switch]$Force
 )
@@ -245,16 +245,12 @@ Write-Host "Installing Windows service '$ServiceName' on port $chosenPort..."
 & dotnet $appArtifact install `
   --service-name $ServiceName `
   --service-display-name $ServiceDisplayName `
-  --service-description "MemorySmith wiki service for Minecraft World KB (TestWorld) — block locations, exploration, world facts" `
+  --service-description "MemorySmith wiki service for Minecraft World KB TestWorld — block locations, exploration, world facts" `
   --service-start-type auto `
   --memory-directory $memoryDir `
   --port $chosenPort `
   -- `
-  --MemorySmith:DataPath $memoryDir `
-  --MemorySmith:PagesPath $pagesPath `
-  --MemorySmith:EventLogPath $eventLogPath `
   --MemorySmith:DataProtectionKeysPath $keysPath `
-  --MemorySmith:VarsPath $varsPath `
   --MemorySmith:Database:ConnectionString "Data Source=$dbPath" `
   --MemorySmith:Audit:JsonlPath (Join-Path (Split-Path $eventLogPath -Parent) "audit-{yyyy}-W{week}.jsonl") `
   --MemorySmith:History:RootPath (Join-Path $WorldDataRoot ".history") `

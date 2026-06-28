@@ -227,6 +227,11 @@ public sealed class AgentBackgroundService(
     // proceeds instead of blocking indefinitely on an unresponsive adapter.
     private int _consecutiveGetStatusTimeouts;
 
+    // Sprint 54 (TSK-0226): per-block consecutive place timeout counts.
+    // Key: blockIndex. After MaxConsecutivePlaceTimeouts, the block is auto-skipped.
+    private readonly ConcurrentDictionary<int, int> _blockTimeoutCounts = new();
+    private const int MaxConsecutivePlaceTimeouts = 3;
+
     // Sprint 40 P0-B: CancellationTokenSource for the active connection, used to
     // force reconnection when a KickedEvent is received (the WebSocket stays alive
     // but the Mineflayer bot is dead). Set by ExecuteAsync, read by ProcessEventsAsync.
@@ -294,6 +299,8 @@ public sealed class AgentBackgroundService(
         _consecutiveZeroAreaScans = 0;
         // Sprint 54 (TSK-0221): reset GetStatus timeout gate.
         _consecutiveGetStatusTimeouts = 0;
+        // Sprint 54 (TSK-0226): reset per-block timeout counters for new goal.
+        _blockTimeoutCounts.Clear();
         // Sprint 52: Creative provisioning via /give. The adapter's creative API
         // (setInventorySlot) may not work on all versions. /give provides a reliable
         // fallback — works without OP on LAN worlds in 1.16.5.
@@ -743,11 +750,13 @@ public sealed class AgentBackgroundService(
                 // the bot has moved. Without this, the first block of a blueprint at the
                 // origin creates an infinite skip loop.
                 case BlockPlaceSkippedEvent bps:
+                    // Sprint 54 (TSK-0225): handle bridge sentinel "?" for missing existingBlock.
+                    var existingBlock = bps.ExistingBlock == "?" ? "" : bps.ExistingBlock;
                     var skipReason = bps.X == _worldState.Position.X
                         && bps.Y == _worldState.Position.Y
                         && bps.Z == _worldState.Position.Z
                         ? "botPosition"
-                        : string.IsNullOrEmpty(bps.ExistingBlock) ? "noReference" : $"occupiedBy_{bps.ExistingBlock}";
+                        : string.IsNullOrEmpty(existingBlock) ? "noReference" : $"occupiedBy_{existingBlock}";
                     logger.LogWarning(
                         "[place] SKIPPED at ({X},{Y},{Z}) — {Reason} (trying to place {Block}, existing={ExistingBlock})",
                         bps.X, bps.Y, bps.Z, skipReason, bps.Block, bps.ExistingBlock);
@@ -1975,6 +1984,8 @@ public sealed class AgentBackgroundService(
         if (correlationId.HasValue && _placeBlockContexts.TryGetValue(correlationId.Value, out var directCtx))
         {
             SetBlockStatus(directCtx.BlueprintId, directCtx.BlockIndex, BuildFactKeys.BlockStatusPlaced);
+            // Sprint 54 (TSK-0226): reset timeout counter on successful placement.
+            _blockTimeoutCounts.TryRemove(directCtx.BlockIndex, out _);
             return;
         }
 
@@ -1987,6 +1998,8 @@ public sealed class AgentBackgroundService(
                 if (_placeBlockContexts.TryGetValue(kv.Key, out var ctx))
                 {
                     SetBlockStatus(ctx.BlueprintId, ctx.BlockIndex, BuildFactKeys.BlockStatusPlaced);
+                    // Sprint 54 (TSK-0226): reset timeout counter on successful placement.
+                    _blockTimeoutCounts.TryRemove(ctx.BlockIndex, out _);
                 }
                 return;
             }
@@ -2060,6 +2073,8 @@ public sealed class AgentBackgroundService(
                         var reasonKey = BuildFactKeys.SkipReason(ctx.BlueprintId, ctx.BlockIndex);
                         _worldState = _worldState.With(b => b.SetFact(reasonKey, skipReason, FactSource.Observed));
                     }
+                    // Sprint 54 (TSK-0226): reset timeout counter when explicitly skipped.
+                    _blockTimeoutCounts.TryRemove(ctx.BlockIndex, out _);
                 }
                 return;
             }
@@ -2218,6 +2233,26 @@ public sealed class AgentBackgroundService(
                                 _consecutiveGetStatusTimeouts);
                             _worldState = _worldState.With(b => b.SetInventoryStale(false));
                             _consecutiveGetStatusTimeouts = 0;
+                        }
+                    }
+
+                    // Sprint 54 (TSK-0226): auto-skip blocks after N consecutive timeouts.
+                    // Prevents the planner from retrying the same unreachable block forever.
+                    if (kv.Value.ToolName.Equals("place", StringComparison.OrdinalIgnoreCase)
+                        && _placeBlockContexts.TryGetValue(kv.Key, out var placeCtx))
+                    {
+                        var blockIdx = placeCtx.BlockIndex;
+                        var count = _blockTimeoutCounts.AddOrUpdate(blockIdx, 1, (_, c) => c + 1);
+                        if (count >= MaxConsecutivePlaceTimeouts)
+                        {
+                            var bpName = _currentGoal is IBuildGoal bg ? bg.Blueprint.Name : placeCtx.BlueprintId;
+                            logger.LogWarning(
+                                "[build] auto-skipping block {Blueprint} #{Index} after {Count} consecutive timeouts",
+                                bpName, blockIdx, count);
+                            SetBlockStatus(placeCtx.BlueprintId, blockIdx, BuildFactKeys.BlockStatusSkipped);
+                            var reasonKey = BuildFactKeys.SkipReason(placeCtx.BlueprintId, blockIdx);
+                            _worldState = _worldState.With(b => b.SetFact(reasonKey, "autoSkip_timeout", FactSource.Inferred));
+                            _blockTimeoutCounts.TryRemove(blockIdx, out _);
                         }
                     }
 
@@ -2578,14 +2613,25 @@ public sealed class AgentBackgroundService(
                 }
             }
 
-            // Find timeout block indices from correlated actions
+            // Find timeout block indices from correlated actions.
+            // Sprint 54 (TSK-0224): exclude blocks already confirmed as "placed"
+            // in world facts. The sweep races with BlockPlacedEvent — a timeout
+            // may be followed by a late event that sets status to "placed".
+            // Only count timeouts for blocks still in pending/in-progress state.
             var timedOutIndices = new List<int>();
             foreach (var kv in _correlatedActions)
             {
                 if (kv.Value.ToolName == "place" && kv.Value.State == ActionLifecycle.TimedOut)
                 {
                     if (_placeBlockContexts.TryGetValue(kv.Key, out var ctx))
+                    {
+                        // Skip if this block is already confirmed placed (late event beat the sweep)
+                        var statusKey = BuildFactKeys.BlockStatus(blueprint.Name, ctx.BlockIndex);
+                        if (_worldState.Facts.TryGetValue(statusKey, out var sv)
+                            && sv?.ToString() == BuildFactKeys.BlockStatusPlaced)
+                            continue;
                         timedOutIndices.Add(ctx.BlockIndex);
+                    }
                 }
             }
             var timeoutNote = timedOutIndices.Count > 0
