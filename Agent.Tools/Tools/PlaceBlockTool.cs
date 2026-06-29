@@ -23,7 +23,7 @@ public sealed class PlaceBlockTool(IWorldAdapter worldAdapter) : ITool
         "(e.g. 'cobblestone', 'oak_planks').";
 
     public JsonElement InputSchema => JsonDocument.Parse(
-        "{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"integer\"},\"y\":{\"type\":\"integer\"},\"z\":{\"type\":\"integer\"},\"material\":{\"type\":\"string\",\"description\":\"Block name (with or without minecraft: prefix)\"}},\"required\":[\"x\",\"y\",\"z\",\"material\"]}"
+        "{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"integer\"},\"y\":{\"type\":\"integer\"},\"z\":{\"type\":\"integer\"},\"material\":{\"type\":\"string\",\"description\":\"Block name (with or without minecraft: prefix)\"},\"block\":{\"type\":\"string\",\"description\":\"Alias for material\"}},\"required\":[\"x\",\"y\",\"z\"]}"
     ).RootElement;
 
     public async Task<ToolResult> ExecuteAsync(
@@ -31,9 +31,13 @@ public sealed class PlaceBlockTool(IWorldAdapter worldAdapter) : ITool
     {
         if (!arguments.TryGetProperty("x", out var xEl) ||
             !arguments.TryGetProperty("y", out var yEl) ||
-            !arguments.TryGetProperty("z", out var zEl) ||
-            !arguments.TryGetProperty("material", out var matEl))
-            return new ToolResult(false, "PlaceBlock requires x, y, z, and material.");
+            !arguments.TryGetProperty("z", out var zEl))
+            return new ToolResult(false, "PlaceBlock requires x, y, and z.");
+
+        // Accept 'material' or 'block' (planner may emit either)
+        if (!arguments.TryGetProperty("material", out var matEl) &&
+            !arguments.TryGetProperty("block", out matEl))
+            return new ToolResult(false, "PlaceBlock requires material (or block).");
 
         var x        = xEl.GetInt32();
         var y        = yEl.GetInt32();

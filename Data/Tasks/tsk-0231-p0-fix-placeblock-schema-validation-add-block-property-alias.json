@@ -1,0 +1,40 @@
+﻿{
+  "id": "tsk-0231-p0-fix-placeblock-schema-validation-add-block-property-alias",
+  "key": "TSK-0231",
+  "title": "P0: Fix PlaceBlock schema validation \u2014 add \u0027block\u0027 property alias",
+  "description": "## Problem\nThe planner emits PlaceBlock actions with a \u0060block\u0060 property, but \u0060PlaceBlockTool.InputSchema\u0060 only declares \u0060material\u0060, \u0060x\u0060, \u0060y\u0060, \u0060z\u0060. The \u0060block\u0060 property is rejected by \u0060ToolDispatcher\u0060 schema validation, causing all PlaceBlock actions to fail silently.\n\nFrom live logs:\n\u0060\u0060\u0060\n[action] place FAIL (0ms): Schema validation failed for \u0027place\u0027:\nUnexpected property \u0027block\u0027 is not declared in the tool schema.\n\u0060\u0060\u0060\n\n## Fix\n1. Add \u0060block\u0060 as an accepted property in \u0060PlaceBlockTool.InputSchema\u0060 JSON schema (alias for \u0060material\u0060)\n2. In \u0060ExecuteAsync\u0060, accept \u0060block\u0060 as a fallback when \u0060material\u0060 is not provided\n3. The adapter (\u0060MineflayerAdapter/index.js\u0060 line 883) already destructures \u0060material\u0060 \u2014 we map \u0060block\u0060 \u2192 \u0060material\u0060 in C# before dispatch\n\n## Files\n- \u0060Agent.Tools/Tools/PlaceBlockTool.cs\u0060\n\n## Acceptance Criteria\n- Schema validation passes when planner sends \u0060block\u0060 property\n- \u0060material\u0060 still works as before (backward compatible)\n- \u0060dotnet build\u0060 \u2014 0 warnings\n- \u0060dotnet test\u0060 \u2014 all tests pass",
+  "type": "Bug",
+  "status": "Done",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-55",
+    "domain:tools",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-2ccea9ad1bf64907ab34b2dd93f97268",
+      "author": "anonymous",
+      "body": "## Fix Applied\n\n**File:** \u0060Agent.Tools/Tools/PlaceBlockTool.cs\u0060\n\n**Changes:**\n1. Added \u0060\u0022block\u0022\u0060 property to \u0060InputSchema\u0060 JSON schema (type: string, description: \u0022Alias for material\u0022)\n2. Removed \u0060\u0022material\u0022\u0060 from \u0060required\u0060 array \u2014 now only x, y, z are required at schema level\n3. Updated \u0060ExecuteAsync\u0060 to accept either \u0060material\u0060 or \u0060block\u0060 property (tries \u0060material\u0060 first, falls back to \u0060block\u0060)\n4. The adapter always receives \u0060material\u0060 in the wire protocol \u2014 mapping happens in C#\n\n**Validation:**\n- \u0060dotnet build\u0060 \u2014 0 warnings \u2705\n- \u0060dotnet test\u0060 \u2014 746/746 passed \u2705\n- \u0060Test-TaskRecords.ps1\u0060 \u2014 225 task records valid \u2705",
+      "createdAtUtc": "2026-06-29T22:53:43.008595Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-29T22:52:03.073349Z",
+  "updatedAtUtc": "2026-06-29T22:53:43.039974Z",
+  "completedAtUtc": "2026-06-29T22:53:43.039974Z",
+  "revision": 3,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0231-p0-fix-placeblock-schema-validation-add-block-property-alias.json"
+}
