@@ -1,5 +1,5 @@
 // MemorySmith.Agent — Web UI & Agent Host
-// v0.52.0  Sprint 52 — Codebase Health + TSK-0121 MoveTo Fix + Build Identity
+// v0.55.0  Sprint 55 Wave B — Environment Queries + Entity Observation + Observe→Evaluate Loop
 
 using Agent.Construction;
 using Agent.Core;
@@ -257,6 +257,9 @@ if (agentEnabled)
         d.Register(new CraftItemTool(world));
         d.Register(new FurnaceTool(world));
         d.Register(new FindFlatAreaTool(world));
+        // Sprint 55 Wave B: environment query tools.
+        d.Register(new QueryBlocksTool(world));
+        d.Register(new QueryEntitiesTool(world));
         return d;
     });
 
@@ -412,7 +415,7 @@ app.UseWhen(
 
 if (agentEnabled)
 {
-    app.Logger.LogInformation("MemorySmith.Agent v0.51.1 starting (Sprint 51 Wave B)");
+    app.Logger.LogInformation("MemorySmith.Agent v0.55.0 starting (Sprint 55 Wave B)");
     var opts = app.Services.GetRequiredService<ChatOptions>();
     app.Logger.LogInformation(
         "Chat LLM config: enabled={Enabled}, provider={Provider}, model={Model}, baseUrl={BaseUrl}",
@@ -463,8 +466,8 @@ app.MapGet("/", (HttpContext ctx) =>
 app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
 {
     Name    = "MemorySmith.Agent",
-    Version = "0.50.2",
-    Phase   = "Sprint 51 — Wave A: Canonicalize & Classify + Harden Robustness",
+    Version = "0.55.0",
+    Phase   = "Sprint 55 — Wave B: Environment Queries + Entity Observation + Observe→Evaluate Loop",
     License = "MIT",
     Repository  = "https://github.com/TheMasonX/MemorySmith.Agent",
     Dashboard   = "/index.html",

@@ -1,10 +1,15 @@
-{
+﻿{
   "id": "tsk-0165-action-progress-telemetry",
+  "key": "TSK-0165",
   "title": "Add action progress telemetry (started/progress/completed/failed/timed-out)",
-  "status": "Backlog",
-  "priority": "Medium",
+  "description": "Add granular action lifecycle events so the C# side can track progress of long-running actions (mining, pathfinding, smelting) without having to infer from final outcomes alone. Per the audit, the action-correlation layer exists but reports progress too coarsely.\n\nImplementation:\n1. Add \u0060actionStarted\u0060 event emitted at the beginning of each \u0060dispatch()\u0060 case, before any work:\n   - \u0060{ action, args, correlationId, timestamp }\u0060\n2. Add \u0060actionProgress\u0060 event for long-running actions:\n   - **Mining**: emit after every block mined with \u0060{mined, targetCount, percentComplete}\u0060\n   - **Pathfinding**: emit on \u0060path_update\u0060 with \u0060{remainingNodes, estimatedTime}\u0060 (already covered by TSK-0158)\n   - **Smelting**: emit periodically with \u0060{smelted, toSmelt, elapsedMs}\u0060\n   - **Wandering**: emit on each waypoint reached\n3. Add \u0060actionFailed\u0060 event with structured reason:\n   - \u0060{ action, reason, detail, correlationId }\u0060\n   - Reason codes: \u0060path_timeout\u0060, \u0060path_no_path\u0060, \u0060path_blocked\u0060, \u0060dig_failed\u0060, \u0060no_block_found\u0060, \u0060missing_item\u0060, \u0060not_spawned\u0060, \u0060furnace_not_found\u0060\n4. Add \u0060actionCompleted\u0060 event (already partly done via \u0060mineComplete\u0060, \u0060craftComplete\u0060, etc. \u2014 standardize).\n5. Create corresponding \u0060WorldEvent\u0060 subtypes:\n   - \u0060ActionStartedEvent(string Action, string CorrelationId, DateTimeOffset Timestamp)\u0060\n   - \u0060ActionProgressEvent(string Action, double PercentComplete, string CorrelationId, DateTimeOffset Timestamp)\u0060\n   - \u0060ActionFailedEvent(string Action, string ReasonCode, string Detail, string CorrelationId, DateTimeOffset Timestamp)\u0060\n   - \u0060ActionCompletedEvent\u0060 already exists as specific types \u2014 add a generic fallback.\n6. Handle in \u0060AgentBackgroundService.ProcessEventsAsync()\u0060:\n   - \u0060ActionStarted\u0060 \u2192 log and track in journal\n   - \u0060ActionProgress\u0060 \u2192 update dashboard progress bar\n   - \u0060ActionFailed\u0060 \u2192 feed into recovery path (TSK-0155 replan loop)\n\nAcceptance:\n- Every action emits a started event on dispatch.\n- Long-running actions (mining, smelting) emit progress events.\n- Failed actions include a machine-readable reason code.\n- Dashboard shows current action progress.\n\nRefs: \u0060msa_planning_mineflayer_audit_20260621_1437.md\u0060 Finding 6 (action progress coarse); \u0060mineflayer-adapter-research.md\u0060 related section",
   "type": "Task",
-  "description": "Add granular action lifecycle events so the C# side can track progress of long-running actions (mining, pathfinding, smelting) without having to infer from final outcomes alone. Per the audit, the action-correlation layer exists but reports progress too coarsely.\n\nImplementation:\n1. Add `actionStarted` event emitted at the beginning of each `dispatch()` case, before any work:\n   - `{ action, args, correlationId, timestamp }`\n2. Add `actionProgress` event for long-running actions:\n   - **Mining**: emit after every block mined with `{mined, targetCount, percentComplete}`\n   - **Pathfinding**: emit on `path_update` with `{remainingNodes, estimatedTime}` (already covered by TSK-0158)\n   - **Smelting**: emit periodically with `{smelted, toSmelt, elapsedMs}`\n   - **Wandering**: emit on each waypoint reached\n3. Add `actionFailed` event with structured reason:\n   - `{ action, reason, detail, correlationId }`\n   - Reason codes: `path_timeout`, `path_no_path`, `path_blocked`, `dig_failed`, `no_block_found`, `missing_item`, `not_spawned`, `furnace_not_found`\n4. Add `actionCompleted` event (already partly done via `mineComplete`, `craftComplete`, etc. — standardize).\n5. Create corresponding `WorldEvent` subtypes:\n   - `ActionStartedEvent(string Action, string CorrelationId, DateTimeOffset Timestamp)`\n   - `ActionProgressEvent(string Action, double PercentComplete, string CorrelationId, DateTimeOffset Timestamp)`\n   - `ActionFailedEvent(string Action, string ReasonCode, string Detail, string CorrelationId, DateTimeOffset Timestamp)`\n   - `ActionCompletedEvent` already exists as specific types — add a generic fallback.\n6. Handle in `AgentBackgroundService.ProcessEventsAsync()`:\n   - `ActionStarted` → log and track in journal\n   - `ActionProgress` → update dashboard progress bar\n   - `ActionFailed` → feed into recovery path (TSK-0155 replan loop)\n\nAcceptance:\n- Every action emits a started event on dispatch.\n- Long-running actions (mining, smelting) emit progress events.\n- Failed actions include a machine-readable reason code.\n- Dashboard shows current action progress.\n\nRefs: `msa_planning_mineflayer_audit_20260621_1437.md` Finding 6 (action progress coarse); `mineflayer-adapter-research.md` related section",
+  "status": "Done",
+  "priority": "Medium",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": null,
+  "reporter": null,
   "labels": [
     "mineflayer",
     "telemetry",
@@ -12,8 +17,22 @@
     "progress",
     "sprint-54"
   ],
-  "estimatedHours": 3.0,
-  "linkedPages": ["Audit/msa_planning_mineflayer_audit_20260621_1437", "Features/mineflayer-adapter"],
-  "designRef": "Data/Pages/Audit/msa_planning_mineflayer_audit_20260621_1437.md",
-  "key": "TSK-0165"
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Audit/msa_planning_mineflayer_audit_20260621_1437",
+    "Features/mineflayer-adapter"
+  ],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "0001-01-01T00:00:00",
+  "updatedAtUtc": "2026-06-29T01:43:31.734915Z",
+  "completedAtUtc": "2026-06-29T01:43:31.734915Z",
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0165-action-progress-telemetry.json"
 }

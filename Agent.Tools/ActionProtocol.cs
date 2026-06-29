@@ -42,4 +42,12 @@ public static class ActionProtocol
     /// <summary>Sprint 40 P0-B: Find the nearest reachable block of a given type.
     /// Returns position + pathfinding distance. Node.js action: <c>findReachableBlock</c>.</summary>
     public const string FindReachableBlock = "findReachableBlock";
+
+    /// <summary>Sprint 55 Wave B: Query blocks at a position or within a bounding box.
+    /// Returns block names and types. Node.js action: <c>queryBlocks</c>.</summary>
+    public const string QueryBlocks = "queryBlocks";
+
+    /// <summary>Sprint 55 Wave B: Query nearby entities (mobs, players, items).
+    /// Returns entity types, positions, and health. Node.js action: <c>queryEntities</c>.</summary>
+    public const string QueryEntities = "queryEntities";
 }

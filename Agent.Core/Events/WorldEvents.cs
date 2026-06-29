@@ -138,6 +138,11 @@ public sealed record ChatEvent(
 /// the JS adapter can include the exact context of a failed action (e.g. which block
 /// position a PlaceBlock was targeting). Previously only Action and Message were sent,
 /// making it impossible to trace which specific operation failed.
+///
+/// Sprint 55 (TSK-0165): added <see cref="ReasonCode"/> — machine-readable error
+/// classification from the JS adapter's classifyError function. Enables the LLM
+/// evaluator and recovery system to make structured decisions without parsing
+/// free-form error strings.
 /// </summary>
 public sealed record ErrorEvent(
     string Action,
@@ -148,7 +153,8 @@ public sealed record ErrorEvent(
     int? Z = null,
     string? Block = null,
     string? Material = null,
-    string? Item = null) : WorldEvent(Timestamp);
+    string? Item = null,
+    string? ReasonCode = null) : WorldEvent(Timestamp);
 
 /// <summary>
 /// Emitted when the bot cannot find a requested block within its search radius.
@@ -247,3 +253,104 @@ public sealed record FlatAreaFoundEvent(
     int MinX, int MaxX, int MinZ, int MaxZ,
     int SearchedRadius,
     DateTimeOffset Timestamp) : WorldEvent(Timestamp);
+
+// ── Sprint 55 (TSK-0165): Action lifecycle telemetry ─────────────────────────
+
+/// <summary>
+/// Emitted at the start of every action dispatched to the Mineflayer adapter.
+/// Enables C#-side tracking of action lifecycle (started → progress → completed/failed).
+/// Distinct from the fire-and-forget dispatch timestamp — this confirms the JS
+/// adapter has received and begun processing the action.
+/// </summary>
+public sealed record ActionStartedEvent(
+    string Action,
+    string? CorrelationId,
+    DateTimeOffset Timestamp) : WorldEvent(Timestamp);
+
+/// <summary>
+/// Emitted periodically during long-running actions (mining, smelting) to report
+/// progress before completion. Allows the dashboard and LLM evaluator to see
+/// mid-action state rather than waiting for the final outcome.
+/// </summary>
+public sealed record ActionProgressEvent(
+    string Action,
+    int Completed,
+    int TargetCount,
+    int PercentComplete,
+    string? CorrelationId,
+    DateTimeOffset Timestamp) : WorldEvent(Timestamp);
+
+/// <summary>
+/// Emitted when an action fails with a machine-readable reason code.
+/// Enables the C# evaluator to make structured decisions about failures
+/// (path_timeout, no_block_found, missing_item, etc.) instead of parsing
+/// free-form error strings from the generic ErrorEvent.
+/// </summary>
+public sealed record ActionFailedEvent(
+    string Action,
+    string ReasonCode,
+    string Detail,
+    string? CorrelationId,
+    DateTimeOffset Timestamp) : WorldEvent(Timestamp);
+
+/// <summary>
+/// Emitted when an action completes successfully. Provides a generic
+/// completion signal for actions that don't have a dedicated completion
+/// event type (e.g., smelt, craft). Complements action-specific completion
+/// events like MineCompleteEvent, CraftCompleteEvent, and BlockPlacedEvent.
+/// </summary>
+public sealed record ActionCompletedEvent(
+    string Action,
+    string? CorrelationId,
+    DateTimeOffset Timestamp) : WorldEvent(Timestamp);
+
+// ── Sprint 55 Wave B: Environment query events ────────────────────────────
+
+/// <summary>
+/// Result of a block query (single position or bounding box).
+/// Returns the list of blocks found with their positions, Minecraft names, and type IDs.
+/// Empty blocks list means air/void at all queried positions.
+/// </summary>
+public sealed record BlocksQueriedEvent(
+    IReadOnlyList<QueriedBlock> Blocks,
+    Position From,
+    Position To,
+    string? CorrelationId,
+    DateTimeOffset Timestamp) : WorldEvent(Timestamp);
+
+/// <summary>A single block result from a queryBlocks action.</summary>
+public sealed record QueriedBlock(
+    int X, int Y, int Z,
+    string Name,
+    int Type);
+
+/// <summary>
+/// Result of an entity query. Returns entities within the specified radius
+/// of the bot's position, sorted by distance.
+/// </summary>
+public sealed record EntitiesQueriedEvent(
+    IReadOnlyList<ObservedEntity> Entities,
+    int Radius,
+    string? EntityTypeFilter,
+    Position BotPosition,
+    string? CorrelationId,
+    DateTimeOffset Timestamp) : WorldEvent(Timestamp);
+
+/// <summary>
+/// Passively observed hostile entities near the bot. Emitted periodically
+/// (cooldown ~3s) when hostile mobs are within ENTITY_SCAN_RADIUS blocks.
+/// Feeds into the observe→evaluate replan loop for threat detection.
+/// </summary>
+public sealed record EntityObservedEvent(
+    IReadOnlyList<ObservedEntity> Entities,
+    Position BotPosition,
+    DateTimeOffset Timestamp) : WorldEvent(Timestamp);
+
+/// <summary>A single entity observed by queryEntities or entityObserved.</summary>
+public sealed record ObservedEntity(
+    string Name,
+    string Type,
+    int X, int Y, int Z,
+    double Distance,
+    int? Health = null,
+    string? Username = null);

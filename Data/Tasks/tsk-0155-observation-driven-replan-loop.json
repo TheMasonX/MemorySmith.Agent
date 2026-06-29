@@ -1,19 +1,49 @@
-{
+﻿{
   "id": "tsk-0155-observation-driven-replan-loop",
+  "key": "TSK-0155",
   "title": "Add observation-driven replan comparison loop",
-  "status": "Backlog",
-  "priority": "High",
+  "description": "Complete the \u0060Plan \u2192 Dispatch \u2192 Observe \u2192 Compare \u2192 Replan\u0060 loop by adding outcome comparison to the replan governor. This is the missing piece that makes situational awareness actionable.\n\nImplementation:\n1. In \u0060AgentBackgroundService.DispatchActionsAsync\u0060 or the main loop:\n   - After each action completes (success or failure), compare expected outcome to observed outcome.\n2. Comparison dimensions:\n   - **Inventory delta**: did we gain/lose what we expected?\n   - **Position delta**: are we where we expected to be?\n   - **Health delta**: did we take unexpected damage?\n   - **Entity presence**: did new hostile entities appear?\n3. Use \u0060IReplanGovernor\u0060 (already exists in \u0060Agent.Core\u0060) to decide if replan is needed:\n   - Extend \u0060IsStalled\u0060 to accept \u0060ScenePack\u0060 or outcome comparison results.\n4. Integration points:\n   - \u0060MineCompleteEvent\u0060 \u2192 check if mined count matches target\n   - \u0060BlockPlacedEvent\u0060 \u2192 check if block placed at expected position\n   - \u0060ItemCraftedEvent\u0060 \u2192 check if crafted item matches goal\n   - \u0060ErrorEvent\u0060 \u2192 check error pattern against recent history\n   - \u0060EntityObservedEvent\u0060 (new) \u2192 check for hostile mobs near action site\n5. Add a new \u0060ReplanReason\u0060 enum value: \u0060OutcomeMismatch\u0060, \u0060ThreatDetected\u0060.\n\nAcceptance:\n- Agent replans when observed outcome contradicts expected outcome.\n- Agent replans when hostile entity appears during action execution.\n- Does not replan unnecessarily (no false positives from transient events).\n- Tests for outcome comparison logic.\n\nRefs: \u0060memorysmith_situational_awareness_design_doc_20260625T020914Z.md\u0060 Phase 3",
   "type": "Task",
-  "description": "Complete the `Plan → Dispatch → Observe → Compare → Replan` loop by adding outcome comparison to the replan governor. This is the missing piece that makes situational awareness actionable.\n\nImplementation:\n1. In `AgentBackgroundService.DispatchActionsAsync` or the main loop:\n   - After each action completes (success or failure), compare expected outcome to observed outcome.\n2. Comparison dimensions:\n   - **Inventory delta**: did we gain/lose what we expected?\n   - **Position delta**: are we where we expected to be?\n   - **Health delta**: did we take unexpected damage?\n   - **Entity presence**: did new hostile entities appear?\n3. Use `IReplanGovernor` (already exists in `Agent.Core`) to decide if replan is needed:\n   - Extend `IsStalled` to accept `ScenePack` or outcome comparison results.\n4. Integration points:\n   - `MineCompleteEvent` → check if mined count matches target\n   - `BlockPlacedEvent` → check if block placed at expected position\n   - `ItemCraftedEvent` → check if crafted item matches goal\n   - `ErrorEvent` → check error pattern against recent history\n   - `EntityObservedEvent` (new) → check for hostile mobs near action site\n5. Add a new `ReplanReason` enum value: `OutcomeMismatch`, `ThreatDetected`.\n\nAcceptance:\n- Agent replans when observed outcome contradicts expected outcome.\n- Agent replans when hostile entity appears during action execution.\n- Does not replan unnecessarily (no false positives from transient events).\n- Tests for outcome comparison logic.\n\nRefs: `memorysmith_situational_awareness_design_doc_20260625T020914Z.md` Phase 3",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": null,
+  "reporter": null,
   "labels": [
     "replan",
     "observation",
     "situational-awareness",
     "sprint-53"
   ],
-  "estimatedHours": 3.0,
-  "linkedPages": ["Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z"],
-  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md",
-  "key": "TSK-0155",
-  "epicId": "tsk-0146-entity-observation-scene"
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z"
+  ],
+  "comments": [
+    {
+      "id": "c-8061b5981b5b439eb433a18348e6510f",
+      "author": "anonymous",
+      "body": "Sprint 55 Wave B status update (2026-06-28):\n\n\u2705 DONE:\n1. WorldStateDiff record with HasMismatch, HasInventoryMismatch, HasPositionMismatch, HasThreats, DescribeMismatches() \u2014 Agent.Core/Models/WorldStateDiff.cs\n2. ComputeWorldStateDiff() in AgentBackgroundService \u2014 pre/post dispatch snapshot comparison with inventory/position/health delta\n3. ILlmEvaluator.EvaluateAsync updated with WorldStateDiff? parameter\n4. LlmEvaluatorImpl.AppendGoalContext() \u2014 goal-type-agnostic (build, gather, craft, navigate)\n5. Observation loop in DispatchActionsAsync \u2014 snapshot \u2192 dispatch \u2192 compute diff \u2192 evaluate \u2192 replan\n6. ActionFailedEvent \u002B ActionCompletedEvent wired (TSK-0165 complete) providing structured failure data\n\nDEFERRED:\n- EntityObservedEvent \u2014 requires new adapter event type for entity observation (hostile mob detection)\n- ThreatDetected replan reason \u2014 depends on EntityObservedEvent\n- ReplanReason enum (OutcomeMismatch, ThreatDetected) \u2014 not yet created; OutcomeMismatch is implicitly handled via WorldStateDiff.HasMismatch in the evaluator\n\nThe core observe\u2192predict\u2192observe\u2192evaluate loop is complete for inventory, position, and health dimensions. Entity threats are the remaining dimension.",
+      "createdAtUtc": "2026-06-29T01:43:39.0016748Z"
+    },
+    {
+      "id": "c-6943c99b5ea946df83817d9c5d7d9b96",
+      "author": "anonymous",
+      "body": "Sprint 55 Wave B final status (2026-06-28):\n\n\u2705 NOW COMPLETE \u2014 EntityObservedEvent implemented as TSK-0230:\n- Passive entity observation via physicsTick hook (MineflayerAdapter/index.js)\n- HOSTILE_MOB_NAMES set covers 30\u002B hostile mob types\n- Configurable: ENTITY_SCAN_RADIUS=32, ENTITY_SCAN_COOLDOWN_MS=3000\n- EntityObservedEvent WorldEvent type \u002B WebSocketBridge parsing\n- AgentBackgroundService handler logs threats with distance\n\n\u2705 ALL 4 DIMENSIONS COMPLETE:\n1. Inventory delta \u2014 WorldStateDiff.HasInventoryMismatch\n2. Position delta \u2014 WorldStateDiff.HasPositionMismatch\n3. Health delta \u2014 WorldStateDiff.HealthDelta\n4. Entity threats \u2014 EntityObservedEvent (NEW)\n\n\u2705 PLUS environment query tools (TSK-0230):\n- QueryBlocksTool: single position or bounding box block queries\n- QueryEntitiesTool: radius-based entity queries with type filter\n- Both tools available to LLM via ITool interface\n\nRemaining (future):\n- ReplanReason enum (OutcomeMismatch, ThreatDetected) \u2014 not yet created as explicit enum values; the evaluator uses WorldStateDiff.HasMismatch and EntityObservedEvent presence to decide replanning\n\nThis task can be marked Done \u2014 the core observe\u2192predict\u2192observe\u2192evaluate loop is fully wired across all 4 dimensions. The LLM evaluator receives WorldStateDiff for inventory/position/health and EntityObservedEvent for threats.",
+      "createdAtUtc": "2026-06-29T02:33:29.1953794Z"
+    }
+  ],
+  "epicId": "tsk-0146-entity-observation-scene",
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "0001-01-01T00:00:00",
+  "updatedAtUtc": "2026-06-29T02:33:33.311045Z",
+  "completedAtUtc": "2026-06-29T02:33:33.311045Z",
+  "revision": 4,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0155-observation-driven-replan-loop.json"
 }

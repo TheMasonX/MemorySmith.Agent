@@ -53,6 +53,13 @@ export const REACHABLE_BLOCK_MAX_CANDIDATES     = 20;
 export const REACHABLE_BLOCK_PATH_TIMEOUT_MS    = 5000;
 export const REACHABLE_BLOCK_GOTO_TOLERANCE     = 2;
 
+// ── Entity observation (Sprint 55 Wave B) ─────────────────────────────────
+
+/** Radius (blocks) within which hostile entities are reported. */
+export const ENTITY_SCAN_RADIUS          = 32;
+/** Minimum interval (ms) between entityObserved event emissions. */
+export const ENTITY_SCAN_COOLDOWN_MS     = 3000;
+
 // ── Crafting / smelting ───────────────────────────────────────────────────────
 
 export const CRAFT_TABLE_SEARCH_RADIUS  = 8;

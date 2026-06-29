@@ -47,7 +47,8 @@ public sealed class LlmEvaluatorImpl : ILlmEvaluator
         IReadOnlyList<ActionOutcome> outcomes,
         WorldState worldState,
         CancellationToken ct = default,
-        bool forceEvaluate = false)
+        bool forceEvaluate = false,
+        WorldStateDiff? diff = null)
     {
         // Fast-path 1: too few data points to make a reliable judgement.
         // Sprint 54 (TSK-0222): skipped when forceEvaluate=true (governor stall).
@@ -74,7 +75,7 @@ public sealed class LlmEvaluatorImpl : ILlmEvaluator
         try
         {
             var systemPrompt = BuildSystemPrompt();
-            var userMessage  = BuildUserMessage(goal, outcomes, worldState);
+            var userMessage  = BuildUserMessage(goal, outcomes, worldState, diff);
 
             var raw = await _provider.CompleteAsync(systemPrompt, userMessage, ct);
 
@@ -132,18 +133,43 @@ public sealed class LlmEvaluatorImpl : ILlmEvaluator
     private static string BuildUserMessage(
         IGoal goal,
         IReadOnlyList<ActionOutcome> outcomes,
-        WorldState worldState)
+        WorldState worldState,
+        WorldStateDiff? diff = null)
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"Goal: {goal.Name}");
+        sb.AppendLine($"Goal: {goal.Name} ({goal.GetType().Name})");
         sb.AppendLine(
             $"World: HP={worldState.Health}/20, Food={worldState.Food}/20, " +
             $"Pos=({worldState.Position.X},{worldState.Position.Y},{worldState.Position.Z}), " +
             $"Inventory={worldState.Inventory.Count} distinct items");
 
-        // Sprint 54 (TSK-0217): build-aware context for LLM replanning.
-        // Report block-level progress and skip reasons so the LLM can diagnose
-        // WHY blocks failed and recommend specific remediation.
+        // Sprint 55 (TSK-0155): goal-type-agnostic context.
+        // Report goal-specific progress so the LLM can evaluate ANY goal type,
+        // not just builds.
+        AppendGoalContext(sb, goal, worldState);
+
+        // Sprint 55 (TSK-0155): include WorldStateDiff for observation comparison.
+        if (diff is not null && diff.HasMismatch)
+        {
+            sb.AppendLine($"Observed mismatches: {diff.DescribeMismatches()}");
+            if (diff.HasThreats)
+                sb.AppendLine($"⚠ Threats detected: {string.Join(", ", diff.NewThreats!)}");
+            if (diff.HealthDelta < 0)
+                sb.AppendLine($"⚠ Health dropped by {Math.Abs(diff.HealthDelta)} HP during actions");
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("Recent outcomes (oldest first):");
+        foreach (var o in outcomes.TakeLast(10))
+            sb.AppendLine($"  [{(o.Success ? "OK  " : "FAIL")}] {o.ToolName}: {o.ObservationSummary}");
+        return sb.ToString();
+    }
+
+    // ── Goal-type-agnostic context (Sprint 55 TSK-0155) ────────────────────
+
+    private static void AppendGoalContext(StringBuilder sb, IGoal goal, WorldState worldState)
+    {
+        // Build goals: block-level progress + skip reasons + facing blocks
         if (goal is IBuildGoal bg)
         {
             var bpName = bg.Blueprint.Name;
@@ -155,17 +181,33 @@ public sealed class LlmEvaluatorImpl : ILlmEvaluator
             if (skipReasons.Count > 0)
                 sb.AppendLine($"Recent skip reasons: {string.Join("; ", skipReasons)}");
 
-            // Include facing/direction data for orientation-sensitive blocks
             var facingBlocks = GetFacingSensitiveBlocks(bg, max: 5);
             if (facingBlocks.Count > 0)
                 sb.AppendLine($"Facing-sensitive blocks: {string.Join(", ", facingBlocks)}");
         }
-
-        sb.AppendLine();
-        sb.AppendLine("Recent outcomes (oldest first):");
-        foreach (var o in outcomes.TakeLast(10))
-            sb.AppendLine($"  [{(o.Success ? "OK  " : "FAIL")}] {o.ToolName}: {o.ObservationSummary}");
-        return sb.ToString();
+        // Gather goals: current inventory vs. target
+        else if (goal is IItemSpecGoal itemGoal)
+        {
+            var spec = itemGoal.Spec;
+            var current = 0;
+            foreach (var block in spec.SourceBlocks)
+            {
+                var key = block.Contains(':') ? block[(block.IndexOf(':') + 1)..] : block;
+                current += worldState.Inventory.GetValueOrDefault(key);
+            }
+            sb.AppendLine($"Gather: {current}/{itemGoal.TargetCount} {spec.ItemId} collected");
+        }
+        // Craft goals: do we have the item yet?
+        else if (goal is CraftItemGoal craftGoal)
+        {
+            var have = worldState.Inventory.GetValueOrDefault(craftGoal.ItemId);
+            sb.AppendLine($"Craft: {have}/{craftGoal.Count} {craftGoal.ItemId} available");
+        }
+        // Navigate goals: distance to target
+        else if (goal.Name.StartsWith("Navigate:", StringComparison.OrdinalIgnoreCase))
+        {
+            sb.AppendLine($"Navigate: currently at ({worldState.Position.X},{worldState.Position.Y},{worldState.Position.Z})");
+        }
     }
 
     // ── Build-aware helpers (Sprint 54 TSK-0217) ──────────────────────────

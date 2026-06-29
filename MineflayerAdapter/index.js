@@ -38,6 +38,10 @@ import * as C from './config.js';
 import { logStructured } from './logger.js';
 import { createMovements } from './movements.js';
 
+// ESM shim: re-enable require() for reading package.json versions at runtime.
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
 // ── Environment / connection ──────────────────────────────────────────────────
 
 const WS_PORT  = parseInt(process.env.WS_PORT   ?? '3000',  10);
@@ -127,9 +131,51 @@ async function drainQueue() {
       }
       console.error(`[dispatch] ${msg.action} failed at`, errorData);
       sendEvent('error', errorData);
+      // TSK-0165: emit actionFailed with machine-readable reason code
+      // so C# can correlate the failure to a specific dispatched action.
+      const reasonCode = classifyError(e.message, msg.action);
+      sendEvent('actionFailed', {
+        action: msg.action,
+        reasonCode,
+        message: e.message,
+        correlationId: msg.correlationId,
+        timestamp: new Date().toISOString(),
+      });
     });
   }
   dispatching = false;
+}
+
+// ── TSK-0165: Error classification for machine-readable reason codes ─────────
+
+/**
+ * Classifies an error message into a machine-readable reason code.
+ * Used by actionFailed events so the C# evaluator can make structured
+ * decisions instead of parsing free-form error strings.
+ */
+function classifyError(message, action) {
+  const m = (message ?? '').toLowerCase();
+  if (m.includes('no') && (m.includes('path') || m.includes('route')))
+    return 'path_no_path';
+  if (m.includes('timeout') || m.includes('timed out'))
+    return 'path_timeout';
+  if (m.includes('blocked') || m.includes('obstructed'))
+    return 'path_blocked';
+  if ((m.includes('no') || m.includes('not found')) && (m.includes('block') || m.includes('within')))
+    return 'no_block_found';
+  if (m.includes('not in inventory') || m.includes('missing') || m.includes('not found') && m.includes('item'))
+    return 'missing_item';
+  if (m.includes('recipe') && (m.includes('missing') || m.includes('not found')))
+    return 'missing_recipe';
+  if (m.includes('dig') && m.includes('fail'))
+    return 'dig_failed';
+  if (m.includes('not spawned') || m.includes('not connected'))
+    return 'not_spawned';
+  if (m.includes('furnace') && (m.includes('not found') || m.includes('no')))
+    return 'furnace_not_found';
+  if (m.includes('crafting') && m.includes('table'))
+    return 'crafting_table_not_found';
+  return 'unknown_error';
 }
 
 // ── WebSocket connection handling ────────────────────────────────────────────
@@ -244,7 +290,9 @@ function sendBotStatus() {
 
 bot.once('spawn', () => {
   spawnPos = { x: bot.entity.position.x, y: bot.entity.position.y, z: bot.entity.position.z };
-  console.log('[mc] bot spawned at', botPos());
+  const adapterVersion = process.env.npm_package_version ?? 'unknown';
+  const mcVersion = bot.version ?? 'unknown';
+  console.log(`[mc] bot spawned at ${JSON.stringify(botPos())} — adapter v${adapterVersion}, MC ${mcVersion}, mineflayer ${require('mineflayer/package.json').version}`);
   sendEvent('spawn', { ...botPos(), hp: bot.health, food: bot.food });
   emitGameModeEvent(bot, sendEvent, logStructured);
 });
@@ -269,6 +317,78 @@ bot.on('playerCollect', (collector, entity) => {
   sendEvent('itemCollected', { item: itemName, count });
   logStructured('debug', 'collect', 'item collected', { item: itemName, count });
 });
+
+// ── Sprint 55 Wave B: Passive entity observation ──────────────────────────
+// Periodically scans for hostile mobs near the bot and emits entityObserved
+// events. Feeds into the C# observe→evaluate replan loop for threat detection.
+//
+// To enable: uncomment the physicsTick hook line below.
+// Disabled by default until chat is verified working on both 1.16.5 and 1.21.x.
+
+const HOSTILE_MOB_NAMES = new Set([
+  'zombie', 'skeleton', 'creeper', 'spider', 'cave_spider',
+  'witch', 'enderman', 'blaze', 'ghast', 'magma_cube', 'slime',
+  'wither_skeleton', 'stray', 'husk', 'drowned', 'phantom',
+  'pillager', 'vindicator', 'evoker', 'ravager', 'hoglin',
+  'piglin', 'piglin_brute', 'zombified_piglin', 'guardian',
+  'elder_guardian', 'silverfish', 'endermite', 'vex',
+  'warden', 'breeze', 'bogged',
+]);
+
+let _lastEntityScanAt = 0;
+
+function scanNearbyEntities() {
+  try {
+    if (!bot?.entity) return;
+    const now = Date.now();
+    if (now - _lastEntityScanAt < C.ENTITY_SCAN_COOLDOWN_MS) return;
+    _lastEntityScanAt = now;
+
+    const botPosObj = botPos();
+    const hostiles = [];
+    const allEntities = Object.values(bot.entities ?? {});
+    for (const e of allEntities) {
+      if (!e || !e.position || e.type !== 'mob') continue;
+      const name = (e.name ?? e.mobType ?? '').toLowerCase();
+      if (!HOSTILE_MOB_NAMES.has(name)) continue;
+
+      const dx = e.position.x - botPosObj.x;
+      const dy = e.position.y - botPosObj.y;
+      const dz = e.position.z - botPosObj.z;
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      if (dist > C.ENTITY_SCAN_RADIUS) continue;
+
+      hostiles.push({
+        name: e.name ?? e.mobType ?? 'unknown',
+        type: e.type,
+        x: Math.floor(e.position.x),
+        y: Math.floor(e.position.y),
+        z: Math.floor(e.position.z),
+        distance: Math.round(dist * 10) / 10,
+        ...(e.health != null ? { health: Math.round(e.health) } : {}),
+      });
+    }
+
+    if (hostiles.length > 0) {
+      hostiles.sort((a, b) => a.distance - b.distance);
+      sendEvent('entityObserved', {
+        entities: hostiles,
+        botX: botPosObj.x, botY: botPosObj.y, botZ: botPosObj.z,
+        timestamp: new Date().toISOString(),
+      });
+      logStructured('warn', 'entity', 'hostile entities detected', {
+        count: hostiles.length,
+        nearest: hostiles[0].name,
+        distance: hostiles[0].distance,
+      });
+    }
+  } catch (err) {
+    console.error('[entity] scanNearbyEntities error:', err.message);
+  }
+}
+
+// TO ENABLE: uncomment the line below after verifying chat works on all MC versions.
+// bot.on('physicsTick', scanNearbyEntities);
 
 // ── Sprint 19: System message filtering ───────────────────────────────────────
 // Server-generated messages (teleport confirmations, join/leave, time set, etc.)
@@ -357,6 +477,9 @@ bot.on('chat', (username, message) => {
 async function dispatch({ action, arguments: args = {}, correlationId }) {
   const _dispatchStart = Date.now();
   logStructured('debug', 'dispatch', 'received', { action, args });
+  // TSK-0165: emit actionStarted so C# can track action lifecycle granularly.
+  sendEvent('actionStarted', { action, correlationId, timestamp: new Date().toISOString() });
+
   try {
   switch (action) {
 
@@ -682,6 +805,14 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
             blockY: blockTargetPos.by,
             blockZ: blockTargetPos.bz,
             correlationId,
+          });
+
+          // TSK-0165: emit actionProgress after each block mined so C# can
+          // track progress of long-running actions without waiting for completion.
+          const percentComplete = Math.round((mined / count) * 100);
+          sendEvent('actionProgress', {
+            action: 'mine', mined, targetCount: count, percentComplete,
+            correlationId, timestamp: new Date().toISOString(),
           });
 
           // Sprint 40 P0-B: Ensure the dropped item is collected.
@@ -1619,9 +1750,107 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       break;
     }
 
+    // ── Sprint 55 Wave B: Environment query tools ─────────────────────────
+
+    case 'queryBlocks': {
+      const { x: x1, y: y1, z: z1, x2, y2, z2 } = args;
+      if (x1 == null || y1 == null || z1 == null)
+        throw new Error('queryBlocks requires x, y, z (single position) or x,y,z,x2,y2,z2 (bounding box)');
+
+      // Bounding-box query: iterate from min to max corners.
+      if (x2 != null && y2 != null && z2 != null) {
+        const minX = Math.min(x1, x2), maxX = Math.max(x1, x2);
+        const minY = Math.min(y1, y2), maxY = Math.max(y1, y2);
+        const minZ = Math.min(z1, z2), maxZ = Math.max(z1, z2);
+
+        const volume = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
+        const maxVolume = 4096; // 16x16x16 -- protects against memory abuse
+        if (volume > maxVolume)
+          throw new Error(`Bounding box too large: ${volume} blocks (max ${maxVolume})`);
+
+        const blocks = [];
+        for (let bx = minX; bx <= maxX; bx++) {
+          for (let by = minY; by <= maxY; by++) {
+            for (let bz = minZ; bz <= maxZ; bz++) {
+              const block = bot.blockAt(toVec3(bx, by, bz));
+              if (block) {
+                blocks.push({ x: bx, y: by, z: bz, name: block.name, type: block.type });
+              }
+            }
+          }
+        }
+        logStructured('info', 'queryBlocks', 'bounding box result', {
+          from: { x: minX, y: minY, z: minZ },
+          to: { x: maxX, y: maxY, z: maxZ },
+          found: blocks.length, volume, correlationId,
+        });
+        sendEvent('blocksQueried', { blocks, fromX: minX, fromY: minY, fromZ: minZ, toX: maxX, toY: maxY, toZ: maxZ, correlationId });
+        break;
+      }
+
+      // Single-block query.
+      const block = bot.blockAt(toVec3(x1, y1, z1));
+      const blocks = block ? [{ x: x1, y: y1, z: z1, name: block.name, type: block.type }] : [];
+      logStructured('debug', 'queryBlocks', 'single result', {
+        x: x1, y: y1, z: z1, found: blocks.length, name: block?.name ?? 'air', correlationId,
+      });
+      sendEvent('blocksQueried', { blocks, fromX: x1, fromY: y1, fromZ: z1, toX: x1, toY: y1, toZ: z1, correlationId });
+      break;
+    }
+
+    case 'queryEntities': {
+      const { radius = 16, entityType } = args;
+      const botPosObj = botPos();
+      const r = Math.min(radius, 64); // cap at 64-block radius
+
+      const entities = [];
+      const allEntities = Object.values(bot.entities ?? {});
+      for (const e of allEntities) {
+        if (!e || !e.position) continue;
+        const dx = e.position.x - botPosObj.x;
+        const dy = e.position.y - botPosObj.y;
+        const dz = e.position.z - botPosObj.z;
+        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (dist > r) continue;
+
+        if (entityType && e.type !== entityType) continue;
+
+        entities.push({
+          name: e.name ?? e.mobType ?? e.type,
+          type: e.type ?? 'unknown',
+          x: Math.floor(e.position.x),
+          y: Math.floor(e.position.y),
+          z: Math.floor(e.position.z),
+          distance: Math.round(dist * 10) / 10,
+          ...(e.health != null ? { health: Math.round(e.health) } : {}),
+          ...(e.username ? { username: e.username } : {}),
+        });
+      }
+
+      entities.sort((a, b) => a.distance - b.distance);
+
+      logStructured('info', 'queryEntities', 'result', {
+        radius: r, entityType, found: entities.length, correlationId,
+      });
+      sendEvent('entitiesQueried', {
+        entities,
+        radius: r,
+        entityType: entityType ?? null,
+        botX: botPosObj.x, botY: botPosObj.y, botZ: botPosObj.z,
+        correlationId,
+      });
+      break;
+    }
+
     default:
       throw new Error(`Unknown action: ${action}`);
   }
+  // TSK-0165: emit actionCompleted for successful dispatch (terminal success state).
+  sendEvent('actionCompleted', {
+    action,
+    correlationId,
+    timestamp: new Date().toISOString(),
+  });
   } finally {
     logStructured('info', 'dispatch', 'done', { action, elapsedMs: Date.now() - _dispatchStart });
   }

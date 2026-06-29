@@ -19,7 +19,7 @@ public sealed class SearchMemoryTool : ITool
     // Sprint 51: fixed to use distinct named groups (x/y/z) instead of single group "x".
     // The axis label is captured as literal text in the axis group; the numeric value
     // is in the val group. This makes the regex self-documenting and safe against
-    // accidental group-name reuse.
+    // accidental group-name reuse.0+
     private static readonly Regex CoordLabelsPattern = new(
         @"\b(?<axis>[xyz])\s*[:=]\s*(?<val>-?\d+)\b",
         RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);

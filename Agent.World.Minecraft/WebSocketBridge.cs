@@ -368,7 +368,8 @@ public sealed class WebSocketBridge(string uri,
                     Z: GetIntOrNull(root, "z"),
                     Block: GetString(root, "block"),
                     Material: GetString(root, "material"),
-                    Item: GetString(root, "item")),
+                    Item: GetString(root, "item"),
+                    ReasonCode: GetString(root, "reasonCode")),
 
                 "blockNotFound" => new BlockNotFoundEvent(
                     Block: GetString(root, "block") ?? "?",
@@ -460,6 +461,40 @@ public sealed class WebSocketBridge(string uri,
                     PathDistance: GetInt(root, "pathDistance", 0),
                     Timestamp: now),
 
+                // Sprint 55 (TSK-0165): action lifecycle telemetry.
+                "actionStarted" => new ActionStartedEvent(
+                    Action: GetString(root, "action") ?? "?",
+                    CorrelationId: GetString(root, "correlationId"),
+                    Timestamp: now),
+
+                "actionProgress" => new ActionProgressEvent(
+                    Action: GetString(root, "action") ?? "?",
+                    Completed: GetInt(root, "mined", GetInt(root, "completed")),
+                    TargetCount: GetInt(root, "targetCount", 1),
+                    PercentComplete: GetInt(root, "percentComplete"),
+                    CorrelationId: GetString(root, "correlationId"),
+                    Timestamp: now),
+
+                // Sprint 55 (TSK-0165): action lifecycle telemetry — terminal states.
+                "actionFailed" => new ActionFailedEvent(
+                    Action: GetString(root, "action") ?? "?",
+                    ReasonCode: GetString(root, "reasonCode") ?? "unknown_error",
+                    Detail: GetString(root, "message") ?? GetString(root, "detail") ?? "",
+                    CorrelationId: GetString(root, "correlationId"),
+                    Timestamp: now),
+
+                "actionCompleted" => new ActionCompletedEvent(
+                    Action: GetString(root, "action") ?? "?",
+                    CorrelationId: GetString(root, "correlationId"),
+                    Timestamp: now),
+
+                // Sprint 55 Wave B: environment query results.
+                "blocksQueried" => ParseBlocksQueried(root, now),
+
+                "entitiesQueried" => ParseEntitiesQueried(root, now),
+
+                "entityObserved" => ParseEntityObserved(root, now),
+
                 _ => null, // unknown event type — ignored
             };
         }
@@ -548,6 +583,74 @@ public sealed class WebSocketBridge(string uri,
         if (el.ValueKind != JsonValueKind.String) return null;
         var s = el.GetString();
         return Guid.TryParse(s, out var g) ? g : null;
+    }
+
+    // ── Sprint 55 Wave B: Environment query parsers ─────────────────────────
+
+    private static BlocksQueriedEvent ParseBlocksQueried(JsonElement root, DateTimeOffset now)
+    {
+        var blocks = new List<QueriedBlock>();
+        if (root.TryGetProperty("blocks", out var blocksArr) && blocksArr.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var b in blocksArr.EnumerateArray())
+            {
+                blocks.Add(new QueriedBlock(
+                    X: GetInt(b, "x"),
+                    Y: GetInt(b, "y"),
+                    Z: GetInt(b, "z"),
+                    Name: GetString(b, "name") ?? "unknown",
+                    Type: GetInt(b, "type")));
+            }
+        }
+
+        return new BlocksQueriedEvent(
+            Blocks: blocks,
+            From: new Position(GetInt(root, "fromX"), GetInt(root, "fromY"), GetInt(root, "fromZ")),
+            To: new Position(GetInt(root, "toX"), GetInt(root, "toY"), GetInt(root, "toZ")),
+            CorrelationId: GetString(root, "correlationId"),
+            Timestamp: now);
+    }
+
+    private static EntitiesQueriedEvent ParseEntitiesQueried(JsonElement root, DateTimeOffset now)
+    {
+        var entities = ParseObservedEntities(root);
+        return new EntitiesQueriedEvent(
+            Entities: entities,
+            Radius: GetInt(root, "radius"),
+            EntityTypeFilter: GetString(root, "entityType"),
+            BotPosition: new Position(GetInt(root, "botX"), GetInt(root, "botY"), GetInt(root, "botZ")),
+            CorrelationId: GetString(root, "correlationId"),
+            Timestamp: now);
+    }
+
+    private static EntityObservedEvent ParseEntityObserved(JsonElement root, DateTimeOffset now)
+    {
+        var entities = ParseObservedEntities(root);
+        return new EntityObservedEvent(
+            Entities: entities,
+            BotPosition: new Position(GetInt(root, "botX"), GetInt(root, "botY"), GetInt(root, "botZ")),
+            Timestamp: now);
+    }
+
+    private static List<ObservedEntity> ParseObservedEntities(JsonElement root)
+    {
+        var entities = new List<ObservedEntity>();
+        if (root.TryGetProperty("entities", out var entitiesArr) && entitiesArr.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var e in entitiesArr.EnumerateArray())
+            {
+                entities.Add(new ObservedEntity(
+                    Name: GetString(e, "name") ?? "unknown",
+                    Type: GetString(e, "type") ?? "mob",
+                    X: GetInt(e, "x"),
+                    Y: GetInt(e, "y"),
+                    Z: GetInt(e, "z"),
+                    Distance: GetDouble(e, "distance"),
+                    Health: GetIntOrNull(e, "health"),
+                    Username: GetString(e, "username")));
+            }
+        }
+        return entities;
     }
 
     // ── Dispose ──────────────────────────────────────────────────────────────

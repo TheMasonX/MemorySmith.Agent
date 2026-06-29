@@ -12,6 +12,10 @@ namespace Agent.Core;
 ///
 /// Sprint 54 (TSK-0220): Replaced <c>Task&lt;bool&gt;</c> return with <see cref="EvaluationResult"/>
 /// so the LLM can suggest a specific remediation action (skip block #N, step back, retry).
+///
+/// Sprint 55 (TSK-0155): Added <see cref="WorldStateDiff"/> parameter so the evaluator
+/// can compare expected vs. actual outcomes across inventory, position, health, and entity
+/// dimensions — closing the observe→predict→observe→evaluate feedback loop.
 /// </summary>
 public interface ILlmEvaluator
 {
@@ -33,13 +37,20 @@ public interface ILlmEvaluator
     /// governor has already declared a stall — the stall itself is evidence of failure,
     /// even if individual tool outcomes appear successful (e.g., fire-and-forget place actions).
     /// </param>
+    /// <param name="diff">
+    /// Sprint 55 (TSK-0155): Expected vs. actual world state comparison. Null when no
+    /// pre-action snapshot was available (legacy path). Provides structured mismatch
+    /// data so the LLM can reason about inventory shortfalls, position drift, health
+    /// drops, and entity threats without parsing free-form outcome summaries.
+    /// </param>
     /// <returns>
     /// <see cref="EvaluationResult"/> with <see cref="EvaluationResult.ShouldReplan"/> set to
     /// <see langword="true"/> to trigger replanning and an optional <see cref="EvaluationResult.Suggestion"/>
     /// for specific remediation.
     /// </returns>
     Task<EvaluationResult> EvaluateAsync(IGoal goal, IReadOnlyList<ActionOutcome> outcomes,
-        WorldState worldState, CancellationToken ct = default, bool forceEvaluate = false);
+        WorldState worldState, CancellationToken ct = default, bool forceEvaluate = false,
+        WorldStateDiff? diff = null);
 }
 
 /// <summary>

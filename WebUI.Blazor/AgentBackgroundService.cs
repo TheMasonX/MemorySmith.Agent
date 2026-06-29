@@ -9,6 +9,7 @@ using Agent.Tools;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Channels;
 
@@ -182,6 +183,11 @@ public sealed class AgentBackgroundService(
     // Cleared when a new plan is generated or when a new goal is set.
     // Read by ILlmEvaluator (Sprint 39).
     private readonly ConcurrentQueue<ActionOutcome> _cycleOutcomes = new();
+
+    // Sprint 55 (TSK-0155): snapshot of world state before dispatching the current
+    // action. Used to compute WorldStateDiff after the action completes, enabling
+    // the observe→compare→evaluate replan loop.
+    private WorldState? _preDispatchSnapshot;
 
     private volatile WorldState _worldState = new();
     private IGoal? _currentGoal;
@@ -790,6 +796,69 @@ public sealed class AgentBackgroundService(
                 // Sprint 40 P0-C: emergency stop acknowledged by the adapter.
                 case StopCompleteEvent:
                     logger.LogDebug("[stop] adapter acknowledged emergency stop");
+                    break;
+
+                // Sprint 55 (TSK-0165): action lifecycle telemetry events.
+                case ActionStartedEvent ase:
+                    logger.LogDebug(
+                        "[telemetry] action started: {Action} correlationId={CorrelationId}",
+                        ase.Action, ase.CorrelationId?[..Math.Min(8, ase.CorrelationId?.Length ?? 0)]);
+                    break;
+
+                case ActionProgressEvent ape:
+                    logger.LogDebug(
+                        "[telemetry] action progress: {Action} {Completed}/{Target} ({Percent}%)",
+                        ape.Action, ape.Completed, ape.TargetCount, ape.PercentComplete);
+                    break;
+
+                // Sprint 55 (TSK-0165): action terminal states with structured reason codes.
+                case ActionFailedEvent afe:
+                    logger.LogWarning(
+                        "[telemetry] action FAILED: {Action} reason={ReasonCode} detail={Detail} correlationId={CorrelationId}",
+                        afe.Action, afe.ReasonCode, afe.Detail,
+                        afe.CorrelationId?[..Math.Min(8, afe.CorrelationId?.Length ?? 0)]);
+                    // Complete the correlated action — terminal failure state.
+                    if (!string.IsNullOrWhiteSpace(afe.CorrelationId)
+                        && Guid.TryParse(afe.CorrelationId, out var afCorrId))
+                        CompleteCorrelatedActionById(afCorrId);
+                    else
+                        CompleteCorrelatedActionByTool(afe.Action);
+                    break;
+
+                case ActionCompletedEvent ace:
+                    logger.LogDebug(
+                        "[telemetry] action completed: {Action} correlationId={CorrelationId}",
+                        ace.Action,
+                        ace.CorrelationId?[..Math.Min(8, ace.CorrelationId?.Length ?? 0)]);
+                    break;
+
+                // Sprint 55 Wave B: environment query results.
+                case BlocksQueriedEvent bqe:
+                    logger.LogInformation(
+                        "[query] blocksQueried: {Count} blocks from ({FromX},{FromY},{FromZ}) to ({ToX},{ToY},{ToZ})",
+                        bqe.Blocks.Count, bqe.From.X, bqe.From.Y, bqe.From.Z,
+                        bqe.To.X, bqe.To.Y, bqe.To.Z);
+                    CompleteCorrelatedActionByTool(ActionProtocol.QueryBlocks);
+                    break;
+
+                case EntitiesQueriedEvent eqe:
+                    logger.LogInformation(
+                        "[query] entitiesQueried: {Count} entities within {Radius} blocks (filter={Filter})",
+                        eqe.Entities.Count, eqe.Radius, eqe.EntityTypeFilter ?? "none");
+                    CompleteCorrelatedActionByTool(ActionProtocol.QueryEntities);
+                    break;
+
+                // Sprint 55 Wave B: passive entity observation — threat detection.
+                case EntityObservedEvent eoe:
+                    if (eoe.Entities.Count > 0)
+                    {
+                        var threats = string.Join(", ",
+                            eoe.Entities.Select(e => $"{e.Name}@{e.Distance:F0}blk"));
+                        logger.LogWarning(
+                            "[entity] {Count} hostile(s) observed near ({BotX},{BotY},{BotZ}): {Threats}",
+                            eoe.Entities.Count, eoe.BotPosition.X, eoe.BotPosition.Y,
+                            eoe.BotPosition.Z, threats);
+                    }
                     break;
 
                 // Sprint 40 P0-B: reachable block query result.
@@ -1702,6 +1771,8 @@ public sealed class AgentBackgroundService(
                     var sw = Stopwatch.StartNew();
                     // Sprint 37 P0-B: use CallWithOutcomeAsync to get structured ActionOutcome.
                     // Sprint 38 P2: use _currentGoal?.Id (default Guid.Empty) for ActionOutcome tracking.
+                    // Sprint 55 (TSK-0155): snapshot world state before dispatch for diff computation.
+                    _preDispatchSnapshot = _worldState;
                     var (result, outcome) = await toolCaller.CallWithOutcomeAsync(
                         _currentGoal?.Id ?? Guid.Empty, action.Tool, doc.RootElement, linkedCts.Token);
                     sw.Stop();
@@ -1714,26 +1785,33 @@ public sealed class AgentBackgroundService(
                     // Sprint 39 P1: observation-driven replanning — evaluate accumulated outcomes after each dispatch.
                     if (_llmEvaluator is not null && _currentGoal is not null)
                     {
+                        // Sprint 55 (TSK-0155): capture currentGoal in a local to prevent NRE
+                        // from concurrent mutation during the async gap (e.g., DeathEvent,
+                        // planning failure, or goal cancellation setting _currentGoal=null
+                        // while EvaluateAsync is awaiting the LLM).
+                        var evaluatingGoal = _currentGoal;
                         var evalSnapshot = _cycleOutcomes.ToArray();
+                        // Sprint 55 (TSK-0155): compute WorldStateDiff for expected-vs-actual comparison.
+                        var diff = ComputeWorldStateDiff(_preDispatchSnapshot, _worldState, outcome);
                         EvaluationResult evalResult;
                         try
                         {
                             evalResult = await _llmEvaluator.EvaluateAsync(
-                                _currentGoal, evalSnapshot, _worldState, ct);
+                                evaluatingGoal, evalSnapshot, _worldState, ct, diff: diff);
                         }
                         catch (OperationCanceledException) { throw; }
                         catch (Exception evalEx)
                         {
                             logger.LogWarning(evalEx,
                                 "[evaluator] threw during EvaluateAsync — skipping replan for goal {Goal}",
-                                _currentGoal.Name);
+                                evaluatingGoal.Name);
                             evalResult = new EvaluationResult(false, $"error: {evalEx.Message}");
                         }
                         if (evalResult.ShouldReplan)
                         {
                             logger.LogInformation(
                                 "[evaluator] LLM recommends replan for goal {Goal} after {Count} outcomes — breaking action loop. Suggestion: {Suggestion}",
-                                _currentGoal.Name, evalSnapshot.Length, evalResult.Suggestion);
+                                evaluatingGoal.Name, evalSnapshot.Length, evalResult.Suggestion);
                             break; // exit action dispatch loop → outer while calls PlanAsync again
                         }
                     }
@@ -2119,6 +2197,21 @@ public sealed class AgentBackgroundService(
                 TransitionCorrelatedAction(kv.Key, ActionLifecycle.Completed);
                 return; // only transition the first match
             }
+        }
+    }
+
+    /// <summary>
+    /// Sprint 55 (TSK-0165): transitions a correlated action to Completed by its
+    /// correlationId. More precise than <see cref="CompleteCorrelatedActionByTool"/>
+    /// when the adapter explicitly reports a terminal state for a specific action.
+    /// Falls back to tool-name matching if the ID is not found.
+    /// </summary>
+    private void CompleteCorrelatedActionById(Guid correlationId)
+    {
+        if (_correlatedActions.TryGetValue(correlationId, out var entry)
+            && entry.State == ActionLifecycle.Dispatched)
+        {
+            TransitionCorrelatedAction(correlationId, ActionLifecycle.Completed);
         }
     }
 
@@ -2594,6 +2687,69 @@ public sealed class AgentBackgroundService(
     /// Sprint 54 (TSK-0219): enriched with per-block skip reasons and timeout indices
     /// so the chat message gives actionable detail instead of just correlation GUIDs.
     /// </summary>
+
+    // ── Sprint 55 (TSK-0155): WorldStateDiff computation ───────────────────
+
+    /// <summary>
+    /// Computes the delta between pre-dispatch and post-dispatch world state.
+    /// Feeds into the observe→compare→evaluate replan loop so the LLM can
+    /// reason about mismatches between planned expectations and observed reality.
+    /// </summary>
+    private static WorldStateDiff ComputeWorldStateDiff(
+        WorldState? preSnapshot, WorldState postState, ActionOutcome outcome)
+    {
+        if (preSnapshot is null) return WorldStateDiff.Empty;
+
+        // Inventory delta: what changed?
+        var actualDelta = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (item, postCount) in postState.Inventory)
+        {
+            var preCount = preSnapshot.Inventory.GetValueOrDefault(item);
+            var delta = postCount - preCount;
+            if (delta != 0)
+                actualDelta[item] = delta;
+        }
+        foreach (var (item, preCount) in preSnapshot.Inventory)
+        {
+            if (!postState.Inventory.ContainsKey(item))
+                actualDelta[item] = -preCount;
+        }
+
+        // Position check
+        var posMismatch = Math.Abs(preSnapshot.Position.X - postState.Position.X) > 3 ||
+                          Math.Abs(preSnapshot.Position.Y - postState.Position.Y) > 2 ||
+                          Math.Abs(preSnapshot.Position.Z - postState.Position.Z) > 3;
+
+        // Health check
+        var healthDelta = postState.Health - preSnapshot.Health;
+
+        // Build expected inventory changes from outcome effects
+        var expectedGained = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var expectedLost = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        foreach (var effect in outcome.Effects)
+        {
+            if (effect.Item is null) continue;
+            switch (effect.Type)
+            {
+                case "ItemCollected":
+                case "ItemCrafted":
+                    expectedGained[effect.Item] = expectedGained.GetValueOrDefault(effect.Item) + (effect.Count ?? 1);
+                    break;
+                case "ItemConsumed":
+                    expectedLost[effect.Item] = expectedLost.GetValueOrDefault(effect.Item) + (effect.Count ?? 1);
+                    break;
+            }
+        }
+
+        return new WorldStateDiff(
+            InventoryGained: expectedGained.Count > 0 ? expectedGained : null,
+            InventoryLost: expectedLost.Count > 0 ? expectedLost : null,
+            ActualInventoryDelta: actualDelta.Count > 0 ? actualDelta : null,
+            ExpectedPosition: posMismatch ? preSnapshot.Position : null,
+            ActualPosition: posMismatch ? postState.Position : null,
+            HealthDelta: healthDelta);
+    }
+
     private string BuildStallDetail()
     {
         if (_currentGoal is IBuildGoal buildGoal)
@@ -2678,7 +2834,7 @@ public sealed class AgentBackgroundService(
             // Fire-and-forget tools like PlaceBlock always report success at dispatch;
             // their real failures (timeouts, skips) are in _correlatedActions, not outcomes.
             var evalResult = await _llmEvaluator.EvaluateAsync(
-                _currentGoal!, outcomes, _worldState, ct, forceEvaluate: true);
+                _currentGoal!, outcomes, _worldState, ct, forceEvaluate: true, diff: null);
 
             if (evalResult.ShouldReplan)
             {
