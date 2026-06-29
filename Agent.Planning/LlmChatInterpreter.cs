@@ -214,6 +214,11 @@ public sealed class LlmChatInterpreter(
             ? $"\nRecent conversation:\n{chatHistory}\n"
             : "";
 
+        // Sprint 55: include nearby hostile entity summary for threat awareness
+        var entityBlock = state.Facts.TryGetValue("nearbyHostiles", out var eh) && eh is string es
+            ? $"\nNearby hostiles: {es}"
+            : "";
+
         // Sprint 54 (TSK-0205/0208/0203): enriched prompt with compound commands,
         // tool auto-crafting, memory recall, and deterministic parser caveats.
         var toolList = toolNames is { Count: > 0 }
@@ -223,7 +228,7 @@ public sealed class LlmChatInterpreter(
         var basePrompt = $$"""
         You are {{botName}}, an autonomous Minecraft bot at ({{botPos.X}},{{botPos.Y}},{{botPos.Z}}).
         Status: {{goalStatus}}. HP: {{health}}/20. Food: {{food}}/20. Players online: {{onlinePlayers}}.
-        Inventory: {{invSummary}}.{{historyBlock}}{{toolList}}
+        Inventory: {{invSummary}}.{{entityBlock}}{{historyBlock}}{{toolList}}
         Decide if the next message is for you and what to do.
         Reply ONLY with valid JSON — no markdown, no prose:
 

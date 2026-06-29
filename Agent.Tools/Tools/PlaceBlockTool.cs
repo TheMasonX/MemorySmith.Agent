@@ -23,7 +23,7 @@ public sealed class PlaceBlockTool(IWorldAdapter worldAdapter) : ITool
         "(e.g. 'cobblestone', 'oak_planks').";
 
     public JsonElement InputSchema => JsonDocument.Parse(
-        "{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"integer\"},\"y\":{\"type\":\"integer\"},\"z\":{\"type\":\"integer\"},\"material\":{\"type\":\"string\",\"description\":\"Block name (with or without minecraft: prefix)\"},\"block\":{\"type\":\"string\",\"description\":\"Alias for material\"}},\"required\":[\"x\",\"y\",\"z\"]}"
+        "{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"integer\"},\"y\":{\"type\":\"integer\"},\"z\":{\"type\":\"integer\"},\"material\":{\"type\":\"string\",\"description\":\"Block name (with or without minecraft: prefix)\"},\"block\":{\"type\":\"string\",\"description\":\"Alias for material\"},\"count\":{\"type\":\"integer\",\"description\":\"Number of blocks to place (informational, ignored by adapter)\"}},\"required\":[\"x\",\"y\",\"z\"]}"
     ).RootElement;
 
     public async Task<ToolResult> ExecuteAsync(

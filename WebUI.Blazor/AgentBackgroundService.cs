@@ -858,6 +858,15 @@ public sealed class AgentBackgroundService(
                             "[entity] {Count} hostile(s) observed near ({BotX},{BotY},{BotZ}): {Threats}",
                             eoe.Entities.Count, eoe.BotPosition.X, eoe.BotPosition.Y,
                             eoe.BotPosition.Z, threats);
+
+                        // Sprint 55: store entity summary for LLM prompt inclusion
+                        var summary = FormatEntitySummary(eoe);
+                        var facts = new Dictionary<string, object?>(_worldState.Facts)
+                        {
+                            ["nearbyHostiles"] = summary,
+                            ["nearbyHostilesUpdatedAt"] = _timeProvider.UtcNow.ToString("O"),
+                        };
+                        _worldState = _worldState with { Facts = facts };
                     }
                     break;
 
@@ -2440,6 +2449,22 @@ public sealed class AgentBackgroundService(
             .OrderByDescending(kv => kv.Value)
             .Take(maxItems)
             .Select(kv => $"{kv.Value}x {kv.Key}"));
+    }
+
+    /// <summary>
+    /// Sprint 55: Formats entity observation data for inclusion in the LLM system prompt.
+    /// Groups by type, sorts by distance, limits to 10 entities.
+    /// </summary>
+    private static string FormatEntitySummary(EntityObservedEvent eoe)
+    {
+        var grouped = eoe.Entities
+            .OrderBy(e => e.Distance)
+            .Take(10)
+            .GroupBy(e => e.Name)
+            .Select(g => g.Count() == 1
+                ? $"{g.Key}@{g.First().Distance:F0}blk"
+                : $"{g.Count()}x {g.Key} (nearest @{g.Min(e => e.Distance):F0}blk)");
+        return string.Join(", ", grouped);
     }
 
     // ── Plan display RLE (TSK-0019) ───────────────────────────────────────────
