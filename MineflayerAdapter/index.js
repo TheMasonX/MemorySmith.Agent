@@ -322,8 +322,7 @@ bot.on('playerCollect', (collector, entity) => {
 // Periodically scans for hostile mobs near the bot and emits entityObserved
 // events. Feeds into the C# observe→evaluate replan loop for threat detection.
 //
-// To enable: uncomment the physicsTick hook line below.
-// Disabled by default until chat is verified working on both 1.16.5 and 1.21.x.
+// Enabled after verifying chat works on both 1.16.5 and 1.21.x (Sprint 55 Wave B).
 
 const HOSTILE_MOB_NAMES = new Set([
   'zombie', 'skeleton', 'creeper', 'spider', 'cave_spider',
@@ -387,8 +386,8 @@ function scanNearbyEntities() {
   }
 }
 
-// TO ENABLE: uncomment the line below after verifying chat works on all MC versions.
-// bot.on('physicsTick', scanNearbyEntities);
+// Sprint 55 Wave B: enabled after verifying chat works on both 1.16.5 and 1.21.x.
+bot.on('physicsTick', scanNearbyEntities);
 
 // ── Sprint 19: System message filtering ───────────────────────────────────────
 // Server-generated messages (teleport confirmations, join/leave, time set, etc.)
