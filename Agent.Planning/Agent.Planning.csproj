@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="../Agent.Core/Agent.Core.csproj" />
     <ProjectReference Include="../Agent.Construction/Agent.Construction.csproj" />
+    <ProjectReference Include="../Agent.Tools/Agent.Tools.csproj" />
   </ItemGroup>
 
   <ItemGroup>

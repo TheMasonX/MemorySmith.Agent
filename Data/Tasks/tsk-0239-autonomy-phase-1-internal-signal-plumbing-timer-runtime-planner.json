@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0239-autonomy-phase-1-internal-signal-plumbing-timer-runtime-planner",
+  "key": "TSK-0239",
+  "title": "Autonomy Phase 1: Internal signal plumbing (timer \u2192 runtime \u2192 planner)",
+  "description": "## Source\n\u0060Data/Pages/Tasks/memorysmith_llm_autonomy_design_2026-06-29.md\u0060 \u2014 Phase 1\n\n## Scope\nWire all non-chat triggers into the same runtime path. Timer emitter using \u0060ITimeProvider\u0060, signal sink, wake logging, deduplication, suppression cooldowns.\n\n## Deliverables\n- Signal envelope type\n- Runtime signal sink\n- Timer emitter using \u0060ITimeProvider\u0060\n- Wake logging (reason, goal ID, accepted/suppressed)\n- Wake deduplication\n- Suppression cooldowns\n\n## Exit criteria\n- Timer wakes can be simulated in tests\n- A timer wake can reach the planner\n- No duplicated planning on repeated timer ticks",
+  "type": "Feature",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-55",
+    "domain:autonomy",
+    "type:feature"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-29T23:46:14.2332402Z",
+  "updatedAtUtc": "2026-06-29T23:46:14.2332402Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

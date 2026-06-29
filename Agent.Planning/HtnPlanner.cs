@@ -4,6 +4,8 @@ using System.Text.Json;
 using Agent.Construction;
 using Agent.Core;
 using Agent.Planning.Goals;
+using Agent.Planning.Llm;
+using Agent.Tools;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -26,10 +28,24 @@ using Microsoft.Extensions.Logging.Abstractions;
 /// which routes typed goals to their decomposers before reaching <see cref="HtnPlanner"/>.
 /// <see cref="HtnPlanner"/> therefore only receives goals with no registered decomposer.
 /// </summary>
-public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logger = null) : IPlanner
+public sealed class HtnPlanner : IPlanner
 {
-    private readonly ILogger<HtnPlanner> _logger = logger ??
-        Microsoft.Extensions.Logging.Abstractions.NullLogger<HtnPlanner>.Instance;
+    private readonly HtnTaskLibrary _library;
+    private readonly ILogger<HtnPlanner> _logger;
+    private readonly ILlmProvider? _llm;
+    private readonly ToolDispatcher? _tools;
+
+    public HtnPlanner(
+        HtnTaskLibrary library,
+        ILogger<HtnPlanner>? logger = null,
+        ILlmProvider? llmProvider = null,
+        ToolDispatcher? toolDispatcher = null)
+    {
+        _library = library;
+        _logger = logger ?? NullLogger<HtnPlanner>.Instance;
+        _llm = llmProvider;
+        _tools = toolDispatcher;
+    }
 
     // â”€â”€ PlanAsync â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public Task<IPlan> PlanAsync(
@@ -49,7 +65,7 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
                 ReadOriginFact(state, buildGoal.Blueprint.Id, "z"),
                 BuildOriginSource.AutoScanned);
 
-            actions.AddRange(library.DecomposeBuild(
+            actions.AddRange(_library.DecomposeBuild(
                 buildGoal.Blueprint,
                 buildGoal.Blocks,
                 origin,
@@ -57,18 +73,18 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
         }
         else if (goal is CraftItemGoal craftGoal)
         {
-            actions.AddRange(library.DecomposeCraftItem(craftGoal.ItemId, craftGoal.Count, state));
+            actions.AddRange(_library.DecomposeCraftItem(craftGoal.ItemId, craftGoal.Count, state));
         }
         else if (goal is IItemSpecGoal itemSpecGoal)
         {
-            actions.AddRange(library.DecomposeGatherItem(
+            actions.AddRange(_library.DecomposeGatherItem(
                 itemSpecGoal.Spec,
                 [itemSpecGoal.TargetCount.ToString()],
                 state));
         }
-        else if (library.HasTask(goal.Name))
+        else if (_library.HasTask(goal.Name))
         {
-            actions.AddRange(library.Decompose(goal.Name, [], state));
+            actions.AddRange(_library.Decompose(goal.Name, [], state));
         }
         else
         {
@@ -76,15 +92,28 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
             // Typed goals now decompose directly above for compatibility with the
             // older tests and direct callers that still invoke HtnPlanner directly.
             foreach (var phase in goal.Phases)
-                if (library.HasTask(phase))
-                    actions.AddRange(library.Decompose(phase, [], state));
+                if (_library.HasTask(phase))
+                    actions.AddRange(_library.Decompose(phase, [], state));
         }
 
         if (actions.Count == 0)
+        {
+            // Sprint 55: LLM fallback — call the language model to generate actions
+            // when no decomposer or task-library method can handle the goal.
+            var llmActions = TryLlmFallback(goal, state);
+            if (llmActions is { Count: > 0 })
+            {
+                _logger.LogWarning(
+                    "[planner] LLM fallback produced {Count} action(s) for goal '{Goal}'",
+                    llmActions.Count, goal.Name);
+                return Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases.ToArray(), llmActions));
+            }
+
             throw new InvalidOperationException(
                 $"HtnPlanner could not decompose goal '{goal.Name}' " +
                 $"(phases: [{string.Join(", ", goal.Phases)}]). " +
-                "No matching task methods found. LLM fallback not yet implemented (Phase 4).");
+                "No matching task methods found and LLM fallback failed or is unavailable.");
+        }
 
         return Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases.ToArray(), actions));
     }
@@ -155,6 +184,94 @@ public sealed class HtnPlanner(HtnTaskLibrary library, ILogger<HtnPlanner>? logg
     }
 
     // â”€â”€ ReplanAsync (TSK-0104: ReplanResult + ReplanGoalContext) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── LLM Fallback (Sprint 55) ────────────────────────────────────────────────
+
+    /// <summary>
+    /// When no decomposer or task-library method can handle a goal, ask the LLM
+    /// to generate actions directly. Returns null if the LLM is unavailable or fails.
+    /// </summary>
+    private IReadOnlyList<ActionData>? TryLlmFallback(IGoal goal, WorldState state)
+    {
+        if (_llm is not { IsAvailable: true })
+        {
+            _logger.LogDebug("[planner] LLM fallback skipped — provider unavailable");
+            return null;
+        }
+
+        var toolNames = _tools?.RegisteredNames is { Count: > 0 } names
+            ? string.Join(", ", names)
+            : "GetStatus, Chat, MoveTo";
+
+        var prompt = string.Concat(
+            "You are a Minecraft bot planner. Generate actions for a goal.\n\n",
+            $"Goal: {goal.Name}\n",
+            $"Description: {goal.Description}\n",
+            $"Phases: [{string.Join(", ", goal.Phases)}]\n\n",
+            $"Bot state: position=({state.Position.X},{state.Position.Y},{state.Position.Z}), ",
+            $"health={state.Health}/20, gameMode={state.GameMode}\n\n",
+            $"Available tools: {toolNames}\n\n",
+            "Reply ONLY with a JSON array of action objects. Each action has \"tool\" (string) ",
+            "and \"args\" (object with parameter names and values).\n",
+            "Example: [{\"tool\":\"MoveTo\",\"args\":{\"x\":10,\"y\":64,\"z\":20}},{\"tool\":\"GetStatus\"}]\n",
+            "If you cannot determine appropriate actions, reply with: []");
+
+        try
+        {
+            var response = _llm.CompleteAsync(prompt, "", CancellationToken.None)
+                .ConfigureAwait(false).GetAwaiter().GetResult();
+
+            if (string.IsNullOrWhiteSpace(response))
+            {
+                _logger.LogWarning("[planner] LLM fallback returned empty response for goal '{Goal}'", goal.Name);
+                return null;
+            }
+
+            return ParseLlmActions(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "[planner] LLM fallback failed for goal '{Goal}'", goal.Name);
+            return null;
+        }
+    }
+
+    private static IReadOnlyList<ActionData>? ParseLlmActions(string llmResponse)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(llmResponse.Trim());
+            var actions = new List<ActionData>();
+            foreach (var el in doc.RootElement.EnumerateArray())
+            {
+                if (!el.TryGetProperty("tool", out var toolEl)) continue;
+                var tool = toolEl.GetString();
+                if (string.IsNullOrWhiteSpace(tool)) continue;
+
+                var args = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+                if (el.TryGetProperty("args", out var argsEl) && argsEl.ValueKind == JsonValueKind.Object)
+                {
+                    foreach (var prop in argsEl.EnumerateObject())
+                        args[prop.Name] = prop.Value.ValueKind switch
+                        {
+                            JsonValueKind.String => prop.Value.GetString(),
+                            JsonValueKind.Number => prop.Value.TryGetInt32(out var i) ? i : prop.Value.GetDouble(),
+                            JsonValueKind.True => true,
+                            JsonValueKind.False => false,
+                            _ => prop.Value.GetRawText(),
+                        };
+                }
+
+                actions.Add(new ActionData { Tool = tool, Arguments = args });
+            }
+            return actions.Count > 0 ? actions : null;
+        }
+        catch (JsonException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[planner] LLM fallback JSON parse error: {ex.Message}");
+            return null;
+        }
+    }
+
     public async Task<ReplanResult> ReplanAsync(
         ReplanGoalContext context, CancellationToken cancellationToken = default)
     {

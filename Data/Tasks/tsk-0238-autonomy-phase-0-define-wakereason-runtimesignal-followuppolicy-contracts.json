@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0238-autonomy-phase-0-define-wakereason-runtimesignal-followuppolicy-contracts",
+  "key": "TSK-0238",
+  "title": "Autonomy Phase 0: Define WakeReason, RuntimeSignal, FollowUpPolicy contracts",
+  "description": "## Source\n\u0060Data/Pages/Tasks/memorysmith_llm_autonomy_design_2026-06-29.md\u0060\n\n## Scope\nDefine the vocabulary before touching runtime behavior: \u0060WakeReason\u0060, \u0060RuntimeSignal\u0060, \u0060FollowUpPolicy\u0060. Update architecture docs and AGENTS.md with the new autonomy model.\n\n## Deliverables\n- \u0060WakeReason\u0060 enum (Chat, Timer, GoalCompleted, ActionCompleted, Recovery, Manual)\n- \u0060RuntimeSignal\u0060 type\n- \u0060FollowUpPolicy\u0060 (None, OnGoalComplete, OnActionComplete, OnTimer, OnFailure, ChainNextSteps)\n- Update \u0060architecture.md\u0060\n- Update AGENTS/task docs with autonomy model\n- Confirm naming and lifecycle rules\n\n## Exit criteria\n- Team agrees on what a wake is\n- Team agrees on what can trigger it\n- Team agrees on suppression rules",
+  "type": "Feature",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-55",
+    "domain:autonomy",
+    "type:design"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-29T23:46:14.1461326Z",
+  "updatedAtUtc": "2026-06-29T23:46:14.1461326Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

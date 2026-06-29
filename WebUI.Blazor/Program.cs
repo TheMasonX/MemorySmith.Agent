@@ -262,12 +262,16 @@ if (agentEnabled)
         d.Register(new QueryEntitiesTool(world));
         return d;
     });
+    builder.Services.AddSingleton<ToolDispatcher>(sp =>
+        (ToolDispatcher)sp.GetRequiredService<IToolCaller>()); // Sprint 55: concrete type for LLM fallback
 
     builder.Services.AddSingleton<HtnTaskLibrary>();
     builder.Services.AddSingleton<HtnPlanner>(sp =>
         new HtnPlanner(
             sp.GetRequiredService<HtnTaskLibrary>(),
-            sp.GetRequiredService<ILogger<HtnPlanner>>())); // Sprint 33 DEF-S32-G
+            sp.GetRequiredService<ILogger<HtnPlanner>>(),
+            sp.GetRequiredService<ILlmProvider>(),
+            sp.GetRequiredService<ToolDispatcher>())); // Sprint 55: LLM fallback + tool names
 
     builder.Services.AddSingleton<IWorldModel>(new WorldModel());
 
@@ -286,6 +290,7 @@ if (agentEnabled)
         reg.Register(new SurviveNightGoalDecomposer(lib));
         reg.Register(new CraftItemGoalDecomposer(lib)); // Sprint 27 P0-D
         reg.Register(new SmeltGoalDecomposer(lib)); // Sprint 44 (TSK-0079)
+        reg.Register(new TaskSequenceGoalDecomposer(reg)); // Sprint 55
         return reg;
     });
     builder.Services.AddSingleton<PlannerRouter>(sp =>

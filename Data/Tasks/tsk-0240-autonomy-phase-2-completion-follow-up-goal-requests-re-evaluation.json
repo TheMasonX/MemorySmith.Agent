@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0240-autonomy-phase-2-completion-follow-up-goal-requests-re-evaluation",
+  "key": "TSK-0240",
+  "title": "Autonomy Phase 2: Completion follow-up (goal requests re-evaluation)",
+  "description": "## Source\n\u0060Data/Pages/Tasks/memorysmith_llm_autonomy_design_2026-06-29.md\u0060 \u2014 Phase 2\n\n## Scope\nCompletion events can request another LLM pass. Follow-up policy attached to goal/intent. Evaluator can request continuation. Sequence continuation limits.\n\n## Deliverables\n- Completion signal type\n- Follow-up policy attached to goal/intent\n- Evaluator can request continuation\n- Sequence continuation limits\n- Outcome-aware follow-up logging\n\n## Exit criteria\n- A goal can explicitly ask for \u0022evaluate again when done\u0022\n- A successful completion can cause a second planning pass\n- Failure can choose between retry, stop, or branch",
+  "type": "Feature",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-55",
+    "domain:autonomy",
+    "type:feature"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-29T23:46:14.2648029Z",
+  "updatedAtUtc": "2026-06-29T23:46:14.2648029Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}
