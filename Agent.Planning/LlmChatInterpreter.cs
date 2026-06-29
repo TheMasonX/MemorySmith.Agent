@@ -264,11 +264,13 @@ public sealed class LlmChatInterpreter(
         • "navigate" — when the player says "come here", "come to me", "follow me", "go to".
           Set coords to null — the system uses the player's current position.
           NEVER set intent="cancel" for "come here" — that will REJECT the command.
-        • "place"   — when the player wants to place individual blocks ("place a torch",
-          "place 3 cobblestone in front of me", "put a block here").
-          Set item to the block ID. Use for SINGLE blocks only — "build" is for structures.
+        • "place"   — when the player wants to place blocks ("place a torch",
+          "place 4 dirt in a 2×2 square", "put a block here").
+          Set item to the block ID. "build" is ONLY for blueprint-based structures.
+          Use "place" for any block placement that does not reference a named blueprint.
           CORRECT: "place a torch" → intent="place", item="torch", count=1
           CORRECT: "put 5 dirt here" → intent="place", item="dirt", count=5
+          CORRECT: "place 4 cobblestone in a square" → intent="place", item="cobblestone", count=4
         • "command" — when the player wants you to execute a Minecraft server command.
           Set item to the FULL command including slash (e.g. "/give @p dirt 64").
 
@@ -286,6 +288,26 @@ public sealed class LlmChatInterpreter(
         response to a short acknowledgement like "Starting to build a {blueprint}..."
         instead of pretending the build is complete. Never say "House built!" or
         similar completion messages — the system will report completion separately.
+
+        BUILDING WITHOUT A BLUEPRINT (FALLBACK): When the player asks to build a
+        simple custom layout that has no blueprint (e.g. "build a 2×2 dirt platform",
+        "make a 3-block cobblestone wall"):
+        - Use intent="place" with the block item and total count.
+        - Queue additional specific placements in "nextSteps" using
+          "place <item> at <x> <y> <z>" syntax for each position.
+        - If you don't know exact coordinates, set x/y/z to null — the system
+          places blocks in front of the bot at its current facing position.
+        - Example: "build a 2×2 dirt platform at (10,64,20)"
+          → intent="place", item="dirt", count=4, x=10, y=64, z=20,
+            nextSteps=["place dirt at 10 64 21",
+                       "place dirt at 11 64 20",
+                       "place dirt at 11 64 21"]
+        - Example: "build a 3-block dirt pillar"
+          → intent="place", item="dirt", count=3,
+            nextSteps=["place dirt", "place dirt"]
+        NOTE: Coordinate-aware placement is under active development. Currently
+        blocks are placed at the bot's current facing position regardless of
+        coordinates. Full coordinate support is coming in a future update.
 
         COMPOUND COMMANDS: When the player chains multiple commands with "then", "and",
         or "after that" (e.g. "gather 5 oak_log then craft 20 planks then build a house"):
