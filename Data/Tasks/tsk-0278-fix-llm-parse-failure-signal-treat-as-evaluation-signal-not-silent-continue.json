@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0278-fix-llm-parse-failure-signal-treat-as-evaluation-signal-not-silent-continue",
+  "key": "TSK-0278",
+  "title": "Fix LLM parse failure signal \u2014 treat as evaluation signal not silent continue",
+  "description": "LlmEvaluatorImpl.ParseEvaluationResult catches all exceptions from JSON parsing and returns new EvaluationResult(false, \u0022unparseable response\u0022) \u2014 meaning \u0022no replan.\u0022 Similarly, ExtractJson falls back to \u0022{}\u0022 when no braces found, which also yields replan=false. A malformed LLM response silently suppresses replanning even when the current plan is actually failing.\n\nFix:\n1. Add structured logging distinguishing failure modes: invalid JSON vs timeout vs low confidence vs truncation\n2. Add response length caps and reject responses over a threshold\n3. Log parse failures at Warning level (currently silent catch blocks)\n4. Make ParseEvaluationResult and ExtractJson internal for testability\n5. Add test suite: valid JSON, truncated JSON, prose-only, empty string, malformed braces, extra properties\n\nReferenced in: Data/Pages/council/2026-06-30-external-audits-council.md\nAudit source: Audit A",
+  "type": "Bug",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-56",
+    "type:bug",
+    "domain:evaluation"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T12:50:46.5396043Z",
+  "updatedAtUtc": "2026-06-30T16:05:21.0100967Z",
+  "completedAtUtc": "2026-06-30T16:05:21.0100967Z",
+  "revision": 3,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0278-fix-llm-parse-failure-signal-treat-as-evaluation-signal-not-silent-continue.json"
+}

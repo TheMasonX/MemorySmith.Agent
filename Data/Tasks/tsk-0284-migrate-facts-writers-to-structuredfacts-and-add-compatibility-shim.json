@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0284-migrate-facts-writers-to-structuredfacts-and-add-compatibility-shim",
+  "key": "TSK-0284",
+  "title": "Migrate Facts writers to StructuredFacts and add compatibility shim",
+  "description": "Council finding: WorldState has both Facts (legacy Dictionary\u003Cstring, object?\u003E) and StructuredFacts (IReadOnlyList\u003CFact\u003E). Most code still reads from Facts (~360\u002B usages). StructuredFacts provenance metadata is never consumed \u2014 zero behavioral impact.\n\nMigration plan:\n1. Add read-side shim in WorldState.Facts getter that falls back to StructuredFacts\n2. Identify all direct Facts writes (not through Builder) and migrate to StructuredFacts\n3. Add [Obsolete] attribute to Facts dictionary with message pointing to StructuredFacts\n4. Run with dual-write for 2 sprints\n5. Remove Facts dictionary writes only after telemetry confirms zero live reads per sprint\n6. Keep Facts as read-only compatibility layer indefinitely (low maintenance cost)\n\nReferenced in: Data/Pages/council/2026-06-30-external-audits-council.md\nAudit source: Audit B",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-57",
+    "type:refactor",
+    "domain:world-state"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T12:51:05.1155631Z",
+  "updatedAtUtc": "2026-06-30T12:51:05.1155631Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

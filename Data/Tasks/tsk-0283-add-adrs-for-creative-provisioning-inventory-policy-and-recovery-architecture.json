@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0283-add-adrs-for-creative-provisioning-inventory-policy-and-recovery-architecture",
+  "key": "TSK-0283",
+  "title": "Add ADRs for creative provisioning, inventory policy, and recovery architecture",
+  "description": "Council finding: Data/Pages/decisions.md has 13 ADRs (D-001 through D-013) but NONE address creative mode, inventory policy, or recovery architecture. These topics are documented only in tactical sprint-level task files.\n\nAdd ADRs for:\n1. Creative provisioning policy \u2014 which layer owns inventory provisioning in creative mode, /give vs creative API precedence\n2. Inventory single source of truth \u2014 which events are authoritative, how reconciliation works\n3. Recovery architecture \u2014 recovery policy vs recovery execution, error classification\n4. Any other cross-cutting decisions that have been made but not recorded\n\nReferenced in: Data/Pages/council/2026-06-30-external-audits-council.md",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-57",
+    "type:docs",
+    "domain:architecture"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T12:51:05.0798684Z",
+  "updatedAtUtc": "2026-06-30T12:51:05.0798684Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

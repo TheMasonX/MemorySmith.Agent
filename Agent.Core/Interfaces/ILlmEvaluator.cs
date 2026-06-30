@@ -55,6 +55,7 @@ public interface ILlmEvaluator
 
 /// <summary>
 /// Sprint 54 (TSK-0220): Result of LLM evaluation with optional remediation suggestion.
+/// Sprint 56 (TSK-0278): Added IsSuccess and FailureReason for structured parse-failure signaling.
 /// </summary>
 /// <param name="ShouldReplan">True to abandon remaining actions and request a fresh plan.</param>
 /// <param name="Reason">Short explanation of the recommendation.</param>
@@ -63,4 +64,18 @@ public interface ILlmEvaluator
 /// Examples: "skip block #9 (occupiedBy_stone)", "step back 3 blocks and retry block #187",
 /// "clear plan and move to origin before rebuilding".
 /// </param>
-public sealed record EvaluationResult(bool ShouldReplan, string Reason = "", string Suggestion = "");
+public sealed record EvaluationResult(bool ShouldReplan, string Reason = "", string Suggestion = "")
+{
+    /// <summary>
+    /// Whether the evaluation itself succeeded (LLM responded, parse was valid).
+    /// When false, <see cref="FailureReason"/> contains the specific failure mode.
+    /// Defaults to true for backward compatibility with existing call sites.
+    /// </summary>
+    public bool IsSuccess { get; init; } = true;
+
+    /// <summary>
+    /// When <see cref="IsSuccess"/> is false, the specific failure mode.
+    /// Values: "ParseFailure", "Timeout", "NullResponse", "ProviderUnavailable".
+    /// </summary>
+    public string? FailureReason { get; init; }
+}

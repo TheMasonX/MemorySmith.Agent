@@ -25,15 +25,21 @@
       "author": "anonymous",
       "body": "**Fix implemented (Sprint 56 Wave A):**\n\nRoot cause: \u0060bot.inventory.items()\u0060 on Mineflayer 4.37.1 \u002B MC 1.16.5 (LAN) does NOT return items placed via \u0060bot.creative.setInventorySlot()\u0060. The API call succeeds without error, but \u0060items()\u0060 returns stale/empty data. On LAN worlds, \u0060/give\u0060 also doesn\u0027t work (no OP).\n\n**Changes:**\n1. \u0060creativeProvider.js\u0060 \u2014 \u0060ensureCreativeItem\u0060 now returns \u0060{ok, slot}\u0060 instead of boolean. When \u0060setInventorySlot\u0060 doesn\u0027t throw, trust the API and return the slot even if \u0060items()\u0060 verification fails. Three levels of verification: items() \u2192 slots[slot] \u2192 trust API.\n2. \u0060index.js\u0060 place handler \u2014 uses new return type. Falls back to slot-based equip, then direct creative equip to slot 36 as last resort.\n\n**Files:** \u0060MineflayerAdapter/creativeProvider.js\u0060, \u0060MineflayerAdapter/index.js\u0060\n**Build:** \u2705 C# build succeeds; JS module loads without syntax errors.\n**Validation needed:** Live test in creative mode with \u0060build a house\u0060.",
       "createdAtUtc": "2026-06-30T03:40:24.321167Z"
+    },
+    {
+      "id": "c-7275305e256f4e7d803fda94ba2554a8",
+      "author": "anonymous",
+      "body": "**CORRECTION (commit 51eb9b6):** Previous fix was wrong.\n\n\u0060bot.inventory.items()\u0060 and \u0060/give\u0060 both work correctly on MC 1.16.5 \u002B Mineflayer 4.37.1 LAN. The creativeProvider.js was reverted to original.\n\n**Real root cause:** The place handler\u0027s creative check \u0060bot.game?.gameMode === 1\u0060 uses strict equality. On some Mineflayer/MC combinations, \u0060bot.game.gameMode\u0060 is stored as the string \u0060\u0022creative\u0022\u0060 instead of the number \u00601\u0060. The strict \u0060=== 1\u0060 comparison fails for strings.\n\n**Correct fix:** Changed to \u0060normalizeGameMode(bot.game?.gameMode) === \u0027creative\u0027\u0060 which handles both:\n- number \u00601\u0060 \u2192 normalizes to \u0060\u0027creative\u0027\u0060\n- string \u0060\u0027creative\u0027\u0060 \u2192 normalizes to \u0060\u0027creative\u0027\u0060\n\nAlso restored diagnostic \u0060console.error\u0060 logs that were removed in the wrong fix.\n\n**Files:** \u0060MineflayerAdapter/index.js\u0060 (place handler only)\n**creativeProvider.js:** Unchanged from Sprint 52.",
+      "createdAtUtc": "2026-06-30T03:51:17.6210628Z"
     }
   ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-30T03:25:41.5561152Z",
-  "updatedAtUtc": "2026-06-30T03:40:24.321167Z",
+  "updatedAtUtc": "2026-06-30T03:51:17.6210628Z",
   "completedAtUtc": null,
-  "revision": 3,
+  "revision": 4,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,

@@ -7,11 +7,13 @@ using Agent.Planning;
 using Agent.Planning.Goals;
 using Agent.Tools;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Channels;
+using WebUI.Blazor.Options;
 
 /// <summary>
 /// Hosted service that owns the agent loop.
@@ -59,7 +61,9 @@ public sealed class AgentBackgroundService(
     // Sprint 52: max concurrent PlaceBlock dispatches per cycle (configurable via appsettings).
     int maxConcurrentPlaceBlock = 8,
     // Sprint 54 (TSK-0199): max character length for chat responses before splitting.
-    int chatMaxResponseLength = 500) : BackgroundService
+    int chatMaxResponseLength = 500,
+    // Sprint 56 (TSK-0286): Safety options with configurable DeniedCommands.
+    IOptions<SafetyOptions>? safetyOptions = null) : BackgroundService
 {
     // Sprint 1b: default exponential backoff delays
     private static readonly TimeSpan[] DefaultReconnectDelays =
@@ -389,6 +393,24 @@ public sealed class AgentBackgroundService(
     // ── Creative provisioning (Sprint 52: delegated to adapter) ──────────────
 
     /// <summary>
+    /// Sprint 56 (TSK-0275): Sanitize a block/item name for /give command dispatch.
+    /// Only allows alphanumeric characters and underscores. Rejects anything that could
+    /// be command injection (spaces, semicolons, shell metacharacters, path traversal).
+    /// Returns null if the name fails validation.
+    /// </summary>
+    private static string? SanitizeBlockName(string block)
+    {
+        if (string.IsNullOrWhiteSpace(block)) return null;
+        // Strip optional minecraft: namespace prefix.
+        var name = block.StartsWith("minecraft:", StringComparison.OrdinalIgnoreCase)
+            ? block[10..] : block;
+        // Only allow [a-zA-Z0-9_]; reject anything else (spaces, semicolons, etc.).
+        if (!System.Text.RegularExpressions.Regex.IsMatch(name, @"^[a-zA-Z0-9_]+$"))
+            return null;
+        return name;
+    }
+
+    /// <summary>
     /// Sprint 52: Creative mode inventory provisioning is handled entirely by the
     /// MineflayerAdapter via creativeProvider.js. The adapter uses
     /// bot.creative.setInventorySlot() (version-agnostic, no OP required).
@@ -411,7 +433,18 @@ public sealed class AgentBackgroundService(
                 var anyProvisioned = false;
                 foreach (var (block, quantity) in materials)
                 {
-                    var have = _worldState.Inventory.GetValueOrDefault(block);
+                    // Sprint 56 (TSK-0275): sanitize block name before /give dispatch.
+                    // Reject names with injection characters (spaces, semicolons, etc.).
+                    var safeBlock = SanitizeBlockName(block);
+                    if (safeBlock is null)
+                    {
+                        logger.LogWarning(
+                            "[creative] rejected unsafe block name '{Block}' for '{Blueprint}'",
+                            block, buildGoal.Blueprint.Name);
+                        continue;
+                    }
+
+                    var have = _worldState.Inventory.GetValueOrDefault(safeBlock);
                     var need = Math.Max(0, quantity - have);
                     if (need <= 0) continue;
 
@@ -419,7 +452,7 @@ public sealed class AgentBackgroundService(
                     if (anyProvisioned)
                         await Task.Delay(200, ct);
 
-                    var giveCmd = $"/give @p {block} {need}";
+                    var giveCmd = $"/give @p {safeBlock} {need}";
                     _queue.Enqueue(new ActionData
                     {
                         Tool = "Chat",
@@ -441,6 +474,36 @@ public sealed class AgentBackgroundService(
             logger.LogWarning(ex, "[creative] /give provisioning failed: {Message}", ex.Message);
         }
     }
+
+    // Sprint 56 (TSK-0277 / TSK-0286): Denied commands are configurable via
+    // Agent:Safety:DeniedCommands in appsettings.json (SafetyOptions).
+    // The static default below is used when no IOptions<SafetyOptions> is injected.
+    // This is a hard safety layer — LLM hallucination must never escalate privileges
+    // or destroy server state through the command intent path.
+    private static readonly HashSet<string> DefaultDeniedCommands = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "/op", "/deop", "/kill", "/ban", "/ban-ip", "/pardon", "/pardon-ip",
+        "/stop", "/save-off", "/save-on", "/save-all",
+        "/reload", "/publish",
+        "/whitelist", "/debug", "/difficulty", "/gamerule",
+        "/setworldspawn", "/setblock", "/fill", "/clone", "/summon",
+        "/gamemode", "/defaultgamemode", "/seed",
+        "/kick", "/list", "/me", "/tell", "/msg", "/w", "/teammsg", "/tm",
+        "/datapack", "/forceload", "/locate", "/loot", "/particle",
+        "/place", "/playsound", "/recipe", "/return", "/ride",
+        "/schedule", "/scoreboard", "/setidletimeout", "/spawnpoint",
+        "/spectate", "/spreadplayers", "/stopsound", "/tag", "/team",
+        "/teammsg", "/teleport", "/tellraw", "/tickingarea", "/title",
+        "/tm", "/trigger", "/w", "/warden_spawn_tracker", "/weather",
+        "/worldborder", "/execute",
+    };
+
+    /// <summary>
+    /// Effective denied commands set. Uses injected <see cref="SafetyOptions"/> when
+    /// available, otherwise falls back to <see cref="DefaultDeniedCommands"/>.
+    /// </summary>
+    private HashSet<string> DeniedCommands =>
+        safetyOptions?.Value?.DeniedCommands ?? DefaultDeniedCommands;
 
     // ── BackgroundService ─────────────────────────────────────────────────────
 
@@ -1154,9 +1217,37 @@ public sealed class AgentBackgroundService(
                 break;
 
             case "command":
-                // Sprint 54: execute a Minecraft server command via chat.
+                // Sprint 56 (TSK-0277 / TSK-0287): deny list for LLM-dispatched server commands.
+                // Blocks destructive/admin commands when AllowDestructiveCommands is false.
+                // When AllowDestructiveCommands is true (explicit opt-in), denied commands
+                // pass through with a warning log.
                 if (intent.Item is not null && intent.Item.StartsWith('/'))
                 {
+                    var cmdLower = intent.Item.Split(' ')[0].ToLowerInvariant();
+                    var isDenied = DeniedCommands.Contains(cmdLower);
+                    var allowDestructive = safetyOptions?.Value?.AllowDestructiveCommands ?? false;
+
+                    if (isDenied && !allowDestructive)
+                    {
+                        logger.LogWarning(
+                            "[command] BLOCKED denied command '{Cmd}' from intent (goal={Goal}, AllowDestructiveCommands=false)",
+                            intent.Item, _currentGoal?.Name ?? "none");
+                        if (pendingResponse is not null)
+                            _chatHistory?.Record(botName, pendingResponse);
+                        break;
+                    }
+
+                    if (isDenied)
+                    {
+                        logger.LogWarning(
+                            "[command] ALLOWED denied command '{Cmd}' (AllowDestructiveCommands=true, goal={Goal})",
+                            intent.Item, _currentGoal?.Name ?? "none");
+                    }
+
+                    logger.LogWarning(
+                        "[command] dispatching '{Cmd}' (goal={Goal})",
+                        intent.Item, _currentGoal?.Name ?? "none");
+
                     if (pendingResponse is not null)
                         logger.LogInformation("[chat] bot: {Response}", pendingResponse);
                     _queue.Enqueue(new ActionData
@@ -1457,6 +1548,23 @@ public sealed class AgentBackgroundService(
         if (_currentGoal is null) return;
         if (!_currentGoal.IsComplete(_worldState)) return;
 
+        // Sprint 56 (TSK-0274): TaskSequenceGoal may report complete when the current
+        // step finishes but more steps remain. Advance instead of nullifying.
+        if (_currentGoal is TaskSequenceGoal seq)
+        {
+            if (seq.TryAdvance())
+            {
+                logger.LogInformation(
+                    "[sequence] advanced via event to step {Step}/{Total}: {Goal}",
+                    seq.CurrentStepIndex + 1, seq.TotalSteps, seq.Name);
+                _queue.Clear();
+                lock (_pendingLock) _pendingActions.Clear();
+                _ = PushGoalToDashboardAsync();
+                return;
+            }
+            // No more steps — fall through to full completion below.
+        }
+
         // Sprint 37: diagnostic logging for premature goal completion via event path.
         // Sprint 40 P0-B: include position for debugging.
         if (_currentGoal is IItemSpecGoal isg)
@@ -1524,9 +1632,10 @@ public sealed class AgentBackgroundService(
             logger.LogWarning("No {Block} found in range — will count as failure.", bnf.Block);
             // TSK-0021: track per-block failure count for progressive wander radius.
             var countKey = $"event:BlockNotFound:Count:{bnf.Block}";
-            // TSK-0106: value is stored as string via .ToString(); read as string and parse.
+            // Sprint 56 (TSK-0276): Robust read — handle both string and int storage.
+            // HtnTaskLibrary reads as string and int.TryParses, so store as string.
             var prevCount = _worldState.Facts.TryGetValue(countKey, out var pc)
-                && pc is string pcs && int.TryParse(pcs, out var pci)
+                && int.TryParse(pc?.ToString(), out var pci)
                 ? pci : 0;
             _worldState = _worldState.With(b =>
                 b.SetFact(countKey, (prevCount + 1).ToString(), FactSource.Observed));

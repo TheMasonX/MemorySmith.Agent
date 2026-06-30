@@ -21,6 +21,10 @@ const GIVE_DELAY_MS = 100;
 /** Current hotbar slot index for round-robin provisioning. */
 let _nextSlotIndex = 0;
 
+// Sprint 56 (TSK-0275): Regex for sanitizing block names before /give dispatch.
+// Only allows alphanumeric + underscores. Rejects spaces, semicolons, etc.
+const SAFE_BLOCK_RE = /^[a-zA-Z0-9_]+$/;
+
 // ── Public API ──────────────────────────────────────────────────────────────
 
 /**
@@ -82,8 +86,17 @@ async function ensureCreativeItem(bot, itemName, count = 1) {
   }
 
   // Strategy 2: /give command (reliable fallback, works on 1.16.5+ with OP)
+  // Sprint 56 (TSK-0275): sanitize block name before /give dispatch.
+  const safeName = cleanName.replace(/^minecraft:/, '');
+  if (!SAFE_BLOCK_RE.test(safeName)) {
+    logStructured('error', 'creative', 'rejected unsafe block name for /give', {
+      item: cleanName, sanitized: safeName,
+    });
+    return false;
+  }
+
   try {
-    bot.chat(`/give @p ${cleanName} ${count}`);
+    bot.chat(`/give @p ${safeName} ${count}`);
     await new Promise(r => setTimeout(r, GIVE_DELAY_MS));
     logStructured('info', 'creative', 'provisioned via /give', {
       item: cleanName, count,

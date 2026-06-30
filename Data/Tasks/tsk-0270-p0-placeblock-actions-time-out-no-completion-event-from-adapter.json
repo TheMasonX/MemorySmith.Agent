@@ -25,15 +25,21 @@
       "author": "anonymous",
       "body": "**Fix implemented (Sprint 56 Wave A):**\n\n**Part 1 \u2014 Adapter (\u0060index.js\u0060):** Reset \u0060_stopRequested = false\u0060 at the start of the \u0060case \u0027place\u0027\u0060 handler. Previously only \u0060mine\u0060 and \u0060wander\u0060 did this. A stale stop flag from a prior emergency stop would cause \u0060bot.pathfinder.goto()\u0060 to throw \u0022The goal was changed before it could be completed!\u0022 for subsequent place actions.\n\n**Part 2 \u2014 C# (\u0060AgentBackgroundService.cs\u0060):** \u0060ActionCompletedEvent\u0060 handler now calls \u0060CompleteCorrelatedActionById\u0060/\u0060CompleteCorrelatedActionByTool\u0060. Previously it only logged. This is a safety net \u2014 most actions already complete via domain events (\u0060blockPlaced\u0060, \u0060moveComplete\u0060, etc.), but adding completion here prevents 30s timeouts when domain events are delayed/lost. Also fixes \u0060chat\u0060 actions which only send \u0060actionCompleted\u0060 (no domain event). Idempotent \u2014 \u0060CompleteCorrelatedActionByTool\u0060 only transitions \u0060Dispatched\u2192Completed\u0060.\n\n**Files:** \u0060MineflayerAdapter/index.js\u0060, \u0060WebUI.Blazor/AgentBackgroundService.cs\u0060\n**Build:** \u2705 C# build succeeds; JS module loads without syntax errors.\n**Validation needed:** Live test \u2014 verify place actions complete without TIMED OUT warnings.",
       "createdAtUtc": "2026-06-30T03:40:24.3600308Z"
+    },
+    {
+      "id": "c-db53aa941c5f41d0bc72f4f63a6c1575",
+      "author": "anonymous",
+      "body": "**ROOT CAUSE FOUND (commit cd60bbe):**\n\nThe place timeout was **5 seconds** (\u0060[\u0022place\u0022] = 5\u0060 in ToolTimeoutOverrides, set in Sprint 43 P1-4). This is far too short:\n\n- Pathfinding alone takes 2-5 seconds per block\n- The adapter processes actions sequentially through a command queue\n- The full round-trip (dispatch \u2192 navigate \u2192 equip \u2192 place \u2192 BlockPlacedEvent \u2192 C#) needs 5-15 seconds\n- When 8 concurrent place actions are dispatched, the adapter queues them \u2014 later actions wait for earlier ones to complete, pushing total time well past 5s\n\n**Fix:** Increased place timeout from 5s \u2192 15s.\n\n**Also added:** StatusEvent diagnostic logging (\u0060[status] received: gameMode=... creative=... inventoryItems=...\u0060) so future runs can confirm whether game mode detection is working.\n\n**Note on game mode:** The world appears to be in survival mode (not creative). The decompose correctly chose the survival path (Wander \u2192 MineBlock \u2192 CraftItem \u2192 place). If the user intended creative mode, the game mode needs to be changed in the Minecraft world/server settings.",
+      "createdAtUtc": "2026-06-30T04:16:19.4243712Z"
     }
   ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-30T03:25:41.4581181Z",
-  "updatedAtUtc": "2026-06-30T03:40:24.3600308Z",
+  "updatedAtUtc": "2026-06-30T04:16:19.4243712Z",
   "completedAtUtc": null,
-  "revision": 3,
+  "revision": 4,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,

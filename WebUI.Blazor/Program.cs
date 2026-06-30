@@ -17,6 +17,7 @@ using Serilog.Events;
 using WebUI.Blazor;
 using WebUI.Blazor.Dashboard.Logging;
 using WebUI.Blazor.Logging;
+using WebUI.Blazor.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +83,8 @@ if (!string.IsNullOrEmpty(llmApiKey))
     builder.Configuration["Agent:Chat:LlmApiKey"] = llmApiKey;
 }
 
+builder.Services.Configure<SafetyOptions>(
+    builder.Configuration.GetSection("Agent:Safety"));
 builder.Services.Configure<RestMemoryGatewayOptions>(
     builder.Configuration.GetSection("Agent:Memory"));
 builder.Services.Configure<MinecraftAdapterConfig>(
@@ -376,7 +379,9 @@ if (agentEnabled)
             // Sprint 52: configurable max concurrent PlaceBlock dispatches.
             maxConcurrentPlaceBlock:  builder.Configuration.GetValue<int>("Agent:Build:MaxConcurrentPlaceBlock", 8),
             // Sprint 54 (TSK-0199): max chat response length before splitting.
-            chatMaxResponseLength:    chatOpts.ChatMaxResponseLength);
+            chatMaxResponseLength:    chatOpts.ChatMaxResponseLength,
+            // Sprint 56 (TSK-0286): configurable denied commands.
+            safetyOptions:            sp.GetRequiredService<IOptions<SafetyOptions>>());
     });
     builder.Services.AddHostedService(sp => sp.GetRequiredService<AgentBackgroundService>());
 }

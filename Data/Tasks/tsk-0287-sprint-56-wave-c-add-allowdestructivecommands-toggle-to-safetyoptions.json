@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0287-sprint-56-wave-c-add-allowdestructivecommands-toggle-to-safetyoptions",
+  "key": "TSK-0287",
+  "title": "Sprint 56 Wave C: Add AllowDestructiveCommands toggle to SafetyOptions",
+  "description": "The Sprint 56 Wave B council fix 2 (TSK-0277) requested an \u0060AllowDestructiveCommands\u0060 toggle but only the DeniedCommands HashSet was implemented. This adds the toggle to SafetyOptions so that even when CommandExecutionEnabled is true, destructive admin commands are gated behind an explicit opt-in flag (default: false).",
+  "type": "Task",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-56",
+    "domain:security",
+    "type:feature"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T18:07:13.2889196Z",
+  "updatedAtUtc": "2026-06-30T18:14:21.9635414Z",
+  "completedAtUtc": "2026-06-30T18:14:21.9635414Z",
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0287-sprint-56-wave-c-add-allowdestructivecommands-toggle-to-safetyoptions.json"
+}

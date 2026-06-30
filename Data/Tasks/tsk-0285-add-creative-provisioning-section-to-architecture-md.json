@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0285-add-creative-provisioning-section-to-architecture-md",
+  "key": "TSK-0285",
+  "title": "Add creative provisioning section to architecture.md",
+  "description": "Council finding: Data/Pages/architecture.md documents the canonical Sprint 50 runtime pipeline but has NO mention of creative provisioning at all. This is a significant documentation gap given that creative mode crosses 3 layers (C# SetGoal, JS creativeProvider.js, adapter index.js).\n\nAdd a section explaining:\n1. The three-layer creative provisioning path\n2. When each path is active (build goals vs gather goals vs place actions)\n3. The race condition and the IsInventoryStale mitigation\n4. The ExecutionCapabilities aspirational model\n5. Interaction with recovery and planner paths\n\nReferenced in: Data/Pages/council/2026-06-30-external-audits-council.md",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-57",
+    "type:docs",
+    "domain:architecture"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T12:51:05.1514572Z",
+  "updatedAtUtc": "2026-06-30T12:51:05.1514572Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

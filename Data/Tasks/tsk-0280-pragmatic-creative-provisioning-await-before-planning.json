@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0280-pragmatic-creative-provisioning-await-before-planning",
+  "key": "TSK-0280",
+  "title": "Pragmatic creative provisioning await before planning",
+  "description": "Council finding: SetGoal() kicks off ProvisionGoalIfCreativeAsync(goal, CancellationToken.None) without awaiting it, then immediately continues into goal setup and planning. Creative provisioning can race against planning, reintroducing stale inventory.\n\nFix: Make creative provisioning a hard precondition of goal activation. Add await before allowing planning to proceed. This is a pragmatic fix \u2014 a cleaner extraction into AgentProvisioningService is deferred to Sprint 59\u002B.\n\nReferenced in: Data/Pages/council/2026-06-30-external-audits-council.md\nAudit source: Audits A, B, D",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-57",
+    "type:bug",
+    "domain:creative"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T12:51:04.9478329Z",
+  "updatedAtUtc": "2026-06-30T12:51:04.9478329Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

@@ -1,0 +1,40 @@
+﻿{
+  "id": "tsk-0274-verify-and-fix-tasksequencegoal-iscomplete-structural-bug",
+  "key": "TSK-0274",
+  "title": "Verify and fix TaskSequenceGoal.IsComplete structural bug",
+  "description": "Council finding: TaskSequenceGoal.IsComplete() may never delegate to the current step\u0027s IsComplete, meaning completion logic is split across TryAdvance() and external callers. This is potentially a P0 structural bug that breaks every multi-step goal sequence. \n\n1. Verify the claim by reading TaskSequenceGoal.cs IsComplete() and TryAdvance()\n2. If confirmed, fix IsComplete() to check current step completion OR ensure the dispatch loop has an alternative advancement path\n3. Add unit tests covering 1-step, 3-step, max-step sequences\n4. Verify integration with AgentBackgroundService dispatch loop\n\nReferenced in: Data/Pages/council/2026-06-30-external-audits-council.md\nAudit source: Audit A (2026-06-30_additional_code_audit)",
+  "type": "Bug",
+  "status": "Done",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-56",
+    "type:bug",
+    "domain:planning"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-668f46c00c714346a7efcaf4525161c6",
+      "author": "anonymous",
+      "body": "Created by SteveBot council review of 4 external audit documents. Links to council report: Data/Pages/council/2026-06-30-external-audits-council.md. This is the highest-stakes verification task \u2014 if TaskSequenceGoal.IsComplete never delegates to current step, it\u0027s a P0 structural bug breaking every multi-step sequence.",
+      "createdAtUtc": "2026-06-30T12:51:12.8613763Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T12:50:46.3839446Z",
+  "updatedAtUtc": "2026-06-30T16:05:20.8639497Z",
+  "completedAtUtc": "2026-06-30T16:05:20.8639497Z",
+  "revision": 5,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0274-verify-and-fix-tasksequencegoal-iscomplete-structural-bug.json"
+}

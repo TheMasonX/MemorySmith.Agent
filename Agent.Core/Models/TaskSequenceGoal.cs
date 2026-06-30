@@ -71,12 +71,20 @@ public sealed class TaskSequenceGoal : IGoal
 
     public bool IsComplete(WorldState state)
     {
-        // The sequence is complete when all steps are done.
-        // We check the current step first, and if it's complete AND
-        // we've advanced past the last step, the whole sequence is done.
+        // Sprint 56 (TSK-0274): The sequence is complete when all steps are done.
+        // The original implementation only checked _currentStep >= _steps.Count,
+        // but _currentStep is only incremented by TryAdvance(), which is only
+        // called from TryAdvanceSequence() inside the IsComplete==true branch.
+        // This created a circular dependency — sequences could never complete.
+        //
+        // Fix: delegate to the current step's IsComplete first. If the current
+        // step is complete AND we're on the last step, the sequence is done.
+        // Otherwise, the caller (TryAdvanceSequence) will advance to the next step.
         if (_currentStep >= _steps.Count)
             return true;
-        return false;
+
+        // Check if the current step itself is complete.
+        return _steps[_currentStep].IsComplete(state);
     }
 
     public bool HasFailed(WorldState state)

@@ -1,0 +1,40 @@
+﻿{
+  "id": "tsk-0277-add-chat-command-deny-list-for-llm-dispatched-commands",
+  "key": "TSK-0277",
+  "title": "Add chat command deny list for LLM-dispatched commands",
+  "description": "SECURITY FINDING (Council Seat 7): The chat command intent path dispatches LLM-generated commands with only a StartsWith(\u0027/\u0027) check. No deny list exists for destructive commands. The LLM is explicitly told \u0022You CAN execute Minecraft server commands (/give, /tp, /setblock, /time, etc.)\u0022 with no restriction on dangerous commands.\n\nAdd:\n1. A deny list of prohibited server commands (/op, /deop, /kill, /ban, /pardon, /stop, /save-off, /difficulty, /gamerule, /setworldspawn, etc.)\n2. All denied commands should be blocked even when CommandExecutionEnabled is true\n3. Log every dispatched command at Warning level with full context (goal, intent, timestamp)\n4. Consider a separate AllowDestructiveCommands toggle for commands that modify server state beyond item provisioning\n\nReferenced in: Data/Pages/council/2026-06-30-external-audits-council.md",
+  "type": "Bug",
+  "status": "Done",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-56",
+    "type:security",
+    "domain:chat"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-57c47d71f54c455db4c418eeff16c5f6",
+      "author": "anonymous",
+      "body": "Created by SteveBot council review. Security finding \u2014 no deny list on LLM-dispatched chat commands. LLM hallucination could dispatch /op, /kill @e, /ban, etc. Needs deny list \u002B Warning-level audit logging. See council report.",
+      "createdAtUtc": "2026-06-30T12:51:12.9321998Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T12:50:46.502777Z",
+  "updatedAtUtc": "2026-06-30T16:05:20.9744324Z",
+  "completedAtUtc": "2026-06-30T16:05:20.9744324Z",
+  "revision": 4,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0277-add-chat-command-deny-list-for-llm-dispatched-commands.json"
+}

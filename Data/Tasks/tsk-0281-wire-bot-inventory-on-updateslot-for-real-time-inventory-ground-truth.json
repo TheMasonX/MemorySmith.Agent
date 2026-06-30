@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0281-wire-bot-inventory-on-updateslot-for-real-time-inventory-ground-truth",
+  "key": "TSK-0281",
+  "title": "Wire bot.inventory.on(\u0027updateSlot\u0027) for real-time inventory ground truth",
+  "description": "Council finding: Inventory is reconstructed from 6\u002B partially-authoritative event paths with no single source of truth. bot.inventory.on(\u0027updateSlot\u0027) is not wired (confirmed in backlog TSK-0063, TSK-0163). The current approach relies on periodic GetStatus reconciliation which is inherently laggy.\n\nFix:\n1. Wire bot.inventory.on(\u0027updateSlot\u0027) in MineflayerAdapter to emit structured slot events\n2. Create UpdateSlotEvent in C# event model\n3. Project slot events into WorldState.Inventory in WorldStateProjector\n4. Add rate-limiting/batching on the JS side (updateSlot fires frequently during mining)\n5. Reduce dependence on periodic GetStatus as a reconciliation crutch\n6. Add metrics to track drift between event-sourced inventory and GetStatus snapshots\n\nReferenced in: Data/Pages/council/2026-06-30-external-audits-council.md\nAudit source: Audits B, C",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-57",
+    "type:feature",
+    "domain:inventory"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T12:51:04.9923728Z",
+  "updatedAtUtc": "2026-06-30T12:51:04.9923728Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

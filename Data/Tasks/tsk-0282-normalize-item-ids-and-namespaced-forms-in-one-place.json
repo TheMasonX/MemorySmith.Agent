@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0282-normalize-item-ids-and-namespaced-forms-in-one-place",
+  "key": "TSK-0282",
+  "title": "Normalize item IDs and namespaced forms in one place",
+  "description": "Council finding: Goal creation normalization is inconsistent for namespaced items. TryMakeBuiltInSpec in GoalFactory normalizes (ToLowerInvariant \u002B Replace(\u0027-\u0027, \u0027_\u0027)) but only in the built-in fallback path. The item registry path passes raw itemId. Different consumers handle namespace prefixes differently.\n\nFix:\n1. Create a shared NormalizeItemId(string raw) \u2192 string helper\n2. Use it consistently across: GoalFactory, WorldStateProjector (inventory normalization), creative provisioning, recovery parsing\n3. Ensure \u0022minecraft:oak_log\u0022 and \u0022oak_log\u0022 produce the same result\n4. Add tests for: namespace stripping, hyphen normalization, case normalization, mixed forms\n\nReferenced in: Data/Pages/council/2026-06-30-external-audits-council.md\nAudit source: Audit A",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-57",
+    "type:refactor",
+    "domain:core"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T12:51:05.0314946Z",
+  "updatedAtUtc": "2026-06-30T12:51:05.0314946Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

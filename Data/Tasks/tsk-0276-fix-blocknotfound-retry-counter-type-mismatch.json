@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0276-fix-blocknotfound-retry-counter-type-mismatch",
+  "key": "TSK-0276",
+  "title": "Fix BlockNotFound retry counter type mismatch",
+  "description": "Council finding (highest-ROI atomic fix): TryRouteAsError in AgentBackgroundService writes the BlockNotFound retry count as a string ((prevCount \u002B 1).ToString()) but HtnTaskLibrary reads it as an integer. The counter never accumulates past 1, so the bot never widens its search radius from 40\u219280\u2192120 blocks.\n\nFix the write path to store as integer, or centralize access through a typed helper. This is a ~5-line fix plus a test.\n\nReferenced in: Data/Pages/council/2026-06-30-external-audits-council.md\nAudit source: Audit C (memorysmith_agent_addendum_audit.md) and Audit D",
+  "type": "Bug",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-56",
+    "type:bug",
+    "domain:recovery"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T12:50:46.4649202Z",
+  "updatedAtUtc": "2026-06-30T16:05:20.9388344Z",
+  "completedAtUtc": "2026-06-30T16:05:20.9388344Z",
+  "revision": 3,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0276-fix-blocknotfound-retry-counter-type-mismatch.json"
+}

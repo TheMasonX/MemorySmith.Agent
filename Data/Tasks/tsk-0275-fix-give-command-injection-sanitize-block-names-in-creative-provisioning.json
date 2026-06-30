@@ -1,0 +1,41 @@
+﻿{
+  "id": "tsk-0275-fix-give-command-injection-sanitize-block-names-in-creative-provisioning",
+  "key": "TSK-0275",
+  "title": "Fix /give command injection \u2014 sanitize block names in creative provisioning",
+  "description": "SECURITY FINDING (Council Seat 7): ProvisionGoalIfCreativeAsync builds \u0060/give @p {block} {need}\u0060 where \u0060block\u0060 comes from Blueprint.Materials[].Block \u2014 a string parsed from wiki page frontmatter with NO validation. Blueprint pages can be created/modified via CreatePageTool (MemorySmith wiki), accepting user/LLM-provided content. The adapter\u0027s creativeProvider.js also falls back to /give via bot.chat() \u2014 same vector.\n\nFix:\n1. Add an allowlist of valid Minecraft item IDs before /give dispatch. Reject unknown block names.\n2. Sanitize \u0060block\u0060 to alphanumeric \u002B underscores only. Reject spaces, semicolons, or shell metacharacters.\n3. Move creative provisioning to adapter\u0027s creative.setInventorySlot() exclusively where possible \u2014 never fall back to /give chat on servers without OP.\n4. Add a server-side CommandExecutionEnabled check in the \u0022command\u0022 intent handler.\n\nReferenced in: Data/Pages/council/2026-06-30-external-audits-council.md",
+  "type": "Bug",
+  "status": "Done",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-56",
+    "type:security",
+    "domain:creative",
+    "domain:adapter"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-a618f3df410f4ed9818690195f597240",
+      "author": "anonymous",
+      "body": "Created by SteveBot council review. Security finding \u2014 /give command injection via unsanitized block names from blueprints. P0 fix required. Block names from Blueprint.Materials[].Block flow directly into \u0060/give @p {block} {need}\u0060 without validation. See council report Data/Pages/council/2026-06-30-external-audits-council.md for details.",
+      "createdAtUtc": "2026-06-30T12:51:12.8963196Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T12:50:46.4287788Z",
+  "updatedAtUtc": "2026-06-30T16:05:20.8997801Z",
+  "completedAtUtc": "2026-06-30T16:05:20.8997801Z",
+  "revision": 4,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0275-fix-give-command-injection-sanitize-block-names-in-creative-provisioning.json"
+}

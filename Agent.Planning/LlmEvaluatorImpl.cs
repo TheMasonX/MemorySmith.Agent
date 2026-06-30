@@ -69,7 +69,11 @@ public sealed class LlmEvaluatorImpl : ILlmEvaluator
             _logger.LogDebug(
                 "[evaluator] provider '{Provider}' unavailable — skipping evaluation for goal {Goal}",
                 _provider.ProviderName, goal.Name);
-            return new EvaluationResult(false, "provider unavailable");
+            return new EvaluationResult(false, "provider unavailable")
+            {
+                IsSuccess = false,
+                FailureReason = "ProviderUnavailable"
+            };
         }
 
         try
@@ -84,12 +88,22 @@ public sealed class LlmEvaluatorImpl : ILlmEvaluator
                 _logger.LogWarning(
                     "[evaluator] provider returned null for goal {Goal} — defaulting to no-replan",
                     goal.Name);
-                return new EvaluationResult(false, "null response");
+                return new EvaluationResult(false, "null response")
+                {
+                    IsSuccess = false,
+                    FailureReason = "NullResponse"
+                };
             }
 
             var result = ParseEvaluationResult(raw);
 
-            if (result.ShouldReplan)
+            if (!result.IsSuccess)
+            {
+                _logger.LogWarning(
+                    "[evaluator] parse failure for goal {Goal}: {Reason} (rawLen={RawLen})",
+                    goal.Name, result.Reason, raw.Length);
+            }
+            else if (result.ShouldReplan)
                 _logger.LogInformation(
                     "[evaluator] recommends replan for goal {Goal} — {Count} outcomes, {Failures} failures. Suggestion: {Suggestion}",
                     goal.Name, outcomes.Count, failureCount, result.Suggestion);
@@ -109,7 +123,11 @@ public sealed class LlmEvaluatorImpl : ILlmEvaluator
             _logger.LogWarning(ex,
                 "[evaluator] unexpected error during evaluation — defaulting to no-replan for goal {Goal}",
                 goal.Name);
-            return new EvaluationResult(false, $"error: {ex.Message}");
+            return new EvaluationResult(false, $"error: {ex.Message}")
+            {
+                IsSuccess = false,
+                FailureReason = ex is TimeoutException ? "Timeout" : "ParseFailure"
+            };
         }
     }
 
@@ -271,28 +289,67 @@ public sealed class LlmEvaluatorImpl : ILlmEvaluator
 
     // ── Response parsing ──────────────────────────────────────────────────────
 
-    private static EvaluationResult ParseEvaluationResult(string response)
+    /// <summary>
+    /// Sprint 56 (TSK-0278): Parses the LLM evaluation response into a structured result.
+    /// Made internal for testability. Returns IsSuccess=false with specific FailureReason
+    /// on parse failure rather than silently defaulting to "no replan."
+    /// </summary>
+    internal static EvaluationResult ParseEvaluationResult(string response)
     {
+        if (string.IsNullOrWhiteSpace(response))
+        {
+            return new EvaluationResult(false, "empty response")
+            {
+                IsSuccess = false,
+                FailureReason = "ParseFailure"
+            };
+        }
+
         try
         {
             var json = ExtractJson(response);
+            if (json is null)
+            {
+                // No JSON brackets found — prose-only or malformed response.
+                return new EvaluationResult(false, "no JSON found in response")
+                {
+                    IsSuccess = false,
+                    FailureReason = "ParseFailure"
+                };
+            }
             using var doc = JsonDocument.Parse(json);
             var shouldReplan = doc.RootElement.TryGetProperty("replan", out var p) && p.GetBoolean();
             var reason = doc.RootElement.TryGetProperty("reason", out var r) ? r.GetString() ?? "" : "";
             var suggestion = doc.RootElement.TryGetProperty("suggestion", out var s) ? s.GetString() ?? "" : "";
             return new EvaluationResult(shouldReplan, reason, suggestion);
         }
-        catch
+        catch (JsonException)
         {
-            return new EvaluationResult(false, "unparseable response");
+            return new EvaluationResult(false, "invalid JSON in response")
+            {
+                IsSuccess = false,
+                FailureReason = "ParseFailure"
+            };
+        }
+        catch (Exception)
+        {
+            return new EvaluationResult(false, "unparseable response")
+            {
+                IsSuccess = false,
+                FailureReason = "ParseFailure"
+            };
         }
     }
 
-    /// <summary>Extracts the first JSON object from an LLM response that may contain prose.</summary>
-    private static string ExtractJson(string text)
+    /// <summary>
+    /// Extracts the first JSON object from an LLM response that may contain prose.
+    /// Sprint 56 (TSK-0278): Made internal for testability. Returns null when no
+    /// JSON brackets found (caller should detect this as a parse failure).
+    /// </summary>
+    internal static string? ExtractJson(string text)
     {
         var start = text.IndexOf('{');
         var end   = text.LastIndexOf('}');
-        return start >= 0 && end > start ? text[start..(end + 1)] : "{}";
+        return start >= 0 && end > start ? text[start..(end + 1)] : null;
     }
 }
