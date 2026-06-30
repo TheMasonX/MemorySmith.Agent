@@ -4,7 +4,7 @@
   "title": "Fix craft recipesFor to include crafting table recipes",
   "description": "**Source:** External audit (Bug 3) | **Council:** P1\n\n**Problem:** \u0060index.js:1631\u0060 calls \u0060bot.recipesFor(itemEntry.id, null, null, null)\u0060. The 4th parameter (\u0060craftingTable\u0060) being \u0060null\u0060 causes Mineflayer to filter OUT all recipes that require a crafting table before returning. Result: \u0060recipes[0]\u0060 can never be a table recipe, and the entire table-search/pathfind logic at lines 1636-1651 is dead code. For items with ONLY table recipes (tools, furnace, chest, etc.), \u0060recipesFor\u0060 returns empty array and throws \u0022No recipe found\u0022.\n\n**Fix:** Change the 4th argument from \u0060null\u0060 to \u0060true\u0060:\n\u0060\u0060\u0060js\nconst recipes = bot.recipesFor(itemEntry.id, null, null, true);\n\u0060\u0060\u0060\n\nThis allows table recipes to be returned, and the existing \u0060recipe.requiresTable\u0060 check \u002B table-search logic becomes reachable and functional for the first time since Sprint 2a.\n\n**Note:** The file header comment has claimed \u0022craft case now pathfinds to nearest crafting table\u0022 since Sprint 2a \u2014 this has never actually worked. Update the comment after fix.\n\n**Files:** \u0060MineflayerAdapter/index.js:1631\u0060\n\n**Validation:** Craft a tool (e.g., wooden pickaxe) with a crafting table nearby \u2014 should succeed. Verify existing craft tests pass.",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,11 +23,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-30T02:34:26.3780138Z",
-  "updatedAtUtc": "2026-06-30T02:34:26.3780138Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-06-30T02:53:02.9761865Z",
+  "completedAtUtc": "2026-06-30T02:53:02.9761865Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0261-fix-craft-recipesfor-to-include-crafting-table-recipes.json"
 }

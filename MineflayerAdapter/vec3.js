@@ -8,8 +8,17 @@
  *
  * This module exports a single function `toVec3(x, y, z)` that creates a
  * plain JS object implementing the FULL prismarine-vector Vec3 API surface.
- * All values are Math.floor'd so .floored() is effectively a no-op, and
- * .floored() returns `this` for performance since values are already integers.
+ * Values are stored RAW (unfloored) so arithmetic methods (offset, plus,
+ * minus, etc.) produce correct fractional results. Call .floored() to get
+ * a new Vec3 with integer coordinates — critical for Mineflayer's internal
+ * dig/place geometry which calls block.position.offset(0.5, 0.5, 0.5)
+ * to aim at block centers instead of corners.
+ *
+ * Sprint 56 (TSK-0262): Fixed .floored() to return a NEW object instead of
+ * `this`, and stopped flooring in the constructor. This matches the real
+ * prismarine-vector Vec3 contract. Previously, .floored() returning `this`
+ * caused prismarine-world's block.position = pos.floored() to leak the shim
+ * into Mineflayer's internal geometry calculations, corrupting aim points.
  *
  * Vec3 API methods verified against prismarine-vector 2.x:
  *   https://github.com/PrismarineJS/prismarine-vector
@@ -19,8 +28,7 @@
  */
 
 export function toVec3(x, y, z) {
-  const fx = Math.floor(x), fy = Math.floor(y), fz = Math.floor(z);
-  const self = { x: fx, y: fy, z: fz };
+  const self = { x, y, z };
 
   // ── Coordinate access ─────────────────────────────────────────────────────
 
@@ -139,11 +147,14 @@ export function toVec3(x, y, z) {
 
   /**
    * Floor each component — returns a NEW Vec3.
-   * NOTE: All toVec3 values are already floored at construction time,
-   * so this returns an identical clone. We keep the full Vec3 API
-   * contract for compatibility with any Mineflayer code that calls it.
+   * IMPORTANT (Sprint 56 TSK-0262): Returns a NEW object, NOT `this`.
+   * prismarine-world calls block.position = pos.floored() — if we return
+   * `this`, every subsequent offset/plus/minus on that block leaks through
+   * this shim and floors to integers, corrupting Mineflayer's aim geometry.
    */
-  self.floored = function () { return self; };
+  self.floored = function () {
+    return toVec3(Math.floor(self.x), Math.floor(self.y), Math.floor(self.z));
+  };
 
   /** Component-wise min with another Vec3 — returns a NEW Vec3. */
   self.min = function (other) {

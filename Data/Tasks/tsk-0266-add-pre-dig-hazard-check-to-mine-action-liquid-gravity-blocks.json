@@ -4,7 +4,7 @@
   "title": "Add pre-dig hazard check to mine action (liquid/gravity blocks)",
   "description": "**Source:** External audit (capability gap) | **Council:** P2\n\n**Problem:** The \u0060mine\u0060 action at index.js has no pre-dig check for hazards above the target block. If a block is supported by the target (e.g., gravel, sand, or liquid above it), mining it could cause collapse, drowning, or lava damage. The \u0060LIQUID_BLOCK_NAMES\u0060 set is already defined in \u0060findFlatArea\u0060 but never checked in \u0060mine\u0060.\n\n**Fix:** Before digging, check the block above the target for:\n1. Gravity blocks (sand, gravel, concrete powder, anvils, dragon egg) \u2014 if present, skip or dig from above first\n2. Liquid blocks (lava, water) \u2014 if present above or adjacent, skip and log warning\n3. Fallback: if hazard detected, send \u0060blockPlaceSkipped\u0060 event with \u0060reason: \u0027hazardAbove\u0027\u0060\n\n**Files:** \u0060MineflayerAdapter/index.js\u0060 (mine action, before \u0060bot.dig(fresh)\u0060 call)\n\n**Validation:** Position bot under gravel/sand \u2014 mine should detect and skip. Position bot near lava \u2014 mine should detect and skip.",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "Medium",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -24,11 +24,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-30T02:34:26.5540492Z",
-  "updatedAtUtc": "2026-06-30T02:34:26.5540492Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-06-30T03:01:28.6460909Z",
+  "completedAtUtc": "2026-06-30T03:01:28.6460909Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0266-add-pre-dig-hazard-check-to-mine-action-liquid-gravity-blocks.json"
 }

@@ -4,7 +4,7 @@
   "title": "Fix bot.bestHarvestTool path and return type in mine action",
   "description": "**Source:** External audit (Bug 2) | **Council:** P0\n\n**Problem:** \u0060index.js:837\u0060 calls \u0060bot.bestHarvestTool(fresh)\u0060 but \u0060bestHarvestTool\u0060 is on \u0060bot.pathfinder\u0060, not \u0060bot\u0060. Even if that were fixed, the code then accesses \u0060harvestTool.item\u0060 but \u0060bot.pathfinder.bestHarvestTool(block)\u0060 returns the \u0060Item\u0060 directly (not \u0060{item, time}\u0060). Result: mine always digs bare-handed. For blocks requiring a tool to drop items (stone, ores), C# inventory model thinks items were collected but MC inventory gets nothing \u2014 state divergence.\n\n**Fix:** \n\u0060\u0060\u0060js\n// Before (line 837):\nconst harvestTool = bot.bestHarvestTool(fresh);\nif (harvestTool) { await bot.equip(harvestTool.item, \u0027hand\u0027); }\n\n// After:\nconst harvestTool = bot.pathfinder.bestHarvestTool(fresh);\nif (harvestTool) { await bot.equip(harvestTool, \u0027hand\u0027); }\n\u0060\u0060\u0060\n\nThis matches the correct pattern already used at line 1028 in the place branch.\n\n**Evidence:** Production logs show 35\u002B occurrences of \u0060\u0022bestHarvestTool is not a function\u0022\u0060. The correct pattern exists at index.js:1028 in the place action.\n\n**Files:** \u0060MineflayerAdapter/index.js:837\u0060\n\n**Validation:** Verify production log no longer shows \u0060bestHarvestTool is not a function\u0060. Run \u0060dotnet test\u0060 (746\u002B tests must pass).",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "Critical",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,11 +23,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-30T02:34:26.3085817Z",
-  "updatedAtUtc": "2026-06-30T02:34:26.3085817Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-06-30T02:53:02.8786094Z",
+  "completedAtUtc": "2026-06-30T02:53:02.8786094Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0260-fix-bot-bestharvesttool-path-and-return-type-in-mine-action.json"
 }

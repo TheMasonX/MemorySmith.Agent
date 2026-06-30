@@ -56,6 +56,11 @@ const WS_TOKEN = process.env.WS_TOKEN ?? null;
 // Imported as `C` at the top of this file — reference as C.CONSTANT_NAME.
 // See config.js for full documentation of each constant.
 
+// ── Sprint 56 (TSK-0263): Reconnect constants ──────────────────────────────────
+const RECONNECT_BASE_DELAY_MS = 2000;   // initial delay before first reconnect
+const RECONNECT_MAX_DELAY_MS   = 60000; // max backoff (1 minute)
+const RECONNECT_BACKOFF_FACTOR = 2;     // exponential multiplier
+
 // ── Sprint 19: Structured file logging ────────────────────────────────────────
 // Sprint 52 modularization: logStructured() lives in ./logger.js.
 // See logger.js for the full implementation.
@@ -190,11 +195,24 @@ wss.on('listening', () => console.log(`[ws] listening on port ${WS_PORT}`));
 // (dev/localhost mode). The secret value is never logged.
 
 wss.on('connection', (ws) => {
-  console.log('[ws] C# agent connected');
-  agentSocket = ws;
+  // Sprint 56 (TSK-0264): Don't assign agentSocket until authenticated.
+  // Previously agentSocket = ws was set immediately on TCP connection,
+  // allowing unauthenticated clients to receive broadcast events and
+  // silently replacing the legitimate C# host.
 
   // Track per-connection auth state. No secret configured → pre-authenticated.
   let isAuthenticated = !WS_TOKEN;
+
+  // Dev mode: no token → assign immediately (but reject second connection).
+  if (isAuthenticated) {
+    if (agentSocket?.readyState === 1) {
+      console.warn('[ws] second connection rejected — already connected (dev mode)');
+      ws.close(1008, 'Already connected');
+      return;
+    }
+    agentSocket = ws;
+    console.log('[ws] C# agent connected (dev mode, no auth)');
+  }
 
   ws.on('message', (raw) => {
     let msg;
@@ -208,8 +226,19 @@ wss.on('connection', (ws) => {
         ws.close(1008, 'Unauthorized');
         return;
       }
+      // Sprint 56 (TSK-0264): Reject second connection when already authenticated.
+      if (agentSocket?.readyState === 1) {
+        console.warn('[ws] second connection rejected — already connected');
+        ws.close(1008, 'Already connected');
+        return;
+      }
       isAuthenticated = true;
+      agentSocket = ws;
       console.log('[ws] handshake accepted');
+      if (bot?.entity) {
+        sendBotStatus();
+        emitGameModeEvent(bot, sendEvent, logStructured);
+      }
       return;
     }
 
@@ -237,11 +266,6 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('error', (e) => console.error('[ws] socket error:', e.message));
-
-  if (bot?.entity) {
-    sendBotStatus();
-    emitGameModeEvent(bot, sendEvent, logStructured);
-  }
 });
 
 // ── Mineflayer bot ────────────────────────────────────────────────────────────
@@ -254,8 +278,24 @@ const botOpts = {
 };
 
 console.log(`[mc] connecting to ${MC_HOST}:${MC_PORT} as ${MC_USER}`);
-const bot = mineflayer.createBot(botOpts);
-bot.loadPlugin(pathfinder);
+
+// ── Sprint 56 (TSK-0263): Reconnect-capable bot creation ──────────────────────
+// Wrapped so reconnect (after disconnect/kick) can re-create the bot and
+// re-register all event handlers without restarting the process.
+
+let bot;
+let _reconnectAttempts = 0;
+let _reconnectTimer = null;
+
+function connectBot() {
+  _reconnectAttempts = 0;
+  bot = mineflayer.createBot(botOpts);
+  bot.loadPlugin(pathfinder);
+  registerBotEventHandlers();
+  return bot;
+}
+
+function registerBotEventHandlers() {
 
 function botPos() {
   const p = bot.entity?.position ?? { x: 0, y: 64, z: 0 };
@@ -445,9 +485,100 @@ function scanBlockBelow() {
 }
 
 // Sprint 55 Wave B: enabled after verifying chat works on both 1.16.5 and 1.21.x.
-bot.on('physicsTick', scanNearbyEntities);
-// Sprint 55 Wave C: passive block below detection.
-bot.on('physicsTick', scanBlockBelow);
+  bot.on('physicsTick', scanNearbyEntities);
+  // Sprint 55 Wave C: passive block below detection.
+  bot.on('physicsTick', scanBlockBelow);
+
+  bot.on('chat', (username, message) => {
+    // Sprint 38 P0-D (BUG-D): defensive try/catch — any uncaught error in the
+    // chat handler would crash the adapter process. Errors are logged and the
+    // event is dropped rather than propagating.
+    try {
+      if (username === bot.username) return;
+
+      // Sprint 19: filter system messages before they reach the LLM pipeline
+      if (isSystemMessage(username, message)) {
+        logStructured('debug', 'chat', 'system message filtered', { username, message });
+
+        const gameModeMatch = message.match(/game mode to (.+)$/i);
+        if (gameModeMatch) {
+          const normalizedMode = normalizeGameMode(gameModeMatch[1]);
+          if (normalizedMode) {
+            sendEvent('gameMode', { mode: normalizedMode });
+            logStructured('info', 'chat', 'gamemode detected', { mode: normalizedMode });
+          }
+        }
+
+        // If the bot was teleported, emit a position update so WorldState stays current
+        const teleportMatch = message.match(/^Teleported\s+(\S+)\s+to\s+(\S+)/i);
+        if (teleportMatch && teleportMatch[1].toLowerCase() === bot.username.toLowerCase()) {
+          setTimeout(() => {
+            if (bot.entity) {
+              sendEvent('move', botPos());
+              logStructured('info', 'chat', 'bot teleport detected — position update sent', botPos());
+            }
+          }, 100);
+        }
+        return;
+      }
+
+      const onlinePlayers = Object.keys(bot.players).filter(p => p !== bot.username).length;
+      const playerEntity  = bot.players[username]?.entity;
+      const playerPos     = playerEntity?.position ?? null;
+      sendEvent('chat', {
+        username,
+        message,
+        onlinePlayers,
+        playerX: playerPos ? Math.round(playerPos.x) : null,
+        playerY: playerPos ? Math.round(playerPos.y) : null,
+        playerZ: playerPos ? Math.round(playerPos.z) : null,
+      });
+    } catch (err) {
+      console.error('[chat] handler error:', err.message);
+      logStructured('error', 'chat', 'handler threw', { username, message, error: err.message });
+    }
+  });
+
+  // Sprint 56 (TSK-0263): Reconnect on disconnect with exponential backoff.
+  // bot.on('end') fires when the MC server connection drops for any reason
+  // (kicked, server restart, network hiccup). Without this, the process is
+  // permanently stuck pointing at a dead bot object.
+  bot.on('end', (reason) => {
+    console.warn(`[mc] disconnected: ${reason}`);
+    logStructured('warn', 'reconnect', 'bot disconnected, will reconnect', { reason });
+    sendEvent('disconnected', { reason, timestamp: new Date().toISOString() });
+
+    if (_reconnectTimer) clearTimeout(_reconnectTimer);
+
+    const delay = Math.min(
+      RECONNECT_BASE_DELAY_MS * Math.pow(RECONNECT_BACKOFF_FACTOR, _reconnectAttempts),
+      RECONNECT_MAX_DELAY_MS
+    );
+    _reconnectAttempts++;
+
+    console.log(`[mc] reconnecting in ${(delay / 1000).toFixed(1)}s (attempt ${_reconnectAttempts})...`);
+    logStructured('info', 'reconnect', 'scheduling reconnect', {
+      attempt: _reconnectAttempts,
+      delayMs: delay,
+    });
+
+    _reconnectTimer = setTimeout(() => {
+      try {
+        connectBot();
+        console.log('[mc] reconnected successfully');
+        logStructured('info', 'reconnect', 'reconnected', { attempt: _reconnectAttempts });
+        sendEvent('reconnected', { attempt: _reconnectAttempts, timestamp: new Date().toISOString() });
+      } catch (err) {
+        console.error(`[mc] reconnect failed: ${err.message}`);
+        logStructured('error', 'reconnect', 'reconnect failed', {
+          attempt: _reconnectAttempts,
+          error: err.message,
+        });
+        // bot.on('end') will fire again on the failed bot, triggering another attempt
+      }
+    }, delay);
+  });
+}
 
 // ── Sprint 19: System message filtering ───────────────────────────────────────
 // Server-generated messages (teleport confirmations, join/leave, time set, etc.)
@@ -481,55 +612,8 @@ function isSystemMessage(username, message) {
   return SYSTEM_MESSAGE_PATTERNS.some(re => re.test(message));
 }
 
-bot.on('chat', (username, message) => {
-  // Sprint 38 P0-D (BUG-D): defensive try/catch — any uncaught error in the
-  // chat handler would crash the adapter process. Errors are logged and the
-  // event is dropped rather than propagating.
-  try {
-    if (username === bot.username) return;
-
-    // Sprint 19: filter system messages before they reach the LLM pipeline
-    if (isSystemMessage(username, message)) {
-      logStructured('debug', 'chat', 'system message filtered', { username, message });
-
-      const gameModeMatch = message.match(/game mode to (.+)$/i);
-      if (gameModeMatch) {
-        const normalizedMode = normalizeGameMode(gameModeMatch[1]);
-        if (normalizedMode) {
-          sendEvent('gameMode', { mode: normalizedMode });
-          logStructured('info', 'chat', 'gamemode detected', { mode: normalizedMode });
-        }
-      }
-
-      // If the bot was teleported, emit a position update so WorldState stays current
-      const teleportMatch = message.match(/^Teleported\s+(\S+)\s+to\s+(\S+)/i);
-      if (teleportMatch && teleportMatch[1].toLowerCase() === bot.username.toLowerCase()) {
-        setTimeout(() => {
-          if (bot.entity) {
-            sendEvent('move', botPos());
-            logStructured('info', 'chat', 'bot teleport detected — position update sent', botPos());
-          }
-        }, 100);
-      }
-      return;
-    }
-
-    const onlinePlayers = Object.keys(bot.players).filter(p => p !== bot.username).length;
-    const playerEntity  = bot.players[username]?.entity;
-    const playerPos     = playerEntity?.position ?? null;
-    sendEvent('chat', {
-      username,
-      message,
-      onlinePlayers,
-      playerX: playerPos ? Math.round(playerPos.x) : null,
-      playerY: playerPos ? Math.round(playerPos.y) : null,
-      playerZ: playerPos ? Math.round(playerPos.z) : null,
-    });
-  } catch (err) {
-    console.error('[chat] handler error:', err.message);
-    logStructured('error', 'chat', 'handler threw', { username, message, error: err.message });
-  }
-});
+// ── Initial bot connection ────────────────────────────────────────────────────
+connectBot();
 
 // ── Action dispatcher ─────────────────────────────────────────────────────────
 
@@ -831,16 +915,16 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         }
 
         // Sprint 41: equip the best available tool before digging.
-        // bot.bestHarvestTool(block) returns { item, time } or null if no tool helps.
+        // bot.pathfinder.bestHarvestTool(block) returns the Item directly or null if no tool helps.
         // If equip fails (e.g. tool is not in hotbar), dig bare-handed.
         try {
-          const harvestTool = bot.bestHarvestTool(fresh);
+          const harvestTool = bot.pathfinder.bestHarvestTool(fresh);
           if (harvestTool) {
             try {
-              await bot.equip(harvestTool.item, 'hand');
+              await bot.equip(harvestTool, 'hand');
             } catch (equipErr) {
               logStructured('debug', 'mine', 'equip failed, digging bare-handed', {
-                tool: harvestTool.item?.name ?? 'unknown',
+                tool: harvestTool.name ?? 'unknown',
                 error: equipErr.message,
               });
             }
@@ -852,6 +936,43 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
         }
 
         try {
+          // Sprint 56 (TSK-0266): Pre-dig hazard check — look for liquid or
+          // gravity blocks above the target that could collapse when dug.
+          const blockAbove = bot.blockAt(toVec3(fresh.x, fresh.y + 1, fresh.z));
+          if (blockAbove && blockAbove.type !== 0) {
+            const GRAVITY_BLOCK_NAMES = new Set([
+              'sand', 'red_sand', 'gravel', 'white_concrete_powder',
+              'orange_concrete_powder', 'magenta_concrete_powder',
+              'light_blue_concrete_powder', 'yellow_concrete_powder',
+              'lime_concrete_powder', 'pink_concrete_powder',
+              'gray_concrete_powder', 'light_gray_concrete_powder',
+              'cyan_concrete_powder', 'purple_concrete_powder',
+              'blue_concrete_powder', 'brown_concrete_powder',
+              'green_concrete_powder', 'red_concrete_powder',
+              'black_concrete_powder', 'anvil', 'chipped_anvil',
+              'damaged_anvil', 'dragon_egg', 'scaffolding',
+            ]);
+            const isGravity = GRAVITY_BLOCK_NAMES.has(blockAbove.name);
+            const isLiquid = C.LIQUID_BLOCK_NAMES.has(blockAbove.name);
+            if (isGravity || isLiquid) {
+              logStructured('warn', 'mine', 'hazard detected above target — skipping dig', {
+                target: fresh.name,
+                aboveBlock: blockAbove.name,
+                hazardType: isLiquid ? 'liquid' : 'gravity',
+                x: fresh.x, y: fresh.y, z: fresh.z,
+              });
+              sendEvent('blockMineSkipped', {
+                block: fresh.name,
+                x: fresh.x, y: fresh.y, z: fresh.z,
+                reason: isLiquid ? 'liquidAbove' : 'gravityAbove',
+                aboveBlock: blockAbove.name,
+                correlationId,
+              });
+              digFailures.set(digKey, 999); // permanently skip this block
+              continue; // skip to next block
+            }
+          }
+
           await bot.dig(fresh);
           mined++;
           pathFailures = 0;
@@ -1077,11 +1198,32 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           }
         }
         if (!steppedAside) {
-          // All preferred offsets have no walkable ground — fall back to x+2
-          logStructured('warn', 'place', 'stepping aside — no walkable ground, using fallback', {
-            x, y, z, material: shortMat,
-          });
-          await bot.pathfinder.goto(new pfGoals.GoalNear(x + 2, y, z, 1));
+          // Sprint 56 (TSK-0265): All preferred offsets have no walkable ground.
+          // Before blindly walking to x+2 (could be a cliff/hole/lava), verify
+          // the fallback position has solid ground.
+          const fallback1 = bot.blockAt(toVec3(x + 2, y - 1, z));
+          const hasGround1 = fallback1 && fallback1.type !== 0 && fallback1.name !== 'air';
+          const fallback2 = bot.blockAt(toVec3(x - 2, y - 1, z));
+          const hasGround2 = fallback2 && fallback2.type !== 0 && fallback2.name !== 'air';
+
+          if (hasGround1) {
+            logStructured('warn', 'place', 'stepping aside — no walkable ground, using fallback x+2', {
+              x, y, z, material: shortMat, groundAtFallback: fallback1.name,
+            });
+            await bot.pathfinder.goto(new pfGoals.GoalNear(x + 2, y, z, 1));
+          } else if (hasGround2) {
+            logStructured('warn', 'place', 'stepping aside — no walkable ground, using fallback x-2', {
+              x, y, z, material: shortMat, groundAtFallback: fallback2.name,
+            });
+            await bot.pathfinder.goto(new pfGoals.GoalNear(x - 2, y, z, 1));
+          } else {
+            // Sprint 56 (TSK-0265): No ground in any direction — skip to avoid walking off cliff.
+            logStructured('error', 'place', 'stepping aside — no walkable ground in any direction, skipping placement', {
+              x, y, z, material: shortMat,
+            });
+            sendEvent('blockPlaceSkipped', { x, y, z, block: shortMat, correlationId, reason: 'noGround' });
+            break;
+          }
         }
         // Fall through to normal placement below — GoalNear(x,y,z,2) will
         // position us correctly from the side.
@@ -1628,7 +1770,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       const itemEntry = bot.registry.itemsByName[itemName];
       if (!itemEntry) throw new Error(`Unknown item: ${itemName}`);
 
-      const recipes = bot.recipesFor(itemEntry.id, null, null, null);
+      const recipes = bot.recipesFor(itemEntry.id, null, null, true);
       if (!recipes || recipes.length === 0)
         throw new Error(`No recipe found for: ${itemName}`);
 
