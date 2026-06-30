@@ -1212,45 +1212,18 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       await bot.pathfinder.goto(new pfGoals.GoalNear(x, y, z, 2));
 
       let item = bot.inventory.items().find(i => i.name === shortMat || i.name === material);
-      // Sprint 52, Sprint 56 (TSK-0272): creative inventory via reusable provider.
-      // On Mineflayer 4.37.1 + MC 1.16.5 (LAN), bot.inventory.items() does NOT
-      // reliably show items placed via bot.creative.setInventorySlot(). The provider
-      // now returns {ok, slot} — equip from bot.inventory.slots[slot] directly.
-      if (!item && bot.game?.gameMode === 1) {
+      // Sprint 52: creative inventory provisioned via reusable provider module.
+      // Sprint 56 (TSK-0270): use normalizeGameMode for robust comparison —
+      // bot.game.gameMode may be number (1) or string ("creative") depending on
+      // Mineflayer version and MC server implementation.
+      if (!item && normalizeGameMode(bot.game?.gameMode) === 'creative') {
+        console.error(`[place] creative check: item=${shortMat} gameMode=${bot.game?.gameMode} inventorySize=${bot.inventory.items().length}`);
         const { ensureCreativeItem } = require('./creativeProvider');
-        const res = await ensureCreativeItem(bot, shortMat || material, 1);
-        if (res.ok) {
-          // Try to find the item via items() first (best case)
+        const ok = await ensureCreativeItem(bot, shortMat || material, 1);
+        console.error(`[place] creative result: item=${shortMat} ok=${ok}`);
+        if (ok) {
           item = bot.inventory.items().find(i => i.name === shortMat || i.name === material);
-          // Sprint 56 (TSK-0272): if items() didn't find it, try the slot directly
-          if (!item && res.slot != null) {
-            const slotItem = bot.inventory.slots[res.slot];
-            if (slotItem && (slotItem.name === shortMat || slotItem.name === material)) {
-              item = slotItem;
-              logStructured('info', 'place', 'creative equip via slot-direct', {
-                material: shortMat, slot: res.slot,
-              });
-            }
-          }
-          // Sprint 56 (TSK-0272): if neither items() nor slots[] found it,
-          // try direct creative equip — place item in hotbar slot 36 and equip
-          if (!item && res.ok) {
-            try {
-              const itemDef = bot.registry.itemsByName[shortMat] || bot.registry.itemsByName[material];
-              if (itemDef) {
-                await bot.creative.setInventorySlot(36, itemDef);
-                await bot.equip(36, 'hand');
-                logStructured('info', 'place', 'creative direct equip to slot 36', {
-                  material: shortMat,
-                });
-                item = { name: shortMat }; // synthetic item — trust equip succeeded
-              }
-            } catch (e) {
-              logStructured('error', 'place', 'creative direct equip failed', {
-                material: shortMat, error: e.message,
-              });
-            }
-          }
+          console.error(`[place] creative recheck: item=${shortMat} found=${!!item}`);
         }
       }
       if (!item) {
