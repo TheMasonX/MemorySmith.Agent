@@ -19,16 +19,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-c77a6765a09a44dc9907f860450c8835",
+      "author": "anonymous",
+      "body": "**Analysis (Sprint 56 Wave A):**\n\n\u0060GetStatusTool\u0060 sends action \u0060ActionProtocol.Status\u0060 which is \u0060\u0022status\u0022\u0060. The adapter\u0027s dispatch switch has \u0060case \u0027status\u0027:\u0060 which calls \u0060sendBotStatus()\u0060 \u2192 sends event \u0060\u0022status\u0022\u0060 \u2192 C# parses as \u0060StatusEvent\u0060 \u2192 handler calls \u0060CompleteCorrelatedActionByTool(\u0022GetStatus\u0022)\u0060 AND \u0060CompleteCorrelatedActionByTool(\u0022Status\u0022)\u0060.\n\nThe scope bug (\u0060botPos\u0060/\u0060sendBotStatus\u0060 inside \u0060registerBotEventHandlers()\u0060) was already fixed in commit \u0060aa4af10\u0060.\n\nTSK-0270\u0027s \u0060ActionCompletedEvent\u0060 fix also helps here \u2014 the \u0060actionCompleted\u0060 event (sent after all dispatch cases via the finally-adjacent try block) now acts as a safety net. If the \u0060status\u0060 domain event is somehow dropped, \u0060actionCompleted\u0060 will complete the correlation.\n\nThis issue likely shares root cause with TSK-0270 (stale \u0060_stopRequested\u0060 flag, or actionCompleted not completing correlations). Awaiting live validation after TSK-0270 fix.",
+      "createdAtUtc": "2026-06-30T03:40:37.2012858Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-30T03:25:41.604611Z",
-  "updatedAtUtc": "2026-06-30T03:25:41.604611Z",
+  "updatedAtUtc": "2026-06-30T03:40:37.2012858Z",
   "completedAtUtc": null,
-  "revision": 1,
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0273-p2-getstatus-action-times-out-adapter-not-responding-to-status-requests.json"
 }

@@ -19,16 +19,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-c6a518e917e74308ac9281293b5c9099",
+      "author": "anonymous",
+      "body": "**Analysis (Sprint 56 Wave A):**\n\nConcurrent place dispatch is already limited: \u0060MaxConcurrentForTool(\u0022place\u0022)\u0060 returns \u0060_maxConcurrentPlaceBlock\u0060 (default 8, configurable via \u0060Agent:Build:MaxConcurrentPlaceBlock\u0060). The dispatch loop skips when \u0060PendingCountOfTool \u003E= MaxConcurrentForTool\u0060. So at most 8 place actions are in-flight simultaneously.\n\nThe 218 actions are returned by \u0060HtnTaskLibrary.DecomposeBuild\u0060 as a single plan in creative mode. This is by design \u2014 creative mode skips pre-gather and emits all block placements at once. The dispatcher processes them in batches of \u22648.\n\nIf there\u0027s a performance issue with 218 sequential place actions taking too long, consider chunking the plan (e.g., 20 blocks per decompose cycle with a GetStatus in between). But the current behavior should be correct \u2014 each block is placed, confirmed via \u0060BlockPlacedEvent\u0060, then the next batch dispatches.\n\nAwaiting live validation to confirm if this is a functional bug or just a large plan size concern.",
+      "createdAtUtc": "2026-06-30T03:40:37.1462141Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-30T03:25:41.5134704Z",
-  "updatedAtUtc": "2026-06-30T03:25:41.5134704Z",
+  "updatedAtUtc": "2026-06-30T03:40:37.1462141Z",
   "completedAtUtc": null,
-  "revision": 1,
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0271-p1-build-dispatches-218-individual-place-actions-simultaneously-instead-of-sequencing.json"
 }

@@ -830,6 +830,19 @@ public sealed class AgentBackgroundService(
                         "[telemetry] action completed: {Action} correlationId={CorrelationId}",
                         ace.Action,
                         ace.CorrelationId?[..Math.Min(8, ace.CorrelationId?.Length ?? 0)]);
+                    // Sprint 56 (TSK-0270): complete the correlated action.
+                    // Most actions also send a domain-specific event (blockPlaced,
+                    // moveComplete, etc.) that already completes the correlation.
+                    // This is a safety net for:
+                    //   1. Actions whose domain event was lost/delayed (prevents 30s timeout).
+                    //   2. Actions that ONLY send actionCompleted (e.g., chat).
+                    // CompleteCorrelatedActionByTool/ById are idempotent — they only
+                    // transition Dispatched→Completed, so double-completion is safe.
+                    if (!string.IsNullOrWhiteSpace(ace.CorrelationId)
+                        && Guid.TryParse(ace.CorrelationId, out var acCorrId))
+                        CompleteCorrelatedActionById(acCorrId);
+                    else
+                        CompleteCorrelatedActionByTool(ace.Action);
                     break;
 
                 // Sprint 55 Wave B: environment query results.
