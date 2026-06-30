@@ -15,7 +15,7 @@ Agent.Vision/            ISpatialAnalyzer, IVisionModel (Phase 4+)
 Agent.Construction/      IArchitect, IBlueprintRepository
 Agent.World.Minecraft/   Mineflayer/Node.js adapter, WebSocket bridge
 WebUI.Blazor/            Dashboard host (REST API + future Blazor UI), DI root
-MemorySmith.Agent.Tests/ NUnit test suite (200+ tests)
+MemorySmith.Agent.Tests/ NUnit test suite (746+ tests)
 MineflayerAdapter/       Node.js Mineflayer bot + logStructured file logger
 Data/Pages/              Wiki pages served by MemorySmith
 ```
@@ -72,7 +72,7 @@ Examples:
 
 | Version | Passed | Skipped | Notes |
 |---------|--------|---------|-------|
-| v0.23.0 | 200+ | 10 | CUDA/ONNX skips expected |
+| v0.55.0 | 746+ | 10 | CUDA/ONNX skips expected |
 
 The 10 skipped tests are CUDA/ONNX-model-dependent. Any other skip is a regression.
 

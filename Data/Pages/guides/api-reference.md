@@ -2,7 +2,7 @@
 
 All REST endpoints exposed by `WebUI.Blazor` (default: `http://localhost:5000`).
 
-**Current version: v0.23.0**
+**Current version: v0.55.0**
 
 ---
 
@@ -25,7 +25,7 @@ Returns current agent state.
   "health": 20,
   "food": 20,
   "position": { "x": 10, "y": 64, "z": -5 },
-  "version": "0.23.0"
+  "version": "0.55.0"
 }
 ```
 

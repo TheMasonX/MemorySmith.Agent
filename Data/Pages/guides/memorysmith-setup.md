@@ -56,7 +56,7 @@ Should return matching pages. If you get a 401, configure the `ApiKey`.
 
 ---
 
-## Part 2: World KB Setup (Sprint 22+)
+## Part 2: World KB Setup
 
 The World KB stores the agent's observations about the Minecraft world — block locations, exploration events, world facts. It's separate from the Agent KB so world facts don't pollute codebase knowledge.
 

@@ -1,0 +1,40 @@
+﻿{
+  "id": "tsk-0288-review-and-update-stale-documentation-versions-and-sprint-references",
+  "key": "TSK-0288",
+  "title": "Review and update stale documentation versions and sprint references",
+  "description": "Audit all documentation and wiki pages in both MemorySmith.Agent and MemorySmith repos for stale version numbers, sprint references, test counts, and roadmap/plan status. Update to reflect current state (v0.51.1, Sprint 51 complete). Covers home.md, getting-started.md, api-reference.md, development.md, chat-system.md, memory.md, planner.md, tool-registry.md, running-the-agent.md, and other docs with outdated version/sprint/test-count claims.",
+  "type": "Task",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:docs",
+    "type:chore",
+    "sprint-52"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-3b8b5fe71cf74b2696c8d4b959f46792",
+      "author": "anonymous",
+      "body": "## Completed Updates\n\n### Critical stale version/sprint/test-count fixes:\n1. **README.md** \u2014 Updated v0.51.0 \u2192 v0.55.0, Sprint 51 \u2192 Sprint 55 Wave B, 742\u002B \u2192 746\u002B tests\n2. **home.md** \u2014 Updated v0.51.1 \u2192 v0.55.0, Sprint 51 complete \u2192 Sprint 55 complete, 742\u002B \u2192 746\u002B tests, \u0022Active: Sprint 52\u0022 \u2192 \u0022Active: Sprint 56\u0022\n3. **getting-started.md** \u2014 Updated v0.51.1 \u2192 v0.55.0, 742\u002B \u2192 746\u002B tests\n4. **api-reference.md** \u2014 Updated v0.51.1 \u2192 v0.55.0, JSON example version 0.51.1 \u2192 0.55.0\n5. **development.md** \u2014 Updated v0.51.1 \u2192 v0.55.0, 742\u002B \u2192 746\u002B tests\n\n### Roadmap updates:\n6. **roadmap.md** \u2014 Added Sprint 56 (in progress), Sprints 52-55 sprint history entries, updated current version to v0.55.0 and latest to Sprint 55\n\n### Sprint reference cleanup:\n7. **chat-system.md** \u2014 Sprint 41 \u2192 Sprint 51\u002B status, limitation section updated\n8. **planner.md** \u2014 Implementation status table: replaced specific sprint numbers with \u0022Complete\u0022\n9. **tool-registry.md** \u2014 Updated Sprint 5 note to general historical note\n10. **features-reference.md** \u2014 Removed \u0022(Sprint 23)\u0022 from WorldKbUrl config entry\n11. **memorysmith-setup.md** \u2014 Removed \u0022(Sprint 22\u002B)\u0022 from World KB Setup section\n12. **running-the-agent.md** \u2014 Removed \u0022Sprint 23:\u0022 comment from WorldKbUrl config example\n13. **memory.md** \u2014 Removed \u0022Phase 7-B\u0022 pipeline reference (generalized to \u0022multi-stage\u0022)\n14. **home.md** \u2014 \u0022Delivered across Sprints 1\u201341\u0022 \u2192 \u00221\u201355\u0022\n\n### Discovered port inconsistency (noted, not changed):\n- Actual \u0060appsettings.json\u0060 uses Agent KB port 6868, but most docs reference port 5001. These are example ports in documentation and may differ per deployment \u2014 leaving as-is since there\u0027s no single \u0022correct\u0022 port.",
+      "createdAtUtc": "2026-06-30T18:20:57.961382Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T18:18:18.0086281Z",
+  "updatedAtUtc": "2026-06-30T18:21:46.119415Z",
+  "completedAtUtc": "2026-06-30T18:21:46.119415Z",
+  "revision": 3,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0288-review-and-update-stale-documentation-versions-and-sprint-references.json"
+}

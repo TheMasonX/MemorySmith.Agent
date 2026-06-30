@@ -1,6 +1,6 @@
 # Chat Interpretation System
 
-**Status:** Active (Sprint 41)  
+**Status:** Active (Sprint 51+)  
 **ADR compliance:** D-003 (deterministic-first; LLM is opt-in), D-011 (parsers never create goals)
 
 ---
@@ -135,7 +135,7 @@ Returns JSON IntentDraft. If confidence < `LlmConfidenceThreshold` (default 0.6)
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `Enabled` | `false` | Enable LLM interpretation |
-| `Model` | `llama3.2` | Model to use |
+| `Model` | `llama3.2` | Model to use (7B+ recommended) |
 | `LlmTimeoutSeconds` | `10` | Timeout per LLM call (Sprint 11) |
 | `LlmMaxResponseTokens` | `300` | Max response tokens via `num_predict` (Sprint 20) |
 | `PlayerCooldownSeconds` | `3` | Per-player rate limit |
@@ -177,7 +177,7 @@ When rate-limited, falls back to pattern matching without delay.
 | Rate limit | `Information` | `Rate limited <username>: 3s cooldown` |
 | LLM timeout | `Warning` | `LLM call timed out after 10s for <username>` |
 
-## Known Limitations (Sprint 40-41)
+## Known Limitations (Sprint 51+)
 
 1. **llama3.2:3b is too small** — misclassifies disagreement as "ignore". Upgrade to 7B+ recommended.
 2. **System message filter leaks** — `/clear` responses with formatting variations reach LLM.

@@ -109,7 +109,7 @@ Recovery: 60s auto-recovery to ACTIVE state.
 
 `GoalFactory` creates `IGoal` instances from goal names and parameters via a `Dictionary<string, Func<...>>` registry. Returns `null` if goalName is not registered (logs warning with available names).
 
-Item classification via `LocalKnowledgeResolver.ResolveAsync` (Phase 7-B pipeline):
+Item classification via `LocalKnowledgeResolver.ResolveAsync` (multi-stage pipeline):
 
 1. **Normalize query** — lowercase, trim, strip pluralization
 2. **IItemRegistry.GetAsync** — exact match against item registry pages (confidence 0.95)
@@ -127,14 +127,14 @@ See [memory.md](memory.md) for the full resolver pipeline details.
 | Component | Status |
 |---|---|
 | `IPlanner` interface | ✅ Defined |
-| `HtnPlanner` | ✅ Sprint 3 |
-| `DecomposerRegistry` | ✅ Sprint 6 |
-| `BuildGoalDecomposer` | ✅ Sprint 6 |
-| `GatherGoalDecomposer` | ✅ Sprint 6 |
-| `SurviveNightGoalDecomposer` | ✅ Sprint 6 |
-| `PlannerRouter` | ✅ Sprint 6 |
-| `ReplanGovernor` (ACTIVE/STALLED) | ✅ Sprint 19 |
-| Progress-hash governor | ✅ Sprint 20 |
-| Governor pre-plan check | ✅ Sprint 21 |
-| `IItemSpecGoal` count fix | ✅ Sprint 22 |
-| LLM integration (`IChatClient`/`ILlmProvider`) | ✅ Sprint 11 |
+| `HtnPlanner` | ✅ Complete |
+| `DecomposerRegistry` | ✅ Complete |
+| `BuildGoalDecomposer` | ✅ Complete |
+| `GatherGoalDecomposer` | ✅ Complete |
+| `SurviveNightGoalDecomposer` | ✅ Complete |
+| `PlannerRouter` | ✅ Complete |
+| `ReplanGovernor` (ACTIVE/STALLED) | ✅ Complete |
+| Progress-hash governor | ✅ Complete |
+| Governor pre-plan check | ✅ Complete |
+| `IItemSpecGoal` count fix | ✅ Complete |
+| LLM integration (`IChatClient`/`ILlmProvider`) | ✅ Complete |

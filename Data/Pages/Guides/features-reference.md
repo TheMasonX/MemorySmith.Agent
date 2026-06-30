@@ -102,7 +102,7 @@ A cross-sprint catalogue of agent features, their configuration knobs, and the a
 | `Agent:Llm:PlayerCooldownSeconds`          | `2`                    | Per-player rate limit cooldown            |
 | `Agent:Llm:GlobalPerMinuteMax`             | `30`                   | Hard cap on LLM calls/minute              |
 | `Agent:Memory:BaseUrl`                     | `http://localhost:5000`| Agent KB                                  |
-| `Agent:Memory:WorldKbUrl`                  | `null` (Sprint 23)     | World KB; null = use agent KB + warning   |
+| `Agent:Memory:WorldKbUrl`                  | `null`                 | World KB; null = use agent KB + warning   |
 | `Agent:Memory:WorldTimeoutSeconds`         | `30`                   | World KB request timeout                  |
 | `Agent:Runtime:ReplanIntervalSeconds`      | `2`                    | How often planner reconsiders             |
 | `Agent:Runtime:ActionTimeoutSeconds`       | `30`                   | Single-action wall clock cap              |

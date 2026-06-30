@@ -2,7 +2,7 @@
 
 MemorySmith.Agent is a **modular autonomous agent framework** that treats Minecraft (and other games) as a *world adapter* while using the MemorySmith wiki as its long-term memory. The design follows Domain-Driven, deep-module principles — each bounded context exposes a small, stable interface and hides its complexity.
 
-**Current version: v0.23.0** | **Sprint 41 in progress** | **63+ tests**
+**Current version: v0.55.0** | **Sprint 55 complete** | **746+ tests**
 
 ## Quick Links
 
@@ -84,7 +84,7 @@ Comprehensive wiki pages for every major subsystem. New agents should start here
 
 ## Project Wiki Memory Store
 
-The project maintains **28 Core memories** covering all critical codebase areas. These are structured JSON files that serve as long-term agent memory:
+The project maintains **28+ Core memories** covering all critical codebase areas. These are structured JSON files that serve as long-term agent memory:
 
 **Agent Runtime & Lifecycle (4):** [Runtime Lifecycle](memories/Core/agent-runtime-lifecycle.json) · [Goal Types](memories/Core/agent-goal-types-catalog.json) · [Action Correlation](memories/Core/agent-action-correlation.json) · [Recovery](memories/Core/agent-recovery-system.json)
 
@@ -107,9 +107,9 @@ API Status: http://localhost:5000/api/agent/status
 
 ## Current Status
 
-**Sprint 41 in progress** — Phase 5 (intent reliability, adaptive execution). 63+ tests.
+**Sprint 55 complete** — v0.55.0 (Environment Queries + Entity Observation + Observe→Evaluate Loop). 746+ tests.
 
-**Delivered across Sprints 1–41:**
+**Delivered across Sprints 1–55:**
 - ✅ Full HTN planner with goal decomposers (Build, Gather, CraftItem, SurviveNight, Navigate)
 - ✅ MemorySmith memory integration (Agent KB + World KB dual gateway)
 - ✅ In-game chat interpretation (deterministic fast-path + LLM fallback)
@@ -128,7 +128,7 @@ API Status: http://localhost:5000/api/agent/status
 - ✅ 28 core memory files covering all subsystems
 - ✅ Feature wiki pages for every major subsystem
 
-Active: Sprint 41 — intent parsing reliability, goto() timeout safety, path_update wiring, stale-inventory guard at goal-creation.
+Active: Sprint 56 — Council-Driven Fixes (Wave B in progress).
 
 ## Solution Structure
 
@@ -143,7 +143,7 @@ MemorySmith.Agent.slnx
 ├── Agent.Construction      Blueprints, IArchitect
 ├── Agent.World.Minecraft   Mineflayer/Node.js adapter, WebSocket bridge
 ├── WebUI.Blazor            Dashboard + REST API host, DI root
-└── MemorySmith.Agent.Tests NUnit test suite (200+ tests)
+└── MemorySmith.Agent.Tests NUnit test suite (746+ tests)
 MineflayerAdapter/          Node.js Mineflayer bot + logStructured file logger
 Data/Pages/                 This wiki — served by MemorySmith as long-term memory
 ```

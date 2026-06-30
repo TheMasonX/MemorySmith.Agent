@@ -2,7 +2,7 @@
 
 All tools available to the agent are registered in `ToolDispatcher` via `RegisterTool`. Each tool exposes a JSON Schema (`InputSchema`) that is validated before execution. The LLM calls tools as structured JSON; `ToolDispatcher` validates and dispatches — no arbitrary code execution.
 
-> **Sprint 5 note:** `ToolEngine` and `ToolRegistry` were deleted. `ToolDispatcher` is the single consolidated dispatcher for both LLM-driven and imperative tool calls.
+> **Note:** `ToolEngine` and `ToolRegistry` were deleted in Sprint 5. `ToolDispatcher` is the single consolidated dispatcher for both LLM-driven and imperative tool calls.
 
 ## Registered Tools
 

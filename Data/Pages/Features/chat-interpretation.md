@@ -11,7 +11,7 @@ The chat interpretation system converts in-game Minecraft chat messages into str
 ```
 Player Chat → IChatInterpreter
                   ├── ChatInterpreter (fast-path, deterministic pattern matching)
-                  └── LlmChatInterpreter (LLM-powered, Ollama/llama3.2:3b)
+                  └── LlmChatInterpreter (LLM-powered, Ollama, 7B+ model recommended)
                       ↓
               IntentDraft (structured intent: gather/build/craft/navigate/cancel/status)
                       ↓

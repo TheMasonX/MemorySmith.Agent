@@ -46,7 +46,7 @@ Edit `WebUI.Blazor/appsettings.json` (or use `appsettings.Development.json` for 
       "BaseUrl": "http://localhost:5000",
       "ApiKey": null,
       "TimeoutSeconds": 30,
-      // Sprint 23: WorldKbUrl now defaults to null. Set explicitly to enable
+      // WorldKbUrl defaults to null. Set explicitly to enable
       // world KB separation. When null, world observations land in the agent KB
       // (BaseUrl) and a startup warning is logged.
       "WorldKbUrl": "http://localhost:6869",

@@ -2,7 +2,7 @@
 
 This guide walks you through running MemorySmith.Agent from a fresh clone.
 
-**Current version: v0.23.0** | 200+ tests
+**Current version: v0.55.0** | 746+ tests
 
 ## Prerequisites
 
@@ -134,7 +134,7 @@ Log files are written to `logs/agent-.log` (rolling daily). Serilog structured J
 dotnet test MemorySmith.Agent.slnx --configuration Release
 ```
 
-Expected: **200+ tests passed, 0 failed** (10 CUDA/ONNX skips are expected in non-GPU environments).
+Expected: **746+ tests passed, 0 failed** (10 CUDA/ONNX skips are expected in non-GPU environments).
 
 ## Next steps
 

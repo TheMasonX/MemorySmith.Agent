@@ -2,7 +2,7 @@
 
 MemorySmith.Agent uses a sprint-based delivery model. Each sprint is council-reviewed by a 6-seat panel before merge.
 
-**Current version: v0.51.1** | **Latest: Sprint 51 — Audit Synthesis + Runtime Bug Fixes**
+**Current version: v0.55.0** | **Latest: Sprint 55 — Environment Queries + Entity Observation + Observe→Evaluate Loop**
 
 ---
 
@@ -96,6 +96,11 @@ Dashboard Wave A (build placement fixes + overview UI), Wave B (BuildOrigin migr
 | **49** | 2026-06-25 | Dashboard Wave 1 + Audit Hardening | Dashboard log sink, publisher, REST endpoints, static HTML UI; ActionQueue lock protection; WebSocket clean shutdown; structured tool outcomes (TSK-0110); emergency stop decoupling (TSK-0119); logger wiring (TSK-0120); version drift repair; TSK-0114/0115 test verification (731+ tests) |
 | **50** | 2026-06-26 | Dashboard Usability — Waves A/B/C/D | **Wave A:** Rehome-to-origin removed, terrain clearance, self-position block skip, overview UI (live log strip, error/warning badges, position trail, current action, auto-scroll) — commit `153fbd6`<br>**Wave B:** BuildOrigin sentinel elimination (TSK-0107), creative dead code removal (TSK-0116), 7-seat council review — commit `3da01c1`<br>**Wave C:** Landing page redirect, header nav, version badge, SignalR status indicator, uptime counter, uncertainty display, enhanced metrics, about page update, docs update — v0.50.1<br>**Wave D:** MoveToTool context wiring (TSK-0004), dead regex field removal (TSK-0118), Serilog SQLite telemetry sink (TSK-0014), doc updates — v0.50.2 |
 | **51** | 2026-06-26 | Audit Synthesis + Runtime Bug Fixes — Waves A/B/B+ | **Wave A (v0.51.0):** 12 canonicalize+classify tasks (bridge registry, doc alignment, regex hardening, deprecation policy, IHttpClientFactory), 5 robustness fixes (Task.WhenAll unwrap, DeathEvent, fault logging, log levels, terminal recovery). NU1903 visible-warning policy. **Wave B (v0.51.1):** Creative build infinite-replan fix, creative inventory fallback in adapter, direct gather recovery for missing materials, Verify-AboutDeps.ps1. **Wave B+:** PlaceBlock observability logging. **Incident:** SQLite CVE — package removed, File sink replaces SQLite, package vetting policy created. |
+| **52** | 2026-06-26 | Situational Awareness: Entity Pipeline + ScenePack (planned) | Entity observation in adapter, EntityObservedEvent, WorldState entity projection, LLM scene context, ScenePackBuilder. |
+| **53** | 2026-06-27 | Reachability, Motion & Environment Exposure (planned) | Pathfinder events wiring, goto() timeout protection, move event throttling, motion/equipment telemetry, durable memory writer, planner context integration. |
+| **54** | 2026-06-28 | Inventory, Chat & Action Lifecycle (planned) | Local world shape, inventory updateSlot, structured message classification, action progress telemetry. |
+| **55** | 2026-06-29 | Build Quality + Modularization (complete) | Environment queries (QueryBlocksTool, QueryEntitiesTool), WorldStateDiff, ILlmEvaluator with diff, Observe→Evaluate loop, PlaceBlock schema issue (P0), build dispatch flooding (P1), creative provisioning (P1), GetStatus timeout (P2). v0.55.0. |
+| **56** | 2026-06-30 | Council-Driven Fixes (in progress) | Wave A: 6 adapter bug fixes from external audit (harvestTool, recipesFor, vec3 fix, reconnect, auth, ground check, pre-dig). Wave B: TaskSequenceGoal.IsComplete verification, /give command injection fix, chat command deny list, config injection fix, hub auth fix, test debt cleanup. |
 
 ---
 
@@ -103,6 +108,7 @@ Dashboard Wave A (build placement fixes + overview UI), Wave B (BuildOrigin migr
 
 | Version | Sprint | Tests | Status |
 |---------|--------|-------|--------|
+| v0.55.0 | 55 | 746 | ✅ green |
 | v0.51.1 | 51 | 742 | ✅ green |
 | v0.51.0 | 51 | 742 | ✅ green |
 | v0.50.2 | 50 | 731+ | ✅ green |
@@ -123,7 +129,15 @@ Dashboard Wave A (build placement fixes + overview UI), Wave B (BuildOrigin migr
 
 ---
 
-## Sprint Roadmap (Planned)
+## Sprint Roadmap (In Progress & Planned)
+
+### Sprint 56 — Council-Driven Fixes + TaskSequenceGoal Verification
+**Status:** 🟡 In Progress (Wave A complete, Wave B in progress)
+
+| Wave | Theme | Tasks |
+|:-----|:------|:------|
+| A | Adapter bug fixes from external audit | TSK-0260 through TSK-0266 (harvestTool, recipesFor, vec3 fix, reconnect, auth, ground check, pre-dig) |
+| B | Council-driven immediate fixes | TSK-0274 (TaskSequenceGoal.IsComplete verification), TSK-0275 (/give command injection), TSK-0277 (chat command deny list), TSK-0278 (config injection), TSK-0279 (hub auth), TSK-0280 (test debt) |
 
 ### Sprint 52 — Situational Awareness: Entity Pipeline + ScenePack
 **Status:** 🟡 Planned (all tasks Backlog) | **Design:** `Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md`
