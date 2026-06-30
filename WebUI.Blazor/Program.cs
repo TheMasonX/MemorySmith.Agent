@@ -208,14 +208,11 @@ if (agentEnabled)
     builder.Services.AddSingleton<LlmContextLogger>();
     builder.Services.AddSingleton<IChatInterpreter>(sp =>
     {
-        // Sprint 36 P1-C: pass registered tool names to the LLM system prompt so the
-        // model knows what tools are available when deciding intent.
-        // Use ToolDispatcher.RegisteredNames (sorted keys, including aliases like "Status")
-        // rather than .All.Select(t=>t.Name) which is nondeterministic and drops aliases.
-        // Resolving IToolCaller first is safe — there are no circular dependencies here.
-        var toolNames = (sp.GetRequiredService<IToolCaller>() as ToolDispatcher)
-                            ?.RegisteredNames
-                        ?? (IReadOnlyList<string>)[];
+        // Sprint 55: pass ITool objects (not just names) so the LLM prompt includes
+        // tool descriptions, parameter names, and required/optional markers.
+        var tools = (sp.GetRequiredService<IToolCaller>() as ToolDispatcher)
+                        ?.All
+                    ?? (IReadOnlyList<ITool>)Array.Empty<ITool>();
         // Sprint 37 P1-B: inject IntentManager so ParseDecision delegates
         // intent→goal mapping to it (PRINCIPLE-1: parsers never create goals).
         return new LlmChatInterpreter(
@@ -225,7 +222,7 @@ if (agentEnabled)
             chatOpts,
             sp.GetRequiredService<ChatHistory>(),
             sp.GetRequiredService<ILogger<LlmChatInterpreter>>(),
-            registeredToolNames: toolNames,
+            registeredTools: tools,
             intentManager: sp.GetRequiredService<IntentManager>(),
             contextLogger: sp.GetRequiredService<LlmContextLogger>());
     });

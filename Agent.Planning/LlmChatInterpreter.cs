@@ -48,9 +48,9 @@ public sealed class LlmChatInterpreter(
     ChatOptions options,
     ChatHistory? history = null,
     ILogger<LlmChatInterpreter>? logger = null,
-    // Sprint 36 P1-C: registered tool names from ToolDispatcher.All, injected at DI time.
-    // Passed to BuildSystemPrompt so the LLM knows what tools are available.
-    IReadOnlyList<string>? registeredToolNames = null,
+    // Sprint 55: changed from IReadOnlyList<string> to IReadOnlyList<ITool> so the
+    // LLM prompt can include tool descriptions, parameter names, and schemas.
+    IReadOnlyList<ITool>? registeredTools = null,
     // Sprint 37 P1-B: intent→goal mapping delegate. Null falls back to local switch in
     // ParseDecision for backward compatibility (tests that don't inject IntentManager).
     IntentManager? intentManager = null,
@@ -120,8 +120,9 @@ public sealed class LlmChatInterpreter(
         var currentGoal = state.Facts.TryGetValue("currentGoal", out var cg) && cg is string s ? s : null;
         var chatHistory = history?.FormatForPrompt();
         var commandsAvailable = options.CommandExecutionEnabled;
+        // Sprint 55: pass ITool objects so the LLM sees descriptions + parameter names
         var systemPrompt = BuildSystemPrompt(botName, botPosition, state, currentGoal,
-            onlinePlayers, registeredToolNames, chatHistory, commandsAvailable);
+            onlinePlayers, registeredTools, chatHistory, commandsAvailable);
         var userMessage = $"{username} says: \"{effective}\"";
         logger?.LogInformation("[llm] calling {Provider} ({Model}) for <{Username}> '{Message}'",
             provider.ProviderName, options.LlmModel, username,
@@ -192,7 +193,7 @@ public sealed class LlmChatInterpreter(
     private static string BuildSystemPrompt(
         string botName, Position botPos, WorldState state,
         string? goal, int onlinePlayers,
-        IReadOnlyList<string>? toolNames = null,
+        IReadOnlyList<ITool>? tools = null,
         string? chatHistory = null,
         bool commandsAvailable = false)
     {
@@ -219,11 +220,8 @@ public sealed class LlmChatInterpreter(
             ? $"\nNearby hostiles: {es}"
             : "";
 
-        // Sprint 54 (TSK-0205/0208/0203): enriched prompt with compound commands,
-        // tool auto-crafting, memory recall, and deterministic parser caveats.
-        var toolList = toolNames is { Count: > 0 }
-            ? $"\nAvailable bot tools: {string.Join(", ", toolNames)}."
-            : "";
+        // Sprint 55: build tool list with descriptions and parameter names from ITool
+        var toolList = FormatToolList(tools);
 
         var basePrompt = $$"""
         You are {{botName}}, an autonomous Minecraft bot at ({{botPos.X}},{{botPos.Y}},{{botPos.Z}}).
@@ -349,6 +347,77 @@ public sealed class LlmChatInterpreter(
               "execution is disabled and suggest alternatives (gather, craft, build).";
 
         return basePrompt + commandBlock;
+    }
+
+    /// <summary>
+    /// Sprint 55: Builds a tool description block for the LLM system prompt from
+    /// <see cref="ITool"/> objects. Includes tool name, description, and parameter
+    /// names extracted from <see cref="ITool.InputSchema"/>. Required parameters
+    /// are marked; optional ones are listed separately.
+    ///
+    /// This runs once per prompt build and is designed to be cheap — schema parsing
+    /// is minimal (just property names and required flags).
+    /// </summary>
+    private static string FormatToolList(IReadOnlyList<ITool>? tools)
+    {
+        if (tools is not { Count: > 0 })
+            return "";
+
+        var sb = new System.Text.StringBuilder();
+        sb.Append("\nAvailable tools (use these names in plan actions):");
+
+        foreach (var tool in tools)
+        {
+            sb.Append("\n  ");
+            sb.Append(tool.Name);
+
+            // Extract parameter info from InputSchema
+            var (required, optional) = ExtractToolParams(tool.InputSchema);
+            if (required.Count > 0 || optional.Count > 0)
+            {
+                sb.Append('(');
+                var allParams = new List<string>();
+                allParams.AddRange(required);
+                allParams.AddRange(optional.Select(p => $"{p}?"));
+                sb.Append(string.Join(", ", allParams));
+                sb.Append(')');
+            }
+
+            sb.Append(" — ");
+            sb.Append(tool.Description);
+        }
+
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Extracts required and optional parameter names from a JSON Schema object.
+    /// </summary>
+    private static (List<string> Required, List<string> Optional) ExtractToolParams(
+        JsonElement schema)
+    {
+        var required = new List<string>();
+        var optional = new List<string>();
+
+        if (!schema.TryGetProperty("properties", out var props))
+            return (required, optional);
+
+        var requiredSet = new HashSet<string>(StringComparer.Ordinal);
+        if (schema.TryGetProperty("required", out var reqArr))
+        {
+            foreach (var r in reqArr.EnumerateArray())
+                requiredSet.Add(r.GetString() ?? "");
+        }
+
+        foreach (var prop in props.EnumerateObject())
+        {
+            if (requiredSet.Contains(prop.Name))
+                required.Add(prop.Name);
+            else
+                optional.Add(prop.Name);
+        }
+
+        return (required, optional);
     }
 
     // -- Response parsing ------------------------------------------------------------------

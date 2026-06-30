@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0253-add-tool-descriptions-parameter-schemas-to-llm-system-prompt",
+  "key": "TSK-0253",
+  "title": "Add tool descriptions \u002B parameter schemas to LLM system prompt",
+  "description": "## Problem\nThe LLM prompt only listed tool names: \u0060\u0022Available bot tools: MoveTo, GetStatus, ...\u0022\u0060. The LLM had no idea what parameters each tool takes, so it couldn\u0027t use tools like \u0060QueryEntities(radius, typeFilter)\u0060 effectively.\n\n## Fix\nChanged \u0060LlmChatInterpreter\u0060 to accept \u0060IReadOnlyList\u003CITool\u003E\u0060 (not just names). Added \u0060FormatToolList\u0060 and \u0060ExtractToolParams\u0060 helpers that programmatically build tool descriptions from \u0060ITool.Description\u0060 and \u0060ITool.InputSchema\u0060:\n\n\u0060\u0060\u0060\nAvailable tools (use these names in plan actions):\n  MoveTo(x, y, z) \u2014 Navigate to coordinates\n  GetStatus \u2014 Request current bot status\n  QueryEntities(radius, typeFilter?) \u2014 Query entities within radius\n  PlaceBlock(x, y, z, material, block?, count?) \u2014 Place a block at coordinates\n  ...\n\u0060\u0060\u0060\n\nRequired params listed first, optional marked with \u0060?\u0060. Adding a new tool automatically includes its description.\n\n## Files\n- \u0060Agent.Planning/LlmChatInterpreter.cs\u0060 \u2014 FormatToolList, ExtractToolParams helpers\n- \u0060WebUI.Blazor/Program.cs\u0060 \u2014 pass ToolDispatcher.All instead of RegisteredNames\n\n## Validation\n- \u0060dotnet build\u0060 \u2014 0 warnings\n- \u0060dotnet test\u0060 \u2014 746/746 passed",
+  "type": "Feature",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-55",
+    "domain:personality",
+    "type:feature"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T00:33:36.1893249Z",
+  "updatedAtUtc": "2026-06-30T00:33:36.1893249Z",
+  "completedAtUtc": "2026-06-30T00:33:36.1893249Z",
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0254-replanning-share-tool-schemas-with-llm-on-validation-failure-for-retry",
+  "key": "TSK-0254",
+  "title": "Replanning: share tool schemas with LLM on validation failure for retry",
+  "description": "## Goal\nWhen a tool action fails schema validation (e.g., wrong parameters), feed the tool\u0027s \u0060InputSchema\u0060 back to the LLM along with the error message, so it can retry with correct parameters.\n\n## Context\nCurrently when \u0060ToolDispatcher.ValidateAgainstSchema\u0060 fails, the action is marked as Failed and the planner moves on. The LLM never learns why. With the new \u0060HtnPlanner.TryLlmFallback\u0060 (TSK-0237), we have a mechanism to retry \u2014 but it doesn\u0027t include the failed tool\u0027s schema for guidance.\n\n## Design\n1. When schema validation fails, capture: tool name, validation error, tool\u0027s InputSchema\n2. In \u0060TryLlmFallback\u0060 or a new retry path, include this context in the LLM prompt\n3. LLM can correct its output (e.g., add missing required params, rename properties)\n\n## Example\n\u0060\u0060\u0060\nLLM emits: {\u0022tool\u0022:\u0022QueryEntities\u0022,\u0022args\u0022:{\u0022radius\u0022:32}}  \u2190 missing typeFilter \u2192\nSchema error: \u0022Missing required property \u0027typeFilter\u0027.\u0022\nRetry prompt includes: QueryEntities schema = {radius: int (required), typeFilter: string (required)}\nLLM corrects: {\u0022tool\u0022:\u0022QueryEntities\u0022,\u0022args\u0022:{\u0022radius\u0022:32,\u0022typeFilter\u0022:\u0022hostile\u0022}}\n\u0060\u0060\u0060\n\n## Files\n- \u0060Agent.Tools/ToolDispatcher.cs\u0060 \u2014 capture failure context\n- \u0060Agent.Planning/HtnPlanner.cs\u0060 \u2014 use failure context in LLM retry prompt\n- Or new \u0060Agent.Planning/LlmRetryHandler.cs\u0060 \u2014 dedicated retry handler",
+  "type": "Feature",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-55",
+    "domain:planning",
+    "type:feature"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T00:33:36.2216771Z",
+  "updatedAtUtc": "2026-06-30T00:33:36.2216771Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}
