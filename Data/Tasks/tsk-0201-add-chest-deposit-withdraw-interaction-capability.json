@@ -18,16 +18,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-4f12f27b9fde4f35b2721882825dc60f",
+      "author": "anonymous",
+      "body": "**Linked to external audit (2026-06-29):** The audit\u0027s capability gap section recommends container deposit/withdraw as a high-leverage addition for base-building workflows. This task already covers it at Low priority. Council recommends keeping Low priority \u2014 gated on \u0060activateBlock\u0060 support.\n\nSee: \u0060Data/Pages/council/mineflayer-external-audit-council-2026-06-29.md\u0060",
+      "createdAtUtc": "2026-06-30T02:34:45.1256967Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-27T15:23:48.7703993Z",
-  "updatedAtUtc": "2026-06-27T15:23:48.7703993Z",
+  "updatedAtUtc": "2026-06-30T02:34:45.1256967Z",
   "completedAtUtc": null,
-  "revision": 1,
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0201-add-chest-deposit-withdraw-interaction-capability.json"
 }

@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0246-vet-yamldotnet-package-per-agents-md-package-policy",
+  "key": "TSK-0246",
+  "title": "Vet YamlDotNet package per AGENTS.md package policy",
+  "description": "## Source\nCouncil review at \u0060Data/Pages/council/blueprint-yaml-autonomy-council-2026-06-29.md\u0060 \u2014 Moderate concern M5  \nBlueprint YAML design \u2014 Phase 1 dependency\n\n## Background\nThe blueprint YAML design introduces \u0060YamlDotNet\u0060 as a new NuGet dependency. Per AGENTS.md Package Vetting Policy:\n\n- **P-1:** Documented justification required for every new package\n- **P-1a:** License whitelist \u2014 MIT, Apache-2.0, BSD-2/3-Clause only. No GPL/AGPL/copyleft.\n- **P-2:** Every dependency must be listed in \u0060WebUI.Blazor/wwwroot/about.html\u0060\n- **P-3:** Vulnerable packages are a P0 blocker \u2014 \u0060dotnet list package --vulnerable\u0060 must return zero results\n- **P-4:** Deprecated packages are prohibited\n- **P-5:** Direct pinning of transitive deps requires justification and a removal plan\n\n## Scope\n1. Add \u0060YamlDotNet\u0060 to \u0060Agent.Construction.csproj\u0060 (or the appropriate project)\n2. Verify license compliance (YamlDotNet is MIT \u2014 \u2705)\n3. Run \u0060dotnet list package --vulnerable\u0060 and verify zero results\n4. Verify not deprecated (check latest stable version on NuGet)\n5. Create package justification document in \u0060Data/Pages/policies/package-justifications/yamldotnet.md\u0060\n6. Add to \u0060WebUI.Blazor/wwwroot/about.html\u0060\n\n## Alternate approach\nEvaluate whether a hand-rolled YAML frontmatter parser could replace the full YamlDotNet dependency. Blueprint YAML uses a small, known schema \u2014 a minimal parser might be simpler and avoid the dependency entirely.\n\n## Deliverables\n- Package justification document\n- \u0060about.html\u0060 update\n- Vulnerability scan results (as comment in task)\n- Decision record: YamlDotNet vs. hand-rolled parser\n\n## Exit Criteria\n- Package meets all 5 policy requirements\n- Justification document written and reviewed\n- Alternative (hand-rolled) evaluated and decision documented",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-56",
+    "domain:construction",
+    "type:compliance"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T00:06:47.08895Z",
+  "updatedAtUtc": "2026-06-30T00:06:47.08895Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

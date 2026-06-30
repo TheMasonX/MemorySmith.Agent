@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0232-p3-auto-detect-mc-port-in-start-mineflayer-ps1-with-10s-timeout",
+  "key": "TSK-0232",
+  "title": "P3: Auto-detect MC port in Start-Mineflayer.ps1 with 10s timeout",
+  "description": "## Problem\n\u0060Start-Mineflayer.ps1\u0060 hardcodes the Minecraft LAN port:\n\u0060\u0060\u0060powershell\n$env:MC_PORT = 56749\n\u0060\u0060\u0060\nThis changes every LAN session. The user has two MC versions (1.16.5 and 1.21.6) open on different ports, so auto-detection must handle multiple candidates.\n\n## Requirements\n1. Scan for active Minecraft LAN game ports\n2. If multiple candidates found, list them and prompt the user with a **10-second timeout**\n3. On timeout, **auto-accept the first one found**\n4. If only one found, use it immediately (no prompt)\n5. If none found, fall back to manual entry\n\n## Detection approach\nMinecraft LAN games broadcast on a specific port (4445 for UDP). Alternatively, scan for Java processes with \u0060-port\u0060 argument, or parse the Minecraft log output \u0022Local game hosted on port XXXXX\u0022. The most reliable is likely parsing the Minecraft process command line for \u0060--port\u0060 or scanning for the LAN broadcast.\n\n## Files\n- \u0060Scripts/Start-Mineflayer.ps1\u0060\n\n## Acceptance Criteria\n- Script detects MC port automatically\n- Works when 2\u002B games are running (lists and times out)\n- 10s timeout with auto-accept first candidate\n- Hardcoded port fallback still works",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-55",
+    "domain:scripts",
+    "type:feature"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-29T23:00:12.6776319Z",
+  "updatedAtUtc": "2026-06-29T23:00:12.6776319Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

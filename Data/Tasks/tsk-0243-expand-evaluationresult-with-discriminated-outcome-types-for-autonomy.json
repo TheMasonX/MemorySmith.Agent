@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0243-expand-evaluationresult-with-discriminated-outcome-types-for-autonomy",
+  "key": "TSK-0243",
+  "title": "Expand EvaluationResult with discriminated outcome types for autonomy",
+  "description": "## Source\nCouncil review at \u0060Data/Pages/council/blueprint-yaml-autonomy-council-2026-06-29.md\u0060 \u2014 Blocking issue B2\n\n## Background\nThe current \u0060EvaluationResult\u0060 (in \u0060Agent.Core/Interfaces/ILlmEvaluator.cs\u0060) returns \u0060bool ShouldReplan\u0060 \u002B \u0060string Reason\u0060 \u002B \u0060string Suggestion\u0060. This is too narrow for the autonomy design, which requires 6 distinct outcomes: stop, continue same goal, advance sequence, create follow-up goal, schedule next wake, recover/replan.\n\n## Scope\nDefine and implement an expanded \u0060EvaluationResult\u0060 (or \u0060EvaluationDirective\u0060) as a discriminated union type that supports all 6 outcomes. This is an additive, non-breaking change (current \u0060ILlmEvaluator\u0060 interface can keep the old signature with an overload).\n\n## Deliverables\n- Discriminated union type for evaluation outcomes\n- Updated \u0060ILlmEvaluator.EvaluateAsync\u0060 with new return type (additive overload)\n- Updated \u0060AgentBackgroundService.TryLlmReplanOnStallAsync\u0060 to handle new outcomes\n- Unit tests for each outcome type\n- No regression in existing build-stall replanning behavior\n\n## Exit Criteria\n- All 6 outcome types are representable and testable\n- Existing build-stall LLM evaluation still works unchanged\n- \u0060FollowUpPolicy\u0060 can produce a \u0060CreateFollowUp\u0060 outcome\n- Timer wakeups can produce a \u0060ScheduleWake\u0060 outcome",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-56",
+    "domain:autonomy",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T00:06:46.9782954Z",
+  "updatedAtUtc": "2026-06-30T00:06:46.9782954Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

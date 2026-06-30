@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0249-add-iruntimesignalsink-and-timer-signal-entry-point-to-agentbackgroundservice",
+  "key": "TSK-0249",
+  "title": "Add IRuntimeSignalSink and timer signal entry point to AgentBackgroundService",
+  "description": "## Source\nCouncil review at \u0060Data/Pages/council/blueprint-yaml-autonomy-council-2026-06-29.md\u0060 \u2014 Blocking issue B1  \nAutonomy design Phase 1\n\n## Background\n\u0060AgentBackgroundService.ExecuteAsync\u0060 (line ~492-493) launches 3 concurrent tasks: ProcessEventsAsync, DispatchActionsAsync, ChatConsumerAsync. There is no fourth loop for timer signals. The autonomy design requires timer-driven wakeups that follow the same internal path as chat signals, but no \u0060IRuntimeSignalSink\u0060 exists and no signal-injection point is wired.\n\n## Scope\n1. Define \u0060IRuntimeSignalSink\u0060 interface\n2. Add a \u0060Channel\u003CRuntimeSignalEnvelope\u003E\u0060 to \u0060AgentBackgroundService\u0060 \n3. Wire a signal consumer loop (or multiplex into DispatchActionsAsync)\n4. Implement timer emitter using \u0060ITimeProvider\u0060\n5. Implement suppression cooldowns with named boolean gates\n6. Implement wake deduplication (identical wake reasons within cooldown window)\n7. Log every wake: reason, goal ID, accepted/suppressed, suppression reason\n\n## Design constraint\nAll wake paths must funnel through the same runtime entrypoint. Timer signals should be handled as runtime signals, not as a separate planner executor. The signal must be observable in logs, dashboard, and journal entries.\n\n## Deliverables\n- \u0060IRuntimeSignalSink\u0060 interface\n- \u0060Channel\u003CRuntimeSignalEnvelope\u003E\u0060 \u002B signal consumer loop\n- Timer emitter using \u0060ITimeProvider\u0060\n- Suppression cooldowns (named boolean gates, not magic numbers)\n- Wake dedup (identical reason within cooldown)\n- Structured wake logging\n- Unit tests: timer wake \u2192 planner, deduplication, cooldown enforcement\n\n## Exit Criteria\n- Timer wakes can be simulated in tests using fake \u0060ITimeProvider\u0060\n- A timer wake can reach the planner\n- No duplicated planning on repeated timer ticks\n- Suppression cooldowns prevent wake storms\n- All wake activity is visible in logs",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-56",
+    "domain:autonomy",
+    "type:feature"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T00:07:04.9726349Z",
+  "updatedAtUtc": "2026-06-30T00:07:04.9726349Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

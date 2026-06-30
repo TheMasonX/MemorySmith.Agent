@@ -266,6 +266,20 @@ function botPos() {
   return { x: Math.floor(p.x), y: Math.floor(p.y), z: Math.floor(p.z) };
 }
 
+// Sprint 55 Wave C: find the surface Y at a given (x,z) by scanning downward
+// from y=128 until a solid block is found. Returns null if the chunk is not loaded.
+function findGroundY(x, z) {
+  try {
+    for (let y = 127; y >= -64; y--) {
+      const block = bot.blockAt(toVec3(x, y, z));
+      if (block && block.type !== 0) return y + 1; // return the block ABOVE the solid one
+    }
+  } catch (err) {
+    // Chunk not loaded — return null, caller will use original Y
+  }
+  return null;
+}
+
 function sendBotStatus() {
   const invItems = bot.inventory?.items() ?? [];
   const invMap = {};
@@ -319,10 +333,10 @@ bot.on('playerCollect', (collector, entity) => {
 });
 
 // ── Sprint 55 Wave B: Passive entity observation ──────────────────────────
-// Periodically scans for hostile mobs near the bot and emits entityObserved
+// Periodically scans for ALL mobs near the bot and emits entityObserved
 // events. Feeds into the C# observe→evaluate replan loop for threat detection.
-//
-// Enabled after verifying chat works on both 1.16.5 and 1.21.x (Sprint 55 Wave B).
+// Hostile/neutral/passive classification uses the HOSTILE_MOB_NAMES set.
+// Sprint 55 Wave C: expanded from hostiles-only to all mobs with hostility flag.
 
 const HOSTILE_MOB_NAMES = new Set([
   'zombie', 'skeleton', 'creeper', 'spider', 'cave_spider',
@@ -334,6 +348,10 @@ const HOSTILE_MOB_NAMES = new Set([
   'warden', 'breeze', 'bogged',
 ]);
 
+// Sprint 55 Wave C: passive block observation — track the block below the bot's feet.
+let _lastBlockScanAt = 0;
+let _lastKnownBlockBelow = null;
+
 let _lastEntityScanAt = 0;
 
 function scanNearbyEntities() {
@@ -344,12 +362,20 @@ function scanNearbyEntities() {
     _lastEntityScanAt = now;
 
     const botPosObj = botPos();
-    const hostiles = [];
+    const observed = [];
     const allEntities = Object.values(bot.entities ?? {});
     for (const e of allEntities) {
-      if (!e || !e.position || e.type !== 'mob') continue;
-      const name = (e.name ?? e.mobType ?? '').toLowerCase();
-      if (!HOSTILE_MOB_NAMES.has(name)) continue;
+      // Sprint 55 Wave C: include both mobs AND objects (dropped items, etc.)
+      if (!e || !e.position) continue;
+      if (e.type !== 'mob' && e.type !== 'object') continue;
+      const rawName = (e.name ?? e.mobType ?? '').toLowerCase();
+      // For item/object entities, try to get the actual item type from metadata
+      const itemType = (e.type === 'object' && e.metadata?.name)
+        ? e.metadata.name
+        : null;
+      const displayName = itemType
+        ? `item:${itemType}`  // e.g. "item:dirt" instead of just "item"
+        : (e.name ?? e.mobType ?? 'unknown');
 
       const dx = e.position.x - botPosObj.x;
       const dy = e.position.y - botPosObj.y;
@@ -357,9 +383,10 @@ function scanNearbyEntities() {
       const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
       if (dist > C.ENTITY_SCAN_RADIUS) continue;
 
-      hostiles.push({
-        name: e.name ?? e.mobType ?? 'unknown',
+      observed.push({
+        name: displayName,
         type: e.type,
+        hostile: itemType ? false : HOSTILE_MOB_NAMES.has(rawName),
         x: Math.floor(e.position.x),
         y: Math.floor(e.position.y),
         z: Math.floor(e.position.z),
@@ -368,17 +395,19 @@ function scanNearbyEntities() {
       });
     }
 
-    if (hostiles.length > 0) {
-      hostiles.sort((a, b) => a.distance - b.distance);
+    if (observed.length > 0) {
+      observed.sort((a, b) => a.distance - b.distance);
+      const hostileCount = observed.filter(e => e.hostile).length;
       sendEvent('entityObserved', {
-        entities: hostiles,
+        entities: observed,
         botX: botPosObj.x, botY: botPosObj.y, botZ: botPosObj.z,
         timestamp: new Date().toISOString(),
       });
-      logStructured('warn', 'entity', 'hostile entities detected', {
-        count: hostiles.length,
-        nearest: hostiles[0].name,
-        distance: hostiles[0].distance,
+      logStructured('info', 'entity', 'entities observed', {
+        count: observed.length,
+        hostile: hostileCount,
+        nearest: observed[0].name,
+        distance: observed[0].distance,
       });
     }
   } catch (err) {
@@ -386,8 +415,39 @@ function scanNearbyEntities() {
   }
 }
 
+// Sprint 55 Wave C: passive block observation — detect the block below the bot.
+function scanBlockBelow() {
+  try {
+    if (!bot?.entity) return;
+    const now = Date.now();
+    if (now - _lastBlockScanAt < 1000) return; // 1s cooldown
+    _lastBlockScanAt = now;
+
+    const pos = botPos();
+    const block = bot.blockAt(toVec3(Math.floor(pos.x), Math.floor(pos.y) - 1, Math.floor(pos.z)));
+    if (block) {
+      const blockName = block.name ?? 'unknown';
+      if (blockName !== _lastKnownBlockBelow) {
+        _lastKnownBlockBelow = blockName;
+        sendEvent('blockBelowChanged', {
+          name: blockName,
+          type: block.type ?? 0,
+          x: Math.floor(pos.x),
+          y: Math.floor(pos.y) - 1,
+          z: Math.floor(pos.z),
+          timestamp: new Date().toISOString(),
+        });
+      }
+    }
+  } catch (err) {
+    // Silent — blockAt can throw on unloaded chunks
+  }
+}
+
 // Sprint 55 Wave B: enabled after verifying chat works on both 1.16.5 and 1.21.x.
 bot.on('physicsTick', scanNearbyEntities);
+// Sprint 55 Wave C: passive block below detection.
+bot.on('physicsTick', scanBlockBelow);
 
 // ── Sprint 19: System message filtering ───────────────────────────────────────
 // Server-generated messages (teleport confirmations, join/leave, time set, etc.)
@@ -483,9 +543,17 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
   switch (action) {
 
     case 'move': {
-      const { x, y, z } = args;
+      let { x, y, z } = args;
       if (x == null || y == null || z == null)
         throw new Error('move requires x, y, z');
+      // Sprint 55 Wave C: clamp target Y to ground level if above ground.
+      // Prevents "Took too long to decide path to goal" errors when the LLM
+      // picks a Y value 3+ blocks above the actual ground surface.
+      const surfaceY = findGroundY(x, z);
+      if (surfaceY != null && y > surfaceY) {
+        logStructured('debug', 'move', 'clamped Y to surface level', { originalY: y, clampedY: surfaceY, x, z });
+        y = surfaceY;
+      }
       // Sprint 51: early-exit when already at target. pathfinder.goto() with
       // GoalNear(1) handles this internally but still incurs goal setup cost.
       const { x: bx, y: by, z: bz } = botPos();

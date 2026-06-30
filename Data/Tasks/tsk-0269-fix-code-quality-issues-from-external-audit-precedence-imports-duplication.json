@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0269-fix-code-quality-issues-from-external-audit-precedence-imports-duplication",
+  "key": "TSK-0269",
+  "title": "Fix code quality issues from external audit (precedence, imports, duplication)",
+  "description": "**Source:** External audit (code quality section) | **Council:** P3\n\n**Problem:** The audit identified several code quality issues in MineflayerAdapter/index.js:\n\n1. **Operator precedence trap** (~line in classifyError): \u0060m.includes(\u0027not in inventory\u0027) || m.includes(\u0027missing\u0027) || m.includes(\u0027not found\u0027) \u0026\u0026 m.includes(\u0027item\u0027)\u0060 evaluates as \u0060A || B || (C \u0026\u0026 D)\u0060 which is correct but reads like \u0060(A || B || C) \u0026\u0026 D\u0060. Add explicit parentheses.\n\n2. **Import inconsistency**: \u0060movements.js\u0060 uses named import \u0060{ Movements }\u0060 while \u0060index.js\u0060 destructures off default export. Both resolve to same class but inconsistent style in same module graph.\n\n3. **findBestBlock alias resolution duplication**: The \u0060aliasNames\u0060/\u0060acceptableIds\u0060 resolution logic is duplicated three times inside the \u0060mine\u0060 case (inside findBestBlock, then twice after pathfinding). Extract to shared helper.\n\n4. **Header comment claims \u0022craft case now pathfinds to nearest crafting table\u0022** \u2014 this has never worked (see TSK-0261). Update comment after fixing Bug 3.\n\n**Files:** \u0060MineflayerAdapter/index.js\u0060, \u0060MineflayerAdapter/movements.js\u0060\n\n**Priority:** Low \u2014 cosmetic and maintainability only, no functional impact.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Low",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "type:refactor",
+    "domain:mineflayer",
+    "code-quality"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T02:34:37.8111525Z",
+  "updatedAtUtc": "2026-06-30T02:34:37.8111525Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

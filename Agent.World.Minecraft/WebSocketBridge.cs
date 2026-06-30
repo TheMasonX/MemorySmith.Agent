@@ -642,6 +642,7 @@ public sealed class WebSocketBridge(string uri,
                 entities.Add(new ObservedEntity(
                     Name: GetString(e, "name") ?? "unknown",
                     Type: GetString(e, "type") ?? "mob",
+                    Hostile: e.TryGetProperty("hostile", out var hostileEl) && hostileEl.GetBoolean(),
                     X: GetInt(e, "x"),
                     Y: GetInt(e, "y"),
                     Z: GetInt(e, "z"),

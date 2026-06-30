@@ -1,0 +1,32 @@
+﻿{
+  "id": "tsk-0251-create-scoping-tasks-for-autonomy-phases-3-5-design",
+  "key": "TSK-0251",
+  "title": "Create scoping tasks for Autonomy Phases 3-5 (design)",
+  "description": "## Source\nCouncil review at \u0060Data/Pages/council/blueprint-yaml-autonomy-council-2026-06-29.md\u0060 \u2014 Moderate concern M2\n\n## Background\nThe autonomy design defines 5 phases, but only Phases 0-2 have tasks (TSK-0238, TSK-0239, TSK-0240). Phases 3 (chaining/branching), 4 (persistence), and 5 (dashboard) have no tasks or scope management.\n\n## Scope\nCreate Backlog design tasks for:\n\n### Phase 3 \u2014 Chaining and Branching (Future)\n- \u0060TaskSequenceGoal\u0060 enhancement or companion continuation goal\n- Support for \u0022do X, then ask whether to do Y\u0022\n- Branch decisions based on ActionOutcome\n- Partial-result chaining\n- Chain depth limit enforcement\n\n### Phase 4 \u2014 Persistence and Restart Resilience (Future)\n- Optional scheduled wake store\n- Wake replay on startup\n- Stale wake cleanup\n- Expiry semantics\n- Metrics for missed wakes\n\n### Phase 5 \u2014 Dashboard and Operator Controls (Future)\n- Pending wakes list display\n- Follow-up policy display\n- Manual wake trigger\n- Cancel wake\n- \u0022Pause autonomy\u0022 toggle (already promoted to TSK-0248)\n- Reason for last suppressed wake\n\n## Exit Criteria\n- Tasks created with type:design labels\n- Each task references the relevant section from the design doc\n- Priority and sprint assignment documented (all Future/Deferred)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:autonomy",
+    "type:design"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T00:07:25.327439Z",
+  "updatedAtUtc": "2026-06-30T00:07:25.327439Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

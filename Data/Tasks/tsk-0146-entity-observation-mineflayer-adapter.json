@@ -1,19 +1,44 @@
-{
+﻿{
   "id": "tsk-0146-entity-observation-mineflayer-adapter",
+  "key": "TSK-0146",
   "title": "Add entity observation events to MineflayerAdapter",
+  "description": "Add periodic entity scanning to MineflayerAdapter so the agent knows what mobs/animals/players are nearby. This is the first step in closing the mob/entity awareness gap documented in \u0060Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md\u0060.\n\nImplementation:\n1. Add a periodic scan (every 2-3 seconds) using \u0060bot.entities\u0060 to collect nearby living entities within a configurable radius (default 32 blocks).\n2. Filter to living entities: mobs (hostile/passive), animals, other players. Exclude item drops, paintings, minecarts, etc.\n3. Emit \u0060entityObserved\u0060 events with: entity type, display name or mob type, position (x/y/z floored), distance from bot, and health if available.\n4. Track which entities were seen last scan; emit \u0060entityDeparted\u0060 when an entity leaves the radius.\n5. Use tunable constants at the top of index.js:\n   - \u0060ENTITY_SCAN_RADIUS = 32\u0060 (blocks)\n   - \u0060ENTITY_SCAN_INTERVAL_MS = 2000\u0060 (ms between scans)\n6. Do NOT scan every tick \u2014 use \u0060setInterval\u0060 or tick-count throttling.\n\nAcceptance:\n- Running agent logs \u0060entityObserved\u0060 events for nearby cows, zombies, etc.\n- Entities that leave the radius emit \u0060entityDeparted\u0060.\n- No entities reported when none are nearby.\n- Item drops are NOT included (those are handled by playerCollect).\n\nRefs: \u0060memorysmith_situational_awareness_design_doc_20260625T020914Z.md\u0060 Phase 1",
+  "type": "Task",
   "status": "Backlog",
   "priority": "High",
-  "type": "Task",
-  "description": "Add periodic entity scanning to MineflayerAdapter so the agent knows what mobs/animals/players are nearby. This is the first step in closing the mob/entity awareness gap documented in `Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md`.\n\nImplementation:\n1. Add a periodic scan (every 2-3 seconds) using `bot.entities` to collect nearby living entities within a configurable radius (default 32 blocks).\n2. Filter to living entities: mobs (hostile/passive), animals, other players. Exclude item drops, paintings, minecarts, etc.\n3. Emit `entityObserved` events with: entity type, display name or mob type, position (x/y/z floored), distance from bot, and health if available.\n4. Track which entities were seen last scan; emit `entityDeparted` when an entity leaves the radius.\n5. Use tunable constants at the top of index.js:\n   - `ENTITY_SCAN_RADIUS = 32` (blocks)\n   - `ENTITY_SCAN_INTERVAL_MS = 2000` (ms between scans)\n6. Do NOT scan every tick — use `setInterval` or tick-count throttling.\n\nAcceptance:\n- Running agent logs `entityObserved` events for nearby cows, zombies, etc.\n- Entities that leave the radius emit `entityDeparted`.\n- No entities reported when none are nearby.\n- Item drops are NOT included (those are handled by playerCollect).\n\nRefs: `memorysmith_situational_awareness_design_doc_20260625T020914Z.md` Phase 1",
+  "assigneeMode": "Directory",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": null,
+  "reporter": null,
   "labels": [
     "entity-awareness",
     "mineflayer",
     "situational-awareness",
     "sprint-52"
   ],
-  "estimatedHours": 3.0,
-  "linkedPages": ["Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z", "Features/mineflayer-adapter"],
-  "designRef": "Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md",
-  "key": "TSK-0146",
-  "epicId": "tsk-0146-entity-observation-scene"
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z",
+    "Features/mineflayer-adapter"
+  ],
+  "comments": [
+    {
+      "id": "c-78bd22ec6df74310836a39b04dbdfd63",
+      "author": "anonymous",
+      "body": "**Linked to external audit (2026-06-29):** The audit confirmed that entity observation (\u0060scanNearbyEntities\u0060) detects threats but the adapter has no attack/flee action to act on them (TSK-0258). The \u0060physicsTick\u0060 hook is currently commented out pending chat interference testing (noted in Sprint 55 handoff). The audit recommends closing this loop with combat/retreat actions before entity observation is fully useful.\n\nSee: \u0060Data/Pages/Audits/mineflayer-audit-claude-06-29-26.md\u0060 and \u0060Data/Pages/council/mineflayer-external-audit-council-2026-06-29.md\u0060",
+      "createdAtUtc": "2026-06-30T02:34:44.9215617Z"
+    }
+  ],
+  "epicId": "tsk-0146-entity-observation-scene",
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "0001-01-01T00:00:00",
+  "updatedAtUtc": "2026-06-30T02:34:44.9215617Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0146-entity-observation-mineflayer-adapter.json"
 }

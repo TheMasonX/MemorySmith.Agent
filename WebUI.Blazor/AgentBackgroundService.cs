@@ -849,25 +849,58 @@ public sealed class AgentBackgroundService(
                     break;
 
                 // Sprint 55 Wave B: passive entity observation — threat detection.
+                // Sprint 55 Wave C: expanded to all mobs with hostility flag.
                 case EntityObservedEvent eoe:
                     if (eoe.Entities.Count > 0)
                     {
-                        var threats = string.Join(", ",
+                        var hostiles = eoe.Entities.Where(e => e.Hostile).ToList();
+                        var hostilesStr = string.Join(", ",
+                            hostiles.Select(e => $"{e.Name}@{e.Distance:F0}blk"));
+                        var allStr = string.Join(", ",
                             eoe.Entities.Select(e => $"{e.Name}@{e.Distance:F0}blk"));
-                        logger.LogWarning(
-                            "[entity] {Count} hostile(s) observed near ({BotX},{BotY},{BotZ}): {Threats}",
+                        logger.LogInformation(
+                            "[entity] {Count} entities observed near ({BotX},{BotY},{BotZ}): {Entities}",
                             eoe.Entities.Count, eoe.BotPosition.X, eoe.BotPosition.Y,
-                            eoe.BotPosition.Z, threats);
+                            eoe.BotPosition.Z, allStr);
 
-                        // Sprint 55: store entity summary for LLM prompt inclusion
+                        // Sprint 55: store entity summaries for LLM prompt inclusion
                         var summary = FormatEntitySummary(eoe);
+                        var hostileSummary = hostiles.Count > 0
+                            ? FormatEntitySummary(eoe with { Entities = hostiles.AsReadOnly() })
+                            : "none";
+
                         var facts = new Dictionary<string, object?>(_worldState.Facts)
                         {
-                            ["nearbyHostiles"] = summary,
+                            ["nearbyHostiles"] = hostileSummary,
                             ["nearbyHostilesUpdatedAt"] = _timeProvider.UtcNow.ToString("O"),
+                            ["nearbyEntities"] = summary,
+                            ["nearbyEntitiesUpdatedAt"] = _timeProvider.UtcNow.ToString("O"),
+                            ["nearbyEntitiesRaw"] = System.Text.Json.JsonSerializer.Serialize(
+                                eoe.Entities.Select(e => new
+                                {
+                                    e.Name, e.Type, e.Hostile,
+                                    e.X, e.Y, e.Z, e.Distance,
+                                    Health = e.Health,
+                                    Username = e.Username
+                                })),
                         };
                         _worldState = _worldState with { Facts = facts };
                     }
+                    break;
+
+                // Sprint 55 Wave C: passive block observation — block below feet changed.
+                case BlockBelowChangedEvent bbce:
+                    logger.LogDebug(
+                        "[block] below changed to {Name} at ({X},{Y},{Z})",
+                        bbce.Name, bbce.X, bbce.Y, bbce.Z);
+                    var blockFacts = new Dictionary<string, object?>(_worldState.Facts)
+                    {
+                        ["blockBelow"] = bbce.Name,
+                        ["blockBelowType"] = bbce.Type,
+                        ["blockBelowAt"] = $"{bbce.X},{bbce.Y},{bbce.Z}",
+                        ["blockBelowUpdatedAt"] = _timeProvider.UtcNow.ToString("O"),
+                    };
+                    _worldState = _worldState with { Facts = blockFacts };
                     break;
 
                 // Sprint 40 P0-B: reachable block query result.
@@ -1264,18 +1297,60 @@ public sealed class AgentBackgroundService(
                     pendingResponse = null;
                 }
 
-                // Explicit coords → MoveTo; null coords → follow player to their position
+                // Sprint 55 Wave C: multi-step navigation via nextSteps.
+                // Parse each nextStep that looks like a relative move command
+                // (e.g. "move 10 blocks east") and enqueue absolute MoveTo actions.
+                var moveActions = new List<ActionData>();
+
+                // Primary move from intent coords, entity-targeted lookup, or player position
                 if (intent.X is { } nx && intent.Y is { } ny && intent.Z is { } nz)
                 {
-                    _queue.Enqueue(new ActionData
+                    moveActions.Add(new ActionData
                     {
                         Tool = "MoveTo",
                         Arguments = { ["x"] = nx, ["y"] = ny, ["z"] = nz }
                     });
                 }
-                else if (chat.PlayerPos is { } playerPos)
+                // Sprint 55 Wave C (TSK-0256): entity-targeted navigation fallback.
+                // When navigate intent has no coords but item names an entity type,
+                // find the nearest matching observed entity and navigate to it.
+                else if (!string.IsNullOrWhiteSpace(intent.Item)
+                    && _worldState.Facts.TryGetValue("nearbyEntitiesRaw", out var ner)
+                    && ner is string nerJson)
                 {
-                    _queue.Enqueue(new ActionData
+                    try
+                    {
+                        var observed = System.Text.Json.JsonSerializer
+                            .Deserialize<ObservedEntityDto[]>(nerJson);
+                        var match = observed?
+                            .Where(e => string.Equals(e.Name, intent.Item,
+                                StringComparison.OrdinalIgnoreCase))
+                            .MinBy(e => e.Distance);
+                        if (match is not null)
+                        {
+                            logger.LogInformation(
+                                "[navigate] entity-targeted: {Entity} at ({X},{Y},{Z}) " +
+                                "distance={Dist:F0}blk",
+                                match.Name, match.X, match.Y, match.Z, match.Distance);
+                            moveActions.Add(new ActionData
+                            {
+                                Tool = "MoveTo",
+                                Arguments =
+                                {
+                                    ["x"] = match.X,
+                                    ["y"] = match.Y,
+                                    ["z"] = match.Z,
+                                }
+                            });
+                        }
+                    }
+                    catch { /* best-effort; fall through to player pos */ }
+                }
+
+                // Fallback: navigate to player position ("come here" pattern)
+                if (moveActions.Count == 0 && chat.PlayerPos is { } playerPos)
+                {
+                    moveActions.Add(new ActionData
                     {
                         Tool = "MoveTo",
                         Arguments =
@@ -1285,6 +1360,37 @@ public sealed class AgentBackgroundService(
                             ["z"] = playerPos.Z,
                         }
                     });
+                }
+
+                // Parse nextSteps for additional relative moves
+                if (intent.NextSteps is { Count: > 0 })
+                {
+                    var currentPos = _worldState.Position;
+                    foreach (var step in intent.NextSteps)
+                    {
+                        var nextPos = ParseRelativeMove(step, currentPos);
+                        if (nextPos is not null)
+                        {
+                            moveActions.Add(new ActionData
+                            {
+                                Tool = "MoveTo",
+                                Arguments = { ["x"] = nextPos.X, ["y"] = nextPos.Y, ["z"] = nextPos.Z }
+                            });
+                            currentPos = nextPos; // chain: next step from this step's target
+                        }
+                    }
+                }
+
+                // Enqueue all moves (they will execute sequentially)
+                foreach (var action in moveActions)
+                {
+                    _queue.Enqueue(action);
+                }
+
+                if (moveActions.Count > 1)
+                {
+                    logger.LogInformation(
+                        "[navigate] enqueued {Count} sequential moves", moveActions.Count);
                 }
                 break;
 
@@ -2454,6 +2560,9 @@ public sealed class AgentBackgroundService(
     /// <summary>
     /// Sprint 55: Formats entity observation data for inclusion in the LLM system prompt.
     /// Groups by type, sorts by distance, limits to 10 entities.
+    /// Sprint 55 Wave C: includes entity positions (x,y,z) for ALL entity types
+    /// so the LLM can output specific coordinates for entity-targeted navigation.
+    /// Grouped entities include the nearest one's coordinates.
     /// </summary>
     private static string FormatEntitySummary(EntityObservedEvent eoe)
     {
@@ -2461,10 +2570,47 @@ public sealed class AgentBackgroundService(
             .OrderBy(e => e.Distance)
             .Take(10)
             .GroupBy(e => e.Name)
-            .Select(g => g.Count() == 1
-                ? $"{g.Key}@{g.First().Distance:F0}blk"
-                : $"{g.Count()}x {g.Key} (nearest @{g.Min(e => e.Distance):F0}blk)");
+            .Select(g =>
+            {
+                var nearest = g.MinBy(e => e.Distance)!;
+                return g.Count() == 1
+                    ? $"{g.Key}@{g.First().Distance:F0}blk({g.First().X},{g.First().Y},{g.First().Z})"
+                    : $"{g.Count()}x {g.Key} (@{nearest.Distance:F0}blk {nearest.X},{nearest.Y},{nearest.Z})";
+            });
         return string.Join(", ", grouped);
+    }
+
+    // ── Sprint 55 Wave C: Relative move parsing for multi-step navigation ─────
+
+    /// <summary>
+    /// Parses a relative movement command like "move 10 blocks east", "move 5 north",
+    /// "go 3 west", or "walk 8 south" into an absolute <see cref="Position"/>.
+    /// Returns null for unrecognized commands or directions.
+    /// </summary>
+    private static Position? ParseRelativeMove(string command, Position currentPos)
+    {
+        var trimmed = command.Trim().ToLowerInvariant();
+        // Patterns: "move N blocks east/north/south/west", "go N east", "walk N north"
+        var match = System.Text.RegularExpressions.Regex.Match(trimmed,
+            @"^(?:move|go|walk|step)\s+(?:(?<count>\d+)\s+)?(?:blocks?\s+)?(?<dir>east|west|north|south|up|down)$");
+        if (!match.Success)
+            return null;
+
+        var dir = match.Groups["dir"].Value;
+        var count = match.Groups["count"].Success ? int.Parse(match.Groups["count"].Value) : 1;
+
+        var (dx, dy, dz) = dir switch
+        {
+            "east"  => (count, 0, 0),
+            "west"  => (-count, 0, 0),
+            "north" => (0, 0, -count),
+            "south" => (0, 0, count),
+            "up"    => (0, count, 0),
+            "down"  => (0, -count, 0),
+            _ => (0, 0, 0),
+        };
+
+        return new Position(currentPos.X + dx, currentPos.Y + dy, currentPos.Z + dz);
     }
 
     // ── Plan display RLE (TSK-0019) ───────────────────────────────────────────
@@ -2995,6 +3141,24 @@ public sealed class AgentBackgroundService(
         try
         {
             var inv = _worldState.Inventory ?? new Dictionary<string, int>();
+
+            // Sprint 55 Wave C: parse structured entity data for dashboard.
+            IReadOnlyList<ObservedEntityDto>? entities = null;
+            if (_worldState.Facts.TryGetValue("nearbyEntitiesRaw", out var raw) && raw is string rawJson)
+            {
+                try
+                {
+                    var parsed = System.Text.Json.JsonSerializer.Deserialize<ObservedEntityDto[]>(rawJson);
+                    if (parsed is { Length: > 0 })
+                        entities = parsed;
+                }
+                catch { /* best-effort parse */ }
+            }
+
+            // Sprint 55 Wave C: block below feet.
+            string? blockBelow = _worldState.Facts.TryGetValue("blockBelow", out var bb) && bb is string bbs
+                ? bbs : null;
+
             var update = new AgentStatusUpdate(
                 Status: _connectionStatus == "reconnecting" ? "reconnecting"
                     : _currentGoal is not null ? "active" : "idle",
@@ -3007,7 +3171,9 @@ public sealed class AgentBackgroundService(
                 Z: _worldState.Position.Z,
                 QueuedActions: _queue.Count,
                 ConsecutiveFailures: _consecutiveFailures,
-                Inventory: inv
+                Inventory: inv,
+                NearbyEntities: entities,
+                BlockBelow: blockBelow
             );
             await hubContext.Clients.Group("dashboard").SendAsync("StatusUpdated", update, ct);
         }

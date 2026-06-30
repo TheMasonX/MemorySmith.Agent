@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0233-p2-re-enable-physicstick-entity-observation-hook",
+  "key": "TSK-0233",
+  "title": "P2: Re-enable physicsTick entity observation hook",
+  "description": "## Problem\nThe \u0060physicsTick\u0060 hook for \u0060scanNearbyEntities\u0060 was commented out pending verification that chat works on both MC versions (1.16.5 and 1.21.x).\n\n## Fix\nUncommented \u0060bot.on(\u0027physicsTick\u0027, scanNearbyEntities)\u0060 in \u0060MineflayerAdapter/index.js\u0060 line 391.\nUpdated comment block to reflect enabled state.\n\n## Config\n- \u0060ENTITY_SCAN_RADIUS = 32\u0060 blocks\n- \u0060ENTITY_SCAN_COOLDOWN_MS = 3000\u0060 (scans every 3s)\n- Detects 28 hostile mob types\n\n## Validation\n- \u0060dotnet test\u0060 \u2014 746/746 passed \u2705\n- Chat verified working on both 1.16.5 and 1.21.x in Sprint 55 Wave B \u2705",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-55",
+    "domain:adapter",
+    "type:feature"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-29T23:00:35.6312825Z",
+  "updatedAtUtc": "2026-06-29T23:00:39.5733619Z",
+  "completedAtUtc": "2026-06-29T23:00:39.5733619Z",
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0233-p2-re-enable-physicstick-entity-observation-hook.json"
+}

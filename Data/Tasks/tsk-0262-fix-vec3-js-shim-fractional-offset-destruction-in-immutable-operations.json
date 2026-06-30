@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0262-fix-vec3-js-shim-fractional-offset-destruction-in-immutable-operations",
+  "key": "TSK-0262",
+  "title": "Fix vec3.js shim fractional offset destruction in immutable operations",
+  "description": "**Source:** External audit (Bug 1) | **Council:** P0 | **Option:** B\n\n**Problem:** \u0060vec3.js\u0060 floors x/y/z at construction and all arithmetic methods (offset, plus, minus, multiply, unit, normalize, etc.) route through \u0060toVec3()\u0060 which re-floors. Since \u0060.floored()\u0060 returns \u0060this\u0060 (not a new object), prismarine-world\u0027s \u0060block.position = pos.floored()\u0060 means \u0060block.position\u0060 IS our broken shim. Mineflayer\u0027s internal digging/placing code calls \u0060block.position.offset(0.5, 0.5, 0.5)\u0060 which floors back to integers \u2014 bot aims at block corners instead of centers.\n\n**Blast radius:** 100% of dig and place calls pass through toVec3. This is the hidden root cause behind Sprint 41/52 placement workarounds (facing-aware retries, 6-face fallback, scaffold logic).\n\n**Fix (Option B from council):** Stop flooring in immutable arithmetic ops. Make \u0060.floored()\u0060 return a NEW shim object with floored values instead of \u0060this\u0060. This matches the real prismarine-vector Vec3 contract.\n\n**Key changes in vec3.js:**\n1. Store raw (unfloored) values in \u0060self.x/y/z\u0060\n2. \u0060.floored()\u0060 returns \u0060toVec3(Math.floor(x), Math.floor(y), Math.floor(z))\u0060 \u2014 a NEW object\n3. Arithmetic methods (offset, plus, minus, etc.) return \u0060toVec3(x\u002Bdx, y\u002Bdy, z\u002Bdz)\u0060 without intermediate flooring (they already add to floored values, but the result gets re-floored \u2014 stop that)\n\n**Note:** The existing \u0060index.js\u0060 call sites all pass integer coordinates to \u0060toVec3()\u0060, so this change is safe for direct calls. The impact is on objects returned by \u0060bot.blockAt()\u0060 that flow into Mineflayer\u0027s own code.\n\n**Files:** \u0060MineflayerAdapter/vec3.js\u0060\n\n**Validation:** After fix, verify \u0060block.position.offset(0.5, 0.5, 0.5)\u0060 returns fractional values. Run E2E placement test to confirm aim centers on block faces. Do NOT remove Sprint 41/52 workaround code yet \u2014 validate first.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "type:bug",
+    "domain:mineflayer",
+    "sprint-56"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T02:34:26.4089982Z",
+  "updatedAtUtc": "2026-06-30T02:34:26.4089982Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

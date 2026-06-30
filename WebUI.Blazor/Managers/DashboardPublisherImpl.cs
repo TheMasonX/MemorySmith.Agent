@@ -29,6 +29,10 @@ public sealed class DashboardPublisherImpl : IDashboardPublisher
     private string? _currentGoalDescription;
     /// <summary>Running count of consecutive failures, set externally.</summary>
     private int _consecutiveFailures;
+    /// <summary>Sprint 55 Wave C: observed entities for dashboard display.</summary>
+    private IReadOnlyList<ObservedEntityDto>? _nearbyEntities;
+    /// <summary>Sprint 55 Wave C: block below the bot's feet.</summary>
+    private string? _blockBelow;
 
     public DashboardPublisherImpl(
         IHubContext<AgentHub>?          hubContext,
@@ -38,6 +42,22 @@ public sealed class DashboardPublisherImpl : IDashboardPublisher
         _hubContext   = hubContext;
         _stateManager = stateManager;
         _logger       = logger;
+    }
+
+    /// <summary>
+    /// Sprint 55 Wave C: updates the observed entities for the next dashboard publish.
+    /// </summary>
+    public void SetNearbyEntities(IReadOnlyList<ObservedEntityDto>? entities)
+    {
+        _nearbyEntities = entities;
+    }
+
+    /// <summary>
+    /// Sprint 55 Wave C: updates the block below for the next dashboard publish.
+    /// </summary>
+    public void SetBlockBelow(string? blockName)
+    {
+        _blockBelow = blockName;
     }
 
     /// <summary>
@@ -85,7 +105,9 @@ public sealed class DashboardPublisherImpl : IDashboardPublisher
                 Z: state.Position.Z,
                 QueuedActions: 0,   // Sprint 40+: wire from ActionQueue
                 ConsecutiveFailures: _consecutiveFailures,
-                Inventory: inv
+                Inventory: inv,
+                NearbyEntities: _nearbyEntities,
+                BlockBelow: _blockBelow
             );
 
             await _hubContext.Clients.Group("dashboard")

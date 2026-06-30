@@ -337,8 +337,10 @@ public sealed record EntitiesQueriedEvent(
     DateTimeOffset Timestamp) : WorldEvent(Timestamp);
 
 /// <summary>
-/// Passively observed hostile entities near the bot. Emitted periodically
-/// (cooldown ~3s) when hostile mobs are within ENTITY_SCAN_RADIUS blocks.
+/// Passively observed entities near the bot. Emitted periodically
+/// (cooldown ~3s) when mobs are within ENTITY_SCAN_RADIUS blocks.
+/// Includes both hostile and non-hostile mobs; the <see cref="ObservedEntity.Hostile"/>
+/// flag distinguishes threat level.
 /// Feeds into the observe→evaluate replan loop for threat detection.
 /// </summary>
 public sealed record EntityObservedEvent(
@@ -350,7 +352,20 @@ public sealed record EntityObservedEvent(
 public sealed record ObservedEntity(
     string Name,
     string Type,
+    bool Hostile,
     int X, int Y, int Z,
     double Distance,
     int? Health = null,
     string? Username = null);
+
+// ── Sprint 55 Wave C: Passive block observation ───────────────────────────
+
+/// <summary>
+/// Emitted when the block below the bot's feet changes (e.g. walking from
+/// grass to stone). Includes the block name and its position.
+/// </summary>
+public sealed record BlockBelowChangedEvent(
+    string Name,
+    int Type,
+    int X, int Y, int Z,
+    DateTimeOffset Timestamp) : WorldEvent(Timestamp);

@@ -18,16 +18,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-6fd35feb2de24c8f867b9f944aabc7f5",
+      "author": "anonymous",
+      "body": "Council review update (2026-06-29): Phase 1 scope expanded to include:\n1. \u0060IRuntimeSignalSink\u0060 \u002B timer signal entry point \u2014 moved to TSK-0249\n2. Suppression cooldowns with named boolean gates\n3. Wake deduplication (identical reason within cooldown)\n4. Structured wake logging (reason, goal ID, accepted/suppressed, suppression reason)\n5. Minimum-viable dashboard: wake reason display \u002B pause toggle \u2014 moved to TSK-0248\n6. Search dedup/caching required before timer-driven autonomy \u2014 create separate task\n\nDependency chain: Phase 0 contracts must ship first (TSK-0238 \u002B TSK-0243 \u002B TSK-0247).\n\nSee full report: \u0060Data/Pages/council/blueprint-yaml-autonomy-council-2026-06-29.md\u0060",
+      "createdAtUtc": "2026-06-30T00:07:13.6318428Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-29T23:46:14.2332402Z",
-  "updatedAtUtc": "2026-06-29T23:46:14.2332402Z",
+  "updatedAtUtc": "2026-06-30T00:07:13.6318428Z",
   "completedAtUtc": null,
-  "revision": 1,
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0239-autonomy-phase-1-internal-signal-plumbing-timer-runtime-planner.json"
 }

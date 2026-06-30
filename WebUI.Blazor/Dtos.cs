@@ -15,6 +15,8 @@ namespace WebUI.Blazor;
 /// <param name="QueuedActions">Number of actions currently in the dispatch queue.</param>
 /// <param name="ConsecutiveFailures">Running count of consecutive action failures.</param>
 /// <param name="Inventory">Item→count snapshot of the agent's inventory.</param>
+/// <param name="NearbyEntities">Observed entities near the bot (null if none).</param>
+/// <param name="BlockBelow">Name of the block below the bot's feet (null if unknown).</param>
 public record AgentStatusUpdate(
     string Status,
     string? Goal,
@@ -26,7 +28,22 @@ public record AgentStatusUpdate(
     int Z,
     int QueuedActions,
     int ConsecutiveFailures,
-    IReadOnlyDictionary<string, int> Inventory);
+    IReadOnlyDictionary<string, int> Inventory,
+    IReadOnlyList<ObservedEntityDto>? NearbyEntities = null,
+    string? BlockBelow = null);
+
+/// <summary>
+/// Lightweight DTO for observed entities sent to the dashboard.
+/// Mirrors <see cref="Agent.Core.ObservedEntity"/> for SignalR serialization.
+/// </summary>
+public record ObservedEntityDto(
+    string Name,
+    string Type,
+    bool Hostile,
+    int X, int Y, int Z,
+    double Distance,
+    int? Health = null,
+    string? Username = null);
 
 /// <summary>
 /// Typed REST API response shape for a single journal entry.

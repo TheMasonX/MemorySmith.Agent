@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0264-gate-websocket-agentsocket-assignment-behind-authentication-handshake",
+  "key": "TSK-0264",
+  "title": "Gate WebSocket agentSocket assignment behind authentication handshake",
+  "description": "**Source:** External audit | **Council:** P2\n\n**Problem:** \u0060agentSocket = ws\u0060 is set the instant a TCP connection lands (index.js, in the \u0060wss.on(\u0027connection\u0027)\u0060 handler), before any handshake message arrives. \u0060sendEvent()\u0060 only checks \u0060agentSocket?.readyState === 1\u0060 \u2014 it has no idea whether that socket authenticated. Consequences:\n1. An unauthenticated client receives every broadcast event (position, inventory, health, chat) from the moment it connects\n2. A second connection silently replaces \u0060agentSocket\u0060, and the legitimate C# host stops receiving events with no error surfaced\n\n**Fix:** \n1. Do NOT assign \u0060agentSocket = ws\u0060 until \u0060isAuthenticated\u0060 is true (move assignment into the handshake message handler)\n2. When a new connection arrives while \u0060agentSocket\u0060 is already authenticated and active, close the new connection with a 409 status\n3. Log a warning when an unauthenticated connection is rejected\n\n**Note:** This is partially mitigated by Sprint 32 SEC-02 which requires handshake messages before command processing. The gap is that event broadcasting starts before auth.\n\n**Files:** \u0060MineflayerAdapter/index.js\u0060 (WebSocket connection handler, ~lines 95-130)\n\n**Validation:** Connect with invalid token \u2014 events should not be received. Connect with valid token \u2014 events resume. Second connection while authenticated should be rejected.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "type:security",
+    "domain:mineflayer",
+    "sprint-56"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T02:34:26.4784201Z",
+  "updatedAtUtc": "2026-06-30T02:34:26.4784201Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

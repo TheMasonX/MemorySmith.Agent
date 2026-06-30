@@ -18,16 +18,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-4a2bbdf63e0c443493875c649981bead",
+      "author": "anonymous",
+      "body": "Council review update (2026-06-29): This task is now gated by the \u0060EvaluationResult\u0060 expansion (TSK-0243) and \u0060FollowUpPolicy vs TaskSequenceGoal\u0060 contract (TSK-0247). Both are prerequisites for Phase 0 completion.\n\nAdditional deliverables from council:\n1. \u0060EvaluationResult\u0060 expansion (discriminated union, not bool\u002Bstrings) \u2014 moved to TSK-0243\n2. \u0060FollowUpPolicy\u0060 vs \u0060TaskSequenceGoal\u0060 interaction documented \u2014 moved to TSK-0247\n3. Architecture.md and AGENTS.md updates remain in this scope\n4. WakeReason enum should include \u0060ExternalCommand\u0060 and \u0060StateChange\u0060 (8 values, not 6)\n\nSee full report: \u0060Data/Pages/council/blueprint-yaml-autonomy-council-2026-06-29.md\u0060",
+      "createdAtUtc": "2026-06-30T00:07:13.5947986Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-29T23:46:14.1461326Z",
-  "updatedAtUtc": "2026-06-29T23:46:14.1461326Z",
+  "updatedAtUtc": "2026-06-30T00:07:13.5947986Z",
   "completedAtUtc": null,
-  "revision": 1,
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0238-autonomy-phase-0-define-wakereason-runtimesignal-followuppolicy-contracts.json"
 }

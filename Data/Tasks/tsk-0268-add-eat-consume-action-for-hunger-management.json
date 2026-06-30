@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0268-add-eat-consume-action-for-hunger-management",
+  "key": "TSK-0268",
+  "title": "Add eat/consume action for hunger management",
+  "description": "**Source:** External audit (capability gap) | **Council:** Deferred post-Sprint 56\n\n**Problem:** The adapter tracks \u0060food\u0060 in status events but has no action to eat when hungry. For any long-running building/mining session in survival mode, hunger depletes and the bot needs to eat to regenerate health and continue working.\n\n**Fix:** Add a new \u0060consume\u0060 action case in the dispatch switch that:\n1. Finds food items in inventory (bread, steak, cooked porkchop, etc.)\n2. Equips the food item\n3. Calls \u0060bot.consume()\u0060 (available in mineflayer)\n4. Reports success/failure via \u0060consumeComplete\u0060 event\n\n**Files:** \u0060MineflayerAdapter/index.js\u0060 (new case in dispatch switch)\n\n**Priority:** Low \u2014 survival mode only. Creative mode doesn\u0027t need eating.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Low",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "type:enhancement",
+    "domain:mineflayer",
+    "capability-gap"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T02:34:37.7699061Z",
+  "updatedAtUtc": "2026-06-30T02:34:37.7699061Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

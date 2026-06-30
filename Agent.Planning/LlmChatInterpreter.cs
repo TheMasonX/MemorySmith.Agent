@@ -215,9 +215,15 @@ public sealed class LlmChatInterpreter(
             ? $"\nRecent conversation:\n{chatHistory}\n"
             : "";
 
-        // Sprint 55: include nearby hostile entity summary for threat awareness
-        var entityBlock = state.Facts.TryGetValue("nearbyHostiles", out var eh) && eh is string es
+        // Sprint 55 Wave B/C: include nearby entity summaries for threat awareness
+        var hostileBlock = state.Facts.TryGetValue("nearbyHostiles", out var eh) && eh is string es
             ? $"\nNearby hostiles: {es}"
+            : "";
+        var entityBlock = state.Facts.TryGetValue("nearbyEntities", out var en) && en is string ens
+            ? $"\nNearby entities: {ens}"
+            : hostileBlock; // fallback to hostile-only if all-entities not available
+        var blockBelowBlock = state.Facts.TryGetValue("blockBelow", out var bb) && bb is string bbs
+            ? $"\nBlock below you: {bbs}"
             : "";
 
         // Sprint 55: build tool list with descriptions and parameter names from ITool
@@ -226,7 +232,7 @@ public sealed class LlmChatInterpreter(
         var basePrompt = $$"""
         You are {{botName}}, an autonomous Minecraft bot at ({{botPos.X}},{{botPos.Y}},{{botPos.Z}}).
         Status: {{goalStatus}}. HP: {{health}}/20. Food: {{food}}/20. Players online: {{onlinePlayers}}.
-        Inventory: {{invSummary}}.{{entityBlock}}{{historyBlock}}{{toolList}}
+        Inventory: {{invSummary}}.{{entityBlock}}{{blockBelowBlock}}{{historyBlock}}{{toolList}}
         Decide if the next message is for you and what to do.
         Reply ONLY with valid JSON — no markdown, no prose:
 
@@ -264,8 +270,17 @@ public sealed class LlmChatInterpreter(
           NEVER use "craft" for smelting requests — that bypasses the furnace.
           CORRECT: "smelt 5 iron ore" → intent="smelt", item="iron_ore", count=5
           CORRECT: "smelt iron" → intent="smelt", item="raw_iron", count=1
-        • "navigate" — when the player says "come here", "come to me", "follow me", "go to".
-          Set coords to null — the system uses the player's current position.
+        • "navigate" — when the player wants you to move somewhere.
+          - For "come here" / "come to me" / "follow me": set x/y/z to null
+            (the system uses the player's current position).
+          - For "go to nearest <entity>" / "go to the <entity>": look at the
+            "Nearby entities" list above. Find the nearest matching entity and
+            set x/y/z to its coordinates AND set item to the entity name.
+            Example: "go to nearest slime" + Nearby entities shows
+            "slime@15blk(90,4,120)" → x=90, y=4, z=120, item="slime".
+            If no matching entity is listed, set clarificationQuestion asking
+            the player for coordinates instead.
+          - For "go to <x> <y> <z>" or relative moves: set x/y/z to the target.
           NEVER set intent="cancel" for "come here" — that will REJECT the command.
         • "place"   — when the player wants to place blocks ("place a torch",
           "place 4 dirt in a 2×2 square", "put a block here").
@@ -336,6 +351,17 @@ public sealed class LlmChatInterpreter(
         It may misinterpret messages containing "help" or "stop" in longer sentences.
         If you see unexpected behavior (e.g. emergency stop when none was requested),
         use intent="conversation" to explain what happened to the player.
+
+        COMBAT: Direct melee attacks (punch, hit, kill) are NOT yet available.
+        When the player tells you to "punch", "attack", "kill", or "hit" an entity:
+        - Use intent="command" with the /summon lightning_bolt command at the
+          entity's coordinates (from the Nearby entities list above).
+          Example: "punch the creeper" → intent="command",
+          item="/summon minecraft:lightning_bolt <creeperX> <creeperY> <creeperZ>"
+        - Navigate closer first if needed: return intent="navigate" with the
+          entity's coords, and put the lightning command in nextSteps.
+        - If commands are disabled, tell the player that combat is not yet
+          available and suggest they handle combat manually.
         """;
 
         // Sprint 54: conditionally include command instructions

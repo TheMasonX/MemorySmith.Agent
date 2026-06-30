@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0263-add-mineflayeradapter-auto-reconnect-logic-with-exponential-backoff",
+  "key": "TSK-0263",
+  "title": "Add MineflayerAdapter auto-reconnect logic with exponential backoff",
+  "description": "**Source:** External audit | **Council:** P1\n\n**Problem:** \u0060bot.on(\u0027kicked\u0027, ...)\u0060 and \u0060bot.on(\u0027error\u0027, ...)\u0060 at index.js:317-318 only log events and send them to C#. There is no \u0060bot.on(\u0027end\u0027, ...)\u0060 handler and no retry logic. When the bot is kicked (server restart, AFK timeout, network hiccup), the process is permanently stuck pointing at a dead \u0060bot\u0060 object. Every subsequent dispatched action throws a raw TypeError, which \u0060classifyError()\u0060 cannot map to \u0060reasonCode: \u0027not_connected\u0027\u0060 because the error text doesn\u0027t contain \u0060\u0027not spawned\u0027\u0060 or \u0060\u0027not connected\u0027\u0060.\n\n**Fix:** Add a \u0060bot.on(\u0027end\u0027, ...)\u0060 handler that:\n1. Logs the disconnection at \u0060warn\u0060 level\n2. Sends a \u0060disconnected\u0060 event to C# side\n3. Reconnects using exponential backoff (2s, 4s, 8s, 16s, max 60s)\n4. Re-registers all event handlers after reconnect\n5. On successful reconnect, sends a \u0060reconnected\u0060 event\n\n**Note:** TSK-0066 covers the C# side reconnect handling and is already Done. This task covers the JS side which currently has none.\n\n**Files:** \u0060MineflayerAdapter/index.js\u0060 (add handler near line 317)\n\n**Validation:** Kill MC server while bot is connected \u2014 verify adapter logs reconnect attempts. Restart server \u2014 verify bot reconnects and resumes.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "type:enhancement",
+    "domain:mineflayer",
+    "sprint-56"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T02:34:26.442085Z",
+  "updatedAtUtc": "2026-06-30T02:34:26.442085Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

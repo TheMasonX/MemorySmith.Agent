@@ -1,0 +1,42 @@
+﻿{
+  "id": "tsk-0256-p0-navigate-go-to-nearest-slime-moves-to-player-instead-of-slime",
+  "key": "TSK-0256",
+  "title": "P0: Navigate \u0022go to nearest slime\u0022 moves to player instead of slime",
+  "description": "When user says \u0022Go to nearest slime\u0022, the LLM returns navigate intent with null x/y/z (because the system prompt says to set coords to null for navigate). The navigate handler falls back to chat.PlayerPos \u2014 the PLAYER\u0027s position \u2014 instead of the nearest slime.\n\nRoot causes:\n1. System prompt lumps ALL navigate intents under \u0022set coords to null\u0022 rule\n2. Entity summary in prompt only shows distance (slime@15blk), not positions \u2014 LLM can\u0027t output coordinates even if it wanted to\n3. No server-side fallback: when navigate has null coords and item=entity type, should find nearest matching entity\n\nFixes needed:\n- Update FormatEntitySummary to include positions\n- Update system prompt navigate rules to allow entity-targeted coords\n- Add entity-targeted navigation fallback in AgentBackgroundService",
+  "type": "Bug",
+  "status": "Done",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-55",
+    "domain:chat",
+    "domain:navigation",
+    "type:bug",
+    "wave-c"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-585a3fd8e33d4a39b350fe741a30345d",
+      "author": "anonymous",
+      "body": "Fixed in Sprint 55 Wave C. Three changes applied:\n\n1. **FormatEntitySummary** (AgentBackgroundService.cs ~line 2527): Entity summary now includes positions \u2014 \u0060slime@15blk(90,4,120)\u0060 instead of just \u0060slime@15blk\u0060. This gives the LLM coordinates it can use.\n\n2. **System prompt navigate rules** (LlmChatInterpreter.cs ~line 256): Updated to distinguish \u0022come here\u0022 (null coords \u2192 player position) from \u0022go to nearest \u003Centity\u003E\u0022 (look up entity coordinates from Nearby entities list in prompt).\n\n3. **Entity-targeted navigation fallback** (AgentBackgroundService.cs ~line 1300): When navigate intent has null coords but \u0060intent.Item\u0060 names an entity type (e.g., \u0022slime\u0022), the handler searches \u0060nearbyEntitiesRaw\u0060 for the nearest matching entity and navigates to it. This is a server-side safety net in case the LLM still doesn\u0027t provide coords.\n\nFiles changed:\n- \u0060WebUI.Blazor/AgentBackgroundService.cs\u0060 \u2014 FormatEntitySummary \u002B navigate fallback\n- \u0060Agent.Planning/LlmChatInterpreter.cs\u0060 \u2014 system prompt navigate rules",
+      "createdAtUtc": "2026-06-30T01:58:18.0978284Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T01:53:48.9732469Z",
+  "updatedAtUtc": "2026-06-30T01:58:22.9906552Z",
+  "completedAtUtc": "2026-06-30T01:58:22.9906552Z",
+  "revision": 4,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0256-p0-navigate-go-to-nearest-slime-moves-to-player-instead-of-slime.json"
+}

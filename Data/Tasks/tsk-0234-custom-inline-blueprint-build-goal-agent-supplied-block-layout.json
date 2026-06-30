@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0234-custom-inline-blueprint-build-goal-agent-supplied-block-layout",
+  "key": "TSK-0234",
+  "title": "Custom inline-blueprint build goal (agent-supplied block layout)",
+  "description": "## Goal\nAllow the agent to construct custom structures WITHOUT a pre-existing blueprint. The agent (or LLM) supplies inline block-position data \u2014 essentially an ephemeral, inline blueprint \u2014 and the system executes it as a build.\n\n## Current State\n- \u0060BuildGoal\u0060 requires a named blueprint from the repository\n- \u0060PlaceBlockGoal\u0060 handles simple \u0022place N blocks\u0022 but **drops coordinates** (x/y/z accepted in constructor but not stored or passed to decomposer)\n- \u0060NextSteps\u0060 \u002B \u0060ParseCommandString\u0060 can queue multi-step placements, but coordinates don\u0027t flow through\n\n## Requirements\n1. New \u0060CustomBuildGoal\u0060 (or extend \u0060BuildGoal\u0060) that accepts inline \u0060{block, x, y, z}[]\u0060 data\n2. \u0060CustomBuildGoalDecomposer\u0060 that sequences individual PlaceBlock actions WITH coordinates\n3. LLM prompt guidance so the agent knows how to emit custom build data\n4. \u0060ParseCommandString\u0060 support for custom build syntax in NextSteps\n\n## Blockers to fix first\n- **Coordinate gap in PlaceBlockGoal**: Constructor takes x/y/z but doesn\u0027t store them. Fields need to be added and passed through \u0060PlaceBlockGoalDecomposer\u0060 to the PlaceBlock action args.\n- **PlaceBlockTool/adapter**: Verify the adapter\u0027s \u0060case \u0027place\u0027\u0060 handler uses x/y/z from args when present (currently it destructures \u0060const { x, y, z, material } = args\u0060 \u2014 so it DOES support coordinates if sent)\n\n## Design questions\n- Should \u0060CustomBuildGoal\u0060 be a separate goal type or should \u0060BuildGoal\u0060 accept optional inline blocks?\n- How does the LLM communicate the block layout? JSON array in a new field? String in NextSteps?\n- How to handle relative positioning (\u0022in front of bot\u0022) vs absolute coordinates?\n\n## Files to touch\n- \u0060Agent.Planning/Goals/PlaceBlockGoal.cs\u0060 \u2014 fix coordinate storage gap\n- \u0060Agent.Planning/Decomposition/PlaceBlockGoalDecomposer.cs\u0060 \u2014 pass coords to actions\n- \u0060Agent.Planning/Goals/\u0060 \u2014 new CustomBuildGoal\n- \u0060Agent.Planning/Decomposition/\u0060 \u2014 new CustomBuildGoalDecomposer\n- \u0060Agent.Planning/GoalFactory.cs\u0060 \u2014 wire new goal type\n- \u0060Agent.Planning/IntentManager.cs\u0060 \u2014 parse custom build from intent/NextSteps\n- \u0060Agent.Planning/LlmChatInterpreter.cs\u0060 \u2014 prompt guidance\n- \u0060Agent.Tools/Tools/PlaceBlockTool.cs\u0060 \u2014 already supports coords (verified)",
+  "type": "Feature",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-55",
+    "domain:planning",
+    "type:feature"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-29T23:05:02.355894Z",
+  "updatedAtUtc": "2026-06-29T23:05:02.355894Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

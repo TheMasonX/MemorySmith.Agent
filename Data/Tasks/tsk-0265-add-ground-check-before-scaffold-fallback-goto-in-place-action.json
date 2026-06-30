@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0265-add-ground-check-before-scaffold-fallback-goto-in-place-action",
+  "key": "TSK-0265",
+  "title": "Add ground check before scaffold fallback goto in place action",
+  "description": "**Source:** External audit | **Council:** P2\n\n**Problem:** At index.js ~1100, when all 4 preferred step-aside offsets have no walkable ground, the code falls back to:\n\u0060\u0060\u0060js\nawait bot.pathfinder.goto(new pfGoals.GoalNear(x \u002B 2, y, z, 1));\n\u0060\u0060\u0060\nThis blindly walks to \u0060x\u002B2\u0060 with NO check for whether solid ground exists at that position. If that location is a cliff edge, hole, or lava, the bot could walk off and take fall/lava damage.\n\n**Fix:** Before the fallback goto, check if the ground at \u0060(x\u002B2, y-1, z)\u0060 is solid (non-air, non-liquid). If not, try \u0060(x-2, y, z)\u0060 as another fallback. If neither has ground, log a warning and skip placement with a \u0060blockPlaceSkipped\u0060 event.\n\n**Files:** \u0060MineflayerAdapter/index.js\u0060 (~lines 1094-1102, in the place action)\n\n**Validation:** Place a block at a position surrounded by air (no ground in any cardinal direction) \u2014 bot should log warning and skip, not walk off a cliff.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "type:bug",
+    "domain:mineflayer",
+    "sprint-56"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T02:34:26.5178119Z",
+  "updatedAtUtc": "2026-06-30T02:34:26.5178119Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

@@ -1,0 +1,42 @@
+﻿{
+  "id": "tsk-0257-dashboard-fix-entity-card-rendering-add-auto-scale-layout",
+  "key": "TSK-0257",
+  "title": "Dashboard: Fix entity card rendering \u002B add auto-scale layout",
+  "description": "The dashboard at index.html needs two improvements:\n\n1. Entity card rendering: The \u0022\uD83D\uDC7E Nearby Entities\u0022 panel exists in the code but needs verification that SignalR push \u002B HTTP poll both populate \u0060nearbyEntities\u0060 correctly. The \u0060renderEntities\u0060 function exists and is called from both paths.\n\n2. Auto-scale layout: The current \u0060main\u0060 grid uses \u0060max-width: 1400px\u0060 with fixed columns \u0060280px 1fr 300px\u0060. This doesn\u0027t scale well to full screen. Need to:\n- Make the layout responsive with CSS container queries or viewport units\n- Allow panels to fill available width\n- Keep minimum sensible widths for each column\n- Ensure the entity panel is always visible and usable",
+  "type": "Bug",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-55",
+    "domain:dashboard",
+    "type:bug",
+    "type:enhancement",
+    "wave-c"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-8ed2009f6db0443d8ee8009a55bf43c0",
+      "author": "anonymous",
+      "body": "Fixed in Sprint 55 Wave C:\n\n1. **Auto-scale layout**: Changed \u0060main\u0060 CSS grid from \u0060max-width: 1400px\u0060 fixed columns to fluid \u0060minmax()\u0060 columns that scale with viewport width \u2014 \u0060grid-template-columns: minmax(260px, 320px) 1fr minmax(280px, 380px)\u0060.\n\n2. **Viewport-relative heights**: Changed panel heights from fixed px to viewport-relative \u0060vh\u0060 units:\n   - Entity list: \u0060200px\u0060 \u2192 \u006030vh\u0060\n   - Action queue: \u0060320px\u0060 \u2192 \u006040vh\u0060\n   - Live log: \u0060200px\u0060 \u2192 \u006025vh\u0060\n\n3. **Version bump**: \u0060v0.50.2\u0060 \u2192 \u0060v0.55.1\u0060\n\nFile changed: \u0060WebUI.Blazor/wwwroot/index.html\u0060",
+      "createdAtUtc": "2026-06-30T01:58:18.1365842Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T01:53:55.2613168Z",
+  "updatedAtUtc": "2026-06-30T01:58:23.0306417Z",
+  "completedAtUtc": "2026-06-30T01:58:23.0306417Z",
+  "revision": 4,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0257-dashboard-fix-entity-card-rendering-add-auto-scale-layout.json"
+}

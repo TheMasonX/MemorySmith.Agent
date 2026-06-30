@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0244-create-migration-plan-for-4-markdown-blueprints-to-yaml",
+  "key": "TSK-0244",
+  "title": "Create migration plan for 4 markdown blueprints to YAML",
+  "description": "## Source\nCouncil review at \u0060Data/Pages/council/blueprint-yaml-autonomy-council-2026-06-29.md\u0060 \u2014 Blocking issue B5  \nBlueprint YAML design doc \u2014 Phase 4 dependency\n\n## Background\nFour markdown blueprints exist in \u0060Data/Pages/blueprints/\u0060: \u0060small-house.md\u0060, \u0060wizards-tower.md\u0060, \u0060farm.md\u0060, \u0060castle.md\u0060. The blueprint YAML design proposes YAML as the canonical format, but has no transition plan for existing blueprints. Phase 4 says \u0022replace markdown parser\u0022 which would destroy the data path.\n\n## Scope\nDesign a migration plan that:\n1. Converts all 4 existing markdown blueprints to YAML via a one-shot script\n2. Keeps the markdown parser operational as a fallback (permanent)\n3. Updates \u0060MemorySmithBlueprintRepository.GetAsync\u0060 to detect format (try YAML first, markdown fallback)\n4. Updates \u0060MemorySmithBlueprintRepository.SearchAsync\u0060 to handle mixed-format results\n5. Updates \u0060features/blueprint-system\u0060 wiki page with new format\n\n## Deliverables\n- Migration script: markdown \u2192 canonical YAML for all 4 blueprints\n- Updated 3-stage lookup with format detection\n- Wiki page update\n- Backward-compatibility test: loading legacy markdown still works\n\n## Exit Criteria\n- All 4 blueprints converted to YAML (originals kept as \u0060.md.bak\u0060 or preserved)\n- Loading a legacy markdown blueprint returns the same block positions as before\n- Loading a YAML blueprint returns correct block positions\n- Search works across both formats\n- Migration is reversible (can load old markdown at any time)",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-56",
+    "domain:construction",
+    "type:planning"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T00:06:47.0137987Z",
+  "updatedAtUtc": "2026-06-30T00:06:47.0137987Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

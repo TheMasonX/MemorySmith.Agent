@@ -1,0 +1,41 @@
+﻿{
+  "id": "tsk-0258-add-attack-melee-tool-for-entity-combat",
+  "key": "TSK-0258",
+  "title": "Add Attack/Melee tool for entity combat",
+  "description": "The agent has no melee attack capability. When user says \u0022punch it\u0022 or \u0022attack the creeper\u0022, the LLM has no Attack tool available and resorts to sending /attack as a chat message (which does nothing) or using /summon lightning_bolt (creative mode workaround).\n\nNeeds:\n1. Add \u0022attack\u0022 action to the MineflayerAdapter action protocol using bot.attack(entity)\n2. Create AttackTool in Agent.Tools that sends the attack action\n3. Register AttackTool in the tool registry\n4. Update system prompt to describe the attack capability",
+  "type": "Feature",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-56",
+    "domain:combat",
+    "type:feature",
+    "type:tool"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-0f23a62a2ad949b8b17768969e94cd96",
+      "author": "anonymous",
+      "body": "**Linked to external audit (2026-06-29):** The audit confirmed this capability gap \u2014 \u0060scanNearbyEntities\u0060 fires \u0060entityObserved\u0060 events but no action exists to respond to threats. The audit recommends \u0060bot.attack(entity)\u0060 plus a retreat goal using \u0060GoalInvert\u0060/\u0060GoalAvoidEntity\u0060. Council deferred to post-Sprint 56, gated on TSK-0146 (entity observation re-enable).\n\nSee: \u0060Data/Pages/Audits/mineflayer-audit-claude-06-29-26.md\u0060 and \u0060Data/Pages/council/mineflayer-external-audit-council-2026-06-29.md\u0060",
+      "createdAtUtc": "2026-06-30T02:34:45.0233543Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T02:15:08.3652029Z",
+  "updatedAtUtc": "2026-06-30T02:34:45.0233543Z",
+  "completedAtUtc": null,
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0258-add-attack-melee-tool-for-entity-combat.json"
+}

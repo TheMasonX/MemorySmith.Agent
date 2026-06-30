@@ -27,15 +27,15 @@ public sealed class LiveLogBuffer
         while (_entries.Count > _capacity && _entries.TryDequeue(out _)) { }
     }
 
-    /// <summary>Returns the latest <paramref name="count"/> entries, newest first.</summary>
+    /// <summary>Returns the latest <paramref name="count"/> entries, oldest first
+    /// (so the dashboard can auto-scroll to bottom for newest).</summary>
     public IReadOnlyList<DashboardLogEntry> GetLatest(int count = 100)
     {
         var all = _entries.ToArray();
         var take = Math.Min(count, all.Length);
         var result = new DashboardLogEntry[take];
         Array.Copy(all, all.Length - take, result, 0, take);
-        // Reverse so newest is first
-        Array.Reverse(result);
+        // Keep oldest-first — frontend renders oldest→newest and auto-scrolls to bottom
         return result;
     }
 

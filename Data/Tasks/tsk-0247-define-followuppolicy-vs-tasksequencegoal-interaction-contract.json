@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0247-define-followuppolicy-vs-tasksequencegoal-interaction-contract",
+  "key": "TSK-0247",
+  "title": "Define FollowUpPolicy vs TaskSequenceGoal interaction contract",
+  "description": "## Source\nCouncil review at \u0060Data/Pages/council/blueprint-yaml-autonomy-council-2026-06-29.md\u0060 \u2014 Moderate concern M1  \nAutonomy design Phase 0\n\n## Background\nThe autonomy design introduces \u0060FollowUpPolicy\u0060 (conditional continuation based on ActionOutcome) alongside existing \u0060TaskSequenceGoal\u0060 (known compile-time sequence). The interaction between these two chaining mechanisms is undefined \u2014 both could fire for the same goal, causing double-chaining or deadlock.\n\n## Scope\nDefine explicit interaction rules:\n1. Does \u0060FollowUpPolicy\u0060 suspend sequence advancement when it fires?\n2. Does sequence advancement reset the \u0060FollowUpPolicy\u0060?\n3. Can they be combined (e.g., sequence step \u2192 follow-up check \u2192 next sequence step)?\n4. What happens to \u0060FollowUpPolicy\u0060 when sub-goals are inside a \u0060TaskSequenceGoal\u0060?\n5. Precedence: which wins when both would chain?\n\n## Deliverables\n- Design document: \u0060Data/Pages/autonomy-models.md\u0060 (or update existing)\n- Precedence rules documented in AGENTS.md\n- Decision record in architecture.md\n\n## Exit Criteria\n- Rules documented and reviewed\n- No ambiguity between the two chaining mechanisms\n- Implementation path clear for Phase 2 and Phase 3",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-56",
+    "domain:autonomy",
+    "type:design"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T00:07:04.9017489Z",
+  "updatedAtUtc": "2026-06-30T00:07:04.9017489Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

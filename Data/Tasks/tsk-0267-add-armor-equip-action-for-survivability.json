@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0267-add-armor-equip-action-for-survivability",
+  "key": "TSK-0267",
+  "title": "Add armor equip action for survivability",
+  "description": "**Source:** External audit (capability gap) | **Council:** Deferred post-Sprint 56\n\n**Problem:** The adapter has no action to equip armor. For combat situations (once attack tool exists), armor provides meaningful survivability. \u0060bot.equip(item, \u0027torso\u0027|\u0027legs\u0027|\u0027head\u0027|\u0027feet\u0027)\u0060 supports armor slot equipping.\n\n**Fix:** Add armor equip capability, either as:\na) A parameter on the existing \u0060equip\u0060 action, or\nb) A standalone \u0060equipArmor\u0060 action\n\n**Files:** \u0060MineflayerAdapter/index.js\u0060 (new action or extend existing)\n\n**Priority:** Low \u2014 gated on combat/attack actions (TSK-0258)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Low",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "type:enhancement",
+    "domain:mineflayer",
+    "capability-gap"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T02:34:37.737783Z",
+  "updatedAtUtc": "2026-06-30T02:34:37.737783Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

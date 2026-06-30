@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0245-assess-blockstate-type-change-impact-across-all-subsystems",
+  "key": "TSK-0245",
+  "title": "Assess BlockState type change impact across all subsystems",
+  "description": "## Source\nCouncil review at \u0060Data/Pages/council/blueprint-yaml-autonomy-council-2026-06-29.md\u0060 \u2014 Blocking issue B4  \nBlueprint YAML design doc \u2014 Phase 0 deliverables\n\n## Background\nThe blueprint YAML design proposes changing \u0060PlacementBlock.BlockState\u0060 from \u0060string?\u0060 (flat string like \u0060\u0022half=top\u0022\u0060) to a structured \u0060BlockState\u0060 class with \u0060Dictionary\u003Cstring, string\u003E Properties\u0060. This is a breaking change that affects:\n\n1. \u0060Agent.Construction/BlueprintSchema.cs\u0060 \u2014 \u0060PlacementBlock\u0060 record definition\n2. \u0060Agent.Construction/BlueprintParser.cs\u0060 \u2014 legend parser annotates BlockState as flat string\n3. \u0060Agent.Construction/BlueprintExecutor.cs\u0060 \u2014 passes \u0060blockState\u0060 as \u0060arguments[\u0022blockState\u0022]\u0060 string\n4. \u0060MineflayerAdapter/index.js\u0060 \u2014 receives \u0060args.blockState\u0060 as string, applies to block\n5. \u0060Agent.Planning/Goals/BuildGoal.cs\u0060 \u2014 stores \u0060IReadOnlyList\u003CPlacementBlock\u003E\u0060\n6. All test files that construct \u0060PlacementBlock\u0060 instances\n\n## Scope\nComplete a full inventory of every code location that reads, writes, or expects \u0060PlacementBlock.BlockState\u0060. For each location, determine:\n- Is it a source (writes the field)?\n- Is it a consumer (reads the field)?\n- Would changing to \u0060BlockState\u0060 object require a serialization format (string \u2194 dict converter)?\n- What is the migration effort per location?\n- Can we keep the flat string as a serialization format and add structured access as an overlay?\n\n## Deliverables\n- Complete inventory document (all file paths \u002B line numbers)\n- Migration effort estimate per subsystem\n- Recommendation: structured \u0060BlockState\u0060 class vs. flat string with helper methods\n- Impact on adapter wire protocol (Node.js)\n\n## Exit Criteria\n- All 6\u002B subsystems inventoried\n- Migration effort estimated (days per subsystem)\n- Decision documented: structured class or flat string with helpers\n- No accidental \u0060BlockState\u0060 changes until this assessment is complete",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-56",
+    "domain:construction",
+    "type:analysis"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-06-30T00:06:47.0521694Z",
+  "updatedAtUtc": "2026-06-30T00:06:47.0521694Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

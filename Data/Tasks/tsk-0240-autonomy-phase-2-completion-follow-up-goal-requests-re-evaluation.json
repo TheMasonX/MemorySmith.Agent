@@ -18,16 +18,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-afcbf8db2ef7485185640c820d66cca7",
+      "author": "anonymous",
+      "body": "Council review update (2026-06-29): Phase 2 requires these gates before implementation:\n1. Phase 0 contract types merged (WakeReason, RuntimeSignal, FollowUpPolicy)\n2. Phase 1 signal plumbing working in production\n3. \u0060EvaluationResult\u0060 discriminated union available (TSK-0243)\n4. \u0060TaskSequenceGoal\u0060 completion detection reliable\n5. Continuation limits must be enforced (no runaway chains)\n\nScope confirmed: completion signal type, follow-up policy attached to goal/intent, evaluator can request continuation, failure can choose retry/stop/branch, outcome-aware logging.\n\nSee full report: \u0060Data/Pages/council/blueprint-yaml-autonomy-council-2026-06-29.md\u0060",
+      "createdAtUtc": "2026-06-30T00:07:13.6629872Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-29T23:46:14.2648029Z",
-  "updatedAtUtc": "2026-06-29T23:46:14.2648029Z",
+  "updatedAtUtc": "2026-06-30T00:07:13.6629872Z",
   "completedAtUtc": null,
-  "revision": 1,
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0240-autonomy-phase-2-completion-follow-up-goal-requests-re-evaluation.json"
 }

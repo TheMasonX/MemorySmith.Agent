@@ -479,6 +479,24 @@ app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
 app.MapGet("/api/agent/status", (AgentBackgroundService? agent, IWorldModel? worldModel) =>
 {
     var currentAction = agent?.GetCurrentAction();
+    var facts = agent?.WorldState.Facts;
+
+    // Sprint 55 Wave C: parse structured entity data for dashboard/API.
+    IReadOnlyList<ObservedEntityDto>? entities = null;
+    if (facts?.TryGetValue("nearbyEntitiesRaw", out var raw) == true && raw is string rawJson)
+    {
+        try
+        {
+            var parsed = System.Text.Json.JsonSerializer.Deserialize<ObservedEntityDto[]>(rawJson);
+            if (parsed is { Length: > 0 })
+                entities = parsed;
+        }
+        catch { /* best-effort parse */ }
+    }
+
+    string? blockBelow = facts?.TryGetValue("blockBelow", out var bb) == true && bb is string bbs
+        ? bbs : null;
+
     return Results.Ok(new
     {
         Status              = agentEnabled ? (agent?.CurrentGoal != null ? "active" : "idle") : "disabled",
@@ -492,6 +510,8 @@ app.MapGet("/api/agent/status", (AgentBackgroundService? agent, IWorldModel? wor
             ? new { tool = currentAction.Tool, args = currentAction.Arguments }
             : null,
         Inventory           = agent?.WorldState.Inventory,
+        NearbyEntities      = entities,
+        BlockBelow          = blockBelow,
         QueuedActions       = agent?.GetPendingActions().Count ?? 0,
         ConsecutiveFailures = agent?.ConsecutiveFailures ?? 0,
         Uncertainty         = worldModel?.Uncertainty ?? 0.0,

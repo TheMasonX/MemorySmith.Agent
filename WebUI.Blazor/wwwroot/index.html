@@ -33,7 +33,7 @@ header h1 span { color: var(--accent); }
 .dot.active { background: var(--green); box-shadow: 0 0 6px var(--green); }
 .dot.idle   { background: var(--yellow); }
 
-main { display: grid; grid-template-columns: 280px 1fr 300px; grid-template-rows: auto 1fr; gap: 12px; padding: 14px; max-width: 1400px; margin: 0 auto; }
+main { display: grid; grid-template-columns: minmax(180px, 225px) 1fr minmax(320px, 420px); gap: 8px; padding: 8px; width: 100%; }
 
 /* ── Panels ── */
 .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
@@ -86,11 +86,21 @@ select:focus, input:focus { border-color: var(--accent); }
 .current-goal .goal-desc { color: var(--dim); font-size: 11px; line-height: 1.4; }
 
 /* ── Queue list ── */
-.queue-list { max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; }
+.queue-list { max-height: 40vh; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; }
 .queue-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 5px 8px; font-size: 11px; display: flex; justify-content: space-between; gap: 8px; }
 .queue-item .tool { color: var(--green); font-weight: 600; white-space: nowrap; }
 .queue-item .args { color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .queue-empty { color: var(--dim); font-size: 11px; text-align: center; padding: 16px; }
+
+/* ── Entity list ── */
+.entity-list { max-height: 30vh; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; }
+.entity-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
+.entity-item .ename { font-weight: 600; }
+.entity-item .ename.hostile { color: var(--red); }
+.entity-item .ename.passive { color: var(--green); }
+.entity-item .ename.item-drop { color: var(--orange); }
+.entity-item .edist { color: var(--dim); font-size: 10px; }
+.entity-item .epos { color: var(--dim); font-size: 10px; }
 
 /* ── Tabs ── */
 .tab-bar { display: flex; gap: 2px; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 14px; }
@@ -113,7 +123,7 @@ select:focus, input:focus { border-color: var(--accent); }
 .log-row .log-level.Warning { color: var(--yellow); }
 .log-row .log-level.Error { color: var(--red); }
 .log-row .log-source { color: var(--purple); margin-right: 8px; }
-.log-row .log-msg { color: var(--text); }
+.log-row .log-msg { color: var(--text); word-wrap: break-word; white-space: normal; }
 
 /* ── Timeline ── */
 .timeline { max-height: 600px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
@@ -131,12 +141,12 @@ select:focus, input:focus { border-color: var(--accent); }
 .tl-empty { color: var(--dim); font-size: 11px; text-align: center; padding: 24px; }
 
 /* ── Live Log Strip (Overview) ── */
-.live-log { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 1px; font-size: 10px; font-family: 'SF Mono', 'Fira Code', monospace; }
-.live-log .log-row { padding: 2px 6px; border-left-width: 2px; font-size: 10px; line-height: 1.4; }
+.live-log { max-height: 25vh; overflow-y: auto; display: flex; flex-direction: column; gap: 1px; font-size: 10px; font-family: 'SF Mono', 'Fira Code', monospace; }
+.live-log .log-row { padding: 2px 6px; border-left-width: 2px; font-size: 10px; line-height: 1.5; min-height: fit-content; }
 .live-log .log-row .log-time { color: var(--dim); margin-right: 4px; min-width: 70px; display: inline-block; }
 .live-log .log-row .log-level { width: 18px; font-size: 9px; }
 .live-log .log-row .log-source { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: middle; }
-.live-log .log-row .log-msg { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.live-log .log-row .log-msg { overflow: visible; word-wrap: break-word; white-space: normal; }
 .live-log-controls { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; flex-wrap: wrap; }
 .live-log-controls .filter-btn { padding: 2px 8px; font-size: 10px; border-radius: 3px; border: 1px solid var(--border); background: var(--surface2); color: var(--dim); cursor: pointer; }
 .live-log-controls .filter-btn.active { background: var(--accent); color: #0d1117; border-color: var(--accent); }
@@ -187,7 +197,7 @@ a:hover { text-decoration: underline; }
 <header>
   <div style="display:flex;align-items:center;gap:12px">
     <h1>MemorySmith.<span>Agent</span></h1>
-    <span style="font-size:10px;color:var(--dim);background:var(--surface2);padding:2px 8px;border-radius:10px;border:1px solid var(--border)">v0.50.2</span>
+    <span style="font-size:10px;color:var(--dim);background:var(--surface2);padding:2px 8px;border-radius:10px;border:1px solid var(--border)">v0.55.1</span>
   </div>
   <div style="display:flex;align-items:center;gap:16px">
     <nav style="display:flex;gap:4px;font-size:12px">
@@ -306,6 +316,11 @@ a:hover { text-decoration: underline; }
         <span class="pos-coord">Z <span id="posZ">—</span></span>
       </div>
 
+      <!-- Sprint 55 Wave C: Block below feet -->
+      <div style="font-size:12px;color:var(--dim);margin-bottom:8px">
+        <span>🪨 Below: <b id="blockBelow" style="color:var(--accent)">—</b></span>
+      </div>
+
       <!-- Current action detail -->
       <div id="currentActionBox" class="current-action" style="display:none">
         <span class="ca-tool" id="currentActionTool">—</span>
@@ -344,6 +359,14 @@ a:hover { text-decoration: underline; }
       <h2>📋 Action Queue <span class="badge blue" id="queueBadge">0</span></h2>
       <div class="queue-list" id="queueList">
         <div class="queue-empty">Queue is empty.</div>
+      </div>
+    </div>
+
+    <!-- Entities Panel (Sprint 55 Wave C) -->
+    <div class="panel" style="flex:1">
+      <h2>👾 Nearby Entities <span class="badge blue" id="entityCountBadge">0</span></h2>
+      <div class="entity-list" id="entityList">
+        <div class="queue-empty">No entities observed yet.</div>
       </div>
     </div>
 
@@ -590,6 +613,16 @@ function applyStatusUpdate(u) {
   document.getElementById('posY').textContent = u.y;
   document.getElementById('posZ').textContent = u.z;
 
+  // Sprint 55 Wave C: Block below feet
+  const blockBelowEl = document.getElementById('blockBelow');
+  if (u.blockBelow) {
+    blockBelowEl.textContent = u.blockBelow;
+    blockBelowEl.style.color = 'var(--accent)';
+  } else {
+    blockBelowEl.textContent = '—';
+    blockBelowEl.style.color = 'var(--dim)';
+  }
+
   // Goal
   applyGoalDisplay(u.goal ?? null, u.goalDescription ?? '');
 
@@ -597,6 +630,9 @@ function applyStatusUpdate(u) {
   renderInventory(u.inventory);
   document.getElementById('queueCount').textContent = u.queuedActions;
   document.getElementById('failCount').textContent  = u.consecutiveFailures;
+
+  // Sprint 55 Wave C: Nearby entities
+  renderEntities(u.nearbyEntities);
 }
 
 function renderInventory(inv) {
@@ -608,6 +644,29 @@ function renderInventory(inv) {
   grid.innerHTML = Object.entries(inv)
     .sort((a, b) => b[1] - a[1])
     .map(([name, count]) => `<div class="inv-item"><span class="name">${name}</span><span class="count">${count}</span></div>`)
+    .join('');
+}
+
+// ── Sprint 55 Wave C: Entity list rendering ───────────────────────────────
+
+function renderEntities(entities) {
+  const list = document.getElementById('entityList');
+  const badge = document.getElementById('entityCountBadge');
+  if (!entities || entities.length === 0) {
+    list.innerHTML = '<div class="queue-empty">No entities observed yet.</div>';
+    if (badge) badge.textContent = '0';
+    return;
+  }
+  if (badge) badge.textContent = entities.length;
+  list.innerHTML = entities
+    .sort((a, b) => a.distance - b.distance)
+    .map(e => {
+      const isItem = e.name && e.name.startsWith('item:');
+      const cls = isItem ? 'item-drop' : (e.hostile ? 'hostile' : 'passive');
+      const icon = isItem ? '📦' : (e.hostile ? '💀' : '👾');
+      const pos = `(${e.x},${e.y},${e.z})`;
+      return `<div class="entity-item"><span class="ename ${cls}">${icon} ${e.name}</span><span class="edist">${e.distance.toFixed(1)}blk</span><span class="epos">${pos}</span></div>`;
+    })
     .join('');
 }
 
@@ -782,6 +841,16 @@ function applyStatus(s) {
     document.getElementById('posZ').textContent = p.z ?? '—';
   }
 
+  // Sprint 55 Wave C: Block below feet
+  const blockBelowEl = document.getElementById('blockBelow');
+  if (s.blockBelow) {
+    blockBelowEl.textContent = s.blockBelow;
+    blockBelowEl.style.color = 'var(--accent)';
+  } else {
+    blockBelowEl.textContent = '—';
+    blockBelowEl.style.color = 'var(--dim)';
+  }
+
   // Counts
   document.getElementById('queueCount').textContent = s.queuedActions ?? 0;
   document.getElementById('failCount').textContent  = s.consecutiveFailures ?? 0;
@@ -831,6 +900,9 @@ function applyStatus(s) {
       `<div class="inv-item"><span class="name" title="${k}">${k}</span><span class="count">${inv[k]}</span></div>`
     ).join('');
   }
+
+  // Sprint 55 Wave C: Nearby entities
+  renderEntities(s.nearbyEntities);
 }
 
 function setStatusOffline() {
