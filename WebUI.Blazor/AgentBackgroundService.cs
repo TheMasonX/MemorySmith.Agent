@@ -78,7 +78,11 @@ public sealed class AgentBackgroundService(
     private static readonly IReadOnlyDictionary<string, int> ToolTimeoutOverrides =
         new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
     {
-        ["place"] = 5,  // Sprint 43 (P1-4): increased from 2s — pathfinding + reference placement takes 2-5s
+        // Sprint 56 (TSK-0270): increased from 5s to 15s. Pathfinding alone takes
+        // 2-5s per block. With sequential adapter queue processing, the total
+        // round-trip (dispatch → navigate → place → blockPlaced event → C#) can
+        // easily exceed 5s for any block more than a few blocks away from the bot.
+        ["place"] = 15,
         // Sprint 54 (TSK-0221): GetStatus used to default to 30s. A timed-out GetStatus
         // blocks the stale-inventory guard, causing the agent to operate on stale inventory
         // for the full 30s. 10s is plenty for a StatusEvent round-trip; if the adapter
@@ -606,6 +610,16 @@ public sealed class AgentBackgroundService(
                     CompleteCorrelatedActionByTool("Status");
                     // Sprint 54 (TSK-0221): reset timeout gate on successful GetStatus.
                     _consecutiveGetStatusTimeouts = 0;
+                    // Sprint 56: log game mode and inventory for diagnostics.
+                    var invCount = _worldState.Inventory.Sum(kv => kv.Value);
+                    logger.LogInformation(
+                        "[status] received: gameMode={GameMode} creative={IsCreative} " +
+                        "inventoryItems={InvCount} inventoryStale={IsStale} pos=({X},{Y},{Z})",
+                        _worldState.GameMode ?? "unknown",
+                        _worldState.IsCreativeMode,
+                        invCount,
+                        _worldState.IsInventoryStale,
+                        _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
                     break;
 
                 case BlockMinedEvent e:
