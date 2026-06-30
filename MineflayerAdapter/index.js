@@ -296,13 +296,124 @@ function connectBot() {
 }
 
 function registerBotEventHandlers() {
+  // ── Bot event forwarding ──────────────────────────────────────────────────
+
+  bot.once('spawn', () => {
+    spawnPos = { x: bot.entity.position.x, y: bot.entity.position.y, z: bot.entity.position.z };
+    const adapterVersion = process.env.npm_package_version ?? 'unknown';
+    const mcVersion = bot.version ?? 'unknown';
+    console.log(`[mc] bot spawned at ${JSON.stringify(botPos())} — adapter v${adapterVersion}, MC ${mcVersion}, mineflayer ${require('mineflayer/package.json').version}`);
+    sendEvent('spawn', { ...botPos(), hp: bot.health, food: bot.food });
+    emitGameModeEvent(bot, sendEvent, logStructured);
+  });
+
+  bot.on('health', () => sendEvent('health', { hp: bot.health, food: bot.food }));
+  bot.on('move',   () => sendEvent('move',   botPos()));
+  bot.on('death',  () => { console.warn('[mc] bot died'); sendEvent('death', botPos()); });
+  bot.on('kicked', (reason) => { console.warn('[mc] kicked:', reason); sendEvent('kicked', { reason }); });
+  bot.on('error',  (e)      => { console.error('[mc] error:', e.message); sendEvent('error', { message: e.message }); });
+  bot.on('game', () => emitGameModeEvent(bot, sendEvent, logStructured));
+
+  // Sprint 35 P0-A: emit itemCollected when the bot picks up a dropped item entity.
+  bot.on('playerCollect', (collector, entity) => {
+    if (collector.username !== bot.username) return;
+    const itemName = entity?.metadata?.name ?? entity?.displayName ?? 'unknown';
+    const count = entity?.count ?? 1;
+    sendEvent('itemCollected', { item: itemName, count });
+    logStructured('debug', 'collect', 'item collected', { item: itemName, count });
+  });
+
+  // Sprint 55 Wave B/C: passive entity + block observation.
+  bot.on('physicsTick', scanNearbyEntities);
+  bot.on('physicsTick', scanBlockBelow);
+
+  bot.on('chat', (username, message) => {
+    // Sprint 38 P0-D (BUG-D): defensive try/catch
+    try {
+      if (username === bot.username) return;
+
+      if (isSystemMessage(username, message)) {
+        logStructured('debug', 'chat', 'system message filtered', { username, message });
+        const gameModeMatch = message.match(/game mode to (.+)$/i);
+        if (gameModeMatch) {
+          const normalizedMode = normalizeGameMode(gameModeMatch[1]);
+          if (normalizedMode) {
+            sendEvent('gameMode', { mode: normalizedMode });
+            logStructured('info', 'chat', 'gamemode detected', { mode: normalizedMode });
+          }
+        }
+        const teleportMatch = message.match(/^Teleported\s+(\S+)\s+to\s+(\S+)/i);
+        if (teleportMatch && teleportMatch[1].toLowerCase() === bot.username.toLowerCase()) {
+          setTimeout(() => {
+            if (bot.entity) {
+              sendEvent('move', botPos());
+              logStructured('info', 'chat', 'bot teleport detected — position update sent', botPos());
+            }
+          }, 100);
+        }
+        return;
+      }
+
+      const onlinePlayers = Object.keys(bot.players).filter(p => p !== bot.username).length;
+      const playerEntity  = bot.players[username]?.entity;
+      const playerPos     = playerEntity?.position ?? null;
+      sendEvent('chat', {
+        username,
+        message,
+        onlinePlayers,
+        playerX: playerPos ? Math.round(playerPos.x) : null,
+        playerY: playerPos ? Math.round(playerPos.y) : null,
+        playerZ: playerPos ? Math.round(playerPos.z) : null,
+      });
+    } catch (err) {
+      console.error('[chat] handler error:', err.message);
+      logStructured('error', 'chat', 'handler threw', { username, message, error: err.message });
+    }
+  });
+
+  // Sprint 56 (TSK-0263): Reconnect on disconnect with exponential backoff.
+  bot.on('end', (reason) => {
+    console.warn(`[mc] disconnected: ${reason}`);
+    logStructured('warn', 'reconnect', 'bot disconnected, will reconnect', { reason });
+    sendEvent('disconnected', { reason, timestamp: new Date().toISOString() });
+
+    if (_reconnectTimer) clearTimeout(_reconnectTimer);
+
+    const delay = Math.min(
+      RECONNECT_BASE_DELAY_MS * Math.pow(RECONNECT_BACKOFF_FACTOR, _reconnectAttempts),
+      RECONNECT_MAX_DELAY_MS
+    );
+    _reconnectAttempts++;
+
+    console.log(`[mc] reconnecting in ${(delay / 1000).toFixed(1)}s (attempt ${_reconnectAttempts})...`);
+    logStructured('info', 'reconnect', 'scheduling reconnect', {
+      attempt: _reconnectAttempts,
+      delayMs: delay,
+    });
+
+    _reconnectTimer = setTimeout(() => {
+      try {
+        connectBot();
+        console.log('[mc] reconnected successfully');
+        logStructured('info', 'reconnect', 'reconnected', { attempt: _reconnectAttempts });
+        sendEvent('reconnected', { attempt: _reconnectAttempts, timestamp: new Date().toISOString() });
+      } catch (err) {
+        console.error(`[mc] reconnect failed: ${err.message}`);
+        logStructured('error', 'reconnect', 'reconnect failed', {
+          attempt: _reconnectAttempts,
+          error: err.message,
+        });
+      }
+    }, delay);
+  });
+}
+
+// ── Helper functions (module scope — called from dispatch and event handlers) ──
 
 function botPos() {
   const p = bot.entity?.position ?? { x: 0, y: 64, z: 0 };
   // Sprint 43 (P1-3): use Math.floor() instead of Math.round() so entity coordinates
   // map to the block the bot is actually standing ON (not the nearest block).
-  // Entity (-231.4, 65.0, 151.2) → floor to (-232, 65, 151), which matches the
-  // block the bot is standing above. round(-231.4) = -231 (off by 1).
   return { x: Math.floor(p.x), y: Math.floor(p.y), z: Math.floor(p.z) };
 }
 
@@ -312,7 +423,7 @@ function findGroundY(x, z) {
   try {
     for (let y = 127; y >= -64; y--) {
       const block = bot.blockAt(toVec3(x, y, z));
-      if (block && block.type !== 0) return y + 1; // return the block ABOVE the solid one
+      if (block && block.type !== 0) return y + 1;
     }
   } catch (err) {
     // Chunk not loaded — return null, caller will use original Y
@@ -326,9 +437,6 @@ function sendBotStatus() {
   for (const item of invItems) {
     invMap[item.name] = (invMap[item.name] ?? 0) + item.count;
   }
-  // Sprint 37: include game mode so C# ApplyStatus can set it from the status
-  // response. Previously game mode was only set via GameModeChangedEvent which
-  // fires asynchronously and can be missed on startup.
   const rawMode = bot?.game?.gameMode;
   const gameMode = rawMode != null ? normalizeGameMode(rawMode) : undefined;
   sendEvent('status', {
@@ -340,43 +448,7 @@ function sendBotStatus() {
   });
 }
 
-// ── Bot event forwarding ──────────────────────────────────────────────────────
-
-bot.once('spawn', () => {
-  spawnPos = { x: bot.entity.position.x, y: bot.entity.position.y, z: bot.entity.position.z };
-  const adapterVersion = process.env.npm_package_version ?? 'unknown';
-  const mcVersion = bot.version ?? 'unknown';
-  console.log(`[mc] bot spawned at ${JSON.stringify(botPos())} — adapter v${adapterVersion}, MC ${mcVersion}, mineflayer ${require('mineflayer/package.json').version}`);
-  sendEvent('spawn', { ...botPos(), hp: bot.health, food: bot.food });
-  emitGameModeEvent(bot, sendEvent, logStructured);
-});
-
-bot.on('health', () => sendEvent('health', { hp: bot.health, food: bot.food }));
-bot.on('move',   () => sendEvent('move',   botPos()));
-bot.on('death',  () => { console.warn('[mc] bot died'); sendEvent('death', botPos()); });
-bot.on('kicked', (reason) => { console.warn('[mc] kicked:', reason); sendEvent('kicked', { reason }); });
-bot.on('error',  (e)      => { console.error('[mc] error:', e.message); sendEvent('error', { message: e.message }); });
-bot.on('game', () => emitGameModeEvent(bot, sendEvent, logStructured));
-
-// Sprint 35 P0-A: emit itemCollected when the bot picks up a dropped item entity.
-// Guard: only fire for the bot's own collections, not other players picking up items.
-// Provides the TRUE item drop name (e.g. "diamond" from diamond_ore, "cobblestone" from stone).
-// WorldStateProjector.ApplyItemCollected uses this as the authoritative inventory source.
-// Periodic GetStatus reconciles any drift.
-bot.on('playerCollect', (collector, entity) => {
-  if (collector.username !== bot.username) return;
-  // entity.metadata.name is the item type (bare name, e.g. "diamond"); entity.count is quantity.
-  const itemName = entity?.metadata?.name ?? entity?.displayName ?? 'unknown';
-  const count = entity?.count ?? 1;
-  sendEvent('itemCollected', { item: itemName, count });
-  logStructured('debug', 'collect', 'item collected', { item: itemName, count });
-});
-
 // ── Sprint 55 Wave B: Passive entity observation ──────────────────────────
-// Periodically scans for ALL mobs near the bot and emits entityObserved
-// events. Feeds into the C# observe→evaluate replan loop for threat detection.
-// Hostile/neutral/passive classification uses the HOSTILE_MOB_NAMES set.
-// Sprint 55 Wave C: expanded from hostiles-only to all mobs with hostility flag.
 
 const HOSTILE_MOB_NAMES = new Set([
   'zombie', 'skeleton', 'creeper', 'spider', 'cave_spider',
@@ -388,10 +460,9 @@ const HOSTILE_MOB_NAMES = new Set([
   'warden', 'breeze', 'bogged',
 ]);
 
-// Sprint 55 Wave C: passive block observation — track the block below the bot's feet.
+// Sprint 55 Wave C: passive block observation state.
 let _lastBlockScanAt = 0;
 let _lastKnownBlockBelow = null;
-
 let _lastEntityScanAt = 0;
 
 function scanNearbyEntities() {
@@ -405,17 +476,13 @@ function scanNearbyEntities() {
     const observed = [];
     const allEntities = Object.values(bot.entities ?? {});
     for (const e of allEntities) {
-      // Sprint 55 Wave C: include both mobs AND objects (dropped items, etc.)
       if (!e || !e.position) continue;
       if (e.type !== 'mob' && e.type !== 'object') continue;
       const rawName = (e.name ?? e.mobType ?? '').toLowerCase();
-      // For item/object entities, try to get the actual item type from metadata
       const itemType = (e.type === 'object' && e.metadata?.name)
-        ? e.metadata.name
-        : null;
+        ? e.metadata.name : null;
       const displayName = itemType
-        ? `item:${itemType}`  // e.g. "item:dirt" instead of just "item"
-        : (e.name ?? e.mobType ?? 'unknown');
+        ? `item:${itemType}` : (e.name ?? e.mobType ?? 'unknown');
 
       const dx = e.position.x - botPosObj.x;
       const dy = e.position.y - botPosObj.y;
@@ -455,12 +522,11 @@ function scanNearbyEntities() {
   }
 }
 
-// Sprint 55 Wave C: passive block observation — detect the block below the bot.
 function scanBlockBelow() {
   try {
     if (!bot?.entity) return;
     const now = Date.now();
-    if (now - _lastBlockScanAt < 1000) return; // 1s cooldown
+    if (now - _lastBlockScanAt < 1000) return;
     _lastBlockScanAt = now;
 
     const pos = botPos();
@@ -482,102 +548,6 @@ function scanBlockBelow() {
   } catch (err) {
     // Silent — blockAt can throw on unloaded chunks
   }
-}
-
-// Sprint 55 Wave B: enabled after verifying chat works on both 1.16.5 and 1.21.x.
-  bot.on('physicsTick', scanNearbyEntities);
-  // Sprint 55 Wave C: passive block below detection.
-  bot.on('physicsTick', scanBlockBelow);
-
-  bot.on('chat', (username, message) => {
-    // Sprint 38 P0-D (BUG-D): defensive try/catch — any uncaught error in the
-    // chat handler would crash the adapter process. Errors are logged and the
-    // event is dropped rather than propagating.
-    try {
-      if (username === bot.username) return;
-
-      // Sprint 19: filter system messages before they reach the LLM pipeline
-      if (isSystemMessage(username, message)) {
-        logStructured('debug', 'chat', 'system message filtered', { username, message });
-
-        const gameModeMatch = message.match(/game mode to (.+)$/i);
-        if (gameModeMatch) {
-          const normalizedMode = normalizeGameMode(gameModeMatch[1]);
-          if (normalizedMode) {
-            sendEvent('gameMode', { mode: normalizedMode });
-            logStructured('info', 'chat', 'gamemode detected', { mode: normalizedMode });
-          }
-        }
-
-        // If the bot was teleported, emit a position update so WorldState stays current
-        const teleportMatch = message.match(/^Teleported\s+(\S+)\s+to\s+(\S+)/i);
-        if (teleportMatch && teleportMatch[1].toLowerCase() === bot.username.toLowerCase()) {
-          setTimeout(() => {
-            if (bot.entity) {
-              sendEvent('move', botPos());
-              logStructured('info', 'chat', 'bot teleport detected — position update sent', botPos());
-            }
-          }, 100);
-        }
-        return;
-      }
-
-      const onlinePlayers = Object.keys(bot.players).filter(p => p !== bot.username).length;
-      const playerEntity  = bot.players[username]?.entity;
-      const playerPos     = playerEntity?.position ?? null;
-      sendEvent('chat', {
-        username,
-        message,
-        onlinePlayers,
-        playerX: playerPos ? Math.round(playerPos.x) : null,
-        playerY: playerPos ? Math.round(playerPos.y) : null,
-        playerZ: playerPos ? Math.round(playerPos.z) : null,
-      });
-    } catch (err) {
-      console.error('[chat] handler error:', err.message);
-      logStructured('error', 'chat', 'handler threw', { username, message, error: err.message });
-    }
-  });
-
-  // Sprint 56 (TSK-0263): Reconnect on disconnect with exponential backoff.
-  // bot.on('end') fires when the MC server connection drops for any reason
-  // (kicked, server restart, network hiccup). Without this, the process is
-  // permanently stuck pointing at a dead bot object.
-  bot.on('end', (reason) => {
-    console.warn(`[mc] disconnected: ${reason}`);
-    logStructured('warn', 'reconnect', 'bot disconnected, will reconnect', { reason });
-    sendEvent('disconnected', { reason, timestamp: new Date().toISOString() });
-
-    if (_reconnectTimer) clearTimeout(_reconnectTimer);
-
-    const delay = Math.min(
-      RECONNECT_BASE_DELAY_MS * Math.pow(RECONNECT_BACKOFF_FACTOR, _reconnectAttempts),
-      RECONNECT_MAX_DELAY_MS
-    );
-    _reconnectAttempts++;
-
-    console.log(`[mc] reconnecting in ${(delay / 1000).toFixed(1)}s (attempt ${_reconnectAttempts})...`);
-    logStructured('info', 'reconnect', 'scheduling reconnect', {
-      attempt: _reconnectAttempts,
-      delayMs: delay,
-    });
-
-    _reconnectTimer = setTimeout(() => {
-      try {
-        connectBot();
-        console.log('[mc] reconnected successfully');
-        logStructured('info', 'reconnect', 'reconnected', { attempt: _reconnectAttempts });
-        sendEvent('reconnected', { attempt: _reconnectAttempts, timestamp: new Date().toISOString() });
-      } catch (err) {
-        console.error(`[mc] reconnect failed: ${err.message}`);
-        logStructured('error', 'reconnect', 'reconnect failed', {
-          attempt: _reconnectAttempts,
-          error: err.message,
-        });
-        // bot.on('end') will fire again on the failed bot, triggering another attempt
-      }
-    }, delay);
-  });
 }
 
 // ── Sprint 19: System message filtering ───────────────────────────────────────
