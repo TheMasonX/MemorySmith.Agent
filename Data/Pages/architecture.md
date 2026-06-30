@@ -42,6 +42,18 @@ IBlueprintRepository    — blueprint CRUD backed by MemorySmith pages
 
 ## Runtime Flow (Canonical — Sprint 50)
 
+### Hard requirements for the next architecture phase
+
+The following rules are now binding for future changes:
+
+- `ExecutionContext` is the canonical runtime state object and should carry planning, dispatch, evaluation, and replanning state instead of relying on loose parameters.
+- `Removal > deprecation > fallback`. Legacy compatibility branches and shims should be removed when the modern typed path is in place.
+- Planning and replanning must use explicit preconditions, postconditions, and structured remediation policies rather than ad hoc free-text fallbacks.
+- Fresh world-state and inventory truth are prerequisites for new plan generation.
+- `AgentBackgroundService` should remain an orchestration layer rather than become the primary owner of runtime policy.
+
+## Runtime Flow (Canonical — Sprint 50)
+
 This is the **single authoritative pipeline** as of Sprint 50. It replaces the conflicting
 descriptions that previously existed in `architecture.md` (deterministic HTN), `AGENTS.md`
 (LLM-first), and `chat-system.md` (hybrid). The pipeline is LLM-first for chat interpretation

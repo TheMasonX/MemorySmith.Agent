@@ -48,6 +48,17 @@ public interface IPlanningManager : IAgentRuntimeComponent
     /// <summary>Generates an initial or updated plan for the active goal.</summary>
     Task<ActionPlan> PlanAsync(IGoal goal, WorldState state, CancellationToken ct = default);
 
+    /// <summary>
+    /// Sprint 57: Generates a plan using the full <see cref="ExecutionContext"/>.
+    /// This is the canonical path — the planner can read preconditions, capabilities,
+    /// and recovery state from the context instead of loose parameters.
+    /// The default implementation delegates to the legacy overload.
+    /// </summary>
+    Task<ActionPlan> PlanAsync(ExecutionContext context, CancellationToken ct = default) =>
+        context.Goal is null
+            ? Task.FromResult(new ActionPlan("idle", [], []))
+            : PlanAsync(context.Goal, context.State, ct);
+
     /// <summary>Signals that the current plan should be reconsidered on the next tick.</summary>
     void RequestReplan();
 }
@@ -78,6 +89,15 @@ public interface IRecoveryManager : IAgentRuntimeComponent
     /// and the goal should continue; false if the goal should be abandoned.
     /// </summary>
     Task<bool> TryRecoverAsync(string errorMessage, WorldState state, CancellationToken ct = default);
+
+    /// <summary>
+    /// Sprint 57: Attempts recovery using the full <see cref="ExecutionContext"/>.
+    /// The recovery manager can read goal state, capabilities, and recovery
+    /// context to make structured decisions instead of string-parsing.
+    /// The default implementation delegates to the legacy overload.
+    /// </summary>
+    Task<bool> TryRecoverAsync(ExecutionContext context, CancellationToken ct = default) =>
+        TryRecoverAsync(context.RecoveryContext.LastError ?? "unknown", context.State, ct);
 }
 
 /// <summary>
@@ -94,6 +114,18 @@ public interface IStateManager : IAgentRuntimeComponent
 
     /// <summary>Applies a world event and updates Current.</summary>
     void Apply(WorldEvent ev);
+
+    /// <summary>
+    /// Sprint 57: Builds an <see cref="ExecutionContext"/> from the current
+    /// world state and the given runtime parameters. This is the canonical
+    /// way to construct the execution context each tick.
+    /// </summary>
+    ExecutionContext BuildContext(
+        IGoal? goal,
+        int queueDepth,
+        int consecutiveFailures,
+        string? lastFailureReason,
+        RecoveryContext? recoveryContext = null);
 }
 
 /// <summary>

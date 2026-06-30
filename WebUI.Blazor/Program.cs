@@ -265,6 +265,20 @@ if (agentEnabled)
     builder.Services.AddSingleton<ToolDispatcher>(sp =>
         (ToolDispatcher)sp.GetRequiredService<IToolCaller>()); // Sprint 55: concrete type for LLM fallback
 
+    // Sprint 57: ActionRegistry — structured action metadata for the planner.
+    // Populated from the ToolDispatcher's registered tools so the planner and LLM
+    // have a canonical list of available actions with descriptions.
+    builder.Services.AddSingleton<ActionRegistry>(sp =>
+    {
+        var dispatcher = (ToolDispatcher)sp.GetRequiredService<IToolCaller>();
+        var registry = new ActionRegistry();
+        foreach (var tool in dispatcher.All)
+        {
+            registry.Register(new ActionDescriptor(tool.Name, tool.Description));
+        }
+        return registry;
+    });
+
     builder.Services.AddSingleton<HtnTaskLibrary>();
     builder.Services.AddSingleton<HtnPlanner>(sp =>
         new HtnPlanner(

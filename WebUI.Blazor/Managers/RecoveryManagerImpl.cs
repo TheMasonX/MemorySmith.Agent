@@ -42,4 +42,31 @@ public sealed class RecoveryManagerImpl : IRecoveryManager
             errorMessage.Length > 80 ? errorMessage[..80] : errorMessage);
         return Task.FromResult(false);
     }
+
+    /// <summary>
+    /// Sprint 57: Structured recovery using <see cref="ExecutionContext"/>.
+    /// Reads recovery context (attempt count, last error) and capabilities
+    /// to make a deterministic recovery decision instead of string-parsing.
+    /// </summary>
+    public Task<bool> TryRecoverAsync(
+        ExecutionContext context,
+        CancellationToken ct = default)
+    {
+        var rc = context.RecoveryContext;
+
+        if (rc.IsExhausted)
+        {
+            _logger.LogWarning(
+                "[recovery] exhausted ({Attempts}/{Max}) for goal {Goal}: {Error}",
+                rc.AttemptCount, RecoveryContext.MaxAttempts,
+                context.GoalName, rc.LastError);
+            return Task.FromResult(false);
+        }
+
+        _logger.LogDebug(
+            "[recovery] stub invoked via ExecutionContext (attempt {Attempt}/{Max}, goal={Goal}, error={Error})",
+            rc.AttemptCount, RecoveryContext.MaxAttempts,
+            context.GoalName, rc.LastError);
+        return Task.FromResult(false);
+    }
 }

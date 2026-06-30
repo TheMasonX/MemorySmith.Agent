@@ -29,6 +29,8 @@ Use the `mcp-tools` skill to query and edit the repo-scoped KB (`Data/Memories`)
 
 ## Tracking
 
+[Roadmap](../../Data/Pages/roadmap.md) page provide a high-level view of the project, its phases, and the current sprint. Use this to track progress, plan future work, and ensure that all tasks are properly scoped and prioritized.
+
 The MemorySmith-backed MCP server provides a robust task tracking system for MemorySmith.Agent. This keeps things consistent, traceable, and allows for cross-agent collaboration. Make use of the related pages/tasks property to cross-reference and enhance visibility, as well as comments for keeping detailed notes and tracking decisions.
 
 All work must be tracked in the MCP task system. Use the `mcp-tools` skill to create, edit, and track tasks. Do not edit task files directly whenever possible, as this can lead to malformed task files. Future work will include adding mcp tools for the task related links, but this is the only acceptable manual edit for now.
@@ -42,4 +44,5 @@ Use the `debug-msa` skill to query rolling logs for agent behavior, errors, and 
 ## Sprint Structure
 
 Each sprint should be broken into 3-5 waves, each with a clear goal and a set of tasks. Each wave should be tracked in the MCP system using tags, with tasks created for each meaningful piece of work.
-After each wave, commit and push. Ensure that all tasks are closed and well-documented. Update documentation, version numbers, and pages/guides as needed.
+After each wave, commit and push. Ensure that all tasks are closed and well-documented.
+**Update documentation, version numbers, and pages/guides as needed.**

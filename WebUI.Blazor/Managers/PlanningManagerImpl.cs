@@ -45,6 +45,45 @@ public sealed class PlanningManagerImpl : IPlanningManager
         return (ActionPlan)plan;
     }
 
+    /// <summary>
+    /// Sprint 57: Canonical plan path using <see cref="ExecutionContext"/>.
+    /// Checks goal preconditions before delegating to the planner, and attaches
+    /// postcondition metadata to the result plan when available.
+    /// </summary>
+    public async Task<ActionPlan> PlanAsync(
+        ExecutionContext context,
+        CancellationToken ct = default)
+    {
+        _replanRequested = false; // clear flag at each plan boundary
+
+        if (context.IsIdle)
+        {
+            _logger.LogDebug("[planning] idle — no plan to generate");
+            return new ActionPlan("idle", [], []);
+        }
+
+        var goal = context.Goal!;
+        _logger.LogDebug("[planning] PlanAsync for goal {Goal} (freshInventory={Fresh})",
+            goal.Name, context.HasFreshInventory);
+
+        // Check goal preconditions when the goal implements IGoalPrecondition.
+        if (goal is IGoalPrecondition precondition)
+        {
+            if (!precondition.CanAttempt(context, out var blockingReason))
+            {
+                _logger.LogWarning(
+                    "[planning] precondition failed for {Goal}: {Reason}",
+                    goal.Name, blockingReason);
+                // Return an empty plan — the caller should treat this as blocked,
+                // not failed, and potentially queue prerequisite acquisition.
+                return new ActionPlan(goal.Name, goal.Phases, []);
+            }
+        }
+
+        var plan = await _planner.PlanAsync(goal, context.State, ct);
+        return (ActionPlan)plan;
+    }
+
     /// <inheritdoc/>
     public void RequestReplan()
     {

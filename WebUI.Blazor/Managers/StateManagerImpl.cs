@@ -58,4 +58,24 @@ public sealed class StateManagerImpl : IStateManager
         }
         _logger.LogDebug("[state] reset to provided WorldState (AgentId={AgentId})", state.AgentId);
     }
+
+    /// <inheritdoc/>
+    public ExecutionContext BuildContext(
+        IGoal? goal,
+        int queueDepth,
+        int consecutiveFailures,
+        string? lastFailureReason,
+        RecoveryContext? recoveryContext = null)
+    {
+        var state = Current;
+        var capabilities = ExecutionCapabilities.FromWorldState(state);
+        return new ExecutionContext(
+            goal,
+            state,
+            queueDepth,
+            consecutiveFailures,
+            lastFailureReason,
+            capabilities,
+            recoveryContext ?? RecoveryContext.None);
+    }
 }
