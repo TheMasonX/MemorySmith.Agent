@@ -139,14 +139,20 @@ Dashboard Wave A (build placement fixes + overview UI), Wave B (BuildOrigin migr
 | A | Adapter bug fixes from external audit | TSK-0260 through TSK-0266 (harvestTool, recipesFor, vec3 fix, reconnect, auth, ground check, pre-dig) |
 | B | Council-driven immediate fixes | TSK-0274 (TaskSequenceGoal.IsComplete verification), TSK-0275 (/give command injection), TSK-0277 (chat command deny list), TSK-0278 (config injection), TSK-0279 (hub auth), TSK-0280 (test debt) |
 
-### Sprint 57 — ExecutionContext + Fresh World-State Prerequisites
-**Status:** � Complete | **Theme:** consolidate runtime state and make planning depend on authoritative state
+### Sprint 57 — ExecutionContext + Fresh World-State Prerequisites + Bug Fixes
+**Status:** Complete (3 waves) | **Handoff:** `Data/Pages/Handoffs/sprint-57-wavec-inventory-handoff.md`
 
 | Task | Priority | Summary |
 |:-----|:--------:|:--------|
-| TSK-0289 | High | ✅ Introduce `ExecutionContext` as the canonical runtime state object for planning, dispatch, evaluation, and replanning |
-| TSK-0291 | High | ✅ Enforce fresh world-snapshot + inventory-truth prerequisites before plan generation |
-| TSK-0295 | High | ✅ Document the new architecture contract and the hard requirement that removal beats deprecation/fallback |
+| TSK-0289 | High | Introduce ExecutionContext as the canonical runtime state object |
+| TSK-0290 | High | Add structured precondition/postcondition and remediation policy objects |
+| TSK-0291 | High | Enforce fresh world-snapshot + inventory-truth prerequisites before plan generation |
+| TSK-0294 | High | Add structured execution capability and action registry surfaces |
+| TSK-0295 | High | Document the new architecture contract |
+| TSK-0296 | Critical | P0: Fix PlaceBlock "goal was changed" systematic failure |
+| TSK-0301 | Critical | P0: Fix inventory failures (spawn inventory, stale guard wait) |
+
+**Next wave backlog:** TSK-0303 (commands prompt), TSK-0304 (block registry), TSK-0302 (inventory refactor)
 
 ### Sprint 58 — Planning Model + Recovery Policy Consolidation
 **Status:** 🟢 Complete (TSK-0290 done early; TSK-0292/0293 deferred to extraction program)
