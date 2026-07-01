@@ -1806,25 +1806,43 @@ public sealed class AgentBackgroundService(
                     }
                 }
 
-                // Sprint 40 P0-B: stale-inventory pre-plan guard.
+                // Sprint 40 P0-B / Sprint 57 P0: stale-inventory pre-plan guard.
                 // When inventory is stale for an inventory-dependent goal (IItemSpecGoal),
-                // enqueue a GetStatus to refresh inventory before planning. Only enqueue
-                // if no GetStatus is already in-flight. Does NOT apply to goals that don't
-                // care about inventory (SimpleGoal, etc.).
-                // IMPORTANT: Do NOT update _lastReplanAt here — this is not a replan event,
-                // and updating it would trigger the 2-second MinReplanInterval delay.
-                if (_currentGoal is IItemSpecGoal &&
-                    _worldState.IsInventoryStale &&
-                    !HasPendingActionOfTool("GetStatus") &&
-                    !HasPendingActionOfTool("Status"))
+                // enqueue a GetStatus to refresh inventory BEFORE planning.
+                //
+                // Sprint 57 fix: previously this guard only enqueued GetStatus and
+                // continued — but the next loop iteration fell through to plan generation
+                // because GetStatus was "pending" (the stale+no-pending check didn't
+                // match). The guard now has TWO branches:
+                //   1. No GetStatus pending → enqueue one, then wait.
+                //   2. GetStatus is pending → keep waiting until stale clears or timeout.
+                //
+                // This ensures inventory is actually fresh before ANY plan is generated,
+                // preventing the "plan generated with empty inventory → all actions fail"
+                // pattern that has plagued gather and build goals for multiple sprints.
+                if (_currentGoal is IItemSpecGoal && _worldState.IsInventoryStale)
                 {
-                    logger.LogInformation(
-                        "[goal] {Goal}: inventory stale — deferring plan, queueing GetStatus | " +
-                        "inventory: [{Inventory}] pos=({PosX},{PosY},{PosZ})",
-                        _currentGoal.Name, SummarizeTaskRelevantInventory(_currentGoal),
-                        _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
-                    _queue.Enqueue(new ActionData { Tool = "GetStatus" });
-                    await Task.Delay(100, ct);
+                    if (!HasPendingActionOfTool("GetStatus") && !HasPendingActionOfTool("Status"))
+                    {
+                        logger.LogInformation(
+                            "[goal] {Goal}: inventory stale — deferring plan, queueing GetStatus | " +
+                            "inventory: [{Inventory}] pos=({PosX},{PosY},{PosZ})",
+                            _currentGoal.Name, SummarizeTaskRelevantInventory(_currentGoal),
+                            _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
+                        _queue.Enqueue(new ActionData { Tool = "GetStatus" });
+                    }
+                    else
+                    {
+                        // Sprint 57: GetStatus is in-flight — wait for it to complete.
+                        // Log at Debug level to avoid flood (fires every cycle while waiting).
+                        logger.LogDebug(
+                            "[goal] {Goal}: inventory still stale — waiting for GetStatus to complete",
+                            _currentGoal.Name);
+                    }
+
+                    // IMPORTANT: Do NOT fall through to plan generation while inventory
+                    // is stale. Continue looping until StatusEvent clears the flag.
+                    await Task.Delay(50, ct);
                     continue;
                 }
 

@@ -329,6 +329,11 @@ function registerBotEventHandlers() {
     console.log(`[mc] bot spawned at ${JSON.stringify(botPos())} — adapter v${adapterVersion}, MC ${mcVersion}, mineflayer ${require('mineflayer/package.json').version}`);
     sendEvent('spawn', { ...botPos(), hp: bot.health, food: bot.food });
     emitGameModeEvent(bot, sendEvent, logStructured);
+    // Sprint 57: Send full inventory on spawn so C# starts with accurate
+    // inventory state. Previously inventory was only sent on explicit GetStatus
+    // requests, causing the agent to report "Inventory is empty" on startup
+    // even when the bot has items from creative mode or prior sessions.
+    sendBotStatus();
   });
 
   bot.on('health', () => sendEvent('health', { hp: bot.health, food: bot.food }));
