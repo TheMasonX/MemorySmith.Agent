@@ -4,7 +4,7 @@
   "title": "Add known-commands section to LLM prompt with correct syntax and deny-list filtering",
   "description": "The LLM system prompt needs a curated list of available Minecraft commands with correct syntax. From user testing, the agent frequently misuses basic commands:\n\n- \u0060/tp\u0060 \u2014 sends wrong argument order (e.g., \u0060/tp @p Leo\u0060 instead of \u0060/tp Leo TheMasonX23\u0060)\n- \u0060/summon\u0060 \u2014 targets self instead of entity at queried coordinates\n- \u0060/give\u0060 \u2014 doesn\u0027t consistently use correct syntax\n- \u0060/locate\u0060 \u2014 not in the prompt at all\n- \u0060/fill\u0060 \u2014 not in the prompt at all\n\nThe fix should:\n1. Add a \u0022known commands\u0022 section to the LLM system prompt (BuildSystemPrompt / LlmChatInterpreter)\n2. Include correct syntax: \u0060/tp \u003Ctarget\u003E \u003Cdestination\u003E\u0060, \u0060/summon \u003Centity\u003E \u003Cx\u003E \u003Cy\u003E \u003Cz\u003E\u0060, \u0060/give \u003Cplayer\u003E \u003Citem\u003E [count]\u0060, \u0060/locate \u003Cstructure\u003E\u0060, \u0060/fill \u003Cx1\u003E \u003Cy1\u003E \u003Cz1\u003E \u003Cx2\u003E \u003Cy2\u003E \u003Cz2\u003E \u003Cblock\u003E\u0060, \u0060/execute as \u003Ctarget\u003E at @s run \u003Ccommand\u003E\u0060, \u0060/time set \u003Cvalue\u003E\u0060, \u0060/weather \u003Ctype\u003E\u0060\n3. Filter the list against DeniedCommands \u2014 don\u0027t tell the LLM about commands it can\u0027t use\n4. Include guidance: \u0022/tp can use player names or coordinates; /summon targets world coordinates not relative to bot; /give works with item IDs like oak_log, stone, dirt\u0022\n\nSearch web for Minecraft command reference if needed for accurate syntax.",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -25,11 +25,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-01T00:13:51.5830668Z",
-  "updatedAtUtc": "2026-07-01T00:13:51.5830668Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-01T05:40:06.1836017Z",
+  "completedAtUtc": "2026-07-01T05:40:06.1836017Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0303-add-known-commands-section-to-llm-prompt-with-correct-syntax-and-deny-list-filtering.json"
 }

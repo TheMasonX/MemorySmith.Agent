@@ -122,7 +122,8 @@ public sealed class LlmChatInterpreter(
         var commandsAvailable = options.CommandExecutionEnabled;
         // Sprint 55: pass ITool objects so the LLM sees descriptions + parameter names
         var systemPrompt = BuildSystemPrompt(botName, botPosition, state, currentGoal,
-            onlinePlayers, registeredTools, chatHistory, commandsAvailable);
+            onlinePlayers, registeredTools, chatHistory, commandsAvailable,
+            options.DeniedCommands);
         var userMessage = $"{username} says: \"{effective}\"";
         logger?.LogInformation("[llm] calling {Provider} ({Model}) for <{Username}> '{Message}'",
             provider.ProviderName, options.LlmModel, username,
@@ -195,7 +196,8 @@ public sealed class LlmChatInterpreter(
         string? goal, int onlinePlayers,
         IReadOnlyList<ITool>? tools = null,
         string? chatHistory = null,
-        bool commandsAvailable = false)
+        bool commandsAvailable = false,
+        IReadOnlySet<string>? deniedCommands = null)
     {
         // Sprint 35 P1-C: build inventory summary (non-zero items, desc order, max 8)
         var invSummary = state.Inventory.Count == 0
@@ -364,15 +366,16 @@ public sealed class LlmChatInterpreter(
           available and suggest they handle combat manually.
         """;
 
-        // Sprint 54: conditionally include command instructions
-        var commandBlock = commandsAvailable
-            ? "\nCOMMANDS: You CAN execute Minecraft server commands (/give, /tp, /setblock, " +
-              "/time, etc.). When asked to run a command, use intent=\"command\" with item=\"/command args\"."
-            : "\nCOMMANDS: Minecraft server commands are NOT currently enabled for you. " +
-              "If a player asks you to use a command like /give or /tp, explain that command " +
-              "execution is disabled and suggest alternatives (gather, craft, build).";
+        // Sprint 57 (TSK-0303): KNOWN COMMANDS section filtered against DeniedCommands.
+        // The LLM must know correct syntax for available commands but NOT
+        // about commands on the deny list (don't tempt hallucination).
+        var commandBlock = BuildCommandBlock(commandsAvailable, deniedCommands);
 
-        return basePrompt + commandBlock;
+        // Sprint 57 (TSK-0304): Include common item aliases so the LLM uses
+        // canonical Minecraft IDs (e.g., "wood" → "oak_log", "cobble" → "cobblestone").
+        var aliasBlock = AliasRegistry.GetAliasesForPrompt();
+
+        return basePrompt + commandBlock + aliasBlock;
     }
 
     /// <summary>
@@ -444,6 +447,90 @@ public sealed class LlmChatInterpreter(
         }
 
         return (required, optional);
+    }
+
+    /// <summary>
+    /// Sprint 57 (TSK-0303): Builds the KNOWN COMMANDS section for the LLM system prompt.
+    /// Includes only commands NOT on the deny list, with correct syntax and usage notes.
+    /// When commands are disabled, returns a brief notice instead.
+    /// </summary>
+    private static string BuildCommandBlock(
+        bool commandsAvailable,
+        IReadOnlySet<string>? deniedCommands)
+    {
+        if (!commandsAvailable)
+        {
+            return "\nCOMMANDS: Minecraft server commands are NOT currently enabled for you. " +
+                   "If a player asks you to use a command like /give or /tp, explain that command " +
+                   "execution is disabled and suggest alternatives (gather, craft, build).";
+        }
+
+        // Sprint 57 (TSK-0303): Curated known commands with correct Minecraft syntax.
+        // Each entry: (command prefix, syntax, usage note). The prefix is checked
+        // against DeniedCommands (case-insensitive, with or without leading slash).
+        var allCommands = new (string Prefix, string Syntax, string Note)[]
+        {
+            ("/tp", "/tp <target> <destination>",
+                "Teleports target TO destination. TWO args: /tp Leo TheMasonX23 (not /tp @p Leo). " +
+                "Can use player names OR coordinates."),
+            ("/give", "/give <player> <item> [count]",
+                "Gives items to a player. Use item IDs like oak_log, stone, dirt (no namespace). " +
+                "Example: /give @p oak_log 64"),
+            ("/time", "/time set <value>",
+                "Sets world time. Values: day, night, noon, midnight, or a number (0-24000)."),
+            ("/weather", "/weather <clear|rain|thunder> [duration]",
+                "Sets weather. Duration in seconds (optional)."),
+            ("/locate", "/locate structure <type>",
+                "Finds nearest structure. Types: village, stronghold, bastion_remnant, etc."),
+            ("/summon", "/summon <entity> <x> <y> <z>",
+                "Summons entity at WORLD coordinates (not relative to bot). " +
+                "Example: /summon minecraft:lightning_bolt 131 5 189"),
+            ("/fill", "/fill <x1> <y1> <z1> <x2> <y2> <z2> <block>",
+                "Fills a region with a block. Uses world coordinates."),
+            ("/execute", "/execute as <target> at @s run <command>",
+                "Runs a command as another entity. Useful for positioned effects."),
+            ("/gamemode", "/gamemode <mode> [player]",
+                "Changes game mode: survival, creative, adventure, spectator."),
+            ("/difficulty", "/difficulty <peaceful|easy|normal|hard>",
+                "Sets world difficulty."),
+        };
+
+        // Filter against DeniedCommands: if the command prefix (without slash)
+        // appears in the deny set, skip it entirely — don't tell the LLM about
+        // commands it can't use.
+        var filtered = allCommands;
+        if (deniedCommands is { Count: > 0 })
+        {
+            filtered = allCommands
+                .Where(c =>
+                {
+                    var cmd = c.Prefix.TrimStart('/');
+                    return !deniedCommands.Contains(cmd) &&
+                           !deniedCommands.Contains(c.Prefix);
+                })
+                .ToArray();
+        }
+
+        if (filtered.Length == 0)
+        {
+            return "\nCOMMANDS: No Minecraft server commands are available for your use.";
+        }
+
+        var sb = new System.Text.StringBuilder();
+        sb.Append("\nKNOWN COMMANDS (use exact syntax):");
+        foreach (var (prefix, syntax, note) in filtered)
+        {
+            sb.Append("\n  ");
+            sb.Append(syntax);
+            sb.Append(" — ");
+            sb.Append(note);
+        }
+
+        sb.Append("\n\nIMPORTANT: Use intent=\"command\" with item set to the FULL command " +
+                  "including the leading slash. Filter the above list against DeniedCommands " +
+                  "before using — only the commands listed above are available.");
+
+        return sb.ToString();
     }
 
     // -- Response parsing ------------------------------------------------------------------

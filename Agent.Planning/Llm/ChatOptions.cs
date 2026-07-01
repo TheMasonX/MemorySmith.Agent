@@ -118,6 +118,14 @@ public sealed record ChatOptions
     public bool CommandExecutionEnabled { get; init; } = true;
 
     /// <summary>
+    /// Sprint 57 (TSK-0303): Minecraft server commands the LLM must NEVER be told about
+    /// or allowed to dispatch. Commands in this set are filtered OUT of the KNOWN COMMANDS
+    /// section of the LLM system prompt. Case-insensitive; leading slash optional.
+    /// When null or empty, no filtering is applied (all known commands are shown).
+    /// </summary>
+    public IReadOnlySet<string>? DeniedCommands { get; init; }
+
+    /// <summary>
     /// Seconds after the bot last spoke during which any message is treated as a continuation
     /// of the conversation (directed at the bot). Default: 60.
     /// </summary>

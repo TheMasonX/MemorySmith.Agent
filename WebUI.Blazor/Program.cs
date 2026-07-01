@@ -168,6 +168,14 @@ if (agentEnabled)
     var chatSection = builder.Configuration.GetSection("Agent:Chat");
     chatSection.Bind(chatOpts);
 
+    // Sprint 57 (TSK-0303): Wire DeniedCommands from SafetyOptions into ChatOptions
+    // so LlmChatInterpreter.BuildSystemPrompt can filter the KNOWN COMMANDS section.
+    var safetySection = builder.Configuration.GetSection("Agent:Safety");
+    var safetyOpts = new SafetyOptions();
+    safetySection.Bind(safetyOpts);
+    if (safetyOpts.DeniedCommands is { Count: > 0 })
+        chatOpts = chatOpts with { DeniedCommands = safetyOpts.DeniedCommands };
+
     // Sprint 52: ChatHistory uses configurable max turns (default 30).
     // Future TSK-0169 will add character-length-based eviction.
     builder.Services.AddSingleton<ChatHistory>(

@@ -146,6 +146,14 @@ public sealed class AgentBackgroundService(
     /// </summary>
     private const int HealthCheckCooldownSeconds = 2;
 
+    /// <summary>
+    /// Sprint 57 (TSK-0302): Minimum seconds between periodic background inventory syncs.
+    /// The agent relies entirely on explicit GetStatus for inventory updates. Without
+    /// periodic sync, inventory can silently drift (codesmell #4). This interval
+    /// ensures periodic refresh even when no goal triggers a GetStatus.
+    /// </summary>
+    private static readonly TimeSpan InventorySyncInterval = TimeSpan.FromSeconds(30);
+
     private readonly TimeSpan[] _reconnectDelays = reconnectDelays ?? DefaultReconnectDelays;
 
     private readonly ActionQueue _queue = new();
@@ -563,7 +571,8 @@ public sealed class AgentBackgroundService(
                 await Task.WhenAll(
                     MonitorAndCancelOnFaultAsync(ProcessEventsAsync(connectionCts.Token), connectionCts),
                     DispatchActionsAsync(connectionCts.Token),
-                    ChatConsumerAsync(connectionCts.Token));
+                    ChatConsumerAsync(connectionCts.Token),
+                    InventorySyncLoopAsync(connectionCts.Token));
 
                 return; // clean exit
             }
@@ -1137,6 +1146,44 @@ public sealed class AgentBackgroundService(
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error processing chat event in consumer.");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sprint 57 (TSK-0302): Periodic background inventory sync.
+    /// Runs every <see cref="InventorySyncInterval"/> seconds. Enqueues a GetStatus
+    /// only when the agent is idle (no active goal) to avoid interfering with
+    /// ongoing operations. This addresses codesmell #4 — the agent previously
+    /// relied entirely on explicit GetStatus triggered by goal changes.
+    /// </summary>
+    private async Task InventorySyncLoopAsync(CancellationToken ct)
+    {
+        // Initial delay: don't sync immediately — wait for the first spawn StatusEvent
+        // which already includes a full inventory snapshot (TSK-0301).
+        await Task.Delay(InventorySyncInterval, ct);
+
+        while (!ct.IsCancellationRequested)
+        {
+            try
+            {
+                await Task.Delay(InventorySyncInterval, ct);
+
+                // Only sync when idle — don't interfere with active goals.
+                if (_currentGoal is not null)
+                    continue;
+
+                // Skip if inventory is already fresh (not stale).
+                if (!_worldState.IsInventoryStale)
+                    continue;
+
+                _queue.Enqueue(new ActionData { Tool = "GetStatus" });
+                logger.LogDebug("[inventory] periodic background sync enqueued (idle, inventory was stale)");
+            }
+            catch (OperationCanceledException) { throw; }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "[inventory] periodic sync loop error: {Message}", ex.Message);
             }
         }
     }

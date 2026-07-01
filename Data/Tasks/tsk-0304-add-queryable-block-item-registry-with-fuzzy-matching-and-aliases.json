@@ -4,7 +4,7 @@
   "title": "Add queryable block/item registry with fuzzy matching and aliases",
   "description": "The agent needs a queryable block/item registry so it can look up Minecraft block IDs when the LLM doesn\u0027t know the exact name. Examples from testing:\n\n- \u0022place a dirt block\u0022 \u2014 LLM might say \u0022dirt\u0022 but the actual block ID might be \u0022minecraft:dirt\u0022\n- \u0022craft a wooden pickaxe\u0022 \u2014 LLM says \u0022wooden_pickaxe\u0022 but it might be \u0022wooden_pickaxe\u0022 in newer versions\n- Creative inventory items might have different IDs than survival drops\n\nThe registry should:\n1. Be queryable by partial/fuzzy name matching\n2. Include common aliases (e.g., \u0022wood\u0022 \u2192 \u0022oak_log\u0022, \u0022stone brick\u0022 \u2192 \u0022stone_bricks\u0022)\n3. Integrate with the MemorySmith item registry (Data/Pages/item-registry/)\n4. Be available to both the LLM prompt (for command generation) and the planner (for action validation)\n5. Support Minecraft version-specific IDs where needed\n\nRelated to TSK-0282 (normalize item IDs) and the existing MemorySmithItemRegistry in Agent.Memory.",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "Medium",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -25,11 +25,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-01T00:13:51.6320388Z",
-  "updatedAtUtc": "2026-07-01T00:13:51.6320388Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-01T05:43:28.534075Z",
+  "completedAtUtc": "2026-07-01T05:43:28.534075Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0304-add-queryable-block-item-registry-with-fuzzy-matching-and-aliases.json"
 }

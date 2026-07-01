@@ -241,6 +241,76 @@ public class Sprint46Tests
         Assert.That(AliasRegistry.CraftAliases["furnace"], Is.EqualTo("furnace"));
     }
 
+    // ── TSK-0304: AliasRegistry fuzzy matching ───────────────────────────────
+
+    [Test]
+    public void TryResolve_ExactAliasMatch_ReturnsCanonicalId()
+    {
+        Assert.That(AliasRegistry.TryResolve("wood", out var id), Is.True);
+        Assert.That(id, Is.EqualTo("oak_log"));
+
+        Assert.That(AliasRegistry.TryResolve("cobble", out id), Is.True);
+        Assert.That(id, Is.EqualTo("cobblestone"));
+    }
+
+    [Test]
+    public void TryResolve_SpacesToUnderscores_MatchesNormalized()
+    {
+        // "stone brick" (with space) should resolve to "stone_bricks"
+        Assert.That(AliasRegistry.TryResolve("stone brick", out var id), Is.True);
+        Assert.That(id, Is.EqualTo("stone_bricks"));
+    }
+
+    [Test]
+    public void TryResolve_DirectKnownId_ReturnsSameId()
+    {
+        Assert.That(AliasRegistry.TryResolve("oak_log", out var id), Is.True);
+        Assert.That(id, Is.EqualTo("oak_log"));
+
+        Assert.That(AliasRegistry.TryResolve("dirt", out id), Is.True);
+        Assert.That(id, Is.EqualTo("dirt"));
+    }
+
+    [Test]
+    public void TryResolve_FuzzySubstringMatch_ReturnsBestMatch()
+    {
+        // "stone_brick" (singular) should fuzzy-match "stone_bricks"
+        Assert.That(AliasRegistry.TryResolve("stone_brick", out var id), Is.True);
+        Assert.That(id, Is.EqualTo("stone_bricks"));
+    }
+
+    [Test]
+    public void TryResolve_UnknownItem_ReturnsFalse()
+    {
+        Assert.That(AliasRegistry.TryResolve("nonexistent_item_xyz", out _), Is.False);
+        Assert.That(AliasRegistry.TryResolve("", out _), Is.False);
+        Assert.That(AliasRegistry.TryResolve("  ", out _), Is.False);
+    }
+
+    [Test]
+    public void Search_ReturnsMultipleResults()
+    {
+        var results = AliasRegistry.Search("stone");
+        Assert.That(results, Has.Some.EqualTo("stone"));
+        Assert.That(results, Has.Some.EqualTo("cobblestone"));
+    }
+
+    [Test]
+    public void Search_EmptyQuery_ReturnsEmpty()
+    {
+        var results = AliasRegistry.Search("");
+        Assert.That(results, Is.Empty);
+    }
+
+    [Test]
+    public void GetAliasesForPrompt_ContainsKeyMappings()
+    {
+        var prompt = AliasRegistry.GetAliasesForPrompt();
+        Assert.That(prompt, Does.Contain("\"wood\" → oak_log"));
+        Assert.That(prompt, Does.Contain("\"cobble\" → cobblestone"));
+        Assert.That(prompt, Does.Contain("\"stone brick\" → stone_bricks"));
+    }
+
     // ── TSK-0109: /api/about metadata ────────────────────────────────────────
 
     [Test]
