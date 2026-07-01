@@ -207,6 +207,13 @@ public sealed class HtnTaskLibrary
     public IReadOnlyList<ActionData> DecomposeCraftItem(
         string itemId, int count, WorldState state)
     {
+        // Sprint 57 Wave D: creative mode — craft items are available via /give.
+        // Skip the entire pre-gather + craft pipeline; just give the item.
+        if (state.IsCreativeMode)
+        {
+            return [ActionFactory.Create("Chat", ("message", $"/give @p {itemId} {count}"))];
+        }
+
         var actions = new List<ActionData>();
 
         // ── Pre-gather iron ingots for iron tools ─────────────────────────────
@@ -296,6 +303,13 @@ public sealed class HtnTaskLibrary
     public IReadOnlyList<ActionData> DecomposeSmeltItem(
         string inputItem, int count, WorldState state)
     {
+        // Sprint 57 Wave D: creative mode — smelted items are available via /give.
+        // Skip the pre-gather + smelt pipeline; just give the item.
+        if (state.IsCreativeMode)
+        {
+            return [ActionFactory.Create("Chat", ("message", $"/give @p {inputItem} {count}"))];
+        }
+
         var actions = new List<ActionData>();
 
         // Sprint 44: pre-gather fuel (coal) — 1 coal smelts up to 8 items.
@@ -709,6 +723,17 @@ public sealed class HtnTaskLibrary
         ItemSpec spec, string[] parameters, WorldState state)
     {
         var count = parameters.Length > 0 && int.TryParse(parameters[0], out var c) ? c : 10;
+
+        // Sprint 57 Wave D: creative mode — use /give instead of mining.
+        // Mining in creative drops nothing, so gather/craft/smelt goals that emit
+        // MineBlock actions never complete. This guard routes to /give which works
+        // in both creative and survival (if OP).
+        if (state.IsCreativeMode)
+        {
+            var itemId = spec.ItemId ?? spec.SourceBlocks.FirstOrDefault() ?? "stone";
+            return [ActionFactory.Create("Chat", ("message", $"/give @p {itemId} {count}"))];
+        }
+
         var actions = new List<ActionData>
         {
         };

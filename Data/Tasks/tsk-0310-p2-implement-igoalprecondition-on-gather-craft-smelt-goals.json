@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0310-p2-implement-igoalprecondition-on-gather-craft-smelt-goals",
+  "key": "TSK-0310",
+  "title": "P2: Implement IGoalPrecondition on gather/craft/smelt goals",
+  "description": "IGoalPrecondition and IGoalPostcondition interfaces are defined in PlanningPolicy.cs but no goal class implements them. Implement CanAttempt(ExecutionContext) on GenericGatherGoal, CraftItemGoal, and SmeltGoal to check capability prerequisites (e.g., creative mode \u2192 always feasible; survival \u2192 require fresh inventory) before plan generation.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-58",
+    "domain:planning",
+    "type:feature"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-01T13:28:33.6597919Z",
+  "updatedAtUtc": "2026-07-01T13:28:33.6597919Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

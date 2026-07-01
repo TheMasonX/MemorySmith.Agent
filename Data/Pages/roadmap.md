@@ -126,6 +126,7 @@ Dashboard Wave A (build placement fixes + overview UI), Wave B (BuildOrigin migr
 | v0.21.0 | 21 | 171+ | ✅ green |
 | v0.20.0 | 20 | 155+ | ✅ green |
 | v0.19.0 | 19 | 142+ | ✅ green |
+| S57WD | 57 | 816 | ✅ green |
 
 ---
 
@@ -139,35 +140,44 @@ Dashboard Wave A (build placement fixes + overview UI), Wave B (BuildOrigin migr
 | A | Adapter bug fixes from external audit | TSK-0260 through TSK-0266 (harvestTool, recipesFor, vec3 fix, reconnect, auth, ground check, pre-dig) |
 | B | Council-driven immediate fixes | TSK-0274 (TaskSequenceGoal.IsComplete verification), TSK-0275 (/give command injection), TSK-0277 (chat command deny list), TSK-0278 (config injection), TSK-0279 (hub auth), TSK-0280 (test debt) |
 
-### Sprint 57 — ExecutionContext + Fresh World-State Prerequisites + Bug Fixes
-**Status:** Complete (3 waves) | **Handoff:** `Data/Pages/Handoffs/sprint-57-wavec-inventory-handoff.md`
+### Sprint 5✅ Complete (4 waves) | **Handoff:** `Data/Pages/Handoffs/sprint-57-wavec-inventory-handoff.md`
+
+| Wave | Theme | Tasks |
+|:-----|:------|:------|
+| A | ExecutionContext + Policy Objects | TSK-0289, TSK-0290, TSK-0291, TSK-0294, TSK-0295 |
+| B | Known Commands + Block Registry | TSK-0303, TSK-0304 |
+| C | Inventory SSOT + PlaceBlock fix | TSK-0296, TSK-0301, TSK-0286, TSK-0302 (partial) |
+| D | Audit Synthesis + High-ROI Bug Fixes | TSK-0305 (summon silent failure), TSK-0306 (creative gather/craft/smelt), TSK-0307 (dual sequence advance), TSK-0308 (eval result check) |
+
+**Wave D completed bugs (from 3 external audits):**
+| Task | Priority | Summary |
+|:-----|:--------:|:--------|
+| TSK-0305 | **P0** | ✅ Fix /summon denylist conflict — enqueue blocked response to player |
+| TSK-0306 | **P0** | ✅ Fix creative gather/craft/smelt — IsCreativeMode guards in decomposers |
+| TSK-0307 | **P1** | ✅ Fix dual TaskSequenceGoal advancement — shared ResetForNextSequenceStep |
+| TSK-0308 | **P1** | ✅ Check EvaluationResult.IsSuccess — add _consecutiveLlmEvalFailures counter |
+
+### Sprint 58 — WorldModel Wiring + Tool Expansion + Precondition Implementation
+**Status:** 🟡 Planned | **Source:** Sprint 57 Wave D audit synthesis
 
 | Task | Priority | Summary |
 |:-----|:--------:|:--------|
-| TSK-0289 | High | Introduce ExecutionContext as the canonical runtime state object |
-| TSK-0290 | High | Add structured precondition/postcondition and remediation policy objects |
-| TSK-0291 | High | Enforce fresh world-snapshot + inventory-truth prerequisites before plan generation |
-| TSK-0294 | High | Add structured execution capability and action registry surfaces |
-| TSK-0295 | High | Document the new architecture contract |
-| TSK-0296 | Critical | P0: Fix PlaceBlock "goal was changed" systematic failure |
-| TSK-0301 | Critical | P0: Fix inventory failures (spawn inventory, stale guard wait) |
+| TSK-0309 | P2 | Wire WorldModel.Predict pre-dispatch and Reconcile post-completion |
+| TSK-0310 | P2 | Implement IGoalPrecondition on gather/craft/smelt goals |
+| TSK-0311 | P2 | Implement EquipItem, ActivateBlock, AttackEntity, and other missing tools |
+| TSK-0312 | P2 | Fix Debug.WriteLine silent exception swallowing in Release builds |
+| TSK-0292 | High | ⏳ Decompose AgentBackgroundService (deferred from S57) |
+| TSK-0293 | High | ⏳ Remove legacy fallback/shim paths (deferred from S57) |
 
-**Next wave backlog:** TSK-0303 (commands prompt), TSK-0304 (block registry), TSK-0302 (inventory refactor)
-
-### Sprint 58 — Planning Model + Recovery Policy Consolidation
-**Status:** 🟢 Complete (TSK-0290 done early; TSK-0292/0293 deferred to extraction program)
+### Sprint 59 — ThinkAndPlan + Extraction Program + Dead Code Cleanup
+**Status:** 🟡 Planned | **Source:** Sprint 57 Wave D audit synthesis
 
 | Task | Priority | Summary |
 |:-----|:--------:|:--------|
-| TSK-0290 | High | ✅ Add structured precondition/postcondition and remediation policy objects |
-| TSK-0292 | High | ⏳ Decompose `AgentBackgroundService` into orchestration-focused services (deferred to Sprint 59+ extraction) |
-| TSK-0293 | High | ⏳ Remove legacy fallback/shim paths in planning and runtime policy (deferred to Sprint 59+ extraction) |
-
-### Sprint 59 — Action Registry + Capability Model
-**Status:** 🟢 Complete (TSK-0294 done early; extraction program deferred)
-
-| Task | Priority | Summary |
-|:-----|:--------:|:--------|
+| TSK-0313 | P2 | Implement ThinkAndPlan tool (mid-execution recursive sub-planning) |
+| TSK-0314 | P3 | Delete IntentAssessment.cs, dead HtnPlanner branches |
+| TSK-0315 | P3 | Add C#-side sanitization in ProvisionGoalIfCreativeAsync |
+| — | — | ABS extraction program (TSK-0292/0293 wiring)
 | TSK-0294 | High | ✅ Add structured execution capability and action registry surfaces |
 
 ### Sprint 52 — Situational Awareness: Entity Pipeline + ScenePack

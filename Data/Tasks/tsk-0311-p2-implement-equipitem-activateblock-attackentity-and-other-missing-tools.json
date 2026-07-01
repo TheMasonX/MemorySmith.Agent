@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0311-p2-implement-equipitem-activateblock-attackentity-and-other-missing-tools",
+  "key": "TSK-0311",
+  "title": "P2: Implement EquipItem, ActivateBlock, AttackEntity, and other missing tools",
+  "description": "Missing tools that block common autonomous behaviors: EquipItem (change held item without mining), ActivateBlock (open doors, press buttons, levers), AttackEntity (direct melee), UseItem (right-click with held item), DropItem, LookAt (orient toward target). Each is ~30 lines JS \u002B ~50 lines C# and dramatically expands what ad-hoc LLM plans can express.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-58",
+    "domain:tools",
+    "type:feature"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-01T13:28:33.7008368Z",
+  "updatedAtUtc": "2026-07-01T13:28:33.7008368Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

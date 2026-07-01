@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0314-p3-delete-intentassessment-cs-dead-htnplanner-branches-createcreativebuildactions",
+  "key": "TSK-0314",
+  "title": "P3: Delete IntentAssessment.cs, dead HtnPlanner branches, CreateCreativeBuildActions",
+  "description": "Delete IntentAssessment.cs (zero consumers, superseded by IGoalPrecondition/IGoalPostcondition in PlanningPolicy.cs). Delete dead HtnPlanner branches: BuildGoal/CraftItemGoal/IItemSpecGoal switch cases (lines 56-84, unreachable via PlannerRouter), and CreateCreativeBuildActions private static method (lines 126-153, zero call sites).",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Low",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-57",
+    "domain:cleanup",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-01T13:28:33.8247519Z",
+  "updatedAtUtc": "2026-07-01T13:28:33.8247519Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

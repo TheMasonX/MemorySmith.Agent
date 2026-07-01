@@ -208,6 +208,10 @@ public sealed class AgentBackgroundService(
     private volatile WorldState _worldState = new();
     private IGoal? _currentGoal;
     private int _consecutiveFailures;
+    // Sprint 57 Wave D: tracks consecutive LLM evaluator non-success results.
+    // Escalates to Error + governor stall after 3 consecutive failures
+    // (parse failures, provider errors, null responses). Reset on success.
+    private int _consecutiveLlmEvalFailures;
     private FailureReason? _lastFailureReason;
     private bool _actionDispatchedThisCycle;
     // Sprint 20: inventory sum snapshot for progress-based stagnation detection.
@@ -1284,8 +1288,20 @@ public sealed class AgentBackgroundService(
                         logger.LogWarning(
                             "[command] BLOCKED denied command '{Cmd}' from intent (goal={Goal}, AllowDestructiveCommands=false)",
                             intent.Item, _currentGoal?.Name ?? "none");
+                        // Sprint 57 Wave D: enqueue the LLM's response so the player knows
+                        // the command was refused, rather than receiving silence.
+                        // Falls back to a terse explanation if no LLM response was generated.
+                        var blockedMsg = pendingResponse ?? "Command was blocked by safety policy.";
+                        _queue.Enqueue(new ActionData
+                        {
+                            Tool = "Chat",
+                            Arguments = { ["message"] = blockedMsg }
+                        });
+                        _ = PushChatToDashboardAsync("bot", botName, blockedMsg);
                         if (pendingResponse is not null)
                             _chatHistory?.Record(botName, pendingResponse);
+                        else
+                            _chatHistory?.Record(botName, blockedMsg);
                         break;
                     }
 
@@ -1609,8 +1625,9 @@ public sealed class AgentBackgroundService(
                 logger.LogInformation(
                     "[sequence] advanced via event to step {Step}/{Total}: {Goal}",
                     seq.CurrentStepIndex + 1, seq.TotalSteps, seq.Name);
-                _queue.Clear();
-                lock (_pendingLock) _pendingActions.Clear();
+                // Sprint 57 Wave D: use shared reset so event-path advancement
+                // doesn't leave stale failure counters or governor state.
+                ResetForNextSequenceStep(seq);
                 _ = PushGoalToDashboardAsync();
                 return;
             }
@@ -2134,6 +2151,34 @@ public sealed class AgentBackgroundService(
                                 "[evaluator] LLM recommends replan for goal {Goal} after {Count} outcomes — breaking action loop. Suggestion: {Suggestion}",
                                 evaluatingGoal.Name, evalSnapshot.Length, evalResult.Suggestion);
                             break; // exit action dispatch loop → outer while calls PlanAsync again
+                        }
+
+                        // Sprint 57 Wave D: track consecutive LLM evaluator failures.
+                        // A parse failure, provider error, or null response returns
+                        // IsSuccess=false, ShouldReplan=false — indistinguishable
+                        // at this call site from a genuine "continue" verdict.
+                        // Escalate after 3 consecutive non-success results.
+                        if (!evalResult.IsSuccess)
+                        {
+                            _consecutiveLlmEvalFailures++;
+                            if (_consecutiveLlmEvalFailures >= 3)
+                            {
+                                logger.LogError(
+                                    "[evaluator] {Count} consecutive non-success results for goal {Goal} " +
+                                    "(last reason: {Reason}) — evaluator loop may be broken",
+                                    _consecutiveLlmEvalFailures, evaluatingGoal.Name, evalResult.FailureReason);
+                                _consecutiveLlmEvalFailures = 0;
+                            }
+                            else
+                            {
+                                logger.LogWarning(
+                                    "[evaluator] non-success result ({Count}/3) for goal {Goal}: {Reason}",
+                                    _consecutiveLlmEvalFailures, evaluatingGoal.Name, evalResult.FailureReason);
+                            }
+                        }
+                        else
+                        {
+                            _consecutiveLlmEvalFailures = 0;
                         }
                     }
                     if (result.Success)
@@ -3268,7 +3313,32 @@ public sealed class AgentBackgroundService(
             return false;
         }
 
-        // Reset state for the next step, but keep the sequence goal alive.
+        // Sprint 57 Wave D: use shared reset extracted from this method.
+        ResetForNextSequenceStep(seq);
+
+        // Announce the next step in chat
+        var nextStep = seq.CurrentStep;
+        _queue.Enqueue(new ActionData
+        {
+            Tool = "Chat",
+            Arguments =
+            {
+                ["message"] = $"Step {seq.CurrentStepIndex + 1}/{seq.TotalSteps}: " +
+                              $"{nextStep.Description}"
+            }
+        });
+
+        return true;
+    }
+
+    /// <summary>
+    /// Sprint 57 Wave D: shared reset called from both sequence advancement paths
+    /// (dispatch loop via <see cref="TryAdvanceSequence"/> and event path via
+    /// <see cref="TryCompleteCurrentGoalFromWorldUpdate"/>). Resets all mutable
+    /// tracking fields so the next sequence step starts clean.
+    /// </summary>
+    private void ResetForNextSequenceStep(TaskSequenceGoal seq)
+    {
         _consecutiveFailures = 0;
         _lastFailureReason = null;
         _lastAbandonedGoalName = null;
@@ -3284,20 +3354,6 @@ public sealed class AgentBackgroundService(
         _consecutiveZeroAreaScans = 0;
         _queue.Clear();
         lock (_pendingLock) _pendingActions.Clear();
-
-        // Announce the next step in chat
-        var nextStep = seq.CurrentStep;
-        _queue.Enqueue(new ActionData
-        {
-            Tool = "Chat",
-            Arguments =
-            {
-                ["message"] = $"Step {seq.CurrentStepIndex + 1}/{seq.TotalSteps}: " +
-                              $"{nextStep.Description}"
-            }
-        });
-
-        return true;
     }
 
     /// <summary>
