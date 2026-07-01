@@ -499,11 +499,16 @@ public sealed class AgentBackgroundService(
     };
 
     /// <summary>
-    /// Effective denied commands set. Uses injected <see cref="SafetyOptions"/> when
-    /// available, otherwise falls back to <see cref="DefaultDeniedCommands"/>.
+    /// Effective denied commands set. Uses the user-configured set from
+    /// <see cref="SafetyOptions"/> when it has items; otherwise falls back to
+    /// <see cref="DefaultDeniedCommands"/>. This ensures the config is
+    /// authoritative — removing an item from the config list actually
+    /// removes it, rather than being merged with the inline code default.
     /// </summary>
     private HashSet<string> DeniedCommands =>
-        safetyOptions?.Value?.DeniedCommands ?? DefaultDeniedCommands;
+        safetyOptions?.Value?.DeniedCommands is { Count: > 0 } configured
+            ? configured
+            : DefaultDeniedCommands;
 
     // ── BackgroundService ─────────────────────────────────────────────────────
 

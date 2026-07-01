@@ -470,6 +470,17 @@ if (agentEnabled)
             "will be sent on connect. If WS_TOKEN is set in the Node.js environment the connection " +
             "will be rejected. Set Agent:Minecraft:AdapterSecret to enable auth.");
     }
+
+    // Sprint 57: Log safety configuration so operators can verify denied commands
+    // and destructive-command policy at startup without inspecting config files.
+    var safetyCfg = app.Services.GetRequiredService<IOptions<SafetyOptions>>().Value;
+    var deniedList = safetyCfg.DeniedCommands is { Count: > 0 }
+        ? string.Join(", ", safetyCfg.DeniedCommands.OrderBy(c => c))
+        : "(built-in default)";
+    app.Logger.LogInformation(
+        "=== Safety config: AllowDestructiveCommands={AllowDestructive}, " +
+        "DeniedCommands=[{Denied}] ===",
+        safetyCfg.AllowDestructiveCommands, deniedList);
 }
 
 if (agentEnabled)

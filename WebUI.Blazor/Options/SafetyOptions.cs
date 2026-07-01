@@ -24,8 +24,9 @@ public sealed record SafetyOptions
     /// This is a hard safety layer — LLM hallucination must never escalate
     /// privileges or destroy server state through the command intent path.
     ///
-    /// Default list blocks 45+ destructive/admin commands.
     /// Commands are compared case-insensitively (leading slash optional in config).
+    /// When this set is empty in config, the built-in <c>DefaultDeniedCommands</c>
+    /// in AgentBackgroundService is used as the fallback.
     ///
     /// Example appsettings.json:
     /// <code>
@@ -38,21 +39,5 @@ public sealed record SafetyOptions
     /// }
     /// </code>
     /// </summary>
-    public HashSet<string> DeniedCommands { get; init; } = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "/op", "/deop", "/kill", "/ban", "/ban-ip", "/pardon", "/pardon-ip",
-        "/stop", "/save-off", "/save-on", "/save-all",
-        "/reload", "/publish",
-        "/whitelist", "/debug", "/difficulty", "/gamerule",
-        "/setworldspawn", "/setblock", "/fill", "/clone", "/summon",
-        "/gamemode", "/defaultgamemode", "/seed",
-        "/kick", "/list", "/me", "/tell", "/msg", "/w", "/teammsg", "/tm",
-        "/datapack", "/forceload", "/locate", "/loot", "/particle",
-        "/place", "/playsound", "/recipe", "/return", "/ride",
-        "/schedule", "/scoreboard", "/setidletimeout", "/spawnpoint",
-        "/spectate", "/spreadplayers", "/stopsound", "/tag", "/team",
-        "/teammsg", "/teleport", "/tellraw", "/tickingarea", "/title",
-        "/tm", "/trigger", "/w", "/warden_spawn_tracker", "/weather",
-        "/worldborder", "/execute",
-    };
+    public HashSet<string> DeniedCommands { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 }

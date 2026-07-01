@@ -72,11 +72,20 @@ const RECONNECT_BACKOFF_FACTOR = 2;     // exponential multiplier
 
 let _stopRequested = false;
 
+// Sprint 57: Track the action type currently being dispatched so handleStop()
+// can avoid cancelling pathfinder navigation during place/move actions.
+// Set before dispatch() call in drainQueue; cleared after dispatch completes.
+// Values: null (none), 'place', 'move', 'mine', 'wander', etc.
+let _dispatchingAction = null;
+
 /**
  * Immediately aborts the current operation:
  *   1. Sets _stopRequested so in-progress loops exit on next iteration.
  *   2. Clears cmdQueue so no more queued commands run.
- *   3. Calls bot.pathfinder.setGoal(null) to cancel active pathfinding.
+ *   3. Calls bot.pathfinder.setGoal(null) to cancel active pathfinding —
+ *      UNLESS a place or move action is currently being dispatched. In that
+ *      case, the pathfinder navigation must be allowed to complete to avoid
+ *      "The goal was changed before it could be completed!" errors.
  *
  * Called directly from the WebSocket message handler (bypasses enqueueCommand)
  * so it takes effect immediately without waiting for the queue to drain.
@@ -85,7 +94,19 @@ function handleStop() {
   console.log('[stop] emergency stop — clearing queue, stopping pathfinder');
   _stopRequested = true;
   cmdQueue.length = 0; // Drain pending commands
-  try { bot.pathfinder.setGoal(null); } catch { /* ignore — bot may not be connected */ }
+
+  // Sprint 57 (TSK-0270 follow-up): Do NOT cancel pathfinder during place/move
+  // actions. Cancelling setGoal(null) while a place or move navigation is in
+  // progress causes "The goal was changed before it could be completed!" —
+  // which makes EVERY block placement fail. Instead, let the current
+  // navigation complete; subsequent queued actions are already cleared above.
+  const isNavigatingAction = _dispatchingAction === 'place' || _dispatchingAction === 'move';
+  if (!isNavigatingAction) {
+    try { bot.pathfinder.setGoal(null); } catch { /* ignore — bot may not be connected */ }
+  } else {
+    console.log('[stop] suppressing pathfinder cancel — active', _dispatchingAction, 'navigation in progress');
+  }
+
   sendEvent('stopComplete', {});
   console.log('[stop] done');
 }
@@ -122,6 +143,7 @@ async function drainQueue() {
   dispatching = true;
   while (cmdQueue.length > 0) {
     const msg = cmdQueue.shift();
+    _dispatchingAction = msg.action; // Sprint 57: track for handleStop suppression
     await dispatch(msg).catch(e => {
       // Sprint 41: include action args (position, block, etc.) in the error event
       // so C# can log the exact context of the failure, not just the error message.
@@ -147,8 +169,10 @@ async function drainQueue() {
         timestamp: new Date().toISOString(),
       });
     });
+    _dispatchingAction = null; // Sprint 57: clear after dispatch completes
   }
   dispatching = false;
+  _dispatchingAction = null; // Sprint 57: safety clear on drain exit
 }
 
 // ── TSK-0165: Error classification for machine-readable reason codes ─────────
