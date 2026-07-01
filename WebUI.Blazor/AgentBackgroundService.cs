@@ -100,6 +100,10 @@ public sealed class AgentBackgroundService(
         ["Wander"]     = 15,
         // Sprint 44 council: SmeltItem timeout must be longer than JS adapter's SMELT_TIMEOUT_MS (40s)
         ["SmeltItem"]  = 45,
+        // Sprint 58 Wave D (TSK-0332): MineBlock defaulted to 30s (DefaultActionTimeoutSeconds).
+        // Most mine actions complete in 2-5s. A shorter timeout lets the agent fail faster
+        // and retry, avoiding full 30s stalls on blocked/unreachable blocks.
+        ["mine"]       = 15,
     };
 
     /// <summary>
@@ -232,6 +236,12 @@ public sealed class AgentBackgroundService(
     private int _cycleInventorySnapshot = -1;
     // Sprint 51: count of confirmed block placements in the current cycle.
     private int _blocksPlacedThisCycle;
+
+    /// <summary>
+    /// Sprint 58 Wave D (TSK-0331): CTS for creative provisioning loop.
+    /// Cancelled in SetGoal before starting a new provisioning loop, and in CancelGoal.
+    /// </summary>
+    private CancellationTokenSource? _goalProvisioningCts;
     // Sprint 4a: connection status for SignalR push; D2: "reconnecting" broadcast
     private string _connectionStatus = "disconnected";
 
@@ -345,7 +355,20 @@ public sealed class AgentBackgroundService(
         // (setInventorySlot) may not work on all versions. /give provides a reliable
         // fallback — works without OP on LAN worlds in 1.16.5.
         if (_worldState.IsCreativeMode)
-            _ = ProvisionGoalIfCreativeAsync(goal, CancellationToken.None);
+        {
+            // Sprint 58 Wave D (TSK-0331): use a linked CTS so provisioning aborts
+            // when the goal changes. Previously used CancellationToken.None which
+            // could let /give commands leak across goal boundaries.
+            _goalProvisioningCts?.Cancel();
+            _goalProvisioningCts?.Dispose();
+            _goalProvisioningCts = new CancellationTokenSource();
+            // Link to connection CTS so shutdown also cancels provisioning.
+            var linkedCts = _connectionCts is not null
+                ? CancellationTokenSource.CreateLinkedTokenSource(
+                    _goalProvisioningCts.Token, _connectionCts.Token)
+                : _goalProvisioningCts;
+            _ = ProvisionGoalIfCreativeAsync(goal, linkedCts.Token);
+        }
 
         // TSK-0021: report task-relevant inventory instead of generic top-5 summary.
         var taskInv = SummarizeTaskRelevantInventory(goal);
@@ -372,6 +395,8 @@ public sealed class AgentBackgroundService(
         // can use Blueprint.Name (not the goal suffix slug) for fact key prefix matching.
         var previousBuildGoal = _currentGoal as IBuildGoal;
         _currentGoal = null;
+        // Sprint 58 Wave D (TSK-0331): cancel provisioning loop on goal cancel.
+        _goalProvisioningCts?.Cancel();
         _journal?.Log(new JournalEntry(
             _timeProvider.UtcNow, JournalEntryType.GoalCancel, previousGoalName ?? "unknown"));
         _consecutiveFailures = 0;
@@ -871,8 +896,10 @@ public sealed class AgentBackgroundService(
                     _blocksPlacedThisCycle++;
                     // Sprint 58 (TSK-0317): increment PlaceBlockGoal.Dispatched on confirmed
                     // placement rather than pre-marking all as dispatched during decompose.
+                    // Sprint 58 Wave D (TSK-0330): use Interlocked.Increment for
+                    // thread safety between event processing and dispatch tasks.
                     if (_currentGoal is Agent.Planning.Goals.PlaceBlockGoal pgGoal)
-                        pgGoal.Dispatched++;
+                        pgGoal.IncrementDispatched();
                     // TSK-0128: use event's CorrelationId for direct context lookup.
                     // TSK-0125: SetBlockStatus writes per-block status instead of linear checkpoint.
                     AdvanceBuildCheckpoint("place", bpe.CorrelationId);
@@ -2020,6 +2047,9 @@ public sealed class AgentBackgroundService(
                     _queue.Clear();
                     _queue.EnqueueAll(plan.Actions);
                     _actionDispatchedThisCycle = false;
+                    // Sprint 58 Wave D (TSK-0333): reset block counter at plan cycle start
+                    // so it doesn't accumulate across continuous placement phases.
+                    _blocksPlacedThisCycle = 0;
                     // Sprint 38 P3: new plan generated — clear cycle outcomes accumulator so
                     // the ILlmEvaluator only sees outcomes from this plan cycle (Sprint 39).
                     _cycleOutcomes.Clear();

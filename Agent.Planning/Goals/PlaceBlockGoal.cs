@@ -1,6 +1,7 @@
 namespace Agent.Planning.Goals;
 
 using Agent.Core;
+using System.Threading;
 
 /// <summary>
 /// Places one or more blocks at the bot's current facing position.
@@ -13,6 +14,8 @@ using Agent.Core;
 /// GatherGoalDecomposer in the decomposer registry.
 ///
 /// Sprint 54: initial implementation.
+/// Sprint 58 Wave D (TSK-0330): _dispatched uses Interlocked for thread safety
+/// between DispatchActionsAsync (read) and ProcessEventsAsync (write).
 /// </summary>
 public sealed class PlaceBlockGoal : IGoal
 {
@@ -56,13 +59,28 @@ public sealed class PlaceBlockGoal : IGoal
     /// <summary>Target Z coordinate, or null to place at bot position.</summary>
     public int? Z => _z;
 
-    /// <summary>Called by the decomposer when a place action is produced.</summary>
-    public int Dispatched { get => _dispatched; set => _dispatched = value; }
+    /// <summary>
+    /// Called by AgentBackgroundService.ProcessEventsAsync on confirmed BlockPlacedEvent.
+    /// Uses Interlocked.Increment for thread safety — the write happens on the event
+    /// processing task while the read (via IsComplete) happens on the dispatch task.
+    /// Sprint 58 Wave D (TSK-0330): was a plain int field with no synchronization.
+    /// </summary>
+    public int Dispatched
+    {
+        get => Volatile.Read(ref _dispatched);
+        set => _dispatched = value; // only used by decomposer pre-Sprint 58; kept for tests
+    }
+
+    /// <summary>
+    /// Thread-safe increment for use from ProcessEventsAsync.
+    /// </summary>
+    public int IncrementDispatched() => Interlocked.Increment(ref _dispatched);
 
     public bool IsComplete(WorldState state)
     {
         // Complete when all blocks have been dispatched as place actions.
-        return _dispatched >= _count;
+        // Sprint 58 Wave D (TSK-0330): use Volatile.Read for thread safety.
+        return Volatile.Read(ref _dispatched) >= _count;
     }
 
     public bool HasFailed(WorldState state)

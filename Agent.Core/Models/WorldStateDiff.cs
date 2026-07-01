@@ -44,6 +44,8 @@ public sealed record WorldStateDiff(
 
     /// <summary>
     /// True when inventory changes don't match expectations.
+    /// Sprint 58 Wave D (TSK-0334): also detects unexpected inventory changes
+    /// (items gained/lost that weren't in the expected gain/loss lists).
     /// </summary>
     public bool HasInventoryMismatch
     {
@@ -71,6 +73,24 @@ public sealed record WorldStateDiff(
                     var actual = ActualInventoryDelta.GetValueOrDefault(item, 0);
                     if (actual > -expectedCount) return true; // didn't lose enough (or gained instead)
                 }
+            }
+
+            // Sprint 58 Wave D (TSK-0334): detect unexpected inventory changes.
+            // Items that changed but weren't in either expected list are anomalies.
+            var expectedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (InventoryGained is not null)
+            {
+                foreach (var k in InventoryGained.Keys) expectedKeys.Add(k);
+            }
+            if (InventoryLost is not null)
+            {
+                foreach (var k in InventoryLost.Keys) expectedKeys.Add(k);
+            }
+
+            foreach (var (item, delta) in ActualInventoryDelta)
+            {
+                if (delta == 0) continue;
+                if (!expectedKeys.Contains(item)) return true; // unexpected change
             }
 
             return false;
