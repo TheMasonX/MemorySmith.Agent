@@ -113,9 +113,11 @@ public sealed record ChatOptions
     /// <summary>
     /// Sprint 54: whether the agent is allowed to execute Minecraft server commands
     /// (e.g. /give, /tp, /setblock) via chat. When false, the LLM is told it cannot
-    /// use commands and the "command" intent is rejected. Default: false (safe).
+    /// use commands and the "command" intent is rejected.
+    /// Sprint 58 (TSK-0319): changed default from true to false (safe-by-default).
+    /// BREAKING CHANGE: set "CommandExecutionEnabled": true in Agent:Chat config to restore.
     /// </summary>
-    public bool CommandExecutionEnabled { get; init; } = true;
+    public bool CommandExecutionEnabled { get; init; } = false;
 
     /// <summary>
     /// Sprint 57 (TSK-0303): Minecraft server commands the LLM must NEVER be told about

@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Channels;
+using WebUI.Blazor.Dashboard;
 using WebUI.Blazor.Options;
 
 /// <summary>
@@ -63,7 +64,9 @@ public sealed class AgentBackgroundService(
     // Sprint 54 (TSK-0199): max character length for chat responses before splitting.
     int chatMaxResponseLength = 500,
     // Sprint 56 (TSK-0286): Safety options with configurable DeniedCommands.
-    IOptions<SafetyOptions>? safetyOptions = null) : BackgroundService
+    IOptions<SafetyOptions>? safetyOptions = null,
+    // Sprint 58 (TSK-0309): WorldModel for predict-before-dispatch and reconcile-after-completion.
+    IWorldModel? worldModel = null) : BackgroundService
 {
     // Sprint 1b: default exponential backoff delays
     private static readonly TimeSpan[] DefaultReconnectDelays =
@@ -163,6 +166,8 @@ public sealed class AgentBackgroundService(
     private readonly ChatHistory? _chatHistory = chatHistory;
     // Sprint 54 (TSK-0203): memory gateway for cross-session fact persistence.
     private readonly IMemoryGateway? _memoryGateway = memoryGateway;
+    // Sprint 58 (TSK-0309): WorldModel for predict-before-dispatch.
+    private readonly IWorldModel? _worldModel = worldModel;
     private readonly ITimeProvider _timeProvider = timeProvider ?? SystemTimeProvider.Instance;
     // Sprint 39 P1-C: maps IntentDraft → GoalRequest in HandleChatEventAsync.
     private readonly IntentManager? _intentManager = intentManager;
@@ -204,6 +209,10 @@ public sealed class AgentBackgroundService(
     // action. Used to compute WorldStateDiff after the action completes, enabling
     // the observe→compare→evaluate replan loop.
     private WorldState? _preDispatchSnapshot;
+    // Sprint 58 (TSK-0309): prediction from WorldModel.Predict before dispatch.
+    // Used to enrich WorldStateDiff.expectedGained/expectedLost for fire-and-forget
+    // tools (MineBlock, PlaceBlock, Wander) whose ActionOutcome.Effects are empty.
+    private PredictionState? _preDispatchPrediction;
 
     private volatile WorldState _worldState = new();
     private IGoal? _currentGoal;
@@ -211,7 +220,12 @@ public sealed class AgentBackgroundService(
     // Sprint 57 Wave D: tracks consecutive LLM evaluator non-success results.
     // Escalates to Error + governor stall after 3 consecutive failures
     // (parse failures, provider errors, null responses). Reset on success.
+    // Sprint 58 Wave C (TSK-0325): circuit breaker — after 3 consecutive failures,
+    // suppress further evaluator calls for a cooldown period instead of resetting
+    // to 0 (which created an infinite fail→log→reset→fail cycle).
     private int _consecutiveLlmEvalFailures;
+    private DateTimeOffset _llmEvalSuppressUntil = DateTimeOffset.MinValue;
+    private static readonly TimeSpan LlmEvalCooldown = TimeSpan.FromMinutes(5);
     private FailureReason? _lastFailureReason;
     private bool _actionDispatchedThisCycle;
     // Sprint 20: inventory sum snapshot for progress-based stagnation detection.
@@ -445,6 +459,17 @@ public sealed class AgentBackgroundService(
                 var anyProvisioned = false;
                 foreach (var (block, quantity) in materials)
                 {
+                    // Sprint 58 Wave C (TSK-0326): guard against goal change mid-provisioning.
+                    // If the goal was cancelled or replaced while we were awaiting the
+                    // inter-command delay, stop enqueuing /give commands for the old goal.
+                    if (_currentGoal != goal)
+                    {
+                        logger.LogInformation(
+                            "[creative] goal changed during provisioning — stopping /give for '{Blueprint}'",
+                            buildGoal.Blueprint.Name);
+                        return;
+                    }
+
                     // Sprint 56 (TSK-0275): sanitize block name before /give dispatch.
                     // Reject names with injection characters (spaces, semicolons, etc.).
                     var safeBlock = SanitizeBlockName(block);
@@ -511,16 +536,27 @@ public sealed class AgentBackgroundService(
     };
 
     /// <summary>
-    /// Effective denied commands set. Uses the user-configured set from
-    /// <see cref="SafetyOptions"/> when it has items; otherwise falls back to
-    /// <see cref="DefaultDeniedCommands"/>. This ensures the config is
-    /// authoritative — removing an item from the config list actually
-    /// removes it, rather than being merged with the inline code default.
+    /// Effective denied commands set. Always includes the built-in
+    /// <see cref="DefaultDeniedCommands"/> as a safety floor. The user-configured
+    /// set from <see cref="SafetyOptions"/> is merged (union) on top — it can add
+    /// more denied commands but never removes the built-in defaults.
+    /// Sprint 58 Wave C (TSK-0324): changed from XOR-replace to union-merge to
+    /// prevent accidentally removing protections like /ban, /stop, /execute.
     /// </summary>
-    private HashSet<string> DeniedCommands =>
-        safetyOptions?.Value?.DeniedCommands is { Count: > 0 } configured
-            ? configured
-            : DefaultDeniedCommands;
+    private HashSet<string> DeniedCommands
+    {
+        get
+        {
+            if (safetyOptions?.Value?.DeniedCommands is { Count: > 0 } configured)
+            {
+                var merged = new HashSet<string>(DefaultDeniedCommands, StringComparer.OrdinalIgnoreCase);
+                foreach (var cmd in configured)
+                    merged.Add(cmd);
+                return merged;
+            }
+            return DefaultDeniedCommands;
+        }
+    }
 
     // ── BackgroundService ─────────────────────────────────────────────────────
 
@@ -833,6 +869,10 @@ public sealed class AgentBackgroundService(
                     logger.LogInformation("[place] CONFIRMED: {Block} placed @ ({X},{Y},{Z})",
                         bpe.Block, bpe.X, bpe.Y, bpe.Z);
                     _blocksPlacedThisCycle++;
+                    // Sprint 58 (TSK-0317): increment PlaceBlockGoal.Dispatched on confirmed
+                    // placement rather than pre-marking all as dispatched during decompose.
+                    if (_currentGoal is Agent.Planning.Goals.PlaceBlockGoal pgGoal)
+                        pgGoal.Dispatched++;
                     // TSK-0128: use event's CorrelationId for direct context lookup.
                     // TSK-0125: SetBlockStatus writes per-block status instead of linear checkpoint.
                     AdvanceBuildCheckpoint("place", bpe.CorrelationId);
@@ -1157,9 +1197,9 @@ public sealed class AgentBackgroundService(
     /// <summary>
     /// Sprint 57 (TSK-0302): Periodic background inventory sync.
     /// Runs every <see cref="InventorySyncInterval"/> seconds. Enqueues a GetStatus
-    /// only when the agent is idle (no active goal) to avoid interfering with
-    /// ongoing operations. This addresses codesmell #4 — the agent previously
-    /// relied entirely on explicit GetStatus triggered by goal changes.
+    /// when inventory is stale, even during active goals (Sprint 58 Wave C TSK-0321:
+    /// goal precondition checks and the LLM evaluator need fresh inventory to make
+    /// correct decisions; the previous idle-only guard let drift accumulate silently).
     /// </summary>
     private async Task InventorySyncLoopAsync(CancellationToken ct)
     {
@@ -1171,18 +1211,18 @@ public sealed class AgentBackgroundService(
         {
             try
             {
+                // Sprint 58 Wave C (TSK-0321): removed idle-only guard — inventory
+                // must stay fresh during active goals for precondition checks and
+                // the LLM evaluator. IsInventoryStale still prevents redundant syncs.
+                // Fixed stacked-delay bug: check before sleeping so first sync
+                // happens after the initial delay, not 2× the interval.
+                if (_worldState.IsInventoryStale)
+                {
+                    _queue.Enqueue(new ActionData { Tool = "GetStatus" });
+                    logger.LogDebug("[inventory] periodic background sync enqueued (inventory was stale)");
+                }
+
                 await Task.Delay(InventorySyncInterval, ct);
-
-                // Only sync when idle — don't interfere with active goals.
-                if (_currentGoal is not null)
-                    continue;
-
-                // Skip if inventory is already fresh (not stale).
-                if (!_worldState.IsInventoryStale)
-                    continue;
-
-                _queue.Enqueue(new ActionData { Tool = "GetStatus" });
-                logger.LogDebug("[inventory] periodic background sync enqueued (idle, inventory was stale)");
             }
             catch (OperationCanceledException) { throw; }
             catch (Exception ex)
@@ -1928,7 +1968,7 @@ public sealed class AgentBackgroundService(
                     // This log captures the EXACT actions from the planner before any processing.
                     var rawActions = string.Join(",", plan.Actions.Take(5).Select(a => a.Tool));
                     var totalActions = plan.Actions.Count;
-                    logger.LogWarning(
+                    logger.LogDebug(
                         "[plan-raw] {Goal}: {N} total actions, first 5: [{Actions}] | planner={Planner}",
                         _currentGoal.Name, totalActions, rawActions,
                         planner.GetType().Name);
@@ -2111,6 +2151,11 @@ public sealed class AgentBackgroundService(
                     // Sprint 38 P2: use _currentGoal?.Id (default Guid.Empty) for ActionOutcome tracking.
                     // Sprint 55 (TSK-0155): snapshot world state before dispatch for diff computation.
                     _preDispatchSnapshot = _worldState;
+                    // Sprint 58 (TSK-0309): predict expected outcome before dispatch.
+                    // Enriches WorldStateDiff with rule-based expectations for
+                    // fire-and-forget tools (MineBlock, PlaceBlock, Wander) whose
+                    // ActionOutcome.Effects are never populated.
+                    _preDispatchPrediction = _worldModel?.Predict(action.Tool, action.Arguments);
                     var (result, outcome) = await toolCaller.CallWithOutcomeAsync(
                         _currentGoal?.Id ?? Guid.Empty, action.Tool, doc.RootElement, linkedCts.Token);
                     sw.Stop();
@@ -2130,7 +2175,7 @@ public sealed class AgentBackgroundService(
                         var evaluatingGoal = _currentGoal;
                         var evalSnapshot = _cycleOutcomes.ToArray();
                         // Sprint 55 (TSK-0155): compute WorldStateDiff for expected-vs-actual comparison.
-                        var diff = ComputeWorldStateDiff(_preDispatchSnapshot, _worldState, outcome);
+                        var diff = ComputeWorldStateDiff(_preDispatchSnapshot, _worldState, outcome, _preDispatchPrediction);
                         EvaluationResult evalResult;
                         try
                         {
@@ -2153,32 +2198,41 @@ public sealed class AgentBackgroundService(
                             break; // exit action dispatch loop → outer while calls PlanAsync again
                         }
 
-                        // Sprint 57 Wave D: track consecutive LLM evaluator failures.
+                        // Sprint 57 Wave D / Sprint 58 Wave C (TSK-0325): track consecutive
+                        // LLM evaluator non-success results with circuit-breaker cooldown.
                         // A parse failure, provider error, or null response returns
                         // IsSuccess=false, ShouldReplan=false — indistinguishable
                         // at this call site from a genuine "continue" verdict.
-                        // Escalate after 3 consecutive non-success results.
+                        // After 3 consecutive failures, suppress evaluator calls for
+                        // LlmEvalCooldown (5 min) to break the infinite fail-loop.
                         if (!evalResult.IsSuccess)
                         {
-                            _consecutiveLlmEvalFailures++;
-                            if (_consecutiveLlmEvalFailures >= 3)
+                            // Skip counting if we're in cooldown — prevents the
+                            // infinite fail→log→reset→fail cycle (TSK-0325).
+                            if (_timeProvider.UtcNow >= _llmEvalSuppressUntil)
                             {
-                                logger.LogError(
-                                    "[evaluator] {Count} consecutive non-success results for goal {Goal} " +
-                                    "(last reason: {Reason}) — evaluator loop may be broken",
-                                    _consecutiveLlmEvalFailures, evaluatingGoal.Name, evalResult.FailureReason);
-                                _consecutiveLlmEvalFailures = 0;
-                            }
-                            else
-                            {
-                                logger.LogWarning(
-                                    "[evaluator] non-success result ({Count}/3) for goal {Goal}: {Reason}",
-                                    _consecutiveLlmEvalFailures, evaluatingGoal.Name, evalResult.FailureReason);
+                                _consecutiveLlmEvalFailures++;
+                                if (_consecutiveLlmEvalFailures >= 3)
+                                {
+                                    _llmEvalSuppressUntil = _timeProvider.UtcNow + LlmEvalCooldown;
+                                    logger.LogError(
+                                        "[evaluator] {Count} consecutive non-success results for goal {Goal} " +
+                                        "(last reason: {Reason}) — suppressing evaluator for {CooldownMin}m",
+                                        _consecutiveLlmEvalFailures, evaluatingGoal.Name, evalResult.FailureReason,
+                                        (int)LlmEvalCooldown.TotalMinutes);
+                                }
+                                else
+                                {
+                                    logger.LogWarning(
+                                        "[evaluator] non-success result ({Count}/3) for goal {Goal}: {Reason}",
+                                        _consecutiveLlmEvalFailures, evaluatingGoal.Name, evalResult.FailureReason);
+                                }
                             }
                         }
                         else
                         {
                             _consecutiveLlmEvalFailures = 0;
+                            _llmEvalSuppressUntil = DateTimeOffset.MinValue;
                         }
                     }
                     if (result.Success)
@@ -3117,8 +3171,9 @@ public sealed class AgentBackgroundService(
     /// Feeds into the observe→compare→evaluate replan loop so the LLM can
     /// reason about mismatches between planned expectations and observed reality.
     /// </summary>
-    private static WorldStateDiff ComputeWorldStateDiff(
-        WorldState? preSnapshot, WorldState postState, ActionOutcome outcome)
+    private WorldStateDiff ComputeWorldStateDiff(
+        WorldState? preSnapshot, WorldState postState, ActionOutcome outcome,
+        PredictionState? prediction = null)
     {
         if (preSnapshot is null) return WorldStateDiff.Empty;
 
@@ -3145,9 +3200,13 @@ public sealed class AgentBackgroundService(
         // Health check
         var healthDelta = postState.Health - preSnapshot.Health;
 
-        // Build expected inventory changes from outcome effects
+        // Sprint 58 (TSK-0309): Build expected inventory changes from outcome effects first,
+        // then fall back to WorldModel.Predict for fire-and-forget tools (MineBlock, PlaceBlock,
+        // Wander) whose ActionOutcome.Effects are never populated.
         var expectedGained = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         var expectedLost = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        // Primary: use structured effects from the action outcome.
         foreach (var effect in outcome.Effects)
         {
             if (effect.Item is null) continue;
@@ -3160,6 +3219,21 @@ public sealed class AgentBackgroundService(
                 case "ItemConsumed":
                     expectedLost[effect.Item] = expectedLost.GetValueOrDefault(effect.Item) + (effect.Count ?? 1);
                     break;
+            }
+        }
+
+        // Fallback: use WorldModel.Predict when outcome.Effects is empty (fire-and-forget tools).
+        if (expectedGained.Count == 0 && expectedLost.Count == 0 && prediction is not null)
+        {
+            // Compute expected delta from pre-snapshot inventory vs predicted inventory.
+            foreach (var (item, predictedCount) in prediction.PredictedInventory)
+            {
+                var preCount = preSnapshot.Inventory.GetValueOrDefault(item);
+                var delta = predictedCount - preCount;
+                if (delta > 0)
+                    expectedGained[item] = expectedGained.GetValueOrDefault(item) + delta;
+                else if (delta < 0)
+                    expectedLost[item] = expectedLost.GetValueOrDefault(item) - delta;
             }
         }
 
@@ -3437,7 +3511,7 @@ public sealed class AgentBackgroundService(
                 NearbyEntities: entities,
                 BlockBelow: blockBelow
             );
-            await hubContext.Clients.Group("dashboard").SendAsync("StatusUpdated", update, ct);
+            await hubContext.Clients.Group("dashboard").SendAsync(DashboardHubEvents.SnapshotUpdated, update, ct);
         }
         catch (Exception ex)
         {

@@ -135,10 +135,12 @@ public sealed class ActionQueue
         }
         catch (Exception ex)
         {
-            // Best-effort: log and continue — queue clear must not be blocked
-            // by a transient WebSocket send failure.
-            System.Diagnostics.Debug.WriteLine(
-                $"[ActionQueue] Stop callback failed: {ex.GetType().Name}: {ex.Message}");
+            // Best-effort: stop callback failure is intentionally swallowed.
+            // The queue clear must not be blocked by a transient WebSocket error.
+            // No ILogger is available at this layer (ActionQueue is a simple POCO
+            // created with `new()` in AgentBackgroundService); upstream callers
+            // observe the failure via the action outcomes and replanning loop.
+            _ = ex; // deliberate discard — see comment above
         }
 
         lock (_lock)

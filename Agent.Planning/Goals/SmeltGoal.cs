@@ -14,7 +14,7 @@ using Agent.Core;
 ///
 /// TSK-0082: OutputItem now delegates to the shared <see cref="SmeltableMapping"/>.
 /// </summary>
-public sealed class SmeltGoal(string inputItem, int count = 1) : IGoal
+public sealed class SmeltGoal(string inputItem, int count = 1) : IGoal, IGoalPrecondition
 {
     public string InputItem => inputItem;
     public int    Count     => count;
@@ -54,4 +54,28 @@ public sealed class SmeltGoal(string inputItem, int count = 1) : IGoal
     /// interface contract. If a failure-write site is added later, restore the fact-key lookup.
     /// </summary>
     public bool HasFailed(WorldState state) => false;
+
+    // ── IGoalPrecondition ────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Sprint 58 (TSK-0310): Creative mode → always feasible (items can be spawned).
+    /// Survival → requires fresh inventory to check input material availability.
+    /// </summary>
+    bool IGoalPrecondition.CanAttempt(ExecutionContext context, out string? blockingReason)
+    {
+        if (context.Capabilities.CanSpawnItems)
+        {
+            blockingReason = null;
+            return true;
+        }
+
+        if (!context.HasFreshInventory)
+        {
+            blockingReason = "Inventory is stale — wait for GetStatus refresh before smelting.";
+            return false;
+        }
+
+        blockingReason = null;
+        return true;
+    }
 }

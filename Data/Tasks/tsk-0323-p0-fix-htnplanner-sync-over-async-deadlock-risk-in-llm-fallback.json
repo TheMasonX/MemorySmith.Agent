@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0323-p0-fix-htnplanner-sync-over-async-deadlock-risk-in-llm-fallback",
+  "key": "TSK-0323",
+  "title": "P0: Fix HtnPlanner sync-over-async deadlock risk in LLM fallback",
+  "description": "HtnPlanner.TryLlmFallback uses sync-over-async: \u0060.ConfigureAwait(false).GetAwaiter().GetResult()\u0060 on _llm.CompleteAsync. This blocks the entire dispatch loop for up to 15s\u002B and risks deadlock if the SynchronizationContext is single-threaded. The LLM call uses CancellationToken.None, making it uncancellable.\n\nFix: Make IPlanner.PlanAsync fully async-through (Task\u003CIPlan\u003E with await throughout the chain). Propagate the cancellation token to the LLM call. The entire planning chain (PlannerRouter \u2192 decomposers \u2192 HtnPlanner \u2192 TryLlmFallback) needs to be async-all-the-way-down.\n\nSource: internal-audit-57-20260701.md \u2014 P0-7 [PR]",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-59",
+    "domain:planning",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-01T13:53:50.8994367Z",
+  "updatedAtUtc": "2026-07-01T14:04:55.0982839Z",
+  "completedAtUtc": "2026-07-01T14:04:55.0982839Z",
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0323-p0-fix-htnplanner-sync-over-async-deadlock-risk-in-llm-fallback.json"
+}

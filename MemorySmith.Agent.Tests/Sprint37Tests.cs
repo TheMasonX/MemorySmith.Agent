@@ -9,7 +9,7 @@ using System.Text.Json;
 /// Sprint 37 tests covering P0-A (ActionOutcome : IObservationSummary),
 /// P0-B (IToolCaller.CallWithOutcomeAsync default implementation),
 /// P1-A (IntentManager.BuildGoalRequest), P1-B (LlmChatInterpreter with IntentManager),
-/// and P1-C (IntentAssessment record).
+/// (P1-C IntentAssessment test removed in Sprint 58 — dead code cleanup).
 ///
 /// Test count: 10 new tests.
 /// </summary>
@@ -204,31 +204,6 @@ public class Sprint37Tests
 
         Assert.That(request, Is.Null,
             "gather without item cannot produce a valid GoalRequest");
-    }
-
-    // ── P1-C: IntentAssessment record ────────────────────────────────────────────────────
-
-    [Test]
-    public void IntentAssessment_RecordFieldsAreAccessible()
-    {
-        var draft = new IntentDraft(
-            "yes", "build", Item: null, Blueprint: "large-castle",
-            Count: null, X: 0, Y: 64, Z: 0,
-            Confidence: 0.92, ClarificationQuestion: null, Response: "Building a castle!");
-
-        var assessment = new IntentAssessment(
-            Draft: draft,
-            RiskLevel: RiskLevel.High,
-            RequiresConfirmation: true,
-            ReasoningSummary: "Building a large structure is high-risk and irreversible.");
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(assessment.Draft, Is.SameAs(draft));
-            Assert.That(assessment.RiskLevel, Is.EqualTo(RiskLevel.High));
-            Assert.That(assessment.RequiresConfirmation, Is.True);
-            Assert.That(assessment.ReasoningSummary, Does.Contain("irreversible"));
-        });
     }
 
     // ── Stub helpers ─────────────────────────────────────────────────────────────────────

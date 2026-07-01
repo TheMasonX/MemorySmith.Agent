@@ -48,7 +48,7 @@ public sealed class HtnPlanner : IPlanner
     }
 
     // â”€â”€ PlanAsync â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    public Task<IPlan> PlanAsync(
+    public async Task<IPlan> PlanAsync(
         IGoal goal, WorldState state, CancellationToken cancellationToken = default)
     {
         var actions = new List<ActionData>();
@@ -100,13 +100,13 @@ public sealed class HtnPlanner : IPlanner
         {
             // Sprint 55: LLM fallback — call the language model to generate actions
             // when no decomposer or task-library method can handle the goal.
-            var llmActions = TryLlmFallback(goal, state);
+            var llmActions = await TryLlmFallbackAsync(goal, state, cancellationToken);
             if (llmActions is { Count: > 0 })
             {
                 _logger.LogWarning(
                     "[planner] LLM fallback produced {Count} action(s) for goal '{Goal}'",
                     llmActions.Count, goal.Name);
-                return Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases.ToArray(), llmActions));
+                return new ActionPlan(goal.Name, goal.Phases.ToArray(), llmActions);
             }
 
             throw new InvalidOperationException(
@@ -115,7 +115,7 @@ public sealed class HtnPlanner : IPlanner
                 "No matching task methods found and LLM fallback failed or is unavailable.");
         }
 
-        return Task.FromResult<IPlan>(new ActionPlan(goal.Name, goal.Phases.ToArray(), actions));
+        return new ActionPlan(goal.Name, goal.Phases.ToArray(), actions);
     }
 
     // Sprint 44 (TSK-0080): SearchMemory: removed â€” results were never consumed.
@@ -189,8 +189,12 @@ public sealed class HtnPlanner : IPlanner
     /// <summary>
     /// When no decomposer or task-library method can handle a goal, ask the LLM
     /// to generate actions directly. Returns null if the LLM is unavailable or fails.
+    /// Sprint 58 Wave C (TSK-0323): made async — was sync-over-async with
+    /// .ConfigureAwait(false).GetAwaiter().GetResult() blocking the dispatch loop
+    /// for 15s+ with CancellationToken.None.
     /// </summary>
-    private IReadOnlyList<ActionData>? TryLlmFallback(IGoal goal, WorldState state)
+    private async Task<IReadOnlyList<ActionData>?> TryLlmFallbackAsync(
+        IGoal goal, WorldState state, CancellationToken ct)
     {
         if (_llm is not { IsAvailable: true })
         {
@@ -217,8 +221,7 @@ public sealed class HtnPlanner : IPlanner
 
         try
         {
-            var response = _llm.CompleteAsync(prompt, "", CancellationToken.None)
-                .ConfigureAwait(false).GetAwaiter().GetResult();
+            var response = await _llm.CompleteAsync(prompt, "", ct);
 
             if (string.IsNullOrWhiteSpace(response))
             {
@@ -235,7 +238,7 @@ public sealed class HtnPlanner : IPlanner
         }
     }
 
-    private static IReadOnlyList<ActionData>? ParseLlmActions(string llmResponse)
+    private IReadOnlyList<ActionData>? ParseLlmActions(string llmResponse)
     {
         try
         {
@@ -267,7 +270,7 @@ public sealed class HtnPlanner : IPlanner
         }
         catch (JsonException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[planner] LLM fallback JSON parse error: {ex.Message}");
+            _logger.LogWarning(ex, "[planner] LLM fallback JSON parse error");
             return null;
         }
     }

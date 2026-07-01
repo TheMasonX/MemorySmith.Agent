@@ -43,10 +43,9 @@ public sealed class PlaceBlockGoalDecomposer : IGoalDecomposer
             });
         }
 
-        // Mark all blocks as dispatched so IsComplete returns true after
-        // the planner dispatches these actions. Prevents re-planning loops.
-        pg.Dispatched = pg.Count;
-
+        // Sprint 58 (TSK-0317): Dispatched is now incremented per confirmed
+        // BlockPlacedEvent in AgentBackgroundService, not pre-set here.
+        // This prevents IsComplete from returning true before blocks are placed.
         actions.Add(new ActionData { Tool = "GetStatus" });
         return new ActionPlan(goal.Name, goal.Phases, actions);
     }

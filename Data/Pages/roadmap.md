@@ -2,7 +2,7 @@
 
 MemorySmith.Agent uses a sprint-based delivery model. Each sprint is council-reviewed by a 6-seat panel before merge.
 
-**Current version: v0.55.0** | **Latest: Sprint 55 — Environment Queries + Entity Observation + Observe→Evaluate Loop**
+**Current version: v0.56.0** | **Latest: Sprint 58 — WorldModel Wiring + P1 Audit Fixes**
 
 ---
 
@@ -108,6 +108,7 @@ Dashboard Wave A (build placement fixes + overview UI), Wave B (BuildOrigin migr
 
 | Version | Sprint | Tests | Status |
 |---------|--------|-------|--------|
+| v0.56.0 | 58 | 815 | ✅ green |
 | v0.55.0 | 55 | 746 | ✅ green |
 | v0.51.1 | 51 | 742 | ✅ green |
 | v0.51.0 | 51 | 742 | ✅ green |
@@ -157,28 +158,46 @@ Dashboard Wave A (build placement fixes + overview UI), Wave B (BuildOrigin migr
 | TSK-0307 | **P1** | ✅ Fix dual TaskSequenceGoal advancement — shared ResetForNextSequenceStep |
 | TSK-0308 | **P1** | ✅ Check EvaluationResult.IsSuccess — add _consecutiveLlmEvalFailures counter |
 
-### Sprint 58 — WorldModel Wiring + Tool Expansion + Precondition Implementation
-**Status:** 🟡 Planned | **Source:** Sprint 57 Wave D audit synthesis
+### Sprint 58 — WorldModel Wiring + P1 Audit Fixes + Precondition Implementation
+**Status:** 🟢 Waves A+B complete (Wave C deferred) | **Handoff:** `Data/Pages/Handoffs/sprint-58-wavea-b-complete.md`
 
+| Wave | Theme | Tasks |
+|:-----|:------|:------|
+| A | Quick Wins + P1 Audit Fixes | TSK-0312 (Debug.WriteLine), TSK-0314 (dead code), TSK-0315 (C# sanitization ✓ already done), TSK-0317 (PlaceBlockGoal premature completion), TSK-0318 (denylist normalization), TSK-0319 (CommandExecutionEnabled default) |
+| B | WorldModel + Precondition Wiring | TSK-0309 (WorldModel.Predict pre-dispatch), TSK-0310 (IGoalPrecondition on gather/craft/smelt) |
+| C | Tool Expansion (deferred) | TSK-0311 (EquipItem, ActivateBlock, AttackEntity, etc.) |
+
+**Wave A+B completed:**
 | Task | Priority | Summary |
 |:-----|:--------:|:--------|
-| TSK-0309 | P2 | Wire WorldModel.Predict pre-dispatch and Reconcile post-completion |
-| TSK-0310 | P2 | Implement IGoalPrecondition on gather/craft/smelt goals |
-| TSK-0311 | P2 | Implement EquipItem, ActivateBlock, AttackEntity, and other missing tools |
-| TSK-0312 | P2 | Fix Debug.WriteLine silent exception swallowing in Release builds |
-| TSK-0292 | High | ⏳ Decompose AgentBackgroundService (deferred from S57) |
-| TSK-0293 | High | ⏳ Remove legacy fallback/shim paths (deferred from S57) |
+| TSK-0312 | P2 | ✅ Fix Debug.WriteLine — ActionQueue explicit swallow + HtnPlanner instance logger |
+| TSK-0314 | P3 | ✅ Delete IntentAssessment.cs + CreateCreativeBuildActions + test |
+| TSK-0315 | P3 | ✅ C# /give sanitization — already done in Sprint 56 (SanitizeBlockName) |
+| TSK-0317 | **P1** | ✅ PlaceBlockGoal premature completion — Dispatched incremented per BlockPlacedEvent |
+| TSK-0318 | **P1** | ✅ Denylist normalization — config entries normalized to slash-prefixed at startup |
+| TSK-0319 | **P1** | ✅ CommandExecutionEnabled default true→false (BREAKING, safe-by-default) |
+| TSK-0309 | P2 | ✅ WorldModel.Predict injected into ABS, enriches WorldStateDiff for fire-and-forget tools |
+| TSK-0310 | P2 | ✅ IGoalPrecondition on GenericGatherGoal, CraftItemGoal, SmeltGoal |
 
-### Sprint 59 — ThinkAndPlan + Extraction Program + Dead Code Cleanup
-**Status:** 🟡 Planned | **Source:** Sprint 57 Wave D audit synthesis
+### Sprint 59 — Sprint 57 Audit Synthesis + Runtime Hardening
+**Status:** 🟡 Planned | **Source:** `internal-audit-57-20260701.md` (34 findings from 4-seat council peer review)
 
-| Task | Priority | Summary |
-|:-----|:--------:|:--------|
-| TSK-0313 | P2 | Implement ThinkAndPlan tool (mid-execution recursive sub-planning) |
-| TSK-0314 | P3 | Delete IntentAssessment.cs, dead HtnPlanner branches |
-| TSK-0315 | P3 | Add C#-side sanitization in ProvisionGoalIfCreativeAsync |
-| — | — | ABS extraction program (TSK-0292/0293 wiring)
-| TSK-0294 | High | ✅ Add structured execution capability and action registry surfaces |
+**Theme:** Fix P0/P1 findings from the Sprint 57 internal audit that have no existing task coverage. These are high-ROI fixes that close critical correctness gaps in the evaluator, inventory sync, planning async safety, dead-code cleanup, and safety configuration hardening.
+
+| Task | Priority | Source | Summary |
+|:-----|:--------:|:------:|:--------|
+| TSK-0320 | **P0** | P0-2 | **Fix LlmEvaluator fast-path** — check WorldStateDiff before returning "continue" when all outcomes succeeded |
+| TSK-0321 | **P0** | P0-3 | **Fix inventory sync** — remove `_currentGoal is not null` guard, fix stacked-delay bug (sync now fires at 60s instead of 30s) |
+| TSK-0322 | **P0** | P0-6 | **Fix ExecutionManager JSON round-trip** — avoid serialize→parse on every dispatch (18-sprint-old deferral) |
+| TSK-0323 | **P0** | P0-7 | **Fix HtnPlanner sync-over-async** — deadlock risk in LLM fallback (`.GetAwaiter().GetResult()` on async call) |
+| TSK-0324 | **P1** | P1-8 | **Fix safety config merge** — XOR switch replaces default deny list instead of merging (35+ protections lost on partial config) |
+| TSK-0325 | **P1** | P1-9 | **Add LLM evaluator circuit breaker** — counter reset-to-0 after 3 failures creates infinite failed-LLM-call loop |
+| TSK-0326 | P2 | P2-7 | **Add goal-identity guard** in ProvisionGoalIfCreativeAsync (stale /give enqueue after goal switch) |
+| TSK-0327 | P2 | P2-8 | **Fix SafetyConfig runtime normalization** — Program.cs normalizes for LLM prompt but not for runtime gate |
+| TSK-0328 | P2 | P2-9 | **Downgrade plan-raw log** — Sprint 52 diagnostic still at Warning level, fires every 10-30s on replan |
+| TSK-0329 | P2 | PR-1 | **Fix SignalR event name drift** — live path uses "StatusUpdated", canonical constant is "SnapshotUpdated" |
+| TSK-0313 | P2 | — | Implement ThinkAndPlan tool (mid-execution recursive sub-planning) |
+| — | — | — | ABS extraction program (TSK-0292/0293 wiring) — deferred to Sprint 60 |
 
 ### Sprint 52 — Situational Awareness: Entity Pipeline + ScenePack
 **Status:** 🟡 Planned (all tasks Backlog) | **Design:** `Data/Pages/Audit/memorysmith_situational_awareness_design_doc_20260625T020914Z.md`

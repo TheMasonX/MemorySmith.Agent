@@ -4,7 +4,7 @@
   "title": "P3: Add C#-side sanitization in ProvisionGoalIfCreativeAsync",
   "description": "ProvisionGoalIfCreativeAsync builds raw /give string from Blueprint.Materials[].Block with no sanitization on the C# side (JS adapter side is already sanitized via SAFE_BLOCK_RE). Add Regex.IsMatch(block, @\u0022^[a-zA-Z0-9_]\u002B$\u0022) validation before building the command string. Defense-in-depth for TSK-0275.",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "Low",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,11 +23,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-01T13:28:33.8681945Z",
-  "updatedAtUtc": "2026-07-01T13:28:33.8681945Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-01T13:35:19.5437495Z",
+  "completedAtUtc": "2026-07-01T13:35:19.5437495Z",
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0315-p3-add-c-side-sanitization-in-provisiongoalifcreativeasync.json"
 }

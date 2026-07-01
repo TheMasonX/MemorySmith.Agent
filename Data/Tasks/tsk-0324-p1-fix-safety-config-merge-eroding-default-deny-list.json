@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0324-p1-fix-safety-config-merge-eroding-default-deny-list",
+  "key": "TSK-0324",
+  "title": "P1: Fix safety config merge eroding default deny list",
+  "description": "The AgentBackgroundService.DeniedCommands property uses an XOR switch: it returns EITHER the config entries OR the built-in 35\u002B entry defaults, never a merge. Configuring any value replaces the entire default list, silently removing protections like /ban, /stop, /execute, /gamemode, /fill.\n\nAdditionally, SafetyOptions.DeniedCommands defaults to an empty set. The real defaults live in AgentBackgroundService.DefaultDeniedCommands. Configuring any value replaces the comprehensive built-in list wholesale.\n\nFix: Merge config with defaults instead of replacing. Make config additive-only (config items can add to defaults but cannot remove them). Normalize SafetyOptions.DeniedCommands entries (add leading slash) before they reach AgentBackgroundService.\n\nSource: internal-audit-57-20260701.md \u2014 P1-8 [PR], P2-8 [PR]",
+  "type": "Task",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-59",
+    "domain:safety",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-01T13:54:04.1225141Z",
+  "updatedAtUtc": "2026-07-01T14:04:55.0530423Z",
+  "completedAtUtc": "2026-07-01T14:04:55.0530423Z",
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0324-p1-fix-safety-config-merge-eroding-default-deny-list.json"
+}

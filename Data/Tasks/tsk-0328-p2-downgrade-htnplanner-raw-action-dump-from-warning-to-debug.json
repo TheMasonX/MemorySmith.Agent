@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0328-p2-downgrade-htnplanner-raw-action-dump-from-warning-to-debug",
+  "key": "TSK-0328",
+  "title": "P2: Downgrade HtnPlanner raw action dump from Warning to Debug",
+  "description": "A Sprint 52 diagnostic log (TSK-0121 debugging) was left running at LogWarning level in AgentBackgroundService.DispatchActionsAsync: \u0022[plan-raw] {Goal}: {N} total actions, first 5: [{Actions}]\u0022. An active agent that replans every ~10-30s produces a Warning log entry on every plan generation, which is noise for operators and can trigger alerting systems. After ~18 sprints, this diagnostic should be downgraded to LogDebug or removed entirely.\n\nSource: internal-audit-57-20260701.md \u2014 P2-9 [PR]",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-59",
+    "domain:core",
+    "domain:observability"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-01T13:54:04.3278378Z",
+  "updatedAtUtc": "2026-07-01T14:04:55.2741435Z",
+  "completedAtUtc": "2026-07-01T14:04:55.2741435Z",
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0328-p2-downgrade-htnplanner-raw-action-dump-from-warning-to-debug.json"
+}

@@ -30,6 +30,12 @@ Internal implementation changes (refactoring, extraction) are NOT breaking unles
 
 ## Breaking Change Log
 
+### v0.56.0 (Sprint 58)
+
+| Change | Type | Migration | Sprint |
+|:-------|:-----|:----------|:-------|
+| **`CommandExecutionEnabled` defaults to `false`** | MINOR | Previously defaulted to `true` (doc said `false`). Set `"CommandExecutionEnabled": true` in `Agent:Chat` config to restore command execution. The LLM prompt already correctly gates command intents; this change aligns the default with the documented safe behavior. | S58 |
+
 ### v0.51.0 (Sprint 51)
 
 | Change | Type | Migration | Sprint |

@@ -1,0 +1,41 @@
+﻿{
+  "id": "tsk-0316-sprint-58-worldmodel-wiring-tool-expansion-p1-audit-fixes",
+  "key": "TSK-0316",
+  "title": "Sprint 58 \u2014 WorldModel Wiring \u002B Tool Expansion \u002B P1 Audit Fixes",
+  "description": "Sprint 58 plan: Wave A covers quick wins (TSK-0312, TSK-0314, TSK-0315) and P1 audit fixes (PlaceBlockGoal premature completion, denylist normalization, CommandExecutionEnabled default). Wave B covers Sprint 58 main tasks: TSK-0309 (WorldModel.Predict/Reconcile), TSK-0310 (IGoalPrecondition), TSK-0311 (missing tools). TSK-0292/0293 (ABS decomposition) remain deferred per 3-audit consensus.",
+  "type": "Epic",
+  "status": "InProgress",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-58",
+    "domain:planning",
+    "domain:tools",
+    "domain:worldmodel"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-a7f8b083c22b465498c09fd6a02698c0",
+      "author": "anonymous",
+      "body": "Sprint 58 Waves A\u002BB complete. 8 of 9 planned tasks done (815 tests pass). Wave C (TSK-0311 missing tools) deferred to next sprint. Handoff: Data/Pages/Handoffs/sprint-58-wavea-b-complete.md. TSK-0292/0293 (ABS decomposition) remain deferred per 3-audit consensus.",
+      "createdAtUtc": "2026-07-01T13:46:14.8488522Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-01T13:33:58.8635714Z",
+  "updatedAtUtc": "2026-07-01T13:46:14.8488522Z",
+  "completedAtUtc": null,
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0316-sprint-58-worldmodel-wiring-tool-expansion-p1-audit-fixes.json"
+}

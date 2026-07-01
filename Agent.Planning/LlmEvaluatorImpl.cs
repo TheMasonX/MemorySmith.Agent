@@ -59,8 +59,11 @@ public sealed class LlmEvaluatorImpl : ILlmEvaluator
         // Sprint 54 (TSK-0222): skipped when forceEvaluate=true. Fire-and-forget
         // tools (place, MineBlock) always report success at dispatch time; their
         // real failures show up later in correlated action timeouts, not outcomes.
+        // Sprint 58 Wave C (TSK-0320): don't fast-path when the world diverged
+        // from expectations. If diff.HasMismatch, the LLM must evaluate whether
+        // the divergence warrants a replan even though all outcomes claim success.
         var failureCount = outcomes.Count(static o => !o.Success);
-        if (!forceEvaluate && failureCount == 0)
+        if (!forceEvaluate && failureCount == 0 && (diff is null || !diff.HasMismatch))
             return new EvaluationResult(false, "all actions succeeded");
 
         // Fast-path 3: provider offline — skip silently.

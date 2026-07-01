@@ -4,7 +4,7 @@
   "title": "P2: Fix Debug.WriteLine silent exception swallowing in Release builds",
   "description": "Debug.WriteLine in ActionQueue.cs (catch block for failed stopCallback) and HtnPlanner.ParseLlmActions (static method) silently drops exceptions in Release builds. Fix: Convert ParseLlmActions to instance method so _logger is accessible. Inject ILogger\u003CActionQueue\u003E into ActionQueue constructor, or make the swallow explicit with a comment.",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "Medium",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -24,11 +24,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-01T13:28:33.7477066Z",
-  "updatedAtUtc": "2026-07-01T13:28:33.7477066Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-01T13:38:02.7939402Z",
+  "completedAtUtc": "2026-07-01T13:38:02.7939402Z",
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0312-p2-fix-debug-writeline-silent-exception-swallowing-in-release-builds.json"
 }

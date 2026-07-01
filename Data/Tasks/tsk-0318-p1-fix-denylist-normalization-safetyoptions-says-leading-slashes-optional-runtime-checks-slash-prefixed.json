@@ -1,0 +1,40 @@
+﻿{
+  "id": "tsk-0318-p1-fix-denylist-normalization-safetyoptions-says-leading-slashes-optional-runtime-checks-slash-prefixed",
+  "key": "TSK-0318",
+  "title": "P1: Fix denylist normalization (SafetyOptions says leading slashes optional, runtime checks slash-prefixed)",
+  "description": "SafetyOptions comment says commands can be configured with leading slash optional, but AgentBackgroundService checks DeniedCommands.Contains(cmdLower) against the slash-prefixed command token. Fix: normalize both sides \u2014 strip leading slash from incoming command before lookup, and ensure default list entries are consistently formatted. Or normalize all entries at startup.",
+  "type": "Task",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-58",
+    "domain:safety",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-9d10fc35a24c4d60823d3e5460c212cf",
+      "author": "anonymous",
+      "body": "Related audit finding (internal-audit-57 P2-8): Program.cs normalizes DeniedCommands entries (adding leading slash) but only injects the normalized set into ChatOptions.DeniedCommands (LLM prompt path). The SafetyOptions instance that AgentBackgroundService.DeniedCommands reads from is NOT normalized. So the LLM prompt filter works but the runtime gate retains the mismatch bug. See TSK-0327 for this.",
+      "createdAtUtc": "2026-07-01T13:54:13.9001332Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-01T13:33:58.9514361Z",
+  "updatedAtUtc": "2026-07-01T13:54:13.9001332Z",
+  "completedAtUtc": "2026-07-01T13:41:36.3999523Z",
+  "revision": 4,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0318-p1-fix-denylist-normalization-safetyoptions-says-leading-slashes-optional-runtime-checks-slash-prefixed.json"
+}

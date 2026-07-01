@@ -16,7 +16,7 @@ using Agent.Core;
 /// mirroring the GenericGatherGoal fix from Sprint 21. Prevents false-completion after
 /// an admin /clear command that the bot did not observe via GetStatus.
 /// </summary>
-public sealed class CraftItemGoal(string itemId, int count = 1) : IGoal
+public sealed class CraftItemGoal(string itemId, int count = 1) : IGoal, IGoalPrecondition
 {
     public string ItemId => itemId;
     public int    Count  => count;
@@ -57,4 +57,28 @@ public sealed class CraftItemGoal(string itemId, int count = 1) : IGoal
         string s when bool.TryParse(s, out var parsed) => parsed,
         _ => false,
     };
+
+    // ── IGoalPrecondition ────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Sprint 58 (TSK-0310): Creative mode → always feasible (items can be spawned).
+    /// Survival → requires fresh inventory to check material availability.
+    /// </summary>
+    bool IGoalPrecondition.CanAttempt(ExecutionContext context, out string? blockingReason)
+    {
+        if (context.Capabilities.CanSpawnItems)
+        {
+            blockingReason = null;
+            return true;
+        }
+
+        if (!context.HasFreshInventory)
+        {
+            blockingReason = "Inventory is stale — wait for GetStatus refresh before crafting.";
+            return false;
+        }
+
+        blockingReason = null;
+        return true;
+    }
 }

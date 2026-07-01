@@ -1,0 +1,40 @@
+﻿{
+  "id": "tsk-0317-p1-fix-placeblockgoal-premature-completion-dispatched-count-during-decompose",
+  "key": "TSK-0317",
+  "title": "P1: Fix PlaceBlockGoal premature completion (dispatched=count during decompose)",
+  "description": "PlaceBlockGoalDecomposer sets pg.Dispatched = pg.Count immediately during decomposition, making IsComplete return true before blocks are placed. Fix: set Dispatched per-block on BlockPlacedEvent confirmation, or move the Dispatched increment to the completion path in AgentBackgroundService.",
+  "type": "Task",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-58",
+    "domain:planning",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-2f07e0c0f8c048e2ae2806561c3842f9",
+      "author": "anonymous",
+      "body": "Peer review finding (internal-audit-57 P0-1): The fix for premature completion introduced a data race. _dispatched is a plain int written by ProcessEventsAsync and read by DispatchActionsAsync with no volatile or Interlocked protection. Under heavy event load, the write may never be visible to the dispatch loop, causing the goal to hang indefinitely. Need to add Interlocked.Increment and Volatile.Read.",
+      "createdAtUtc": "2026-07-01T13:54:13.8435436Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-01T13:33:58.9058328Z",
+  "updatedAtUtc": "2026-07-01T13:54:13.8435436Z",
+  "completedAtUtc": "2026-07-01T13:41:36.1902224Z",
+  "revision": 4,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0317-p1-fix-placeblockgoal-premature-completion-dispatched-count-during-decompose.json"
+}

@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0329-p2-fix-signalr-event-name-drift-statusupdated-vs-snapshotupdated",
+  "key": "TSK-0329",
+  "title": "P2: Fix SignalR event name drift (StatusUpdated vs SnapshotUpdated)",
+  "description": "There\u0027s a three-way event name mismatch in the dashboard SignalR path:\n- DashboardHubEvents.SnapshotUpdated constant uses \u0022SnapshotUpdated\u0022\n- AgentBackgroundService.PushStatusToDashboardAsync (LIVE path) uses raw string \u0022StatusUpdated\u0022\n- DashboardPublisherImpl.PublishStatusAsync (DEAD code) uses the canonical constant \u0022SnapshotUpdated\u0022\n- JS client listener handles BOTH event names with a migration comment from Sprint 5A\n\nThe migration was never completed. If DashboardPublisherImpl is ever wired back in, the JS client will receive two updates per tick with different event names. Fix: Migrate ABS to use the canonical DashboardHubEvents.SnapshotUpdated constant and remove the JS fallback for \u0022StatusUpdated\u0022.\n\nSource: internal-audit-57-20260701.md \u2014 [PR-1]",
+  "type": "Task",
+  "status": "Done",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-59",
+    "domain:dashboard",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-01T13:54:04.3724944Z",
+  "updatedAtUtc": "2026-07-01T14:04:55.3277763Z",
+  "completedAtUtc": "2026-07-01T14:04:55.3277763Z",
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0329-p2-fix-signalr-event-name-drift-statusupdated-vs-snapshotupdated.json"
+}

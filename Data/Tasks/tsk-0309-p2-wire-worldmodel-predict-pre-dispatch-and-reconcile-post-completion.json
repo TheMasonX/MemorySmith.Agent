@@ -4,7 +4,7 @@
   "title": "P2: Wire WorldModel.Predict pre-dispatch and Reconcile post-completion",
   "description": "ComputeWorldStateDiff computes actual inventory delta (pre/post dispatch), but expectedGained/expectedLost are populated from ActionOutcome.Effects \u2014 which are never populated for async fire-and-forget tools (MineBlock, PlaceBlock, Wander). The LLM evaluator receives observation data but no expectation half. Wire WorldModel.Predict before each dispatch and Reconcile after StatusEvent confirms completion to provide structured expected-vs-actual data for every action type.",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "Medium",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -24,11 +24,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-01T13:28:33.6046368Z",
-  "updatedAtUtc": "2026-07-01T13:28:33.6046368Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-01T13:45:18.4086596Z",
+  "completedAtUtc": "2026-07-01T13:45:18.4086596Z",
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0309-p2-wire-worldmodel-predict-pre-dispatch-and-reconcile-post-completion.json"
 }

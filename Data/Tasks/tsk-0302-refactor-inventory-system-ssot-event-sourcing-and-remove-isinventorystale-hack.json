@@ -25,15 +25,21 @@
       "author": "anonymous",
       "body": "Sprint 57 Wave C \u2014 Addressed codesmell #4 (periodic background inventory sync):\n- Added \u0060InventorySyncInterval\u0060 constant (30s) to AgentBackgroundService\n- Added \u0060InventorySyncLoopAsync\u0060 method that runs as a 4th parallel task in ExecuteAsync\n- Sync only fires when agent is idle (no active goal) and inventory is stale\n- Initial 30s delay avoids redundant sync on startup (spawn already sends StatusEvent)\n\nRemaining codesmells (deferred to Sprint 58\u002B):\n1. No SSOT \u2014 6\u002B event paths update inventory (requires IInventoryService extraction)\n2. IsInventoryStale fragile boolean \u2014 checked 5 places, cleared in 1\n3. StatusEvent overwrites without merge\n5. Stale guard spin-wait hack\n6. /give silently fails on LAN\n7. Immutable record copies drift between StateManagerImpl and ABS\n\nBuild: succeeded. Tests: 816 passed, 0 failed.",
       "createdAtUtc": "2026-07-01T05:45:10.6460648Z"
+    },
+    {
+      "id": "c-276c34f0c78d4f13b93969b5d98f8697",
+      "author": "anonymous",
+      "body": "Related audit finding (P0-3 from internal-audit-57): InventorySyncLoopAsync only syncs when idle AND stale \u2014 never during active goals. The ApplyBlockMined projector explicitly acknowledges double-counting and relies on periodic GetStatus, but the guard prevents this during goals. This is a sub-problem within the broader inventory SSOT refactor. See TSK-0321 for the immediate fix (guards \u002B timing) vs TSK-0302 for the fundamental event-sourcing redesign.",
+      "createdAtUtc": "2026-07-01T13:54:13.7920762Z"
     }
   ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-01T00:13:41.3418965Z",
-  "updatedAtUtc": "2026-07-01T05:45:10.6460648Z",
+  "updatedAtUtc": "2026-07-01T13:54:13.7920762Z",
   "completedAtUtc": null,
-  "revision": 2,
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,

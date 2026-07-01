@@ -6,7 +6,7 @@ using Agent.Core;
 /// Gathers a target number of units of any item described by an <see cref="ItemSpec"/>.
 /// [rest of existing XML doc]
 /// </summary>
-public sealed class GenericGatherGoal(ItemSpec item, int targetCount) : IGoal, IItemSpecGoal
+public sealed class GenericGatherGoal(ItemSpec item, int targetCount) : IGoal, IItemSpecGoal, IGoalPrecondition
 {
     public ItemSpec Spec => item;
     public int TargetCount => targetCount;
@@ -74,4 +74,28 @@ public sealed class GenericGatherGoal(ItemSpec item, int targetCount) : IGoal, I
         string s when bool.TryParse(s, out var parsed) => parsed,
         _ => false,
     };
+
+    // ── IGoalPrecondition ────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Sprint 58 (TSK-0310): Creative mode → always feasible (items can be spawned).
+    /// Survival → requires fresh inventory to avoid planning against stale counts.
+    /// </summary>
+    bool IGoalPrecondition.CanAttempt(ExecutionContext context, out string? blockingReason)
+    {
+        if (context.Capabilities.CanSpawnItems)
+        {
+            blockingReason = null;
+            return true;
+        }
+
+        if (!context.HasFreshInventory)
+        {
+            blockingReason = "Inventory is stale — wait for GetStatus refresh before gathering.";
+            return false;
+        }
+
+        blockingReason = null;
+        return true;
+    }
 }

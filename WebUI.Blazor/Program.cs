@@ -173,8 +173,37 @@ if (agentEnabled)
     var safetySection = builder.Configuration.GetSection("Agent:Safety");
     var safetyOpts = new SafetyOptions();
     safetySection.Bind(safetyOpts);
+    // Sprint 58 (TSK-0318): normalize DeniedCommands entries to always have
+    // leading slash so runtime checks are consistent regardless of config format.
     if (safetyOpts.DeniedCommands is { Count: > 0 })
-        chatOpts = chatOpts with { DeniedCommands = safetyOpts.DeniedCommands };
+    {
+        var normalized = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var cmd in safetyOpts.DeniedCommands)
+        {
+            var entry = cmd.StartsWith('/') ? cmd : $"/{cmd}";
+            normalized.Add(entry);
+        }
+        chatOpts = chatOpts with { DeniedCommands = normalized };
+    }
+
+    // Sprint 58 Wave C (TSK-0327): normalize SafetyOptions.DeniedCommands at startup
+    // for the runtime path used by ABS (AgentBackgroundService.DeniedCommands property).
+    // The ChatOptions normalization above only covers the LLM prompt path.
+    // SafetyOptions is a record; we mutate the HashSet in-place via PostConfigure.
+    builder.Services.PostConfigure<SafetyOptions>(opts =>
+    {
+        if (opts.DeniedCommands is { Count: > 0 })
+        {
+            var toNormalize = opts.DeniedCommands
+                .Where(cmd => !cmd.StartsWith('/'))
+                .ToList();
+            foreach (var cmd in toNormalize)
+            {
+                opts.DeniedCommands.Remove(cmd);
+                opts.DeniedCommands.Add($"/{cmd}");
+            }
+        }
+    });
 
     // Sprint 52: ChatHistory uses configurable max turns (default 30).
     // Future TSK-0169 will add character-length-based eviction.
