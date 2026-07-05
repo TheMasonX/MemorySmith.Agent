@@ -61,6 +61,9 @@ public sealed class ReplanGovernor : IReplanGovernor
     /// <summary>
     /// Current stall recovery delay based on attempt count.
     /// Returns the graduated delay for the current stall attempt, capped at the last value.
+    /// Uses <c>_stallAttempt - 1</c> (clamped at 0) because <c>_stallAttempt</c> is
+    /// incremented when the stall is declared, so the first stall reads index 0 = 5s.
+    /// Sprint 59 (TSK-0342): fixed off-by-one that skipped tier 0 (5s).
     /// </summary>
     public TimeSpan CurrentStallDelay
     {
@@ -68,7 +71,7 @@ public sealed class ReplanGovernor : IReplanGovernor
         {
             lock (_lock)
             {
-                var idx = Math.Min(_stallAttempt, _graduatedDelaysSec.Length - 1);
+                var idx = Math.Min(Math.Max(0, _stallAttempt - 1), _graduatedDelaysSec.Length - 1);
                 return TimeSpan.FromSeconds(_graduatedDelaysSec[idx]);
             }
         }
@@ -87,15 +90,17 @@ public sealed class ReplanGovernor : IReplanGovernor
         {
             if (_isStalled)
             {
-                // Auto-recovery: allow one retry after graduated timeout
-                var idx = Math.Min(_stallAttempt, _graduatedDelaysSec.Length - 1);
+                // Auto-recovery: allow one retry after graduated timeout.
+                // Sprint 59 (TSK-0342): do NOT reset _stallAttempt on auto-recovery —
+                // only RecordProgress/Reset should clear it so backoff escalates:
+                // 5→10→20→30→30s instead of resetting to 5s every cycle.
+                var idx = Math.Min(Math.Max(0, _stallAttempt - 1), _graduatedDelaysSec.Length - 1);
                 var timeout = TimeSpan.FromSeconds(_graduatedDelaysSec[idx]);
                 if ((DateTimeOffset.UtcNow - _stalledAt) >= timeout)
                 {
                     _isStalled = false;
                     _identicalPlanCount = 1;
                     _lastFingerprint = planFingerprint;
-                    _stallAttempt = 0;
                     return ReplanVerdict.Proceed;
                 }
                 return ReplanVerdict.Stalled;
@@ -152,14 +157,18 @@ public sealed class ReplanGovernor : IReplanGovernor
         lock (_lock)
         {
             if (!_isStalled) return false;
-            var idx = Math.Min(_stallAttempt, _graduatedDelaysSec.Length - 1);
+            // Sprint 59 (TSK-0342): use _stallAttempt - 1 (clamped) so the first
+            // stall reads tier 0 (5s), and auto-recovery does NOT reset the attempt
+            // counter — only RecordProgress/Reset should clear it so backoff escalates.
+            var idx = Math.Min(Math.Max(0, _stallAttempt - 1), _graduatedDelaysSec.Length - 1);
             var timeout = TimeSpan.FromSeconds(_graduatedDelaysSec[idx]);
             if ((DateTimeOffset.UtcNow - _stalledAt) >= timeout)
             {
                 _isStalled = false;
                 _identicalPlanCount = 1; // start at 1 so first retry doesn't immediately re-stall
                 _lastFingerprint = null; // clear fingerprint so Evaluate starts fresh
-                _stallAttempt = 0;       // reset attempt counter on recovery
+                // Note: _stallAttempt intentionally NOT reset here — only RecordProgress/Reset
+                // clears the counter so graduated backoff (5→10→20→30s) actually escalates.
                 return true;
             }
             return false;

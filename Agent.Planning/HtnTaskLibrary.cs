@@ -36,7 +36,20 @@ public sealed class HtnTaskLibrary
     public HtnTaskLibrary(ILogger<HtnTaskLibrary>? logger = null)
     {
         _logger = logger;
-        _methods = new Dictionary<string, TaskDecomposer>(StringComparer.OrdinalIgnoreCase);
+        _methods = new Dictionary<string, TaskDecomposer>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["GatherWood"]      = GatherWoodDecompose,
+            ["FindTree"]        = FindTreeDecompose,
+            ["MineWood"]        = MineWoodDecompose,
+            ["Collect"]         = CollectDecompose,
+            ["SurviveNight"]    = SurviveNightDecompose,
+            ["FindShelter"]     = FindShelterDecompose,
+            ["LightArea"]       = LightAreaDecompose,
+            ["WaitForSunrise"]  = WaitDecompose,
+            ["Wander"]          = WanderDecompose,
+            ["Explore"]         = ExploreDecompose,
+            ["FindFlatArea"]    = FindFlatAreaDecompose,
+        };
     }
 
     // ── Crafting constants ────────────────────────────────────────────────────
@@ -152,24 +165,6 @@ public sealed class HtnTaskLibrary
     };
 
     private readonly Dictionary<string, TaskDecomposer> _methods;
-
-    public HtnTaskLibrary() : this(null)
-    {
-        _methods = new Dictionary<string, TaskDecomposer>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["GatherWood"]      = GatherWoodDecompose,
-            ["FindTree"]        = FindTreeDecompose,
-            ["MineWood"]        = MineWoodDecompose,
-            ["Collect"]         = CollectDecompose,
-            ["SurviveNight"]    = SurviveNightDecompose,
-            ["FindShelter"]     = FindShelterDecompose,
-            ["LightArea"]       = LightAreaDecompose,
-            ["WaitForSunrise"]  = WaitDecompose,
-            ["Wander"]          = WanderDecompose,
-            ["Explore"]         = ExploreDecompose,
-            ["FindFlatArea"]    = FindFlatAreaDecompose,
-        };
-    }
 
     public bool HasTask(string taskName) => _methods.ContainsKey(taskName);
 

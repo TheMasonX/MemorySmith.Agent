@@ -72,17 +72,22 @@ public sealed class WorldModel : IWorldModel
         BeliefState current;
         lock (_lock) { current = _belief; }
 
-        return toolName switch
+        // Sprint 59 (TSK-0336/TSK-0309): normalize tool name to lowercase to bridge
+        // the domain mismatch between PascalCase ITool.Name values (e.g. "MineBlock",
+        // "CraftItem") and lowercase wire-protocol names (e.g. "mine", "craft").
+        // Also accept the PascalCase forms directly for unit-test clarity.
+        var normalized = toolName.ToLowerInvariant();
+        return normalized switch
         {
-            "move" => PredictMove(current, args),
-            "status" => PredictStatus(current),
-            "mine" => PredictMine(current, args),
-            "craft" => PredictCraft(current, args),
-            "place" => PredictPlace(current, args),
-            "smelt" => PredictSmelt(current, args),
+            "move" or "moveto" => PredictMove(current, args),
+            "status" or "getstatus" => PredictStatus(current),
+            "mine" or "mineblock" => PredictMine(current, args),
+            "craft" or "craftitem" => PredictCraft(current, args),
+            "place" or "placeblock" => PredictPlace(current, args),
+            "smelt" or "smeltitem" => PredictSmelt(current, args),
             "wander" => PredictWander(current, args),
             "chat" => PredictNoChange(current, toolName, args),
-            "findFlatArea" => PredictNoChange(current, toolName, args),
+            "findflatarea" => PredictNoChange(current, toolName, args),
             _ => PredictUnknown(current, toolName, args),
         };
     }

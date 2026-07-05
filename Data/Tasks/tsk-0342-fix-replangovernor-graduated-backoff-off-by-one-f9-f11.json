@@ -4,7 +4,7 @@
   "title": "Fix ReplanGovernor graduated backoff off-by-one (F9/F11)",
   "description": "## Finding F9/F11 (Council: P1, 90% confidence)\n\nReplanGovernor implements a graduated backoff schedule [5, 10, 20, 30] seconds for stall recovery delays. Two bugs:\n\n1. **Off-by-one**: _stallAttempt is incremented from 0\u21921 in the same call that declares the stall. When CurrentStallDelay reads \u0060_graduatedDelaysSec[Math.Min(_stallAttempt, 3)]\u0060, it gets index 1 = 10s instead of index 0 = 5s. The first stall always waits 10s, not 5s.\n\n2. **Auto-recovery resets counter**: Auto-recovery (both inline in Evaluate and in TryAutoRecover) resets _stallAttempt to 0, same as RecordProgress. Since the same underlying problem usually persists, the next stall starts from 0\u21921 again, getting 10s again. Tiers 3 and 4 (20s, 30s) and tier 1 (5s) are unreachable in normal operation.\n\n## Why not caught\nReplanGovernorTests.cs uses a single-element delay array [0], which makes the off-by-one invisible since Math.Min(_stallAttempt, 0) is always 0 regardless of _stallAttempt\u0027s value.\n\n## Recommendation\n1. Only RecordProgress/Reset should clear _stallAttempt. Auto-recovery should leave it untouched so backoff escalates: 5\u219210\u219220\u219230\u219230...\n2. Fix off-by-one: compute delay index from _stallAttempt - 1 (clamped at 0) at the point the stall is declared, or read the delay before incrementing\n3. Add a test with the real [5, 10, 20, 30] array asserting the first stall\u0027s CurrentStallDelay is 5s\n\n## Sources\n- msa_sprint58_deep_audit_delta2_dev_round3_20260701_1830_CT.md (F11)\n- msa_sprint58_deep_audit_dev_round3_20260701_1615_CT_DELTA.md (D2)\n- Data/Pages/Audits/council-review-consolidated-audits-7-5-26.md",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -19,16 +19,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-c5934c12aa174a1b9f67e62a0a7a4c28",
+      "author": "anonymous",
+      "body": "## Implementation Complete\n\n**Files changed:** \u0060Agent.Core/ReplanGovernor.cs\u0060\n\nTwo fixes:\n1. **Off-by-one (tier 0 unreachable):** Fixed \u0060CurrentStallDelay\u0060, \u0060Evaluate()\u0060 auto-recovery, and \u0060TryAutoRecover()\u0060 to use \u0060Math.Max(0, _stallAttempt - 1)\u0060 for the delay index. The first stall now correctly reads tier 0 = 5s.\n\n2. **Auto-recovery resets counter:** \u0060TryAutoRecover()\u0060 and the inline auto-recovery in \u0060Evaluate()\u0060 no longer reset \u0060_stallAttempt\u0060 to 0. Only \u0060RecordProgress()\u0060 and \u0060Reset()\u0060 clear the counter. This allows the graduated backoff to actually escalate: 5\u219210\u219220\u219230\u219230s.\n\n**Validation:** \u0060dotnet build\u0060 succeeds (0 warnings, 0 errors). \u0060dotnet test\u0060 passes 815/815 tests.",
+      "createdAtUtc": "2026-07-05T20:07:21.2561486Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-05T18:49:01.705084Z",
-  "updatedAtUtc": "2026-07-05T18:49:01.705084Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-05T20:07:28.1156143Z",
+  "completedAtUtc": "2026-07-05T20:07:28.1156143Z",
+  "revision": 4,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0342-fix-replangovernor-graduated-backoff-off-by-one-f9-f11.json"
 }

@@ -4,7 +4,7 @@
   "title": "Add WorldStateDiff unexpected-inventory-change detection (F31)",
   "description": "## Finding F31 (Council: P1, 92% confidence)\n\nWorldStateDiff currently detects inventory mismatches between predicted and actual outcomes but does not detect \u0022unexpected\u0022 changes \u2014 inventory keys in the actual delta that were not in either the predicted gained or predicted lost sets. This means inventory changes from unmodeled sources (e.g., mob drops, other players, environmental pickup) are invisible to the diff.\n\n## Effect\nThe observe\u2192evaluate\u2192replan loop misses inventory changes from non-tool sources. The evaluator may incorrectly conclude \u0022all outcomes matched expectations\u0022 when the inventory has changed in ways the tool model didn\u0027t predict.\n\n## Recommendation\nAdd \u0060HasUnexpectedChanges\u0060 to \u0060WorldStateDiff\u0060:\n1. After computing predicted gained/lost, cross-reference against actual inventory delta\n2. Any key in ActualInventoryDelta not present in either gained or lost becomes an unexpected change\n3. Expose this in the diff\u0027s DescribeMismatches() output\n4. Surface in LlmEvaluatorImpl prompt context\n\nThis is a ~10-line addition with high observability value.\n\n## Sources\n- internal-audit-57-20260701.md (P1-6)\n- Data/Pages/Audits/council-review-consolidated-audits-7-5-26.md",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -19,16 +19,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-a2275e0ca321420581b06c0ae676878c",
+      "author": "anonymous",
+      "body": "## Implementation Complete\n\n**Files changed:** \u0060Agent.Core/Models/WorldStateDiff.cs\u0060\n\nAdded \u0060HasUnexpectedChanges\u0060 property that detects inventory items changed outside expected gains/losses. This now feeds into \u0060HasInventoryMismatch\u0060 first (so unexpected changes are surfaced even when expected lists are null). Updated \u0060DescribeMismatches()\u0060 to report unexpected changes.\n\nAlso extends **TSK-0320**: the \u0060HasUnexpectedChanges\u0060 property is available for the evaluator to surface in prompt context.\n\n**Validation:** \u0060dotnet build\u0060 succeeds (0 warnings, 0 errors). \u0060dotnet test\u0060 passes 815/815 tests.",
+      "createdAtUtc": "2026-07-05T20:07:21.3118954Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-05T18:49:16.609454Z",
-  "updatedAtUtc": "2026-07-05T18:49:16.609454Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-05T20:07:28.1677524Z",
+  "completedAtUtc": "2026-07-05T20:07:28.1677524Z",
+  "revision": 4,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0344-add-worldstatediff-unexpected-inventory-change-detection-f31.json"
 }

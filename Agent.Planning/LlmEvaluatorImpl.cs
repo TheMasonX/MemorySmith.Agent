@@ -190,6 +190,15 @@ public sealed class LlmEvaluatorImpl : ILlmEvaluator
 
     private static void AppendGoalContext(StringBuilder sb, IGoal goal, WorldState worldState)
     {
+        // Sprint 59 (TSK-0320): TaskSequenceGoal — delegate to the current step's context.
+        // Place this check first so it recurses into the active step's type-specific logic.
+        if (goal is TaskSequenceGoal seq)
+        {
+            sb.AppendLine($"Sequence: step {seq.CurrentStepIndex + 1}/{seq.TotalSteps} — {seq.CurrentStep.Name}");
+            AppendGoalContext(sb, seq.CurrentStep, worldState);
+            return;
+        }
+
         // Build goals: block-level progress + skip reasons + facing blocks
         if (goal is IBuildGoal bg)
         {

@@ -46,11 +46,18 @@ public sealed record WorldStateDiff(
     /// True when inventory changes don't match expectations.
     /// Sprint 58 Wave D (TSK-0334): also detects unexpected inventory changes
     /// (items gained/lost that weren't in the expected gain/loss lists).
+    /// Sprint 59 (TSK-0344): now also returns true when there are unexpected
+    /// changes even without expected gains/losses (e.g. unmodeled side effects).
     /// </summary>
     public bool HasInventoryMismatch
     {
         get
         {
+            // Sprint 59 (TSK-0344): check for unexpected changes first —
+            // even without expected gains/losses, unexpected inventory deltas
+            // are real anomalies worth surfacing.
+            if (HasUnexpectedChanges) return true;
+
             if (InventoryGained is null && InventoryLost is null) return false;
             if (ActualInventoryDelta is null) return false;
 
@@ -75,8 +82,24 @@ public sealed record WorldStateDiff(
                 }
             }
 
-            // Sprint 58 Wave D (TSK-0334): detect unexpected inventory changes.
-            // Items that changed but weren't in either expected list are anomalies.
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// True when inventory items changed that were not in either the expected
+    /// gains or expected losses. Detects unmodeled side effects such as mob drops,
+    /// other players, or environmental pickup.
+    /// Sprint 59 (TSK-0344): extracted as a standalone property for use by the
+    /// evaluator prompt context.
+    /// </summary>
+    public bool HasUnexpectedChanges
+    {
+        get
+        {
+            if (ActualInventoryDelta is null || ActualInventoryDelta.Count == 0)
+                return false;
+
             var expectedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (InventoryGained is not null)
             {
@@ -85,6 +108,12 @@ public sealed record WorldStateDiff(
             if (InventoryLost is not null)
             {
                 foreach (var k in InventoryLost.Keys) expectedKeys.Add(k);
+            }
+
+            // If there are no expected keys and any delta is non-zero, it's unexpected.
+            if (expectedKeys.Count == 0)
+            {
+                return ActualInventoryDelta.Values.Any(static delta => delta != 0);
             }
 
             foreach (var (item, delta) in ActualInventoryDelta)
@@ -114,22 +143,47 @@ public sealed record WorldStateDiff(
 
     /// <summary>
     /// Returns a concise human-readable description of mismatches for the LLM evaluator.
+    /// Sprint 59 (TSK-0344): describes unexpected inventory changes when present.
     /// </summary>
     public string DescribeMismatches()
     {
         var parts = new List<string>();
 
-        if (HasInventoryMismatch && InventoryGained is not null && ActualInventoryDelta is not null)
+        if (HasInventoryMismatch)
         {
-            var missed = new List<string>();
-            foreach (var (item, expected) in InventoryGained)
+            // Describe expected-miss shortfalls first.
+            if (InventoryGained is not null && ActualInventoryDelta is not null)
             {
-                var actual = ActualInventoryDelta.GetValueOrDefault(item, 0);
-                if (actual < expected)
-                    missed.Add($"{item} (expected +{expected}, got +{actual})");
+                var missed = new List<string>();
+                foreach (var (item, expected) in InventoryGained)
+                {
+                    var actual = ActualInventoryDelta.GetValueOrDefault(item, 0);
+                    if (actual < expected)
+                        missed.Add($"{item} (expected +{expected}, got +{actual})");
+                }
+                if (missed.Count > 0)
+                    parts.Add($"Inventory shortfall: {string.Join(", ", missed)}");
             }
-            if (missed.Count > 0)
-                parts.Add($"Inventory shortfall: {string.Join(", ", missed)}");
+
+            // Sprint 59 (TSK-0344): describe unexpected inventory changes.
+            if (HasUnexpectedChanges && ActualInventoryDelta is not null)
+            {
+                var unexpected = new List<string>();
+                var expectedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                if (InventoryGained is not null)
+                    foreach (var k in InventoryGained.Keys) expectedKeys.Add(k);
+                if (InventoryLost is not null)
+                    foreach (var k in InventoryLost.Keys) expectedKeys.Add(k);
+
+                foreach (var (item, delta) in ActualInventoryDelta)
+                {
+                    if (delta == 0) continue;
+                    if (!expectedKeys.Contains(item))
+                        unexpected.Add($"{item} {(delta > 0 ? "+" : "")}{delta}");
+                }
+                if (unexpected.Count > 0)
+                    parts.Add($"Unexpected inventory: {string.Join(", ", unexpected)}");
+            }
         }
 
         if (HasPositionMismatch && ExpectedPosition is not null && ActualPosition is not null)
