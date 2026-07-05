@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0343-wire-entityobservedevent-into-structuredfacts-f33",
+  "key": "TSK-0343",
+  "title": "Wire EntityObservedEvent into StructuredFacts (F33)",
+  "description": "## Finding F33 (Council: P1, 92% confidence)\n\nEntityObservedEvent writes entity observation data to WorldState.Facts (the untyped legacy dict with no eviction) rather than WorldState.StructuredFacts (provenance-tracked with a trim mechanism). This means entity observations accumulate indefinitely in the legacy dict, consuming memory and never being evicted. The StructuredFacts system was designed specifically to handle this use case.\n\n## Effect\nEntity facts in the legacy Facts dict grow without bound during long agent sessions. The StructuredFacts trim mechanism cannot clean them, so stale entity positions persist indefinitely.\n\n## Recommendation\n1. Change EntityObservedEvent handler to write to StructuredFacts instead of Facts\n2. Ensure the provenance tracking includes entity ID, observation time, and confidence\n3. Add TTL-based eviction for stale entity observations (default: 60s)\n4. Verify that consumers reading entity data check both stores or are migrated to StructuredFacts\n\n## Sources\n- internal-audit-57-20260701.md (P3-1/P2-2)\n- Data/Pages/Audits/council-review-consolidated-audits-7-5-26.md",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:core",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-05T18:49:16.5401438Z",
+  "updatedAtUtc": "2026-07-05T18:49:16.5401438Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}
