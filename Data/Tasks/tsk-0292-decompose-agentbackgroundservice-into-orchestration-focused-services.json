@@ -4,7 +4,7 @@
   "title": "Decompose AgentBackgroundService into orchestration-focused services",
   "description": "Reduce AgentBackgroundService from a god object into an orchestration layer by extracting planning, execution, recovery, world-state, and dashboard responsibilities into dedicated services. Preserve the current runtime behavior while moving policy and side-effect concerns out of the host service. Source: Data/Pages/Audits/memorysmith_agent_decomposition_delta_report.md and Data/Pages/Audits/2026-06-30_memorysmith_llm_agent_architecture_execution_context_and_replanning_audit.md.",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -24,11 +24,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-06-30T22:35:53.4988802Z",
-  "updatedAtUtc": "2026-06-30T22:35:53.4988802Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-05T20:30:27.1177573Z",
+  "completedAtUtc": "2026-07-05T20:30:27.1177573Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0292-decompose-agentbackgroundservice-into-orchestration-focused-services.json"
 }
