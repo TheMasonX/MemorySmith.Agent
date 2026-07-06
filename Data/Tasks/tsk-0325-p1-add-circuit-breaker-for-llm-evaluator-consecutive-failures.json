@@ -18,14 +18,21 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-9a42d672ffb44e66b42ac2a495fccd0e",
+      "author": "anonymous",
+      "body": "Sprint 59 Wave B: Completed remaining work on circuit breaker cooldown:\n\n1. Changed LlmEvalCooldown from 5 minutes \u2192 60 seconds (handoff spec)\n2. Added pre-call guard in DispatchActionsAsync: skips evaluator when \u0060_timeProvider.UtcNow \u003C _llmEvalSuppressUntil\u0060\n3. Added pre-call guard in TryLlmReplanOnStallAsync: returns early during cooldown, letting governor\u0027s deterministic backoff handle the stall\n4. Fixed log message from {CooldownMin}m \u2192 {CooldownSec}s\n\nPreviously the circuit breaker tracked failures and logged suppression but never actually prevented evaluator calls during cooldown \u2014 the infinite fail\u2192log\u2192call\u2192fail loop continued unabated.\n\nBuild: 0 warnings, 0 errors. Tests: 815/815 passed.",
+      "createdAtUtc": "2026-07-06T23:43:20.9465215Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-01T13:54:04.194833Z",
-  "updatedAtUtc": "2026-07-01T14:04:55.1361552Z",
+  "updatedAtUtc": "2026-07-06T23:43:20.9465215Z",
   "completedAtUtc": "2026-07-01T14:04:55.1361552Z",
-  "revision": 2,
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,

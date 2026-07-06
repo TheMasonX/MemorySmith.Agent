@@ -229,7 +229,7 @@ public sealed class AgentBackgroundService(
     // to 0 (which created an infinite fail→log→reset→fail cycle).
     private int _consecutiveLlmEvalFailures;
     private DateTimeOffset _llmEvalSuppressUntil = DateTimeOffset.MinValue;
-    private static readonly TimeSpan LlmEvalCooldown = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan LlmEvalCooldown = TimeSpan.FromSeconds(60);
     private FailureReason? _lastFailureReason;
     private bool _actionDispatchedThisCycle;
     // Sprint 20: inventory sum snapshot for progress-based stagnation detection.
@@ -2198,6 +2198,17 @@ public sealed class AgentBackgroundService(
                     // Sprint 39 P1: observation-driven replanning — evaluate accumulated outcomes after each dispatch.
                     if (_llmEvaluator is not null && _currentGoal is not null)
                     {
+                        // Sprint 59 Wave B (TSK-0325): pre-call circuit-breaker guard.
+                        // Skip evaluator calls during the cooldown period to break the
+                        // infinite fail→log→reset→fail cycle when the LLM is unavailable.
+                        if (_timeProvider.UtcNow < _llmEvalSuppressUntil)
+                        {
+                            logger.LogDebug(
+                                "[evaluator] suppressed — {Remaining:F0}s remaining in cooldown",
+                                (_llmEvalSuppressUntil - _timeProvider.UtcNow).TotalSeconds);
+                        }
+                        else
+                        {
                         // Sprint 55 (TSK-0155): capture currentGoal in a local to prevent NRE
                         // from concurrent mutation during the async gap (e.g., DeathEvent,
                         // planning failure, or goal cancellation setting _currentGoal=null
@@ -2247,9 +2258,9 @@ public sealed class AgentBackgroundService(
                                     _llmEvalSuppressUntil = _timeProvider.UtcNow + LlmEvalCooldown;
                                     logger.LogError(
                                         "[evaluator] {Count} consecutive non-success results for goal {Goal} " +
-                                        "(last reason: {Reason}) — suppressing evaluator for {CooldownMin}m",
+                                        "(last reason: {Reason}) — suppressing evaluator for {CooldownSec}s",
                                         _consecutiveLlmEvalFailures, evaluatingGoal.Name, evalResult.FailureReason,
-                                        (int)LlmEvalCooldown.TotalMinutes);
+                                        (int)LlmEvalCooldown.TotalSeconds);
                                 }
                                 else
                                 {
@@ -2264,6 +2275,7 @@ public sealed class AgentBackgroundService(
                             _consecutiveLlmEvalFailures = 0;
                             _llmEvalSuppressUntil = DateTimeOffset.MinValue;
                         }
+                        } // end else (cooldown guard — TSK-0325)
                     }
                     if (result.Success)
                     {
@@ -3351,6 +3363,18 @@ public sealed class AgentBackgroundService(
     private async Task TryLlmReplanOnStallAsync(CancellationToken ct)
     {
         if (_llmEvaluator is null) return;
+
+        // Sprint 59 Wave B (TSK-0325): respect evaluator cooldown.
+        // When the evaluator is suppressed due to consecutive failures,
+        // skip the LLM call — the stall will be handled by the governor's
+        // deterministic backoff instead.
+        if (_timeProvider.UtcNow < _llmEvalSuppressUntil)
+        {
+            logger.LogDebug(
+                "[llm-replan] suppressed during evaluator cooldown — {Remaining:F0}s remaining",
+                (_llmEvalSuppressUntil - _timeProvider.UtcNow).TotalSeconds);
+            return;
+        }
 
         try
         {
