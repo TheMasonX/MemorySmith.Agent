@@ -37,15 +37,18 @@ public sealed class WorldModel : IWorldModel
         get { lock (_lock) return _cachedUncertainty; }
     }
 
-    public WorldModel()
+    private readonly ITimeProvider _timeProvider;
+
+    public WorldModel(ITimeProvider? timeProvider = null)
     {
+        _timeProvider = timeProvider ?? SystemTimeProvider.Instance;
         // Spr�nt 25 P1-A: separate dictionary instances for each state.
         // Previously a single empty dict was shared between _observed and _belief,
         // meaning mutations to one would silently corrupt the other.
         _observed = new ObservationState(20, 20, new Position(0, 0, 0),
-            new Dictionary<string, int>(), [], DateTimeOffset.UtcNow);
+            new Dictionary<string, int>(), [], _timeProvider.UtcNow);
         _belief = new BeliefState(20, 20, new Position(0, 0, 0),
-            new Dictionary<string, int>(), [], DateTimeOffset.UtcNow);
+            new Dictionary<string, int>(), [], _timeProvider.UtcNow);
     }
 
     public void Observe(ObservationState observation)
@@ -63,7 +66,7 @@ public sealed class WorldModel : IWorldModel
                 observation.RecentObservations
                     .Select(f => new Fact(f.Key, f.Value, FactSource.Observed, f.Timestamp))
                     .ToList(),
-                DateTimeOffset.UtcNow);
+                _timeProvider.UtcNow);
         }
     }
 
@@ -180,7 +183,7 @@ public sealed class WorldModel : IWorldModel
                 _belief.Position,
                 newInv,
                 _belief.ActiveBeliefs,
-                DateTimeOffset.UtcNow);
+                _timeProvider.UtcNow);
         }
     }
 

@@ -4,7 +4,7 @@
   "title": "Fix Node.js pipe buffer hang \u2014 read stdout/stderr pipes",
   "description": "**Source:** Internal audit Sprint 60 (2026-07-11) finding P0-004\n\n\u0060MinecraftAdapter.cs\u0060 (line ~93) starts the Node.js process but never reads its \u0060stdout\u0060 or \u0060stderr\u0060 pipes. If the adapter writes enough stdout/stderr output (e.g., console.log from Mineflayer, structured logging), the OS pipe buffer fills up (typically 64KB on Windows, 16KB on Linux/macOS). When full, the Node.js process blocks on \u0060write(2)\u0060 \u2014 it stops making progress until the pipe is drained. This effectively hangs the adapter.\n\n**Impact:** Under verbose logging or error conditions, the adapter will appear to hang. The C# side sees a healthy process (no crash) but the adapter stops processing commands.\n\n**Recommendation:** Add asynchronous pipe readers for both stdout and stderr. The simplest approach: redirect stdout/stderr to the same logger used by the adapter, or use \u0060Process.BeginOutputReadLine()\u0060/\u0060BeginErrorReadLine()\u0060. For production, consider using a pipe draining strategy (discard after a buffer limit) to prevent blocking.",
   "type": "Bug",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "Critical",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,11 +23,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T06:50:46.6478561Z",
-  "updatedAtUtc": "2026-07-11T06:50:46.6478561Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-11T07:05:48.6336262Z",
+  "completedAtUtc": "2026-07-11T07:05:48.6336262Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0389-fix-node-js-pipe-buffer-hang-read-stdout-stderr-pipes.json"
 }

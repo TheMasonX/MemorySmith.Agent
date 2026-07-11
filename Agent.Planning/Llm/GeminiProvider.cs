@@ -34,12 +34,22 @@ public sealed class GeminiProvider(HttpClient http, ChatOptions options,
     {
         if (!IsAvailable) return null;
 
+        // Sprint 60 (TSK-0399): Guard against null/empty API key.
+        if (string.IsNullOrWhiteSpace(options.LlmApiKey))
+        {
+            _logger.LogWarning("GeminiProvider: LlmApiKey is null or empty");
+            return null;
+        }
+
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         cts.CancelAfter(TimeSpan.FromSeconds(options.LlmTimeoutSeconds));
 
         try
         {
-            var endpoint = $"/v1beta/models/{options.LlmModel}:generateContent?key={options.LlmApiKey}";
+            // Sprint 60 (TSK-0399): API key moved from URL query string to
+            // X-Goog-Api-Key header to prevent key leakage in server logs,
+            // crash dumps, and HttpRequestException messages.
+            var endpoint = $"/v1beta/models/{options.LlmModel}:generateContent";
             var request  = new GeminiRequest
             {
                 SystemInstruction = new GeminiContent { Parts = [new GeminiPart { Text = systemPrompt }] },
@@ -51,10 +61,27 @@ public sealed class GeminiProvider(HttpClient http, ChatOptions options,
                         Parts = [new GeminiPart { Text = userMessage }],
                     }
                 ],
+                // Sprint 60 (TSK-0400): Add generation config to cap response length.
+                GenerationConfig = new GeminiGenerationConfig
+                {
+                    MaxOutputTokens = options.LlmMaxResponseTokens > 0
+                        ? options.LlmMaxResponseTokens
+                        : 512,
+                },
             };
 
-            var response = await http.PostAsJsonAsync(endpoint, request, cts.Token);
-            if (!response.IsSuccessStatusCode) return null;
+            var req = new HttpRequestMessage(HttpMethod.Post, endpoint);
+            req.Headers.Add("X-Goog-Api-Key", options.LlmApiKey);
+            req.Content = JsonContent.Create(request);
+
+            var response = await http.SendAsync(req, cts.Token);
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync(cts.Token);
+                _logger.LogWarning("GeminiProvider: HTTP {Status} from {Endpoint}: {Body}",
+                    (int)response.StatusCode, endpoint, body);
+                return null;
+            }
 
             var result = await response.Content
                 .ReadFromJsonAsync<GeminiResponse>(cancellationToken: cts.Token);
@@ -72,6 +99,16 @@ public sealed class GeminiProvider(HttpClient http, ChatOptions options,
     {
         [JsonPropertyName("systemInstruction")] public GeminiContent? SystemInstruction { get; set; }
         [JsonPropertyName("contents")]          public GeminiContent[] Contents { get; set; } = [];
+        [JsonPropertyName("generationConfig")]  public GeminiGenerationConfig? GenerationConfig { get; set; }
+    }
+
+    /// <summary>
+    /// Sprint 60 (TSK-0400): Generation config to control response length.
+    /// Maps to https://ai.google.dev/api/generate-content#generationconfig
+    /// </summary>
+    private sealed class GeminiGenerationConfig
+    {
+        [JsonPropertyName("maxOutputTokens")] public int MaxOutputTokens { get; set; } = 512;
     }
 
     private sealed class GeminiContent

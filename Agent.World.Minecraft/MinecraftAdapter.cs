@@ -129,6 +129,25 @@ public sealed class MinecraftAdapter(MinecraftAdapterConfig config) : IWorldAdap
         _nodeProcess = Process.Start(psi)
             ?? throw new InvalidOperationException($"Failed to start Node process: {config.NodeScriptPath}");
 
+        // TSK-0389: Drain stdout/stderr pipes asynchronously to prevent the OS pipe
+        // buffer from filling up and blocking the Node.js subprocess. Without this,
+        // verbose adapter logging causes the subprocess to hang.
+        _nodeProcess.BeginOutputReadLine();
+        _nodeProcess.BeginErrorReadLine();
+        // Attach event handlers so pipe data is visible in the C# log at Debug level.
+        // The adapter's structured logger (logger.cjs) writes to a file, so this is
+        // a secondary diagnostics channel — not the primary log path.
+        _nodeProcess.OutputDataReceived += (_, args) =>
+        {
+            if (!string.IsNullOrEmpty(args.Data))
+                System.Diagnostics.Debug.WriteLine($"[adapter:stdout] {args.Data}");
+        };
+        _nodeProcess.ErrorDataReceived += (_, args) =>
+        {
+            if (!string.IsNullOrEmpty(args.Data))
+                System.Diagnostics.Debug.WriteLine($"[adapter:stderr] {args.Data}");
+        };
+
         await WaitForPortAsync(config.WebSocketPort, config.NodeStartTimeoutMs, cancellationToken);
     }
 

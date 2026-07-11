@@ -35,7 +35,10 @@ import { emitGameModeEvent, normalizeGameMode } from './gameModeState.js';
 import { toVec3 } from './vec3.js';
 // Sprint 52 modularization (TSK-0166): extracted to separate modules.
 import * as C from './config.js';
-import { logStructured } from './logger.js';
+// logger.js was renamed to logger.cjs (TSK-0391) to fix the cross-format
+// import error when creativeProvider.cjs requires it. Use createRequire
+// (already available below) for the CommonJS import.
+const { logStructured } = require('./logger.cjs');
 import { createMovements } from './movements.js';
 
 // ESM shim: re-enable require() for reading package.json versions at runtime.
@@ -123,9 +126,21 @@ const wss = new WebSocketServer({ port: WS_PORT });
 let agentSocket = null;
 let spawnPos = null;
 
+/**
+ * Sends a structured event to the C# host over the WebSocket connection.
+ * Wrapped in try/catch (TSK-0387) so that ERR_STREAM_DESTROYED or other
+ * WebSocket send failures don't crash the Node.js process.
+ */
 function sendEvent(event, data = {}) {
-  if (agentSocket?.readyState === 1 /* OPEN */) {
+  if (agentSocket?.readyState !== 1 /* OPEN */) return;
+  try {
     agentSocket.send(JSON.stringify({ event, ...data }));
+  } catch (err) {
+    logStructured('error', 'ws', 'sendEvent failed', {
+      event,
+      error: err.message,
+      readyState: agentSocket?.readyState,
+    });
   }
 }
 
@@ -2130,3 +2145,37 @@ function shutdown() {
 }
 process.on('SIGINT',  shutdown);
 process.on('SIGTERM', shutdown);
+
+// ── Crash guards (TSK-0388) ────────────────────────────────────────────────────
+// Node.js 22+ terminates the process on unhandled rejections. These handlers
+// ensure diagnostic logging before exit and attempt to notify the C# host.
+
+/** Emit a fatal error event to C# before the process exits. */
+function emitFatalError(origin, err) {
+  const errorData = {
+    error: err?.message ?? String(err),
+    stack: err?.stack,
+    origin,
+  };
+  logStructured('error', 'crash', `process ${origin}`, errorData);
+  // Best-effort notification to C# host — process may already be in a bad state.
+  try {
+    if (agentSocket?.readyState === 1 /* OPEN */) {
+      agentSocket.send(JSON.stringify({ event: 'adapterCrash', ...errorData }));
+    }
+  } catch { /* swallow — process is shutting down */ }
+}
+
+process.on('unhandledRejection', (reason) => {
+  emitFatalError('unhandledRejection', reason);
+  // Node.js default: print warning. For a bot process, give a short grace
+  // period for the crash event to be sent before the process terminates.
+  setTimeout(() => process.exit(1), 500);
+});
+
+process.on('uncaughtException', (err) => {
+  emitFatalError('uncaughtException', err);
+  // An uncaught exception means the process state is unreliable. Exit
+  // immediately after sending the crash notification.
+  setTimeout(() => process.exit(1), 500);
+});

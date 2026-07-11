@@ -1,17 +1,18 @@
 /**
- * logger.js — Structured JSON-line file logger for the MineflayerAdapter.
+ * logger.cjs — Structured JSON-line file logger for the MineflayerAdapter.
  *
- * Extracted from index.js Sprint 52 modularization (TSK-0166).
- * Writes JSON lines to a daily rolling log file alongside the C# host's Serilog
- * output. Console stays concise; the file captures full structured context for
- * post-hoc diagnostics.
+ * Converted from ESM (.js) to CommonJS (.cjs) so that both the ESM index.js
+ * and the CJS creativeProvider.cjs can import it without ERR_REQUIRE_ESM.
+ *
+ * Sprint 60 (TSK-0391): Fixed cross-format import regression. The previous
+ * logger.js used ESM export, which crashed creativeProvider.cjs's require().
  *
  * Usage:
- *   import { logStructured } from './logger.js';
+ *   const { logStructured } = require('./logger.cjs');
  *   logStructured('info', 'mine', 'block mined', { block: 'oak_log', count: 5 });
  */
 
-import { appendFileSync, mkdirSync, existsSync } from 'node:fs';
+const { appendFileSync, mkdirSync, existsSync } = require('node:fs');
 
 const LOG_DIR = process.env.LOG_DIR ?? './logs';
 try { if (!existsSync(LOG_DIR)) mkdirSync(LOG_DIR, { recursive: true }); } catch { /* best-effort */ }
@@ -23,7 +24,7 @@ try { if (!existsSync(LOG_DIR)) mkdirSync(LOG_DIR, { recursive: true }); } catch
  * @param {string} message - human-readable summary
  * @param {Object} [data] - structured context (merged into the JSON entry)
  */
-export function logStructured(level, category, message, data = {}) {
+function logStructured(level, category, message, data = {}) {
   const entry = JSON.stringify({
     t: new Date().toISOString(),
     l: level,
@@ -36,3 +37,5 @@ export function logStructured(level, category, message, data = {}) {
     appendFileSync(`${LOG_DIR}/adapter-${dateStr}.log`, entry + '\n');
   } catch { /* best-effort — never crash the bot on log I/O failure */ }
 }
+
+module.exports = { logStructured };

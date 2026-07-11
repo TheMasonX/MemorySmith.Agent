@@ -37,6 +37,7 @@ public sealed class ReplanGovernor : IReplanGovernor
 
     private readonly int _threshold;
     private readonly int[] _graduatedDelaysSec;
+    private readonly ITimeProvider _timeProvider;
     private readonly object _lock = new();
 
     private string? _lastFingerprint;
@@ -52,10 +53,12 @@ public sealed class ReplanGovernor : IReplanGovernor
     /// </summary>
     public ReplanGovernor(
         int identicalPlanThreshold = Default_threshold,
-        int[]? stallGraduatedDelaysSec = null)
+        int[]? stallGraduatedDelaysSec = null,
+        ITimeProvider? timeProvider = null)
     {
         _threshold = identicalPlanThreshold;
         _graduatedDelaysSec = stallGraduatedDelaysSec ?? DefaultStallGraduatedDelaysSec;
+        _timeProvider = timeProvider ?? SystemTimeProvider.Instance;
     }
 
     /// <summary>
@@ -96,7 +99,7 @@ public sealed class ReplanGovernor : IReplanGovernor
                 // 5→10→20→30→30s instead of resetting to 5s every cycle.
                 var idx = Math.Min(Math.Max(0, _stallAttempt - 1), _graduatedDelaysSec.Length - 1);
                 var timeout = TimeSpan.FromSeconds(_graduatedDelaysSec[idx]);
-                if ((DateTimeOffset.UtcNow - _stalledAt) >= timeout)
+                if ((_timeProvider.UtcNow - _stalledAt) >= timeout)
                 {
                     _isStalled = false;
                     _identicalPlanCount = 1;
@@ -112,7 +115,7 @@ public sealed class ReplanGovernor : IReplanGovernor
                 if (_identicalPlanCount >= _threshold)
                 {
                     _isStalled = true;
-                    _stalledAt = DateTimeOffset.UtcNow;
+                    _stalledAt = _timeProvider.UtcNow;
                     _stallAttempt++; // increment so next recovery uses longer delay
                     return ReplanVerdict.Stalled;
                 }
@@ -162,7 +165,7 @@ public sealed class ReplanGovernor : IReplanGovernor
             // counter — only RecordProgress/Reset should clear it so backoff escalates.
             var idx = Math.Min(Math.Max(0, _stallAttempt - 1), _graduatedDelaysSec.Length - 1);
             var timeout = TimeSpan.FromSeconds(_graduatedDelaysSec[idx]);
-            if ((DateTimeOffset.UtcNow - _stalledAt) >= timeout)
+            if ((_timeProvider.UtcNow - _stalledAt) >= timeout)
             {
                 _isStalled = false;
                 _identicalPlanCount = 1; // start at 1 so first retry doesn't immediately re-stall

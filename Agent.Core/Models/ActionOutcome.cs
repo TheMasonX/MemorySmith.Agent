@@ -106,33 +106,33 @@ public record ActionOutcome(
     string IObservationSummary.Summary => ObservationSummary;
 
     /// <summary>Creates a completed outcome with a single ItemCollected effect.</summary>
-    public static ActionOutcome Collected(Guid goalId, string tool, string item, int count) =>
+    public static ActionOutcome Collected(Guid goalId, string tool, string item, int count, DateTimeOffset? timestamp = null) =>
         new(goalId, tool, OutcomeType.Completed,
             $"Collected {count}x {item}",
             [new StructuredEffect("ItemCollected", item, count)],
-            DateTimeOffset.UtcNow);
+            timestamp ?? DateTimeOffset.UtcNow);
 
     /// <summary>Creates a failure outcome with the given error message.</summary>
-    public static ActionOutcome Failed(Guid goalId, string tool, string reason) =>
-        new(goalId, tool, OutcomeType.Failed, reason, [], DateTimeOffset.UtcNow);
+    public static ActionOutcome Failed(Guid goalId, string tool, string reason, DateTimeOffset? timestamp = null) =>
+        new(goalId, tool, OutcomeType.Failed, reason, [], timestamp ?? DateTimeOffset.UtcNow);
 
     /// <summary>Creates a simple success outcome with no structured effects.</summary>
-    public static ActionOutcome Succeeded(Guid goalId, string tool, string summary) =>
-        new(goalId, tool, OutcomeType.Completed, summary, [], DateTimeOffset.UtcNow);
+    public static ActionOutcome Succeeded(Guid goalId, string tool, string summary, DateTimeOffset? timestamp = null) =>
+        new(goalId, tool, OutcomeType.Completed, summary, [], timestamp ?? DateTimeOffset.UtcNow);
 
     /// <summary>Creates a NoProgress outcome — tool call succeeded but no progress made.</summary>
-    public static ActionOutcome NoProgress(Guid goalId, string tool, string detail) =>
-        new(goalId, tool, OutcomeType.NoProgress, detail, [], DateTimeOffset.UtcNow);
+    public static ActionOutcome NoProgress(Guid goalId, string tool, string detail, DateTimeOffset? timestamp = null) =>
+        new(goalId, tool, OutcomeType.NoProgress, detail, [], timestamp ?? DateTimeOffset.UtcNow);
 
     /// <summary>Creates a Blocked outcome — prerequisite not met.</summary>
-    public static ActionOutcome Blocked(Guid goalId, string tool, string reason) =>
-        new(goalId, tool, OutcomeType.Blocked, reason, [], DateTimeOffset.UtcNow);
+    public static ActionOutcome Blocked(Guid goalId, string tool, string reason, DateTimeOffset? timestamp = null) =>
+        new(goalId, tool, OutcomeType.Blocked, reason, [], timestamp ?? DateTimeOffset.UtcNow);
 
     /// <summary>Creates an Unreachable outcome — target not reachable.</summary>
-    public static ActionOutcome Unreachable(Guid goalId, string tool, string detail) =>
-        new(goalId, tool, OutcomeType.Unreachable, detail, [], DateTimeOffset.UtcNow);
+    public static ActionOutcome Unreachable(Guid goalId, string tool, string detail, DateTimeOffset? timestamp = null) =>
+        new(goalId, tool, OutcomeType.Unreachable, detail, [], timestamp ?? DateTimeOffset.UtcNow);
 
     /// <summary>Creates a TimedOut outcome.</summary>
-    public static ActionOutcome TimedOut(Guid goalId, string tool, string detail) =>
-        new(goalId, tool, OutcomeType.TimedOut, detail, [], DateTimeOffset.UtcNow);
+    public static ActionOutcome TimedOut(Guid goalId, string tool, string detail, DateTimeOffset? timestamp = null) =>
+        new(goalId, tool, OutcomeType.TimedOut, detail, [], timestamp ?? DateTimeOffset.UtcNow);
 }

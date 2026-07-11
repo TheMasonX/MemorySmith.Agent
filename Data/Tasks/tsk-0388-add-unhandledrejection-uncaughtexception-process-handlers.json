@@ -4,7 +4,7 @@
   "title": "Add unhandledRejection/uncaughtException process handlers",
   "description": "**Source:** Internal audit Sprint 60 (2026-07-11) finding P0-003\n\n\u0060MineflayerAdapter/index.js\u0060 has no \u0060process.on(\u0027unhandledRejection\u0027)\u0060 or \u0060process.on(\u0027uncaughtException\u0027)\u0060 handlers. Node.js 22\u002B terminates the process on unhandled rejections. Any async error in the adapter (Promise rejection inside an action handler, pathfinder timeout, bot.chat() failure) will crash the bot process without diagnostic logging.\n\n**Recommendation:** Add both process-level handlers at module init time. Log structured diagnostics and emit a \u0060processCrash\u0060 or \u0060adapterError\u0060 event to the C# side before the process terminates. Make the uncaughtException handler optional terminate (allow C# to decide) via the existing handshake protocol.",
   "type": "Bug",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "Critical",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,11 +23,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T06:50:46.583976Z",
-  "updatedAtUtc": "2026-07-11T06:50:46.583976Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-11T07:05:48.5769635Z",
+  "completedAtUtc": "2026-07-11T07:05:48.5769635Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0388-add-unhandledrejection-uncaughtexception-process-handlers.json"
 }

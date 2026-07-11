@@ -4,7 +4,7 @@
   "title": "ITimeProvider injection batch \u2014 ReplanGovernor, WorldState, WorldModel, ActionOutcome",
   "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 merged group P1-001\n\nFour code paths use \u0060DateTimeOffset.UtcNow\u0060 directly instead of injected \u0060ITimeProvider\u0060:\n1. \u0060ReplanGovernor.cs\u0060 \u2014 3 instances in Evaluate, _stalledAt, TryAutoRecover\n2. \u0060WorldState.cs\u0060 \u2014 IsInventoryFresh() method (Sprint 60 regression)\n3. \u0060WorldModel.cs\u0060 \u2014 Constructor, Observe, ApplyOutcome (4 instances)\n4. \u0060ActionOutcome.cs\u0060 \u2014 All 7 factory methods (Collected, Failed, Succeeded, etc.)\n\n**Recommendation:** Inject \u0060ITimeProvider\u0060 (default \u0060SystemTimeProvider.Instance\u0060) into ReplanGovernor and WorldModel constructors. Add optional \u0060DateTimeOffset? now = null\u0060 param to WorldState.IsInventoryFresh and ActionOutcome factory methods, defaulting to \u0060DateTimeOffset.UtcNow\u0060.",
   "type": "Refactor",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,11 +23,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T06:51:06.1438035Z",
-  "updatedAtUtc": "2026-07-11T06:51:06.1438035Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-11T07:05:48.7407263Z",
+  "completedAtUtc": "2026-07-11T07:05:48.7407263Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0394-itimeprovider-injection-batch-replangovernor-worldstate-worldmodel-actionoutcome.json"
 }

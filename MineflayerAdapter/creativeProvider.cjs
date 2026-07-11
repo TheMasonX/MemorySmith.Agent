@@ -8,7 +8,7 @@
 // when setInventorySlot succeeded but the item didn't appear in inventory
 // (a known Mineflayer quirk on some versions).
 
-const { logStructured } = require('./logger');
+const { logStructured } = require('./logger.cjs');
 
 // ── Constants ───────────────────────────────────────────────────────────────
 

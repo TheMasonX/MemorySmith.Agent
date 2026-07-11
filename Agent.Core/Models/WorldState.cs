@@ -48,10 +48,11 @@ public record WorldState
     /// within the specified <paramref name="maxAge"/>. Defaults to 60 seconds.
     /// Returns false when inventory has never been confirmed (<see cref="LastFreshInventoryAt"/> is null).
     /// </summary>
-    public bool IsInventoryFresh(TimeSpan? maxAge = null)
+    public bool IsInventoryFresh(TimeSpan? maxAge = null, DateTimeOffset? now = null)
     {
         if (LastFreshInventoryAt is null) return false;
-        return (DateTimeOffset.UtcNow - LastFreshInventoryAt.Value) <= (maxAge ?? TimeSpan.FromSeconds(60));
+        now ??= DateTimeOffset.UtcNow;
+        return (now.Value - LastFreshInventoryAt.Value) <= (maxAge ?? TimeSpan.FromSeconds(60));
     }
 
     public bool IsCreativeMode => MatchesCreativeMode(GameMode)

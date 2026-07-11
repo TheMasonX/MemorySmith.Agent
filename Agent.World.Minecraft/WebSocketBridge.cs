@@ -495,6 +495,16 @@ public sealed class WebSocketBridge(string uri,
 
                 "entityObserved" => ParseEntityObserved(root, now),
 
+                // Sprint 55 Wave C: block below bot changed (e.g. grass→stone).
+                // TSK-0395: wired through ParseEvent — was silently dropped before.
+                "blockBelowChanged" => new BlockBelowChangedEvent(
+                    Name: GetString(root, "name") ?? "?",
+                    Type: GetInt(root, "type"),
+                    X: GetInt(root, "x"),
+                    Y: GetInt(root, "y"),
+                    Z: GetInt(root, "z"),
+                    Timestamp: now),
+
                 _ => null, // unknown event type — ignored
             };
         }

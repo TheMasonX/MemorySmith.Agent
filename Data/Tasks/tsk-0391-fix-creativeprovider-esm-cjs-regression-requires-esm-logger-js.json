@@ -4,7 +4,7 @@
   "title": "Fix creativeProvider ESM/CJS regression \u2014 requires() ESM logger.js",
   "description": "**Source:** Internal audit Sprint 60 (2026-07-11) finding P0-001 (council escalation)\n\nThe Wave A fix for MSA-ADAPT-001 renamed \u0060creativeProvider.js\u0060 to \u0060creativeProvider.cjs\u0060 to solve the CommonJS-in-ESM problem. However, \u0060creativeProvider.cjs\u0060 still imports \u0060logger.js\u0060 via \u0060require(\u0027./logger\u0027)\u0060 \u2014 and \u0060logger.js\u0060 is an ESM module (uses \u0060export\u0060 syntax, and the project has \u0060\u0022type\u0022: \u0022module\u0022\u0060 in \u0060package.json\u0060). This means \u0060require(\u0027./logger\u0027)\u0060 fails with \u0060ERR_REQUIRE_ESM\u0060, and the creative provisioning path crashes at runtime.\n\n**Impact:** Creative-mode block placement is broken. The bot cannot build in creative mode.\n\n**Recommendation:** Either:\n(a) Convert \u0060logger.js\u0060 to CommonJS as well (rename to \u0060.cjs\u0060), or\n(b) Convert \u0060creativeProvider.cjs\u0060 to ESM syntax (\u0060import\u0060/\u0060export default\u0060), or\n(c) Inline the logging dependency in \u0060creativeProvider.cjs\u0060 to avoid the cross-format import.",
   "type": "Bug",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "Critical",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,11 +23,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T06:50:46.7806262Z",
-  "updatedAtUtc": "2026-07-11T06:50:46.7806262Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-11T07:05:48.4637546Z",
+  "completedAtUtc": "2026-07-11T07:05:48.4637546Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0391-fix-creativeprovider-esm-cjs-regression-requires-esm-logger-js.json"
 }
