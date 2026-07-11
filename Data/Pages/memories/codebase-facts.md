@@ -32,15 +32,13 @@ Persistent facts about the codebase for agents working in this repo.
 
 ## Current phase status
 
-- Phase 0: Complete — skeleton, interfaces, wiki
-- Phase 1: Complete — WebSocket bridge, MoveTo/Status tools, agent loop
-- Phase 2: Complete — RestMemoryGateway, memory tools, DI wiring
-- Phase 3: Complete — HTN planner, GatherWoodGoal, SurviveNightGoal, GoalFactory
-- Phase 4: Complete — ActionData.Context bag, findBestBlock, BLOCK_MINING_ALIASES, graduated stall, emergency stop, kick→reconnect
-- Phase 5: Complete (Sprint 45) — intent reliability, LLM model upgrade, goto safety, dashboard decoupling, smelt goal, checkpoint verification
-- Phase 6: In progress (Sprint 46) — Observability First: silent-failure hardening, structured logging across all catch→null paths, WebSocketBridge resilience, BuildOrigin consolidation, ReplanResult, documentation drift repair
+- Phase 0–5: Complete (Sprint 45)
+- Phase 6: Complete (Sprint 46) — Observability First: silent-failure hardening, structured logging across all catch→null paths, WebSocketBridge resilience, BuildOrigin consolidation, ReplanResult, documentation drift repair
+- Phase 7: In progress (Sprint 47–59+) — Entity awareness, adapter telemetry, TaskSequence decomposition, LLM fallback, dashboard wiring, inventory reliability
+- Sprint 59 complete as of 2026-07-06
+- **Master KB**: See `/memories/repo/master-knowledge-base.md` for comprehensive codebase reference
 
-## Core memory count: 28 files (all critical areas covered)
+## Core memory count: 28+ files (all critical areas covered)
 
 See `Data/Memories/Core/` for the full catalog. New agents should read the [home.md](../home.md) Features table first, then consult specific core memories for implementation details.
 

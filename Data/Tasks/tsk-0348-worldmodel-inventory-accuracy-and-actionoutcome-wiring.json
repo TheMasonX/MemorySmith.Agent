@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0348-worldmodel-inventory-accuracy-and-actionoutcome-wiring",
+  "key": "TSK-0348",
+  "title": "WorldModel inventory accuracy and ActionOutcome wiring",
+  "description": "Ensure \u0060ActionOutcome.Effects\u0060 or \u0060WorldModel.Predict\u0060 accurately models Place/Smelt/Craft inventory deltas. Add unit and integration tests to cover dispatch \u2192 outcome \u2192 world diff.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:agent",
+    "type:bug",
+    "type:regression-test"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T00:24:55.5899868Z",
+  "updatedAtUtc": "2026-07-11T00:24:55.5899868Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

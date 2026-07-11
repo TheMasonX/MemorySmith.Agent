@@ -1,0 +1,32 @@
+﻿{
+  "id": "tsk-0345-fix-replan-flooding-and-loop-preservation",
+  "key": "TSK-0345",
+  "title": "Fix replan flooding and loop-preservation",
+  "description": "Resolve replan flooding and preserve plan progress across replans to prevent duplicate/oscillating goals. Add unit and integration tests and CI gating to prevent regressions.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "type:bug",
+    "domain:planning"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T00:24:32.8736449Z",
+  "updatedAtUtc": "2026-07-11T00:24:32.8736449Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

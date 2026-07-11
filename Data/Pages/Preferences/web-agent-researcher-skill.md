@@ -23,11 +23,13 @@ If they don't fit within the scope of the current task, they need to be added st
 
 ## Executive Summary
 
-## Findings
+## Items Table
 
-// Severity sorted
+// Master findings table, severity sorted
 | ID | Name | Description | Severity | Impact | Probability | Confidence |
 | -- | ---- | ----------- | -------- | ------ | ----------- | ---------- |
+
+## Items List
 
 ### {ITEMID}-001: Finding Name
 

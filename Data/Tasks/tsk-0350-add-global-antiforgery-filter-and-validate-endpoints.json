@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0350-add-global-antiforgery-filter-and-validate-endpoints",
+  "key": "TSK-0350",
+  "title": "Add global antiforgery filter and validate endpoints",
+  "description": "Implement global antiforgery middleware/filter, audit public endpoints, and add automated tests to assert antiforgery tokens required where applicable. Document exceptions.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "security",
+    "web",
+    "csrf"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T00:25:03.2611808Z",
+  "updatedAtUtc": "2026-07-11T00:25:03.2611808Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

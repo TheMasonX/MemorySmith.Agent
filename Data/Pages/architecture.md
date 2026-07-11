@@ -17,7 +17,7 @@ Plus supporting projects:
 | `Agent.Vision` | ISpatialAnalyzer, aesthetic analysis via vision models (Phase 4) |
 | `Agent.Construction` | IArchitect, IBlueprintRepository, blueprint schema |
 | `WebUI.Blazor` | Blazor Server dashboard, SignalR real-time updates, REST control API, DI root |
-| `MemorySmith.Agent.Tests` | NUnit tests — 200+ passing |
+| `MemorySmith.Agent.Tests` | NUnit tests — 746+ passing (Sprint 59) |
 
 ## Key Interfaces
 

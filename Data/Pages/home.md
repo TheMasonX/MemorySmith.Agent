@@ -2,7 +2,7 @@
 
 MemorySmith.Agent is a **modular autonomous agent framework** that treats Minecraft (and other games) as a *world adapter* while using the MemorySmith wiki as its long-term memory. The design follows Domain-Driven, deep-module principles — each bounded context exposes a small, stable interface and hides its complexity.
 
-**Current version: v0.55.0** | **Sprint 55 complete** | **746+ tests**
+**Current version: v0.60.0** | **Sprint 59 complete** | **746+ tests (verified)**
 
 ## Quick Links
 
