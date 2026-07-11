@@ -1,0 +1,32 @@
+﻿{
+  "id": "tsk-0356-add-e2e-game-test-gatherwood-scenario",
+  "key": "TSK-0356",
+  "title": "Add E2E game test: GatherWood scenario",
+  "description": "## Problem\nThere is no end-to-end game test that validates the full agent pipeline against a real Minecraft server \u002B Mineflayer adapter. Unit tests cover individual components but cannot detect integration issues in the dispatch\u2192adapter\u2192event\u2192completion loop.\n\n## Scope\nImplement a controlled E2E test for the \u0022GatherWood\u0022 scenario:\n\n1. **Infrastructure setup:**\n   - Script or compose file to spin up a disposable Minecraft server (MC 1.16.5) \u002B Mineflayer adapter\n   - Test harness that connects the agent to the server\n   - Cleanup/teardown on completion\n\n2. **Test scenario:**\n   - Agent receives \u0022gather 3 oak logs\u0022 command\n   - Verifies agent plans: SearchMemory \u2192 MoveTo \u2192 MineBlock (3x) \u2192 GetStatus\n   - Verifies 3 oak_logs appear in inventory\n   - Verifies no TIMED OUT warnings in agent log\n   - Times out after 120 seconds\n\n3. **Assertions:**\n   - Action sequence matches expected plan\n   - All dispatched actions reach Completed state\n   - Inventory delta shows \u002B3 oak_logs\n   - Agent log contains no errors\n\n## Files\n- Scripts/Start-E2ETest.ps1 (new \u2014 orchestration script)\n- MemorySmith.Agent.Tests/E2E/GatherWoodScenario.cs (new)\n\n## Dependencies\n- Docker or local Java for Minecraft server\n- Mineflayer adapter running in Node.js\n- Requires configured MemorySmith API instance or mock\n\n## Validation\n- Test passes consistently (3/3 runs)\n- Test cleans up server and adapter on completion",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:testing",
+    "type:feature"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T01:40:01.5321341Z",
+  "updatedAtUtc": "2026-07-11T01:40:01.5321341Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

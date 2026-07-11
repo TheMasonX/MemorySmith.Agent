@@ -1,18 +1,58 @@
 {
   "Id": "agent-dashboard-integration",
-  "Title": "MemorySmith.Agent — Blazor Dashboard & Real-Time Monitoring",
-  "Content": "The Blazor Server dashboard (WebUI.Blazor) provides real-time agent visibility via REST endpoints and SignalR. The dashboard is the primary human interface for monitoring the agent.\n\n## Architecture\n\nThe Blazor app hosts:\n- REST API (/api/agent/*, /api/goals/*, /api/tools/*)\n- SignalR Hub (/hubs/monitor)\n- AgentBackgroundService (IHostedService)\n- All in one process — no separate queue, database, or broker\n\n## REST Endpoints\n\n| Endpoint | Method | Purpose |\n|----------|--------|--------|\n| /api/agent/status | GET | Current agent state (goal, connection, inventory, position) |\n| /api/agent/plan | POST | Set a goal: {goalName, parameters} |\n| /api/agent/stop | POST | Stop agent (?emergency=true for emergency stop) |\n| /api/agent/command | POST | Execute arbitrary action |\n| /api/goals | GET | List available goal types |\n| /api/goals | DELETE | Cancel current goal |\n| /api/tools | GET | List all registered tools with schemas |\n| /about | GET | Dashboard about page |\n\n## Dashboard Push (AgentBackgroundService)\n\nAgentBackgroundService pushes updates to dashboard consumers via:\n\nPushStatusToDashboardAsync (called periodically):\n- Publishes AgentStatusModel: connection status, current goal, position, health, food, inventory summary\n\nPushChatToDashboardAsync (called on chat events):\n- Publishes chat messages with username, message, timestamp\n\nPushGoalToDashboardAsync (called on goal changes):\n- Publishes goal state: name, phases, completion status, failure reason\n\n## SignalR Hub\n\nThe SignalR hub (/hubs/monitor) provides real-time streaming of agent state without polling. Dashboard components subscribe to hub methods for:\n- StatusUpdate: periodic agent status snapshot\n- ChatMessage: in-game chat relay\n- GoalUpdate: goal lifecycle events\n- LogEntry: structured log messages\n\n## Dashboard Components (WebUI.Blazor/Components/)\n\n- AgentStatusPanel: connection status, health, food, position, game mode\n- GoalTracker: current goal, phases, progress\n- InventoryPanel: current inventory contents\n- ChatLog: real-time chat display\n- ToolConsole: command input and tool execution history\n- ActionLog: dispatched actions with status\n\n## Update Frequency\n\n- Status push: every 1-2 seconds (configurable)\n- Chat/Goal/Log push: event-driven (immediate on occurrence)\n- SignalR reconnection: automatic with retry\n\n## Sprint Planning\n\nSprint 41-42 work items related to dashboard:\n- TSK-0041: Dashboard contracts snapshot models\n- TSK-0042: Dashboard event bus\n- TSK-0043: Dashboard snapshot store\n- TSK-0044: Dashboard broadcast service\n- TSK-0045: Refactor AgentBackgroundService to event bus\n- TSK-0046: SignalR event normalization\n\nThese are part of the ongoing dashboard improvement effort to decouple dashboard publishing from the main agent loop.",
+  "Title": "MemorySmith.Agent — Blazor Dashboard, SignalR Hub & Live Monitoring Infrastructure",
+  "Content": "The Blazor Server dashboard (`WebUI.Blazor`) provides real-time agent visibility via REST endpoints, SignalR push, and a static HTML dashboard. It is the primary human interface for monitoring the agent.\n\n## Architecture\n\nThe Blazor app hosts all monitoring infrastructure in one process:\n\n| Component | Purpose |\n|-----------|---------|\n| REST API | `/api/agent/*`, `/api/goals/*`, `/api/tools/*`, `/api/journal/*`, `/api/chat/*` |\n| SignalR Hub | `/hubs/monitor` via `AgentHub` — real-time push to dashboard clients |\n| `AgentBackgroundService` | `IHostedService` — agent lifecycle and event processing |\n| `LiveLogBuffer` | In-memory ring buffer (1000 entries) for recent log events |\n| `DashboardPublisherImpl` | `IDashboardPublisher` — periodic status snapshot publishing |\n\nNo separate queue, database, or broker — all in-process.\n\n## REST Endpoints\n\n| Endpoint | Method | Purpose |\n|----------|--------|--------|\n| `/api/agent/status` | GET | Current agent state (goal, connection, inventory, position, nearby entities, block below) |\n| `/api/agent/plan` | POST | Set a goal: `{goalName, parameters}` |\n| `/api/agent/stop` | POST | Stop agent (`?emergency=true` for emergency stop) |\n| `/api/agent/command` | POST | Execute arbitrary action |\n| `/api/goals` | GET | List available goal types |\n| `/api/goals` | DELETE | Cancel current goal |\n| `/api/tools` | GET | List all registered tools with schemas |\n| `/api/journal` | GET | Recent journal entries |\n| `/api/chat` | GET | Recent chat messages |\n| `/api/diagnostics` | GET | Diagnostic info (requires auth) |\n| `/about` | GET | Dashboard about page |\n\n## AgentHub (SignalR)\n\nLocated in `WebUI.Blazor/AgentHub.cs`. Clients join `\"dashboard\"` group on connect:\n\n- `OnConnectedAsync`: `Groups.AddToGroupAsync(ConnectionId, \"dashboard\")`\n- `OnDisconnectedAsync`: `Groups.RemoveFromGroupAsync`\n- Hub path: `/hubs/monitor`\n\n### SignalR Events Published\n\n| Event Constant | DTO | Description |\n|----------------|-----|-------------|\n| `DashboardHubEvents.SnapshotUpdated` | `AgentStatusUpdate` | Periodic agent status snapshot (health, food, pos, inventory, entities) |\n| `ChatMessage` | string | In-game chat relay |\n| `GoalUpdate` | string | Goal lifecycle events (started, completed, failed) |\n| `LogEntry` | `DashboardLogEntry` | Structured log messages from `LiveLogBuffer` |\n\n## LiveLogBuffer (`WebUI.Blazor/Dashboard/Logging/LiveLogBuffer.cs`)\n\nBounded in-memory ring buffer of recent `DashboardLogEntry` records:\n\n| Property | Value |\n|----------|-------|\n| Capacity | 1000 entries (default) |\n| Thread safety | `ConcurrentQueue` — thread-safe |\n| Eviction | Oldest entries dropped when full (`while (_entries.Count > _capacity && _entries.TryDequeue(out _)) { }`) |\n\n**Methods:**\n\n| Method | Description |\n|--------|-------------|\n| `Add(entry)` | Enqueues entry, drops oldest if at capacity |\n| `GetLatest(count = 100)` | Returns latest N entries, oldest first (dashboard auto-scrolls to newest) |\n| `Count` | Current number of entries |\n| `Clear()` | Empties the buffer |\n\nUsed by the dashboard timeline endpoint to surface recent Warning/Information/Error log events without querying rolling files.\n\n## DashboardPublisherImpl (`IDashboardPublisher`)\n\nLocated in `WebUI.Blazor/Managers/DashboardPublisherImpl.cs`. Concrete implementation that sends agent status updates to connected dashboard clients via SignalR.\n\n### State Setters\n\n| Method | Description |\n|--------|-------------|\n| `SetCurrentGoal(goalName, goalDescription)` | Updates current goal metadata for subsequent publishes |\n| `SetConsecutiveFailures(count)` | Sets the consecutive failure counter |\n| `SetNearbyEntities(entities)` | Sprint 55 Wave C: updates observed entities for dashboard display |\n| `SetBlockBelow(blockName)` | Sprint 55 Wave C: updates block below bot's feet |\n\n### PublishStatusAsync\n\nReads `IStateManager.Current` to populate the `AgentStatusUpdate` DTO, then sends via `IHubContext<AgentHub>.Clients.Group(\"dashboard\").SendAsync(DashboardHubEvents.SnapshotUpdated, update, ct)`.\n\nError handling: `OperationCanceledException` re-thrown; all other exceptions logged as warning and swallowed (non-fatal for publish loop).\n\n## AgentStatusUpdate DTO\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `Status` | string | `\"active\"` \\| `\"idle\"` \\| `\"reconnecting\"` \\| `\"disconnected\"` |\n| `Goal` | string? | Current goal name, or null if idle |\n| `GoalDescription` | string? | Human-readable goal description |\n| `Health` | int | Agent health (0–20) |\n| `Food` | int | Agent food level (0–20) |\n| `X`, `Y`, `Z` | int | World coordinates |\n| `QueuedActions` | int | Number of actions in dispatch queue |\n| `ConsecutiveFailures` | int | Running count of consecutive action failures |\n| `Inventory` | `IReadOnlyDictionary<string, int>` | Item → count snapshot |\n| `NearbyEntities` | `IReadOnlyList<ObservedEntityDto>?` | Observed entities near the bot (null if none) |\n| `BlockBelow` | string? | Block below the bot's feet (null if unknown) |\n\n## ObservedEntityDto\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `Name` | string | Entity display name |\n| `Type` | string | Entity type (`\"mob\"`, `\"object\"`, `\"player\"`) |\n| `Hostile` | bool | Whether the entity is a known hostile mob |\n| `X`, `Y`, `Z` | int | Entity position |\n| `Distance` | double | Euclidean distance from the bot |\n| `Health` | int? | Entity health (if available) |\n| `Username` | string? | Player username (if applicable) |\n\n## Key Source Files\n\n| File | Location |\n|------|----------|\n| `DashboardPublisherImpl.cs` | `WebUI.Blazor/Managers/DashboardPublisherImpl.cs` |\n| `AgentHub.cs` | `WebUI.Blazor/AgentHub.cs` |\n| `LiveLogBuffer.cs` | `WebUI.Blazor/Dashboard/Logging/LiveLogBuffer.cs` |\n| `Dtos.cs` | `WebUI.Blazor/Dtos.cs` |\n| `AgentBackgroundService.cs` (dashboard push) | `WebUI.Blazor/AgentBackgroundService.cs` |\n| Dashboard components | `WebUI.Blazor/Components/` |",
   "Status": 2,
-  "Confidence": 0.9,
-  "Tags": ["agent", "dashboard", "blazor", "signalr", "monitoring", "rest-api", "kind:reference", "audience:agent", "scope:architecture"],
-  "References": ["agent-runtime-lifecycle", "agent-architecture-bounded-contexts"],
+  "Confidence": 0.95,
+  "Tags": [
+    "kind:reference",
+    "audience:agent",
+    "scope:architecture"
+  ],
+  "References": [
+    "agent-dashboard-publisher-impl",
+    "agent-runtime-lifecycle",
+    "agent-architecture-bounded-contexts"
+  ],
   "Conflicts": [],
   "SourceLinks": [
-    { "Label": "AgentBackgroundService.cs (dashboard push)", "Uri": "%RepoRoot%WebUI.Blazor/AgentBackgroundService.cs" },
-    { "Label": "Dashboard components", "Uri": "%RepoRoot%WebUI.Blazor/Components/" },
-    { "Label": "Dashboard improvement plan", "Uri": "%RepoRoot%Data/Pages/Tasks/blazor-dashboard-improvement.md" },
-    { "Label": "Dashboard improvement v2", "Uri": "%RepoRoot%Data/Pages/Tasks/blazor-dashboard-improvement-v2.md" }
+    {
+      "Label": "DashboardPublisherImpl.cs",
+      "Uri": "%RepoRoot%WebUI.Blazor/Managers/DashboardPublisherImpl.cs",
+      "StartLine": 1,
+      "EndLine": 150
+    },
+    {
+      "Label": "AgentHub.cs",
+      "Uri": "%RepoRoot%WebUI.Blazor/AgentHub.cs",
+      "StartLine": 1,
+      "EndLine": 25
+    },
+    {
+      "Label": "LiveLogBuffer.cs",
+      "Uri": "%RepoRoot%WebUI.Blazor/Dashboard/Logging/LiveLogBuffer.cs",
+      "StartLine": 1,
+      "EndLine": 50
+    },
+    {
+      "Label": "Dtos.cs",
+      "Uri": "%RepoRoot%WebUI.Blazor/Dtos.cs",
+      "StartLine": 1,
+      "EndLine": 50
+    },
+    {
+      "Label": "AgentBackgroundService.cs (dashboard push)",
+      "Uri": "%RepoRoot%WebUI.Blazor/AgentBackgroundService.cs",
+      "StartLine": 1,
+      "EndLine": 100
+    },
+    {
+      "Label": "Dashboard components",
+      "Uri": "%RepoRoot%WebUI.Blazor/Components/",
+      "StartLine": null,
+      "EndLine": null
+    }
   ],
   "UsageCount": 0,
-  "LastUpdated": "2026-06-23T00:00:00Z"
+  "LastUpdated": "2026-07-10T00:00:00Z"
 }

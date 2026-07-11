@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0353-unified-build-decomposition-extract-buildactionpipeline",
+  "key": "TSK-0353",
+  "title": "Unified build decomposition: Extract BuildActionPipeline",
+  "description": "## Problem\n\u0060HtnTaskLibrary.DecomposeBuild\u0060 has a ~300-line \u0060if/else\u0060 branch separating creative and survival build paths. Most orchestration logic (origin, placement loop, checkpoint, vegetation clearing) is shared between them. The split duplicates code and makes both paths harder to maintain.\n\n## Solution\nExtract \u0060BuildActionPipeline\u0060 \u2014 an injectable pipeline with:\n- \u0060IBuildMaterialProvider\u0060 \u2014 interface for material acquisition (creative vs survival)\n- Shared placement loop, checkpoint, origin, vegetation clearing\n- CreativeMaterialProvider and SurvivalMaterialProvider implementations\n\nReference: \u0060Data/Pages/Audit/survival-creative-build-decomposition-analysis.md\u0060\n\n## Files\n- Agent.Construction/BuildActionPipeline.cs (new)\n- Agent.Construction/Interfaces/IBuildMaterialProvider.cs (new)\n- Agent.Construction/CreativeMaterialProvider.cs (new)\n- Agent.Construction/SurvivalMaterialProvider.cs (new)\n- Agent.Planning/HtnTaskLibrary.cs (refactor DecomposeBuild)\n\n## Validation\n- Both creative and survival build paths produce identical action sequences\n- All existing build tests pass\n- No regressions in blueprint placement",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:planning",
+    "domain:build",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T01:39:40.1032679Z",
+  "updatedAtUtc": "2026-07-11T01:39:40.1032679Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

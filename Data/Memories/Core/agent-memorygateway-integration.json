@@ -1,16 +1,40 @@
 {
   "Id": "agent-memorygateway-integration",
   "Title": "MemorySmith.Agent — IMemoryGateway and MemorySmith REST API",
-  "Content": "IMemoryGateway (Agent.Core) has 4 methods: SearchAsync, GetPageAsync, CreatePageAsync, UpdatePageAsync.\n\nRestMemoryGateway (Agent.Memory) implements this via MemorySmith REST endpoints:\n  GET /api/search?query={q}&limit=20   -> unified search (pages + memories)\n  GET /api/pages/{slug}               -> page content (body field)\n  POST /api/pages                     -> create page {slug, title, body, minimumRole}\n  PUT /api/pages/{slug}               -> update page\n\nSearchResult.Kind field distinguishes 'page' (slug usable in GetPageAsync) from 'memory' (UUID, NOT a valid page slug).\n\nConfig: Agent:Memory:BaseUrl, ApiKey, TimeoutSeconds, DefaultPageRole in appsettings.json.\nAuth: X-Api-Key header if ApiKey is configured in MemorySmith.\n\nPhase 2 bug fixed: UpdatePageAsync preserves existing title via GET-then-PUT; falls back gracefully if page doesn't exist.\nIHttpClientFactory used for connection pooling (not new HttpClient()).\n\nFor Phase 2 tests, use MockMemoryGateway (in MemorySmith.Agent.Tests). No real MemorySmith instance needed for unit tests.",
+  "Content": "## Interface\n\n`IMemoryGateway` (`Agent.Core.Interfaces`) has 4 methods:\n\n| Method | Signature | Returns |\n|--------|-----------|---------|\n| `SearchAsync` | `(query, ct)` | `IReadOnlyList<SearchResult>` |\n| `GetPageAsync` | `(slug, ct)` | `string?` (page body) |\n| `CreatePageAsync` | `(slug, title, body, minimumRole, ct)` | `string` (slug) |\n| `UpdatePageAsync` | `(pageId, content, title?, ct)` | void |\n\n## RestMemoryGateway (`Agent.Memory/RestMemoryGateway.cs`)\n\nImplements `IMemoryGateway` via MemorySmith REST endpoints:\n\n| Operation | HTTP | Endpoint |\n|-----------|------|----------|\n| Search | GET | `/api/search?query={q}&limit=20` |\n| GetPage | GET | `/api/pages/{slug}` |\n| CreatePage | POST | `/api/pages {slug, title, body, minimumRole}` |\n| UpdatePage | PUT | `/api/pages/{slug}` |\n\n`SearchResult.Kind` field distinguishes:\n- `\"page\"`: slug is usable in `GetPageAsync`\n- `\"memory\"`: UUID-based identifier (NOT a valid page slug)\n\n## Configuration (`RestMemoryGatewayOptions`)\n\nBound from `appsettings.json` section `\"Agent:Memory\"`:\n\n| Option | Type | Default | Description |\n|--------|------|---------|-------------|\n| `BaseUrl` | string | `http://localhost:5000` | MemorySmith base URL |\n| `ApiKey` | string? | null | `X-Api-Key` header if configured |\n| `TimeoutSeconds` | int | 30 | HTTP request timeout |\n| `DefaultPageRole` | string | `\"Anonymous\"` | Default role for created pages |\n| `ItemCacheTtlSeconds` | int | 60 | In-memory cache TTL for item registry lookups |\n| `NullCacheTtlSeconds` | int | 5 | Sprint 45 TSK-0092: shorter TTL for null cache entries (reduces repeated null lookups) |\n| `WorldKbUrl` | string? | null | Sprint 22: separate URL for World KB gateway (null = disabled) |\n| `WorldApiKey` | string? | null | API key for World KB gateway |\n| `WorldTimeoutSeconds` | int | 30 | Timeout for World KB gateway requests |\n\n### Dual Gateway Configuration\n\nThe agent supports two independent REST gateways:\n1. **Primary gateway** (`BaseUrl`/`ApiKey`/`TimeoutSeconds`): general MemorySmith wiki access\n2. **World KB gateway** (`WorldKbUrl`/`WorldApiKey`/`WorldTimeoutSeconds`): separate endpoint for world-specific knowledge\n\nWhen `WorldKbUrl` is null (default), the World KB gateway is disabled and all requests go through the primary gateway.\n\n## Error Handling (Sprint 45+)\n\n`SearchAsync` and other HTTP methods wrap all calls in try/catch (Sprint 53 TSK-0193):\n\n| Exception | Handling |\n|-----------|----------|\n| `HttpRequestException` | `LogWarning`, return `[]` (or null for GetPage) |\n| `TaskCanceledException` (timeout) | `LogWarning`, return `[]` (or null for GetPage) |\n| `JsonException` | `LogWarning`, return `[]` |\n| `OperationCanceledException` | Propagate (cooperative cancellation) |\n\nPattern:\n```csharp\ntry\n{\n    var response = await _httpClient.GetAsync(url, ct);\n    // ... process response\n}\ncatch (OperationCanceledException) { throw; }\ncatch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)\n{\n    logger?.LogWarning(ex, \"SearchAsync failed for query {Query}: {Message}\", query, ex.Message);\n    return [];\n}\n```\n\n## UpdatePageAsync Dual Paths (Sprint 51 TSK-0138)\n\n| Path | Condition | Behavior |\n|------|-----------|----------|\n| **Explicit title** | `title` parameter provided | Skip GET, use title directly |\n| **No title** | `title` is null | GET existing page first, extract title from response; 404-only catch for upsert fallback (TSK-0111) |\n\nKey rules:\n- Explicit title path eliminates the race condition between GET and PUT\n- Auth failures, timeouts, and 500s propagate to avoid silent data loss\n- Only `404 Not Found` is caught for upsert fallback; all other errors propagate\n\n## Caching\n\n- `ItemCacheTtlSeconds` (default 60): in-memory `ConcurrentDictionary` cache for item registry lookups\n- `NullCacheTtlSeconds` (default 5): shorter TTL for null entries (prevents repeated cache-miss HTTP calls)\n- Set `ItemCacheTtlSeconds = 0` to disable caching entirely\n- Cache entries include expiry check: `DateTimeOffset.UtcNow < entry.Expires`\n\n## Key Source Files\n\n| File | Location |\n|------|----------|\n| `RestMemoryGateway.cs` | `Agent.Memory/RestMemoryGateway.cs` |\n| `RestMemoryGatewayOptions.cs` | `Agent.Memory/RestMemoryGatewayOptions.cs` |\n| Memory wiki page | `Data/Pages/memory.md` |",
   "Status": 2,
   "Confidence": 0.95,
-  "Tags": ["agent", "memory", "rest-api", "memorysmith", "kind:integration", "audience:agent", "scope:memory"],
-  "References": ["agent-architecture-bounded-contexts", "agent-technology-stack"],
+  "Tags": [
+    "kind:integration",
+    "audience:agent",
+    "scope:memory"
+  ],
+  "References": [
+    "agent-wiki-integration",
+    "agent-architecture-bounded-contexts",
+    "agent-technology-stack"
+  ],
   "Conflicts": [],
   "SourceLinks": [
-    { "Label": "RestMemoryGateway.cs", "Uri": "%RepoRoot%Agent.Memory/RestMemoryGateway.cs", "StartLine": null, "EndLine": null },
-    { "Label": "Memory wiki page",    "Uri": "%RepoRoot%Data/Pages/memory.md",               "StartLine": null, "EndLine": null }
+    {
+      "Label": "RestMemoryGateway.cs",
+      "Uri": "%RepoRoot%Agent.Memory/RestMemoryGateway.cs",
+      "StartLine": 1,
+      "EndLine": 200
+    },
+    {
+      "Label": "RestMemoryGatewayOptions.cs",
+      "Uri": "%RepoRoot%Agent.Memory/RestMemoryGatewayOptions.cs",
+      "StartLine": 1,
+      "EndLine": 60
+    },
+    {
+      "Label": "Memory wiki page",
+      "Uri": "%RepoRoot%Data/Pages/memory.md",
+      "StartLine": null,
+      "EndLine": null
+    }
   ],
   "UsageCount": 0,
-  "LastUpdated": "2026-06-15T23:30:00Z"
+  "LastUpdated": "2026-07-10T00:00:00Z"
 }

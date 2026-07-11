@@ -1,0 +1,28 @@
+{
+  "Id": "agent-intent-manager",
+  "Title": "MemorySmith.Agent — IntentManager: Pipeline, GoalRequest Hierarchy & Command Parsing",
+  "Content": "## Overview\n\n`IntentManager` (`Agent.Planning/IntentManager.cs`) is the bridge between `IChatInterpreter` (which produces `IntentDraft`) and `GoalFactory` (which creates `IGoal` instances). It is the central component enforcing PRINCIPLE-1 (parsers never create goals).\n\n```\nIntentDraft → IntentManager.BuildGoalRequest → GoalRequest → GoalFactory.CreateAsync → IGoal\n```\n\n## Pipeline\n\n1. `LlmChatInterpreter.ParseDecision` deserializes the LLM's JSON response into an `IntentDraft`\n2. `IntentManager.BuildGoalRequest(IntentDraft)` maps the semantic intent to a typed `GoalRequest`\n3. `GoalFactory.CreateAsync(GoalRequest.GoalName, GoalRequest.Parameters)` creates the concrete `IGoal`\n\n## GoalRequest Hierarchy (Sprint 39 P3)\n\nAbstract base record with typed subclasses:\n\n```csharp\npublic abstract record GoalRequest(string GoalName)\n{\n    public abstract IReadOnlyDictionary<string, object?>? Parameters { get; }\n}\n```\n\n| Subclass | Constructor | GoalName Pattern | Parameters |\n|----------|-------------|-----------------|------------|\n| `GatherGoalRequest` | `(string Item, int Count = 10)` | `GatherItem:{Item}` | `{ count }` |\n| `CraftGoalRequest` | `(string Item, int Count = 1)` | `CraftItem:{Item}` | `{ count }` |\n| `BuildGoalRequest` | `(string Blueprint, BuildOrigin? Origin = null)` | `Build:{Blueprint}` | `{ originX, originY, originZ }` or null |\n| `NavigateGoalRequest` | `(int X, int Y, int Z)` | `MoveTo` | `{ x, y, z }` |\n| `SmeltGoalRequest` | `(string InputItem, int Count = 1)` | `SmeltItem:{InputItem}` | `{ count }` |\n| `PlaceGoalRequest` | `(string Item, int Count = 1, int? X = null, int? Y = null, int? Z = null)` | `PlaceBlock:{Item}` | `{ count, x?, y?, z? }` |\n\n## BuildGoalRequest Mapping Table\n\n| `IntentDraft.Intent` | Map To | Conditions | Notes |\n|---------------------|--------|------------|-------|\n| `gather` | `GatherGoalRequest(item, count ?? 10)` | Item required | Alias resolution via `ResolveItem()` |\n| `place` | `PlaceGoalRequest(item, count ?? 1, x?, y?, z?)` | Item required; coords optional | Sprint 54; null coords = place in front |\n| `craft` | `CraftGoalRequest(item, count ?? 1)` | Item required | Alias resolution via `ResolveItem()` |\n| `build` | `BuildGoalRequest(blueprint, origin?)` | Blueprint required | Via `TryBuildGoal()`; alias resolution via `ResolveBlueprint()` |\n| `navigate` | `NavigateGoalRequest(x, y, z)` | All 3 coords required | Returns null if coords missing (secondary path) |\n| `smelt` | `SmeltGoalRequest(item, count ?? 1)` | Item required | Sprint 44 TSK-0079; separated from craft |\n| `cancel` | null | — | Fast-pathed, produces no goal |\n| `status` | null | — | Fast-pathed, produces no goal |\n| `help` | null | — | Fast-pathed, produces no goal |\n| `conversation` / `clarify` / `ignore` | null | — | No goal produced |\n\n## Alias Resolution\n\n### `ResolveItem(string item)`\n- Checks `AliasRegistry.ItemAliases` for canonical Minecraft ID mappings\n- Examples: `\"wool\"` → `\"white_wool\"`, `\"planks\"` → `\"oak_planks\"`\n- Returns item as-is if no alias exists\n\n### `ResolveBlueprint(string? blueprint)`\n- Checks `AliasRegistry.BlueprintAliases` for common name → canonical blueprint ID\n- Examples: `\"house\"` → `\"small-house\"`, `\"wall\"` → `\"stone-wall\"`\n- Returns null for null input\n\n## ParseCommandString (TSK-0205)\n\nParses simple command strings from `IntentDraft.NextSteps` for multi-step chaining. Regex-driven with named capture groups:\n\n| Pattern | Regex | Maps To |\n|---------|-------|---------|\n| `craft N item` / `craft item` | `^craft\\s+(?:(?<count>\\d+)\\s+)?(?<item>.+)$` | `CraftGoalRequest(item, count ?? 1)` |\n| `gather/mine/get N item` | `^(?:gather|mine|get)\\s+(?:(?<count>\\d+)\\s+)?(?<item>.+)$` | `GatherGoalRequest(item, count ?? 10)` |\n| `build [a] blueprint` | `^build\\s+(?:a\\s+)?(?<blueprint>.+)$` | `BuildGoalRequest(blueprint, null)` |\n| `place N item [at X Y Z]` | `^place\\s+(?:(?<count>\\d+)\\s+)?(?<item>.+?)(?:\\s+at\\s+(?<x>-?\\d+)\\s+(?<y>-?\\d+)\\s+(?<z>-?\\d+))?$` | `PlaceGoalRequest(item, count, x?, y?, z?)` |\n| `move/go/navigate/walk to X Y Z` | `^(?:move|go|navigate|walk)\\s+(?:to\\s+)?(?<x>-?\\d+)\\s+(?<y>-?\\d+)\\s+(?<z>-?\\d+)` | `NavigateGoalRequest(x, y, z)` |\n| `smelt N item` / `smelt item` | `^smelt\\s+(?:(?<count>\\d+)\\s+)?(?<item>.+)$` | `SmeltGoalRequest(item, count ?? 1)` |\n\nReturns null for unrecognized commands.\n\n## Key Source Files\n\n| File | Location |\n|------|----------|\n| `IntentManager.cs` (GoalRequest hierarchy in same file) | `Agent.Planning/IntentManager.cs` |\n| `LlmChatInterpreter.cs` | `Agent.Planning/LlmChatInterpreter.cs` |\n| `AliasRegistry.cs` | `Agent.Planning/AliasRegistry.cs` |\n| `GoalFactory.cs` | `Agent.Planning/GoalFactory.cs` |",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": [
+    "kind:reference",
+    "audience:agent",
+    "scope:planning"
+  ],
+  "References": [
+    "agent-alias-registry",
+    "agent-build-origin",
+    "agent-intent-parsing-issues"
+  ],
+  "Conflicts": [],
+  "SourceLinks": [
+    {
+      "Label": "IntentManager.cs",
+      "Uri": "%RepoRoot%Agent.Planning/IntentManager.cs",
+      "StartLine": 1,
+      "EndLine": 250
+    }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-07-10T00:00:00Z"
+}

@@ -1,0 +1,39 @@
+{
+  "Id": "agent-dashboard-publisher-impl",
+  "Title": "MemorySmith.Agent — DashboardPublisherImpl: IDashboardPublisher, SignalR Integration & State Management",
+  "Content": "## Overview\n\n`DashboardPublisherImpl` (`WebUI.Blazor/Managers/DashboardPublisherImpl.cs`) is the concrete implementation of `IDashboardPublisher`. It sends periodic agent status snapshots to connected dashboard clients via SignalR (`AgentHub`), reading current world state from `IStateManager`.\n\n## IDashboardPublisher Interface\n\n```csharp\npublic interface IDashboardPublisher\n{\n    Task PublishStatusAsync(CancellationToken ct = default);\n}\n```\n\n## DashboardPublisherImpl Concrete Implementation\n\n### Constructor\n\n```csharp\npublic sealed class DashboardPublisherImpl(\n    IHubContext<AgentHub>? hubContext,\n    IStateManager stateManager,\n    ILogger<DashboardPublisherImpl> logger) : IDashboardPublisher\n```\n\nDependencies:\n- `IHubContext<AgentHub>?` — optional; when null, publishes are silently skipped (graceful degradation for non-dashboard hosts)\n- `IStateManager` — reads `Current` for health, food, position, inventory\n- `ILogger<DashboardPublisherImpl>` — structured logging\n\n### State Setters\n\n| Method | Parameters | Description |\n|--------|-----------|-------------|\n| `SetCurrentGoal` | `(string? goalName, string? goalDescription)` | Called by `AgentBackgroundService.SetGoal` when the goal changes |\n| `SetConsecutiveFailures` | `(int count)` | Tracks running failure count for status payload |\n| `SetNearbyEntities` | `(IReadOnlyList<ObservedEntityDto>? entities)` | Sprint 55 Wave C: observed entities for dashboard display |\n| `SetBlockBelow` | `(string? blockName)` | Sprint 55 Wave C: block below the bot's feet |\n\n### PublishStatusAsync\n\nFlow:\n1. Guard: if `_hubContext` is null, log debug and return (graceful degradation)\n2. Read `_stateManager.Current` for health, food, position, inventory\n3. Build `AgentStatusUpdate` DTO with current state + stored metadata\n4. Send via `_hubContext.Clients.Group(\"dashboard\").SendAsync(DashboardHubEvents.SnapshotUpdated, update, ct)`\n5. Exception handling: `OperationCanceledException` re-thrown; all other exceptions logged as warning and swallowed\n\n```csharp\npublic async Task PublishStatusAsync(CancellationToken ct = default)\n{\n    if (_hubContext is null)\n    {\n        _logger.LogDebug(\"[dashboard] hubContext is null — skipping publish\");\n        return;\n    }\n\n    try\n    {\n        var state = _stateManager.Current;\n        var update = new AgentStatusUpdate(\n            Status: state.AgentId is not null && _currentGoalName is not null\n                ? \"active\" : \"idle\",\n            Goal: _currentGoalName,\n            GoalDescription: _currentGoalDescription,\n            Health: state.Health,\n            Food: state.Food,\n            X: state.Position.X,\n            Y: state.Position.Y,\n            Z: state.Position.Z,\n            QueuedActions: 0,\n            ConsecutiveFailures: _consecutiveFailures,\n            Inventory: inv,\n            NearbyEntities: _nearbyEntities,\n            BlockBelow: _blockBelow\n        );\n\n        await _hubContext.Clients.Group(\"dashboard\")\n            .SendAsync(DashboardHubEvents.SnapshotUpdated, update, ct);\n    }\n    catch (OperationCanceledException) { throw; }\n    catch (Exception ex)\n    {\n        _logger.LogWarning(ex, \"[dashboard] failed to publish status update via SignalR\");\n    }\n}\n```\n\n## AgentHub SignalR Hub (`WebUI.Blazor/AgentHub.cs`)\n\n| Property | Value |\n|----------|-------|\n| Hub path | `/hubs/monitor` |\n| Client group | `\"dashboard\"` |\n| `OnConnectedAsync` | `Groups.AddToGroupAsync(ConnectionId, \"dashboard\")` |\n| `OnDisconnectedAsync` | `Groups.RemoveFromGroupAsync` |\n\n### SignalR Events\n\n| Event Name | DTO | Frequency |\n|------------|-----|-----------|\n| `DashboardHubEvents.SnapshotUpdated` | `AgentStatusUpdate` | Periodic (~1s) from `PublishStatusAsync` |\n| `ChatMessage` | `string` | On in-game chat |\n| `GoalUpdate` | `string` | On goal lifecycle change |\n| `LogEntry` | `DashboardLogEntry` | On log write (via `LiveLogBuffer`) |\n\n## AgentStatusUpdate DTO (`WebUI.Blazor/Dtos.cs`)\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `Status` | `string` | `\"active\"` \\| `\"idle\"` \\| `\"reconnecting\"` \\| `\"disconnected\"` |\n| `Goal` | `string?` | Current goal name, or null |\n| `GoalDescription` | `string?` | Human-readable goal description |\n| `Health` | `int` | Agent health (0–20) |\n| `Food` | `int` | Agent food level (0–20) |\n| `X`, `Y`, `Z` | `int` | World coordinates |\n| `QueuedActions` | `int` | Actions in dispatch queue |\n| `ConsecutiveFailures` | `int` | Running failure count |\n| `Inventory` | `IReadOnlyDictionary<string, int>` | Item → count snapshot |\n| `NearbyEntities` | `IReadOnlyList<ObservedEntityDto>?` | Observed entities, null if none |\n| `BlockBelow` | `string?` | Block below bot's feet, null if unknown |\n\n## Key Source Files\n\n| File | Location |\n|------|----------|\n| `DashboardPublisherImpl.cs` | `WebUI.Blazor/Managers/DashboardPublisherImpl.cs` |\n| `AgentHub.cs` | `WebUI.Blazor/AgentHub.cs` |\n| `Dtos.cs` (AgentStatusUpdate, ObservedEntityDto) | `WebUI.Blazor/Dtos.cs` |\n| `LiveLogBuffer.cs` | `WebUI.Blazor/Dashboard/Logging/LiveLogBuffer.cs` |\n| `AgentBackgroundService.cs` (dashboard push integration) | `WebUI.Blazor/AgentBackgroundService.cs` |",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": [
+    "kind:reference",
+    "audience:agent",
+    "scope:dashboard"
+  ],
+  "References": [
+    "agent-dashboard-integration",
+    "agent-entity-observation"
+  ],
+  "Conflicts": [],
+  "SourceLinks": [
+    {
+      "Label": "DashboardPublisherImpl.cs",
+      "Uri": "%RepoRoot%WebUI.Blazor/Managers/DashboardPublisherImpl.cs",
+      "StartLine": 1,
+      "EndLine": 150
+    },
+    {
+      "Label": "AgentHub.cs",
+      "Uri": "%RepoRoot%WebUI.Blazor/AgentHub.cs",
+      "StartLine": 1,
+      "EndLine": 25
+    },
+    {
+      "Label": "Dtos.cs",
+      "Uri": "%RepoRoot%WebUI.Blazor/Dtos.cs",
+      "StartLine": 1,
+      "EndLine": 80
+    }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-07-10T00:00:00Z"
+}

@@ -1,0 +1,44 @@
+{
+  "Id": "agent-task-governance",
+  "Title": "MemorySmith.Agent — Task Governance: Conventions, Validation & Lifecycle",
+  "Content": "## Overview\n\nAll tasks live in Data/Tasks/*.json. These conventions prevent data integrity issues across agent and human workflows.\n\n## Schema Contract\n\nEvery task JSON file must conform to:\n- Required fields: id, key, title, status, type, priority, description, createdAtUtc, updatedAtUtc, revision\n- Field casing: camelCase (id, key, title, status, description, etc.)\n- ID format: id = \"tsk-XXXX-descriptive-slug\" matching the filename. key = \"TSK-XXXX\"\n- New tasks: id must match ^tsk-\\d{4}-[a-z0-9-]+$. key must match ^TSK-\\d{4}$\n\n## Allowed Statuses\n\n| Status | Meaning |\n|--------|---------|\n| Backlog | Not yet started, awaiting prioritization |\n| Ready | Prioritized and scoped, ready to begin |\n| InProgress | Actively being worked on |\n| Blocked | Cannot proceed; reason documented in comments |\n| Done | Complete with evidence comment |\n| Archived | Superseded or no longer relevant; rationale documented |\n| Rejected | Considered and declined; rationale documented |\n\nNo other status values permitted. Non-standard statuses must be migrated to the canonical set.\n\n## Priority Values\n\nOnly Critical, High, Medium, Low are permitted. Priority labels (p0, p1, P0) are not allowed in the labels array.\n\n## Labels\n\nLowercase with hyphen-separated words. Prefix conventions:\n- sprint-XX: sprint association (e.g. sprint-53)\n- domain:xxx: domain area (e.g. domain:mineflayer, domain:chat)\n- type:xxx: classification (e.g. type:bug, type:refactor, type:testing)\nPriority codes NOT allowed as labels. Duplicate casing variants not permitted.\n\n## Lifecycle\n\n1. Creation: Use memorysmith_task_create MCP tool or copy validated template\n2. Validation: Always run Test-TaskRecords.ps1 after creation or mutation\n3. Done transition: Requires evidence comment with file paths, test results, or sprint handoff reference\n4. Unique keys: Check for existing keys before creating new tasks\n\n## Validation\n\nScript: pwsh ./Scripts/Test-TaskRecords.ps1\nChecks: valid JSON, allowed statuses, allowed priorities, unique keys, no orphan .md files, no embedded control characters\nCI step in .github/workflows/ci.yml runs same validation on every push touching Data/Tasks/",
+  "Status": 2,
+  "Confidence": 0.97,
+  "Tags": [
+    "agent",
+    "task-governance",
+    "task-records",
+    "validation",
+    "conventions",
+    "kind:reference",
+    "audience:agent",
+    "scope:project-management"
+  ],
+  "References": [
+    "agent-ci-infrastructure",
+    "agent-architecture-bounded-contexts"
+  ],
+  "Conflicts": [],
+  "SourceLinks": [
+    {
+      "Label": "AGENTS.md (Task Governance section)",
+      "Uri": "%RepoRoot%AGENTS.md",
+      "StartLine": 1,
+      "EndLine": 100
+    },
+    {
+      "Label": "Test-TaskRecords.ps1",
+      "Uri": "%RepoRoot%Scripts/Test-TaskRecords.ps1",
+      "StartLine": null,
+      "EndLine": null
+    },
+    {
+      "Label": "CI workflow",
+      "Uri": "%RepoRoot%.github/workflows/ci.yml",
+      "StartLine": 1,
+      "EndLine": 40
+    }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-07-10T00:00:00Z"
+}

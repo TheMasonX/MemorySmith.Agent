@@ -195,18 +195,18 @@ This sprint focuses on architectural stability — removing deprecated/legacy fa
 
 ### Gap Analysis → New Task Candidates
 
-The following documented items have **no corresponding task record** and should be created before they are needed:
+The following documented items now have task records created during the 2026-07-10 roadmap triage:
 
-| Item | Source | Proposed Priority |
-|:-----|:-------|:-----------------:|
-| **LLM model upgrade 3B→7B+** | Multiple audits, Sprint 41+ | **P0** — Most impactful perf improvement available |
-| **IBuildGoal marker interface** | Roadmap, Council S52 | P1 — Replace `goal is BuildGoal` type-checks |
-| **Unified build decomposition (Creative+Survival)** | Multiple audits, council reports | **High** — Extract `BuildActionPipeline` from 300-line `if/else` in `HtnTaskLibrary` |
-| **HtnTaskLibrary split** | Council S52 plan | High — 5 focused decomposers (Gather, Craft, Smelt, Build, Explore) |
-| **Typed PlanContext** | Council S52 plan | Medium — Replace `Dictionary<string, object?>` with typed properties |
-| **E2E game test (GatherWood)** | Sprint 50 handoff | High — Requires Minecraft server + Mineflayer |
-| **Dashboard event bus** | Roadmap Upcoming Priorities | P1 — Decouple publishing from agent loop |
-| **World KB setup guide + deployment** | Roadmap | P2 — Deploy dedicated MemorySmith wiki instance |
+| Item | Task | Priority |
+|:-----|:----:|:--------:|
+| **LLM model upgrade 3B→7B+** | TSK-0351 | **Critical** |
+| **IBuildGoal marker interface** | TSK-0352 | High |
+| **Unified build decomposition (Creative+Survival)** | TSK-0353 | High |
+| **HtnTaskLibrary split** | TSK-0354 | High |
+| **Typed PlanContext** | TSK-0355 | Medium |
+| **E2E game test (GatherWood)** | TSK-0356 | High |
+| **Dashboard event bus** | TSK-0357 | High |
+| **World KB setup guide + deployment** | TSK-0358 | Medium |
 
 ---
 
@@ -216,7 +216,7 @@ The following documented items have **no corresponding task record** and should 
 |----------|-------|--------|
 | Core memories (JSON) | 28 | 15 new + 13 existing = 28 covering all critical areas |
 | Feature wiki pages | 10 | Agent Runtime, Chat Interpretation, Planning, Blueprints, World Events, Adapter, Safety, Memory/Wiki, Dashboard, Emergency Stop |
-| Task records | 70+ | tsk-0001 through tsk-0170 (Agent: 55 active; MemorySmith: legacy numbering) |
+| Task records | 80+ | tsk-0001 through tsk-0358 (Agent: 80+ active; MemorySmith: legacy numbering) |
 | Guides | 18+ | Getting started, adding goals/tools, API, troubleshooting, etc. |
 | Council reviews | 20+ | Sprint 0 through Sprint 38 |
 | Blueprint files | 4 | small-house, farm, castle, wizards-tower |

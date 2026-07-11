@@ -1,0 +1,34 @@
+{
+  "Id": "agent-alias-registry",
+  "Title": "MemorySmith.Agent — AliasRegistry: Shared Item/Blueprint/Craft Alias Dictionaries",
+  "Content": "## Overview\n\nAliasRegistry (Agent.Planning/AliasRegistry.cs) is a static class containing shared alias dictionaries for item, blueprint, and craft name resolution.\n\nConsolidates previously-duplicated dictionaries in ChatInterpreter and IntentManager into a single source of truth (TSK-0099).\n\n## ItemAliases\n\nIReadOnlyDictionary<string, string> (case-insensitive via StringComparer.OrdinalIgnoreCase):\nMaps common player shorthand and LLM-output names to canonical Minecraft item IDs.\n\nSources:\n- ChatInterpreter: player shorthand (wood→oak_log, cobble→cobblestone, etc.)\n- IntentManager: LLM output normalization (wool→white_wool, planks→oak_planks, etc.)\n\nKey mappings include wood types (oak, birch, spruce, dark_oak, jungle, acacia, cherry, mangrove), stone types (cobblestone, stone_bricks), ores/items (coal, diamond, emerald, redstone, lapis_lazuli, iron_ore, gold_ore, copper_ore), terrain (dirt, sand, gravel, clay, snow_block), and utility items (wool→white_wool, planks→oak_planks, glass, chest, stick, etc.)\n\n## BlueprintAliases\n\nMaps common player-facing names to canonical blueprint IDs:\nhouse, small house, cabin, shelter, hut, home, shack → small-house\n\n## CraftAliases\n\nMaps craft shorthand to canonical Minecraft item IDs for craft intent normalization:\nIncludes planks, sticks, chest, crafting_table, furnace, torch, tools (wooden/iron variants), armor, bread, bowl, sign, ladder, fence, door, trapdoor, slab, stairs.\n\n## Fuzzy Matching (Sprint 57 TSK-0304)\n\nTryResolve(name, out canonicalId) method:\n1. Exact alias match (case-insensitive)\n2. Fuzzy substring matching against Lazy<HashSet<string>> _knownItemIds\n_knownItemIds contains all alias values + alias keys that look like valid IDs + additional common block IDs\n\n## Usage\n\n- IntentManager.ResolveItem: resolves item names before GoalRequest creation\n- IntentManager.ResolveBlueprint: resolves blueprint aliases before BuildGoalRequest creation\n- ChatInterpreter.ResolveCraftItem: uses CraftAliases for craft intent normalization",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": [
+    "agent",
+    "alias-registry",
+    "item-aliases",
+    "blueprint-aliases",
+    "craft-aliases",
+    "fuzzy-matching",
+    "kind:reference",
+    "audience:agent",
+    "scope:planning"
+  ],
+  "References": [
+    "agent-intent-parsing-issues",
+    "agent-intent-manager",
+    "agent-architecture-bounded-contexts"
+  ],
+  "Conflicts": [],
+  "SourceLinks": [
+    {
+      "Label": "AliasRegistry.cs",
+      "Uri": "%RepoRoot%Agent.Planning/AliasRegistry.cs",
+      "StartLine": 1,
+      "EndLine": 200
+    }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-07-10T00:00:00Z"
+}

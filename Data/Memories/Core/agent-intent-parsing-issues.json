@@ -1,53 +1,53 @@
 {
-    "Id":  "agent-intent-parsing-issues",
-    "Title":  "MemorySmith.Agent — Intent Parsing Failures with Ollama (llama3.2:3b)",
-    "Content":  "## Problem Summary\n\nDuring Sprint 40 runtime testing with Ollama (llama3.2:3b), the agent repeatedly failed to correctly parse player chat intent. Three distinct failure modes were observed:\n\n### Failure 1: \"no, that\u0027s wrong\" → classified as \"ignore\"\n\nLog:\n```\n[chat] \u003cTheMasonX23\u003e no, that\u0027s wrong\n[llm] failed to parse JSON from ollama response: \u0027{\n  \"addressed\": \"no\",\n  \"intent\": \"ignore\",\n  \"response\": \"\"\n}\u0027\n[chat] \u003cTheMasonX23\u003e -\u003e clarify\n```\n\n**Problem:** The LLM correctly set `addressed: \"yes\"` and `intent: \"ignore\"` — but this is WRONG. The user is clearly addressing the bot (disagreeing with its previous inventory claim). \"ignore\" should only be used for messages NOT directed at the bot. This is an LLM model quality issue — llama3.2:3b is too small to reliably distinguish between \"not addressed\" and \"addressed but disagreeing\".\n\n**Impact:** The user\u0027s correction is silently dropped. The bot appears to ignore the user.\n\n### Failure 2: \"Removed 58 item(s)\" → leaked through system message filter\n\nLog:\n```\n[chat] \u003cTheMasonX23\u003e Removed 58 item(s) from player TheMasonX23]\n[llm] failed to parse JSON from ollama response: \u0027{...}\u0027\n```\n\n**Problem:** The SYSTEM_MESSAGE_PATTERNS filter in index.js blocked most server messages, but `/clear` responses have slight formatting variations (trailing bracket, different phrasing) that leak through. The Mineflayer chat handler forwards whatever chat events arrive from the server, and the pattern filter is regex-based — fragile against formatting differences.\n\n**Impact:** Server messages reach the LLM pipeline, wasting a 15-second Ollama call that returns garbage.\n\n### Failure 3: Clarify uses hardcoded \"clarify\" response instead of LLM-generated question\n\nLog:\n```\n[chat] \u003cTheMasonX23\u003e -\u003e clarify\n```\n\n**Problem:** When ParseDecision in LlmChatInterpreter triggers the clarify path (confidence \u003c threshold), the response text is supposed to be the LLM-generated clarificationQuestion. But when the LLM fails to parse (returns null from ParseDecision), the pattern fallback\u0027s clarify response is a generic hardcoded string. Even when the LLM response DOES parse with low confidence, the clarificationQuestion is often empty or unhelpful because llama3.2:3b doesn\u0027t reliably produce good clarifying questions.\n\n**Impact:** The bot says \"-\u003e clarify\" in logs but the user doesn\u0027t see a meaningful question in chat. The bot appears confused.\n\n### Failure 4: \"inventory\" / \"inv\" fast-path bypasses LLM entirely\n\nLog:\n```\n[chat] \u003cTheMasonX23\u003e leo, your inventory is stale, refresh it\n[chat] \u003cTheMasonX23\u003e -\u003e status\n[chat] bot: Inventory: 3x dirt\n```\n\n**Problem:** The pattern-based ChatInterpreter has fast-path keywords like \"inv\" and \"inventory\" that classify as status intent BEFORE the LLM is consulted. The user\u0027s message \"your inventory is stale, refresh it\" triggers the \"inventory\" keyword match and returns status — completely bypassing the LLM and ignoring the user\u0027s actual request (to refresh/re-sync inventory, not just report it).\n\n**Impact:** The bot repeatedly reports stale inventory instead of refreshing it. The user\u0027s intent is lost.\n\n## Root Causes\n\n1. **Model quality:** llama3.2:3b (3B parameters) is too small for reliable intent classification. Needs a larger model (7B+) or a different approach entirely for the LLM-based path.\n2. **Pattern fast-paths are too broad:** Keywords like \"inv\" and \"inventory\" match in contexts where the user\u0027s intent is NOT a simple status check. The pattern fallback should require more precise matching or be deprioritized.\n3. **No recovery from clarification:** When the LLM fails or produces low-confidence, the system falls back to hardcoded patterns that don\u0027t explain what\u0027s happening. The user sees no useful output.\n\n## Recommendations\n\n1. **Upgrade or switch LLM model:** llama3.2:3b is insufficient for reliable intent parsing. Consider:\n   - llama3.1:8b or similar (better intent classification)\n   - A smaller dedicated intent-classification model fine-tuned for Minecraft commands\n   - OpenAI/GitHub Models API fallback when Ollama confidence is low\n\n2. **Make \"clarify\" use the LLM:** When the pattern fallback produces \"clarify\", the system should re-prompt the LLM with a refined request: \"The player\u0027s intent was unclear. Ask a specific clarifying question about what they want.\" This would generate better clarification questions.\n\n3. **Audit and narrow pattern fast-paths:** Review all keywords in ChatInterpreter. Remove \"inv\" and \"inventory\" as hard fast-paths. Instead, route ALL non-trivial messages through the LLM and only use deterministic fast-paths for \"cancel\", \"status\" (when explicitly matching simple patterns like \"status\" or \"stop\"), and \"help\".\n\n4. **Add system message classification robustness:** Use the structured chat system (TSK-0038) instead of fragile regex patterns in index.js.\n\n5. **Consider graduated LLM strategy:** Try Ollama first with short timeout (5s), fall back to a cloud API (GitHub Models) with longer timeout if Ollama fails or returns low confidence.",
-    "Status":  2,
-    "Confidence":  0.92,
-    "Tags":  [
-                 "agent",
-                 "intent-parsing",
-                 "ollama",
-                 "llm",
-                 "chat",
-                 "bug",
-                 "kind:bug",
-                 "audience:agent",
-                 "scope:personality"
-             ],
-    "References":  [
-                       "agent-phase-status-current",
-                       "agent-sprint40-p0-implementation-status"
-                   ],
-    "Conflicts":  [
-
-                  ],
-    "SourceLinks":  [
-                        {
-                            "Label":  "ChatInterpreter source",
-                            "Uri":  "%RepoRoot%Agent.Planning/LlmChatInterpreter.cs",
-                            "StartLine":  42,
-                            "EndLine":  320
-                        },
-                        {
-                            "Label":  "ChatInterpreter tests",
-                            "Uri":  "%RepoRoot%MemorySmith.Agent.Tests/ChatInterpreterTests.cs",
-                            "StartLine":  1,
-                            "EndLine":  200
-                        },
-                        {
-                            "Label":  "Chat system docs",
-                            "Uri":  "%RepoRoot%Data/Pages/chat-system.md",
-                            "StartLine":  null,
-                            "EndLine":  null
-                        },
-                        {
-                            "Label":  "HandleChatEventAsync",
-                            "Uri":  "%RepoRoot%WebUI.Blazor/AgentBackgroundService.cs",
-                            "StartLine":  724,
-                            "EndLine":  830
-                        }
-                    ],
-    "UsageCount":  0,
-    "LastUpdated":  "2026-06-23T00:00:00Z"
+  "Id": "agent-intent-parsing-issues",
+  "Title": "MemorySmith.Agent — Intent Parsing Pipeline (Chat Interpreter & IntentManager)",
+  "Content": "## Overview\n\nThe agent's intent parsing pipeline transforms player chat messages into actionable goals through a multi-stage process:\n\n```\nChat → IChatInterpreter → ChatInterpretation → IntentManager → GoalRequest → GoalFactory → IGoal\n```\n\nThis is PRINCIPLE-1 (Sprint 35+): **parsers never create goals**. The interpreter expresses semantic intent via `ChatInterpretation`; `IntentManager.BuildGoalRequest` maps it to a typed `GoalRequest`; `GoalFactory.CreateAsync` resolves the `GoalRequest.GoalName` to a concrete `IGoal`.\n\n## IntentDraft Schema (LlmChatInterpreter)\n\nThe LLM returns a JSON object via `ParseDecision` with these fields:\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `addressed` | string | `\"yes\"` \\| `\"maybe\"` \\| `\"no\"` — whether the player is addressing the bot |\n| `intent` | string | One of 12 intent types (see below) |\n| `item` | string? | Minecraft item/block ID targeted by the intent |\n| `blueprint` | string? | Blueprint name for build intent |\n| `count` | int? | Quantity for gather/craft/smelt/place intents |\n| `x`, `y`, `z` | int? | Coordinates for navigate/place intents |\n| `confidence` | float | 0.0–1.0; `LlmConfidenceThreshold` (default 0.6) gates clarification |\n| `clarificationQuestion` | string? | Asked when `confidence < threshold` |\n| `response` | string | In-game reply (max 50 words, empty if intent is `ignore`) |\n| `nextSteps` | string? | Parsed via `ParseCommandString` for multi-step chaining (TSK-0205) |\n\n### 12 Intent Types\n\n| Intent | Maps To | Produces Goal? |\n|--------|---------|----------------|\n| `gather` | `GatherGoalRequest(item, count)` | Yes (default count 10) |\n| `place` | `PlaceGoalRequest(item, count, x?, y?, z?)` | Yes (null coords = place in front, Sprint 54) |\n| `craft` | `CraftGoalRequest(item, count)` | Yes (default count 1) |\n| `build` | `BuildGoalRequest(blueprint, origin?)` | Yes (resolves blueprint aliases) |\n| `navigate` | `NavigateGoalRequest(x, y, z)` | Yes (null coords → handled separately in ABS) |\n| `smelt` | `SmeltGoalRequest(inputItem, count)` | Yes (Sprint 44 TSK-0079; separated from craft) |\n| `cancel` | null | No — fast-pathed, produces no goal |\n| `status` | null | No — fast-pathed, produces no goal |\n| `help` | null | No — fast-pathed, produces no goal |\n| `conversation` | null | No — general chat, no goal |\n| `clarify` | null | No — clarification flow |\n| `ignore` | null | No — silent drop |\n\n## IntentManager.BuildGoalRequest\n\nLocated in `Agent.Planning/IntentManager.cs`. Maps `IntentDraft` to typed `GoalRequest` subclasses:\n\n- **gather**: `GatherGoalRequest(ResolveItem(item), draft.Count ?? 10)`\n- **place**: `PlaceGoalRequest(ResolveItem(item), draft.Count ?? 1, draft.X, draft.Y, draft.Z)`\n- **craft**: `CraftGoalRequest(ResolveItem(item), draft.Count ?? 1)`\n- **build**: `BuildGoalRequest(ResolvedBlueprint, BuildOrigin.FromNullable(x, y, z))` via `TryBuildGoal()`\n- **navigate**: `NavigateGoalRequest(x, y, z)` — returns null when coords missing (secondary path)\n- **smelt**: `SmeltGoalRequest(ResolveItem(item), draft.Count ?? 1)` — Sprint 44 fix for 7-sprint-old smelt→CraftItem routing bug\n- **cancel/status/help**: returns null (fast-pathed)\n\n### Alias Resolution\n\n- `ResolveItem(item)`: checks `AliasRegistry.ItemAliases` for canonical Minecraft ID mappings (e.g., `\"wool\"` → `\"white_wool\"`). Returns item as-is if no alias exists.\n- `ResolveBlueprint(blueprint)`: checks `AliasRegistry.BlueprintAliases` for common name → canonical blueprint ID mappings (e.g., `\"house\"` → `\"small-house\"`). Returns null for null input.\n\n## GoalRequest Hierarchy (Sprint 39 P3)\n\nAbstract base: `GoalRequest(string GoalName)` with virtual `Parameters` dictionary for backward-compat with `GoalFactory.CreateAsync`.\n\n| Subclass | GoalName Pattern | Parameters |\n|----------|-----------------|------------|\n| `GatherGoalRequest` | `GatherItem:{Item}` | `{ count }` |\n| `CraftGoalRequest` | `CraftItem:{Item}` | `{ count }` |\n| `BuildGoalRequest` | `Build:{Blueprint}` | `{ originX, originY, originZ }` or null |\n| `NavigateGoalRequest` | `MoveTo` | `{ x, y, z }` |\n| `SmeltGoalRequest` | `SmeltItem:{InputItem}` | `{ count }` |\n| `PlaceGoalRequest` | `PlaceBlock:{Item}` | `{ count, x?, y?, z? }` |\n\n## IntentManager.ParseCommandString\n\nParses simple command strings from `IntentDraft.NextSteps` for multi-step chaining (TSK-0205). Regex-driven patterns:\n\n| Pattern | Maps To |\n|---------|---------|\n| `craft N item` / `craft item` | `CraftGoalRequest(item, count)` |\n| `gather/mine/get N item` / `gather/mine/get item` | `GatherGoalRequest(item, count ?? 10)` |\n| `build blueprint` / `build a blueprint` | `BuildGoalRequest(blueprint, null)` |\n| `place N item` / `place item at X Y Z` / `place item in front` | `PlaceGoalRequest(item, count, x?, y?, z?)` |\n| `move/go/navigate/walk to X Y Z` | `NavigateGoalRequest(x, y, z)` |\n| `smelt N item` / `smelt item` | `SmeltGoalRequest(item, count)` |\n\nReturns null for unrecognized commands.\n\n## Key Source Files\n\n| File | Location |\n|------|----------|\n| `LlmChatInterpreter.cs` | `Agent.Planning/LlmChatInterpreter.cs` |\n| `IntentManager.cs` | `Agent.Planning/IntentManager.cs` |\n| `GoalRequest` records | `Agent.Planning/IntentManager.cs` (same file, bottom) |\n| `ChatInterpreterTests.cs` | `MemorySmith.Agent.Tests/ChatInterpreterTests.cs` |\n| `HandleChatEventAsync` | `WebUI.Blazor/AgentBackgroundService.cs` (line ~724) |\n| Chat system docs | `Data/Pages/chat-system.md` |",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": [
+    "kind:reference",
+    "audience:agent",
+    "scope:personality",
+    "scope:planning"
+  ],
+  "References": [
+    "agent-alias-registry",
+    "agent-intent-manager",
+    "agent-architecture-bounded-contexts"
+  ],
+  "Conflicts": [],
+  "SourceLinks": [
+    {
+      "Label": "LlmChatInterpreter.cs",
+      "Uri": "%RepoRoot%Agent.Planning/LlmChatInterpreter.cs",
+      "StartLine": 42,
+      "EndLine": 320
+    },
+    {
+      "Label": "IntentManager.cs",
+      "Uri": "%RepoRoot%Agent.Planning/IntentManager.cs",
+      "StartLine": 1,
+      "EndLine": 250
+    },
+    {
+      "Label": "ChatInterpreter tests",
+      "Uri": "%RepoRoot%MemorySmith.Agent.Tests/ChatInterpreterTests.cs",
+      "StartLine": 1,
+      "EndLine": 200
+    },
+    {
+      "Label": "Chat system docs",
+      "Uri": "%RepoRoot%Data/Pages/chat-system.md",
+      "StartLine": null,
+      "EndLine": null
+    },
+    {
+      "Label": "HandleChatEventAsync",
+      "Uri": "%RepoRoot%WebUI.Blazor/AgentBackgroundService.cs",
+      "StartLine": 724,
+      "EndLine": 830
+    }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-07-10T00:00:00Z"
 }

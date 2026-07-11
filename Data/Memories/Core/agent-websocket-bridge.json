@@ -1,18 +1,46 @@
 {
   "Id": "agent-websocket-bridge",
   "Title": "MemorySmith.Agent — WebSocketBridge & World Adapter Transport",
-  "Content": "The WebSocket bridge is the transport layer between C# host and Node.js Mineflayer subprocess. It handles serialization, deserialization, reconnection, keep-alive, and error routing.\n\n## Architecture\n\nC# (WebUI.Blazor) → MinecraftAdapter → WebSocketBridge → WebSocket → Node.js (MineflayerAdapter/index.js) → Minecraft Server\n\n## IWorldAdapter Interface (Agent.Core/Interfaces/IWorldAdapter.cs)\n\n- ConnectAsync(CancellationToken) → spawns Node.js subprocess, connects WebSocket\n- SendActionAsync(ActionData, CancellationToken) → sends JSON message\n- ReceiveEventsAsync(CancellationToken) → returns IAsyncEnumerable<WorldEvent>\n- DisconnectAsync() → clean shutdown\n\n## MinecraftAdapter (Agent.World.Minecraft/MinecraftAdapter.cs)\n\n- On ConnectAsync: locates Node.js executable, spawns index.js with configured env vars (SERVER_HOST, SERVER_PORT, BOT_USERNAME, WS_PORT)\n- Waits for WebSocket connection with port polling and timeout\n- On disconnect: retries unless cancellation requested\n\n## WebSocketBridge (Agent.World.Minecraft/WebSocketBridge.cs)\n\n### SendActionAsync\n\nSerializes ActionData to JSON: {action, arguments, correlationId}. Sends via WebSocket.SendAsync. On send failure: writes to _messageChannel (for retry).\n\n### ReceiveEventsAsync\n\nBackground receive loop reads from WebSocket, deserializes JSON, calls ParseEvent, yields parsed events via Channel<WorldEvent>. Channel provides backpressure — if C# can't keep up, messages buffer in the channel.\n\n### ParseEvent (line ~210)\n\nReads root['event'] as string, pattern-matches to typed event constructor. Uses local helpers GetInt, GetString, GetDouble (~lines 385-410). Unknown event types return null and are silently dropped.\n\n### Reconnection\n\n- On disconnect: KickedEvent cancels _connectionCts → ExecuteAsync observes cancellation → reconnect loop\n- Reconnect uses exponential backoff: [2s, 4s, 8s, 16s, 32s] (DefaultReconnectDelays)\n- _currentGoal is preserved across reconnections → agent resumes after reconnect\n\n### Message Format\n\nC# → Node.js:\n{\n  'action': 'mineBlock' | 'moveTo' | 'placeBlock' | 'craftItem' | 'getStatus' | 'chat' | 'wander' | 'findFlatArea' | 'findReachableBlock' | 'stop' | 'smeltItem',\n  'arguments': { ... },\n  'correlationId': 'guid'\n}\n\nNode.js → C#:\n{\n  'event': 'blockMined' | 'moveComplete' | 'chat' | 'status' | 'error' | ...,\n  ...payload fields\n}\n\n## Key Constants (AGENTS.md convention)\n\n- WS_PORT: default 3000 (configurable)\n- DefaultReconnectDelays: [2000, 4000, 8000, 16000, 32000] ms\n- MessageBufferSize: Channel capacity for event backpressure\n\n## Error Handling\n\n- Send failures: message written to _messageChannel for retry\n- Receive failures: disconnected event → _connectionCts cancel → reconnect\n- Malformed JSON: logged, message dropped\n- Unknown event types: silently dropped (logged at debug level)",
+  "Content": "The WebSocket bridge is the transport layer between C# host and Node.js Mineflayer subprocess. It handles serialization, deserialization, reconnection, keep-alive, and error routing.\n\n## Architecture\n\nC# (WebUI.Blazor) → MinecraftAdapter → WebSocketBridge → WebSocket → Node.js (MineflayerAdapter/index.js) → Minecraft Server\n\n## IWorldAdapter Interface (Agent.Core/Interfaces/IWorldAdapter.cs)\n\n- ConnectAsync(CancellationToken) → spawns Node.js subprocess, connects WebSocket\n- SendActionAsync(ActionData, CancellationToken) → sends JSON message\n- ReceiveEventsAsync(CancellationToken) → returns IAsyncEnumerable<WorldEvent>\n- DisconnectAsync() → clean shutdown\n\n## MinecraftAdapter (Agent.World.Minecraft/MinecraftAdapter.cs)\n\n- On ConnectAsync: locates Node.js executable, spawns index.js with configured env vars (SERVER_HOST, SERVER_PORT, BOT_USERNAME, WS_PORT)\n- Waits for WebSocket connection with port polling and timeout\n- On disconnect: retries with exponential backoff unless cancellation requested\n\n## WebSocketBridge (Agent.World.Minecraft/WebSocketBridge.cs)\n\n### SendActionAsync\n\nSerializes ActionData to JSON: {action, arguments, correlationId}. Sends via WebSocket.SendAsync. On send failure: writes to _messageChannel (for retry).\n\n### ReceiveEventsAsync\n\nBackground receive loop reads from WebSocket, deserializes JSON, calls ParseEvent, yields parsed events via Channel<WorldEvent>. The channel is **unbounded** (Channel.CreateUnbounded) — no backpressure. If C# can't keep up, events buffer in memory indefinitely.\n\n### ParseEvent (line ~210)\n\nReads root['event'] as string, pattern-matches to typed event constructor. Uses local helpers GetInt, GetString, GetDouble (~lines 385-410), GetIntOrNull, TryGetGuid. Unknown event types return null and are silently dropped.\n\n**Sprint 55 additions (TSK-0165):** Added parsing for 'actionStarted', 'actionProgress', 'actionFailed', 'actionCompleted' — action lifecycle telemetry events with machine-readable reason codes.\n\n**Sprint 55 Wave B additions:** Added parsing for 'blocksQueried' (→BlocksQueriedEvent via ParseBlocksQueried), 'entitiesQueried' (→EntitiesQueriedEvent via ParseEntitiesQueried), 'entityObserved' (→EntityObservedEvent via ParseEntityObserved). Each uses the shared ParseObservedEntities helper for entity list deserialization.\n\n**Sprint 55 Wave C gap — 'blockBelowChanged':** This event is NOT parsed by WebSocketBridge.ParseEvent. The adapter sends it on physicsTick but the C# side silently drops it as an unknown event type. Known gap — no consumer has required it yet.\n\n### Handshake Protocol (Sprint 32 SEC-02)\n\nWhen `adapterSecret` is configured, ConnectAsync sends a handshake message immediately after WebSocket connection:\n```json\n{\"type\":\"handshake\",\"secret\":\"<configured-secret>\"}\n```\nThe Node.js WebSocket server validates the secret before accepting commands. When secret is null/empty, no handshake is sent (dev/localhost mode).\n\nThe handshake is re-sent on every reconnection within RunReceiveLoopWithRetryAsync.\n\n### Reconnection — Two-Tier System\n\nThe WebSocketBridge has TWO distinct reconnect mechanisms:\n\n1. **Bridge-level (WebSocketBridge.RunReceiveLoopWithRetryAsync):**\n   - Simple retry: maxRetries=3, retryDelayMs=5000\n   - On each retry: disposes old socket, creates new ClientWebSocket, reconnects, re-sends adapter secret handshake\n   - After all 3 retries fail: logs permanent failure, completes inbound channel\n\n2. **Adapter-level (MinecraftAdapter.cs):**\n   - Exponential backoff with DefaultReconnectDelays: [2000, 4000, 8000, 16000, 32000] ms\n   - Handles spawning a NEW Node.js process when the subprocess dies (not just WebSocket reconnect)\n   - On disconnect: KickedEvent triggers cancellation of _connectionCts → ExecuteAsync observes cancellation → full reconnect loop\n   - `_currentGoal` is preserved across reconnections → agent resumes after reconnect\n\n### Message Format\n\nC# → Node.js (actual wire format from SendAsync):\n```json\n{\n  'action': '<wire-name from ActionProtocol>',\n  'arguments': { ...type-dependent args... }\n}\n```\n\nNote: correlationId is stored in ActionData but is NOT serialized by WebSocketBridge.SendAsync. The Node.js side extracts correlationId from arguments (passed via args.correlationId by the ActionData arguments dictionary).\n\nNode.js → C# (34 event types):\n```json\n{\n  'event': 'spawn' | 'health' | 'move' | 'moveComplete' | 'blockMined' | 'itemCollected' |\n           'mineComplete' | 'mineAborted' | 'stopComplete' | 'craftComplete' | 'smeltComplete' |\n           'chat' | 'status' | 'error' | 'blockNotFound' | 'death' | 'kicked' | 'gameMode' |\n           'blockPlaced' | 'blockPlaceSkipped' | 'wanderComplete' | 'wanderFailed' |\n           'flatAreaFound' | 'reachableBlockFound' | 'actionStarted' | 'actionProgress' |\n           'actionFailed' | 'actionCompleted' | 'blocksQueried' | 'entitiesQueried' |\n           'entityObserved' | 'blockBelowChanged',\n  ...payload fields\n}\n```\n\n## Key Constants\n\n- WS_PORT: default 3000 (configurable via env var WS_PORT)\n- Bridge receive retry: maxRetries=3, retryDelayMs=5000\n- Adapter reconnect delays: [2000, 4000, 8000, 16000, 32000] ms (MinecraftAdapter DefaultReconnectDelays)\n- Receive buffer: 32,768 bytes per frame; multi-frame messages reassembled via StringBuilder(4096)\n\n## Error Handling\n\n- Send failures: InvalidOperationException thrown if WebSocket not connected (caller's responsibility to reconnect)\n- Receive failures: WebSocketException caught in RunReceiveLoopWithRetryAsync → retry up to 3 times\n- Malformed JSON: caught by JsonException in ParseEvent → logged as warning, event dropped\n- Unknown event types: return null → event silently dropped (not logged individually to avoid log spam from high-frequency events)\n- Channel completion: _inbound.Writer.TryComplete() called on ALL terminal paths (normal close, cancellation, retry exhaustion) — TSK-0112 fix prevents suspended readers",
   "Status": 2,
-  "Confidence": 0.95,
-  "Tags": ["agent", "websocket", "transport", "minecraft-adapter", "nodejs", "kind:reference", "audience:agent", "scope:architecture"],
-  "References": ["agent-world-event-catalog", "agent-mineflayer-adapter-state", "agent-action-correlation", "agent-runtime-lifecycle"],
+  "Confidence": 0.96,
+  "Tags": [
+    "agent",
+    "websocket",
+    "transport",
+    "minecraft-adapter",
+    "nodejs",
+    "handshake",
+    "reconnect",
+    "kind:reference",
+    "audience:agent",
+    "scope:architecture"
+  ],
+  "References": [
+    "agent-world-event-catalog",
+    "agent-mineflayer-adapter-state",
+    "agent-action-correlation",
+    "agent-runtime-lifecycle"
+  ],
   "Conflicts": [],
   "SourceLinks": [
-    { "Label": "WebSocketBridge.cs", "Uri": "%RepoRoot%Agent.World.Minecraft/WebSocketBridge.cs" },
-    { "Label": "MinecraftAdapter.cs", "Uri": "%RepoRoot%Agent.World.Minecraft/MinecraftAdapter.cs" },
-    { "Label": "IWorldAdapter.cs", "Uri": "%RepoRoot%Agent.Core/Interfaces/IWorldAdapter.cs" },
-    { "Label": "Adapter research paper", "Uri": "%RepoRoot%Data/Pages/Tasks/mineflayer_adapter_research_paper.md" }
+    {
+      "Label": "WebSocketBridge.cs",
+      "Uri": "%RepoRoot%Agent.World.Minecraft/WebSocketBridge.cs"
+    },
+    {
+      "Label": "MinecraftAdapter.cs",
+      "Uri": "%RepoRoot%Agent.World.Minecraft/MinecraftAdapter.cs"
+    },
+    {
+      "Label": "IWorldAdapter.cs",
+      "Uri": "%RepoRoot%Agent.Core/Interfaces/IWorldAdapter.cs"
+    },
+    {
+      "Label": "Adapter research paper",
+      "Uri": "%RepoRoot%Data/Pages/Tasks/mineflayer_adapter_research_paper.md"
+    }
   ],
   "UsageCount": 0,
-  "LastUpdated": "2026-06-23T00:00:00Z"
+  "LastUpdated": "2026-07-10T00:00:00Z"
 }

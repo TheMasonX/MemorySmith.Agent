@@ -1,18 +1,49 @@
 {
   "Id": "agent-testing-infrastructure",
   "Title": "MemorySmith.Agent — Testing Infrastructure & Conventions",
-  "Content": "The test project (MemorySmith.Agent.Tests) uses NUnit 4.6.1 with standard mocking patterns. ~63+ tests as of Sprint 40.\n\n## Test Stack\n\n- NUnit 4.6.1, NUnit3TestAdapter 6.2.0, Microsoft.NET.Test.Sdk 18.6.0\n- coverlet.collector 10.0.1 for code coverage\n- GitHubActionsTestLogger 2.4.1 for CI annotations\n- Moq or manual mock implementations (MockMemoryGateway, etc.)\n\n## Test Categories\n\nBased on test file organization:\n- Domain model tests (~7): WorldState, Position, ItemSpec, Fact\n- Memory gateway tests (~7): RestMemoryGateway, MockMemoryGateway, SearchResult disambiguation\n- Tool engine tests (~4): ToolDispatcher, InputSchema validation, tool call routing\n- World adapter tests (~6): MinecraftAdapter, WebSocketBridge, message serialization\n- Planner + goal tests (~15+): HtnPlanner, each goal type IsComplete/HasFailed, PlannerRouter routing, decomposer registration\n- Integration tests (~6): Full pipeline tests (Connect → Plan → Dispatch → Event → Complete), ReconnectAfterFailures, etc.\n- Chat interpreter tests: ChatInterpreter pattern matching, LlmChatInterpreter JSON parsing, confidence threshold behavior\n\n## Mock Strategy\n\n- MockMemoryGateway: in-memory implementation of IMemoryGateway for unit tests (no real MemorySmith instance needed)\n- MockWorldAdapter: simulates WebSocket events for pipeline testing\n- Test-injectable delays: optional constructor params with 'null = use defaults' pattern so tests can inject zero-delay values\n- file-scoped test helper classes: use 'file' modifier to avoid name collisions\n\n## CI Configuration\n\n- GitHub Actions with single build-and-test job on ubuntu-latest\n- ci.runsettings activates GitHubActionsTestLogger\n- dotnet build --no-restore first (restore cached in CI)\n- dotnet test with coverage via coverlet.collector\n\n## Known Issues\n\n- coverlet.collector 6.0.4 doesn't exist on NuGet — use 10.0.1\n- XPlat Code Coverage locally shows 'Unable to find datacollector' but tests still pass (exit 0)\n- Sandbox NuGet restore may fail with proxy 407 — workaround: start authproxy.py on port 9081, override HTTPS_PROXY/https_proxy\n- Some test data fixtures use real Data/Memories files — tests should copy to temp storage before mutation (per copilot-instructions.md)\n\n## Test Patterns\n\n- Arrange/Act/Assert with descriptive test names (TestName_Scenario_ExpectedBehavior)\n- Test categories via [Category('name')] attribute\n- Async test methods with Task return type\n- Parallel test execution within assembly (NUnit default)\n\n## Scripts\n\n- Scripts/Validate-Repo.ps1: default local validation entrypoint. Flags: -IncludeCoverage, -IncludeE2E, -IncludeDocs\n- Scripts/ directories also contain utility scripts for sandbox setup and data management",
+  "Content": "The test project (MemorySmith.Agent.Tests) uses NUnit 4.6.1 with standard mocking patterns. **746+ tests** across ~68 test files as of Sprint 59.\n\n## Test Stack\n\n- NUnit 4.6.1, NUnit3TestAdapter 6.2.0, NUnit.Analyzers 4.14.0\n- Microsoft.NET.Test.Sdk 18.7.0\n- coverlet.collector 10.0.1 (for code coverage)\n- GitHubActionsTestLogger 3.0.4 (for CI annotations)\n- Microsoft.AspNetCore.Mvc.Testing 10.0.9 (Sprint 32: ApiKeyMiddleware integration tests)\n- Moq or manual mock implementations (MockMemoryGateway, MockWorldAdapter, MockPlanner, FakeTimeProvider)\n- NUnit.Analyzers 4.14.0 (Roslyn analyzers for NUnit best practices — catches missing assertions, incorrect test signatures, etc.)\n- ci.runsettings activates GitHubActionsTestLogger\n- Project references: Agent.Core, Agent.Construction, Agent.Planning, Agent.Tools, WebUI.Blazor\n\n## Sprint-Numbered Test Files\n\nThe test suite includes sprint-specific regression test files that accumulate over time:\n\n**Active sprint test files:** Sprint19Tests, Sprint20Tests, Sprint21Tests, Sprint22Tests, Sprint23Tests, Sprint25Tests, Sprint26Tests, Sprint27Tests, Sprint28Tests, Sprint30Tests, Sprint32Tests, Sprint35Tests, Sprint36Tests, Sprint37Tests, Sprint38Tests, Sprint39Tests, Sprint44Tests, Sprint46Tests, Sprint47Tests, Sprint48Tests, Sprint51Tests, Sprint57ExecutionContextTests (~22 sprint files).\n\n**Sprint-numbered file index (by sprint):**\n- Sprint 19: Sprint19Tests.cs\n- Sprint 20: Sprint20Tests.cs\n- Sprint 21: Sprint21Tests.cs\n- Sprint 22: Sprint22Tests.cs\n- Sprint 23: Sprint23Tests.cs\n- Sprint 25: Sprint25Tests.cs\n- Sprint 26: Sprint26Tests.cs\n- Sprint 27: Sprint27Tests.cs\n- Sprint 28: Sprint28Tests.cs\n- Sprint 30: Sprint30Tests.cs\n- Sprint 32: Sprint32Tests.cs\n- Sprint 35: Sprint35Tests.cs\n- Sprint 36: Sprint36Tests.cs\n- Sprint 37: Sprint37Tests.cs\n- Sprint 38: Sprint38Tests.cs\n- Sprint 39: Sprint39Tests.cs\n- Sprint 44: Sprint44Tests.cs\n- Sprint 46: Sprint46Tests.cs\n- Sprint 47: Sprint47Tests.cs\n- Sprint 48: Sprint48Tests.cs\n- Sprint 51: Sprint51Tests.cs\n- Sprint 57: Sprint57ExecutionContextTests.cs\n\n**Core non-sprint test files:** ActionPlanTests, AgentBackgroundServiceTests (with AgentBackgroundServiceTestHelper), BlueprintParserTests, BuildGoalTests, ChatInterpreterTests, CoreModelsTests, CraftItemGoalTests, GatherWoodGoalTests, GenericGatherGoalTests, GoalFactoryBuildTests, GoalFactoryBuiltInTests, GoalFactoryTests, HtnPlannerBuildTests, HtnPlannerTests, HtnTaskLibraryCraftingTests, HtnTaskLibraryExtraTests, ItemRegistryTests, ItemSpecParserTests, KnowledgeResolverTests, LlmChatInterpreterTests, LlmEvaluatorImplTests, MockMemoryGatewayTests, MockWorldAdapterTests, ReplanGovernorTests, SimpleGoalTests, SurviveNightGoalTests, TaskSequenceGoalTests, ToolDispatcherTests, ToolDispatchTests, ToolEngineTests, WorldStateBuilderTests, WorldStateProjectorTests (~32 files).\n\n**Backup/support files:** Several .bak files from sprint refactoring (Sprint23Tests.cs.bak, Sprint25Tests.cs.bak, Sprint26Tests.cs.bak, Sprint27Tests.cs.bak, Sprint39Tests.cs.bak, ToolDispatchTests.cs.bak).\n\n## Test Categories\n\n- **Domain model tests:** WorldState, Position, ItemSpec, Fact, ActionOutcome, world state projection\n- **Memory gateway tests:** RestMemoryGateway (via mock HTTP), MockMemoryGateway, KnowledgeResolver, ItemRegistry, SearchResult disambiguation\n- **Tool engine tests:** ToolDispatcher routing, InputSchema validation, tool call lifecycle, 14 tool implementations\n- **World adapter tests:** MinecraftAdapter, WebSocketBridge, message serialization, event parsing\n- **Planner + goal tests:** HtnPlanner, goal type IsComplete/HasFailed, GoalFactory routing, decomposer registration, replan governor, task sequence decomposition\n- **Integration tests:** Full pipeline (Connect→Plan→Dispatch→Event→Complete), ReconnectAfterFailures, ApiKeyMiddleware\n- **Chat interpreter tests:** ChatInterpreter pattern matching, LlmChatInterpreter JSON parsing + truncation recovery (TryParseTruncatedJson), confidence threshold behavior, IntenManager goal mapping\n- **Entity/observation tests (Sprint 55+):** Entity observation, environment queries, Observe→Evaluate loop\n- **ExecutionContext tests (Sprint 57+):** Sprint57ExecutionContextTests covering runtime state carry\n\n## Mock Strategy\n\n- MockMemoryGateway: in-memory IMemoryGateway for unit tests (no real MemorySmith instance)\n- MockWorldAdapter: simulates WebSocket events for pipeline testing\n- MockPlanner: stub IPlanner for agent background service tests\n- Test-injectable delays: optional constructor params with null = use defaults pattern for zero-delay test values\n- File-scoped test helper classes: file modifier to avoid name collisions\n- FakeTimeProvider: injectable time for timeout/reconnect tests\n- AgentBackgroundServiceTestHelper: shared helper for agent lifecycle tests\n\n## CI Configuration\n\n- GitHub Actions single build-and-test job on ubuntu-latest\n- ci.runsettings activates GitHubActionsTestLogger\n- dotnet build --no-restore first\n- dotnet test with coverage via coverlet.collector (Cobertura format)\n- -p:CopilotSkipCliDownload=true on both build and test to avoid VS Code Copilot CLI download\n\n## Known Issues\n\n- coverlet.collector 6.0.4 doesnt exist on NuGet — use 10.0.1\n- XPlat Code Coverage locally shows Unable to find datacollector but tests pass (exit 0)\n- Coverage is collected but NOT reported via reportgenerator or uploaded as CI artifacts in Agent repo (unlike MemorySmith main repo which has full pipeline)\n- MemorySmith main repo has Validate-Repo.ps1 as unified entry point; Agent repo lacks equivalent",
   "Status": 2,
-  "Confidence": 0.92,
-  "Tags": ["agent", "testing", "nunit", "ci", "mocks", "kind:reference", "audience:agent", "scope:testing"],
-  "References": ["agent-ci-baseline-status", "agent-phase-status-current"],
+  "Confidence": 0.98,
+  "Tags": [
+    "agent",
+    "testing",
+    "nunit",
+    "ci",
+    "mocks",
+    "coverage",
+    "regression",
+    "kind:reference",
+    "audience:agent",
+    "scope:testing"
+  ],
+  "References": [
+    "agent-ci-baseline-status",
+    "agent-phase-status-current",
+    "agent-technology-stack"
+  ],
   "Conflicts": [],
   "SourceLinks": [
-    { "Label": "Test project", "Uri": "%RepoRoot%MemorySmith.Agent.Tests/" },
-    { "Label": "Test csproj", "Uri": "%RepoRoot%MemorySmith.Agent.Tests/MemorySmith.Agent.Tests.csproj" },
-    { "Label": "CI workflow", "Uri": "%RepoRoot%.github/workflows/ci.yml" },
-    { "Label": "Validate-Repo.ps1", "Uri": "%RepoRoot%Scripts/Validate-Repo.ps1" }
+    {
+      "Label": "Test project",
+      "Uri": "%RepoRoot%MemorySmith.Agent.Tests/"
+    },
+    {
+      "Label": "Test csproj",
+      "Uri": "%RepoRoot%MemorySmith.Agent.Tests/MemorySmith.Agent.Tests.csproj"
+    },
+    {
+      "Label": "CI workflow",
+      "Uri": "%RepoRoot%.github/workflows/ci.yml"
+    },
+    {
+      "Label": "ci.runsettings",
+      "Uri": "%RepoRoot%MemorySmith.Agent.Tests/ci.runsettings"
+    },
+    {
+      "Label": "Architecture wiki",
+      "Uri": "%RepoRoot%Data/Pages/architecture.md"
+    }
   ],
   "UsageCount": 0,
-  "LastUpdated": "2026-06-23T00:00:00Z"
+  "LastUpdated": "2026-07-10T20:00:00Z"
 }

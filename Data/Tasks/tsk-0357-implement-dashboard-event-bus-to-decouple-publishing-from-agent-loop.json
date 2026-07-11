@@ -1,0 +1,32 @@
+﻿{
+  "id": "tsk-0357-implement-dashboard-event-bus-to-decouple-publishing-from-agent-loop",
+  "key": "TSK-0357",
+  "title": "Implement dashboard event bus to decouple publishing from agent loop",
+  "description": "## Problem\nDashboard publishing is currently coupled directly to the agent execution loop in AgentBackgroundService. This creates:\n- Performance overhead on the agent dispatch cycle\n- No buffering/batching of status updates\n- Dashboard unavailability during agent restart\n- No replay capability for late-connecting dashboard clients\n\n## Solution\nImplement an in-process event bus that decouples dashboard publishing from the agent loop:\n\n1. **IEventBus interface** \u2014 Publish\u003CT\u003E / Subscribe\u003CT\u003E pattern\n2. **InProcessEventBus implementation** \u2014 Channel\u003CT\u003E-based pub/sub with bounded capacity\n3. **DashboardEventPublisher** \u2014 subscribes to relevant event types and forwards to SignalR\n4. **Event types:**\n   - AgentStateChanged (goal, status, inventory snapshot)\n   - ActionDispatched / ActionCompleted / ActionFailed\n   - ErrorEvent / WarningEvent\n   - LogEvent (configurable minimum level)\n\n## Files\n- Agent.Core/Interfaces/IEventBus.cs (new)\n- Agent.Core/Runtime/InProcessEventBus.cs (new)\n- WebUI.Blazor/Services/DashboardEventPublisher.cs (new)\n- WebUI.Blazor/AgentBackgroundService.cs (refactor \u2014 publish events instead of calling SignalR directly)\n\n## Validation\n- Dashboard updates arrive with \u003C 500ms latency\n- Agent dispatch cycle shows no measurable overhead\n- Late-connecting client receives current state snapshot on connect",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:dashboard",
+    "type:feature"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T01:40:01.7686573Z",
+  "updatedAtUtc": "2026-07-11T01:40:01.7686573Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

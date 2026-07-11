@@ -1,33 +1,17 @@
 {
-    "Id":  "agent-phase-status-current",
-    "Title":  "MemorySmith.Agent — Current Phase Status",
-    "Content":  "Phases 0-4 complete. Sprint 40 P0/P1 fixes deployed. Phase 5 (intent reliability, adaptive execution) is the current focus.\n\nPhase 0 (Skeleton): all interfaces, wiki pages, CI baseline.\nPhase 1 (Core MVP): MinecraftAdapter.ConnectAsync with subprocess launch and port-wait, MoveToTool, StatusTool, AgentBackgroundService hosted loop.\nPhase 2 (Memory): RestMemoryGateway (IHttpClientFactory), SearchMemoryTool, GetPageTool, CreatePageTool, MockMemoryGateway. SearchResult.Kind disambiguates page slugs from memory UUIDs.\nPhase 3 (Planner): HtnPlanner (await/try-catch ReplanAsync), HtnTaskLibrary (8 task methods), GatherWoodGoal, SurviveNightGoal, IGoalFactory, GoalFactory, POST /api/agent/plan, GET /api/goals.\nPhase 4 (Sprint 40 — complete): ActionData.Context bag, WebSocketBridge with background receive loop, MineflayerAdapter/index.js with pathfinder. Block position off-by-one fixed (findBestBlock three-pass scorer + Y-penalty + grass_block alias). Dig infinite-loop fixed (MAX_DIG_FAILURES=3). Stall retry graduated from 60s fixed to [10,20,30,60]s with chat notification. build + 63 tests green.\n\nPhase 5 (started — Sprint 41): Intent parsing reliability (ollama 3B insufficient), goto() timeout safety, path_update wiring, stale-inventory guard at goal-creation.\n\nCI baseline: 63 tests passing. Last green build: Sprint 40 P0 fixes. Repo: https://github.com/TheMasonX/MemorySmith.Agent",
-    "Status":  2,
-    "Confidence":  1.0,
-    "Tags":  [
-                 "agent",
-                 "phase-status",
-                 "roadmap",
-                 "kind:status",
-                 "audience:agent",
-                 "scope:project"
-             ],
-    "References":  [
-                       "agent-architecture-bounded-contexts",
-                       "agent-ci-baseline-status",
-                       "agent-technology-stack"
-                   ],
-    "Conflicts":  [
-
-                  ],
-    "SourceLinks":  [
-                        {
-                            "Label":  "Roadmap wiki page",
-                            "Uri":  "%RepoRoot%Data/Pages/roadmap.md",
-                            "StartLine":  null,
-                            "EndLine":  null
-                        }
-                    ],
-    "UsageCount":  0,
-    "LastUpdated":  "2026-06-23T00:00:00Z"
+  "Id": "agent-phase-status-current",
+  "Title": "MemorySmith.Agent — Current Phase Status (Sprint 59+)",
+  "Content": "Phases 0-4 complete. Phase 5 (intent reliability, adaptive execution, observation-driven replanning) active through Sprints 41-59. See roadmap.md for future phase planning.\n\n## Phase 0 (Skeleton)\nAll interfaces, wiki pages, CI baseline. Agent.Core with IGoal, IWorldAdapter, IToolCaller, etc.\n\n## Phase 1 (Core MVP)\nMinecraftAdapter.ConnectAsync with subprocess launch and port-wait, MoveToTool, StatusTool, AgentBackgroundService hosted loop.\n\n## Phase 2 (Memory)\nRestMemoryGateway (IHttpClientFactory), SearchMemoryTool, GetPageTool, CreatePageTool, MockMemoryGateway. SearchResult.Kind disambiguates page slugs from memory UUIDs.\n\n## Phase 3 (Planner)\nHtnPlanner (await/try-catch ReplanAsync), HtnTaskLibrary (8 task methods), GatherWoodGoal, SurviveNightGoal, IGoalFactory, GoalFactory, POST /api/agent/plan, GET /api/goals.\n\n## Phase 4 (Sprint 40 — complete)\nActionData.Context bag, WebSocketBridge with background receive loop, MineflayerAdapter/index.js with pathfinder. Block position off-by-one fixed (findBestBlock three-pass scorer + Y-penalty + grass_block alias). Dig infinite-loop fixed (MAX_DIG_FAILURES=3). Stall retry graduated from 60s fixed to [10,20,30,60]s with chat notification. 63 tests green.\n\n## Phase 5 (Sprints 41-59 — applying)\n\n### Sprint 41-42\nTaskSequenceGoal implementation. PlaceBlock concurrency model (maxConcurrentPlaceBlock=8, _placeBlockContexts ConcurrentDictionary). Emergency stop clears _placeBlockContexts.\n\n### Sprint 43\nSelective CancelGoal: conflicting goals (gather, build, craft) trigger emergency stop; idle/wander goals just clear queue without adapter flush. Prevents unnecessary adapter queue flushes.\n\n### Sprint 44\nStale _placeBlockContexts cleanup in SweepTimedOutActions. SmeltItem timeout set to 45s (must exceed JS adapter SMELT_TIMEOUT_MS=40s). Council review.\n\n### Sprint 51\n\"Not in inventory\" fast-path recovery (TryExtractMissingMaterial → direct GatherGoal). Creative mode guard skips gather in creative mode.\n\n### Sprint 52\nChatHistory for recording bot responses into LLM system prompt. Safety options (DeniedCommands). Configurable maxConcurrentPlaceBlock and chatMaxResponseLength.\n\n### Sprint 54 (TSK-0199, TSK-0203, TSK-0205, TSK-0221, TSK-0226)\nChat response splitting (chatMaxResponseLength=500). IMemoryGateway for cross-session fact persistence (LoadSessionFactsAsync). TaskSequenceGoal from chat intents. GetStatus timeout escalation (2 consecutive → clears IsInventoryStale). Auto-skip after 3 consecutive place timeouts (_blockTimeoutCounts).\n\n### Sprint 55 (TSK-0155, TSK-0165)\nPre-dispatch WorldState snapshot (_preDispatchSnapshot). Entity observation (EntityObservedEvent, EntitiesQueriedEvent, BlockBelowChangedEvent). Action lifecycle telemetry events (actionStarted, actionProgress, actionFailed, actionCompleted).\n\n### Sprint 56 (TSK-0270, TSK-0286)\nPlaceBlock timeout increased from 5s to 15s (pathfinding round-trip). SafetyOptions with DeniedCommands.\n\n### Sprint 57 (TSK-0302)\nInventorySyncLoopAsync — 4th concurrent loop, periodic inventory refresh every 30s, prevents silent inventory drift.\n\n### Sprint 58 Wave C (TSK-0309, TSK-0325, TSK-0331, TSK-0332)\nWorldModel for predict-before-dispatch and reconcile-after-completion (IWorldModel). LLM evaluator circuit breaker (3 consecutive failures → 60s cooldown). Goal provisioning CTS (_goalProvisioningCts). Mine timeout set to 15s (fail fast on blocked blocks).\n\n### Sprint 59 (TSK-0320)\nLLM evaluator delegates to TaskSequenceGoal current step context. 746+ tests passing.\n\n## Phase 6 (Strategy, not started)\nAER recorded. AgentRuntime decomposition into separate services: RecoveryManagerImpl, PlanningManagerImpl, ExecutionManager, StateManager — currently stubs only. Promise/Project structure defined in .github/agents/smith.agent.md.\n\n## Current CI Baseline\n746+ tests passing. See agent-testing-infrastructure for details. Repo: https://github.com/TheMasonX/MemorySmith.Agent\n\n## Key Architectural Decisions\n\n| Decision | Sprint | Description |\n|----------|--------|-------------|\n| Fire-and-forget dispatch | 36 | ActionOutcome universal tool result |\n| Per-tool timeouts | 44+ | ToolTimeoutOverrides dictionary |\n| PlaceBlock concurrency | 42 | MaxConcurrentForTool with _maxConcurrentPlaceBlock=8 |\n| Selective CancelGoal | 43 | Different stop behavior by goal type |\n| LLM circuit breaker | 58 | 3 failures → 60s cooldown |\n| Inventory sync loop | 57 | 30s periodic refresh |\n| WorldModel predict | 58 | Predict-before-dispatch + reconcile |\n| Cross-session facts | 54 | IMemoryGateway for persistence |",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": ["agent", "phase-status", "roadmap", "kind:status", "audience:agent", "scope:project"],
+  "References": ["agent-architecture-bounded-contexts", "agent-ci-baseline-status", "agent-technology-stack", "agent-testing-infrastructure", "agent-runtime-lifecycle", "agent-recovery-system", "agent-action-correlation", "agent-emergency-stop"],
+  "Conflicts": [],
+  "SourceLinks": [
+    { "Label": "Roadmap wiki page", "Uri": "%RepoRoot%Data/Pages/roadmap.md" },
+    { "Label": "Master Knowledge Base", "Uri": "%RepoRoot%/memories/repo/master-knowledge-base.md" },
+    { "Label": "AgentBackgroundService.cs", "Uri": "%RepoRoot%WebUI.Blazor/AgentBackgroundService.cs", "StartLine": 1, "EndLine": 3557 }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-07-10T00:00:00Z"
 }

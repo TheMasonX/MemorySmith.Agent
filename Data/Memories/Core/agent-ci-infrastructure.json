@@ -1,0 +1,47 @@
+{
+  "Id": "agent-ci-infrastructure",
+  "Title": "MemorySmith.Agent — CI/CD Pipeline & Infrastructure",
+  "Content": "## Overview\n\nThe CI pipeline runs on GitHub Actions, performing build, test, coverage collection, and task record validation on every push to main/master/feature branches and PRs to main/master.\n\n## Workflow: .github/workflows/ci.yml\n\n### Triggers\n- push: main, master, feature/**\n- pull_request: main, master\n\n### Job: build-and-test\n\nRuns on ubuntu-latest with steps:\n1. actions/checkout@v4\n2. Setup .NET 10.0.x via actions/setup-dotnet@v4\n3. dotnet restore MemorySmith.Agent.slnx\n4. dotnet build --no-restore --configuration Release -p:CopilotSkipCliDownload=true\n5. dotnet test --no-build --configuration Release --verbosity normal -p:CopilotSkipCliDownload=true --collect:\"XPlat Code Coverage\" --results-directory artifacts/TestResults with cobertura format\n6. pwsh ./Scripts/Test-TaskRecords.ps1 (task record validation)\n\n### Known Issues & Lessons\n\n- NuGet restore requires authproxy (127.0.0.1:9081) to inject credentials into CONNECT requests\n- Must override BOTH HTTPS_PROXY and https_proxy (lowercase) for dotnet to use the proxy\n- Subagents may double-encode JSON in raw string literals — use regular escaped strings for any file with JSON content pushed via GitHub API\n- ToolEngineTests previously used C# raw string literals that got double-encoded; fixed to regular escaped strings\n- -p:CopilotSkipCliDownload=true prevents the Copilot CLI download during build (required in CI where no VS Code is present)\n\n## Local Validation\n\nScripts/Validate-Repo.ps1 is the default local validation entrypoint:\n- -IncludeCoverage: include code coverage\n- -IncludeE2E: include end-to-end tests\n- -IncludeDocs: include documentation validation\n\nTask record validation: pwsh ./Scripts/Test-TaskRecords.ps1 (checks valid JSON, allowed statuses/priorities, unique keys, no orphan files)\n\n## MCP Server CI\n\nMemorySmith.Agent exposes an MCP endpoint (GET /mcp, POST /mcp with JSON-RPC). Verified tool inventory documented in stevebot-mcp-verified-baseline memory.",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": [
+    "agent",
+    "ci-cd",
+    "github-actions",
+    "build",
+    "test",
+    "coverage",
+    "validation",
+    "kind:reference",
+    "audience:agent",
+    "scope:infrastructure"
+  ],
+  "References": [
+    "agent-task-governance",
+    "stevebot-mcp-verified-baseline",
+    "agent-architecture-bounded-contexts"
+  ],
+  "Conflicts": [],
+  "SourceLinks": [
+    {
+      "Label": "CI workflow",
+      "Uri": "%RepoRoot%.github/workflows/ci.yml",
+      "StartLine": 1,
+      "EndLine": 40
+    },
+    {
+      "Label": "AGENTS.md (CI lessons)",
+      "Uri": "%RepoRoot%AGENTS.md",
+      "StartLine": 1,
+      "EndLine": 30
+    },
+    {
+      "Label": "Codebase facts (CI section)",
+      "Uri": "%RepoRoot%Data/Pages/memories/codebase-facts.md",
+      "StartLine": 1,
+      "EndLine": 100
+    }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-07-10T00:00:00Z"
+}

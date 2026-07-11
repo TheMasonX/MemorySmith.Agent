@@ -1,0 +1,33 @@
+{
+  "Id": "agent-smelt-goal",
+  "Title": "MemorySmith.Agent — SmeltGoal & SmeltableMapping: Smelting Pipeline",
+  "Content": "## Overview\n\n`SmeltGoal` (`Agent.Planning/Goals/SmeltGoal.cs`) is the goal type for instructing the bot to smelt a specific item. It was introduced in Sprint 44 (TSK-0079) to fix a 7-sprint-old routing bug where smelt intents were incorrectly mapped to `CraftItemGoal`, which never exercised the adapter's dedicated `case 'smelt':` handler.\n\n`SmeltableMapping` (`Agent.Planning/SmeltableMapping.cs`) is the shared static class providing input→output mappings, reverse (output→input) lookups, and mineable-block classification.\n\n## SmeltGoal (`Agent.Planning/Goals/SmeltGoal.cs`)\n\n### Constructor\n\n```csharp\npublic sealed class SmeltGoal(string inputItem, int count = 1) : IGoal, IGoalPrecondition\n```\n\n### Properties\n\n| Property | Type | Description |\n|----------|------|-------------|\n| `InputItem` | `string` | The item to smelt (e.g., `\"iron_ore\"`, `\"raw_iron\"`) |\n| `Count` | `int` | Target count of output items |\n| `OutputItem` | `string` | Derived via `SmeltableMapping.GetOutput(inputItem)` — returns known output or identity passthrough |\n| `Name` | `string` | `\"SmeltItem:{inputItem}\"` |\n| `Description` | `string` | Human-readable: `\"Smelt {count}x {inputItem} into {outputItem}\"` |\n| `Phases` | `string[]` | `[\"Smelt\"]` |\n| `Id` | `Guid` | Stable per-instance ID for ActionOutcome tracking |\n| `FailureReason` | `string?` | Set when the goal fails |\n\n### Completion Condition\n\n```csharp\npublic bool IsComplete(WorldState state)\n{\n    if (state.IsInventoryStale) return false;\n    return state.Inventory.GetValueOrDefault(OutputItem) >= count;\n}\n```\n\nGoal is complete when the inventory holds at least `Count` units of `OutputItem`. Returns `false` if inventory is stale (needs a `GetStatus` refresh).\n\n### Precondition (Sprint 58 TSK-0310)\n\n- **Creative mode**: always feasible (items can be spawned)\n- **Survival**: requires fresh inventory to check input material availability\n\n## SmeltableMapping (`Agent.Planning/SmeltableMapping.cs`)\n\nTSK-0082: Shared static class to eliminate OutputItem drift across `SmeltGoal`, `HtnTaskLibrary.DecomposeSmeltItem`, and `HtnTaskLibrary.IsMineableBlock`.\n\n### Input → Output Mapping\n\n| Input | Output |\n|-------|--------|\n| `iron_ore` | `iron_ingot` |\n| `raw_iron` | `iron_ingot` |\n| `gold_ore` | `gold_ingot` |\n| `raw_gold` | `gold_ingot` |\n| `nether_gold_ore` | `gold_ingot` |\n| `copper_ore` | `copper_ingot` |\n| `raw_copper` | `copper_ingot` |\n| `ancient_debris` | `netherite_scrap` |\n\nNote: The wild-card `*_ore → *_ingot` pattern is intentionally avoided because it produces invalid item IDs for non-smeltable ores (e.g., `redstone_ore` → `\"redstone_ingot\"`).\n\n### Reverse Mapping (Output → Input Block)\n\n| Output | Input Block (to mine) |\n|--------|----------------------|\n| `iron_ingot` | `iron_ore` |\n| `gold_ingot` | `gold_ore` |\n| `copper_ingot` | `copper_ore` |\n| `netherite_scrap` | `ancient_debris` |\n\n### Raw Input → Block Resolution (AUD-48-001)\n\n```\nraw_iron   → iron_ore\nraw_gold   → gold_ore\nraw_copper → copper_ore\n```\n\nThis prevents `DecomposeSmeltItem` from emitting invalid actions like `MineBlock(raw_iron)`.\n\n### Mineable Smeltable Blocks\n\n```\nSmeltableMineableBlocks = {\n    \"iron_ore\", \"deepslate_iron_ore\",\n    \"gold_ore\", \"deepslate_gold_ore\",\n    \"copper_ore\", \"deepslate_copper_ore\",\n    \"ancient_debris\", \"nether_gold_ore\",\n    \"coal_ore\", \"deepslate_coal_ore\",\n}\n```\n\n### Key Methods\n\n| Method | Description |\n|--------|-------------|\n| `GetOutput(string inputItem)` | Returns smelted output, or identity passthrough if unknown |\n| `GetInputBlock(string item)` | Returns mineable source block. Resolution order: RawInputToBlock → OutputToInput → identity |\n| `IsSmeltableMineableBlock(string block)` | Returns true if block is in `SmeltableMineableBlocks` |\n\n## Key Source Files\n\n| File | Location |\n|------|----------|\n| `SmeltGoal.cs` | `Agent.Planning/Goals/SmeltGoal.cs` |\n| `SmeltableMapping.cs` | `Agent.Planning/SmeltableMapping.cs` |\n| `SmeltGoalDecomposer.cs` | `Agent.Planning/Decomposition/` |",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": [
+    "kind:reference",
+    "audience:agent",
+    "scope:planning"
+  ],
+  "References": [
+    "agent-planner-architecture",
+    "agent-goal-types-catalog"
+  ],
+  "Conflicts": [],
+  "SourceLinks": [
+    {
+      "Label": "SmeltGoal.cs",
+      "Uri": "%RepoRoot%Agent.Planning/Goals/SmeltGoal.cs",
+      "StartLine": 1,
+      "EndLine": 120
+    },
+    {
+      "Label": "SmeltableMapping.cs",
+      "Uri": "%RepoRoot%Agent.Planning/SmeltableMapping.cs",
+      "StartLine": 1,
+      "EndLine": 100
+    }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-07-10T00:00:00Z"
+}

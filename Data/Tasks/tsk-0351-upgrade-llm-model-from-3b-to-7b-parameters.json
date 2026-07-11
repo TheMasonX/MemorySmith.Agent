@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0351-upgrade-llm-model-from-3b-to-7b-parameters",
+  "key": "TSK-0351",
+  "title": "Upgrade LLM model from 3B to 7B\u002B parameters",
+  "description": "## Problem\nIntent parsing reliability is the #1 runtime issue. The current ollama 3B model frequently produces low-confidence or incorrect intent classifications, causing the agent to ask unnecessary clarification questions or misinterpret commands entirely.\n\n## Evidence\n- Multiple audit findings (Sprint 41\u002B, internal-audit-57)\n- Roadmap Gap Analysis \u2014 most impactful performance improvement available\n- LLM evaluator fast-path (TSK-0320) partially mitigates but doesn\u0027t address model quality\n\n## Scope\n1. Evaluate available 7B\u002B models compatible with ollama (e.g., Mistral 7B, Llama 3 8B, Qwen 2.5 7B)\n2. Update OllamaProvider configuration in appsettings.json\n3. Update num_predict and timeout settings for larger model\n4. Benchmark intent parsing accuracy vs 3B model\n5. Update documentation (README, architecture.md) with model requirements\n\n## Files\n- Agent.Personality/LlmChatInterpreter.cs \u2014 primary consumer\n- Agent.Core/Runtime/OllamaProvider.cs \u2014 model configuration\n- Configuration files (appsettings.json)\n\n## Validation\n- 10\u002B test chat commands with known intents\n- Verify confidence scores consistently above 0.7\n- Verify no regression in response latency",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:chat",
+    "type:enhancement",
+    "sprint-60"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T01:39:39.7466488Z",
+  "updatedAtUtc": "2026-07-11T01:39:39.7466488Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

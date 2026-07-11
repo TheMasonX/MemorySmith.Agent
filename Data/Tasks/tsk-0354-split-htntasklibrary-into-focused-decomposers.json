@@ -1,0 +1,32 @@
+﻿{
+  "id": "tsk-0354-split-htntasklibrary-into-focused-decomposers",
+  "key": "TSK-0354",
+  "title": "Split HtnTaskLibrary into focused decomposers",
+  "description": "## Problem\n\u0060HtnTaskLibrary\u0060 currently owns decomposition logic for all goal types (Gather, Craft, Smelt, Build, Explore) in a single monolithic class. This violates single-responsibility and makes it difficult to test, extend, or replace individual decomposition strategies.\n\n## Solution (Council S52 plan)\nFollow the pattern established by \u0060BuildGoalDecomposer\u0060, \u0060SmeltGoalDecomposer\u0060, \u0060CraftItemGoalDecomposer\u0060, and \u0060GenericGatherGoalDecomposer\u0060. Ensure all 5 decomposer types have their own focused class:\n\n- GatherGoalDecomposer (exists: GenericGatherGoalDecomposer)\n- CraftItemGoalDecomposer (exists)\n- SmeltGoalDecomposer (exists)\n- BuildGoalDecomposer (exists)\n- ExploreGoalDecomposer (missing \u2014 needs creation)\n\nMove remaining decomposition logic from \u0060HtnTaskLibrary\u0060 into the appropriate decomposer. \u0060HtnTaskLibrary\u0060 becomes a registry/factory that routes to the correct decomposer.\n\n## Files\n- Agent.Planning/HtnTaskLibrary.cs (strip decomposition logic)\n- Agent.Planning/Decomposition/ (ensure all 5 decomposers exist)\n- Agent.Planning/Decomposition/ExploreGoalDecomposer.cs (new)\n\n## Validation\n- All existing planning tests pass\n- Each decomposer is independently testable\n- \u0060HtnTaskLibrary\u0060 is under 200 lines",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:planning",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T01:39:40.2201928Z",
+  "updatedAtUtc": "2026-07-11T01:39:40.2201928Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

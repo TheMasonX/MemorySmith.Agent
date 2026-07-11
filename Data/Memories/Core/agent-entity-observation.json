@@ -1,0 +1,45 @@
+{
+  "Id": "agent-entity-observation",
+  "Title": "MemorySmith.Agent — Entity Observation System: PhysicsTick Scanning & Hostile Mob Detection",
+  "Content": "## Overview\n\nThe entity observation system provides passive, periodic scanning of entities near the bot. It runs on every `physicsTick` via Mineflayer, with a cooldown to avoid excessive CPU usage. The observed entities feed into the dashboard display, threat detection, and the observe→evaluate replan loop.\n\n## JS Adapter (`MineflayerAdapter/index.js`) — Sprint 55 Wave B\n\n### Entity Scanning\n\n| Property | Value |\n|----------|-------|\n| Trigger | `bot.on('physicsTick', scanNearbyEntities)` |\n| Cooldown | `C.ENTITY_SCAN_COOLDOWN_MS` = 3000ms (3 seconds) |\n| Radius | `C.ENTITY_SCAN_RADIUS` = 32 blocks |\n| Entity types | `mob` and `object` (items on ground) |\n\n### Scan Logic\n\n```js\nfunction scanNearbyEntities() {\n    const now = Date.now();\n    if (now - _lastEntityScanAt < C.ENTITY_SCAN_COOLDOWN_MS) return;\n    _lastEntityScanAt = now;\n\n    for (const e of Object.values(bot.entities ?? {})) {\n        if (!e || !e.position) continue;\n        if (e.type !== 'mob' && e.type !== 'object') continue;\n        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);\n        if (dist > C.ENTITY_SCAN_RADIUS) continue;\n        observed.push({\n            name, type, hostile: HOSTILE_MOB_NAMES.has(rawName),\n            x, y, z, distance, health?\n        });\n    }\n    if (observed.length > 0) {\n        observed.sort((a, b) => a.distance - b.distance);\n        sendEvent('entityObserved', { entities: observed, botPos, timestamp });\n    }\n}\n```\n\n### Hostile Mob Names (28 types)\n\n```javascript\nconst HOSTILE_MOB_NAMES = new Set([\n  'zombie', 'skeleton', 'creeper', 'spider', 'cave_spider',\n  'witch', 'enderman', 'blaze', 'ghast', 'magma_cube', 'slime',\n  'wither_skeleton', 'stray', 'husk', 'drowned', 'phantom',\n  'pillager', 'vindicator', 'evoker', 'ravager', 'hoglin',\n  'piglin', 'piglin_brute', 'zombified_piglin', 'guardian',\n  'elder_guardian', 'silverfish', 'endermite', 'vex',\n  'warden', 'breeze', 'bogged',\n]);\n```\n\nNote: `itemType` objects (e.g., dropped items) are never marked as hostile.\n\n### Block Observation\n\n| Property | Value |\n|----------|-------|\n| Trigger | `bot.on('physicsTick', scanBlockBelow)` |\n| Cooldown | 1000ms (1 second) |\n\nEmits `blockBelowChanged` event when the block beneath the bot changes.\n\n## C# Events (`Agent.Core/Events/WorldEvents.cs`) — Sprint 55 Wave C\n\n### EntityObservedEvent\n\n```csharp\npublic sealed record EntityObservedEvent(\n    IReadOnlyList<ObservedEntity> Entities,\n    Position BotPosition,\n    DateTimeOffset Timestamp) : WorldEvent(Timestamp);\n```\n\nEmitted periodically (cooldown ~3s) when mobs are within `ENTITY_SCAN_RADIUS` blocks.\n\n### ObservedEntity\n\n```csharp\npublic sealed record ObservedEntity(\n    string Name,\n    string Type,       // \"mob\", \"object\", \"player\"\n    bool Hostile,\n    int X, int Y, int Z,\n    double Distance,\n    int? Health = null,\n    string? Username = null);\n```\n\n### BlockBelowChangedEvent\n\n```csharp\npublic sealed record BlockBelowChangedEvent(\n    string Name,\n    int Type,\n    int X, int Y, int Z,\n    DateTimeOffset Timestamp) : WorldEvent(Timestamp);\n```\n\n## WebSocket Bridge Parsing\n\n`WebSocketBridge.cs` contains `ParseEntityObserved(JsonElement root, DateTimeOffset now)` which parses the `entityObserved` wire event into the typed C# event.\n\n## Dashboard Integration\n\nObserved entities are pushed to the dashboard via `DashboardPublisherImpl.SetNearbyEntities()` and serialized as `ObservedEntityDto` in the `AgentStatusUpdate` SignalR payload.\n\n## Key Source Files\n\n| File | Location |\n|------|----------|\n| `index.js` (scanNearbyEntities) | `MineflayerAdapter/index.js` (line ~495) |\n| `config.js` (constants) | `MineflayerAdapter/config.js` (line ~59) |\n| `WorldEvents.cs` (EntityObservedEvent, BlockBelowChangedEvent) | `Agent.Core/Events/WorldEvents.cs` (line ~340) |\n| `WebSocketBridge.cs` (ParseEntityObserved) | `Agent.World.Minecraft/WebSocketBridge.cs` (line ~626) |\n| `DashboardPublisherImpl.cs` (SetNearbyEntities) | `WebUI.Blazor/Managers/DashboardPublisherImpl.cs` |\n| `Dtos.cs` (ObservedEntityDto) | `WebUI.Blazor/Dtos.cs` |",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": [
+    "kind:reference",
+    "audience:agent",
+    "scope:adapter"
+  ],
+  "References": [
+    "agent-mineflayer-adapter-state",
+    "agent-dashboard-integration"
+  ],
+  "Conflicts": [],
+  "SourceLinks": [
+    {
+      "Label": "index.js (entity scanning)",
+      "Uri": "%RepoRoot%MineflayerAdapter/index.js",
+      "StartLine": 485,
+      "EndLine": 560
+    },
+    {
+      "Label": "config.js (entity constants)",
+      "Uri": "%RepoRoot%MineflayerAdapter/config.js",
+      "StartLine": 57,
+      "EndLine": 62
+    },
+    {
+      "Label": "WorldEvents.cs (EntityObservedEvent)",
+      "Uri": "%RepoRoot%Agent.Core/Events/WorldEvents.cs",
+      "StartLine": 340,
+      "EndLine": 380
+    },
+    {
+      "Label": "WebSocketBridge.cs (ParseEntityObserved)",
+      "Uri": "%RepoRoot%Agent.World.Minecraft/WebSocketBridge.cs",
+      "StartLine": 626,
+      "EndLine": 640
+    }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-07-10T00:00:00Z"
+}

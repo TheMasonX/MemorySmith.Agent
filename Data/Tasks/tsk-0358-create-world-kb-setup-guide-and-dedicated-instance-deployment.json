@@ -1,0 +1,32 @@
+﻿{
+  "id": "tsk-0358-create-world-kb-setup-guide-and-dedicated-instance-deployment",
+  "key": "TSK-0358",
+  "title": "Create World KB setup guide and dedicated instance deployment",
+  "description": "## Problem\nThe agent currently relies on a possibly-shared MemorySmith wiki instance for item/blueprint/knowledge lookups. There is no documented procedure for setting up a dedicated World KB instance, which is required for:\n- Isolated testing without polluting shared data\n- Deterministic blueprint/item resolution\n- Production deployment with dedicated resources\n\n## Scope\n1. **Setup guide** (\u0060Data/Pages/Guides/world-kb-setup.md\u0060):\n   - Prerequisites (MemorySmith API instance, database)\n   - Configuration steps\n   - Environment variables and appsettings.json entries\n   - Verification steps (curl examples)\n\n2. **Deployment script** (\u0060Scripts/Deploy-WorldKb.ps1\u0060):\n   - Create/update the wiki instance\n   - Seed initial item registry entries\n   - Seed test blueprints\n   - Verify connectivity\n\n3. **Configuration reference:**\n   - Document WorldKbUrl, ApiKey, and all related settings\n   - Add startup health check that verifies World KB connectivity\n   - Log meaningful error message if World KB is unreachable\n\n## Files\n- Data/Pages/Guides/world-kb-setup.md (new)\n- Scripts/Deploy-WorldKb.ps1 (new)\n- Agent.Memory/RestMemoryGateway.cs (add startup health check)\n\n## Validation\n- Guide can be followed end-to-end by new developer\n- Deployed instance passes health check\n- Agent successfully resolves items and blueprints from dedicated instance",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:documentation",
+    "type:feature"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T01:40:01.8539823Z",
+  "updatedAtUtc": "2026-07-11T01:40:01.8539823Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

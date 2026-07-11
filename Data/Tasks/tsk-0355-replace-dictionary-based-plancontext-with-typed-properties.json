@@ -1,0 +1,32 @@
+﻿{
+  "id": "tsk-0355-replace-dictionary-based-plancontext-with-typed-properties",
+  "key": "TSK-0355",
+  "title": "Replace Dictionary-based PlanContext with typed properties",
+  "description": "## Problem\nPlanning context is passed as \u0060Dictionary\u003Cstring, object?\u003E\u0060 throughout the pipeline. This causes:\n- No compile-time type safety\n- Magic string keys scattered across the codebase\n- Boxing/unboxing overhead for value types\n- Difficult to discover available context values\n\n## Solution (Council S52 plan)\nReplace with a typed \u0060PlanContext\u0060 record class:\n\n\u0060\u0060\u0060csharp\npublic sealed record PlanContext(\n    IReadOnlyList\u003CActionData\u003E? PreviousActions,\n    WorldState? CurrentWorld,\n    int? BuildOriginX, int? BuildOriginY, int? BuildOriginZ,\n    string? BlueprintId,\n    IReadOnlyDictionary\u003Cstring, object?\u003E Extensions  // for custom/additional data\n);\n\u0060\u0060\u0060\n\nThe \u0060Extensions\u0060 dictionary provides escape hatch for ad-hoc data while keeping the core contract typed.\n\n## Files\n- Agent.Core/Models/PlanContext.cs (new)\n- Agent.Planning/ (update all planning interfaces and implementations)\n- WebUI.Blazor/AgentBackgroundService.cs (update context construction)\n\n## Validation\n- All existing tests pass\n- No remaining \u0060Dictionary\u003Cstring, object?\u003E\u0060 for planning context",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:planning",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T01:39:40.5326589Z",
+  "updatedAtUtc": "2026-07-11T01:39:40.5326589Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

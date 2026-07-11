@@ -1,0 +1,35 @@
+{
+  "Id": "agent-action-outcome",
+  "Title": "MemorySmith.Agent — ActionOutcome & StructuredEffect: Universal Tool Result",
+  "Content": "## Overview\n\nActionOutcome (Agent.Core/Models/ActionOutcome.cs) is the universal result artifact for every ToolDispatcher.CallAsync execution. It is the single result type flowing into recovery, replanning, journaling, and world-state updates.\n\n## OutcomeType Enum (Sprint 40 P0-B)\n\n| Value | Meaning |\n|-------|---------|\n| Completed | Action completed successfully and produced expected result |\n| NoProgress | Action completed but no measurable progress (item not collected, wrong output) |\n| Failed | Action failed due to an error or exception |\n| Blocked | Prerequisite not met (no reachable block, missing tool, insufficient items) |\n| Unreachable | Target was unreachable (pathfinding failure) |\n| TimedOut | Action timed out before completing |\n\nReplaced the original bool Success field. The Success property is now computed: true for Completed only.\n\n## ActionOutcome Record\n\nFields:\n- GoalId (Guid): links outcome to the active goal\n- ToolName (string): the tool that produced this outcome (e.g. \"MineBlock\")\n- Outcome (OutcomeType): semantic status\n- ObservationSummary (string): human-readable description of what happened\n- Effects (IReadOnlyList<StructuredEffect>): typed list of world changes\n- Timestamp (DateTimeOffset): when the outcome was recorded\n- Success (bool, computed): true when Outcome == Completed\n\nImplements IObservationSummary for LLM evaluator consumption.\n\n### Factory Helpers\n- ActionOutcome.Collected(goalId, tool, item, count): OutcomeType.Completed + ItemCollected effect\n- ActionOutcome.Succeeded(goalId, tool, summary): OutcomeType.Completed, no effects\n- ActionOutcome.Failed(goalId, tool, reason): OutcomeType.Failed\n\n## StructuredEffect Record\n\nFields: Type (string), Item (string?), Count (int?), Detail (string?)\n\nType vocabulary:\n- ItemCollected: item landed in inventory (playerCollect, craft/smelt output)\n- ItemConsumed: item removed from inventory (placed, used as ingredient)\n- ItemCrafted: item crafted at table/furnace\n- PositionChanged: bot moved to new location\n- BlockPlaced: block placed in world\n- BlockMined: block removed from world\n- StatusRefreshed: full bot status refreshed (HP, food, inventory)\n- MemorySearched: MemorySmith search executed\n- MemoryPageCreated: new MemorySmith page created\n\n## Consumers\n\n1. AgentJournal: records ActionOutcome for post-hoc analysis (Append, GetRecent, Clear)\n2. AgentBackgroundService: uses ActionOutcome as WorldState update hints in observation-driven replanning\n3. ILlmEvaluator.EvaluateAsync(goal, outcomes): receives ActionOutcome[] to decide if replanning is needed (Sprint 39 stub, Sprint 45+ concrete)\n4. IReplanGovernor: uses outcome data for stall detection",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": [
+    "agent",
+    "action-outcome",
+    "structured-effect",
+    "tool-result",
+    "observation",
+    "replanning",
+    "journal",
+    "kind:reference",
+    "audience:agent",
+    "scope:core"
+  ],
+  "References": [
+    "agent-runtime-lifecycle",
+    "agent-architecture-bounded-contexts",
+    "agent-replan-governor"
+  ],
+  "Conflicts": [],
+  "SourceLinks": [
+    {
+      "Label": "ActionOutcome.cs",
+      "Uri": "%RepoRoot%Agent.Core/Models/ActionOutcome.cs",
+      "StartLine": 1,
+      "EndLine": 100
+    }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-07-10T00:00:00Z"
+}

@@ -1,0 +1,33 @@
+{
+  "Id": "agent-task-sequence-goal",
+  "Title": "MemorySmith.Agent — TaskSequenceGoal: Compound Sequential Goal Execution",
+  "Content": "er. Created when the LLM detects a compound command like \\\"gather wood then build a house\\\" (TSK-0205). Each step is a standard `IGoal` created via the normal `GoalFactory` pipeline.\\n\\n## TaskSequenceGoal (`Agent.Core/Models/TaskSequenceGoal.cs`)\\n\\n### Constructor\\n\\n```csharp\\npublic TaskSequenceGoal(IReadOnlyList<IGoal> steps)\\n```\\n\\n- **Max 5 steps** (`MaxSteps = 5`): guard against runaway chains\\n- Throws `ArgumentException` for empty steps or > 5 steps\\n- Each step validated at construction time\\n\\n### Properties\\n\\n| Property | Type | Description |\\n|----------|------|-------------|\\n| `Id` | `Guid` | Stable per-instance ID for ActionOutcome tracking |\\n| `Name` | `string` | `\\\"Sequence:{CurrentStep.Name}\\\"` \u2014 delegates to current step |\\n| `Description` | `string` | `\\\"Step {N}/{Total}: {CurrentStep.Description}\\\"` |\\n| `Phases` | `string[]` | Delegates to current step's phases |\\n| `FailureReason` | `string?` | Set when the current step fails |\\n| `DamageInterruptThresholdHp` | `int?` | Delegates to current step |\\n| `CurrentStepIndex` | `int` | 0-based index of the active step |\\n| `TotalSteps` | `int` | Total number of steps in the sequence |\\n| `CurrentStep` | `IGoal` | The currently active sub-goal |\\n| `RemainingSteps` | `IReadOnlyList<IGoal>` | All remaining steps (including current) |\\n\\n### Step Advancement\\n\\n```csharp\\npublic bool TryAdvance()\\n```\\n\\n- Increments `_currentStep` by 1\\n- Returns `true` if there is a next step, `false` if the sequence is complete\\n- Only called from agent logic when `IsComplete` returns `true` for current step\\n\\n### Completion Logic (Sprint 56 TSK-0274 fix)\\n\\n```csharp\\npublic bool IsComplete(WorldState state)\\n{\\n    if (_currentStep >= _steps.Count)\\n        return true;\\n    return _steps[_currentStep].IsComplete(state);\\n}\\n```\\n\\n**Sprint 56 fix:** The original implementation had a circular dependency \u2014 `IsComplete` only checked `_currentStep >= _steps.Count`, but `TryAdvance()` was only called from inside the `IsComplete == true` branch, so sequences could never complete. Fixed by delegating to the current step's `IsComplete` first.\\n\\n### Failure Detection\\n\\n```csharp\\npublic bool HasFailed(WorldState state)\\n{\\n    if (_currentStep < _steps.Count && _steps[_currentStep].HasFailed(state))\\n    {\\n        FailureReason = _steps[_currentStep].FailureReason;\\n        return true;\\n    }\\n    return false;\\n}\\n```\\n\\nThe sequence fails when the current step fails. The `FailureReason` is propagated from the failing step.\\n\\n## TaskSequenceGoalDecomposer (`Agent.Planning/Decomposition/TaskSequenceGoalDecomposer.cs`) \u2014 Sprint 55\\n\\nDecomposes a `TaskSequenceGoal` by delegating to the registered decomposer for the current step's goal type.\\n\\n```csharp\\npublic sealed class TaskSequenceGoalDecomposer(DecomposerRegistry registry) : IGoalDecomposer\\n{\\n    public bool CanHandle(IGoal goal) => goal is TaskSequenceGoal;\\n\\n    public ActionPlan Decompose(IGoal goal, WorldState state)\\n    {\\n        var seq = (TaskSequenceGoal)goal;\\n        var step = seq.CurrentStep;\\n\\n        if (registry.Find(step) is { } stepDecomposer)\\n            return stepDecomposer.Decompose(step, state);\\n\\n        throw new InvalidOperationException(\\n            $\"TaskSequenceGoal decomposer could not find a decomposer for \" +\\n            $\"step '{step.Name}' (type: {step.GetType().Name}). \" +\\n            $\"Register a decomposer for this goal type in DecomposerRegistry.\");\\n    }\\n}\\n```\\n\\n**Sprint 55 origin:** Fixes the crash where `HtnPlanner` received a wrapped `TaskSequenceGoal` and could not decompose it because no decomposer was registered for the sequence wrapper itself.\\n\\n## Key Source Files\\n\\n| File | Location |\\n|------|----------|\\n| `TaskSequenceGoal.cs` | `Agent.Core/Models/TaskSequenceGoal.cs` |\\n| `TaskSequenceGoalDecomposer.cs` | `Agent.Planning/Decomposition/TaskSequenceGoalDecomposer.cs` |\\n| `TaskSequenceGoalTests.cs` | `MemorySmith.Agent.Tests/TaskSequenceGoalTests.cs` |",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": [
+    "kind:reference",
+    "audience:agent",
+    "scope:planning"
+  ],
+  "References": [
+    "agent-planner-architecture",
+    "agent-intent-manager"
+  ],
+  "Conflicts": [],
+  "SourceLinks": [
+    {
+      "Label": "TaskSequenceGoal.cs",
+      "Uri": "%RepoRoot%Agent.Core/Models/TaskSequenceGoal.cs",
+      "StartLine": 1,
+      "EndLine": 150
+    },
+    {
+      "Label": "TaskSequenceGoalDecomposer.cs",
+      "Uri": "%RepoRoot%Agent.Planning/Decomposition/TaskSequenceGoalDecomposer.cs",
+      "StartLine": 1,
+      "EndLine": 35
+    }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-07-10T00:00:00Z"
+}

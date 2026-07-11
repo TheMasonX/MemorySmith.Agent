@@ -1,0 +1,38 @@
+{
+  "Id": "agent-build-origin",
+  "Title": "MemorySmith.Agent — BuildOrigin Value Object (TSK-0103)",
+  "Content": "## Overview\n\nBuildOrigin (Agent.Planning/Goals/BuildOrigin.cs) is a sealed record value object representing a resolved build origin with its provenance. Consolidated from three nullable coordinate fields (OriginX, OriginY, OriginZ) and BuildOriginSource enum previously stored as separate properties on BuildGoal (TSK-0103, absorbing TSK-0098).\n\n## Record Structure\n\n```csharp\npublic sealed record BuildOrigin(int X, int Y, int Z, BuildOriginSource Source);\n```\n\n## Key Design Decisions\n\n- Atomic: all three coordinates must be present. Partial coordinates are rejected.\n- Self-documenting: Source tracks HOW the origin was determined\n- No sentinel overloading: missing origin is represented as null, not (0,0,0)\n- String? type on Source values for flexibility\n\n## BuildOriginSource Enum (defined in BuildGoal.cs)\n\n| Value | Meaning |\n|-------|---------|\n| Explicit | Player explicitly provided coordinates (via chat or REST API) |\n| PlayerPosition | Derived from the bot's current position as a positional fallback |\n| AutoScanned | Found via FindFlatArea or automatic scanning (warning logged before building) |\n\n## Factory Method\n\nBuildOrigin.FromNullable(int? x, int? y, int? z, BuildOriginSource source = BuildOriginSource.AutoScanned):\n- Returns null when any coordinate is null (prevents partial origin ambiguity)\n- Used by BuildGoalRequest constructor to safely handle optional coords from IntentDraft\n\n## Usage Flow\n\n1. IntentManager.TryBuildGoal(IntentDraft): calls BuildOrigin.FromNullable(draft.X, draft.Y, draft.Z)\n2. If all three coords present → BuildOrigin with UserSpecified source\n3. If any coord missing → null origin (agent auto-resolves)\n4. BuildGoalRequest stores BuildOrigin? → GoalFactory creates BuildGoal\n5. BuildGoal.Origin property exposes the BuildOrigin for the decomposer",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": [
+    "agent",
+    "build-origin",
+    "value-object",
+    "coordinates",
+    "build-goal",
+    "kind:reference",
+    "audience:agent",
+    "scope:planning"
+  ],
+  "References": [
+    "agent-intent-manager",
+    "agent-architecture-bounded-contexts"
+  ],
+  "Conflicts": [],
+  "SourceLinks": [
+    {
+      "Label": "BuildOrigin.cs",
+      "Uri": "%RepoRoot%Agent.Planning/Goals/BuildOrigin.cs",
+      "StartLine": 1,
+      "EndLine": 40
+    },
+    {
+      "Label": "BuildGoal.cs (BuildOriginSource enum)",
+      "Uri": "%RepoRoot%Agent.Planning/Goals/BuildGoal.cs",
+      "StartLine": 109,
+      "EndLine": 125
+    }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-07-10T00:00:00Z"
+}

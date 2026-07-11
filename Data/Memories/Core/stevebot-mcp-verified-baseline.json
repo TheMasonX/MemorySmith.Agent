@@ -1,22 +1,45 @@
 {
-  "Title": "SteveBot MCP verified baseline",
-  "Kind": "Operational",
-  "Status": "Core",
-  "Summary": "Verified the local MemorySmith.Agent MCP endpoint and live tool inventory using the repo-local key. This memory records the non-destructive route behavior and the current caveats for SteveBot and the MCP skill docs.",
-  "Confidence": 98,
-  "Tags": ["stevebot", "mcp", "memorysmith-agent", "tools", "verification"],
-  "Evidence": [
-    "GET /health returned 200 with status Healthy.",
-    "GET /api/health/live returned 200 with status Healthy.",
-    "GET /api/health/ready returned 200 with status Ready.",
-    "GET /api/diagnostics returned 401 Unauthorized, so diagnostic endpoints require authenticated access.",
-    "GET /mcp returned the live tool catalog: memorysmith_search, memorysmith_hybrid_search, memorysmith_context_pack, memorysmith_get, memorysmith_code_search, memorysmith_code_search_status, memorysmith_page_search, memorysmith_page_get, memorysmith_task_list, memorysmith_task_get.",
-    "POST /mcp initialize/ping/tools/list returned 200 JSON-RPC responses.",
-    "The semantic-search fallback path remains limited because the ONNX embedding model is not currently present."
+  "Id": "stevebot-mcp-verified-baseline",
+  "Title": "MemorySmith.Agent — SteveBot MCP Endpoint Verified Baseline",
+  "Content": "## Overview\n\nVerified the local MemorySmith.Agent MCP endpoint and live tool inventory using the repo-local key. Documents the non-destructive route behavior and current caveats.\n\n## Verified Endpoints (as of 2026-07-10)\n\n| Endpoint | Status | Notes |\n|----------|--------|-------|\n| `GET /health` | 200 Healthy | Basic health check |\n| `GET /api/health/live` | 200 Healthy | Liveness probe |\n| `GET /api/health/ready` | 200 Ready | Readiness probe |\n| `GET /api/diagnostics` | 401 Unauthorized | Requires authenticated access |\n\n## MCP Tool Inventory\n\nBoth `GET /mcp` and `POST /mcp` (JSON-RPC) return the live tool catalog. Verified tool names:\n\n| Tool | Description |\n|------|-------------|\n| `memorysmith_search` | Search memories by text query |\n| `memorysmith_hybrid_search` | Hybrid (vector + lexical) search |\n| `memorysmith_context_pack` | Build agent-ready context packs |\n| `memorysmith_get` | Get a single memory record by ID |\n| `memorysmith_code_search` | Search indexed code files |\n| `memorysmith_code_search_status` | Check code search index status |\n| `memorysmith_page_search` | Search wiki pages |\n| `memorysmith_page_get` | Get a single wiki page by slug |\n| `memorysmith_task_list` | List tasks with filters |\n| `memorysmith_task_get` | Get a single task by ID |\n\n### JSON-RPC Methods Supported\n\n- `initialize` — capability negotiation\n- `ping` — keepalive / liveness\n- `tools/list` — enumerate available tools\n\n## Caveats & Known Limitations\n\n- Use the repo-local `X-Api-Key` from `.vscode/mcp.json` for live route probes\n- The semantic-search fallback path remains limited because the ONNX embedding model is not currently present in this repo\n- Tool names documented here are verified from live endpoint; always check the live endpoint before coding against tool names\n- The MCP endpoint is scoped to `MemorySmith.Agent` local memory/docs/tasks surfaces only\n- The `MemorySmith.Agent` REST API runs alongside the Blazor dashboard in a single process\n\n## Usage\n\n- Use these verified tool names when coding MCP client code or writing tests\n- Update this memory when the MCP tool catalog changes (new tools added, renamed, or removed)\n- MCP configuration is in `.vscode/mcp.json` (repo-local key with `X-Api-Key` header)\n\n## Key Source Files\n\n| File | Location |\n|------|----------|\n| MCP endpoint | `WebUI.Blazor/Controllers/McpController.cs` |\n| Health controller | `WebUI.Blazor/Controllers/HealthController.cs` |\n| MCP config | `.vscode/mcp.json` |",
+  "Status": 2,
+  "Confidence": 0.95,
+  "Tags": [
+    "stevebot",
+    "mcp",
+    "memorysmith-agent",
+    "tools",
+    "verification",
+    "json-rpc",
+    "kind:reference",
+    "audience:agent",
+    "scope:infrastructure"
   ],
-  "Notes": [
-    "Use the repo-local X-Api-Key from .vscode/mcp.json for any live route probes.",
-    "Keep any MCP work scoped to MemorySmith.Agent and its local memory/docs/tasks surfaces.",
-    "Update docs and task records from verified tool inventory rather than inferred tool names."
-  ]
+  "References": [
+    "agent-memorygateway-integration",
+    "agent-architecture-bounded-contexts"
+  ],
+  "Conflicts": [],
+  "SourceLinks": [
+    {
+      "Label": "MCP endpoint source",
+      "Uri": "%RepoRoot%WebUI.Blazor/Controllers/McpController.cs",
+      "StartLine": null,
+      "EndLine": null
+    },
+    {
+      "Label": "Health controller",
+      "Uri": "%RepoRoot%WebUI.Blazor/Controllers/HealthController.cs",
+      "StartLine": null,
+      "EndLine": null
+    },
+    {
+      "Label": "MCP config",
+      "Uri": "%RepoRoot%.vscode/mcp.json",
+      "StartLine": null,
+      "EndLine": null
+    }
+  ],
+  "UsageCount": 0,
+  "LastUpdated": "2026-07-10T00:00:00Z"
 }

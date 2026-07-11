@@ -1,9 +1,11 @@
-# Web Agent Researcher Skill
-Access my public MemorySmith.Agent repo on the latest commit, which will provided.
+# Bug Report Skill
+
 You will be doing a deepdive codebase audit and create a markdown report for the agents tasked with implementing.
 
 ## Research Process
+
 As you go:
+
 - Look for bugs, inconsistencies, gaps, or missed opportunities.
 - Look for brittle conditions, assumptions, implicit contracts, poorly handled or silently swallowed errors.
 - Look for architectural design bugs, and refactoring and codebase health improvement opportunities.
@@ -59,14 +61,9 @@ Name format: `{task-description}-audit-{dd-mm-yy-hh-mm-ss}.md`
 
 ## Rules
 
-State all assumptions and open questions. Provide realistic, grounded confidence values as %.
+State **ALL** assumptions and open questions. Provide realistic, grounded confidence values as %.
 Use evidence based claims and cite sources as appropriate.
-Think critically and do not take claims at face value without evidence.
-Provide assistance with planning and implementation guidance where possible to give the agent an easy time following along
-Avoid prose or explanation heavy sections unless they are critical. That bloat dillutes the SNR and context.
-Make it just a summary followed by the actionable findings and recommendations, with rationale and sources.
-
-## Sources
-
-- https://github.com/TheMasonX/MemorySmith.Agent/tree/main
-- https://github.com/TheMasonX/MemorySmith.Agent/commit/d6dc26e54a58b8c6bd9cf5bf776844675dd8a399
+Think critically and **DO NOT** take claims at face value without evidence and personal skeptical review.
+Provide assistance with planning and implementation guidance where possible to give the agent an easy time following along.
+Avoid prose or explanation heavy sections unless they are critical. That bloat dillutes the context and reduces SNR.
+**DO NOT** make assumptions about the codebase without evidence. If you cannot find evidence, state that explicitly and move on. **DO NOT** assume the contents of a file without reading it.

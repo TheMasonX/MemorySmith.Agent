@@ -1,19 +1,58 @@
 {
   "Id": "agent-wiki-integration",
-  "Title": "MemorySmith.Agent — MemorySmith Wiki Integration (REST Gateway & Local Fallback)",
-  "Content": "The agent uses the MemorySmith wiki as its long-term memory through a dual-gateway IMemoryGateway setup. Each gateway (Agent KB and World KB) connects to a separate MemorySmith instance.\n\n## IMemoryGateway Interface (Agent.Core)\n\n- SearchAsync(query, limit=20, ct) → IReadOnlyList<SearchResult>\n- GetPageAsync(slug, ct) → Page?\n- CreatePageAsync(slug, title, body, minimumRole, ct) → Page\n- UpdatePageAsync(slug, title, body, minimumRole, ct) → Page\n\n## RestMemoryGateway (Agent.Memory/RestMemoryGateway.cs)\n\nImplements IMemoryGateway via MemorySmith REST endpoints:\n- GET /api/search?query={q}&limit=20 → unified search (pages + memories)\n- GET /api/pages/{slug} → page content (body field)\n- POST /api/pages → create page {slug, title, body, minimumRole}\n- PUT /api/pages/{slug} → update page\n\nSearchResult.Kind field distinguishes 'page' (slug usable in GetPageAsync) from 'memory' (UUID, NOT a valid page slug).\n\n## Dual Gateway Setup (Sprint 22)\n\n| Gateway | Key | Purpose | Default URL |\n|---------|-----|---------|-------------|\n| Agent KB | (default) | Codebase, guides, architecture | http://localhost:5001 |\n| World KB | 'world' | World facts, exploration log | WorldKbUrl (null = disabled) |\n\nTool routing (Sprint 23):\n- SearchMemoryTool, CreatePageTool → World KB (world facts and events)\n- GetPageTool → Agent KB (codebase knowledge and guides)\n\n## Configuration (appsettings.json)\n\nAgent:Memory section:\n- BaseUrl (string): MemorySmith base URL\n- ApiKey (string?): X-Api-Key header if configured\n- TimeoutSeconds (int, default 30)\n- DefaultPageRole (string, default 'User')\n- WorldKbUrl (string?): separate URL for World KB gateway (null = disabled)\n\n## LocalKnowledgeResolver (Agent.Memory/LocalKnowledgeResolver.cs)\n\nProvides local file fallback when MemorySmith instance is unavailable:\n- Maps slugs to local files under Data/Pages/ and Data/Memories/\n- Used as fallback chain in MemorySmithBlueprintRepository\n- Also supports reading item registry pages from Data/Pages/item-registry/\n\n## Known Fixes\n\n- Phase 2: UpdatePageAsync preserves existing title via GET-then-PUT; falls back gracefully if page doesn't exist\n- IHttpClientFactory used for connection pooling (not new HttpClient())\n- Auth: X-Api-Key header if ApiKey is configured in MemorySmith\n\n## Testing\n\nMockMemoryGateway (in MemorySmith.Agent.Tests) provides in-memory IMemoryGateway implementation. No real MemorySmith instance needed for unit tests. Tests should copy Data/Memories to temp storage before mutation (copilot-instructions.md).",
+  "Title": "MemorySmith.Agent — MemorySmith Wiki Integration (REST Gateway, Local Fallback & Item/Blueprint Registry)",
+  "Content": "The agent uses the MemorySmith wiki as its long-term memory through a dual-gateway `IMemoryGateway` setup with local file fallback.\n\n## MemorySmithItemRegistry (`Agent.Memory/MemorySmithItemRegistry.cs`)\n\n`IItemRegistry` implementation backed by wiki pages at slug `item-registry/{itemId}`.\n\n### Wiki Page Format\n\nStandard item registry markdown:\n```markdown\n# {item-id}\nitem_id: {item_id}\ndisplay_name: {Human Readable Name}\nsource_blocks: {comma-separated block IDs}\nrequires_smelting: {true/false}\nmin_harvest_level: {0-4}\n```\n\n- `ParseItemSpec`: public static method, parses heading and `key:value` pairs from page content\n- Returns `null` for unknown or malformed pages\n- Never calls the LLM (D-003)\n\n### 3-Stage Lookup Strategy\n\n| Stage | Source | Details |\n|-------|--------|---------|\n| 1. Direct slug | Gateway | `item-registry/{normalized-slug}` via `IMemoryGateway.GetPageAsync` |\n| 2. Local file | Disk | `{localPagesRoot}/Data/Pages/item-registry/{slug}.md` (offline/dev fallback) |\n| 3. Search fallback | Gateway | `IMemoryGateway.SearchAsync` for non-standard slugs (spelling variants, partial names) |\n\n### Caching (Sprint 2c + Sprint 45)\n\n- `ConcurrentDictionary<slug, (ItemSpec?, Expiry)>` in-memory cache\n- `ItemCacheTtlSeconds` (default 60): TTL for found items\n- `NullCacheTtlSeconds` (default 5): Shorter TTL for null entries (TSK-0092)\n- Set `ItemCacheTtlSeconds = 0` to disable caching entirely\n- Cache includes expiry check: `DateTimeOffset.UtcNow < entry.Expires`\n\n## MemorySmithBlueprintRepository (`Agent.Memory/MemorySmithBlueprintRepository.cs`)\n\n`IBlueprintRepository` backed by wiki pages at slug `blueprints/{blueprintId}`:\n- Standard blueprint markdown format: frontmatter + Y-layer grids + optional legend\n- `SaveAsync` not implemented (blueprints authored as wiki pages manually)\n\n### 3-Stage Lookup Strategy\n\n| Stage | Source | Details |\n|-------|--------|---------|\n| 1. Direct slug | Gateway | `blueprints/{normalized-slug}` via `IMemoryGateway.GetPageAsync` |\n| 2. Local file | Disk | `Data/Pages/blueprints/{id}.md` (offline/dev fallback) |\n| 3. Search fallback | Gateway | `IMemoryGateway.SearchAsync` for non-standard IDs |\n\n### Error Handling\n\n- All gateway calls wrapped in try/catch for `HttpRequestException`, `TaskCanceledException`\n- `OperationCanceledException` propagated for cooperative cancellation\n- **Empty blueprint Id rejection** (Sprint 45 TSK-0094): empty/null IDs are rejected before any HTTP call is made\n- `RawMarkdown` preserved in `BlueprintSpec` for callers that need the original wiki text\n\n### Search Fallback Mechanism\n\nWhen direct slug lookup (Stage 1) and local file fallback (Stage 2) both fail, the system falls back to `IMemoryGateway.SearchAsync`:\n\n1. Normalize the query to item-id form (lowercase, spaces/hyphens → underscores)\n2. Issue search with the original user-facing name (semantic search benefits from human-readable form)\n3. Match results against the expected slug pattern (`item-registry/{id}` or `blueprints/{id}`)\n4. Return the first matching result's content\n\nThis is particularly important for non-standard slugs where the LLM may produce variant spellings.\n\n## LocalKnowledgeResolver (`Agent.Memory/LocalKnowledgeResolver.cs`)\n\nPhase 7-B implementation of `IKnowledgeResolver`. Three knowledge sources in priority order:\n\n| Priority | Source | Confidence | Details |\n|----------|--------|------------|---------|\n| 1 | `IItemRegistry` | 0.95 | Exact ID lookup by normalized item name |\n| 2 | `IMemoryGateway` | 0.60 × score | Wiki search (semantic; receives raw query, not normalized ID) |\n| 3 | WorldState.StructuredFacts | 0.70 recent / 0.50 stale | Runtime observed facts from live world state |\n\n### Retrieval Pipeline\n\n1. Normalize query to item-id form (lowercase, spaces/hyphens → underscores)\n2. Exact ID lookup in `IItemRegistry`\n3. `IMemoryGateway.SearchAsync` to fill remaining TopN slots\n4. WorldFact scan (synchronous, in-memory; no I/O) for keys containing the normalized query\n5. Apply type filter, confidence threshold, sort, TopN cap\n6. Detect ambiguity: flag `WasAmbiguous` when top-2 scores are within 0.05\n\n### Key Rules\n\n- Does not call the LLM (D-003)\n- Does not traverse the memory graph\n- Phase 7-C will normalize the observation pipeline before WorldFacts enter the resolver\n- Alias-based lookup will be added when `IItemRegistry` gains alias support (Phase 7-B D5)\n\n## Key Source Files\n\n| File | Location |\n|------|----------|\n| `RestMemoryGateway.cs` | `Agent.Memory/RestMemoryGateway.cs` |\n| `RestMemoryGatewayOptions.cs` | `Agent.Memory/RestMemoryGatewayOptions.cs` |\n| `MemorySmithItemRegistry.cs` | `Agent.Memory/MemorySmithItemRegistry.cs` |\n| `MemorySmithBlueprintRepository.cs` | `Agent.Memory/MemorySmithBlueprintRepository.cs` |\n| `LocalKnowledgeResolver.cs` | `Agent.Memory/LocalKnowledgeResolver.cs` |\n| Memory wiki page | `Data/Pages/memory.md` |",
   "Status": 2,
-  "Confidence": 0.95,
-  "Tags": ["agent", "wiki", "memorysmith", "rest-api", "gateway", "integration", "kind:reference", "audience:agent", "scope:memory"],
-  "References": ["agent-memorygateway-integration", "agent-architecture-bounded-contexts", "agent-blueprint-system"],
+  "Confidence": 0.96,
+  "Tags": [
+    "kind:reference",
+    "audience:agent",
+    "scope:memory"
+  ],
+  "References": [
+    "agent-memorygateway-integration",
+    "agent-architecture-bounded-contexts",
+    "agent-blueprint-system"
+  ],
   "Conflicts": [],
   "SourceLinks": [
-    { "Label": "RestMemoryGateway.cs", "Uri": "%RepoRoot%Agent.Memory/RestMemoryGateway.cs" },
-    { "Label": "RestMemoryGatewayOptions.cs", "Uri": "%RepoRoot%Agent.Memory/RestMemoryGatewayOptions.cs" },
-    { "Label": "LocalKnowledgeResolver.cs", "Uri": "%RepoRoot%Agent.Memory/LocalKnowledgeResolver.cs" },
-    { "Label": "Memory wiki page", "Uri": "%RepoRoot%Data/Pages/memory.md" },
-    { "Label": "World KB guide", "Uri": "%RepoRoot%Data/Pages/guides/world-kb.md" }
+    {
+      "Label": "RestMemoryGateway.cs",
+      "Uri": "%RepoRoot%Agent.Memory/RestMemoryGateway.cs",
+      "StartLine": 1,
+      "EndLine": 200
+    },
+    {
+      "Label": "RestMemoryGatewayOptions.cs",
+      "Uri": "%RepoRoot%Agent.Memory/RestMemoryGatewayOptions.cs",
+      "StartLine": 1,
+      "EndLine": 60
+    },
+    {
+      "Label": "MemorySmithItemRegistry.cs",
+      "Uri": "%RepoRoot%Agent.Memory/MemorySmithItemRegistry.cs",
+      "StartLine": 1,
+      "EndLine": 200
+    },
+    {
+      "Label": "MemorySmithBlueprintRepository.cs",
+      "Uri": "%RepoRoot%Agent.Memory/MemorySmithBlueprintRepository.cs",
+      "StartLine": 1,
+      "EndLine": 200
+    },
+    {
+      "Label": "LocalKnowledgeResolver.cs",
+      "Uri": "%RepoRoot%Agent.Memory/LocalKnowledgeResolver.cs",
+      "StartLine": 1,
+      "EndLine": 100
+    },
+    {
+      "Label": "Memory wiki page",
+      "Uri": "%RepoRoot%Data/Pages/memory.md",
+      "StartLine": null,
+      "EndLine": null
+    }
   ],
   "UsageCount": 0,
-  "LastUpdated": "2026-06-23T00:00:00Z"
+  "LastUpdated": "2026-07-10T00:00:00Z"
 }
