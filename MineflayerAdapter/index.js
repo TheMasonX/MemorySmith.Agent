@@ -1834,6 +1834,10 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       break;
 
     case 'craft': {
+      if (_stopRequested) {
+        sendEvent('craftAborted', { item: args.item, correlationId: args.correlationId });
+        break;
+      }
       const { item: itemName, count = 1, tableSearchRadius = C.CRAFT_TABLE_SEARCH_RADIUS } = args;
       if (!itemName) throw new Error('craft requires item');
 
@@ -1877,6 +1881,10 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
     }
 
     case 'smelt': {
+      if (_stopRequested) {
+        sendEvent('smeltAborted', { item: args.item, correlationId: args.correlationId });
+        break;
+      }
       const { item: inputName, count = 1, fuel = 'coal' } = args;
       if (!inputName) throw new Error('smelt requires item');
 

@@ -1,0 +1,39 @@
+{
+  "id": "tsk-0410-improve-adapter-error-handling-and-correlation",
+  "key": "TSK-0410",
+  "title": "Improve adapter error handling and correlation",
+  "description": "**Source:** 2026-07-10 council audit; migrated from MemorySmith repo TSK-3074\n\nReplace empty catches, ensure correlationId propagation across MineflayerAdapter and WebSocket bridge, and add host-facing bridge failure events. Add tests.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:mineflayer",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-msa-0410-001",
+      "author": "anonymous",
+      "body": "Migrated from MemorySmith TSK-3074. Created from 2026-07-10 council audit; see Data/Pages/audits/codebase-audit-2026-07-10-council-review.md",
+      "createdAtUtc": "2026-07-11T07:00:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T07:00:00Z",
+  "updatedAtUtc": "2026-07-11T07:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

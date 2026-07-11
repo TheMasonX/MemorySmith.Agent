@@ -4,7 +4,7 @@
   "title": "Add _stopRequested check to craft and smelt action handlers",
   "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 AG-005\n\nThe \u0060craft\u0060 and \u0060smelt\u0060 action cases in \u0060MineflayerAdapter/index.js\u0060 do not check \u0060_stopRequested\u0060. \u0060handleStop()\u0060 clears \u0060cmdQueue\u0060 and cancels pathfinder, but if a craft or smelt operation is in progress, it continues to completion. The bot cannot abort a craft or smelt operation.\n\n**Impact:** If the agent is in danger (e.g., hostile mob approaching) and sends a stop command, the bot will finish crafting/smelting before reacting. For long smelt operations (up to 40s), this is a significant delay.\n\n**Recommendation:** Check \u0060_stopRequested\u0060 before starting new craft/smelt operations.",
   "type": "Bug",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -18,14 +18,20 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-0406-1",
+      "author": "AgentSmith",
+      "body": "Implemented _stopRequested checks at the start of both 'craft' and 'smelt' action cases in MineflayerAdapter/index.js. If _stopRequested is true, the handler sends craftAborted/smeltAborted event and breaks instead of proceeding. Validated: dotnet build succeeds, 822 tests pass, 0 failures. Evidence: MineflayerAdapter/index.js lines 1839-1843 (craft) and 1883-1887 (smelt)."
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T06:51:30.8771195Z",
-  "updatedAtUtc": "2026-07-11T06:51:30.8771195Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-11T07:30:00Z",
+  "completedAtUtc": "2026-07-11T07:30:00Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,

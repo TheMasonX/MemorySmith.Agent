@@ -410,6 +410,10 @@ if (agentEnabled)
 
     builder.Services.AddSingleton<AgentBackgroundService>(sp =>
     {
+        // Sprint 60 (TSK-0134): wrap factory in try/catch so missing DI registrations
+        // produce a clear error message instead of a silent startup failure.
+        try
+        {
         var cfg = sp.GetRequiredService<IOptions<MinecraftAdapterConfig>>().Value;
         return new AgentBackgroundService(
             sp.GetRequiredService<IWorldAdapter>(),
@@ -439,6 +443,13 @@ if (agentEnabled)
             chatMaxResponseLength:    chatOpts.ChatMaxResponseLength,
             // Sprint 56 (TSK-0286): configurable denied commands.
             safetyOptions:            sp.GetRequiredService<IOptions<SafetyOptions>>());
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.Error.WriteLine($"[FATAL] AgentBackgroundService DI resolution failed: {ex.Message}");
+            Console.Error.WriteLine($"  This usually means a required service is not registered in DI.");
+            throw; // Crash-fast — agent cannot function without its dependencies.
+        }
     });
     builder.Services.AddHostedService(sp => sp.GetRequiredService<AgentBackgroundService>());
 }
@@ -529,6 +540,33 @@ if (agentEnabled)
         safetyCfg.AllowDestructiveCommands, deniedList);
 }
 
+// Sprint 60 (TSK-0134): Health check endpoint.
+// Reports agent and DI registration health without antiforgery requirements.
+app.MapGet("/health", (IServiceProvider sp) =>
+{
+    // Check if the core agent service can be resolved.
+    var agentHealthy = false;
+    var agentError = (string?)null;
+    try
+    {
+        using var scope = sp.CreateScope();
+        var agent = scope.ServiceProvider.GetService<AgentBackgroundService>();
+        agentHealthy = agent is not null;
+    }
+    catch (Exception ex)
+    {
+        agentError = ex.Message;
+    }
+
+    return Results.Ok(new
+    {
+        status    = agentHealthy ? "healthy" : "degraded",
+        agent     = agentHealthy ? "resolved" : "unresolved",
+        agentError,
+        timestamp = DateTimeOffset.UtcNow,
+    });
+});
+
 // Sprint 60 (TSK-0350): Global antiforgery middleware chain.
 //
 // 1. UseAntiforgery() — sets IAntiforgeryValidationFeature on requests. Does NOT
@@ -583,7 +621,7 @@ app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new
     RegisteredGoals = factory?.RegisteredGoals ?? [],
 }));
 
-app.MapGet("/api/agent/status", (AgentBackgroundService? agent, IWorldModel? worldModel) =>
+app.MapGet("/api/agent/status", (AgentBackgroundService? agent, IWorldModel? worldModel, ILogger<Program> logger) =>
 {
     var currentAction = agent?.GetCurrentAction();
     var facts = agent?.WorldState.Facts;
@@ -598,7 +636,7 @@ app.MapGet("/api/agent/status", (AgentBackgroundService? agent, IWorldModel? wor
             if (parsed is { Length: > 0 })
                 entities = parsed;
         }
-        catch { /* best-effort parse */ }
+        catch (Exception ex) { logger.LogWarning(ex, "Failed to parse nearbyEntitiesRaw in /api/agent/status."); }
     }
 
     string? blockBelow = facts?.TryGetValue("blockBelow", out var bb) == true && bb is string bbs

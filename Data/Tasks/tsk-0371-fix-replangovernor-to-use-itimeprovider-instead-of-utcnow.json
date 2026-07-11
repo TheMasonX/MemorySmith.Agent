@@ -24,15 +24,21 @@
       "author": "anonymous",
       "body": "**Scope expanded by internal audit Sprint 60 (2026-07-11):** The ITimeProvider gap is wider than originally scoped. The merged finding (P1-001) now includes: (1) ReplanGovernor \u2014 3 UtcNow instances, (2) WorldState.IsInventoryFresh \u2014 Sprint 60 regression, (3) WorldModel \u2014 4 UtcNow instances in constructor/Observe/ApplyOutcome, (4) ActionOutcome \u2014 all 7 factory methods. See TSK-0394 for the batch implementation task that supersedes this scope.",
       "createdAtUtc": "2026-07-11T06:52:10.2596277Z"
+    },
+    {
+      "id": "c-2f1e16ef05d54ab9bf01cc87727dc544",
+      "author": "anonymous",
+      "body": "Scope superseded by TSK-0394 (Done). The batch ITimeProvider injection covers ReplanGovernor, WorldState, WorldModel, and ActionOutcome. ReplanGovernor now accepts ITimeProvider? with SystemTimeProvider.Instance default. Recommend closing TSK-0371 as superseded.",
+      "createdAtUtc": "2026-07-11T07:06:13.1546139Z"
     }
   ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T05:19:54.4471319Z",
-  "updatedAtUtc": "2026-07-11T06:52:10.2596277Z",
+  "updatedAtUtc": "2026-07-11T07:06:13.1546139Z",
   "completedAtUtc": null,
-  "revision": 2,
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,

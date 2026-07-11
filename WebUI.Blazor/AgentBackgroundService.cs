@@ -610,6 +610,8 @@ public sealed class AgentBackgroundService(
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        logger.LogInformation("AgentBackgroundService starting (ExecuteAsync entry).");
+
         for (int attempt = 0; attempt < MaxConnectionAttempts; attempt++)
         {
             if (stoppingToken.IsCancellationRequested) return;
@@ -681,7 +683,7 @@ public sealed class AgentBackgroundService(
             {
                 connectionCts.Cancel();
                 try { await worldAdapter.DisconnectAsync(CancellationToken.None); }
-                catch { /* best-effort cleanup */ }
+                catch (Exception ex) { logger.LogWarning(ex, "Best-effort disconnect cleanup failed."); }
             }
         }
 
@@ -1638,7 +1640,7 @@ public sealed class AgentBackgroundService(
                             });
                         }
                     }
-                    catch { /* best-effort; fall through to player pos */ }
+                    catch (Exception ex) { logger.LogWarning(ex, "Failed to parse named location from chat; falling through to player pos."); }
                 }
 
                 // Fallback: navigate to player position ("come here" pattern)
@@ -3677,7 +3679,7 @@ public sealed class AgentBackgroundService(
                     if (parsed is { Length: > 0 })
                         entities = parsed;
                 }
-                catch { /* best-effort parse */ }
+                catch (Exception ex) { logger.LogWarning(ex, "Failed to parse nearbyEntitiesRaw for dashboard status."); }
             }
 
             // Sprint 55 Wave C: block below feet.
@@ -3704,7 +3706,7 @@ public sealed class AgentBackgroundService(
         }
         catch (Exception ex)
         {
-            logger.LogDebug(ex, "SignalR status push failed (best-effort).");
+            logger.LogWarning(ex, "SignalR status push failed (best-effort).");
         }
     }
 
@@ -3718,7 +3720,7 @@ public sealed class AgentBackgroundService(
         }
         catch (Exception ex)
         {
-            logger.LogDebug(ex, "SignalR chat push failed (best-effort).");
+            logger.LogWarning(ex, "SignalR chat push failed (best-effort).");
         }
     }
 
@@ -3735,7 +3737,7 @@ public sealed class AgentBackgroundService(
         }
         catch (Exception ex)
         {
-            logger.LogDebug(ex, "SignalR goal push failed (best-effort).");
+            logger.LogWarning(ex, "SignalR goal push failed (best-effort).");
         }
     }
 
@@ -3931,6 +3933,8 @@ public sealed class AgentBackgroundService(
     // Sprint 25 P0-D: log abandoned PendingActions on shutdown.
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
+        logger.LogInformation("AgentBackgroundService stopping (StopAsync entry).");
+
         var abandoned = _correlatedActions.Values
             .Where(pa => pa.State == ActionLifecycle.Dispatched)
             .ToList();

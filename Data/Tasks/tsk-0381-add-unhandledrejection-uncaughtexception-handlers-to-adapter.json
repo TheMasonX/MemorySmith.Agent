@@ -1,10 +1,10 @@
-﻿{
+{
   "id": "tsk-0381-add-unhandledrejection-uncaughtexception-handlers-to-adapter",
   "key": "TSK-0381",
   "title": "Add unhandledRejection/uncaughtException handlers to adapter",
-  "description": "P0 from 10-agent audit (escalated by council). MineflayerAdapter/index.js has no process.on(\u0027unhandledRejection\u0027) or process.on(\u0027uncaughtException\u0027) handlers. In Node.js 22\u002B, unhandled rejections terminate the process. Any unhandled promise rejection kills the adapter without cleanup, triggering unnecessary C# reconnect. Add handlers that log and attempt clean shutdown. Source: codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md (P0-003).",
+  "description": "P0 from 10-agent audit (escalated by council). MineflayerAdapter/index.js has no process.on('unhandledRejection') or process.on('uncaughtException') handlers. In Node.js 22+, unhandled rejections terminate the process. Any unhandled promise rejection kills the adapter without cleanup, triggering unnecessary C# reconnect. Add handlers that log and attempt clean shutdown. Source: codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md (P0-003).",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Archived",
   "priority": "Critical",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -18,14 +18,20 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "body": "Duplicate of TSK-0388 which is already Done. TSK-0388 implemented unhandledRejection/uncaughtException handlers in commit e1f1a34. Archiving this copy.",
+      "author": "AgentSmith",
+      "id": "c-0381-1"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T06:23:57.2927256Z",
-  "updatedAtUtc": "2026-07-11T06:23:57.2927256Z",
+  "updatedAtUtc": "2026-07-11T07:30:00Z",
   "completedAtUtc": null,
-  "revision": 1,
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,

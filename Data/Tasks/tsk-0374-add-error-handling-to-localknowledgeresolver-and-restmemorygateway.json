@@ -24,15 +24,21 @@
       "author": "anonymous",
       "body": "**Scope expanded by internal audit Sprint 60 (2026-07-11):** Additional error handling gaps found beyond the original scope: (1) GetPageAsync has no transport-level error handling for DNS/TLS failures, (2) UpdatePageAsync both PUT branches have no try/catch, (3) CreatePageAsync silently ignores the \u0060type\u0060 parameter from the interface. See TSK-0401 for the combined fix task.",
       "createdAtUtc": "2026-07-11T06:52:10.318046Z"
+    },
+    {
+      "id": "c-9679c20ebc4c4a159f5d2a91f9b177ec",
+      "author": "anonymous",
+      "body": "Partial scope covered by TSK-0401 (Backlog). The CreatePageAsync GetPageAsync transport-level error handling and UpdatePageAsync error handling remain. The LocalKnowledgeResolver and CreatePageAsync error handling from the original scope are still pending.",
+      "createdAtUtc": "2026-07-11T07:06:13.2059929Z"
     }
   ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T06:23:43.853285Z",
-  "updatedAtUtc": "2026-07-11T06:52:10.318046Z",
+  "updatedAtUtc": "2026-07-11T07:06:13.2059929Z",
   "completedAtUtc": null,
-  "revision": 2,
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,

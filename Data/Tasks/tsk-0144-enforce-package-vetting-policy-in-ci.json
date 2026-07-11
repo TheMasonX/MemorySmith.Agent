@@ -1,9 +1,19 @@
 {
   "id": "tsk-0144-enforce-package-vetting-policy-in-ci",
   "title": "Enforce package vetting policy in CI and audit existing dependencies",
-  "status": "Ready",
+  "status": "Done",
   "priority": "Critical",
   "type": "Task",
+  "comments": [
+    {
+      "id": "c-0144-1",
+      "author": "AgentSmith",
+      "body": "Implemented: (1) Created Scripts/Invoke-PackageVetting.ps1 that checks P-3 (vulnerable packages), P-4 (deprecated packages), and runs Verify-AboutDeps for P-2. (2) Added CI steps to .github/workflows/ci.yml for package vetting and About page verification. Validated: dotnet build succeeds, 822 tests pass, task records valid, script runs successfully."
+    }
+  ],
+  "updatedAtUtc": "2026-07-11T07:30:00Z",
+  "completedAtUtc": "2026-07-11T07:30:00Z",
+  "revision": 2,
   "description": "Implement automated enforcement of the package vetting policy (Data/Pages/policies/package-vetting.md):\n\n1. Add a CI step that runs `dotnet list package --vulnerable` and fails the build if any vulnerabilities are found (treat warnings as errors for NU1903+).\n2. Add a CI step that checks for deprecated packages (`dotnet list package --deprecated`).\n3. Add a pre-commit or build-time check that verifies the About page (WebUI.Blazor/wwwroot/about.html) lists every top-level package from the solution.\n4. Document the CI enforcement in the policy page.\n\nAcceptance: CI goes red if a vulnerable/deprecated package is added or if the About page is out of sync.",
   "linkedPages": ["policies/package-vetting"],
   "labels": [

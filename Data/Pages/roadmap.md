@@ -98,7 +98,7 @@ Environment queries (QueryBlocksTool, QueryEntitiesTool), WorldStateDiff, ILlmEv
 
 | Version | Sprint | Tests | Status |
 |---------|--------|-------|--------|
-| v0.60.0 | 60 | 815 | ✅ green (Wave A+B) |
+| v0.60.0 | 60 | 822 | ✅ green (Wave A+B+D/E partial) |
 | v0.56.0 | 56–58 | 815+ | ✅ green |
 | v0.55.0 | 55 | 746 | ✅ green |
 | v0.51.1 | 51 | 742 | ✅ green |
@@ -147,7 +147,7 @@ Environment queries (QueryBlocksTool, QueryEntitiesTool), WorldStateDiff, ILlmEv
 | TSK-0326–0329 | P2 | Goal-identity guard, SafetyConfig runtime normalization, log levels, SignalR event name drift | ✅ Done |
 
 ### Sprint 60 — Architectural Stability & Legacy Cleanup 🎯 **CURRENT**
-**Status:** 🟢 Wave B complete | **Theme:** Remove legacy fallback paths, reduce tech debt surface, harden core pipelines
+**Status:** 🟢 Wave D/E/F partial complete | **Theme:** Remove legacy fallback paths, reduce tech debt surface, harden core pipelines
 
 This sprint focuses on architectural stability — removing deprecated/legacy fallbacks, refactoring fragile subsystems, and cleaning up tech debt accumulated across 50+ sprints.
 
@@ -156,9 +156,11 @@ This sprint focuses on architectural stability — removing deprecated/legacy fa
 | A | **Legacy Fallback Removal** | TSK-0293 (remove legacy planning/runtime shims), TSK-0284 (migrate Facts writers to StructuredFacts), TSK-0082 (extract shared SmeltableMapping), TSK-0118 (remove dead ChatInterpreter regex fields) | **High** | ✅ Complete |
 | B | **Core Pipeline Hardening** | TSK-0322 (ExecutionManager JSON round-trip — P0), TSK-0345 (replan flooding fix), TSK-0348 (WorldModel inventory/ActionOutcome wiring) | **Critical** | ✅ Complete |
 | C | **Audit Synthesis Tasks** | TSK-0346 (adapter goto timeout gap), TSK-0347 (restore search scoring), TSK-0349 (rotate secrets + secret scanning), TSK-0350 (global antiforgery filter) | **High** | ✅ Complete |
-| D | **Inventory SSOT + BlockState** | TSK-0302 (inventory SSOT refactor — event-sourced, remove IsInventoryStale), TSK-0245 (assess BlockState type change impact) | **Critical** | 🔵 Planned |
-| E | **Ready Backlog Cleanup** | TSK-0144 (CI package vetting), TSK-0145 (CI Verify-AboutDeps), TSK-0134 (DI startup logging), TSK-0133 (replan param preservation), TSK-0132 (page search score fix), TSK-0271 (build dispatch sequencing) | High | 🔵 Planned |
-| F | **Post-Wave-C Audit Fixes (NEW)** | **Critical:** TSK-0380 (sendEvent crash guard), TSK-0381 (crash guard handlers), TSK-0382 (pipe buffer hang), TSK-0383 (LLM prompt injection), TSK-0387 (sendEvent crash guard — Node), TSK-0388 (unhandledRejection handlers), TSK-0389 (pipe buffer hang — C# side), TSK-0390 (prompt injection guard), TSK-0391 (creativeProvider ESM/CJS regression). **High:** TSK-0361 (_ws data race), TSK-0362 (double-connect), TSK-0363 (CI vuln scan), TSK-0366 (playerCollect), TSK-0367 (listener leak), TSK-0368 (HTTPS redirect), TSK-0370 (MaxTokens), TSK-0371 (ITimeProvider), TSK-0384 (BuildGoal.Id), TSK-0385 (entity prompt dup), TSK-0386 (rate limiting), TSK-0392 (ToolResult Success/Outcome), TSK-0393 (ActionData mutable dicts), TSK-0394 (ITimeProvider batch), TSK-0395 (BlockBelowChangedEvent wiring), TSK-0396 (5 JS events ParseEvent), TSK-0397 (GatherItemDecompose over-mining), TSK-0398 (MineWoodDecompose over-mining), TSK-0399 (Gemini API key header), TSK-0400 (MaxTokens config), TSK-0401 (memory gateway error handling), TSK-0402 (ABS silent catches), TSK-0403 (SignalR log level), TSK-0404 (DashboardPublisherImpl), TSK-0405 (goto timeout 9+ calls), TSK-0406 (craft/smelt stop), TSK-0407 (BuildGoal.Id), TSK-0408 (cmdQueue rate limit) | **Critical/High** | 🔵 Ready |
+| D | **Inventory SSOT + BlockState** | TSK-0302 (inventory SSOT refactor — event-sourced, remove IsInventoryStale), TSK-0245 (assess BlockState type change impact) | **Critical** | ✅ Complete |
+| D | **High-ROI Safe Fixes (Wave 1)** | TSK-0406 (craft/smelt stop), TSK-0402 (ABS silent catches), TSK-0403 (SignalR log level), TSK-0134 (DI startup logging), TSK-0144 (CI package vetting), TSK-0145 (CI Verify-AboutDeps) | **High/Critical** | ✅ Complete |
+| E | **Ready Backlog Cleanup** | TSK-0133 (replan param preservation), TSK-0132 (page search score fix), TSK-0271 (build dispatch sequencing), TSK-0293 (remove legacy shims) | High | 🔵 Planned |
+| F | **Post-Wave-C Audit Fixes (Remaining)** | **Critical:** TSK-0383/0390 (LLM prompt injection). **High:** TSK-0392 (ToolResult Success/Outcome), TSK-0393 (ActionData mutable dicts), TSK-0396 (5 JS events ParseEvent), TSK-0397/0398 (over-mining fixes), TSK-0400 (MaxTokens config), TSK-0401 (memory gateway error handling), TSK-0404 (DashboardPublisherImpl), TSK-0405 (goto timeout 9+ calls), TSK-0407/0408 (rate limiting) | **Critical/High** | 🔵 Ready |
+| Note | **Duplicates resolved** | TSK-0380/0387 (sendEvent crash), TSK-0381/0388 (unhandledRejection), TSK-0382/0389 (pipe buffer), TSK-0384/0407 (BuildGoal.Id), TSK-0386/0408 (rate limiting) — keep Done copies, archive Backlog duplicates | — | ✅ |
 
 ---
 

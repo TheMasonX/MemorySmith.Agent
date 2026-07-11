@@ -4,7 +4,7 @@
   "title": "Fix sendEvent crash \u2014 add try/catch to WebSocket send in adapter",
   "description": "P0 from 10-agent audit (escalated by council). sendEvent() in MineflayerAdapter/index.js ~122 has no try/catch around agentSocket.send(). A transient WebSocket error during any event handler (move, health, death, etc.) terminates the Node.js process. Wrap send() in try/catch with structured logging. Source: codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md (P0-002).",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Archived",
   "priority": "Critical",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -18,15 +18,21 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-0380-1",
+      "author": "AgentSmith",
+      "body": "Duplicate of TSK-0387 which is already Done. TSK-0387 implemented the sendEvent try/catch guard in commit e1f1a34. Archiving this copy."
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T06:23:57.23756Z",
-  "updatedAtUtc": "2026-07-11T06:23:57.23756Z",
+  "updatedAtUtc": "2026-07-11T07:30:00Z",
   "completedAtUtc": null,
-  "revision": 1,
-  "isArchived": false,
+  "revision": 2,
+  "isArchived": true,
   "hasLoadError": false,
   "loadError": null,
   "sourceFilePath": null

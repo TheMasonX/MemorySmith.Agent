@@ -1,0 +1,39 @@
+{
+  "id": "tsk-0409-enforce-parser-planner-boundary",
+  "key": "TSK-0409",
+  "title": "Enforce parser→planner boundary",
+  "description": "**Source:** 2026-07-10 council audit; migrated from MemorySmith repo TSK-3068\n\nAdd invariant tests ensuring parsers never create goals; update Agent.Construction/BlueprintParser.cs to return diagnostics for unterminated frontmatter; add unit tests.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "domain:planning",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-msa-0409-001",
+      "author": "anonymous",
+      "body": "Migrated from MemorySmith TSK-3068. Created from 2026-07-10 council audit; see Data/Pages/audits/codebase-audit-2026-07-10-council-review.md",
+      "createdAtUtc": "2026-07-11T07:00:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T07:00:00Z",
+  "updatedAtUtc": "2026-07-11T07:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

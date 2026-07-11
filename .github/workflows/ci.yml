@@ -45,3 +45,11 @@ jobs:
       - name: Validate task records
         run: pwsh ./Scripts/Test-TaskRecords.ps1
         shell: pwsh
+
+      - name: Package vetting (P-3/P-4)
+        run: pwsh ./Scripts/Invoke-PackageVetting.ps1
+        shell: pwsh
+
+      - name: Verify About page dependency inventory (P-2)
+        run: pwsh ./Scripts/Verify-AboutDeps.ps1
+        shell: pwsh
