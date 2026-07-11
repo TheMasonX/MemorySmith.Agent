@@ -155,21 +155,24 @@ This sprint focuses on architectural stability — removing deprecated/legacy fa
 |:-----|:------|:------|:--------:|:------:|
 | A | **Legacy Fallback Removal** | TSK-0293 (remove legacy planning/runtime shims), TSK-0284 (migrate Facts writers to StructuredFacts), TSK-0082 (extract shared SmeltableMapping), TSK-0118 (remove dead ChatInterpreter regex fields) | **High** | ✅ Complete |
 | B | **Core Pipeline Hardening** | TSK-0322 (ExecutionManager JSON round-trip — P0), TSK-0345 (replan flooding fix), TSK-0348 (WorldModel inventory/ActionOutcome wiring) | **Critical** | ✅ Complete |
-| C | **Audit Synthesis Tasks** | TSK-0346 (adapter goto timeout gap), TSK-0347 (restore search scoring), TSK-0349 (rotate secrets + secret scanning), TSK-0350 (global antiforgery filter) | **High** | 🔵 Ready |
+| C | **Audit Synthesis Tasks** | TSK-0346 (adapter goto timeout gap), TSK-0347 (restore search scoring), TSK-0349 (rotate secrets + secret scanning), TSK-0350 (global antiforgery filter) | **High** | ✅ Complete |
 | D | **Inventory SSOT + BlockState** | TSK-0302 (inventory SSOT refactor — event-sourced, remove IsInventoryStale), TSK-0245 (assess BlockState type change impact) | **Critical** | 🔵 Planned |
 | E | **Ready Backlog Cleanup** | TSK-0144 (CI package vetting), TSK-0145 (CI Verify-AboutDeps), TSK-0134 (DI startup logging), TSK-0133 (replan param preservation), TSK-0132 (page search score fix), TSK-0271 (build dispatch sequencing) | High | 🔵 Planned |
+| F | **Post-Wave-C Audit Fixes (NEW)** | **Critical:** TSK-0380 (sendEvent crash guard), TSK-0381 (crash guard handlers), TSK-0382 (pipe buffer hang), TSK-0383 (LLM prompt injection), TSK-0387 (sendEvent crash guard — Node), TSK-0388 (unhandledRejection handlers), TSK-0389 (pipe buffer hang — C# side), TSK-0390 (prompt injection guard), TSK-0391 (creativeProvider ESM/CJS regression). **High:** TSK-0361 (_ws data race), TSK-0362 (double-connect), TSK-0363 (CI vuln scan), TSK-0366 (playerCollect), TSK-0367 (listener leak), TSK-0368 (HTTPS redirect), TSK-0370 (MaxTokens), TSK-0371 (ITimeProvider), TSK-0384 (BuildGoal.Id), TSK-0385 (entity prompt dup), TSK-0386 (rate limiting), TSK-0392 (ToolResult Success/Outcome), TSK-0393 (ActionData mutable dicts), TSK-0394 (ITimeProvider batch), TSK-0395 (BlockBelowChangedEvent wiring), TSK-0396 (5 JS events ParseEvent), TSK-0397 (GatherItemDecompose over-mining), TSK-0398 (MineWoodDecompose over-mining), TSK-0399 (Gemini API key header), TSK-0400 (MaxTokens config), TSK-0401 (memory gateway error handling), TSK-0402 (ABS silent catches), TSK-0403 (SignalR log level), TSK-0404 (DashboardPublisherImpl), TSK-0405 (goto timeout 9+ calls), TSK-0406 (craft/smelt stop), TSK-0407 (BuildGoal.Id), TSK-0408 (cmdQueue rate limit) | **Critical/High** | 🔵 Ready |
 
 ---
 
-### Sprint 61 — Situational Awareness & Tool Expansion
-**Status:** 🔵 Planned | Theme: Entity pipeline, missing tools, durable memory
+### Sprint 61 — Situational Awareness, Tool Expansion & Audit Remediation
+**Status:** 🔵 Planned | Theme: Entity pipeline, missing tools, durable memory, post-audit remediation
 
 | Wave | Theme | Candidate Tasks |
 |:-----|:------|:----------------|
-| A | Entity Pipeline Wiring | TSK-0343 (EntityObservedEvent → StructuredFacts), TSK-0146/0147/0148 (entity observation, events, WorldState projection) |
-| B | Missing Tools | TSK-0311 (EquipItem, ActivateBlock, AttackEntity), TSK-0299 (player coords in LLM context) |
-| C | Adapter Hardening | TSK-0337 (WebSocketBridge reconnect retry), TSK-0339 (adapter reconnect backoff), TSK-0346 (goto timeout) |
-| D | Durable Memory Writer | TSK-0152/0153 (policy-based world KB writer for goals/landmarks/failures) |
+| A | **Entity Pipeline Wiring** | TSK-0343 (EntityObservedEvent → StructuredFacts), TSK-0146/0147/0148 (entity observation, events, WorldState projection) |
+| B | **Missing Tools** | TSK-0311 (EquipItem, ActivateBlock, AttackEntity), TSK-0299 (player coords in LLM context) |
+| C | **Adapter Hardening** | TSK-0337 (WebSocketBridge reconnect retry), TSK-0339 (adapter reconnect backoff), TSK-0364 (over-mining), TSK-0365 (HasFailed) |
+| D | **Runtime Decomposition Cleanup** | TSK-0369 (remove dead runtime decomposition — P0, S61 deferred), TSK-0292 (DashboardPublisherImpl cleanup), TSK-0374 (memory gateway error handling) |
+| E | **Test Infrastructure** | TSK-0379 (e2e integration test), TSK-0376 (WebSocketBridge tests), TSK-0191 (LLM provider tests) |
+| F | **Durable Memory Writer** | TSK-0152/0153 (policy-based world KB writer for goals/landmarks/failures) |
 
 ---
 

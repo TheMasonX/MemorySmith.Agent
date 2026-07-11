@@ -53,7 +53,7 @@ public sealed class HtnPlanner : IPlanner
     {
         var actions = new List<ActionData>();
 
-        if (goal is BuildGoal buildGoal)
+        if (goal is IBuildGoal buildGoal)
         {
             // TSK-0107: construct BuildOrigin from facts for the decomposer.
             // TSK-0116: removed IsCreativeMode branch — HtnTaskLibrary.DecomposeBuild
@@ -124,7 +124,7 @@ public sealed class HtnPlanner : IPlanner
         ["CraftItem:", "FindFlatArea:", "Build:", "MoveTo:"];
 
     private static IReadOnlyList<ActionData> CreateCreativeBuildActions(
-        BuildGoal buildGoal, WorldState state, int originX, int originY, int originZ)
+        IBuildGoal buildGoal, WorldState state, int originX, int originY, int originZ)
     {
         var actions = new List<ActionData>
         {

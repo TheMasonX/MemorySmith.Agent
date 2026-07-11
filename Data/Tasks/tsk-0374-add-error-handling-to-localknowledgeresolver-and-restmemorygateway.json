@@ -1,0 +1,40 @@
+﻿{
+  "id": "tsk-0374-add-error-handling-to-localknowledgeresolver-and-restmemorygateway",
+  "key": "TSK-0374",
+  "title": "Add error handling to LocalKnowledgeResolver and RestMemoryGateway",
+  "description": "LocalKnowledgeResolver calls SearchAsync without error handling (crash on transient HTTP failure). RestMemoryGateway.CreatePageAsync throws unhandled on HTTP failure; UpdatePageAsync PUT failure path silently propagates with no logging. Add try/catch matching MemorySmithBlueprintRepository pattern. Source: codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-61",
+    "domain:memory",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-75c433b9c07b4a5fb1735f7de7b3d786",
+      "author": "anonymous",
+      "body": "**Scope expanded by internal audit Sprint 60 (2026-07-11):** Additional error handling gaps found beyond the original scope: (1) GetPageAsync has no transport-level error handling for DNS/TLS failures, (2) UpdatePageAsync both PUT branches have no try/catch, (3) CreatePageAsync silently ignores the \u0060type\u0060 parameter from the interface. See TSK-0401 for the combined fix task.",
+      "createdAtUtc": "2026-07-11T06:52:10.318046Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:23:43.853285Z",
+  "updatedAtUtc": "2026-07-11T06:52:10.318046Z",
+  "completedAtUtc": null,
+  "revision": 2,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0374-add-error-handling-to-localknowledgeresolver-and-restmemorygateway.json"
+}

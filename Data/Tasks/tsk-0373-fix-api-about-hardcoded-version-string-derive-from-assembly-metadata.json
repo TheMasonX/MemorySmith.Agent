@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0373-fix-api-about-hardcoded-version-string-derive-from-assembly-metadata",
+  "key": "TSK-0373",
+  "title": "Fix /api/about hardcoded version string \u2014 derive from assembly metadata",
+  "description": "The /api/about REST endpoint (Program.cs ~578) hardcodes Version = \u00220.55.0\u0022 and Phase = \u0022Sprint 55\u0022. The startup log correctly derives version from FileVersionInfo (Wave A fix), but the API endpoint was missed. Source: codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md (P3-004). Replace hardcoded string with AssemblyInformationalVersion-based derivation, update index.html badge to read from API.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:webui",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:23:43.7896364Z",
+  "updatedAtUtc": "2026-07-11T06:23:43.7896364Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

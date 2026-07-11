@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0400-fix-cloud-providers-to-respect-llmmaxresponsetokens-config",
+  "key": "TSK-0400",
+  "title": "Fix cloud providers to respect LlmMaxResponseTokens config",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 MSA-LLM-003\n\n\u0060AnthropicProvider.cs\u0060 (line ~47) and \u0060OpenAICompatibleProvider.cs\u0060 (line ~65) hardcode \u0060MaxTokens = 512\u0060, ignoring \u0060options.LlmMaxResponseTokens\u0060 (default 300). \u0060GeminiProvider.cs\u0060 has no max-token parameter at all \u2014 responses are unbounded.\n\n**Recommendation:** Apply the \u0060OllamaProvider\u0060 pattern to all providers: use \u0060options.LlmMaxResponseTokens \u003E 0 ? options.LlmMaxResponseTokens : 512\u0060 for Anthropic and OpenAI, and add \u0060generationConfig\u0060 with \u0060maxOutputTokens\u0060 to Gemini.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:llm",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:51:30.5199505Z",
+  "updatedAtUtc": "2026-07-11T06:51:30.5199505Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

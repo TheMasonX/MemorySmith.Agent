@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0396-add-5-js-emitted-event-handlers-to-websocketbridge-parseevent",
+  "key": "TSK-0396",
+  "title": "Add 5 JS-emitted event handlers to WebSocketBridge ParseEvent",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 MSA-ADAPT-003/004\n\nFive events emitted by \u0060MineflayerAdapter/index.js\u0060 have no C# ParseEvent handler in \u0060WebSocketBridge.cs\u0060:\n- \u0060disconnected\u0060 \u2014 no C# event type exists\n- \u0060reconnected\u0060 \u2014 no C# event type exists\n- \u0060blockBelowChanged\u0060 \u2014 event type exists but no parse entry\n- \u0060blockMineSkipped\u0060 \u2014 no C# event type exists\n- \u0060creativeProvisionComplete\u0060 \u2014 no C# event type exists\n\nAll five fall through to \u0060_ =\u003E null\u0060 and are silently discarded.\n\n**Recommendation:** Create typed C# event records for the missing event types (DisconnectedEvent, ReconnectedEvent, BlockMineSkippedEvent, CreativeProvisionCompleteEvent). Add parse entries. Update WorldStateProjector if needed.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:minecraft-adapter",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:51:06.2581095Z",
+  "updatedAtUtc": "2026-07-11T06:51:06.2581095Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

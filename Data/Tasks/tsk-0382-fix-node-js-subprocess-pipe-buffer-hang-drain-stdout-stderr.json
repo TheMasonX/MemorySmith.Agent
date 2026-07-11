@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0382-fix-node-js-subprocess-pipe-buffer-hang-drain-stdout-stderr",
+  "key": "TSK-0382",
+  "title": "Fix Node.js subprocess pipe buffer hang \u2014 drain stdout/stderr",
+  "description": "P0 from 10-agent audit (escalated by council). MinecraftAdapter.StartNodeProcessAsync sets RedirectStandardOutput=true and RedirectStandardError=true but has no background read loop. When pipe buffers fill (4KB Windows, 64KB Linux), the Node.js process blocks on write(2) indefinitely. Bot becomes completely unresponsive. Fix: add background ReadToEndAsync tasks or set RedirectStandardOutput=false. Source: codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md (P0-004).",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:adapter",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:23:57.3384251Z",
+  "updatedAtUtc": "2026-07-11T06:23:57.3384251Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

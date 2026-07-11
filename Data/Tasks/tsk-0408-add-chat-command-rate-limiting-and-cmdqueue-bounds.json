@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0408-add-chat-command-rate-limiting-and-cmdqueue-bounds",
+  "key": "TSK-0408",
+  "title": "Add chat command rate limiting and cmdQueue bounds",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 council finding P1-010\n\nThe \u0060cmdQueue\u0060 in \u0060MineflayerAdapter/index.js\u0060 is unbounded \u2014 a flood of commands can grow it without limit, leading to OOM. Additionally, there\u0027s no rate limiting on chat/command input to the adapter beyond the C#-side ChatRateLimiter (which only applies to LLM chat, not adapter commands).\n\n**Impact:** A compromised or misconfigured client can flood the agent with commands, exhausting the Minecraft adapter queue, causing OOM, or triggering anti-spam kicks from the Minecraft server.\n\n**Recommendation:** \n1. Add a maximum queue depth to \u0060cmdQueue\u0060 (e.g., 100 items) \u2014 reject new commands when the queue is full.\n2. Consider a per-endpoint rate limiter in the C# REST API for \u0060/api/agent/*\u0060 POST endpoints.\n3. Log a warning when rate limiting or queue bounds are hit.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:mineflayer",
+    "type:security"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:51:38.3022124Z",
+  "updatedAtUtc": "2026-07-11T06:51:38.3022124Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0402-fix-remaining-abs-silent-catch-blocks-add-logging-per-rule-e-3",
+  "key": "TSK-0402",
+  "title": "Fix remaining ABS silent catch blocks \u2014 add logging per Rule E-3",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 MSA-WEB-001/002\n\nThree silent \u0060catch { /* best-effort ... */ }\u0060 blocks remain in \u0060AgentBackgroundService.cs\u0060 with zero logging:\n- Line ~684: \u0060catch { /* best-effort cleanup */ }\u0060 in disconnect exhaustion path\n- Line ~1630: \u0060catch { /* best-effort; fall through to player pos */ }\u0060 in HandleChatEventAsync entity parsing\n- Line ~3659: \u0060catch { /* best-effort parse */ }\u0060 in PushStatusToDashboardAsync entity parsing\n\nAlso one in \u0060Program.cs\u0060 line ~601 for entity JSON parsing in \u0060/api/agent/status\u0060.\n\n**Recommendation:** Replace each with \u0060logger.LogWarning(ex, ...)\u0060 with contextual message per AGENTS.md Rule E-3.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:webui",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:51:30.6719852Z",
+  "updatedAtUtc": "2026-07-11T06:51:30.6719852Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0397-fix-gatheritemdecompose-over-mining-mine-single-source-block-with-fallback",
+  "key": "TSK-0397",
+  "title": "Fix GatherItemDecompose over-mining \u2014 mine single source block with fallback",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 MSA-PLAN-001\n\n\u0060GatherItemDecompose\u0060 in \u0060HtnTaskLibrary.cs\u0060 (~line 820) iterates ALL source blocks in \u0060spec.SourceBlocks\u0060 and emits a \u0060MineBlock\u0060 action for each, all with the full requested count. For \u0060OakLogSpec\u0060 (7 source blocks: oak, birch, spruce, dark_oak, jungle, acacia, cherry) with count=10, the plan contains 7 separate \u0060MineBlock\u0060 actions each targeting count=10 \u2014 up to 70 blocks mined for 10 requested.\n\n**Recommendation:** Mine only the first source block that has a \u0060BlockNotFound\u0060 fact absent (i.e., known to be present in the current biome). Fall through to additional variants only after the first returns \u0060BlockNotFound\u0060.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:planning",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:51:06.322993Z",
+  "updatedAtUtc": "2026-07-11T06:51:06.322993Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

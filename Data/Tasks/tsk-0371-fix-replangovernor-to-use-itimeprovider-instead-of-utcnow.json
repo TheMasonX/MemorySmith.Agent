@@ -18,16 +18,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-d8e601eda7a24adfb4b83883935c3e61",
+      "author": "anonymous",
+      "body": "**Scope expanded by internal audit Sprint 60 (2026-07-11):** The ITimeProvider gap is wider than originally scoped. The merged finding (P1-001) now includes: (1) ReplanGovernor \u2014 3 UtcNow instances, (2) WorldState.IsInventoryFresh \u2014 Sprint 60 regression, (3) WorldModel \u2014 4 UtcNow instances in constructor/Observe/ApplyOutcome, (4) ActionOutcome \u2014 all 7 factory methods. See TSK-0394 for the batch implementation task that supersedes this scope.",
+      "createdAtUtc": "2026-07-11T06:52:10.2596277Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T05:19:54.4471319Z",
-  "updatedAtUtc": "2026-07-11T05:19:54.4471319Z",
+  "updatedAtUtc": "2026-07-11T06:52:10.2596277Z",
   "completedAtUtc": null,
-  "revision": 1,
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0371-fix-replangovernor-to-use-itimeprovider-instead-of-utcnow.json"
 }

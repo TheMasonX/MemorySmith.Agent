@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0405-fix-goto-timeout-protection-for-remaining-9-unprotected-calls",
+  "key": "TSK-0405",
+  "title": "Fix goto() timeout protection for remaining 9\u002B unprotected calls",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 AG-004\n\nTSK-0346 (Wave C) wrapped the \u0060move\u0060 case\u0027s \u0060goto()\u0060 in try-catch with deterministic failure reporting. However, ~9 other \u0060goto()\u0060 calls in \u0060MineflayerAdapter/index.js\u0060 (mine loop, item pickup, place, wander, craft, smelt, step-aside) do NOT have the same treatment. Mineflayer\u0027s \u0060pathfinder.goto()\u0060 does not accept a timeout parameter \u2014 if the pathfinder gets stuck, \u0060goto()\u0060 can hang indefinitely.\n\n**Impact:** The \u0060move\u0060 case now handles timeouts gracefully, but other actions that use \u0060goto()\u0060 can block indefinitely.\n\n**Recommendation:** Add a timeout wrapper (e.g., \u0060Promise.race\u0060 with a configurable timeout) for all remaining unprotected \u0060goto()\u0060 calls, or implement a per-action timeout comparable to the \u0060move\u0060 case\u0027s try-catch pattern.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:mineflayer",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:51:30.8261669Z",
+  "updatedAtUtc": "2026-07-11T06:51:30.8261669Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

@@ -18,16 +18,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-67a17af870134dcd8ca926af1c272259",
+      "author": "anonymous",
+      "body": "**Council recalibration from internal audit Sprint 60 (2026-07-11):** Severity downgraded from P0 to P2. The AgentRuntime decomposition dead code is architectural debt, not an active crash/security risk. However, the scope is larger than originally estimated \u2014 it includes AgentRuntime \u002B DashboardPublisherImpl dead code \u002B 6 unused manager interfaces. See TSK-0404 for the DashboardPublisherImpl component.",
+      "createdAtUtc": "2026-07-11T06:52:10.4313926Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T05:19:54.2697199Z",
-  "updatedAtUtc": "2026-07-11T05:19:54.2697199Z",
+  "updatedAtUtc": "2026-07-11T06:52:10.4313926Z",
   "completedAtUtc": null,
-  "revision": 1,
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0369-remove-dead-runtime-decomposition-agent-runtime-stubs-di.json"
 }

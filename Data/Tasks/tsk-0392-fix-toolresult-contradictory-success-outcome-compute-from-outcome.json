@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0392-fix-toolresult-contradictory-success-outcome-compute-from-outcome",
+  "key": "TSK-0392",
+  "title": "Fix ToolResult contradictory Success/Outcome \u2014 compute from Outcome",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 MSA-CORE-001\n\n\u0060ToolResult\u0060 is a positional record with both \u0060bool Success\u0060 and \u0060OutcomeType Outcome\u0060. Both are independently settable, allowing contradictory states like \u0060new ToolResult(Success: false, Outcome: OutcomeType.Completed)\u0060.\n\n**Recommendation:** Remove the standalone \u0060Success\u0060 property from \u0060ToolResult\u0060 and compute it from \u0060Outcome\u0060, matching the pattern already used in \u0060ActionOutcome\u0060.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:core",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:51:05.9994082Z",
+  "updatedAtUtc": "2026-07-11T06:51:05.9994082Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

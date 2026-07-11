@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0384-add-buildgoal-id-property-for-outcome-correlation",
+  "key": "TSK-0384",
+  "title": "Add BuildGoal.Id property for outcome correlation",
+  "description": "P1 from 10-agent audit. BuildGoal does not override Guid Id \u2014 inherits Guid.Empty from IGoal. All other 6 goals have per-instance Id = Guid.NewGuid(). All ActionOutcome.GoalId for build-derived outcomes are Guid.Empty, breaking per-goal outcome correlation for the entire build pipeline. Add public Guid Id { get; } = Guid.NewGuid(); to BuildGoal. Source: codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md (P1-003).",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:planning",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:23:57.4329601Z",
+  "updatedAtUtc": "2026-07-11T06:23:57.4329601Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

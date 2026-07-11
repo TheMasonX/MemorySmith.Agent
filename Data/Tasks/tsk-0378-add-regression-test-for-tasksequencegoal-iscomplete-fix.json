@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0378-add-regression-test-for-tasksequencegoal-iscomplete-fix",
+  "key": "TSK-0378",
+  "title": "Add regression test for TaskSequenceGoal _isComplete fix",
+  "description": "Sprint 60 Wave A added _isComplete terminal flag to TaskSequenceGoal to prevent infinite loop. No unit test verifies the scenario: TryAdvance() returns false (last step) -\u003E IsComplete() returns true. A future refactor could silently reintroduce the infinite loop. Source: codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md (P3-011).",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "type:testing",
+    "domain:planning"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:23:44.0454579Z",
+  "updatedAtUtc": "2026-07-11T06:23:44.0454579Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0375-remove-stale-python-scripts-from-scripts-directory",
+  "key": "TSK-0375",
+  "title": "Remove stale Python scripts from Scripts/ directory",
+  "description": "6 one-shot Python scripts from Sprint 40-45 era remain in Scripts/: apply_htn_v2.py, edit_htntasklibrary.py, final_fix.py, final_fix2.py, Fix-CorruptedTasks.py, fix_syntax.py. All have hardcoded absolute paths and are not reusable. Delete them. Source: codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "type:cleanup",
+    "domain:infra"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:23:43.8993059Z",
+  "updatedAtUtc": "2026-07-11T06:23:43.8993059Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

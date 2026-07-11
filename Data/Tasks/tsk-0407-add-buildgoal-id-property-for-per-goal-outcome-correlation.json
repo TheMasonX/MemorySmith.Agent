@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0407-add-buildgoal-id-property-for-per-goal-outcome-correlation",
+  "key": "TSK-0407",
+  "title": "Add BuildGoal.Id property for per-goal outcome correlation",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 council finding P1-003\n\n\u0060BuildGoal\u0060 is missing an \u0060Id\u0060 property \u2014 all instances share \u0060Guid.Empty\u0060. This means per-goal outcome correlation for the build pipeline is broken. The \u0060ActionOutcome.GoalId\u0060 field always contains \u0060Guid.Empty\u0060 for build-related actions, making it impossible to correlate outcomes to specific build goals.\n\n**Recommendation:** Add a \u0060Guid Id { get; init; } = Guid.NewGuid()\u0060 property to \u0060BuildGoal\u0060, matching the pattern used by other goal types.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:planning",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:51:30.9271577Z",
+  "updatedAtUtc": "2026-07-11T06:51:30.9271577Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

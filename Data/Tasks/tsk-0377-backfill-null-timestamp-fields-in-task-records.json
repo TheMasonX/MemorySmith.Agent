@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0377-backfill-null-timestamp-fields-in-task-records",
+  "key": "TSK-0377",
+  "title": "Backfill null timestamp fields in task records",
+  "description": "42 task records have null createdAtUtc or updatedAtUtc fields. Run the normalization/backfill script to set these to reasonable defaults. Source: codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "type:cleanup",
+    "domain:infra"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:23:43.9928906Z",
+  "updatedAtUtc": "2026-07-11T06:23:43.9928906Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

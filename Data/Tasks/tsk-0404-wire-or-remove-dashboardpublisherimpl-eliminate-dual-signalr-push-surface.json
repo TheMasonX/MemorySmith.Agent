@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0404-wire-or-remove-dashboardpublisherimpl-eliminate-dual-signalr-push-surface",
+  "key": "TSK-0404",
+  "title": "Wire or remove DashboardPublisherImpl \u2014 eliminate dual SignalR push surface",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 MSA-MGR-001\n\n\u0060DashboardPublisherImpl\u0060 is registered in DI and composed into \u0060AgentRuntime\u0060, but none of its methods are ever called. ABS directly calls its own \u0060PushStatusToDashboardAsync\u0060, \u0060PushChatToDashboardAsync\u0060, and \u0060PushGoalToDashboardAsync\u0060 \u2014 duplicating the same SignalR push logic. \u0060QueuedActions\u0060 is hardcoded to 0, \u0060_nearbyEntities\u0060 and \u0060_blockBelow\u0060 are always null.\n\n**Impact:** Dead code creating maintenance burden \u2014 two SignalR push paths to maintain, \u0060AgentRuntime\u0060 registration is misleading.\n\n**Recommendation:** Either delete \u0060DashboardPublisherImpl\u0060 and the \u0060IDashboardPublisher\u0060/\u0060AgentRuntime\u0060 registrations, or refactor ABS to delegate dashboard pushes to \u0060DashboardPublisherImpl\u0060 through \u0060AgentRuntime\u0060. The latter is the Sprint 39/40 decomposition plan.",
+  "type": "Refactor",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:webui",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:51:30.7733666Z",
+  "updatedAtUtc": "2026-07-11T06:51:30.7733666Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

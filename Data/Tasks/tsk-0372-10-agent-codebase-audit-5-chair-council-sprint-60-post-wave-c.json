@@ -1,0 +1,41 @@
+﻿{
+  "id": "tsk-0372-10-agent-codebase-audit-5-chair-council-sprint-60-post-wave-c",
+  "key": "TSK-0372",
+  "title": "10-Agent Codebase Audit \u002B 5-Chair Council \u2014 Sprint 60 Post-Wave-C",
+  "description": "Full 10-agent homogeneous swarm codebase audit of MemorySmith.Agent (post-Wave-C, commit f350daf) followed by a 5-chair heterogeneous council peer review. Covers all 10 layers: Agent.Core Models/Events/Runtime, Agent.Planning Goals/Planner/LLM, Agent.Tools, Agent.World.Minecraft, WebUI.Blazor, MineflayerAdapter, Tests/Scripts/Config. Synthesize findings, create tasks for uncovered issues, update roadmap.",
+  "type": "Audit",
+  "status": "Done",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:audit",
+    "type:codebase-audit",
+    "type:council-review"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [
+    {
+      "id": "c-6bd8446fb6e94781a4fde268d0a3f598",
+      "author": "anonymous",
+      "body": "## Audit Complete \u2705\n\n**10-agent swarm \u002B 5-chair council review completed.** Final report at \u0060Data/Pages/Audits/codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md\u0060.\n\n**Key results:**\n- 106 raw findings \u2192 79 post-council (5 P0, 14 P1, 28 P2, 32 P3)\n- 2 false positives removed, 17 findings merged into 7 groups\n- 15 severity recalibrations, 6 new architectural findings\n- 3 security escalations to P0 (sendEvent crash, crash guard handlers, pipe buffer hang)\n- 2 security gaps identified by council (LLM prompt injection P0, rate limiting P1)\n\n**New tasks created (14 total):**\n- TSK-0373: Fix /api/about hardcoded version\n- TSK-0374: Error handling in memory gateways\n- TSK-0375: Remove stale Python scripts\n- TSK-0376: WebSocketBridge unit tests\n- TSK-0377: Backfill null timestamps\n- TSK-0378: _isComplete regression test\n- TSK-0379: e2e integration test\n- TSK-0380: sendEvent crash guard (Critical)\n- TSK-0381: Crash guard handlers (Critical)\n- TSK-0382: Pipe buffer hang (Critical)\n- TSK-0383: LLM prompt injection (Critical)\n- TSK-0384: BuildGoal.Id property\n- TSK-0385: Entity prompt duplication fix\n- TSK-0386: Rate limiting/cmdQueue cap\n\n**Roadmap updated:** Sprint 60 Wave C \u2192 Complete, Wave F (Post-Wave-C Audit Fixes) added with 14 tasks. Sprint 61 restructured with audit remediation waves.\n\n**Key cross-cutting themes:**\n1. Node.js crash surface unprotected (3 independent P0s)\n2. ITimeProvider adoption stalled (3\u002B components)\n3. Goal HasFailed architecturally dead (5/7 goals)\n4. Dashboard dual-write corruption\n5. Runtime decomposition aspirational (Sprint 36\u002B, never integrated)\n6. LLM prompt injection unaddressed",
+      "createdAtUtc": "2026-07-11T06:24:37.7771427Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:11:06.1304229Z",
+  "updatedAtUtc": "2026-07-11T06:24:41.0279503Z",
+  "completedAtUtc": "2026-07-11T06:24:41.0279503Z",
+  "revision": 3,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": "tsk-0372-10-agent-codebase-audit-5-chair-council-sprint-60-post-wave-c.json"
+}

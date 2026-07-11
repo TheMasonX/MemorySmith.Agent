@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0395-wire-blockbelowchangedevent-through-websocketbridge-parseevent",
+  "key": "TSK-0395",
+  "title": "Wire BlockBelowChangedEvent through WebSocketBridge ParseEvent",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 P1 finding\n\n\u0060BlockBelowChangedEvent\u0060 is defined in \u0060WorldEvents.cs\u0060 (line 367) and handled in \u0060AgentBackgroundService.cs\u0060 (line 1094), but \u0060WebSocketBridge.ParseEvent\u0060 has NO \u0060\u0022blockBelowChanged\u0022\u0060 case. The event falls through to \u0060_ =\u003E null\u0060 and is silently discarded. Block-below tracking is completely broken \u2014 the \u0060blockBelow\u0060/\u0060blockBelowType\u0060/\u0060blockBelowAt\u0060 facts in WorldState are never populated.\n\n**Recommendation:** Add a \u0060\u0022blockBelowChanged\u0022 =\u003E\u0060 case in \u0060WebSocketBridge.ParseEvent\u0060 that parses the JSON fields (\u0060name\u0060, \u0060type\u0060, \u0060x\u0060, \u0060y\u0060, \u0060z\u0060) into a \u0060BlockBelowChangedEvent\u0060.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:minecraft-adapter",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:51:06.203608Z",
+  "updatedAtUtc": "2026-07-11T06:51:06.203608Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

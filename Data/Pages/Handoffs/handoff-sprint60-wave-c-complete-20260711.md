@@ -1,7 +1,7 @@
 # Handoff — Sprint 60 Wave C Complete (2026-07-11)
 
-**Branch:** `dev/round-3` (`dbc949b`)
-**Previous agent:** SteveBot
+**Branch:** `dev/round-3` (`f350daf`)
+**Previous agent:** Agent Smith (Session 2)
 **Next agent:** SteveBot or Agent Smith
 
 ---
@@ -47,19 +47,24 @@
   - AWS access/secret keys, GitHub PATs, NuGet API keys, Slack tokens
   - Private SSH keys, connection strings, passwords
   - Configurable false-positive list and file skip list
-- Installed `.git/hooks/pre-commit.bat` — calls the scan script (batch wrapper needed for Windows)
+- Installed `.git/hooks/pre-commit` — calls `Invoke-SecretScan.ps1` directly (PowerShell script, no batch wrapper needed)
 - Added CI secret scan step to `.github/workflows/ci.yml` — report-only (`continue-on-error: true`) until baseline is clean
+- Copied `Invoke-SecretScan.ps1` to MemorySmith base repo (`d:\@Repos\MemorySmith\Scripts\`) and installed pre-commit hook there
+- Added CI secret scanning step to MemorySmith base repo's `.github/workflows/ci.yml`
 - Created `Data/Pages/policies/secret-management.md` — secret inventory table, rotation procedures, git filter-repo instructions
 
 **⚠️ NOTE:** The CI workflow change (`.github/workflows/ci.yml`) requires the `workflow` OAuth scope which is blocked per AGENTS.md Rule E-X. The user must apply this change manually via the GitHub web UI.
 
 **⚠️ Human dependency:** Actual credential rotation (revoking old keys, generating new ones, updating env vars) requires human action. Documented in `secret-management.md`.
 
-**Files changed:**
+**Files changed (MemorySmith.Agent):**
 - `Scripts/Invoke-SecretScan.ps1` — NEW
-- `.git/hooks/pre-commit.bat` — NEW
+- `.git/hooks/pre-commit` — NEW (link to Scripts/Invoke-SecretScan.ps1)
+
+**Files changed (MemorySmith base):**
+- `Scripts/Invoke-SecretScan.ps1` — NEW (copied from Agent)
+- `.git/hooks/pre-commit` — NEW
 - `.github/workflows/ci.yml` — added secret scan step
-- `Data/Pages/policies/secret-management.md` — NEW
 
 ---
 
@@ -75,7 +80,7 @@
 **Files changed:**
 - `MineflayerAdapter/index.js` — goto() wrapped with deterministic outcome emission
 
-**Known risks:** Other `goto()` callers (place, craft, mine item pickup) are already within try-catch blocks or have their own error handling. Only the `move` case had the silent-drop issue.
+**Known risks:** Other `goto()` callers (place, craft, mine item pickup) are already within try-catch blocks or have their own error handling. Only the `move` case had the silent-drop issue. The mine action's `goto()` (line ~886) has a retry loop with `classifyError` via the `drainQueue` catch that emits `actionFailed` on exhaustion.
 
 ---
 
@@ -103,9 +108,10 @@
 | Check | Result |
 |-------|--------|
 | Build | ✅ Succeeds (0 errors, 0 warnings) |
-| Tests | ✅ 821 pass, 0 failures |
-| Task records | ✅ Valid |
-| Branch | `dev/round-3` (`dbc949b`) |
+| Tests | ✅ **822** pass, 0 failures |
+| Task records | ✅ Valid — 365 records (Agent), 376 records (base repo) |
+| Pre-commit hooks | ✅ Installed in both repos |
+| Branch | `dev/round-3` (`f350daf`) |
 
 ---
 

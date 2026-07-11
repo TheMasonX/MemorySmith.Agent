@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0398-fix-minewooddecompose-over-mining-mine-single-log-variant",
+  "key": "TSK-0398",
+  "title": "Fix MineWoodDecompose over-mining \u2014 mine single log variant",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 MSA-PLAN-008\n\n\u0060MineWoodDecompose\u0060 in \u0060HtnTaskLibrary.cs\u0060 (~line 830) mines BOTH \u0060minecraft:oak_log\u0060 AND \u0060minecraft:birch_log\u0060 at the full requested count. Same over-mining pattern as MSA-PLAN-001, for the legacy wood decomposition path.\n\n**Recommendation:** Mine only one variant unless the first fails.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:planning",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:51:06.3975733Z",
+  "updatedAtUtc": "2026-07-11T06:51:06.3975733Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

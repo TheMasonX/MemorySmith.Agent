@@ -17,7 +17,7 @@
 |----------|---------|
 | **Docs & Reports** | 10-agent swarm audit reports, council reviews, kb-graph-rag audit, ci-cd-quality-infrastructure-reference, planning-goals-reference, tool-system-reference wiki pages |
 | **Task Triage** | Archived 43+ stale Backlog tasks (screenshots TSK-0057–0063, markdown expansion TSK-0075–0090, chat polish TSK-0091–0100, and others). Moved 3 dormant InProgress tasks (TSK-0201, 0202, 0203) to Backlog. Created new audit tasks TSK-3015–3090. |
-| **Skills** | Added `codebase-audit` (7-phase), `subagent-swarm`, `memorysmith-base-integration-reference`. Updated `council` skill with subagent-swarm delegation. |
+| **Skills** | Added `codebase-audit` (7-phase, later renamed to `msa-codebase-audit`), `subagent-swarm`, `memorysmith-base-integration-reference`. Updated `council` skill with subagent-swarm delegation. |
 | **Memories** | Consolidated tags across 50+ records. Moved 2 Working→Core. Deprecated stale validation record. |
 | **Agent Config** | Updated `smith.agent.md` with MCP task tool names. Added `agents:` property to agent files. |
 

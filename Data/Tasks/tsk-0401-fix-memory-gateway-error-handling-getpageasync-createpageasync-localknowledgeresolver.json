@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0401-fix-memory-gateway-error-handling-getpageasync-createpageasync-localknowledgeresolver",
+  "key": "TSK-0401",
+  "title": "Fix memory gateway error handling \u2014 GetPageAsync, CreatePageAsync, LocalKnowledgeResolver",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 MSA-MEM-001/002/003 \u002B new findings\n\nThree memory gateway methods lack adequate error handling:\n1. \u0060LocalKnowledgeResolver.ResolveAsync\u0060 (~line 88) \u2014 calls \u0060memory.SearchAsync\u0060 with zero try/catch. Transient HTTP failure crashes the pipeline.\n2. \u0060RestMemoryGateway.CreatePageAsync\u0060 (~line 95) \u2014 \u0060EnsureSuccessStatusCode()\u0060 throws on 4xx/5xx with no error handling.\n3. \u0060RestMemoryGateway.GetPageAsync\u0060 (~line 70-73) \u2014 returns null on any non-success HTTP status; callers cannot distinguish 404 from 401/403/500. Also no transport-level error handling for DNS/TLS failures.\n4. \u0060RestMemoryGateway.UpdatePageAsync\u0060 (~lines 110, 131) \u2014 both PUT branches call \u0060EnsureSuccessStatusCode()\u0060 with no try/catch.\n\n**Recommendation:** Add try/catch for \u0060HttpRequestException\u0060 and \u0060TaskCanceledException\u0060 with warning logging to all methods. For GetPageAsync, log warnings for non-404 status codes and only return null on 404.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:memory",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:51:30.6170935Z",
+  "updatedAtUtc": "2026-07-11T06:51:30.6170935Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

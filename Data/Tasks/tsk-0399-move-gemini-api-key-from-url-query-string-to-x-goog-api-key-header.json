@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0399-move-gemini-api-key-from-url-query-string-to-x-goog-api-key-header",
+  "key": "TSK-0399",
+  "title": "Move Gemini API key from URL query string to X-Goog-Api-Key header",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 MSA-LLM-005\n\n\u0060GeminiProvider.cs\u0060 (line ~30) embeds the API key in the URL query string: \u0060$\u0022/v1beta/models/{options.LlmModel}:generateContent?key={options.LlmApiKey}\u0022\u0060. Keys in URLs appear in server access logs, proxy/cache logs, browser referrer headers, crash dumps, and \u0060HttpRequestException\u0060 message text.\n\n**Recommendation:** Change to \u0060req.Headers.Add(\u0022X-Goog-Api-Key\u0022, options.LlmApiKey)\u0060 and POST to the endpoint without the \u0060?key=\u0060 parameter.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:llm",
+    "type:security"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:51:06.4567415Z",
+  "updatedAtUtc": "2026-07-11T06:51:06.4567415Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0386-add-chat-command-rate-limiting-and-cmdqueue-size-cap",
+  "key": "TSK-0386",
+  "title": "Add chat command rate limiting and cmdQueue size cap",
+  "description": "P1 council-identified finding. The cmdQueue array in MineflayerAdapter/index.js has no max length \u2014 unbounded memory growth under command flood. No rate limiting on chat/command pipeline. Add cmdQueue size cap (e.g., 100) and rate limiting to the chat pipeline. Source: codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md (P1-010).",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:adapter",
+    "type:security"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:23:57.5298656Z",
+  "updatedAtUtc": "2026-07-11T06:23:57.5298656Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

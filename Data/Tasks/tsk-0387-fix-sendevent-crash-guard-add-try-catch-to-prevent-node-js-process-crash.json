@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0387-fix-sendevent-crash-guard-add-try-catch-to-prevent-node-js-process-crash",
+  "key": "TSK-0387",
+  "title": "Fix sendEvent crash guard \u2014 add try/catch to prevent Node.js process crash",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) finding P0-002\n\n\u0060sendEvent\u0060 in \u0060MineflayerAdapter/index.js\u0060 (line ~122-129) has no error handling. If the WebSocket is destroyed (ERR_STREAM_DESTROYED), the send throws and crashes the Node.js process. The C# side gets a WebSocket close event but has no visibility into the cause \u2014 the error is invisible.\n\n**Recommendation:** Wrap \u0060agentSocket.send()\u0060 in try/catch. Log the error via \u0060logStructured\u0060. Do not rethrow \u2014 the event is best-effort. Also consider checking \u0060agentSocket.readyState\u0060 before sending.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:mineflayer",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:50:46.5076508Z",
+  "updatedAtUtc": "2026-07-11T06:50:46.5076508Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

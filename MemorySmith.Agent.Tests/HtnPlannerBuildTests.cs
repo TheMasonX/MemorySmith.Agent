@@ -189,6 +189,20 @@ public sealed class HtnPlannerBuildTests
         Assert.That(plan.Actions.Last().Tool, Is.EqualTo("GetStatus"));
     }
 
+    [Test]
+    public async Task PlanAsync_IBuildGoalGoal_UsesBuildDecomposition()
+    {
+        var blueprint = MakeBlueprintWithMaterials(id: "custom-build");
+        var goal = new TestBuildGoal(blueprint, [
+            new PlacementBlock(2, 0, 0, "cobblestone"),
+            new PlacementBlock(3, 0, 0, "cobblestone")
+        ]);
+        var plan = await new HtnPlanner(new HtnTaskLibrary()).PlanAsync(goal, WithAutoOrigin(new WorldState()));
+
+        Assert.That(plan.Actions, Is.Not.Empty);
+        Assert.That(plan.Actions.Any(a => string.Equals(a.Tool, "place", StringComparison.OrdinalIgnoreCase)), Is.True);
+    }
+
     // ── Helper methods ────────────────────────────────────────────────────────
 
     private static async Task<IPlan> MakePlan(
@@ -222,4 +236,19 @@ public sealed class HtnPlannerBuildTests
     private static int CountTool(IPlan plan, string toolName) =>
         plan.Actions.Count(a =>
             string.Equals(a.Tool, toolName, StringComparison.OrdinalIgnoreCase));
+
+    private sealed class TestBuildGoal(Blueprint blueprint, IReadOnlyList<PlacementBlock> blocks) : IBuildGoal
+    {
+        public Blueprint Blueprint { get; } = blueprint;
+        public IReadOnlyList<PlacementBlock> Blocks { get; } = blocks;
+        public BuildOrigin? Origin { get; init; }
+        public bool HasExplicitOrigin => Origin is not null;
+        public string Name { get; } = $"Build:{blueprint.Id}";
+        public string Description { get; } = $"Build {blueprint.Name}";
+        public string[] Phases { get; } = ["GatherMaterials", "Build", "Verify"];
+        public string? FailureReason { get; set; }
+
+        public bool IsComplete(WorldState state) => false;
+        public bool HasFailed(WorldState state) => false;
+    }
 }

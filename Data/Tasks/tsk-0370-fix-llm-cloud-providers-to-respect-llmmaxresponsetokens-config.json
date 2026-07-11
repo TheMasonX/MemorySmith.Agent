@@ -18,16 +18,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-8e1ef60b70db495eb9313797e9ffb1d5",
+      "author": "anonymous",
+      "body": "**Scope confirmed by internal audit Sprint 60 (2026-07-11):** AnthropicProvider and OpenAICompatibleProvider still hardcode MaxTokens=512. GeminiProvider has no max-token parameter at all. Council confirmed P2 severity. See TSK-0400 for the fix.",
+      "createdAtUtc": "2026-07-11T06:52:10.3768401Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T05:19:54.3295469Z",
-  "updatedAtUtc": "2026-07-11T05:19:54.3295469Z",
+  "updatedAtUtc": "2026-07-11T06:52:10.3768401Z",
   "completedAtUtc": null,
-  "revision": 1,
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0370-fix-llm-cloud-providers-to-respect-llmmaxresponsetokens-config.json"
 }

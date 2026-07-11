@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0379-add-end-to-end-integration-test-for-full-agent-pipeline",
+  "key": "TSK-0379",
+  "title": "Add end-to-end integration test for full agent pipeline",
+  "description": "No test covers the full pipeline: chat -\u003E interpretation -\u003E goal -\u003E plan -\u003E dispatch -\u003E adapter -\u003E event -\u003E projector -\u003E dashboard. WebSocketBridge has zero tests. The full pipeline gap has been flagged across 3 audit rounds. Design and implement a test harness that excercises the complete flow with mocked adapter. Source: codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md.",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-61",
+    "type:testing",
+    "domain:infra"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:23:44.09263Z",
+  "updatedAtUtc": "2026-07-11T06:23:44.09263Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

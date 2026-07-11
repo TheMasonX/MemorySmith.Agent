@@ -4,7 +4,7 @@
   "title": "Add IBuildGoal marker interface to replace type-checks",
   "description": "## Problem\nHtnPlanner and other pipeline code uses \u0060goal is BuildGoal\u0060 type-checks to identify build goals. This is fragile \u2014 adding new goal types that behave like builds requires updating every type-check site.\n\n## Solution\nAdd \u0060IBuildGoal\u0060 marker interface in \u0060Agent.Core/Interfaces/\u0060. Have \u0060BuildGoal\u0060 implement it. Replace all \u0060goal is BuildGoal\u0060 type-checks with \u0060goal is IBuildGoal\u0060.\n\n## Files\n- Agent.Core/Interfaces/IGoal.cs (add IBuildGoal)\n- Agent.Planning/BuildGoal.cs (implement IBuildGoal)\n- Agent.Planning/HtnPlanner.cs (replace type-checks)\n- Any other files using \u0060is BuildGoal\u0060 pattern\n\n## Validation\n- All existing tests pass\n- grep for \u0060is BuildGoal\u0060 returns zero results (except the single implementation site)",
   "type": "Task",
-  "status": "Backlog",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,11 +23,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T01:39:39.9382536Z",
-  "updatedAtUtc": "2026-07-11T01:39:39.9382536Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-11T05:38:16.7326128Z",
+  "completedAtUtc": "2026-07-11T05:38:16.7326128Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0352-add-ibuildgoal-marker-interface-to-replace-type-checks.json"
 }

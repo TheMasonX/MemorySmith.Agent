@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0393-fix-actiondata-mutable-dictionaries-use-ireadonlydictionary",
+  "key": "TSK-0393",
+  "title": "Fix ActionData mutable dictionaries \u2014 use IReadOnlyDictionary",
+  "description": "**Source:** Internal audit Sprint 60 (2026-07-11) \u2014 MSA-CORE-002\n\n\u0060ActionData.Arguments\u0060 and \u0060ActionData.Context\u0060 are \u0060Dictionary\u003Cstring, object?\u003E\u0060 with \u0060{ get; init; }\u0060. The dictionary reference is frozen but the contents are mutable. Any code holding a reference can mutate dictionaries after construction.\n\n**Recommendation:** Change both to \u0060IReadOnlyDictionary\u003Cstring, object?\u003E\u0060 and use \u0060new Dictionary(...)\u0060 in the constructor.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:core",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:51:06.0770888Z",
+  "updatedAtUtc": "2026-07-11T06:51:06.0770888Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

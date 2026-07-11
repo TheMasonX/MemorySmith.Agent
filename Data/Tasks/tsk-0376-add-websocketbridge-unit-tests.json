@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0376-add-websocketbridge-unit-tests",
+  "key": "TSK-0376",
+  "title": "Add WebSocketBridge unit tests",
+  "description": "WebSocketBridge has zero unit tests despite hosting P0 (data race), P2 (no max message size, Dispose bypass, fire-and-forget with no error routing) bugs. Add tests for SendAsync, RunReceiveLoopWithRetryAsync, Dispose, and reconnect scenarios. Source: codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md (P2). Blocked on TSK-0361 (data race fix).",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-61",
+    "type:testing",
+    "domain:adapter"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:23:43.9462111Z",
+  "updatedAtUtc": "2026-07-11T06:23:43.9462111Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

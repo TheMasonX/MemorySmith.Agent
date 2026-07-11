@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0385-fix-nearby-entity-display-bug-remove-duplicate-hostile-llm-context",
+  "key": "TSK-0385",
+  "title": "Fix nearby entity display bug \u2014 remove duplicate hostile LLM context",
+  "description": "P1 from 10-agent audit (escalated to P0 by council for safety impact). LlmChatInterpreter.cs ~200: the fallback entityBlock = hostileBlock means when nearbyEntities fact is absent but nearbyHostiles is present, the hostile list appears twice in the LLM prompt (once in hostileBlock, once in entityBlock). Wastes LLM context and inflates perceived threat count. Fix: change entityBlock fallback to empty string. Source: codebase-audit-20260711-10agent-swarm-5chair-council-post-wave-c.md (P1-006).",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:llm",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T06:23:57.4805203Z",
+  "updatedAtUtc": "2026-07-11T06:23:57.4805203Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}
