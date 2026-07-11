@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0360-10-agent-codebase-audit-5-chair-council-sprint-60-post-wave-a",
+  "key": "TSK-0360",
+  "title": "10-Agent Codebase Audit \u002B 5-Chair Council \u2014 Sprint 60 Post-Wave-A",
+  "description": "Run a 10-agent codebase audit swarm followed by a 5-chair council review for MemorySmith.Agent. Focus: Sprint 60 state after Wave A fixes committed, verify fix quality, detect regressions, sweep for remaining issues across all layers. Produce audit report and task synthesis.",
+  "type": "Epic",
+  "status": "InProgress",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:audit",
+    "type:codebase-audit"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T05:06:48.6975791Z",
+  "updatedAtUtc": "2026-07-11T05:06:48.6975791Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

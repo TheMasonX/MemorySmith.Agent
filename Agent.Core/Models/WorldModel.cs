@@ -138,6 +138,52 @@ public sealed class WorldModel : IWorldModel
         return deviation;
     }
 
+    /// <summary>
+    /// Sprint 60 (TSK-0348): Apply structured ActionOutcome effects to the belief state.
+    /// Updates inventory based on ItemCollected, ItemConsumed, ItemCrafted effects.
+    /// This keeps the belief state synchronized with actual action results even when
+    /// no follow-up world event arrives (common for fire-and-forget dispatch patterns).
+    /// </summary>
+    public void ApplyOutcome(ActionOutcome outcome)
+    {
+        lock (_lock)
+        {
+            var newInv = new Dictionary<string, int>(_belief.Inventory);
+
+            foreach (var effect in outcome.Effects)
+            {
+                if (effect.Item is null) continue;
+
+                switch (effect.Type)
+                {
+                    case "ItemCollected":
+                    case "ItemCrafted":
+                        newInv[effect.Item] = newInv.GetValueOrDefault(effect.Item) + (effect.Count ?? 1);
+                        break;
+
+                    case "ItemConsumed":
+                    {
+                        var have = newInv.GetValueOrDefault(effect.Item);
+                        var after = Math.Max(0, have - (effect.Count ?? 1));
+                        if (after == 0)
+                            newInv.Remove(effect.Item);
+                        else
+                            newInv[effect.Item] = after;
+                        break;
+                    }
+                }
+            }
+
+            _belief = new BeliefState(
+                _belief.Health,
+                _belief.Food,
+                _belief.Position,
+                newInv,
+                _belief.ActiveBeliefs,
+                DateTimeOffset.UtcNow);
+        }
+    }
+
     // ── Rule-based predictors ─────────────────────────────────────────────
 
     private static PredictionState PredictMove(BeliefState b, IReadOnlyDictionary<string, object?> args)
@@ -185,13 +231,91 @@ public sealed class WorldModel : IWorldModel
             $"Craft {count}x {item}");
     }
 
-    private static PredictionState PredictPlace(BeliefState b, IReadOnlyDictionary<string, object?> args) =>
-        new("place", args, b.Position, b.Health, b.Food, b.Inventory,
-            0.90, "Place block — inventory unchanged (consumed by action)");
+    /// <summary>
+    /// Sprint 60 (TSK-0348): PredictPlace now deducts the placed block from inventory.
+    /// Accepts either 'material' or 'block' arg key (PlaceBlockTool schema accepts both).
+    /// Previous behavior returned inventory unchanged, which caused WorldStateDiff to
+    /// report no expected inventory change for PlaceBlock actions.
+    /// </summary>
+    private static PredictionState PredictPlace(BeliefState b, IReadOnlyDictionary<string, object?> args)
+    {
+        var material = GetStrArg(args, "material") ?? GetStrArg(args, "block", "unknown");
+        var count = GetIntArg(args, "count", 1);
+        var newInv = new Dictionary<string, int>(b.Inventory);
 
-    private static PredictionState PredictSmelt(BeliefState b, IReadOnlyDictionary<string, object?> args) =>
-        new("smelt", args, b.Position, b.Health, b.Food, b.Inventory,
-            0.80, "Smelt — outcome depends on furnace state");
+        var have = newInv.GetValueOrDefault(material);
+        if (have > 0)
+        {
+            var after = have - count;
+            if (after <= 0)
+                newInv.Remove(material);
+            else
+                newInv[material] = after;
+        }
+
+        return new PredictionState("place", args, b.Position, b.Health, b.Food, newInv,
+            0.85, $"Place {count}x {material} — deduct {count} from inventory");
+    }
+
+    /// <summary>
+    /// Sprint 60 (TSK-0348): PredictSmelt now predicts the output item and deducts
+    /// the input from inventory. Uses a minimal smeltable-item lookup instead of
+    /// duplicating the full SmeltableMapping from Agent.Planning (which Agent.Core
+    /// cannot reference). For unknown inputs, returns current inventory unchanged
+    /// with reduced confidence to signal uncertainty.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, string> _smeltInputToOutput =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["iron_ore"]        = "iron_ingot",
+            ["raw_iron"]        = "iron_ingot",
+            ["gold_ore"]        = "gold_ingot",
+            ["raw_gold"]        = "gold_ingot",
+            ["copper_ore"]      = "copper_ingot",
+            ["raw_copper"]      = "copper_ingot",
+            ["ancient_debris"]  = "netherite_scrap",
+            ["sand"]            = "glass",
+            ["cobblestone"]     = "stone",
+            ["stone"]           = "smooth_stone",
+            ["clay"]            = "brick",
+            ["netherrack"]      = "nether_brick",
+            ["cactus"]          = "cactus_green",
+            ["oak_log"]         = "charcoal",
+            ["spruce_log"]      = "charcoal",
+            ["birch_log"]       = "charcoal",
+            ["jungle_log"]      = "charcoal",
+            ["acacia_log"]      = "charcoal",
+            ["dark_oak_log"]    = "charcoal",
+        };
+
+    private static PredictionState PredictSmelt(BeliefState b, IReadOnlyDictionary<string, object?> args)
+    {
+        var input = GetStrArg(args, "item", "unknown");
+        var count = GetIntArg(args, "count", 1);
+        var newInv = new Dictionary<string, int>(b.Inventory);
+
+        if (_smeltInputToOutput.TryGetValue(input, out var output))
+        {
+            // Deduct input
+            var have = newInv.GetValueOrDefault(input);
+            if (have > 0)
+            {
+                var after = have - count;
+                if (after <= 0)
+                    newInv.Remove(input);
+                else
+                    newInv[input] = after;
+            }
+            // Add output
+            newInv[output] = newInv.GetValueOrDefault(output) + count;
+
+            return new PredictionState("smelt", args, b.Position, b.Health, b.Food, newInv,
+                0.80, $"Smelt {count}x {input} → +{count} {output}");
+        }
+
+        return new PredictionState("smelt", args, b.Position, b.Health, b.Food, b.Inventory,
+            0.50, $"Smelt {input} — unknown output, low confidence");
+    }
 
     private static PredictionState PredictWander(BeliefState b, IReadOnlyDictionary<string, object?> args) =>
         new("wander", args, null, b.Health, b.Food - 1, b.Inventory,

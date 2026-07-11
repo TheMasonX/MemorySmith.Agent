@@ -4,7 +4,7 @@
   "title": "Sprint 60 Wave A \u2014 High ROI easy fixes from 10-agent audit",
   "description": "Implement the highest-ROI, lowest-effort fixes identified by the 10-agent codebase audit (2026-07-10):\n\n1. MSA-ADAPT-001: Fix creativeProvider.js CommonJS in ESM project (rename to .cjs)\n2. MSA-CORE-017: Fix TaskSequenceGoal infinite loop on terminal completion (add _isComplete flag)\n3. MSA-INFRA-006: Delete all .bak and .bak.bak files from repository\n4. MSA-WEB-004: Derive version from AssemblyInformationalVersionAttribute instead of hardcoded string\n5. MSA-CORE-005: Fix ClearAndEnqueueAsync silent catch \u2014 add ILogger\n6. MSA-LLM-001: Fix doc comment typo in IntentManager.cs\n7. MSA-TEST-001: Delete stale .bak files in test directory\n\nAlso commit and push the pending Data/Memories/Core knowledge base updates and audit documents from previous agent sessions.",
   "type": "Task",
-  "status": "InProgress",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -19,16 +19,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-13cbd85df6884ec79be3f0c58b443e64",
+      "author": "anonymous",
+      "body": "## Wave Complete \u2014 Evidence\n\nCommit \u0060413b8c3\u0060 pushed to \u0060dev/round-3\u0060. All 6 fixes implemented and validated:\n\n### Fixes Applied\n\n| Finding | Fix | Files Changed | Validation |\n|---------|-----|---------------|------------|\n| MSA-ADAPT-001 | Renamed creativeProvider.js \u2192 creativeProvider.cjs \u002B updated require() path in index.js | \u0060creativeProvider.cjs\u0060 (renamed), \u0060index.js\u0060 | Build passes |\n| MSA-CORE-017 | Added \u0060_isComplete\u0060 flag to TaskSequenceGoal, set by TryAdvance when returning false, checked in IsComplete to prevent infinite loop | \u0060TaskSequenceGoal.cs\u0060 | All 815 tests pass |\n| MSA-INFRA-006 | Deleted 33 .bak/.bak.bak files across all layers | N/A (cleanup) | Build passes, no stale files remain |\n| MSA-WEB-004 | Replaced hardcoded \u0060\u0022v0.55.0\u0022\u0060 with \u0060FileVersionInfo.ProductVersion\u0060 from assembly; updated header comment to Sprint 60 | \u0060Program.cs\u0060 | Build passes |\n| MSA-CORE-005 | Added \u0060Action\u003CException\u003E? onStopError\u0060 callback to \u0060ClearAndEnqueueAsync\u0060; wired in ABS damage-interrupt caller with \u0060logger.LogWarning\u0060; updated test to verify callback invocation | \u0060ActionQueue.cs\u0060, \u0060CoreModelsTests.cs\u0060, \u0060AgentBackgroundService.cs\u0060 | All 815 tests pass |\n| MSA-LLM-001 | Fixed truncated \u0060.z///\u0060 in IntentManager doc comment | \u0060IntentManager.cs\u0060 | Build passes |\n\n### Validation Results\n- **Build:** 0 errors, 0 warnings\n- **Tests:** 815 passed, 0 failed, 0 skipped\n- **Task records:** 353 records validated (PASS)\n- **Repository:** 33 .bak files removed",
+      "createdAtUtc": "2026-07-11T04:58:00.1057474Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T04:53:02.4521637Z",
-  "updatedAtUtc": "2026-07-11T04:53:02.4521637Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-11T04:58:04.2298335Z",
+  "completedAtUtc": "2026-07-11T04:58:04.2298335Z",
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0359-sprint-60-wave-a-high-roi-easy-fixes-from-10-agent-audit.json"
 }

@@ -34,6 +34,15 @@ public interface IWorldModel
     double Reconcile(PredictionState prediction, ObservationState actual);
 
     /// <summary>
+    /// Sprint 60 (TSK-0348): Apply structured <see cref="ActionOutcome.Effects"/> to the
+    /// belief state. Updates inventory based on ItemCollected, ItemConsumed, ItemCrafted,
+    /// and other effect types. Keeps the belief state in sync with actual action results
+    /// even when no explicit observation event arrives (e.g., fire-and-forget tools that
+    /// produce ActionOutcome but no follow-up world event).
+    /// </summary>
+    void ApplyOutcome(ActionOutcome outcome);
+
+    /// <summary>
     /// Current aggregate uncertainty (0.0 – 1.0) across recent predictions.
     /// Derived from the running average of Reconcile results.
     /// </summary>

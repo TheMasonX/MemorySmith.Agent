@@ -154,6 +154,20 @@ public sealed class AgentBackgroundService(
     private const int HealthCheckCooldownSeconds = 2;
 
     /// <summary>
+    /// Sprint 60 (TSK-0345): Minimum time since the last meaningful event before allowing
+    /// replanning. If events (BlockMined, ItemCollected, Status, etc.) arrived within this
+    /// window, the previous plan's actions are still being processed — skip replanning
+    /// to prevent flooding the adapter with duplicate actions.
+    /// </summary>
+    private static readonly TimeSpan EventSettleTimeout = TimeSpan.FromMilliseconds(500);
+
+    /// <summary>
+    /// Sprint 60 (TSK-0345): Maximum time to wait for in-flight action results before
+    /// forcing a replan. Prevents indefinite stall when events are lost.
+    /// </summary>
+    private static readonly TimeSpan MaxPostDispatchSettle = TimeSpan.FromSeconds(5);
+
+    /// <summary>
     /// Sprint 57 (TSK-0302): Minimum seconds between periodic background inventory syncs.
     /// The agent relies entirely on explicit GetStatus for inventory updates. Without
     /// periodic sync, inventory can silently drift (codesmell #4). This interval
@@ -236,6 +250,11 @@ public sealed class AgentBackgroundService(
     private int _cycleInventorySnapshot = -1;
     // Sprint 51: count of confirmed block placements in the current cycle.
     private int _blocksPlacedThisCycle;
+
+    // Sprint 60 (TSK-0345): tracks when the last meaningful world event arrived.
+    // Used by the replan flood guard to avoid creating new plans while the adapter
+    // is still processing the previous plan's actions.
+    private DateTimeOffset _lastMeaningfulEventAt = DateTimeOffset.MinValue;
 
     /// <summary>
     /// Sprint 58 Wave D (TSK-0331): CTS for creative provisioning loop.
@@ -696,6 +715,12 @@ public sealed class AgentBackgroundService(
             else
                 logger.LogDebug("World event: {Type}", worldEvent.GetType().Name);
             _worldState = _projector.Apply(_worldState, worldEvent);
+
+            // Sprint 60 (TSK-0345): Track last meaningful event time for replan flood guard.
+            // Meaningful events = events that indicate the adapter is processing the plan.
+            // MoveEvent is excluded (fires ~10x/sec and would prevent replanning indefinitely).
+            if (worldEvent is not MoveEvent)
+                _lastMeaningfulEventAt = _timeProvider.UtcNow;
 
             // Sprint 23 P0-A: real-time damage interrupt.
             // Detect health drops by comparing against _previousHealth (set at end of each event).
@@ -1989,6 +2014,33 @@ public sealed class AgentBackgroundService(
                     continue;
                 }
 
+                // Sprint 60 (TSK-0345): Event-driven replan flood guard.
+                // If meaningful events arrived within EventSettleTimeout, the previous plan's
+                // actions are still being processed by the adapter — wait for events to settle
+                // before creating a new plan. This prevents flooding the adapter with duplicate
+                // actions (e.g., creating a new build plan every 2s while the bot is still placing
+                // blocks from the previous plan). Falls through after MaxPostDispatchSettle to
+                // prevent indefinite stall when events are lost.
+                var timeSinceLastEvent = _timeProvider.UtcNow - _lastMeaningfulEventAt;
+                if (timeSinceLastEvent < EventSettleTimeout)
+                {
+                    var timeSinceLastReplan = _timeProvider.UtcNow - _lastReplanAt;
+                    if (timeSinceLastReplan < MaxPostDispatchSettle)
+                    {
+                        logger.LogTrace(
+                            "[replan] deferring — events arriving ({Elapsed:F0}ms ago), " +
+                            "waiting for settle (timeout={MaxSettleSec}s)",
+                            timeSinceLastEvent.TotalMilliseconds,
+                            MaxPostDispatchSettle.TotalSeconds);
+                        await Task.Delay(100, ct);
+                        continue;
+                    }
+                    logger.LogDebug(
+                        "[replan] forcing replan after {Elapsed:F0}s settle timeout — " +
+                        "events still arriving but MaxPostDispatchSettle elapsed",
+                        MaxPostDispatchSettle.TotalSeconds);
+                }
+
                 try
                 {
                     var plan = await planner.PlanAsync(_currentGoal, _worldState, ct);
@@ -2144,8 +2196,9 @@ public sealed class AgentBackgroundService(
                         if (schemaProps.Contains(kv.Key))
                             action.Arguments.TryAdd(kv.Key, kv.Value);
                     }
-                    var argsJson = JsonSerializer.Serialize(action.Arguments);
-                    using var doc = JsonDocument.Parse(argsJson);
+                    // Sprint 60 (TSK-0322): Use SerializeToElement instead of
+                    // serialize→parse round-trip to preserve numeric type fidelity.
+                    var argsElement = JsonSerializer.SerializeToElement(action.Arguments);
 
                     var actionTimeoutSec = GetActionTimeoutSeconds(action.Tool);
                     using var timeoutCts = new CancellationTokenSource(
@@ -2175,7 +2228,7 @@ public sealed class AgentBackgroundService(
 
                     // Sprint 19: log args at Debug level (file only) for diagnostics
                     logger.LogDebug("[dispatch] {Tool} args: {Args} correlationId={CorrelationId}",
-                        action.Tool, argsJson, correlationId);
+                        action.Tool, argsElement.ToString(), correlationId);
                     _journal?.Log(new JournalEntry(
                         _timeProvider.UtcNow, JournalEntryType.ActionDispatched, action.Tool,
                         new Dictionary<string, object?> { ["correlationId"] = correlationId.ToString() }));
@@ -2190,7 +2243,7 @@ public sealed class AgentBackgroundService(
                     // ActionOutcome.Effects are never populated.
                     _preDispatchPrediction = _worldModel?.Predict(action.Tool, action.Arguments);
                     var (result, outcome) = await toolCaller.CallWithOutcomeAsync(
-                        _currentGoal?.Id ?? Guid.Empty, action.Tool, doc.RootElement, linkedCts.Token);
+                        _currentGoal?.Id ?? Guid.Empty, action.Tool, argsElement, linkedCts.Token);
                     sw.Stop();
                     // Sprint 37 P0-B: log structured outcome. Replaces the per-path ActionCompleted /
                     // ActionFailed journal entries below (now removed).
@@ -2198,6 +2251,10 @@ public sealed class AgentBackgroundService(
                     // observation-driven replanning: Plan → Execute → ActionOutcome → LLM Evaluate → Replan?
                     _journal?.LogOutcome(outcome);
                     _cycleOutcomes.Enqueue(outcome);
+                    // Sprint 60 (TSK-0348): Apply ActionOutcome effects to WorldModel belief state.
+                    // Keeps the belief state in sync with actual action results even for
+                    // fire-and-forget tools whose follow-up events may not arrive immediately.
+                    _worldModel?.ApplyOutcome(outcome);
                     // Sprint 39 P1: observation-driven replanning — evaluate accumulated outcomes after each dispatch.
                     if (_llmEvaluator is not null && _currentGoal is not null)
                     {
@@ -2396,8 +2453,11 @@ public sealed class AgentBackgroundService(
                             _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
                         _blocksPlacedThisCycle = 0;
                     }
-                    logger.LogDebug("Plan cycle complete — settling for 100 ms");
-                    await Task.Delay(100, ct);
+                    // Sprint 60 (TSK-0345): Short settle delay to let Minecraft adapter events
+                    // (blockPlaced, playerCollect) arrive before the next plan cycle.
+                    // The primary flood guard is the EventSettleTimeout check in the plan block
+                    // above — this is just a brief pause to batch events before progress check.
+                    await Task.Delay(200, ct);
                     _actionDispatchedThisCycle = false;
                     // Sprint 20: compare inventory sum before/after cycle to detect real game progress.
                     // blockMined events have up to 300ms to arrive before this check.

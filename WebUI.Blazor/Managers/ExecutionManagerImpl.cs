@@ -12,10 +12,10 @@ using System.Text.Json;
 /// Wraps <see cref="IToolCaller"/> to dispatch a single <see cref="ActionData"/> and
 /// return a structured <see cref="ActionOutcome"/>.
 ///
-/// Design note: ActionData.Arguments is Dictionary&lt;string,object?&gt; but
-/// IToolCaller.CallWithOutcomeAsync expects JsonElement. This class performs a
-/// JSON round-trip (serialize → parse → JsonElement) for the conversion.
-/// Sprint 40 may introduce a direct ActionData→JsonElement path to avoid the allocation.
+/// Sprint 60 (TSK-0322): Replaced JSON round-trip (serialize→parse→JsonElement) with
+/// <see cref="JsonSerializer.SerializeToElement"/> for direct Dictionary→JsonElement
+/// conversion. This avoids unnecessary string allocation and preserves numeric type
+/// fidelity (long, decimal, etc.) that was lost during the serialize/parse round-trip.
 ///
 /// GoalId: defaults to Guid.Empty at this interface boundary. Call
 /// <see cref="SetCurrentGoal"/> when the active goal changes so ActionOutcomes
@@ -53,8 +53,10 @@ public sealed class ExecutionManagerImpl : IExecutionManager
         JsonElement argsElement;
         try
         {
-            var json = JsonSerializer.Serialize(action.Arguments);
-            argsElement = JsonDocument.Parse(json).RootElement;
+            // Sprint 60 (TSK-0322): Use SerializeToElement for direct conversion,
+            // avoiding the serialize→parse round-trip that lost numeric type fidelity
+            // (long→int, decimal precision) and allocated an intermediate string.
+            argsElement = JsonSerializer.SerializeToElement(action.Arguments);
         }
         catch (Exception ex)
         {
