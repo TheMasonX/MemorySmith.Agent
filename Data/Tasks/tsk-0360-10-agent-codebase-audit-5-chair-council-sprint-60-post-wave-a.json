@@ -4,7 +4,7 @@
   "title": "10-Agent Codebase Audit \u002B 5-Chair Council \u2014 Sprint 60 Post-Wave-A",
   "description": "Run a 10-agent codebase audit swarm followed by a 5-chair council review for MemorySmith.Agent. Focus: Sprint 60 state after Wave A fixes committed, verify fix quality, detect regressions, sweep for remaining issues across all layers. Produce audit report and task synthesis.",
   "type": "Epic",
-  "status": "InProgress",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -18,16 +18,23 @@
   "attachments": [],
   "externalLinks": [],
   "linkedPages": [],
-  "comments": [],
+  "comments": [
+    {
+      "id": "c-ac23203f1cba481eac28a7628c82c458",
+      "author": "anonymous",
+      "body": "## 10-Agent Codebase Audit \u002B 5-Chair Council \u2014 Complete\n\n**Date:** 2026-07-11\n**Commit:** 413b8c3 (Sprint 60 Wave A)\n\n### Executive Summary\n- 10-agent homogeneous swarm \u2192 109 raw findings\n- 5-chair heterogeneous council \u2192 recalibrated to **103 findings** (6 removed/merged, 8 upgrades, 12 downgrades)\n- **P0 (5):** runtime decomposition dead code, WebSocketBridge _ws data race, orphaned Node processes, zero CI vulnerability defense, SignalR hub no auth\n- **P1 (18):** over-mining, HasFailed never true, goto timeouts, craft/smelt stop guard, playerCollect \u0027unknown\u0027, event listener leak, hardcoded version, CI gaps, etc.\n\n### Key Deliverables\n1. Audit report: \u0060Data/Pages/Audits/codebase-audit-20260711-10agent-swarm-5chair-council.md\u0060\n2. **11 new task records created** (TSK-0361 through TSK-0371):\n   - TSK-0361: Fix WebSocketBridge _ws data race (Critical)\n   - TSK-0362: Fix MinecraftAdapter double-connect (Critical)\n   - TSK-0363: Add vulnerability scanning to CI, remove NU1903 exemption (Critical)\n   - TSK-0364: Fix GatherItemDecompose over-mining (High)\n   - TSK-0365: Add failure detection to PlaceBlockGoal.HasFailed (High)\n   - TSK-0366: Fix playerCollect fallback chain (High)\n   - TSK-0367: Fix connectBot event listener leak (High)\n   - TSK-0368: Add HTTPS redirection middleware (High)\n   - TSK-0369: Remove dead runtime decomposition (Critical, Sprint 61)\n   - TSK-0370: Fix ReplanGovernor ITimeProvider (High)\n   - TSK-0371: Fix LLM providers MaxTokens config (High)\n\n### Council Key Findings\n- **Chair 1 (Architecture):** Runtime decomposition is the single largest finding source (~15%). Recommended Sprint 61 cleanup.\n- **Chair 2 (Runtime):** playerCollect bug is WORSE than described \u2014 always returns \u0027unknown\u0027.\n- **Chair 3 (Safety):** SignalR hub P1\u2192P0 escalation; no CSRF/SecurityHeaders.\n- **Chair 4 (QA):** 11/22 P0/P1 findings untracked (50% gap); 42/354 task records null timestamps.\n- **Chair 5 (Sprint):** 11 findings recommended for S60 (~12.75h), 12 quick wins (\u003C30min each).",
+      "createdAtUtc": "2026-07-11T05:19:54.4460681Z"
+    }
+  ],
   "epicId": null,
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T05:06:48.6975791Z",
-  "updatedAtUtc": "2026-07-11T05:06:48.6975791Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-11T05:19:59.4188538Z",
+  "completedAtUtc": "2026-07-11T05:19:59.4188538Z",
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0360-10-agent-codebase-audit-5-chair-council-sprint-60-post-wave-a.json"
 }

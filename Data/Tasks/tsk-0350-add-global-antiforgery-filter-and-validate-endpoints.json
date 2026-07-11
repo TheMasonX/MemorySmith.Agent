@@ -4,7 +4,7 @@
   "title": "Add global antiforgery filter and validate endpoints",
   "description": "Implement global antiforgery middleware/filter, audit public endpoints, and add automated tests to assert antiforgery tokens required where applicable. Document exceptions.",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "Critical",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,11 +23,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T00:25:03.2611808Z",
-  "updatedAtUtc": "2026-07-11T00:25:03.2611808Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-11T05:23:10.7899108Z",
+  "completedAtUtc": "2026-07-11T05:23:10.7899108Z",
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0350-add-global-antiforgery-filter-and-validate-endpoints.json"
 }

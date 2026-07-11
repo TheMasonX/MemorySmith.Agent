@@ -10,6 +10,7 @@ using Agent.Planning;
 using Agent.Planning.Llm;
 using Agent.Tools;
 using Agent.World.Minecraft;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -364,6 +365,11 @@ if (agentEnabled)
 
     builder.Services.AddSignalR();
 
+    // Sprint 60 (TSK-0350): Register antiforgery services for CSRF protection.
+    // Validated by UseAntiforgery() middleware on POST/PUT/DELETE/PATCH requests.
+    // The SignalR hub at /agent-hub is exempted via .DisableAntiforgery().
+    builder.Services.AddAntiforgery();
+
     // Sprint 39 P1: LLM evaluator for observation-driven replanning.
     builder.Services.AddSingleton<ILlmEvaluator>(sp => new LlmEvaluatorImpl(
         sp.GetRequiredService<ILlmProvider>(),
@@ -523,8 +529,22 @@ if (agentEnabled)
         safetyCfg.AllowDestructiveCommands, deniedList);
 }
 
+// Sprint 60 (TSK-0350): Global antiforgery middleware chain.
+//
+// 1. UseAntiforgery() — sets IAntiforgeryValidationFeature on requests. Does NOT
+//    short-circuit the pipeline; safe methods (GET, HEAD, OPTIONS, TRACE) and
+//    .DisableAntiforgery() endpoints are skipped automatically.
+// 2. AntiforgeryValidationMiddleware — checks the feature and returns 400 when
+//    validation fails, providing the actual short-circuit enforcement.
+app.UseAntiforgery();
+app.UseMiddleware<AntiforgeryValidationMiddleware>();
+
+// The SignalR hub uses .DisableAntiforgery() because its negotiate endpoint (POST)
+// carries WebSocket handshake parameters that cannot include antiforgery tokens.
+// WebSocket connections are inherently same-origin and immune to CSRF via
+// the WebSocket API (no cookie-based cross-origin requests possible).
 if (agentEnabled)
-    app.MapHub<AgentHub>("/agent-hub");
+    app.MapHub<AgentHub>("/agent-hub").DisableAntiforgery();
 
 // Sprint 50 Wave C: root / now redirects to dashboard HTML.
 // UseDefaultFiles + UseStaticFiles serve index.html from wwwroot/.
@@ -533,6 +553,23 @@ app.MapGet("/", (HttpContext ctx) =>
 {
     ctx.Response.Redirect("/index.html");
     return Task.CompletedTask;
+});
+
+// Sprint 60 (TSK-0350): Antiforgery token endpoint for the SPA dashboard.
+// The dashboard fetches a token on load and includes it in POST/DELETE requests
+// via the header returned in the response. This endpoint is a GET (safe method)
+// so the UseAntiforgery() middleware skips it automatically. Placed at a path
+// OUTSIDE /api/ so the ApiKeyMiddleware does not gate it — the dashboard must
+// be able to fetch a token without an API key. The token is tied to the session
+// cookie established during the initial page load, not the API key.
+app.MapGet("/antiforgery/token", (IAntiforgery antiforgery, HttpContext context) =>
+{
+    var tokens = antiforgery.GetAndStoreTokens(context);
+    return Results.Ok(new
+    {
+        token      = tokens.RequestToken,
+        headerName = tokens.HeaderName,
+    });
 });
 
 app.MapGet("/api/about", (IGoalFactory? factory) => Results.Ok(new

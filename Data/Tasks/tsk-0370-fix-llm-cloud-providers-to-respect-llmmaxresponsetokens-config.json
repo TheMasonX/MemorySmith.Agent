@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0370-fix-llm-cloud-providers-to-respect-llmmaxresponsetokens-config",
+  "key": "TSK-0370",
+  "title": "Fix LLM cloud providers to respect LlmMaxResponseTokens config",
+  "description": "P1 finding from 2026-07-11 audit (MSA-LLM-003): All cloud LLM providers (Anthropic, Gemini, OpenAI-Compatible) hardcode MaxTokens=512 instead of reading LlmMaxResponseTokens from ChatOptions config. Admin-configured token limit is silently ignored. Source: Data/Pages/Audits/codebase-audit-20260711-10agent-swarm-5chair-council.md",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:llm",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T05:19:54.3295469Z",
+  "updatedAtUtc": "2026-07-11T05:19:54.3295469Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

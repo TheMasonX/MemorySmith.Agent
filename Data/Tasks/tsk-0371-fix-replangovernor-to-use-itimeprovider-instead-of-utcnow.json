@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0371-fix-replangovernor-to-use-itimeprovider-instead-of-utcnow",
+  "key": "TSK-0371",
+  "title": "Fix ReplanGovernor to use ITimeProvider instead of UtcNow",
+  "description": "P1 finding from 2026-07-11 audit (MSA-INFRA-001): ReplanGovernor uses DateTime.UtcNow directly instead of injected ITimeProvider. This prevents deterministic testing. Inject ITimeProvider and use it for all time-based decisions (stall timeout, auto-recovery). Source: Data/Pages/Audits/codebase-audit-20260711-10agent-swarm-5chair-council.md",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:core",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T05:19:54.4471319Z",
+  "updatedAtUtc": "2026-07-11T05:19:54.4471319Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

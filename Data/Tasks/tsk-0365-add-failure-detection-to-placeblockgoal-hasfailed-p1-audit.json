@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0365-add-failure-detection-to-placeblockgoal-hasfailed-p1-audit",
+  "key": "TSK-0365",
+  "title": "Add failure detection to PlaceBlockGoal.HasFailed (P1 audit)",
+  "description": "P1 finding from 2026-07-11 audit: PlaceBlockGoal.HasFailed always returns false \u2014 no failure detection mechanism. If placement is obstructed forever, the goal never fails, creating an infinite loop. Add consecutive-failure detection to HasFailed. Source: Data/Pages/Audits/codebase-audit-20260711-10agent-swarm-5chair-council.md (P1-002)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:planning",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T05:19:38.7076086Z",
+  "updatedAtUtc": "2026-07-11T05:19:38.7076086Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

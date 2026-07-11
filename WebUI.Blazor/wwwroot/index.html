@@ -479,6 +479,32 @@ async function init() {
   setInterval(refreshQueue,  3000);
   startLiveLogPolling();              // Sprint 50: persistent mini-log on Overview
   startUptimeCounter();               // Sprint 50 Wave C: uptime display
+  // Sprint 60 (TSK-0350): Fetch antiforgery token for POST/DELETE requests
+  initAntiforgery();
+}
+
+// ── Antiforgery (Sprint 60, TSK-0350) ────────────────────────────────────
+
+let antiforgeryToken = null;
+let antiforgeryHeader = 'RequestVerificationToken';
+
+async function initAntiforgery() {
+  try {
+    const res = await fetch('/antiforgery/token');
+    if (res.ok) {
+      const data = await res.json();
+      antiforgeryToken = data.token;
+      antiforgeryHeader = data.headerName || 'RequestVerificationToken';
+    }
+  } catch(e) { console.warn('Antiforgery init failed', e); }
+}
+
+function antiforgeryHeaders(headers) {
+  const h = Object.assign({}, headers || {});
+  if (antiforgeryToken) {
+    h[antiforgeryHeader] = antiforgeryToken;
+  }
+  return h;
 }
 
 // ── Uptime Counter ──────────────────────────────────────────────────────────
@@ -742,7 +768,7 @@ async function setGoal() {
   try {
     const res = await fetch('/api/agent/plan', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: antiforgeryHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ goalName, parameters: Object.keys(params).length ? params : null }),
     });
     const data = await res.json();
@@ -761,7 +787,7 @@ async function setGoal() {
 
 async function cancelGoal() {
   try {
-    await fetch('/api/agent/goal', { method: 'DELETE' });
+    await fetch('/api/agent/goal', { method: 'DELETE', headers: antiforgeryHeaders() });
     setGoalMsg('Goal cancelled.');
     addChatMsg('sys', null, 'Goal cancelled.');
   } catch(e) { setGoalMsg(`✗ ${e.message}`); }
@@ -780,7 +806,7 @@ async function setOrigin() {
   try {
     const res = await fetch('/api/agent/origin', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: antiforgeryHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ blueprintId: bpId, x, y, z }),
     });
     const data = await res.json();
@@ -947,7 +973,7 @@ async function sendChat() {
   try {
     await fetch('/api/agent/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: antiforgeryHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ message: msg }),
     });
   } catch(e) { addChatMsg('sys', null, `Send failed: ${e.message}`); }

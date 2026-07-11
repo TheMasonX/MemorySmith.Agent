@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0366-fix-playercollect-fallback-chain-always-returns-unknown",
+  "key": "TSK-0366",
+  "title": "Fix playerCollect fallback chain (always returns \u0027unknown\u0027)",
+  "description": "P1 finding from 2026-07-11 audit (MSA-MF-006, council-verified as worse than reported): playerCollect handler uses entity?.metadata?.name but Mineflayer metadata is an array of MetadataPropertyValue objects, so .name on an array always returns undefined. Item names ALWAYS resolve to \u0027unknown\u0027. Replace with version-safe fallback documented in AGENTS.md. Source: Data/Pages/Audits/codebase-audit-20260711-10agent-swarm-5chair-council.md (P1-005)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:adapter",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T05:19:38.7546572Z",
+  "updatedAtUtc": "2026-07-11T05:19:38.7546572Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

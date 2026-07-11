@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0361-fix-websocketbridge-ws-data-race-p0-from-10-agent-audit",
+  "key": "TSK-0361",
+  "title": "Fix WebSocketBridge _ws data race (P0 from 10-agent audit)",
+  "description": "P0 finding from 2026-07-11 audit: _ws is mutated without synchronization in WebSocketBridge.cs. SendAsync reads _ws to check IsOpen while the reconnect loop disposes and replaces _ws. No lock \u2014 send can race with reconnect. Guard _ws access with a lock or use ImmutableInterlocked for atomic swap. Source: Data/Pages/Audits/codebase-audit-20260711-10agent-swarm-5chair-council.md (P0-002)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:adapter",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T05:19:38.4537442Z",
+  "updatedAtUtc": "2026-07-11T05:19:38.4537442Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

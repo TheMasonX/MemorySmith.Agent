@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0367-fix-connectbot-event-listener-leak-on-reconnect-p1-audit",
+  "key": "TSK-0367",
+  "title": "Fix connectBot event listener leak on reconnect (P1 audit)",
+  "description": "P1 finding from 2026-07-11 audit (MSA-MF-007): connectBot() creates new bot and registers handlers without removing old ones. On reconnect, duplicate listeners accumulate \u2014 each event fires N times after N reconnections. Add removeAllListeners() before re-registration. Source: Data/Pages/Audits/codebase-audit-20260711-10agent-swarm-5chair-council.md (P1-006)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:adapter",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T05:19:38.7998619Z",
+  "updatedAtUtc": "2026-07-11T05:19:38.7998619Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

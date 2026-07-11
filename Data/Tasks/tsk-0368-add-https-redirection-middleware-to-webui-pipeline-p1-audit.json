@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0368-add-https-redirection-middleware-to-webui-pipeline-p1-audit",
+  "key": "TSK-0368",
+  "title": "Add HTTPS redirection middleware to WebUI pipeline (P1 audit)",
+  "description": "P1 finding from 2026-07-11 audit (council-discovered): WebUI.Blazor/Program.cs has no UseHttpsRedirection() call. API keys via X-Api-Key header, agent status data, player chat all transmitted in cleartext. Add app.UseHttpsRedirection() to the pipeline. Source: Data/Pages/Audits/codebase-audit-20260711-10agent-swarm-5chair-council.md (P1-008)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:security",
+    "type:hardening"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T05:19:38.8445379Z",
+  "updatedAtUtc": "2026-07-11T05:19:38.8445379Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

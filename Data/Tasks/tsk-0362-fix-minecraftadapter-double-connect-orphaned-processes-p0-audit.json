@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0362-fix-minecraftadapter-double-connect-orphaned-processes-p0-audit",
+  "key": "TSK-0362",
+  "title": "Fix MinecraftAdapter double-connect orphaned processes (P0 audit)",
+  "description": "P0 finding from 2026-07-11 audit: MinecraftAdapter.ConnectAsync has no guard against existing connection. If called twice, _nodeProcess and _bridge are replaced without disposing the previous instances. Orphaned Node.js processes accumulate. Also, Dispose doesn\u0027t call DisconnectAsync. Add guard \u002B ensure cleanup. Source: Data/Pages/Audits/codebase-audit-20260711-10agent-swarm-5chair-council.md (P0-003)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:adapter",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T05:19:38.522036Z",
+  "updatedAtUtc": "2026-07-11T05:19:38.522036Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

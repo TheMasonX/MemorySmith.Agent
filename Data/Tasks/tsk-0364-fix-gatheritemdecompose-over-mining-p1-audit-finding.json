@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0364-fix-gatheritemdecompose-over-mining-p1-audit-finding",
+  "key": "TSK-0364",
+  "title": "Fix GatherItemDecompose over-mining (P1 audit finding)",
+  "description": "P1 finding from 2026-07-11 audit: GatherItemDecompose adds 7 MineBlock actions per source block type without deducting expected yield from inventory projections. Mining 7 oak_logs when only 3 are needed wastes agent time and inventory space. Track per-block expected yield and adjust target count dynamically. Source: Data/Pages/Audits/codebase-audit-20260711-10agent-swarm-5chair-council.md (P1-001)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-60",
+    "domain:planning",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T05:19:38.6463999Z",
+  "updatedAtUtc": "2026-07-11T05:19:38.6463999Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

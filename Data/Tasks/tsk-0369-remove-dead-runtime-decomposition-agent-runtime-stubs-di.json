@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0369-remove-dead-runtime-decomposition-agent-runtime-stubs-di",
+  "key": "TSK-0369",
+  "title": "Remove dead runtime decomposition (AGENT.Runtime stubs \u002B DI)",
+  "description": "P0 finding from 2026-07-11 audit (MSA-RT-006, council-upgraded): The Sprint 37\u002B runtime decomposition (6 interfaces \u002B 6 stub implementations \u002B AgentRuntime record \u002B DI registrations) is completely unused by AgentBackgroundService. ABS receives all dependencies directly. Delete: AgentRuntime record, IRecoveryManager/IPlanningManager/IExecutionManager interfaces \u002B stubs, and their DI registrations. Consolidate to only IIrentManager/IDashboardPublisher/IStateManager which have real value. This removes 12\u002B findings in one commit. Source: Data/Pages/Audits/codebase-audit-20260711-10agent-swarm-5chair-council.md (P0-001)",
+  "type": "Task",
+  "status": "Backlog",
+  "priority": "Critical",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "anonymous",
+  "labels": [
+    "sprint-61",
+    "domain:core",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-11T05:19:54.2697199Z",
+  "updatedAtUtc": "2026-07-11T05:19:54.2697199Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}
