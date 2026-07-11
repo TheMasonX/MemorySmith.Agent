@@ -98,6 +98,7 @@ Environment queries (QueryBlocksTool, QueryEntitiesTool), WorldStateDiff, ILlmEv
 
 | Version | Sprint | Tests | Status |
 |---------|--------|-------|--------|
+| v0.60.0 | 60 | 815 | ✅ green (Wave A+B) |
 | v0.56.0 | 56–58 | 815+ | ✅ green |
 | v0.55.0 | 55 | 746 | ✅ green |
 | v0.51.1 | 51 | 742 | ✅ green |
@@ -146,17 +147,17 @@ Environment queries (QueryBlocksTool, QueryEntitiesTool), WorldStateDiff, ILlmEv
 | TSK-0326–0329 | P2 | Goal-identity guard, SafetyConfig runtime normalization, log levels, SignalR event name drift | ✅ Done |
 
 ### Sprint 60 — Architectural Stability & Legacy Cleanup 🎯 **CURRENT**
-**Status:** 🟢 Planned | **Theme:** Remove legacy fallback paths, reduce tech debt surface, harden core pipelines
+**Status:** 🟢 Wave B complete | **Theme:** Remove legacy fallback paths, reduce tech debt surface, harden core pipelines
 
 This sprint focuses on architectural stability — removing deprecated/legacy fallbacks, refactoring fragile subsystems, and cleaning up tech debt accumulated across 50+ sprints.
 
-| Wave | Theme | Tasks | Priority |
-|:-----|:------|:------|:--------:|
-| A | **Legacy Fallback Removal** | TSK-0293 (remove legacy planning/runtime shims), TSK-0284 (migrate Facts writers to StructuredFacts), TSK-0082 (extract shared SmeltableMapping), TSK-0118 (remove dead ChatInterpreter regex fields) | **High** |
-| B | **Core Pipeline Hardening** | TSK-0322 (ExecutionManager JSON round-trip — P0), TSK-0345 (replan flooding fix), TSK-0348 (WorldModel inventory/ActionOutcome wiring) | **Critical** |
-| C | **Audit Synthesis Tasks** | TSK-0346 (adapter goto timeout gap), TSK-0347 (restore search scoring), TSK-0349 (rotate secrets + secret scanning), TSK-0350 (global antiforgery filter) | **High** |
-| D | **Inventory SSOT + BlockState** | TSK-0302 (inventory SSOT refactor — event-sourced, remove IsInventoryStale), TSK-0245 (assess BlockState type change impact) | **Critical** |
-| E | **Ready Backlog Cleanup** | TSK-0144 (CI package vetting), TSK-0145 (CI Verify-AboutDeps), TSK-0134 (DI startup logging), TSK-0133 (replan param preservation), TSK-0132 (page search score fix), TSK-0271 (build dispatch sequencing) | High |
+| Wave | Theme | Tasks | Priority | Status |
+|:-----|:------|:------|:--------:|:------:|
+| A | **Legacy Fallback Removal** | TSK-0293 (remove legacy planning/runtime shims), TSK-0284 (migrate Facts writers to StructuredFacts), TSK-0082 (extract shared SmeltableMapping), TSK-0118 (remove dead ChatInterpreter regex fields) | **High** | ✅ Complete |
+| B | **Core Pipeline Hardening** | TSK-0322 (ExecutionManager JSON round-trip — P0), TSK-0345 (replan flooding fix), TSK-0348 (WorldModel inventory/ActionOutcome wiring) | **Critical** | ✅ Complete |
+| C | **Audit Synthesis Tasks** | TSK-0346 (adapter goto timeout gap), TSK-0347 (restore search scoring), TSK-0349 (rotate secrets + secret scanning), TSK-0350 (global antiforgery filter) | **High** | 🔵 Ready |
+| D | **Inventory SSOT + BlockState** | TSK-0302 (inventory SSOT refactor — event-sourced, remove IsInventoryStale), TSK-0245 (assess BlockState type change impact) | **Critical** | 🔵 Planned |
+| E | **Ready Backlog Cleanup** | TSK-0144 (CI package vetting), TSK-0145 (CI Verify-AboutDeps), TSK-0134 (DI startup logging), TSK-0133 (replan param preservation), TSK-0132 (page search score fix), TSK-0271 (build dispatch sequencing) | High | 🔵 Planned |
 
 ---
 
