@@ -346,7 +346,10 @@ public sealed class AgentBackgroundService(
         // Sprint 21 P0-A: mark inventory as potentially stale so GenericGatherGoal.IsComplete
         // won't false-complete on stale inventory (e.g. after admin /clear). Cleared by
         // WorldStateProjector.ApplyStatus when a fresh StatusEvent arrives via GetStatus.
-        _worldState = _worldState.With(b => b.SetInventoryStale(true));
+        // Sprint 60 Wave D (TSK-0302): also clear the timestamp-based freshness tracker.
+        _worldState = _worldState.With(b => b
+            .SetInventoryStale(true)
+            .SetLastFreshInventoryAt(null));
         // Sprint 23 P0-A/P1-B: reset health-damage tracking for new goal.
         // D-7 resolution: -1 forces re-initialization on the first HealthEvent so we never
         // compute a spurious damage delta from stale inter-goal state.
@@ -463,7 +466,7 @@ public sealed class AgentBackgroundService(
     // ── Creative provisioning (Sprint 52: delegated to adapter) ──────────────
 
     /// <summary>
-    /// Sprint 56 (TSK-0275): Sanitize a block/item name for /give command dispatch.
+    /// Sprint 56 (TSK-0275): Sanitize a block/item name for command dispatch.
     /// Only allows alphanumeric characters and underscores. Rejects anything that could
     /// be command injection (spaces, semicolons, shell metacharacters, path traversal).
     /// Returns null if the name fails validation.
@@ -481,14 +484,13 @@ public sealed class AgentBackgroundService(
     }
 
     /// <summary>
-    /// Sprint 52: Creative mode inventory provisioning is handled entirely by the
-    /// MineflayerAdapter via creativeProvider.js. The adapter uses
-    /// bot.creative.setInventorySlot() (version-agnostic, no OP required).
+    /// Sprint 60 Wave D (TSK-0302): Creative provisioning via the adapter's
+    /// CreativeProvision action. Uses <c>bot.creative.setInventorySlot()</c>
+    /// (version-agnostic, no OP required) with a built-in /give fallback.
     ///
-    /// Sprint 52: Re-enabled /give as a secondary provisioning path. The adapter
-    /// handles per-block creative inventory, but some items (torch, glass_pane,
-    /// crafting_table, chest) may not appear via setInventorySlot on 1.16.5.
-    /// /give ensures these materials are available before building starts.
+    /// This replaces the previous /give chat-command approach which silently
+    /// failed on LAN worlds where /give requires OP that can't be granted.
+    /// The adapter's <c>creativeProvider.js</c> handles the dual-path strategy.
     /// </summary>
     private async Task ProvisionGoalIfCreativeAsync(IGoal goal, CancellationToken ct)
     {
@@ -504,18 +506,15 @@ public sealed class AgentBackgroundService(
                 foreach (var (block, quantity) in materials)
                 {
                     // Sprint 58 Wave C (TSK-0326): guard against goal change mid-provisioning.
-                    // If the goal was cancelled or replaced while we were awaiting the
-                    // inter-command delay, stop enqueuing /give commands for the old goal.
                     if (_currentGoal != goal)
                     {
                         logger.LogInformation(
-                            "[creative] goal changed during provisioning — stopping /give for '{Blueprint}'",
+                            "[creative] goal changed during provisioning — stopping for '{Blueprint}'",
                             buildGoal.Blueprint.Name);
                         return;
                     }
 
-                    // Sprint 56 (TSK-0275): sanitize block name before /give dispatch.
-                    // Reject names with injection characters (spaces, semicolons, etc.).
+                    // Sanitize block name (defensive).
                     var safeBlock = SanitizeBlockName(block);
                     if (safeBlock is null)
                     {
@@ -529,18 +528,21 @@ public sealed class AgentBackgroundService(
                     var need = Math.Max(0, quantity - have);
                     if (need <= 0) continue;
 
-                    // 200ms spacing to avoid anti-spam
+                    // 200ms spacing to avoid flooding the adapter
                     if (anyProvisioned)
                         await Task.Delay(200, ct);
 
-                    var giveCmd = $"/give @p {safeBlock} {need}";
                     _queue.Enqueue(new ActionData
                     {
-                        Tool = "Chat",
-                        Arguments = { ["message"] = giveCmd }
+                        Tool = "CreativeProvision",
+                        Arguments =
+                        {
+                            ["item"] = safeBlock,
+                            ["count"] = need,
+                        }
                     });
                     logger.LogInformation(
-                        "[creative] /give {Need}x {Item} for '{Blueprint}'",
+                        "[creative] provisioning {Need}x {Item} for '{Blueprint}' via CreativeProvision",
                         need, block, buildGoal.Blueprint.Name);
                     anyProvisioned = true;
                 }
@@ -552,7 +554,7 @@ public sealed class AgentBackgroundService(
         catch (OperationCanceledException) { /* shutdown */ }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "[creative] /give provisioning failed: {Message}", ex.Message);
+            logger.LogWarning(ex, "[creative] provisioning failed: {Message}", ex.Message);
         }
     }
 
@@ -1117,7 +1119,7 @@ public sealed class AgentBackgroundService(
                         "cancelling goal '{Goal}', clearing queue and stale inventory",
                         de.Pos.X, de.Pos.Y, de.Pos.Z,
                         _currentGoal?.Name ?? "(none)");
-                    _worldState = _worldState with { IsInventoryStale = true };
+                    _worldState = _worldState with { IsInventoryStale = true, LastFreshInventoryAt = null };
                     lock (_pendingLock) _pendingActions.Clear();
                     _correlatedActions.Clear();
                     _currentGoal = null;
@@ -3442,33 +3444,82 @@ public sealed class AgentBackgroundService(
         try
         {
             var outcomes = _cycleOutcomes.ToArray();
-            // Sprint 54 (TSK-0222): forceEvaluate=true bypasses fast-paths.
+            // Sprint 60 Wave D (TSK-0243): use directive-based evaluation.
             // The governor has already declared a stall — that IS the failure signal.
             // Fire-and-forget tools like PlaceBlock always report success at dispatch;
             // their real failures (timeouts, skips) are in _correlatedActions, not outcomes.
-            var evalResult = await _llmEvaluator.EvaluateAsync(
+            var directive = await _llmEvaluator.EvaluateWithDirectiveAsync(
                 _currentGoal!, outcomes, _worldState, ct, forceEvaluate: true, diff: null);
 
-            if (evalResult.ShouldReplan)
+            switch (directive)
             {
-                logger.LogInformation(
-                    "[llm-replan] LLM recommends replan for '{Goal}': {Reason}. Suggestion: {Suggestion}",
-                    _currentGoal!.Name, evalResult.Reason, evalResult.Suggestion);
+                case EvaluationDirective.Recover r:
+                    logger.LogInformation(
+                        "[llm-replan] Recover for '{Goal}': {Reason}. Suggestion: {Suggestion}",
+                        _currentGoal!.Name, r.Reason, r.Suggestion);
 
-                // Sprint 54: send the LLM's suggestion to chat so the player
-                // knows what remediation is being attempted.
-                if (!string.IsNullOrEmpty(evalResult.Suggestion))
-                {
-                    _queue.Enqueue(new ActionData
+                    // Send the LLM's suggestion to chat so the player knows
+                    // what remediation is being attempted.
+                    if (!string.IsNullOrEmpty(r.Suggestion))
                     {
-                        Tool = "Chat",
-                        Arguments = { ["message"] = $"[LLM] {evalResult.Suggestion}" }
-                    });
-                }
+                        _queue.Enqueue(new ActionData
+                        {
+                            Tool = "Chat",
+                            Arguments = { ["message"] = $"[LLM] {r.Suggestion}" }
+                        });
+                    }
 
-                // Sprint 54: clear the action queue so the outer loop replans
-                // fresh instead of retrying the same stale actions.
-                _queue.Clear();
+                    // Clear the action queue so the outer loop replans fresh
+                    // instead of retrying the same stale actions.
+                    _queue.Clear();
+                    break;
+
+                case EvaluationDirective.Stop s:
+                    logger.LogWarning(
+                        "[llm-replan] Stop for '{Goal}': {Reason}. Abandoning goal.",
+                        _currentGoal!.Name, s.Reason);
+                    _currentGoal = null;
+                    _queue.Clear();
+                    break;
+
+                case EvaluationDirective.AdvanceSequence:
+                    logger.LogInformation(
+                        "[llm-replan] AdvanceSequence for '{Goal}' — advancing to next step.",
+                        _currentGoal!.Name);
+                    if (_currentGoal is TaskSequenceGoal seq)
+                    {
+                        _queue.Clear();
+                        // The outer loop will re-evaluate and advance the sequence
+                        // via TryAdvanceSequence on next iteration.
+                    }
+                    break;
+
+                case EvaluationDirective.CreateFollowUp f:
+                    logger.LogInformation(
+                        "[llm-replan] CreateFollowUp for '{Goal}': {FollowUpGoal} — {Reason}",
+                        _currentGoal!.Name, f.FollowUpGoal, f.Reason);
+                    // Record the follow-up goal as a fact so the outer loop can
+                    // create it after the current goal completes.
+                    _worldState = _worldState.With(b =>
+                        b.SetFact("goal:followup", f.FollowUpGoal, FactSource.LlmDirective));
+                    break;
+
+                case EvaluationDirective.ScheduleWake w:
+                    logger.LogInformation(
+                        "[llm-replan] ScheduleWake for '{Goal}': {Delay:F0}s — {Reason}",
+                        _currentGoal!.Name, w.Delay.TotalSeconds, w.Reason);
+                    // Schedule wake is a no-op in the current loop; the stall timer
+                    // will naturally retry. The directive signals intent for future
+                    // timer-based wakeup support.
+                    break;
+
+                case EvaluationDirective.Continue:
+                default:
+                    // No replan needed — continue executing current plan.
+                    logger.LogDebug(
+                        "[llm-replan] Continue for '{Goal}' — no action needed.",
+                        _currentGoal?.Name ?? "(null)");
+                    break;
             }
         }
         catch (OperationCanceledException) { /* shutdown */ }

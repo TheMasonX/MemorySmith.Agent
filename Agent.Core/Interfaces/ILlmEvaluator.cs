@@ -51,6 +51,19 @@ public interface ILlmEvaluator
     Task<EvaluationResult> EvaluateAsync(IGoal goal, IReadOnlyList<ActionOutcome> outcomes,
         WorldState worldState, CancellationToken ct = default, bool forceEvaluate = false,
         WorldStateDiff? diff = null);
+
+    /// <summary>
+    /// Sprint 60 Wave D (TSK-0243): Evaluates accumulated outcomes and returns a
+    /// discriminated <see cref="EvaluationDirective"/> covering 6 distinct outcomes:
+    /// continue, stop, advance sequence, create follow-up goal, schedule wake, recover/replan.
+    ///
+    /// This is an additive overload — the original <see cref="EvaluateAsync"/> is unchanged
+    /// for backward compatibility. The default implementation returns <c>Continue</c>.
+    /// </summary>
+    Task<EvaluationDirective> EvaluateWithDirectiveAsync(IGoal goal,
+        IReadOnlyList<ActionOutcome> outcomes, WorldState worldState,
+        CancellationToken ct = default, bool forceEvaluate = false,
+        WorldStateDiff? diff = null);
 }
 
 /// <summary>
@@ -78,4 +91,30 @@ public sealed record EvaluationResult(bool ShouldReplan, string Reason = "", str
     /// Values: "ParseFailure", "Timeout", "NullResponse", "ProviderUnavailable".
     /// </summary>
     public string? FailureReason { get; init; }
+}
+
+/// <summary>
+/// Sprint 60 Wave D (TSK-0243): Discriminated union of evaluation outcomes from
+/// <see cref="ILlmEvaluator.EvaluateWithDirectiveAsync"/>. Replaces the bare
+/// <c>ShouldReplan</c> bool with 6 distinct directives for the autonomy pipeline.
+/// </summary>
+public abstract record EvaluationDirective
+{
+    /// <summary>Continue executing the current plan without changes.</summary>
+    public sealed record Continue(string Reason = "") : EvaluationDirective;
+
+    /// <summary>Abandon the current goal entirely.</summary>
+    public sealed record Stop(string Reason = "") : EvaluationDirective;
+
+    /// <summary>Advance to the next step in a <c>TaskSequenceGoal</c>.</summary>
+    public sealed record AdvanceSequence : EvaluationDirective;
+
+    /// <summary>Create a follow-up goal after the current one completes.</summary>
+    public sealed record CreateFollowUp(string FollowUpGoal, string Reason = "") : EvaluationDirective;
+
+    /// <summary>Schedule a wake-up timer for deferred evaluation.</summary>
+    public sealed record ScheduleWake(TimeSpan Delay, string Reason = "") : EvaluationDirective;
+
+    /// <summary>Recover from a failure by replanning with a specific suggestion.</summary>
+    public sealed record Recover(string Suggestion = "", string Reason = "") : EvaluationDirective;
 }

@@ -174,13 +174,14 @@ public static class BlueprintParser
     // ── Legend ────────────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Internal parsed legend entry: block ID plus optional facing/blockState
-    /// extracted from per-symbol annotations.
+    /// Sprint 60 Wave D (TSK-0245): Internal parsed legend entry: block ID plus
+    /// optional facing/blockState extracted from per-symbol annotations.
+    /// <see cref="BlockState"/> is now a structured record instead of a flat string.
     /// </summary>
     private sealed record LegendEntry(
         string? BlockId,
         string? Facing = null,
-        string? BlockState = null);
+        BlockState? BlockState = null);
 
     private static Dictionary<char, LegendEntry> ParseLegend(string[] lines, int contentStart)
     {
@@ -247,9 +248,11 @@ public static class BlueprintParser
             if (parenIdx > 0)
                 blockId = blockId[..parenIdx].Trim();
 
-            // Parse annotations: facing: X, blockState: X
+            // Sprint 60 Wave D (TSK-0245): Parse annotations: facing: X, blockState: X
+            // blockState value is a wire-format string (e.g. "half=top,waterlogged=true")
+            // that gets parsed into a structured BlockState record.
             string? facing = null;
-            string? blockState = null;
+            string? rawBlockState = null;
             for (int a = 1; a < parts.Length; a++)
             {
                 var annotation = parts[a];
@@ -262,8 +265,10 @@ public static class BlueprintParser
                 if (key.Equals("facing", StringComparison.OrdinalIgnoreCase) && val.Length > 0)
                     facing = val;
                 else if (key.Equals("blockState", StringComparison.OrdinalIgnoreCase) && val.Length > 0)
-                    blockState = val;
+                    rawBlockState = val;
             }
+
+            var blockState = BlockState.Parse(rawBlockState);
 
             string? resolvedBlockId;
             if (blockId.Equals("air",  StringComparison.OrdinalIgnoreCase)

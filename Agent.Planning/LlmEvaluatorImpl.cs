@@ -364,4 +364,165 @@ public sealed class LlmEvaluatorImpl : ILlmEvaluator
         var end   = text.LastIndexOf('}');
         return start >= 0 && end > start ? text[start..(end + 1)] : null;
     }
+
+    // ── Discriminated directive evaluation (TSK-0243) ─────────────────────────
+
+    /// <summary>
+    /// Sprint 60 Wave D (TSK-0243): Evaluator overload that returns a discriminated
+    /// <see cref="EvaluationDirective"/>. Uses the same fast-path and provider logic
+    /// as <see cref="EvaluateAsync"/> but parses a richer response format with a
+    /// "directive" field.
+    /// </summary>
+    public async Task<EvaluationDirective> EvaluateWithDirectiveAsync(
+        IGoal goal,
+        IReadOnlyList<ActionOutcome> outcomes,
+        WorldState worldState,
+        CancellationToken ct = default,
+        bool forceEvaluate = false,
+        WorldStateDiff? diff = null)
+    {
+        // Fast-path 1: too few data points.
+        if (!forceEvaluate && outcomes.Count < MinOutcomesBeforeEval)
+            return new EvaluationDirective.Continue("too few outcomes");
+
+        // Fast-path 2: all outcomes succeeded — no reason to change course.
+        var failureCount = outcomes.Count(static o => !o.Success);
+        if (!forceEvaluate && failureCount == 0 && (diff is null || !diff.HasMismatch))
+            return new EvaluationDirective.Continue("all actions succeeded");
+
+        // Fast-path 3: provider offline.
+        if (!_provider.IsAvailable)
+        {
+            _logger.LogDebug(
+                "[evaluator/directive] provider '{Provider}' unavailable — returning Continue for goal {Goal}",
+                _provider.ProviderName, goal.Name);
+            return new EvaluationDirective.Continue("provider unavailable");
+        }
+
+        try
+        {
+            var systemPrompt = BuildDirectiveSystemPrompt();
+            var userMessage  = BuildUserMessage(goal, outcomes, worldState, diff);
+
+            var raw = await _provider.CompleteAsync(systemPrompt, userMessage, ct);
+
+            if (raw is null)
+            {
+                _logger.LogWarning(
+                    "[evaluator/directive] provider returned null for goal {Goal} — defaulting to Continue",
+                    goal.Name);
+                return new EvaluationDirective.Continue("null response");
+            }
+
+            var directive = ParseEvaluationDirective(raw);
+
+            if (directive is EvaluationDirective.Continue c)
+                _logger.LogDebug(
+                    "[evaluator/directive] Continue for goal {Goal}: {Reason}",
+                    goal.Name, c.Reason);
+            else
+                _logger.LogInformation(
+                    "[evaluator/directive] {Type} for goal {Goal} — {Count} outcomes, {Failures} failures. {Detail}",
+                    directive.GetType().Name, goal.Name, outcomes.Count, failureCount,
+                    DescribeDirective(directive));
+
+            return directive;
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex,
+                "[evaluator/directive] unexpected error — defaulting to Continue for goal {Goal}",
+                goal.Name);
+            return new EvaluationDirective.Continue($"error: {ex.Message}");
+        }
+    }
+
+    private static string BuildDirectiveSystemPrompt() =>
+        "You are an autonomous Minecraft agent evaluator. Decide which directive " +
+        "the agent should follow based on observed outcomes.\n\n" +
+        "Respond ONLY with compact JSON:\n" +
+        "  {\"directive\":\"continue\", \"reason\":\"...\"}\n" +
+        "  {\"directive\":\"stop\", \"reason\":\"...\"}\n" +
+        "  {\"directive\":\"advance\", \"reason\":\"...\"}\n" +
+        "  {\"directive\":\"followup\", \"followUpGoal\":\"...\", \"reason\":\"...\"}\n" +
+        "  {\"directive\":\"schedule_wake\", \"delaySeconds\":60, \"reason\":\"...\"}\n" +
+        "  {\"directive\":\"recover\", \"suggestion\":\"...\", \"reason\":\"...\"}\n\n" +
+        "Directives:\n" +
+        "- continue: Keep executing the current plan (default for normal progress).\n" +
+        "- stop: Abandon the current goal entirely (goal impossible).\n" +
+        "- advance: Move to the next step in a sequence (current step complete).\n" +
+        "- followup: When current goal finishes, start a named follow-up goal.\n" +
+        "- schedule_wake: Pause evaluation and check again after a delay.\n" +
+        "- recover: Replan with the specific suggestion (multiple failures, resources missing).\n\n" +
+        "Choose recover when: multiple consecutive failures on the same tool, " +
+        "a required resource that clearly does not exist, or a goal that cannot be completed " +
+        "given the current world state.\n" +
+        "Default to continue for single transient failures or minor setbacks.\n" +
+        "Keep reason and suggestion under 20 words each.";
+
+    /// <summary>
+    /// Parses a JSON response into an <see cref="EvaluationDirective"/>.
+    /// Internal for testability. Returns <c>Continue</c> on any parse failure.
+    /// </summary>
+    internal static EvaluationDirective ParseEvaluationDirective(string response)
+    {
+        if (string.IsNullOrWhiteSpace(response))
+            return new EvaluationDirective.Continue("empty response");
+
+        try
+        {
+            var json = ExtractJson(response);
+            if (json is null)
+                return new EvaluationDirective.Continue("no JSON found");
+
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+
+            if (!root.TryGetProperty("directive", out var dirProp))
+                return new EvaluationDirective.Continue("missing directive field");
+
+            var directive = dirProp.GetString() ?? "continue";
+            var reason = root.TryGetProperty("reason", out var r) ? r.GetString() ?? "" : "";
+
+            return directive.ToLowerInvariant() switch
+            {
+                "stop" => new EvaluationDirective.Stop(reason),
+                "advance" => new EvaluationDirective.AdvanceSequence(),
+                "followup" => new EvaluationDirective.CreateFollowUp(
+                    root.TryGetProperty("followUpGoal", out var fg) ? fg.GetString() ?? "" : "",
+                    reason),
+                "schedule_wake" => new EvaluationDirective.ScheduleWake(
+                    root.TryGetProperty("delaySeconds", out var ds)
+                        ? TimeSpan.FromSeconds(ds.GetInt32())
+                        : TimeSpan.FromSeconds(60),
+                    reason),
+                "recover" => new EvaluationDirective.Recover(
+                    root.TryGetProperty("suggestion", out var sg) ? sg.GetString() ?? "" : "",
+                    reason),
+                _ => new EvaluationDirective.Continue(reason),
+            };
+        }
+        catch (JsonException)
+        {
+            return new EvaluationDirective.Continue("invalid JSON");
+        }
+        catch (Exception)
+        {
+            return new EvaluationDirective.Continue("unparseable response");
+        }
+    }
+
+    /// <summary>
+    /// Returns a human-readable summary of a directive for logging.
+    /// </summary>
+    private static string DescribeDirective(EvaluationDirective directive) => directive switch
+    {
+        EvaluationDirective.Stop s => $"stop: {s.Reason}",
+        EvaluationDirective.AdvanceSequence => "advance to next step",
+        EvaluationDirective.CreateFollowUp f => $"follow-up: {f.FollowUpGoal}",
+        EvaluationDirective.ScheduleWake w => $"wake in {w.Delay.TotalSeconds:F0}s: {w.Reason}",
+        EvaluationDirective.Recover r => $"recover: {r.Suggestion}",
+        _ => "",
+    };
 }

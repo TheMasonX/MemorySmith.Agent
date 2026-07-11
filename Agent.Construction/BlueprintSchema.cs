@@ -52,8 +52,10 @@ public record Dimensions(int X = 0, int Y = 0, int Z = 0);
 /// stairs, slabs, furnaces.
 /// </param>
 /// <param name="BlockState">
-/// Optional block state properties (e.g. "half=top", "shape=inner_left").
-/// Passed through to the adapter for future use. <c>null</c> means default state.
+/// Sprint 60 Wave D (TSK-0245): Optional structured block state properties
+/// (e.g. half=top, shape=inner_left). Serialized to wire format by
+/// <see cref="BlueprintExecutor"/> via <see cref="BlockState.ToWireString"/>.
+/// <c>null</c> means default state.
 /// </param>
 public record PlacementBlock(int X, int Y, int Z, string BlockId,
-    string? Facing = null, string? BlockState = null);
+    string? Facing = null, BlockState? BlockState = null);

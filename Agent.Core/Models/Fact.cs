@@ -52,6 +52,13 @@ public enum FactSource
     /// than Observed because they derive from error interpretation, not direct observation.
     /// </summary>
     Recovery,
+
+    /// <summary>
+    /// Sprint 60 Wave D (TSK-0243): Fact originated from an LLM evaluation directive
+    /// (ILlmEvaluator.EvaluateWithDirectiveAsync). Used to persist follow-up goals
+    /// and other evaluation-derived state into WorldState.
+    /// </summary>
+    LlmDirective,
 }
 
 /// <summary>

@@ -23,13 +23,36 @@ public record WorldState
     public DateTimeOffset UpdatedAt { get; init; } = DateTimeOffset.UtcNow;
 
     /// <summary>
-    /// Sprint 21 P0-A: true when inventory was marked potentially stale by
+    /// Sprint 21 P0-A: True when inventory was marked potentially stale by
     /// <see cref="WebUI.Blazor.AgentBackgroundService.SetGoal"/>.
     /// Cleared by <see cref="WorldStateProjector"/> when a fresh <c>StatusEvent</c> arrives.
     /// <see cref="Agent.Planning.Goals.GenericGatherGoal.IsComplete"/> returns false while
     /// this flag is set, preventing false-completion after admin <c>/clear</c>.
+    ///
+    /// Sprint 60 Wave D (TSK-0302): Complemented by <see cref="LastFreshInventoryAt"/>
+    /// timestamp model. New code should use <see cref="IsInventoryFresh(TimeSpan?)"/>
+    /// instead of reading this boolean directly.
     /// </summary>
     public bool IsInventoryStale { get; init; } = false;
+
+    /// <summary>
+    /// Sprint 60 Wave D (TSK-0302): UTC timestamp of the last confirmed fresh
+    /// inventory snapshot. <c>null</c> when inventory has never been confirmed
+    /// (e.g. after SetGoal or initial spawn before first StatusEvent).
+    /// Set by <see cref="WorldStateProjector.ApplyStatus"/> when a StatusEvent arrives.
+    /// </summary>
+    public DateTimeOffset? LastFreshInventoryAt { get; init; }
+
+    /// <summary>
+    /// Sprint 60 Wave D (TSK-0302): Returns true if inventory was confirmed fresh
+    /// within the specified <paramref name="maxAge"/>. Defaults to 60 seconds.
+    /// Returns false when inventory has never been confirmed (<see cref="LastFreshInventoryAt"/> is null).
+    /// </summary>
+    public bool IsInventoryFresh(TimeSpan? maxAge = null)
+    {
+        if (LastFreshInventoryAt is null) return false;
+        return (DateTimeOffset.UtcNow - LastFreshInventoryAt.Value) <= (maxAge ?? TimeSpan.FromSeconds(60));
+    }
 
     public bool IsCreativeMode => MatchesCreativeMode(GameMode)
         || (Facts.TryGetValue("world:gamemode", out var gm) && MatchesCreativeMode(Convert.ToString(gm)));
@@ -152,6 +175,17 @@ public record WorldState
         public Builder SetInventoryStale(bool stale)
         {
             _state = _state with { IsInventoryStale = stale };
+            return this;
+        }
+
+        /// <summary>
+        /// Sprint 60 Wave D (TSK-0302): Records the UTC timestamp of the last confirmed
+        /// fresh inventory snapshot. Set by WorldStateProjector when a StatusEvent arrives.
+        /// Pass <c>null</c> to clear (e.g. on SetGoal when inventory becomes potentially stale).
+        /// </summary>
+        public Builder SetLastFreshInventoryAt(DateTimeOffset? timestamp)
+        {
+            _state = _state with { LastFreshInventoryAt = timestamp };
             return this;
         }
 

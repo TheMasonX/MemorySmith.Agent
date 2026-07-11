@@ -332,7 +332,9 @@ public sealed class BlueprintParserTests
         var (_, blocks) = BlueprintParser.Parse(markdown);
         Assert.That(blocks, Has.Count.EqualTo(1));
         Assert.That(blocks[0].BlockId, Is.EqualTo("oak_slab"));
-        Assert.That(blocks[0].BlockState, Is.EqualTo("half=top"));
+        // Sprint 60 Wave D (TSK-0245): BlockState is now a structured record.
+        // Verify via ToWireString() round-trip.
+        Assert.That(blocks[0].BlockState?.ToWireString(), Is.EqualTo("half=top"));
         Assert.That(blocks[0].Facing, Is.Null);
     }
 
@@ -358,7 +360,8 @@ public sealed class BlueprintParserTests
         Assert.That(blocks, Has.Count.EqualTo(1));
         Assert.That(blocks[0].BlockId, Is.EqualTo("oak_slab"));
         Assert.That(blocks[0].Facing, Is.EqualTo("up"));
-        Assert.That(blocks[0].BlockState, Is.EqualTo("half=top"));
+        // Sprint 60 Wave D (TSK-0245): BlockState is now a structured record.
+        Assert.That(blocks[0].BlockState?.ToWireString(), Is.EqualTo("half=top"));
     }
 
     [Test]

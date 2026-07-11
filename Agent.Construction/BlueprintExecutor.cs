@@ -48,8 +48,10 @@ public sealed class BlueprintExecutor : IBlueprintExecutor
             };
             if (block.Facing != null)
                 action.Arguments["facing"] = block.Facing;
+            // Sprint 60 Wave D (TSK-0245): BlockState is now a structured record;
+            // serialize to wire format string for the adapter.
             if (block.BlockState != null)
-                action.Arguments["blockState"] = block.BlockState;
+                action.Arguments["blockState"] = block.BlockState.ToWireString();
             actions.Add(action);
         }
 

@@ -222,6 +222,9 @@ public sealed class WorldStateProjector
             // Sprint 21 P0-A: a GetStatus response confirms the current server-side inventory.
             // Clearing the stale flag allows GenericGatherGoal.IsComplete to proceed normally.
             b.SetInventoryStale(false);
+            // Sprint 60 Wave D (TSK-0302): Record the timestamp of this confirmed inventory
+            // snapshot so callers can use time-based freshness checks.
+            b.SetLastFreshInventoryAt(e.Timestamp);
             // Sprint 37: StatusEvent now carries game mode, so GetStatus responses also
             // update the confirmed game mode. Previously only GameModeChangedEvent (async)
             // set this, which could be missed on startup — causing false creative detection.

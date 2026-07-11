@@ -1766,6 +1766,37 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       sendBotStatus();
       break;
 
+    case 'CreativeProvision': {
+      // Sprint 60 Wave D (TSK-0302): Creative provisioning via adapter's
+      // ensureCreativeItem (uses setInventorySlot + /give fallback).
+      // Replaces the fragile C#-side /give chat command that silently fails on LAN.
+      const { item: provItem, count: provCount = 64 } = args;
+      if (!provItem) throw new Error('CreativeProvision requires item');
+      const { ensureCreativeItem } = require('./creativeProvider.cjs');
+      const ok = await ensureCreativeItem(bot, provItem, provCount);
+      if (ok) {
+        logStructured('info', 'CreativeProvision', 'success', {
+          item: provItem, count: provCount, correlationId,
+        });
+        sendEvent('creativeProvisionComplete', { item: provItem, count: provCount, correlationId });
+      } else {
+        logStructured('warn', 'CreativeProvision', 'failed — falling back to /give', {
+          item: provItem, count: provCount, correlationId,
+        });
+        // Fall back to /give as last resort
+        try {
+          bot.chat(`/give @p ${provItem} ${provCount}`);
+          sendEvent('creativeProvisionComplete', { item: provItem, count: provCount, correlationId });
+        } catch (e) {
+          logStructured('error', 'CreativeProvision', '/give also failed', {
+            item: provItem, error: e.message, correlationId,
+          });
+          sendEvent('error', { action: 'CreativeProvision', message: e.message, correlationId });
+        }
+      }
+      break;
+    }
+
     case 'chat':
       // Sprint 40 P0-B: guard against bot.chat() being called before bot has spawned.
       // The startup announcement can arrive before bot.entity is initialized.
