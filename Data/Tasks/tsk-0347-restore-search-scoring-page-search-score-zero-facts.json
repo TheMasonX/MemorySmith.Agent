@@ -4,7 +4,7 @@
   "title": "Restore search scoring (page-search-score-zero-facts)",
   "description": "Investigate and fix zero-scoring pages in search. Add BM25 indexing or embedding pipeline, ranking telemetry, and CI ranking tests using TestWorld.",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,11 +23,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T00:24:48.7167867Z",
-  "updatedAtUtc": "2026-07-11T00:24:48.7167867Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-11T05:30:30.726838Z",
+  "completedAtUtc": "2026-07-11T05:30:30.726838Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0347-restore-search-scoring-page-search-score-zero-facts.json"
 }

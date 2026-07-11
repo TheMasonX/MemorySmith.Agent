@@ -4,7 +4,7 @@
   "title": "Fix adapter goto / pathfinder timeout gap",
   "description": "Close the \u0060goto\u0060 timeout / outcome gap so adapter returns deterministic outcomes and publishes correct events. Add E2E test and validate event contract.",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -23,11 +23,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-11T00:24:41.4467645Z",
-  "updatedAtUtc": "2026-07-11T00:24:41.4467645Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-11T05:27:51.0019958Z",
+  "completedAtUtc": "2026-07-11T05:27:51.0019958Z",
+  "revision": 2,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0346-fix-adapter-goto-pathfinder-timeout-gap.json"
 }

@@ -45,8 +45,14 @@ public sealed class RestMemoryGateway(HttpClient http, RestMemoryGatewayOptions 
             // Preserve MemorySmith's server-side ordering (score desc, then date desc).
             // Kind="page" → PageId is a slug usable in GetPageAsync.
             // Kind="memory" → PageId is a UUID, NOT a valid page slug.
+            // Sprint 60 (TSK-0347): Page results from MemorySmith's /api/search
+            // return Score=null because PageSummary lacks a Score field. Until the
+            // base repo fix (MSR-001) is deployed, give pages a minimum score floor
+            // so they appear in results instead of being invisible at Score=0.0.
+            // Memory results carry their RRF hybrid score and are unaffected.
+            const double PageScoreFloor = 0.05;
             return hits
-                .Select(h => new SearchResult(h.Id, h.Score ?? 0.0, h.Snippet, h.Kind))
+                .Select(h => new SearchResult(h.Id, h.Score ?? (h.Kind == "page" ? PageScoreFloor : 0.0), h.Snippet, h.Kind))
                 .ToArray();
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)

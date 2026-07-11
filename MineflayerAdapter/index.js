@@ -649,8 +649,25 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       logStructured('info', 'move', 'navigating', { x, y, z, botX: bx, botY: by, botZ: bz, dist: dist.toFixed(1) });
       const movements = createMovements(bot);
       bot.pathfinder.setMovements(movements);
-      await bot.pathfinder.goto(new pfGoals.GoalNear(x, y, z, 1));
-      sendEvent('moveComplete', { ...botPos(), correlationId });
+      // Sprint 60 (TSK-0346): Wrap goto() with try-catch so timeouts emit a
+      // deterministic moveComplete failure event instead of silently dropping
+      // the outcome (which left actions in Dispatched→SweepTimedOut orphan state).
+      // The error IS re-thrown after the failure event so the outer drainQueue
+      // catch also emits actionFailed for the C# outcome correlator.
+      try {
+        await bot.pathfinder.goto(new pfGoals.GoalNear(x, y, z, 1));
+        sendEvent('moveComplete', { ...botPos(), correlationId });
+      } catch (err) {
+        const reasonCode = classifyError(err.message, 'move');
+        logStructured('warn', 'move', 'goto failed', {
+          x, y, z, reasonCode, message: err.message, correlationId,
+        });
+        sendEvent('moveComplete', {
+          ...botPos(), correlationId,
+          failed: true, reasonCode, message: err.message,
+        });
+        throw err; // Re-throw so drainQueue catch emits actionFailed
+      }
       break;
     }
 

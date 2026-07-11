@@ -30,6 +30,18 @@ jobs:
           --collect:"XPlat Code Coverage" --results-directory artifacts/TestResults
           -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
 
+      - name: Secret scan
+        run: pwsh ./Scripts/Invoke-SecretScan.ps1 -ScanAll -ReportPath artifacts/secret-scan-report.json
+        shell: pwsh
+        continue-on-error: true  # TSK-0349: report-only until baseline is clean
+
+      - name: Upload secret scan report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: secret-scan-report
+          path: artifacts/secret-scan-report.json
+
       - name: Validate task records
         run: pwsh ./Scripts/Test-TaskRecords.ps1
         shell: pwsh
