@@ -1257,6 +1257,13 @@ public sealed class AgentBackgroundService(
     /// when inventory is stale, even during active goals (Sprint 58 Wave C TSK-0321:
     /// goal precondition checks and the LLM evaluator need fresh inventory to make
     /// correct decisions; the previous idle-only guard let drift accumulate silently).
+    ///
+    /// Sprint 60 Wave E (TSK-0301): Uses <see cref="WorldState.IsInventoryFresh"/>
+    /// timestamp model instead of the <see cref="WorldState.IsInventoryStale"/> boolean
+    /// flag. The boolean flag is cleared after the first StatusEvent and never set
+    /// again during active goals, so the sync loop silently stopped refreshing during
+    /// long-running goals. The timestamp model ensures periodic refresh (every 60s
+    /// by default) even when the stale flag is false.
     /// </summary>
     private async Task InventorySyncLoopAsync(CancellationToken ct)
     {
@@ -1268,15 +1275,19 @@ public sealed class AgentBackgroundService(
         {
             try
             {
-                // Sprint 58 Wave C (TSK-0321): removed idle-only guard — inventory
-                // must stay fresh during active goals for precondition checks and
-                // the LLM evaluator. IsInventoryStale still prevents redundant syncs.
-                // Fixed stacked-delay bug: check before sleeping so first sync
-                // happens after the initial delay, not 2× the interval.
-                if (_worldState.IsInventoryStale)
+                // Sprint 60 Wave E (TSK-0301): use IsInventoryFresh() timestamp model
+                // instead of IsInventoryStale boolean. IsInventoryStale is only set to
+                // true by SetGoal and cleared after the first StatusEvent, so the old
+                // guard never fired during active goals. IsInventoryFresh() returns true
+                // when LastFreshInventoryAt is within the configured maxAge (default 60s),
+                // ensuring periodic refresh during long-running goals.
+                if (!_worldState.IsInventoryFresh())
                 {
                     _queue.Enqueue(new ActionData { Tool = "GetStatus" });
-                    logger.LogDebug("[inventory] periodic background sync enqueued (inventory was stale)");
+                    logger.LogDebug("[inventory] periodic background sync enqueued (inventory not fresh — last refresh was {Age:F0}s ago)",
+                        _worldState.LastFreshInventoryAt is not null
+                            ? (DateTimeOffset.UtcNow - _worldState.LastFreshInventoryAt.Value).TotalSeconds
+                            : double.PositiveInfinity);
                 }
 
                 await Task.Delay(InventorySyncInterval, ct);
@@ -1981,14 +1992,24 @@ public sealed class AgentBackgroundService(
                 // This ensures inventory is actually fresh before ANY plan is generated,
                 // preventing the "plan generated with empty inventory → all actions fail"
                 // pattern that has plagued gather and build goals for multiple sprints.
-                if (_currentGoal is IItemSpecGoal && _worldState.IsInventoryStale)
+                //
+                // Sprint 60 Wave E (TSK-0301): also check <see cref="WorldState.IsInventoryFresh"/>
+                // timestamp model alongside the boolean <see cref="WorldState.IsInventoryStale"/>.
+                // The boolean flag is only set by SetGoal and cleared after the first StatusEvent,
+                // so it never fires during active goals. The timestamp model catches drift during
+                // long-running goals where inventory hasn't been refreshed in >60s.
+                if (_currentGoal is IItemSpecGoal && (_worldState.IsInventoryStale || !_worldState.IsInventoryFresh()))
                 {
                     if (!HasPendingActionOfTool("GetStatus") && !HasPendingActionOfTool("Status"))
                     {
+                        var age = _worldState.LastFreshInventoryAt is not null
+                            ? $"{(DateTimeOffset.UtcNow - _worldState.LastFreshInventoryAt.Value).TotalSeconds:F0}s"
+                            : "never";
                         logger.LogInformation(
-                            "[goal] {Goal}: inventory stale — deferring plan, queueing GetStatus | " +
+                            "[goal] {Goal}: inventory stale (stale={Stale}, freshAge={Age}) — deferring plan, queueing GetStatus | " +
                             "inventory: [{Inventory}] pos=({PosX},{PosY},{PosZ})",
-                            _currentGoal.Name, SummarizeTaskRelevantInventory(_currentGoal),
+                            _currentGoal.Name, _worldState.IsInventoryStale, age,
+                            SummarizeTaskRelevantInventory(_currentGoal),
                             _worldState.Position.X, _worldState.Position.Y, _worldState.Position.Z);
                         _queue.Enqueue(new ActionData { Tool = "GetStatus" });
                     }
@@ -1997,12 +2018,12 @@ public sealed class AgentBackgroundService(
                         // Sprint 57: GetStatus is in-flight — wait for it to complete.
                         // Log at Debug level to avoid flood (fires every cycle while waiting).
                         logger.LogDebug(
-                            "[goal] {Goal}: inventory still stale — waiting for GetStatus to complete",
-                            _currentGoal.Name);
+                            "[goal] {Goal}: inventory not fresh (stale={Stale}) — waiting for GetStatus to complete",
+                            _currentGoal.Name, _worldState.IsInventoryStale);
                     }
 
                     // IMPORTANT: Do NOT fall through to plan generation while inventory
-                    // is stale. Continue looping until StatusEvent clears the flag.
+                    // is stale or not fresh. Continue looping until StatusEvent clears.
                     await Task.Delay(50, ct);
                     continue;
                 }

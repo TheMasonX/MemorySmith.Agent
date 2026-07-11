@@ -178,6 +178,15 @@ public sealed class LlmEvaluatorImpl : ILlmEvaluator
             if (diff.HealthDelta < 0)
                 sb.AppendLine($"⚠ Health dropped by {Math.Abs(diff.HealthDelta)} HP during actions");
         }
+        // Sprint 60 Wave E (TSK-0344): surface unexpected inventory changes even
+        // when HasMismatch is false. These are inventory deltas from unmodeled
+        // sources (mob drops, other players, environmental pickup) that don't
+        // correspond to any expected gain or loss. The evaluator should be aware
+        // of them because they represent state drift from non-tool sources.
+        else if (diff is not null && diff.HasUnexpectedChanges)
+        {
+            sb.AppendLine($"Note: unexpected inventory changes detected: {diff.DescribeMismatches()}");
+        }
 
         sb.AppendLine();
         sb.AppendLine("Recent outcomes (oldest first):");
