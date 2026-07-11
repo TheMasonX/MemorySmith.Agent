@@ -1247,7 +1247,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
       // Mineflayer version and MC server implementation.
       if (!item && normalizeGameMode(bot.game?.gameMode) === 'creative') {
         console.error(`[place] creative check: item=${shortMat} gameMode=${bot.game?.gameMode} inventorySize=${bot.inventory.items().length}`);
-        const { ensureCreativeItem } = require('./creativeProvider');
+        const { ensureCreativeItem } = require('./creativeProvider.cjs');
         const ok = await ensureCreativeItem(bot, shortMat || material, 1);
         console.error(`[place] creative result: item=${shortMat} ok=${ok}`);
         if (ok) {

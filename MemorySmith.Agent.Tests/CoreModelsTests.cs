@@ -121,13 +121,20 @@ public class ActionQueueConcurrencyTests
     public async Task ClearAndEnqueueAsync_StopCallbackFailure_StillClearsQueue()
     {
         // TSK-0119: stop callback failure should not prevent queue clear.
+        // Sprint 60 (TSK-0359 / MSA-CORE-005): onStopError callback must be invoked.
         var queue = new ActionQueue();
         queue.Enqueue(new ActionData { Tool = "MoveTo" });
         queue.Enqueue(new ActionData { Tool = "MineBlock" });
 
+        Exception? captured = null;
         await queue.ClearAndEnqueueAsync(
             new ActionData { Tool = "GetStatus" },
-            stopCallback: () => throw new InvalidOperationException("Simulated send failure"));
+            stopCallback: () => throw new InvalidOperationException("Simulated send failure"),
+            onStopError: ex => captured = ex);
+
+        // onStopError callback must have been invoked with the exception.
+        Assert.That(captured, Is.Not.Null, "onStopError callback must be invoked on failure");
+        Assert.That(captured!.Message, Does.Contain("Simulated send failure"));
 
         // Queue should be cleared and priority action enqueued despite the throw.
         Assert.That(queue.Count, Is.EqualTo(1));

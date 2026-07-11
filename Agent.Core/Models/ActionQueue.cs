@@ -116,14 +116,23 @@ public sealed class ActionQueue
     /// always recover from damage interrupts even under transient network issues.
     /// </para>
     /// <para>
+    /// Sprint 60 (TSK-0359 / MSA-CORE-005): Replaced silent catch with an
+    /// <c>Action&lt;Exception&gt;?</c> callback so upstream callers can log the
+    /// failure. Violated AGENTS.md Rule E-3 (never swallow exceptions silently).
+    /// </para>
+    /// <para>
     /// Usage in AgentBackgroundService during replan with active Dispatched entries:
     /// <code>
     /// await _actionQueue.ClearAndEnqueueAsync(priorityAction,
-    ///     stopCallback: () => _bridge.SendAsync(ActionData.Stop(), ct));
+    ///     stopCallback: () => _bridge.SendAsync(ActionData.Stop(), ct),
+    ///     onStopError: ex => logger?.LogWarning(ex, "Stop callback failed in ClearAndEnqueueAsync"));
     /// </code>
     /// </para>
     /// </summary>
-    public async Task ClearAndEnqueueAsync(ActionData action, Func<Task>? stopCallback = null)
+    public async Task ClearAndEnqueueAsync(
+        ActionData action,
+        Func<Task>? stopCallback = null,
+        Action<Exception>? onStopError = null)
     {
         // Send stop BEFORE acquiring the lock so the adapter receives the signal
         // while any in-flight action is still running on the JS side.
@@ -135,12 +144,9 @@ public sealed class ActionQueue
         }
         catch (Exception ex)
         {
-            // Best-effort: stop callback failure is intentionally swallowed.
-            // The queue clear must not be blocked by a transient WebSocket error.
-            // No ILogger is available at this layer (ActionQueue is a simple POCO
-            // created with `new()` in AgentBackgroundService); upstream callers
-            // observe the failure via the action outcomes and replanning loop.
-            _ = ex; // deliberate discard — see comment above
+            // Sprint 60 (TSK-0359): No longer silently discarded. Pass to
+            // onStopError callback so upstream callers can log the failure.
+            onStopError?.Invoke(ex);
         }
 
         lock (_lock)

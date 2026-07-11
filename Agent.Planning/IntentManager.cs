@@ -5,7 +5,7 @@ using Agent.Planning.Goals;
 
 /// <summary>
 /// Maps <see cref="IntentDraft"/> to a typed <see cref="GoalRequest"/> suitable
-/// for the GoalFactory pipeline (PRINCIPLE-1: parsers never create goals).z///
+/// for the GoalFactory pipeline (PRINCIPLE-1: parsers never create goals).
 /// Sprint 39 P3: GoalRequest refactored from a single loosely-typed record to an
 /// abstract base + typed subclasses (GatherGoalRequest, CraftGoalRequest,
 /// BuildGoalRequest, NavigateGoalRequest). Each subclass encodes its own parameters

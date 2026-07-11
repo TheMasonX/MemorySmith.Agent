@@ -15,6 +15,7 @@ public sealed class TaskSequenceGoal : IGoal
 {
     private readonly IReadOnlyList<IGoal> _steps;
     private int _currentStep;
+    private bool _isComplete;
 
     /// <summary>Maximum steps allowed in a sequence (guard against runaway chains).</summary>
     public const int MaxSteps = 5;
@@ -29,6 +30,7 @@ public sealed class TaskSequenceGoal : IGoal
                 nameof(steps));
         _steps = steps;
         _currentStep = 0;
+        _isComplete = false;
     }
 
     public Guid Id { get; } = Guid.NewGuid();
@@ -59,31 +61,39 @@ public sealed class TaskSequenceGoal : IGoal
 
     /// <summary>
     /// Advances to the next step. Returns true if there is a next step,
-    /// false if the sequence is complete.
+    /// false if the sequence is complete. When returning false, sets
+    /// the terminal completion flag so <see cref="IsComplete"/> returns
+    /// true unconditionally on subsequent calls.
     /// </summary>
     public bool TryAdvance()
     {
         if (_currentStep + 1 >= _steps.Count)
+        {
+            // Sprint 60 (TSK-0359 / MSA-CORE-017): Set terminal flag to
+            // prevent infinite loop — TryAdvance returns false but future
+            // IsComplete calls must still return true.
+            _isComplete = true;
             return false;
+        }
         _currentStep++;
         return true;
     }
 
     public bool IsComplete(WorldState state)
     {
-        // Sprint 56 (TSK-0274): The sequence is complete when all steps are done.
-        // The original implementation only checked _currentStep >= _steps.Count,
-        // but _currentStep is only incremented by TryAdvance(), which is only
-        // called from TryAdvanceSequence() inside the IsComplete==true branch.
-        // This created a circular dependency — sequences could never complete.
-        //
-        // Fix: delegate to the current step's IsComplete first. If the current
-        // step is complete AND we're on the last step, the sequence is done.
-        // Otherwise, the caller (TryAdvanceSequence) will advance to the next step.
+        // Sprint 60 (TSK-0359 / MSA-CORE-017): Terminal flag signals that
+        // TryAdvance has already returned false (all steps done). Without
+        // this flag, the agent loops forever checking the last step's
+        // IsComplete without ever advancing past it.
+        if (_isComplete)
+            return true;
+
+        // Sprint 56 (TSK-0274): Guard against out-of-bounds access.
         if (_currentStep >= _steps.Count)
             return true;
 
-        // Check if the current step itself is complete.
+        // Delegate to the current step's IsComplete. When true, the
+        // caller (TryAdvanceSequence) will advance to the next step.
         return _steps[_currentStep].IsComplete(state);
     }
 

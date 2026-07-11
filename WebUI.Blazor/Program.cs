@@ -1,5 +1,5 @@
 // MemorySmith.Agent — Web UI & Agent Host
-// v0.55.0  Sprint 55 Wave B — Environment Queries + Entity Observation + Observe→Evaluate Loop
+// Sprint 60 — Architectural Stability & Legacy Cleanup
 
 using Agent.Construction;
 using Agent.Core;
@@ -473,7 +473,10 @@ app.UseWhen(
 
 if (agentEnabled)
 {
-    app.Logger.LogInformation("MemorySmith.Agent v0.55.0 starting (Sprint 55 Wave B)");
+    var agentVersion = System.Diagnostics.FileVersionInfo
+        .GetVersionInfo(typeof(Program).Assembly.Location)
+        .ProductVersion ?? "unknown";
+    app.Logger.LogInformation("MemorySmith.Agent v{Version} starting", agentVersion);
     var opts = app.Services.GetRequiredService<ChatOptions>();
     app.Logger.LogInformation(
         "Chat LLM config: enabled={Enabled}, provider={Provider}, model={Model}, baseUrl={BaseUrl}",

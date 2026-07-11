@@ -1184,10 +1184,13 @@ public sealed class AgentBackgroundService(
         // new GetStatus actions before the stop, leaving the old mine/wander loop running.
         // ClearAndEnqueueAsync awaits the stop callback before the lock-protected
         // clear+enqueue, ensuring JS receives the stop before any new actions are dispatched.
+        // Sprint 60 (TSK-0359): onStopError callback replaces silent exception discard.
         await _queue.ClearAndEnqueueAsync(
             new ActionData { Tool = "GetStatus" },
             () => worldAdapter.SendActionAsync(
-                new ActionData { Tool = EmergencyStopActionName }, CancellationToken.None));
+                new ActionData { Tool = EmergencyStopActionName }, CancellationToken.None),
+            onStopError: ex => logger.LogWarning(ex,
+                "[damage] ClearAndEnqueueAsync stop callback failed during damage interrupt"));
         _lastDamageInterruptAt = _timeProvider.UtcNow;
         _lastHealthStatusEnqueuedAt = _timeProvider.UtcNow; // D-6: sync passive check gate
 
