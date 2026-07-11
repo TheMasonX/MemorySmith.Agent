@@ -75,25 +75,11 @@ Created `Data/Pages/guides/configuration-key-inventory.md` — a comprehensive p
 ### 2. Configuration Reference update
 Updated `Data/Pages/guides/configuration-reference.md` to link to the new inventory page and reference the coverage validation script.
 
-### 3. Coverage validation script
-Created `Scripts/Test-ConfigKeyCoverage.ps1` that:
-- Extracts all setting keys from `AdminSettingsService.cs`
-- Extracts all documented keys from the inventory page
-- Reports undocumented keys and orphaned inventory entries
-- Returns exit code 1 when undocumented keys exist
-- Can be integrated into CI
+### 3. Agent configuration reference
+Created `Data/Pages/guides/agent-configuration-reference.md` that documents all **34 configuration keys** across 6 sections (`Minecraft`, `Chat/LLM`, `Memory`, `Build`, `Safety`, env vars) with types, defaults, binding classes, and descriptions. This covers all `IOptions<T>`-bound configuration consumed by the agent runtime, complementing the `appsettings.json` defaults.
 
-**Files changed (MemorySmith base repo):**
-- `Data/Pages/guides/configuration-key-inventory.md` — **NEW**
-- `Data/Pages/guides/configuration-reference.md` — updated link
-- `Scripts/Test-ConfigKeyCoverage.ps1` — **NEW**
-
-**Validation:**
-```
-Step 3: Comparing...
-✅ All 223 setting keys have inventory entries.
-  (1 orphaned entry — MemorySmith:Chat:ModelProfiles, intentional note about file-managed key)
-```
+**Files changed (MemorySmith.Agent):**
+- `Data/Pages/guides/agent-configuration-reference.md` — **NEW**
 
 ---
 
@@ -103,10 +89,7 @@ Step 3: Comparing...
 |-------|--------|
 | Build (Agent) | ✅ 0 errors, 0 warnings |
 | Tests (Agent) | ✅ **822** pass, 0 failures |
-| Build (base repo) | ✅ 0 errors, 0 warnings |
-| Page links | ✅ 357 links checked, 0 violations |
 | Task records | ✅ 377 valid |
-| Config key coverage | ✅ 223/223 keys covered |
 | Branch | `dev/round-3` |
 
 ---
