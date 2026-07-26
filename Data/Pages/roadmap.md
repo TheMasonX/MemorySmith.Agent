@@ -175,6 +175,7 @@ This sprint focuses on architectural stability — removing deprecated/legacy fa
 | D | **Runtime Decomposition Cleanup** | TSK-0369 (remove dead runtime decomposition — P0, S61 deferred), TSK-0292 (DashboardPublisherImpl cleanup), TSK-0374 (memory gateway error handling) |
 | E | **Test Infrastructure** | TSK-0379 (e2e integration test), TSK-0376 (WebSocketBridge tests), TSK-0191 (LLM provider tests) |
 | F | **Durable Memory Writer** | TSK-0152/0153 (policy-based world KB writer for goals/landmarks/failures) |
+| G | **Audit Synthesis Remediation** | TSK-0412 (workflow ownership), TSK-0413 (lifecycle health contracts), TSK-0414 (planner preconditions/failure propagation), TSK-0415 (boundary-failure contracts) |
 
 ---
 
@@ -187,6 +188,7 @@ This sprint focuses on architectural stability — removing deprecated/legacy fa
 | B | ScenePack Integration | TSK-0149/0150/0151 (LLM scene context, ScenePackBuilder, chat pipeline wiring) |
 | C | Autonomy Dashboard | TSK-0248 (minimal autonomy dashboard), TSK-0249 (RuntimeSignalSink) |
 | D | FollowUpPolicy | TSK-0247 (FollowUpPolicy vs TaskSequenceGoal contract) |
+| E | Audit Synthesis Hardening | TSK-0416 (scenario-based regression suites and replay support) |
 
 ---
 
@@ -222,7 +224,7 @@ The following documented items now have task records created during the 2026-07-
 |----------|-------|--------|
 | Core memories (JSON) | 28 | 15 new + 13 existing = 28 covering all critical areas |
 | Feature wiki pages | 10 | Agent Runtime, Chat Interpretation, Planning, Blueprints, World Events, Adapter, Safety, Memory/Wiki, Dashboard, Emergency Stop |
-| Task records | 80+ | tsk-0001 through tsk-0358 (Agent: 80+ active; MemorySmith: legacy numbering) |
+| Task records | 80+ | tsk-0001 through tsk-0416 (Agent: 80+ active; MemorySmith: legacy numbering) |
 | Guides | 18+ | Getting started, adding goals/tools, API, troubleshooting, etc. |
 | Council reviews | 20+ | Sprint 0 through Sprint 38 |
 | Blueprint files | 4 | small-house, farm, castle, wizards-tower |

@@ -105,7 +105,8 @@ function handleStop() {
   // navigation complete; subsequent queued actions are already cleared above.
   const isNavigatingAction = _dispatchingAction === 'place' || _dispatchingAction === 'move';
   if (!isNavigatingAction) {
-    try { bot.pathfinder.setGoal(null); } catch { /* ignore — bot may not be connected */ }
+    try { bot.pathfinder.setGoal(null); }
+    catch (err) { console.debug('[stop] setGoal cancel ignored (bot may not be connected):', err && err.message); }
   } else {
     console.log('[stop] suppressing pathfinder cancel — active', _dispatchingAction, 'navigation in progress');
   }
@@ -1058,8 +1059,9 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
               );
               // Wait a bit more for collection
               await new Promise(r => setTimeout(r, C.MINE_ITEM_PICKUP_MOVE_WAIT_MS));
-            } catch {
+            } catch (err) {
               // Movement failed — item may still be picked up if bot is close enough
+              console.debug('[mine] movement to collect item failed:', err && err.message);
               await new Promise(r => setTimeout(r, C.MINE_ITEM_PICKUP_REMOVE_BLOCK_MS));
             }
           }
@@ -1558,10 +1560,10 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
             bot.world.on('chunkColumnLoad', waitForLoad);
           });
         }
-      } catch {
+      } catch (err) {
         // If chunks time out, log and continue — scan will use whatever is loaded.
-        console.warn('[findFlatArea] chunk load wait timed out — scanning with loaded chunks only');
-        logStructured('warn', 'findFlatArea', 'chunk load timeout', { radius: r });
+        console.warn('[findFlatArea] chunk load wait timed out — scanning with loaded chunks only', err && err.message);
+        logStructured('warn', 'findFlatArea', 'chunk load timeout', { radius: r, error: err && err.message });
       }
 
       // Re-read position after chunk loading (bot may have settled)
@@ -2171,7 +2173,7 @@ function emitFatalError(origin, err) {
     if (agentSocket?.readyState === 1 /* OPEN */) {
       agentSocket.send(JSON.stringify({ event: 'adapterCrash', ...errorData }));
     }
-  } catch { /* swallow — process is shutting down */ }
+  } catch (err) { console.debug('[adapter] adapterCrash notify failed (process shutting down):', err && err.message); }
 }
 
 process.on('unhandledRejection', (reason) => {

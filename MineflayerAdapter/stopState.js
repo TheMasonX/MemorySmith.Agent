@@ -26,7 +26,8 @@ export function createStopState(bot, sendEvent) {
   function handleStop() {
     console.log('[stop] emergency stop — clearing queue, stopping pathfinder');
     _stopRequested = true;
-    try { bot.pathfinder.setGoal(null); } catch { /* ignore — bot may not be connected */ }
+    try { bot.pathfinder.setGoal(null); }
+    catch (err) { console.debug('[stop] setGoal cancel ignored (bot may not be connected):', err && err.message); }
     sendEvent('stopComplete', {});
     console.log('[stop] done');
   }

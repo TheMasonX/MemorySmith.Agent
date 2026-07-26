@@ -1,0 +1,43 @@
+{
+  "id": "tsk-0423-add-per-goal-id-for-buildgoal",
+  "key": "TSK-0423",
+  "title": "Add per-goal Id to BuildGoal for outcome correlation",
+  "description": "Add an `Id` (GUID) to `BuildGoal` and propagate correlation to action outcomes and fact keys to avoid collisions for concurrent builds of the same blueprint.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "SteveBot",
+  "labels": [
+    "sprint-61",
+    "domain:planning",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audits/audit-synthesis-sprint61-62-plan-20260726.md",
+    "Data/Pages/Audits/msa-corpus-reconciliation-part1-council-verdict-26-07-22-02-50-27.md"
+  ],
+  "comments": [
+    {
+      "id": "c-TSK-0423-001",
+      "author": "SteveBot",
+      "body": "Add unique Id per BuildGoal instance for reliable correlation of outcomes; update existing facts migration if necessary.",
+      "createdAtUtc": "2026-07-26T16:11:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T16:11:00Z",
+  "updatedAtUtc": "2026-07-26T16:11:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

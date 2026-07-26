@@ -1,0 +1,43 @@
+﻿{
+  "id": "tsk-0415-audit-synthesis-standardize-boundary-failure-contracts-for-adapter-memory-and-llm-calls",
+  "key": "TSK-0415",
+  "title": "Audit synthesis: standardize boundary-failure contracts for adapter, memory, and LLM calls",
+  "description": "Introduce a consistent error contract for adapter, memory gateway, and LLM boundary failures with explicit timeout, cancellation, and recovery semantics. Derived from the runtime hardening and SignalR/auth review set.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "SteveBot",
+  "labels": [
+    "sprint-61",
+    "domain:runtime",
+    "type:audits"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audits/audit-synthesis-sprint61-62-plan-20260726.md",
+    "Data/Pages/Audits/council-review-runtime-migration-llm-hardening-20260726.md"
+  ],
+  "comments": [
+    {
+      "id": "c-TSK-0415-001",
+      "author": "SteveBot",
+      "body": "Standardize boundary-failure contracts and add logging/metrics for evaluator parse failures; see council decision for priority.",
+      "createdAtUtc": "2026-07-26T16:00:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T15:55:01.6115321Z",
+  "updatedAtUtc": "2026-07-26T16:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

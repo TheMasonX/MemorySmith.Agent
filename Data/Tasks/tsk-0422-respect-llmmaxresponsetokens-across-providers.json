@@ -1,0 +1,43 @@
+{
+  "id": "tsk-0422-respect-llmmaxresponsetokens-across-providers",
+  "key": "TSK-0422",
+  "title": "Respect LlmMaxResponseTokens across all LLM providers",
+  "description": "Update Anthropic and OpenAI-compatible providers to honor `options.LlmMaxResponseTokens`, factor shared LLM provider boilerplate into a base class, and add unit tests for token-limit behavior.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "SteveBot",
+  "labels": [
+    "sprint-61",
+    "domain:llm",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audits/audit-synthesis-sprint61-62-plan-20260726.md",
+    "Data/Pages/Audits/msa-duplication-supplychain-audit-delta-26-07-15-22-08-36.md"
+  ],
+  "comments": [
+    {
+      "id": "c-TSK-0422-001",
+      "author": "SteveBot",
+      "body": "Fix hardcoded MaxTokens in Anthropic/OpenAI-compatible providers and factor LlmProviderBase for shared logic.",
+      "createdAtUtc": "2026-07-26T16:10:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T16:10:00Z",
+  "updatedAtUtc": "2026-07-26T16:10:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

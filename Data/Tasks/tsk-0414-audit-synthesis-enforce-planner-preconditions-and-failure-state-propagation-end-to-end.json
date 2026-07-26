@@ -1,0 +1,43 @@
+﻿{
+  "id": "tsk-0414-audit-synthesis-enforce-planner-preconditions-and-failure-state-propagation-end-to-end",
+  "key": "TSK-0414",
+  "title": "Audit synthesis: enforce planner preconditions and failure-state propagation end to end",
+  "description": "Wire planner preconditions, postconditions, and structured failure-state propagation through gather/craft/smelt flows so stale or invalid execution cannot proceed silently. Derived from planning-policy and execution-context audits.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "SteveBot",
+  "labels": [
+    "sprint-61",
+    "domain:planning",
+    "type:audits"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audits/audit-synthesis-sprint61-62-plan-20260726.md",
+    "Data/Pages/Audits/council-review-runtime-migration-llm-hardening-20260726.md"
+  ],
+  "comments": [
+    {
+      "id": "c-TSK-0414-001",
+      "author": "SteveBot",
+      "body": "Planner precondition task updated with council synthesis; ensure pre/postcondition tests are included in PR templates for each slice.",
+      "createdAtUtc": "2026-07-26T16:00:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T15:55:01.5254678Z",
+  "updatedAtUtc": "2026-07-26T16:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

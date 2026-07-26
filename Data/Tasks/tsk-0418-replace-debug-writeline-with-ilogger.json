@@ -1,0 +1,42 @@
+{
+  "id": "tsk-0418-replace-debug-writeline-with-ilogger",
+  "key": "TSK-0418",
+  "title": "Replace Debug.WriteLine with ILogger for adapter subprocess output and ban Debug.WriteLine",
+  "description": "Update Node adapter stdout/stderr handlers to use injected `ILogger` and add a Roslyn banned-API rule or pre-commit hook to prevent `System.Diagnostics.Debug.WriteLine` in production code.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "SteveBot",
+  "labels": [
+    "sprint-61",
+    "domain:observability",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audits/audit-synthesis-sprint61-62-plan-20260726.md"
+  ],
+  "comments": [
+    {
+      "id": "c-TSK-0418-001",
+      "author": "SteveBot",
+      "body": "Replace Debug.WriteLine handlers with ILogger and add analyzer rule to prevent regression.",
+      "createdAtUtc": "2026-07-26T16:06:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T16:06:00Z",
+  "updatedAtUtc": "2026-07-26T16:06:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

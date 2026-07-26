@@ -1,0 +1,42 @@
+{
+  "id": "tsk-0424-archive-merge-duplicate-backlog-tasks",
+  "key": "TSK-0424",
+  "title": "Archive and merge duplicate backlog tasks; normalize statuses to reflect code",
+  "description": "Identify duplicate or superseded tasks from the audit sweep, archive or merge them, and ensure task statuses match repository evidence. Add a CI check to detect exact-title duplicates moving forward.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "SteveBot",
+  "labels": [
+    "sprint-62",
+    "domain:process",
+    "type:maintenance"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audits/audit-synthesis-sprint61-62-plan-20260726.md"
+  ],
+  "comments": [
+    {
+      "id": "c-TSK-0424-001",
+      "author": "SteveBot",
+      "body": "Housekeeping pass to merge duplicates found during audit synthesis. Use Scripts/Test-TaskRecords.ps1 to validate after edits.",
+      "createdAtUtc": "2026-07-26T16:12:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T16:12:00Z",
+  "updatedAtUtc": "2026-07-26T16:12:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

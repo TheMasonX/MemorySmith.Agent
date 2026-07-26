@@ -1,0 +1,43 @@
+﻿{
+  "id": "tsk-0413-audit-synthesis-add-lifecycle-health-contracts-for-runtime-services-and-adapters",
+  "key": "TSK-0413",
+  "title": "Audit synthesis: add lifecycle health contracts for runtime services and adapters",
+  "description": "Define readiness/liveness and health ownership for runtime services, adapters, and long-lived resources so startup, reconnect, and shutdown ordering is explicit and testable. Derived from runtime coupling, adapter resilience, and dead-scaffolding audits.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "SteveBot",
+  "labels": [
+    "sprint-61",
+    "domain:runtime",
+    "type:audits"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audits/audit-synthesis-sprint61-62-plan-20260726.md",
+    "Data/Pages/Audits/council-review-runtime-migration-llm-hardening-20260726.md"
+  ],
+  "comments": [
+    {
+      "id": "c-TSK-0413-001",
+      "author": "SteveBot",
+      "body": "Task uplifted from audit synthesis. Review managers list and assign migration owner; the council recommends starting with dashboard slice.",
+      "createdAtUtc": "2026-07-26T16:00:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T15:55:01.4524986Z",
+  "updatedAtUtc": "2026-07-26T16:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

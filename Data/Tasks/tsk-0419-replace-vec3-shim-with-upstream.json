@@ -1,0 +1,43 @@
+{
+  "id": "tsk-0419-replace-vec3-shim-with-upstream",
+  "key": "TSK-0419",
+  "title": "Replace local vec3 shim with upstream `vec3` dependency",
+  "description": "Add `vec3` as a direct npm dependency, update imports to use the upstream API, run compatibility checks, and remove the local `vec3.js` shim.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "SteveBot",
+  "labels": [
+    "sprint-61",
+    "domain:adapter",
+    "type:dependency"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audits/audit-synthesis-sprint61-62-plan-20260726.md",
+    "Data/Pages/Audits/msa-vec3-shim-orphan-modularization-delta-audit-26-07-19-11-54-13.md"
+  ],
+  "comments": [
+    {
+      "id": "c-TSK-0419-001",
+      "author": "SteveBot",
+      "body": "Add vec3 as direct dependency and remove local shim after compatibility verification.",
+      "createdAtUtc": "2026-07-26T16:07:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T16:07:00Z",
+  "updatedAtUtc": "2026-07-26T16:07:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

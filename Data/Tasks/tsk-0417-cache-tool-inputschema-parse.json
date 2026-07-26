@@ -1,0 +1,43 @@
+{
+  "id": "tsk-0417-cache-tool-inputschema-parse",
+  "key": "TSK-0417",
+  "title": "Cache tool InputSchema parsing to eliminate repeated JsonDocument.Parse",
+  "description": "Convert per-tool `InputSchema` properties to cached parsed JsonElement instances or introduce a ToolBase that parses and caches the schema once, then validate via lightweight profiling to confirm reduced allocations.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "SteveBot",
+  "labels": [
+    "sprint-61",
+    "domain:performance",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audits/audit-synthesis-sprint61-62-plan-20260726.md",
+    "Data/Pages/Audits/council-review-runtime-migration-llm-hardening-20260726.md"
+  ],
+  "comments": [
+    {
+      "id": "c-TSK-0417-001",
+      "author": "SteveBot",
+      "body": "Created from audit synthesis: eliminate repeated JsonDocument.Parse in hot dispatch path.",
+      "createdAtUtc": "2026-07-26T16:05:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T16:05:00Z",
+  "updatedAtUtc": "2026-07-26T16:05:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

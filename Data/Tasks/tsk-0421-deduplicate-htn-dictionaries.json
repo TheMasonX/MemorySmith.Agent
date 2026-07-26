@@ -1,0 +1,43 @@
+{
+  "id": "tsk-0421-deduplicate-htn-dictionaries",
+  "key": "TSK-0421",
+  "title": "Deduplicate HTN domain dictionaries to CommonMinecraftBlocks",
+  "description": "Remove duplicate domain dictionaries from `HtnTaskLibrary` and replace usages with `CommonMinecraftBlocks` constants; add a CI check to detect future verbatim domain-data duplication.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "SteveBot",
+  "labels": [
+    "sprint-62",
+    "domain:data",
+    "type:refactor"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audits/audit-synthesis-sprint61-62-plan-20260726.md",
+    "Data/Pages/Audits/msa-htn-data-duplication-test-org-delta-audit-26-07-18-18-04-38.md"
+  ],
+  "comments": [
+    {
+      "id": "c-TSK-0421-001",
+      "author": "SteveBot",
+      "body": "Consolidate PlankToLogMap etc. to CommonMinecraftBlocks and add CI detection for future duplicates.",
+      "createdAtUtc": "2026-07-26T16:09:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T16:09:00Z",
+  "updatedAtUtc": "2026-07-26T16:09:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

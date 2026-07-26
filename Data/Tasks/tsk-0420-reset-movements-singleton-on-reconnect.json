@@ -1,0 +1,43 @@
+{
+  "id": "tsk-0420-reset-movements-singleton-on-reconnect",
+  "key": "TSK-0420",
+  "title": "Reset Movements singleton on bot reconnect and deduplicate movement helpers",
+  "description": "Implement resetMovements() in movements.js (or force recreate), call during bot reconnect, and extract shared movement helpers to remove duplicates and prevent stale state after reconnect.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "SteveBot",
+  "labels": [
+    "sprint-62",
+    "domain:adapter",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audits/audit-synthesis-sprint61-62-plan-20260726.md",
+    "Data/Pages/Audits/msa-regression-reinvented-library-delta-audit-26-07-19-22-59-14.md"
+  ],
+  "comments": [
+    {
+      "id": "c-TSK-0420-001",
+      "author": "SteveBot",
+      "body": "Reset Movements on reconnect to avoid stale pathfinder state; coordinate with adapter maintainers for integration testing.",
+      "createdAtUtc": "2026-07-26T16:08:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T16:08:00Z",
+  "updatedAtUtc": "2026-07-26T16:08:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

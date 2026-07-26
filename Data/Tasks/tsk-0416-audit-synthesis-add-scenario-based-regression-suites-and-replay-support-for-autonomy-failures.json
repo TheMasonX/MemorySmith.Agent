@@ -1,0 +1,43 @@
+﻿{
+  "id": "tsk-0416-audit-synthesis-add-scenario-based-regression-suites-and-replay-support-for-autonomy-failures",
+  "key": "TSK-0416",
+  "title": "Audit synthesis: add scenario-based regression suites and replay support for autonomy failures",
+  "description": "Add regression scenarios and deterministic replay support for stale memory, interrupted operations, partial success, and world-state drift so autonomy behavior is exercised end to end. Derived from the external audit corpus and the roadmap\u0027s maturity gap for autonomous runtime resilience.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "SteveBot",
+  "labels": [
+    "sprint-62",
+    "domain:testing",
+    "type:audits"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audits/audit-synthesis-sprint61-62-plan-20260726.md",
+    "Data/Pages/Audits/council-review-runtime-migration-llm-hardening-20260726.md"
+  ],
+  "comments": [
+    {
+      "id": "c-TSK-0416-001",
+      "author": "SteveBot",
+      "body": "Scenario-regression task aligned with audit synthesis. Coordinate with testing infra to reserve staging nodes for acceptance gates.",
+      "createdAtUtc": "2026-07-26T16:00:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T15:55:01.6873812Z",
+  "updatedAtUtc": "2026-07-26T16:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

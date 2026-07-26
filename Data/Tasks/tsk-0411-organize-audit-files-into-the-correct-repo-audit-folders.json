@@ -1,0 +1,33 @@
+﻿{
+  "id": "tsk-0411-organize-audit-files-into-the-correct-repo-audit-folders",
+  "key": "TSK-0411",
+  "title": "Organize audit files into the correct repo audit folders",
+  "description": "Move MemorySmith-specific audit documents from the MemorySmith.Agent audit folder into the MemorySmith audit folder while leaving the MS.Agent audit set in place.",
+  "type": "Task",
+  "status": "InProgress",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Agent",
+  "reporter": "Copilot",
+  "labels": [
+    "ops",
+    "audits",
+    "repo-organize"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T15:41:57.9821716Z",
+  "updatedAtUtc": "2026-07-26T15:41:57.9821716Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

@@ -1,0 +1,43 @@
+﻿{
+  "id": "tsk-0412-audit-synthesis-make-observe-decide-execute-verify-recover-workflow-explicit",
+  "key": "TSK-0412",
+  "title": "Audit synthesis: make observe-decide-execute-verify-recover workflow explicit",
+  "description": "Create explicit workflow contracts and replay metadata for the autonomous loop so behavior is owned by a single workflow object rather than scattered inline logic. Derived from the architecture-policy audits and the 2026-07-15 to 2026-07-23 corpus review (capstone requirements, planning-policy, migration, and runtime coupling findings).",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "SteveBot",
+  "reporter": "SteveBot",
+  "labels": [
+    "sprint-61",
+    "domain:runtime",
+    "type:audits"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [
+    "Data/Pages/Audits/audit-synthesis-sprint61-62-plan-20260726.md",
+    "Data/Pages/Audits/council-review-runtime-migration-llm-hardening-20260726.md"
+  ],
+  "comments": [
+    {
+      "id": "c-TSK-0412-001",
+      "author": "SteveBot",
+      "body": "Task created from audit synthesis and council review (2026-07-26). See linked planning note and council report for slice boundaries and acceptance criteria.",
+      "createdAtUtc": "2026-07-26T16:00:00Z"
+    }
+  ],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T15:55:01.3543723Z",
+  "updatedAtUtc": "2026-07-26T16:00:00Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

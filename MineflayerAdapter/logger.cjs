@@ -35,7 +35,10 @@ function logStructured(level, category, message, data = {}) {
   const dateStr = new Date().toISOString().split('T')[0];
   try {
     appendFileSync(`${LOG_DIR}/adapter-${dateStr}.log`, entry + '\n');
-  } catch { /* best-effort — never crash the bot on log I/O failure */ }
+  } catch (err) {
+    // Best-effort — never crash the bot on log I/O failure. Log to console as fallback.
+    try { console.error('[adapter logger] write failed:', err && err.message); } catch {}
+  }
 }
 
 module.exports = { logStructured };

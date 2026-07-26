@@ -1,7 +1,9 @@
 ---
 name: debug-msa
 description: 'Debug MemorySmith.Agent by querying rolling log files — agent, adapter, chat, or LLM context — with time windows, level filters, app-instance isolation, and tail mode.'
+argument-hint: 'Source (agent/adapter/chat/llm), time window, level filter, and app instance connection ID'
 user-invocable: true
+disable-model-invocation: false
 ---
 
 # Debug MemorySmith.Agent (debug-msa)

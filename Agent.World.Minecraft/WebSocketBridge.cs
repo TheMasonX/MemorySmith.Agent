@@ -202,7 +202,11 @@ public sealed class WebSocketBridge(string uri,
                     // Dispose old socket and reconnect
                     if (_ws is not null)
                     {
-                        try { _ws.Dispose(); } catch { /* best-effort cleanup */ }
+                        try { _ws.Dispose(); }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "WebSocketBridge: disposing old socket failed: {Message}", ex.Message);
+                        }
                     }
 
                     _ws = new ClientWebSocket();

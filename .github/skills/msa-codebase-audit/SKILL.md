@@ -3,6 +3,7 @@ name: msa-codebase-audit
 description: 'Sweep the MemorySmith.Agent codebase for bugs, inconsistencies, gaps, weak guards, error handling gaps, observability/logging issues, overcoupling, and architectural fixes. Produces a council-reviewed markdown report with MCP task synthesis. Supports opt-in parallel subagent swarm when a number of subagents is supplied. Use when users request a systematic audit, quality sweep, bug hunt, or pre-sprint review.'
 argument-hint: 'Sprint number, report timestamp format, optional focus areas, optional N subagents (e.g., "with 4 subagents")'
 user-invocable: true
+disable-model-invocation: false
 ---
 
 # MSA Codebase Audit & Council Review
