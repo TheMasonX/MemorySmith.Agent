@@ -14,7 +14,7 @@ Get-ChildItem "$taskDir\*.json" | Sort-Object Name | ForEach-Object {
     try {
         $task = Get-Content $path -Raw | ConvertFrom-Json
     } catch {
-        Write-Host "SKIP: $($_.Name) - not valid JSON"
+        try { Write-Host "SKIP: $($_.Name) - not valid JSON: $($_.Exception.Message)" -ForegroundColor Yellow } catch {}
         $skipped++
         return
     }

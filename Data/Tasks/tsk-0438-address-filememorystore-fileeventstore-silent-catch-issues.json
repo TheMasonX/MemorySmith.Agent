@@ -1,0 +1,32 @@
+﻿{
+  "id": "tsk-0438-address-filememorystore-fileeventstore-silent-catch-issues",
+  "key": "TSK-0438",
+  "title": "Address FileMemoryStore/FileEventStore silent-catch issues",
+  "description": "Audit P1-MS-004 and P1-MS-005: FileMemoryStore (temp file cleanup) and FileEventStore (malformed JSON lines) have silent catches that hide failures. Action: add logging, consider quarantining malformed lines, and ensure errors are surfaced to monitoring. Assign to storage maintainers (out-of-scope for Agent repo).",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "MemorySmith.Storage Team",
+  "reporter": "SteveBot",
+  "labels": [
+    "domain:storage",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T17:26:52.9523947Z",
+  "updatedAtUtc": "2026-07-26T17:26:52.9523947Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

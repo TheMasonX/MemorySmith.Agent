@@ -16,7 +16,9 @@ Get-ChildItem "$taskDir\*.json" | ForEach-Object {
     try {
         $t = Get-Content $_ -Raw | ConvertFrom-Json
         $tasks[$t.key] = @{ path = $_.FullName; task = $t }
-    } catch {}
+    } catch {
+        try { Write-Host "Skipping invalid task file: $($_.FullName): $($_.Exception.Message)" -ForegroundColor Yellow } catch {}
+    }
 }
 
 # Entity/Observation/Scene epic — add epicId to link them

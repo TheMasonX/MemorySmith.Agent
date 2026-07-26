@@ -1,0 +1,32 @@
+﻿{
+  "id": "tsk-0436-add-logging-and-platform-safe-shutdown-to-minecraftadapter-disconnectasync",
+  "key": "TSK-0436",
+  "title": "Add logging and platform-safe shutdown to MinecraftAdapter DisconnectAsync",
+  "description": "Audit reports three silent \u0060catch {}\u0060 blocks inside \u0060Agent.World.Minecraft/MinecraftAdapter.cs\u0060 during process kill and disconnect sequences; on Windows \u0060kill -TERM\u0060 always throws and the error is swallowed. Action: add \u0060ILogger\u0060 usage, platform-safe process termination, and replace silent catches with \u0060logger.LogWarning(ex, ...)\u0060. Out-of-scope for Agent repo fixes here; assign to adapter maintainers.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "MinecraftAdapter Maintainers",
+  "reporter": "SteveBot",
+  "labels": [
+    "domain:adapter",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T17:26:34.7092752Z",
+  "updatedAtUtc": "2026-07-26T17:26:34.7092752Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

@@ -15,7 +15,7 @@
 const { appendFileSync, mkdirSync, existsSync } = require('node:fs');
 
 const LOG_DIR = process.env.LOG_DIR ?? './logs';
-try { if (!existsSync(LOG_DIR)) mkdirSync(LOG_DIR, { recursive: true }); } catch { /* best-effort */ }
+try { if (!existsSync(LOG_DIR)) mkdirSync(LOG_DIR, { recursive: true }); } catch (err) { try { console.error('[adapter logger] mkdir failed:', err && err.message); } catch {} }
 
 /**
  * Writes a structured JSON line to the daily adapter log file.

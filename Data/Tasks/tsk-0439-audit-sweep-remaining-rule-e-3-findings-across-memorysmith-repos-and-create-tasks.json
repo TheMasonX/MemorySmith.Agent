@@ -1,0 +1,32 @@
+﻿{
+  "id": "tsk-0439-audit-sweep-remaining-rule-e-3-findings-across-memorysmith-repos-and-create-tasks",
+  "key": "TSK-0439",
+  "title": "Audit: Sweep remaining Rule E-3 findings across MemorySmith repos and create tasks",
+  "description": "Run a cross-repo sweep to catalog remaining \u0060catch {}\u0060 and other silent-catch patterns flagged in audits. Produce a task per logical owner (Agent, App, Storage, Adapter) with file lists and proposed fixes. This task creates follow-up tasks for each repo owner. Mark as Ready and include \u0060Data/Pages/Audits/*\u0060 references.",
+  "type": "Task",
+  "status": "Ready",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "Platform Reliability Team",
+  "reporter": "SteveBot",
+  "labels": [
+    "type:task",
+    "domain:ops"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T17:26:57.6345816Z",
+  "updatedAtUtc": "2026-07-26T17:26:57.6345816Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

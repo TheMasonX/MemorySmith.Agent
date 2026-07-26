@@ -71,13 +71,17 @@ foreach ($task in $tasks) {
             -ErrorAction Stop
         Write-Host "Created: $($response.key) - $($response.title)" -ForegroundColor Green
     } catch {
-        if ($_.Exception.Response.StatusCode -eq 401) {
-            Write-Host "Not authenticated. Please log in at $baseUrl/login first." -ForegroundColor Yellow
-            Write-Host "Task JSON was:" -ForegroundColor Cyan
-            Write-Host $json -ForegroundColor Gray
-            break
-        } else {
-            Write-Host "Failed to create task: $_" -ForegroundColor Red
+        try {
+            if ($_.Exception.Response.StatusCode -eq 401) {
+                Write-Host "Not authenticated. Please log in at $baseUrl/login first." -ForegroundColor Yellow
+                Write-Host "Task JSON was:" -ForegroundColor Cyan
+                Write-Host $json -ForegroundColor Gray
+                break
+            } else {
+                Write-Host "Failed to create task: $($_.Exception.Message)" -ForegroundColor Red
+            }
+        } catch {
+            Write-Host "Failed to create task (unknown error): $_" -ForegroundColor Red
         }
     }
 }

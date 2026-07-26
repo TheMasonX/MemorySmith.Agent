@@ -24,6 +24,8 @@ foreach ($File in $Files) {
                 $Valid = ($reencoded -eq $Content)
             }
             catch {
+                # Ignore invalid base64 for this file but log debug message
+                try { Write-Host "Decode check failed for $($File.FullName): $($_.Exception.Message)" -ForegroundColor Yellow } catch {}
                 $Valid = $false
             }
         }
@@ -50,6 +52,6 @@ foreach ($File in $Files) {
         }
     }
     catch {
-        Write-Error "Failed to process file $($File.FullName): $_"
+        try { Write-Error "Failed to process file $($File.FullName): $($_.Exception.Message)" } catch {}
     }
 }

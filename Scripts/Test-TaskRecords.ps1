@@ -47,7 +47,7 @@ Get-ChildItem -LiteralPath $tasksRoot -Filter '*.json' -File | Sort-Object Name 
     try {
         $task = Get-Content -LiteralPath $_.FullName -Raw | ConvertFrom-Json
     } catch {
-        [void]$errors.Add("$($_.Name): invalid JSON: $($_.Exception.Message)")
+        try { [void]$errors.Add("$($_.Name): invalid JSON: $($_.Exception.Message)") } catch { [void]$errors.Add("$($_.Name): invalid JSON (parse error)") }
         return
     }
 

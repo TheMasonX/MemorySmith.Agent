@@ -1,0 +1,32 @@
+﻿{
+  "id": "tsk-0437-add-eslint-ci-gate-for-mineflayeradapter-and-fix-adapter-lint-issues",
+  "key": "TSK-0437",
+  "title": "Add ESLint \u002B CI gate for MineflayerAdapter and fix adapter lint issues",
+  "description": "Audit recommends adding \u0060eslint\u0060 with \u0060eslint:recommended\u0060 for \u0060MineflayerAdapter/\u0060 and a CI gate. Action: add \u0060package.json\u0060 devDeps, eslint config, fix the 5 confirmed issues (including two silent catches by converting to \u0060logStructured(\u0027debug\u0027, err.message)\u0060), and add CI step. Assign to adapter maintainers (out-of-scope for MemorySmith.Agent).",
+  "type": "Chore",
+  "status": "Backlog",
+  "priority": "Medium",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "MineflayerAdapter Maintainers",
+  "reporter": "SteveBot",
+  "labels": [
+    "domain:adapter",
+    "type:chore"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T17:26:40.3362194Z",
+  "updatedAtUtc": "2026-07-26T17:26:40.3362194Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

@@ -165,7 +165,7 @@ function Invoke-SecretScan {
             }
         }
         catch {
-            # Skip files that can't be read
+            try { Write-Host "Skipping unreadable file $($file): $($_.Exception.Message)" -ForegroundColor Yellow } catch {}
         }
     }
 

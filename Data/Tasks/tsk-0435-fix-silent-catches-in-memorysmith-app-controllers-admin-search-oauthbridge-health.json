@@ -1,0 +1,32 @@
+﻿{
+  "id": "tsk-0435-fix-silent-catches-in-memorysmith-app-controllers-admin-search-oauthbridge-health",
+  "key": "TSK-0435",
+  "title": "Fix silent catches in MemorySmith.App controllers (Admin/Search/OAuthBridge/Health)",
+  "description": "Audit found silent catch blocks and swallowing of exceptions in MemorySmith.App controllers which hides failures and violates Rule E-3. Files: MemorySmith.App/Controllers/AdminController.cs, MemorySmith.App/Controllers/SearchController.cs, MemorySmith.App/Controllers/OAuthBridgeController.cs, MemorySmith.App/Controllers/HealthController.cs. Action: add structured logging (\u0060ILogger\u0060) and replace bare \u0060catch {}\u0060 with \u0060logger.LogWarning(ex, ...)\u0060 or appropriate error handling. Out-of-scope for MemorySmith.Agent \u2014 assign to MemorySmith.App maintainers.",
+  "type": "Bug",
+  "status": "Backlog",
+  "priority": "High",
+  "assigneeMode": "Custom",
+  "assigneeDirectoryId": null,
+  "assigneeCustomText": "MemorySmith.App Team",
+  "reporter": "SteveBot",
+  "labels": [
+    "domain:webapp",
+    "type:bug"
+  ],
+  "attachments": [],
+  "externalLinks": [],
+  "linkedPages": [],
+  "comments": [],
+  "epicId": null,
+  "parentId": null,
+  "dueDateUtc": null,
+  "createdAtUtc": "2026-07-26T17:26:24.5179227Z",
+  "updatedAtUtc": "2026-07-26T17:26:24.5179227Z",
+  "completedAtUtc": null,
+  "revision": 1,
+  "isArchived": false,
+  "hasLoadError": false,
+  "loadError": null,
+  "sourceFilePath": null
+}

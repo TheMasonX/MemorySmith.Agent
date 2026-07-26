@@ -179,7 +179,10 @@ function Read-FileLines($path) {
         }
         finally { $reader.Dispose() }
     }
-    catch { throw }
+    catch {
+        Write-Warning "Read-FileLines failed for path $path: $($_.Exception.Message)"
+        throw
+    }
 }
 
 # ── AppStart mode — scan for agent restarts ───────────────────────────────────
