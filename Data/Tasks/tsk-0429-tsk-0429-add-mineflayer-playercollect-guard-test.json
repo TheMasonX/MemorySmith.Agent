@@ -4,7 +4,7 @@
   "title": "Add Mineflayer playerCollect guard test",
   "description": "Add a small test (unit or lightweight integration) ensuring the Mineflayer adapter \u0060playerCollect\u0060 handler ignores collections not performed by our bot (guard \u0060collector.username !== bot.username\u0060).",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "Medium",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -19,11 +19,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-26T16:29:18.0509487Z",
-  "updatedAtUtc": "2026-07-26T16:29:18.0509487Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-26T22:03:25.9729588Z",
+  "completedAtUtc": "2026-07-26T22:03:25.9729588Z",
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0429-tsk-0429-add-mineflayer-playercollect-guard-test.json"
 }

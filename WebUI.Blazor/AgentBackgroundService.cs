@@ -1333,7 +1333,11 @@ public sealed class AgentBackgroundService(
             _worldState.Position, chat.PlayerPos, _worldState, ct);
 
         await thinkingCts.CancelAsync();
-        try { await thinkingTask.ConfigureAwait(false); } catch (OperationCanceledException) { }
+        try { await thinkingTask.ConfigureAwait(false); }
+        catch (OperationCanceledException ex) when (ct.IsCancellationRequested)
+        {
+            logger.LogDebug(ex, "Slow-chat notification was cancelled with the request.");
+        }
 
         // Sprint 11: log the resolved intent for visibility
         if (intent is not null)

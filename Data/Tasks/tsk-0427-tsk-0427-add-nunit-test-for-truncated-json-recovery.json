@@ -4,7 +4,7 @@
   "title": "Add NUnit test for truncated JSON recovery",
   "description": "Add a small NUnit test that exercises the code path that attempts to recover or parse truncated JSON responses from the LLM (\u0060TryParseTruncatedJson\u0060/similar) to assert behavior on partial inputs and protect against regressions.",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "Medium",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -19,11 +19,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-26T16:29:10.2115451Z",
-  "updatedAtUtc": "2026-07-26T16:29:10.2115451Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-26T22:03:25.7724926Z",
+  "completedAtUtc": "2026-07-26T22:03:25.7724926Z",
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0427-tsk-0427-add-nunit-test-for-truncated-json-recovery.json"
 }

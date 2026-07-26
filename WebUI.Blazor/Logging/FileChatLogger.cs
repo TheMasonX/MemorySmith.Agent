@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 
 namespace WebUI.Blazor.Logging;
 
@@ -9,7 +10,7 @@ namespace WebUI.Blazor.Logging;
 /// and Mineflayer adapter log files.
 ///
 /// The directory is created on first write if it does not exist.
-/// I/O errors are silently swallowed (best-effort — never crash the agent loop).
+/// I/O errors are logged and swallowed (best-effort — never crash the agent loop).
 /// Thread-safe via the lock around the StreamWriter.
 /// </summary>
 public sealed class FileChatLogger : IChatLogger, IDisposable
@@ -25,14 +26,16 @@ public sealed class FileChatLogger : IChatLogger, IDisposable
     };
 
     private readonly string _baseDirectory;
+    private readonly ILogger<FileChatLogger>? _logger;
     private readonly ReaderWriterLockSlim _rwLock = new();
     private StreamWriter? _writer;
     private string? _currentDate;
     private bool _disposed;
 
-    public FileChatLogger(string? baseDirectory = null)
+    public FileChatLogger(string? baseDirectory = null, ILogger<FileChatLogger>? logger = null)
     {
         _baseDirectory = baseDirectory ?? Path.Combine(Directory.GetCurrentDirectory(), "logs");
+        _logger = logger;
     }
 
     public void LogInbound(string username, string message, string? correlationId = null)
@@ -66,9 +69,9 @@ public sealed class FileChatLogger : IChatLogger, IDisposable
                 _rwLock.ExitWriteLock();
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Best-effort — never crash the agent loop on log I/O failure.
+            _logger?.LogWarning(ex, "Unable to write chat log entry.");
         }
     }
 

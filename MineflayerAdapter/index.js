@@ -915,7 +915,7 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
           console.warn(`[mine] nav to ${shortName} failed (${pathFailures}/${C.MAX_MINE_PATH_FAILURES}): ${e.message}`);
           if (pathFailures >= C.MAX_MINE_PATH_FAILURES)
             throw new Error(`Pathfinding to ${shortName} failed ${C.MAX_MINE_PATH_FAILURES} times: ${e.message}`);
-          await new Promise(r => setTimeout(r, 500));
+          await new Promise(r => setTimeout(r, C.INVENTORY_REFRESH_DELAY_MS));
           continue;
         }
 
@@ -2008,8 +2008,9 @@ async function dispatch({ action, arguments: args = {}, correlationId }) {
               reachablePathDist = pathDist;
             }
           }
-        } catch {
-          // Pathfinding failed for this candidate — try next
+        } catch (err) {
+          // Pathfinding failed for this candidate — try next. Log minimal debug info.
+          console.debug('[findReachableBlock] pathfinding failed for candidate:', candidate, err && err.message);
           continue;
         }
       }

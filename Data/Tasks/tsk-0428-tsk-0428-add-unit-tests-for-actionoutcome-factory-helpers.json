@@ -4,7 +4,7 @@
   "title": "Add unit tests for ActionOutcome factory helpers",
   "description": "Add small NUnit tests validating \u0060ActionOutcome.Collected\u0060, \u0060.Succeeded\u0060, and \u0060.Failed\u0060 produce consistent records, non-empty summaries, and reasonable timestamps. Keep tests tiny and deterministic.",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "Medium",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -19,11 +19,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-26T16:29:13.065215Z",
-  "updatedAtUtc": "2026-07-26T16:29:13.065215Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-26T22:03:25.8899505Z",
+  "completedAtUtc": "2026-07-26T22:03:25.8899505Z",
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0428-tsk-0428-add-unit-tests-for-actionoutcome-factory-helpers.json"
 }

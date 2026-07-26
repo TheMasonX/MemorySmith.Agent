@@ -68,6 +68,7 @@ export const FURNACE_SEARCH_RADIUS      = 16;
 export const FURNACE_REACH_DISTANCE     = 2;
 /** Total timeout for smelt operations (all items). */
 export const SMELT_TIMEOUT_MS           = 40_000;
+export const INVENTORY_REFRESH_DELAY_MS = 500;
 
 // ── Flat-area scan ────────────────────────────────────────────────────────────
 // Sprint 19: increased default radius from 20 to 32. C# planner sends radius=48

@@ -4,7 +4,7 @@
   "title": "Add magic-number finder checklist and small fixes",
   "description": "Add a small code-search task to find hard-coded timeouts/distances and replace a few occurrences with named constants (\u003C=10 modified lines). Provide a checklist and example replacements.",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "Medium",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -19,11 +19,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-26T16:29:25.6770722Z",
-  "updatedAtUtc": "2026-07-26T16:29:25.6770722Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-26T22:03:26.1030467Z",
+  "completedAtUtc": "2026-07-26T22:03:26.1030467Z",
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0431-tsk-0431-add-magic-number-finder-checklist-and-small-fixes.json"
 }

@@ -4,7 +4,7 @@
   "title": "Validate *Options are sealed record and add a test",
   "description": "Check that \u0060*Options\u0060 option classes are declared as \u0060sealed record\u0060 and add one unit test using \u0060with {}\u0060 to guard against incorrect shapes. Keep modifications minimal (no more than a few file checks \u002B test).",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "Medium",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -19,11 +19,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-26T16:29:35.4834933Z",
-  "updatedAtUtc": "2026-07-26T16:29:35.4834933Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-26T22:03:26.2305061Z",
+  "completedAtUtc": "2026-07-26T22:03:26.2305061Z",
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0433-tsk-0433-validate-options-are-sealed-record-and-add-a-test.json"
 }

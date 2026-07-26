@@ -4,7 +4,7 @@
   "title": "Add logging for non-rethrown catches",
   "description": "Add \u0060logger?.LogWarning\u0060 or higher to catch blocks that currently swallow exceptions without logging. Include a brief audit list of files to change and a single-example patch.",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -19,11 +19,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-26T16:29:02.6761167Z",
-  "updatedAtUtc": "2026-07-26T16:29:02.6761167Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-26T22:03:25.5529177Z",
+  "completedAtUtc": "2026-07-26T22:03:25.5529177Z",
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0425-tsk-0425-log-non-rethrown-catches.json"
 }

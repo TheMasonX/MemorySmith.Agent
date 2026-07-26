@@ -4,7 +4,7 @@
   "title": "Add default-branch logging in event switches",
   "description": "Audit event handling \u0060switch\u0060 statements and add \u0060default\u0060 branches that log unhandled event types and payloads at \u0060LogWarning\u0060/\u0060LogDebug\u0060 levels. Provide short example patches for the adapter and AgentBackgroundService.",
   "type": "Task",
-  "status": "Ready",
+  "status": "Done",
   "priority": "High",
   "assigneeMode": "Custom",
   "assigneeDirectoryId": null,
@@ -19,11 +19,11 @@
   "parentId": null,
   "dueDateUtc": null,
   "createdAtUtc": "2026-07-26T16:29:05.3245571Z",
-  "updatedAtUtc": "2026-07-26T16:29:05.3245571Z",
-  "completedAtUtc": null,
-  "revision": 1,
+  "updatedAtUtc": "2026-07-26T22:03:25.7084995Z",
+  "completedAtUtc": "2026-07-26T22:03:25.7084995Z",
+  "revision": 3,
   "isArchived": false,
   "hasLoadError": false,
   "loadError": null,
-  "sourceFilePath": null
+  "sourceFilePath": "tsk-0426-tsk-0426-add-default-branch-logging-in-event-switches.json"
 }
