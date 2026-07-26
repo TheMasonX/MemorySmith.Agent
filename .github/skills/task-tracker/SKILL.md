@@ -44,6 +44,17 @@ memorysmith_task_create
 
 Required: `title`. Strongly recommended: `description`, `priority`, `labels`.
 
+### Updating Assignment and Labels
+
+`memorysmith_task_update` replaces the full labels array; it does not append to the existing labels. Read the current task first, preserve its existing labels, and include the complete replacement array when adding an ordering or sprint label.
+
+Assignment modes are mutually exclusive:
+
+- `assigneeMode: Custom` requires `assigneeCustomText` and must not include `assigneeDirectoryId`.
+- `assigneeMode: Directory` requires a valid `assigneeDirectoryId` and must not include `assigneeCustomText`.
+
+If a directory task has no usable directory ID, use `Custom` with an explicit agent label rather than sending a null directory ID. Validate the task record after metadata updates.
+
 ### 2. Start Working
 
 Transition to `InProgress` with a note explaining what you're doing:
